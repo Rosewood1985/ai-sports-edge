@@ -8,8 +8,12 @@ import {
   Image,
   RefreshControl,
   ActivityIndicator,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
+import { Container, Grid } from '../components/ResponsiveLayout';
+import { DeviceType, getDeviceType, responsiveSpacing } from '../utils/responsiveUtils';
+import { useResponsiveStyles } from '../hooks/useResponsiveStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { UFCEvent, UFCFighter, UFCFight } from '../types/ufc';
@@ -137,13 +141,20 @@ const UFCScreen: React.FC = () => {
   };
 
   // Render event item
-  const renderEventItem = ({ item }: { item: UFCEvent }) => (
+  const renderEventItem = ({
+    item,
+    width = 220
+  }: {
+    item: UFCEvent;
+    width?: number;
+  }) => (
     <TouchableOpacity
       style={[
         styles.eventItem,
         {
           backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
           borderColor: selectedEvent?.id === item.id ? colors.primary : 'transparent',
+          width,
         },
       ]}
       onPress={() => setSelectedEvent(item)}
@@ -501,13 +512,32 @@ const UFCScreen: React.FC = () => {
     );
   }
 
+  // Get device type for responsive layout
+  const isTablet = getDeviceType() === DeviceType.TABLET;
+  
+  // Create responsive styles
+  const responsiveStyles = useResponsiveStyles(({ isTablet }) => ({
+    eventsList: {
+      paddingRight: isTablet ? 24 : 16,
+    },
+    eventItem: {
+      width: isTablet ? 280 : 220,
+    },
+    fightCardsContainer: {
+      flexDirection: isTablet ? 'row' as const : 'column' as const,
+    },
+    mainCardContainer: {
+      flex: isTablet ? 1 : undefined,
+      marginRight: isTablet ? 16 : 0,
+    },
+    prelimCardContainer: {
+      flex: isTablet ? 1 : undefined,
+      marginTop: isTablet ? 0 : 16,
+    },
+  }));
+
   return (
-    <View style={[
-      styles.container,
-      {
-        backgroundColor: colors.background,
-      }
-    ]}>
+    <Container style={{ backgroundColor: colors.background }}>
       <View style={[
         styles.backgroundGradient,
         {
@@ -547,17 +577,21 @@ const UFCScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Events horizontal list - adaptive width based on device */}
       <FlatList
         horizontal
         data={events}
-        renderItem={renderEventItem}
+        renderItem={({ item }) => renderEventItem({
+          item,
+          width: responsiveStyles.eventItem.width
+        })}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.eventsList}
+        contentContainerStyle={[styles.eventsList, responsiveStyles.eventsList]}
         showsHorizontalScrollIndicator={false}
       />
 
       {selectedEvent && (
-        <View style={styles.eventDetailsContainer}>
+        <ScrollView style={styles.eventDetailsContainer}>
           <Text style={[styles.eventDetailsTitle, { color: colors.text }]}>
             {selectedEvent.name}
           </Text>
@@ -568,13 +602,21 @@ const UFCScreen: React.FC = () => {
             {selectedEvent.venue}, {selectedEvent.location}
           </Text>
 
-          <View style={styles.fightCardsContainer}>
-            {renderFightCard(selectedEvent.mainCard, 'Main Card')}
-            {renderFightCard(selectedEvent.prelimCard || [], 'Preliminary Card')}
+          {/* Responsive fight cards layout - row on tablet, column on phone */}
+          <View style={[styles.fightCardsContainer, responsiveStyles.fightCardsContainer]}>
+            <View style={responsiveStyles.mainCardContainer}>
+              {renderFightCard(selectedEvent.mainCard, 'Main Card')}
+            </View>
+            
+            {selectedEvent.prelimCard && selectedEvent.prelimCard.length > 0 && (
+              <View style={responsiveStyles.prelimCardContainer}>
+                {renderFightCard(selectedEvent.prelimCard, 'Preliminary Card')}
+              </View>
+            )}
           </View>
-        </View>
+        </ScrollView>
       )}
-    </View>
+    </Container>
   );
 };
 
@@ -622,7 +664,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 12,
     borderWidth: 2,
-    width: 220,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

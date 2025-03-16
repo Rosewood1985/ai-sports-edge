@@ -27,6 +27,18 @@ A comprehensive sports betting app with AI-powered predictions, UFC fight tracki
 
 ## UI/UX Enhancements
 
+### Responsive Design for Mobile & Tablet
+
+The app is fully optimized for both mobile and tablet layouts:
+
+- **Adaptive Layouts**: Different layouts for phones and tablets
+- **Responsive Typography**: Font sizes adjust based on device type
+- **Flexible Grids**: Column counts change based on available space
+- **Orientation Support**: Layouts adapt to portrait and landscape modes
+- **Touch Optimization**: Larger touch targets on tablets
+
+See [Responsive UI Optimizations](docs/responsive-ui-optimizations.md) for detailed implementation.
+
 ### High-Contrast & Readable Design
 
 #### Fighter Card Improvements
