@@ -1,5 +1,7 @@
 import { League, Team, Event, LeagueFilter } from '../types/sports';
+import { UFCEvent, UFCFighter } from '../types/ufc';
 import { handleApiError } from '../utils/errorHandling';
+import { ufcService } from './ufcService';
 
 // Cache duration in milliseconds (30 minutes)
 const CACHE_DURATION = 30 * 60 * 1000;
@@ -55,9 +57,12 @@ class SportsDataService {
    */
   async fetchUSLeagues(): Promise<League[]> {
     try {
-      const allLeagues = await this.fetchAllLeagues();
-      const americanLeagues = allLeagues.filter(league => 
-        league.strCountry === "USA");
+      // Using the exact implementation provided
+      const response = await fetch("https://thesportsdb.com/api/v1/json/3/all_leagues.php");
+      const data = await response.json();
+      
+      // Filter American leagues
+      const americanLeagues = data.leagues.filter((league: League) => league.strCountry === "USA");
       
       console.log("American Leagues:", americanLeagues);
       return americanLeagues;
@@ -71,16 +76,18 @@ class SportsDataService {
    */
   async fetchCollegeLeagues(): Promise<League[]> {
     try {
-      const allLeagues = await this.fetchAllLeagues();
+      // Using the exact implementation provided
+      const response = await fetch("https://thesportsdb.com/api/v1/json/3/all_leagues.php");
+      const data = await response.json();
       
-      // Filter for college leagues
-      const collegeLeagues = allLeagues.filter(league => 
-        (league.strLeagueAlternate?.includes("NCAA") || 
-         league.strLeague.toLowerCase().includes("college") ||
-         league.strLeague.includes("NCAA")));
+      // Filter for college sports leagues (conferences)
+      const collegeLeagues = data.leagues.filter((league: League) =>
+        league.strLeague.toLowerCase().includes("college") ||
+        league.strLeague.includes("NCAA") ||
+        league.strLeagueAlternate?.includes("NCAA"));
       
-      // Mark these as college leagues
-      collegeLeagues.forEach(league => {
+      // Mark these as college leagues (needed for filtering functionality)
+      collegeLeagues.forEach((league: League) => {
         league.isCollege = true;
       });
       
@@ -203,6 +210,63 @@ class SportsDataService {
     this.leaguesCache = null;
     this.teamsCache.clear();
     this.eventsCache.clear();
+  }
+
+  /**
+   * Fetch UFC events
+   */
+  async fetchUFCEvents(): Promise<UFCEvent[]> {
+    try {
+      return await ufcService.fetchUpcomingEvents();
+    } catch (error) {
+      return handleApiError('Error fetching UFC events', error);
+    }
+  }
+
+  /**
+   * Fetch UFC fighters
+   */
+  async fetchUFCFighters(): Promise<UFCFighter[]> {
+    try {
+      return await ufcService.fetchAllFighters();
+    } catch (error) {
+      return handleApiError('Error fetching UFC fighters', error);
+    }
+  }
+
+  /**
+   * Fetch UFC fighter details
+   */
+  async fetchUFCFighter(fighterId: string): Promise<UFCFighter | null> {
+    try {
+      return await ufcService.fetchFighter(fighterId);
+    } catch (error) {
+      console.error(`Error fetching UFC fighter ${fighterId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch UFC event details
+   */
+  async fetchUFCEvent(eventId: string): Promise<UFCEvent | null> {
+    try {
+      return await ufcService.fetchEvent(eventId);
+    } catch (error) {
+      console.error(`Error fetching UFC event ${eventId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Search UFC fighters
+   */
+  async searchUFCFighters(query: string): Promise<UFCFighter[]> {
+    try {
+      return await ufcService.searchFighters(query);
+    } catch (error) {
+      return handleApiError(`Error searching UFC fighters for "${query}"`, error);
+    }
   }
 }
 

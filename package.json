@@ -1,6 +1,6 @@
 {
   "name": "ai-sports-edge",
-  "main": "App.js",
+  "main": "App.tsx",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",

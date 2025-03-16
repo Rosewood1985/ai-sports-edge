@@ -313,6 +313,18 @@ const SettingsScreen = (): JSX.Element => {
       <View style={themedStyles.section}>
         <Text style={themedStyles.sectionTitle}>App</Text>
         {renderSettingItem(
+          'trophy-outline',
+          'League Preferences',
+          'Select which leagues to follow',
+          <TouchableOpacity onPress={() => {
+            // @ts-ignore - Navigation typing issue
+            navigation.navigate('LeagueSelection');
+          }}>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+        )}
+        
+        {renderSettingItem(
           'information-circle',
           'View Onboarding',
           'Take the app tour again to learn about features',

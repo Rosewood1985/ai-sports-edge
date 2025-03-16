@@ -1,4 +1,5 @@
 import { Game, AIPrediction, ConfidenceLevel, DailyInsight, GameResult } from '../types/odds';
+import { PropBetLine, PropBetPrediction, PropBetType } from '../types/playerProps';
 import { auth } from '../config/firebase';
 import { hasPremiumAccess } from './subscriptionService';
 
@@ -230,9 +231,248 @@ export const getDailyInsights = async (): Promise<DailyInsight> => {
   };
 };
 
+/**
+ * Generate an AI prediction for a player prop bet
+ * @param propBet - The player prop bet to predict
+ * @returns AI prediction for the player prop bet
+ */
+export const generatePropBetPrediction = async (propBet: PropBetLine): Promise<PropBetPrediction> => {
+  // In a real app, this would call an AI model API
+  // For now, we'll simulate AI predictions with random data
+  
+  // Randomly select over or under
+  const prediction = Math.random() > 0.5 ? 'over' : 'under';
+  
+  // Generate a confidence score (0-100)
+  const confidenceScore = Math.floor(Math.random() * 100);
+  
+  // Determine confidence level based on score
+  let confidence: ConfidenceLevel;
+  if (confidenceScore >= 70) {
+    confidence = 'high';
+  } else if (confidenceScore >= 40) {
+    confidence = 'medium';
+  } else {
+    confidence = 'low';
+  }
+  
+  // Generate reasoning based on prop type
+  let reasoning = '';
+  switch (propBet.type) {
+    case 'points':
+      reasoning = prediction === 'over'
+        ? `${propBet.player} has exceeded this points line in 7 of the last 10 games.`
+        : `${propBet.player} has gone under this points line in 6 of the last 10 games.`;
+      break;
+    case 'rebounds':
+      reasoning = prediction === 'over'
+        ? `${propBet.player} has a favorable rebounding matchup against this opponent.`
+        : `${propBet.player}'s rebounding numbers tend to decrease against this opponent.`;
+      break;
+    case 'assists':
+      reasoning = prediction === 'over'
+        ? `${propBet.player} has been more involved in the offense recently.`
+        : `${propBet.player} may see reduced playmaking opportunities in this matchup.`;
+      break;
+    case 'touchdowns':
+      reasoning = prediction === 'over'
+        ? `${propBet.player} has scored in 3 consecutive games.`
+        : `${propBet.player} faces a tough red zone defense.`;
+      break;
+    default:
+      reasoning = prediction === 'over'
+        ? `${propBet.player} has been performing above expectations recently.`
+        : `${propBet.player} may struggle to reach this line based on recent performance.`;
+  }
+  
+  // Simulate historical accuracy (60-95%)
+  const historicalAccuracy = 60 + Math.floor(Math.random() * 35);
+  
+  // All prop bet predictions are premium content
+  const isPremium = true;
+  
+  return {
+    propBet,
+    prediction,
+    confidence,
+    confidenceScore,
+    reasoning,
+    historicalAccuracy,
+    isPremium
+  };
+};
+
+/**
+ * Get AI predictions for a list of player prop bets
+ * @param propBets - List of player prop bets
+ * @returns Player prop bets with AI predictions
+ */
+export const getPropBetPredictions = async (propBets: PropBetLine[]): Promise<PropBetPrediction[]> => {
+  try {
+    // Check if user has premium access
+    const userId = auth.currentUser?.uid;
+    let hasPremium = false;
+    
+    if (userId) {
+      hasPremium = await hasPremiumAccess(userId);
+    }
+    
+    // If user doesn't have premium access, return empty array
+    if (!hasPremium) {
+      return [];
+    }
+    
+    // Generate predictions for each prop bet
+    const predictions = await Promise.all(
+      propBets.map(async (propBet) => {
+        return await generatePropBetPrediction(propBet);
+      })
+    );
+    
+    return predictions;
+  } catch (error) {
+    console.error('Error generating prop bet predictions:', error);
+    return [];
+  }
+};
+
+/**
+ * Get sample player prop bets for a game
+ * @param game - The game to get prop bets for
+ * @returns List of player prop bets
+ */
+export const getSamplePropBets = (game: Game): PropBetLine[] => {
+  // In a real app, this would fetch actual prop bets from an API
+  // For now, we'll generate sample prop bets
+  
+  // Generate player names based on team names
+  const homeTeamPlayers = [
+    `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Johnson`,
+    `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Smith`,
+    `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Williams`
+  ];
+  
+  const awayTeamPlayers = [
+    `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Brown`,
+    `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Davis`,
+    `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Miller`
+  ];
+  
+  // Determine sport type based on game title
+  let propTypes: PropBetType[] = [];
+  if (game.sport_title.toLowerCase().includes('basketball')) {
+    propTypes = ['points', 'rebounds', 'assists', 'threePointers'];
+  } else if (game.sport_title.toLowerCase().includes('football')) {
+    propTypes = ['passingYards', 'rushingYards', 'receivingYards', 'touchdowns'];
+  } else if (game.sport_title.toLowerCase().includes('baseball')) {
+    propTypes = ['hits', 'strikeouts', 'homeRuns'];
+  } else if (game.sport_title.toLowerCase().includes('hockey')) {
+    propTypes = ['goals', 'assists', 'saves'];
+  } else {
+    propTypes = ['points', 'assists', 'goals'];
+  }
+  
+  // Generate prop bets
+  const propBets: PropBetLine[] = [];
+  
+  // Home team props
+  homeTeamPlayers.forEach(player => {
+    const propType = propTypes[Math.floor(Math.random() * propTypes.length)];
+    let line = 0;
+    
+    // Set reasonable lines based on prop type
+    switch (propType) {
+      case 'points':
+        line = 15.5 + Math.floor(Math.random() * 15);
+        break;
+      case 'rebounds':
+        line = 5.5 + Math.floor(Math.random() * 10);
+        break;
+      case 'assists':
+        line = 3.5 + Math.floor(Math.random() * 8);
+        break;
+      case 'threePointers':
+        line = 1.5 + Math.floor(Math.random() * 5);
+        break;
+      case 'passingYards':
+        line = 225.5 + Math.floor(Math.random() * 100);
+        break;
+      case 'rushingYards':
+        line = 55.5 + Math.floor(Math.random() * 70);
+        break;
+      case 'receivingYards':
+        line = 45.5 + Math.floor(Math.random() * 80);
+        break;
+      case 'touchdowns':
+        line = 0.5 + Math.floor(Math.random() * 2);
+        break;
+      default:
+        line = 9.5 + Math.floor(Math.random() * 10);
+    }
+    
+    propBets.push({
+      type: propType,
+      player,
+      team: game.home_team,
+      line,
+      overOdds: -110 + Math.floor(Math.random() * 40) - 20,
+      underOdds: -110 + Math.floor(Math.random() * 40) - 20
+    });
+  });
+  
+  // Away team props
+  awayTeamPlayers.forEach(player => {
+    const propType = propTypes[Math.floor(Math.random() * propTypes.length)];
+    let line = 0;
+    
+    // Set reasonable lines based on prop type
+    switch (propType) {
+      case 'points':
+        line = 15.5 + Math.floor(Math.random() * 15);
+        break;
+      case 'rebounds':
+        line = 5.5 + Math.floor(Math.random() * 10);
+        break;
+      case 'assists':
+        line = 3.5 + Math.floor(Math.random() * 8);
+        break;
+      case 'threePointers':
+        line = 1.5 + Math.floor(Math.random() * 5);
+        break;
+      case 'passingYards':
+        line = 225.5 + Math.floor(Math.random() * 100);
+        break;
+      case 'rushingYards':
+        line = 55.5 + Math.floor(Math.random() * 70);
+        break;
+      case 'receivingYards':
+        line = 45.5 + Math.floor(Math.random() * 80);
+        break;
+      case 'touchdowns':
+        line = 0.5 + Math.floor(Math.random() * 2);
+        break;
+      default:
+        line = 9.5 + Math.floor(Math.random() * 10);
+    }
+    
+    propBets.push({
+      type: propType,
+      player,
+      team: game.away_team,
+      line,
+      overOdds: -110 + Math.floor(Math.random() * 40) - 20,
+      underOdds: -110 + Math.floor(Math.random() * 40) - 20
+    });
+  });
+  
+  return propBets;
+};
+
 export default {
   getAIPredictions,
   getLiveUpdates,
   getGameResult,
-  getDailyInsights
+  getDailyInsights,
+  getPropBetPredictions,
+  getSamplePropBets
 };

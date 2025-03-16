@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Game, ConfidenceLevel } from '../types/odds';
 import PremiumFeature from './PremiumFeature';
+import PropBetList from './PropBetList';
 
 interface GameCardProps {
   game: Game;
@@ -145,6 +146,9 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
           </View>
         </PremiumFeature>
       )}
+      
+      {/* Player Prop Predictions */}
+      <PropBetList game={game} />
     </TouchableOpacity>
   );
 });
