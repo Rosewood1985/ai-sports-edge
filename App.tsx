@@ -5,7 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { StatusBar, useColorScheme } from "react-native";
 import StripeProvider from "./components/StripeProvider";
-import LoginScreen from "./screens/LoginScreen";
+import NeonLoginScreen from "./screens/NeonLoginScreen";
 import NeonOddsScreen from "./screens/NeonOddsScreen";
 import { colors } from "./styles/theme";
 
@@ -53,9 +53,10 @@ function App(): JSX.Element {
           >
             <Stack.Screen
               name="Login"
-              component={LoginScreen}
+              component={NeonLoginScreen}
               options={{
                 title: "AI SPORTS EDGE",
+                headerShown: false, // Hide header for login screen
               }}
             />
             <Stack.Screen
