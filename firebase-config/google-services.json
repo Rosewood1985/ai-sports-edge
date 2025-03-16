@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "63216708515",
+    "project_id": "ai-sports-edge",
+    "storage_bucket": "ai-sports-edge.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63216708515:android:209e6baf130386edb00816",
+        "android_client_info": {
+          "package_name": "com.aisportsedge.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

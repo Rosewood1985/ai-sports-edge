@@ -89,6 +89,16 @@ See [Responsive UI Optimizations](docs/responsive-ui-optimizations.md) for detai
 
 ## Technical Implementation
 
+### Firebase Integration
+
+The app uses Firebase for authentication, database, and cloud functions:
+
+- **Authentication**: User sign-up, sign-in, and account management
+- **Firestore**: Real-time database for storing user data, FAQs, and app content
+- **Cloud Functions**: Serverless backend for processing data and handling complex operations
+
+See [Firebase Integration Documentation](docs/firebase-integration.md) for detailed implementation.
+
 ### API Integration
 
 ```typescript
