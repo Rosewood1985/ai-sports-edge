@@ -3,6 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Game, ConfidenceLevel } from '../types/odds';
 import PremiumFeature from './PremiumFeature';
 import PropBetList from './PropBetList';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+// Define navigation type
+type RootStackParamList = {
+  PlayerStats: { gameId: string; gameTitle: string };
+  [key: string]: object | undefined;
+};
+
+type GameCardNavigationProp = StackNavigationProp<RootStackParamList>;
 
 interface GameCardProps {
   game: Game;
@@ -16,6 +27,8 @@ interface GameCardProps {
  * @returns {JSX.Element} - Rendered component
  */
 const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Element => {
+  const navigation = useNavigation<GameCardNavigationProp>();
+  
   // Check if game object has required properties
   if (!game || !game.home_team || !game.away_team) {
     return (
@@ -43,6 +56,19 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
     if (onPress) {
       onPress(game);
     }
+  };
+  
+  // Check if the game is live or has started
+  const isGameActive = () => {
+    return game.live_updates || new Date(game.commence_time) <= new Date();
+  };
+  
+  // Navigate to player stats screen
+  const navigateToPlayerStats = () => {
+    navigation.navigate('PlayerStats', {
+      gameId: game.id,
+      gameTitle: `${game.home_team} vs ${game.away_team}`
+    });
   };
 
   return (
@@ -149,6 +175,17 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       
       {/* Player Prop Predictions */}
       <PropBetList game={game} />
+      
+      {/* Player Stats Button - Only show for active games */}
+      {isGameActive() && (
+        <TouchableOpacity
+          style={styles.statsButton}
+          onPress={navigateToPlayerStats}
+        >
+          <Ionicons name="stats-chart" size={16} color="#fff" style={styles.statsIcon} />
+          <Text style={styles.statsButtonText}>View Player Stats</Text>
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 });
@@ -293,6 +330,23 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold',
+  },
+  statsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 12,
+  },
+  statsIcon: {
+    marginRight: 6,
+  },
+  statsButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   }
 });
 

@@ -1,15 +1,24 @@
-import { UFCFighter, UFCEvent, UFCFight } from '../types/ufc';
+import { UFCFighter, UFCEvent, UFCFight, RoundBettingOption, FightStatus } from '../types/ufc';
 import { ApiError } from '../utils/errorHandling';
 import axios from 'axios';
 import {
   ODDS_API_CONFIG,
   SHERDOG_API_CONFIG,
+  ERROR_MESSAGES,
+  REQUEST_TIMEOUT,
   fetchFromSherdogApi,
   fetchUFCOdds,
-  scrapeUFCData
+  fetchRoundBettingData,
+  generateMockRoundBettingData,
+  scrapeUFCData,
+  buildApiUrl
 } from '../config/ufcApi';
+import { Alert } from 'react-native';
 
 // Cache duration in milliseconds (30 minutes)
+const CACHE_DURATION = 30 * 60 * 1000;
+// Shorter cache duration for live data (5 minutes)
+const LIVE_CACHE_DURATION = 5 * 60 * 1000;
 
 // Custom error handling for UFC service
 function handleUfcApiError<T>(message: string, error: unknown, fallbackValue: T): T {
@@ -25,7 +34,6 @@ function handleUfcApiError<T>(message: string, error: unknown, fallbackValue: T)
   
   throw new ApiError(`${message}: ${String(error)}`);
 }
-const CACHE_DURATION = 30 * 60 * 1000;
 
 // Cache storage
 interface CacheItem<T> {
@@ -40,10 +48,13 @@ class UFCService {
   private fightersCache: CacheItem<UFCFighter[]> | null = null;
   private fighterDetailsCache: Map<string, CacheItem<UFCFighter>> = new Map();
   private eventDetailsCache: Map<string, CacheItem<UFCEvent>> = new Map();
+  private fightDetailsCache: Map<string, CacheItem<UFCFight>> = new Map();
+  private roundBettingCache: Map<string, CacheItem<RoundBettingOption[]>> = new Map();
   
-  private isCacheValid<T>(cache: CacheItem<T> | null): boolean {
+  private isCacheValid<T>(cache: CacheItem<T> | null, isLiveData: boolean = false): boolean {
     if (!cache) return false;
-    return Date.now() - cache.timestamp < CACHE_DURATION;
+    const cacheDuration = isLiveData ? LIVE_CACHE_DURATION : CACHE_DURATION;
+    return Date.now() - cache.timestamp < cacheDuration;
   }
 
   /**
@@ -564,6 +575,243 @@ class UFCService {
   }
 
   /**
+   * Fetch round betting options for a specific fight
+   * @param fightId The ID of the fight
+   * @returns Promise that resolves with round betting options
+   */
+  async fetchRoundBettingOptions(fightId: string): Promise<RoundBettingOption[]> {
+    try {
+      // Validate fight ID
+      if (!fightId) {
+        throw new Error(ERROR_MESSAGES.INVALID_FIGHT_ID);
+      }
+
+      // Check cache first
+      if (this.roundBettingCache.has(fightId) &&
+          this.isCacheValid(this.roundBettingCache.get(fightId)!, true)) {
+        return this.roundBettingCache.get(fightId)!.data;
+      }
+      
+      // Extract the actual fight ID from our prefixed ID format
+      const actualFightId = fightId.startsWith('fight-') ? fightId.substring(6) : fightId;
+      
+      try {
+        // Try to fetch from API
+        const options = await fetchRoundBettingData(actualFightId);
+        
+        // Update cache
+        this.roundBettingCache.set(fightId, {
+          data: options,
+          timestamp: Date.now()
+        });
+        
+        return options;
+      } catch (apiError) {
+        console.error(`Error fetching round betting options from API for fight ${fightId}:`, apiError);
+        
+        // If API fails, try to generate mock data based on fight details
+        try {
+          // Get fight details to generate realistic options
+          let fight: UFCFight | undefined;
+          
+          // Check if we have the fight in our cache
+          if (this.fightDetailsCache.has(fightId) &&
+              this.isCacheValid(this.fightDetailsCache.get(fightId)!)) {
+            fight = this.fightDetailsCache.get(fightId)!.data;
+          } else {
+            // If not in cache, try to find it in events
+            const events = await this.fetchUpcomingEvents();
+            
+            // Search for the fight in all events
+            for (const event of events) {
+              // Check main card
+              const mainCardFight = event.mainCard.find(f => f.id === fightId);
+              if (mainCardFight) {
+                fight = mainCardFight;
+                break;
+              }
+              
+              // Check prelim card
+              if (event.prelimCard) {
+                const prelimFight = event.prelimCard.find(f => f.id === fightId);
+                if (prelimFight) {
+                  fight = prelimFight;
+                  break;
+                }
+              }
+            }
+          }
+          
+          if (!fight) {
+            throw new Error(`Fight with ID ${fightId} not found`);
+          }
+          
+          // Generate mock round betting options
+          const options = generateMockRoundBettingData(
+            fightId,
+            fight.fighter1.id,
+            fight.fighter2.id,
+            fight.rounds
+          );
+          
+          // Update cache
+          this.roundBettingCache.set(fightId, {
+            data: options,
+            timestamp: Date.now()
+          });
+          
+          return options;
+        } catch (error) {
+          console.error(`Error generating mock round betting options for fight ${fightId}:`, error);
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching round betting options for fight ${fightId}:`, error);
+      
+      // Handle specific error types
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          console.error(ERROR_MESSAGES.TIMEOUT_ERROR);
+          Alert.alert('Error', 'Request timed out. Please try again.');
+        } else if (error.response) {
+          if (error.response.status === 429) {
+            console.error(ERROR_MESSAGES.RATE_LIMIT_EXCEEDED);
+            Alert.alert('Error', 'Rate limit exceeded. Please try again later.');
+          } else {
+            console.error(`API Error: ${error.response.status} - ${error.response.data}`);
+            Alert.alert('Error', 'Failed to fetch round betting options. Please try again.');
+          }
+        } else if (error.request) {
+          console.error(ERROR_MESSAGES.NETWORK_ERROR);
+          Alert.alert('Error', 'Network error. Please check your connection and try again.');
+        }
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      }
+      
+      return [];
+    }
+  }
+
+  /**
+   * Fetch fight details
+   * @param fightId The ID of the fight
+   * @returns Promise that resolves with fight details
+   */
+  async fetchFightDetails(fightId: string): Promise<UFCFight | null> {
+    try {
+      // Validate fight ID
+      if (!fightId) {
+        throw new Error(ERROR_MESSAGES.INVALID_FIGHT_ID);
+      }
+
+      // Check cache first
+      if (this.fightDetailsCache.has(fightId) &&
+          this.isCacheValid(this.fightDetailsCache.get(fightId)!)) {
+        return this.fightDetailsCache.get(fightId)!.data;
+      }
+      
+      // Try to find the fight in events
+      const events = await this.fetchUpcomingEvents();
+      
+      // Search for the fight in all events
+      for (const event of events) {
+        // Check main card
+        const mainCardFight = event.mainCard.find(f => f.id === fightId);
+        if (mainCardFight) {
+          // Update cache
+          this.fightDetailsCache.set(fightId, {
+            data: mainCardFight,
+            timestamp: Date.now()
+          });
+          
+          return mainCardFight;
+        }
+        
+        // Check prelim card
+        if (event.prelimCard) {
+          const prelimFight = event.prelimCard.find(f => f.id === fightId);
+          if (prelimFight) {
+            // Update cache
+            this.fightDetailsCache.set(fightId, {
+              data: prelimFight,
+              timestamp: Date.now()
+            });
+            
+            return prelimFight;
+          }
+        }
+      }
+      
+      // If fight not found in events, try to fetch from API
+      try {
+        // Extract the actual fight ID from our prefixed ID format
+        const actualFightId = fightId.startsWith('fight-') ? fightId.substring(6) : fightId;
+        
+        // Try to get fight from API
+        const response = await axios.get(`${this.baseUrl}/fights/${actualFightId}`, {
+          timeout: REQUEST_TIMEOUT
+        });
+        
+        // Map API response to our UFCFight format
+        const fighter1 = await this.fetchFighter(response.data.fighter1_id);
+        const fighter2 = await this.fetchFighter(response.data.fighter2_id);
+        
+        const fight: UFCFight = {
+          id: fightId,
+          fighter1,
+          fighter2,
+          weightClass: response.data.weight_class || 'Unknown',
+          isTitleFight: response.data.is_title_fight || false,
+          rounds: response.data.rounds || 3,
+          status: response.data.status || FightStatus.SCHEDULED,
+          startTime: response.data.start_time,
+          winner: response.data.winner_id,
+          winMethod: response.data.win_method,
+          winRound: response.data.win_round
+        };
+        
+        // Update cache
+        this.fightDetailsCache.set(fightId, {
+          data: fight,
+          timestamp: Date.now()
+        });
+        
+        return fight;
+      } catch (apiError) {
+        console.error(`Error fetching fight details from API for fight ${fightId}:`, apiError);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error fetching fight details for ${fightId}:`, error);
+      
+      // Handle specific error types
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          console.error(ERROR_MESSAGES.TIMEOUT_ERROR);
+          Alert.alert('Error', 'Request timed out. Please try again.');
+        } else if (error.response) {
+          if (error.response.status === 429) {
+            console.error(ERROR_MESSAGES.RATE_LIMIT_EXCEEDED);
+            Alert.alert('Error', 'Rate limit exceeded. Please try again later.');
+          } else {
+            console.error(`API Error: ${error.response.status} - ${error.response.data}`);
+            Alert.alert('Error', 'Failed to fetch fight details. Please try again.');
+          }
+        } else if (error.request) {
+          console.error(ERROR_MESSAGES.NETWORK_ERROR);
+          Alert.alert('Error', 'Network error. Please check your connection and try again.');
+        }
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      }
+      
+      return null;
+    }
+  }
+
+  /**
    * Clear all caches
    */
   clearCache(): void {
@@ -571,6 +819,8 @@ class UFCService {
     this.fightersCache = null;
     this.fighterDetailsCache.clear();
     this.eventDetailsCache.clear();
+    this.fightDetailsCache.clear();
+    this.roundBettingCache.clear();
   }
 }
 

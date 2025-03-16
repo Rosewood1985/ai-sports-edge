@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import { auth } from "../config/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { StackNavigationProp } from "@react-navigation/stack";
+import MobileAppDownload from "../components/MobileAppDownload";
+import { appDownloadService } from "../services/appDownloadService";
 
 // Define the navigation prop type
 type RootStackParamList = {
@@ -20,12 +22,42 @@ type Props = {
 export default function LoginScreen({ navigation }: Props): JSX.Element {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showDownloadPrompt, setShowDownloadPrompt] = useState<boolean>(false);
+  const [isNewUser, setIsNewUser] = useState<boolean>(false);
+  
+  // Get app store URLs
+  const { appStoreUrl, playStoreUrl, webAppUrl } = appDownloadService.getAppStoreUrls();
+  
+  // Check if we should show the download prompt after registration
+  useEffect(() => {
+    if (isNewUser && auth.currentUser) {
+      const checkDownloadPrompt = async () => {
+        const shouldShow = await appDownloadService.shouldShowDownloadPrompt(auth.currentUser!.uid);
+        setShowDownloadPrompt(shouldShow);
+      };
+      
+      checkDownloadPrompt();
+    }
+  }, [isNewUser]);
+  
+  // Handle closing the download prompt
+  const handleCloseDownloadPrompt = async () => {
+    if (auth.currentUser) {
+      await appDownloadService.markDownloadPromptAsShown(auth.currentUser.uid);
+    }
+    setShowDownloadPrompt(false);
+  };
 
   const handleSignUp = async (): Promise<void> => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       Alert.alert("Success", "Account created!");
-      navigation.replace("Main");
+      setIsNewUser(true);
+      // We'll navigate after the user has seen the download prompt
+      // or immediately if the prompt isn't shown
+      if (!(await appDownloadService.shouldShowDownloadPrompt(auth.currentUser!.uid))) {
+        navigation.replace("Main");
+      }
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
@@ -43,21 +75,34 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
 
   return (
     <View style={styles.container}>
+      {/* Show download prompt if needed */}
+      {showDownloadPrompt && (
+        <MobileAppDownload
+          onClose={() => {
+            handleCloseDownloadPrompt();
+            navigation.replace("Main");
+          }}
+          appStoreUrl={appStoreUrl}
+          playStoreUrl={playStoreUrl}
+          webAppUrl={webAppUrl}
+        />
+      )}
+      
       <Text style={styles.title}>AI Sports Edge</Text>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Email" 
-        value={email} 
-        onChangeText={setEmail} 
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Password" 
-        value={password} 
-        secureTextEntry 
-        onChangeText={setPassword} 
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        secureTextEntry
+        onChangeText={setPassword}
       />
       <Button title="Login" onPress={handleLogin} />
       <Button title="Sign Up" onPress={handleSignUp} />

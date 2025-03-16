@@ -196,6 +196,14 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 9.99,
     amount: 999,
     productType: 'microtransaction'
+  },
+  {
+    id: 'player-plus-minus',
+    name: 'Single Game +/- Data',
+    description: 'Access to player plus-minus tracking for a specific game',
+    price: 1.99,
+    amount: 199,
+    productType: 'microtransaction'
   }
 ];
 
@@ -646,6 +654,193 @@ export const formatDate = (date?: Date | number): string => {
   });
 };
 
+/**
+ * Check if user has access to player plus-minus data for a specific game
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Whether the user has access
+ */
+export const hasPlayerPlusMinusAccess = async (
+  userId: string,
+  gameId: string
+): Promise<boolean> => {
+  try {
+    // First check if user has premium access (Premium Monthly, Premium Annual, Weekend Pass, or Game Day Pass)
+    const hasPremium = await hasPremiumAccess(userId);
+    if (hasPremium) {
+      // Get the subscription to check if it's a premium plan
+      const subscription = await getUserSubscription(userId);
+      if (subscription && (
+        subscription.planId === 'premium-monthly' ||
+        subscription.planId === 'premium-yearly'
+      )) {
+        return true;
+      }
+      
+      // Check one-time purchases (Weekend Pass or Game Day Pass)
+      const purchasesKey = `one_time_purchases_${userId}`;
+      const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
+      const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
+      
+      // Check if user has an active one-time purchase
+      const now = Date.now();
+      const hasActiveOneTimePurchase = existingPurchases.some(
+        (purchase: any) => purchase.active && purchase.expirationDate > now &&
+        (purchase.productId === 'weekend-pass' || purchase.productId === 'game-day-pass')
+      );
+      
+      if (hasActiveOneTimePurchase) {
+        return true;
+      }
+    }
+    
+    // Check if user has purchased player plus-minus access for this specific game
+    const microtransactionsKey = `microtransactions_${userId}`;
+    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
+    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
+    
+    // Check if user has an unused player plus-minus purchase for this game
+    const hasUnusedPlusMinusAccess = existingMicrotransactions.some(
+      (purchase: any) => !purchase.used &&
+      purchase.productId === 'player-plus-minus' &&
+      purchase.gameId === gameId
+    );
+    
+    return hasUnusedPlusMinusAccess;
+  } catch (error) {
+    console.error('Error checking player plus-minus access:', error);
+    return false;
+  }
+};
+
+/**
+ * Purchase player plus-minus access for a specific game
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Success status
+ */
+export const purchasePlayerPlusMinusAccess = async (
+  userId: string,
+  gameId: string
+): Promise<boolean> => {
+  try {
+    // Find the product
+    const product = MICROTRANSACTIONS.find(p => p.id === 'player-plus-minus');
+    if (!product) {
+      throw new Error('Player plus-minus product not found');
+    }
+    
+    // Store the purchase
+    const purchaseData = {
+      id: `purchase_${Date.now()}`,
+      productId: 'player-plus-minus',
+      gameId: gameId, // Store the game ID to track which game this purchase is for
+      purchaseDate: Date.now(),
+      used: false
+    };
+    
+    // Save to AsyncStorage
+    const purchasesKey = `microtransactions_${userId}`;
+    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
+    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
+    
+    existingPurchases.push(purchaseData);
+    
+    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
+    
+    return true;
+  } catch (error) {
+    console.error('Error purchasing player plus-minus access:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if user has access to round betting for a specific fight
+ * @param userId User ID
+ * @param fightId Fight ID
+ * @returns Whether the user has access
+ */
+export const hasRoundBettingAccess = async (
+  userId: string,
+  fightId: string
+): Promise<boolean> => {
+  try {
+    // First check if user has premium access
+    const hasPremium = await hasPremiumAccess(userId);
+    if (hasPremium) {
+      return true;
+    }
+    
+    // Check if user has purchased round betting for this fight
+    const microtransactionsKey = `microtransactions_${userId}`;
+    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
+    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
+    
+    // Check if user has an unused round betting purchase for this fight
+    const hasUnusedRoundBettingAccess = existingMicrotransactions.some(
+      (purchase: any) => !purchase.used &&
+      purchase.productId === 'round-betting' &&
+      purchase.fightId === fightId
+    );
+    
+    return hasUnusedRoundBettingAccess;
+  } catch (error) {
+    console.error('Error checking round betting access:', error);
+    return false;
+  }
+};
+
+/**
+ * Purchase round betting access for a specific fight
+ * @param userId User ID
+ * @param fightId Fight ID
+ * @returns Success status
+ */
+export const purchaseRoundBettingAccess = async (
+  userId: string,
+  fightId: string
+): Promise<boolean> => {
+  try {
+    // Find the product
+    const product = MICROTRANSACTIONS.find(p => p.id === 'round-betting');
+    if (!product) {
+      // Add round-betting product if it doesn't exist
+      MICROTRANSACTIONS.push({
+        id: 'round-betting',
+        name: 'Round Betting',
+        description: 'Access to round-by-round betting for a specific fight',
+        price: 1.99,
+        amount: 199,
+        productType: 'microtransaction'
+      });
+    }
+    
+    // Store the purchase
+    const purchaseData = {
+      id: `purchase_${Date.now()}`,
+      productId: 'round-betting',
+      fightId: fightId,
+      purchaseDate: Date.now(),
+      used: false
+    };
+    
+    // Save to AsyncStorage
+    const purchasesKey = `microtransactions_${userId}`;
+    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
+    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
+    
+    existingPurchases.push(purchaseData);
+    
+    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
+    
+    return true;
+  } catch (error) {
+    console.error('Error purchasing round betting access:', error);
+    return false;
+  }
+};
+
 export default {
   hasPremiumAccess,
   getSubscriptionStatus,
@@ -660,6 +855,10 @@ export default {
   purchaseOneTimeProduct,
   purchaseMicrotransaction,
   hasGamePredictionAccess,
+  hasPlayerPlusMinusAccess,
+  purchasePlayerPlusMinusAccess,
+  hasRoundBettingAccess,
+  purchaseRoundBettingAccess,
   SUBSCRIPTION_PLANS,
   ONE_TIME_PURCHASES,
   MICROTRANSACTIONS,

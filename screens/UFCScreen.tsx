@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { StackNavigationProp } from '@react-navigation/stack';
 import {
   View,
   Text,
@@ -29,7 +30,14 @@ import { rewardsService } from '../services/rewardsService';
 // Key for storing favorite fighters
 const FAVORITE_FIGHTERS_KEY = 'favorite_fighters';
 
-const UFCScreen: React.FC = () => {
+// Define navigation prop type
+type UFCScreenNavigationProp = StackNavigationProp<any, 'UFC'>;
+
+interface UFCScreenProps {
+  navigation: UFCScreenNavigationProp;
+}
+
+const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
   const [events, setEvents] = useState<UFCEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<UFCEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -171,6 +179,11 @@ const UFCScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
+  // Navigate to fight detail screen
+  const navigateToFightDetail = (fight: UFCFight) => {
+    navigation.navigate('FightDetail', { fightId: fight.id });
+  };
+
   // Render fight card
   const renderFightCard = (fights: UFCFight[], title: string) => {
     if (!fights || fights.length === 0) return null;
@@ -181,7 +194,7 @@ const UFCScreen: React.FC = () => {
           {title}
         </Text>
         {fights.map((fight, index) => (
-          <View
+          <TouchableOpacity
             key={fight.id || index}
             style={[
               styles.fightItem,
@@ -190,6 +203,7 @@ const UFCScreen: React.FC = () => {
                 borderColor: isDark ? '#333333' : '#EEEEEE',
               },
             ]}
+            onPress={() => navigateToFightDetail(fight)}
           >
             <View style={[
               styles.fighterContainer,
@@ -457,7 +471,6 @@ const UFCScreen: React.FC = () => {
                 )}
               </View>
             </View>
-          </View>
         ))}
       </View>
     );

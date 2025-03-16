@@ -1,4 +1,5 @@
-import { firebase, auth, firestore } from '../config/firebase';
+import { auth, firestore } from '../config/firebase';
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 
 /**
  * Test Firebase authentication
@@ -23,13 +24,14 @@ export const testAuth = async (): Promise<any> => {
 export const testFirestore = async (): Promise<any> => {
   try {
     // Try to read a test document
-    const testDoc = await firestore.collection('test').doc('connection').get();
-    console.log('Firestore test document exists:', testDoc.exists);
+    const testDocRef = doc(collection(firestore, 'test'), 'connection');
+    const testDoc = await getDoc(testDocRef);
+    console.log('Firestore test document exists:', testDoc.exists());
     
     // If the document doesn't exist, create it
-    if (!testDoc.exists) {
-      await firestore.collection('test').doc('connection').set({
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    if (!testDoc.exists()) {
+      await setDoc(testDocRef, {
+        timestamp: new Date(),
         message: 'Firebase connection test successful'
       });
       console.log('Created test document in Firestore');
