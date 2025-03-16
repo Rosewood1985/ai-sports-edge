@@ -31,6 +31,18 @@ const MobileAppDownload: React.FC<MobileAppDownloadProps> = ({
     const { width, height } = Dimensions.get('window');
     const isTabletOrDesktop = width >= 768 || height >= 768;
     setIsLargeDevice(isTabletOrDesktop);
+    
+    // Add event listener for dimension changes
+    const dimensionsHandler = Dimensions.addEventListener('change', () => {
+      const { width, height } = Dimensions.get('window');
+      const isTabletOrDesktop = width >= 768 || height >= 768;
+      setIsLargeDevice(isTabletOrDesktop);
+    });
+    
+    // Clean up
+    return () => {
+      dimensionsHandler.remove();
+    };
   }, []);
   
   // Determine if current platform is iOS

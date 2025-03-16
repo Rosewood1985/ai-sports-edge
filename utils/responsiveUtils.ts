@@ -88,10 +88,21 @@ export const responsiveSpacing = (size: number): number => {
  */
 export const useResponsiveDimensions = () => {
   const [dimensions, setDimensions] = React.useState(Dimensions.get('window'));
+  const [deviceInfo, setDeviceInfo] = React.useState({
+    isTablet: isTablet(),
+    deviceType: getDeviceType(),
+    orientation: getOrientation(),
+  });
   
   React.useEffect(() => {
     const onChange = ({ window }: { window: ScaledSize }) => {
       setDimensions(window);
+      // Update device info in the state update function to avoid unnecessary re-renders
+      setDeviceInfo({
+        isTablet: isTablet(),
+        deviceType: getDeviceType(),
+        orientation: getOrientation(),
+      });
     };
     
     const subscription = Dimensions.addEventListener('change', onChange);
@@ -101,9 +112,7 @@ export const useResponsiveDimensions = () => {
   
   return {
     ...dimensions,
-    isTablet: isTablet(),
-    deviceType: getDeviceType(),
-    orientation: getOrientation(),
+    ...deviceInfo
   };
 };
 

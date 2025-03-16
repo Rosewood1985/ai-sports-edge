@@ -1,44 +1,53 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
-  ScrollView,
-  StyleSheet,
-  FlatList,
   Text,
+  StyleSheet,
+  ScrollView,
   TouchableOpacity,
   RefreshControl,
-  SectionList
+  Alert
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { auth } from "../config/firebase";
+import { hasPremiumAccess } from "../services/subscriptionService";
 import useOddsData from "../hooks/useOddsData";
-import GameCard from "../components/GameCard";
 import Header from "../components/Header";
 import LoadingIndicator from "../components/LoadingIndicator";
 import ErrorMessage from "../components/ErrorMessage";
 import EmptyState from "../components/EmptyState";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { Game, ConfidenceLevel } from "../types/odds";
-import PremiumFeature from "../components/PremiumFeature";
-import { Ionicons } from "@expo/vector-icons";
-import { getCurrentLocation, filterLocalGames } from "../services/geolocationService";
-import { Location } from "../services/geolocationService";
-import { trackScreenView } from "../services/analyticsService";
+import GameCard from "../components/GameCard";
+import DailyFreePick from "../components/DailyFreePick";
+import TrendingBets from "../components/TrendingBets";
+import CommunityPolls from "../components/CommunityPolls";
+import AILeaderboard from "../components/AILeaderboard";
+import FreemiumFeature from "../components/FreemiumFeature";
+import BlurredPrediction from "../components/BlurredPrediction";
 import { useTheme } from "../contexts/ThemeContext";
+import { 
+  getTrendingBets, 
+  getCommunityPolls, 
+  getAILeaderboard,
+  getBlurredPredictions
+} from "../services/aiPredictionService";
 
 type OddsScreenProps = {
   navigation: StackNavigationProp<any, 'Odds'>;
 };
 
 /**
- * OddsScreen component displays live betting odds
+ * OddsScreen component displays live betting odds with freemium features
  * @param {OddsScreenProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
 export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element {
-  const [refreshing, setRefreshing] = useState(false);
-  const [showInsights, setShowInsights] = useState(true);
-  const [userLocation, setUserLocation] = useState<Location | null>(null);
-  const [localGames, setLocalGames] = useState<Game[]>([]);
-  const [viewMode, setViewMode] = useState<'all' | 'local'>('all');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [hasPremium, setHasPremium] = useState<boolean>(false);
+  const [trendingBets, setTrendingBets] = useState<any[]>([]);
+  const [communityPolls, setCommunityPolls] = useState<any[]>([]);
+  const [leaderboardEntries, setLeaderboardEntries] = useState<any[]>([]);
+  const [blurredPredictions, setBlurredPredictions] = useState<any[]>([]);
   const { colors, isDark } = useTheme();
   
   // Use our custom hook to manage odds data, loading state, and errors
@@ -51,30 +60,77 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
     refreshLiveData
   } = useOddsData("americanfootball_nfl");
   
-  // Track screen view
+  // Check if user has premium access
   useEffect(() => {
-    trackScreenView('OddsScreen');
-  }, []);
-  
-  // Get user location and filter local games
-  useEffect(() => {
-    const getLocation = async () => {
+    let isMounted = true;
+    
+    const checkPremiumAccess = async () => {
       try {
-        const location = await getCurrentLocation();
-        setUserLocation(location);
+        const userId = auth.currentUser?.uid;
         
-        if (location && odds.length > 0) {
-          const local = filterLocalGames(odds, location);
-          setLocalGames(local);
+        if (!userId) {
+          if (isMounted) setHasPremium(false);
+          return;
         }
+        
+        const premium = await hasPremiumAccess(userId);
+        if (isMounted) setHasPremium(premium);
       } catch (error) {
-        console.error('Error getting location:', error);
+        console.error('Error checking premium access:', error);
+        if (isMounted) setHasPremium(false);
       }
     };
     
-    getLocation();
-  }, [odds]);
-
+    checkPremiumAccess();
+    
+    // Listen for auth state changes
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user && isMounted) {
+        checkPremiumAccess();
+      }
+    });
+    
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
+  
+  // Load freemium content
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadFreemiumContent = async () => {
+      try {
+        // Get trending bets
+        const trends = await getTrendingBets();
+        if (isMounted) setTrendingBets(trends);
+        
+        // Get community polls
+        const polls = await getCommunityPolls();
+        if (isMounted) setCommunityPolls(polls);
+        
+        // Get leaderboard entries
+        const entries = await getAILeaderboard();
+        if (isMounted) setLeaderboardEntries(entries);
+        
+        // Get blurred predictions if not premium
+        if (!hasPremium && odds.length > 0) {
+          const blurred = await getBlurredPredictions(odds.slice(0, 3));
+          if (isMounted) setBlurredPredictions(blurred);
+        }
+      } catch (error) {
+        console.error('Error loading freemium content:', error);
+      }
+    };
+    
+    loadFreemiumContent();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [odds, hasPremium]);
+  
   // Set up auto-refresh for live data
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -82,372 +138,297 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
     }, 60000); // Refresh every minute
     
     return () => clearInterval(intervalId);
-  }, [refreshLiveData]);
-
+  }, []);
+  
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await refresh();
     setRefreshing(false);
   }, [refresh]);
-
-  // Get confidence color based on level
-  const getConfidenceColor = (level: ConfidenceLevel): string => {
-    switch (level) {
-      case 'high':
-        return '#4CAF50'; // Green
-      case 'medium':
-        return '#FFC107'; // Yellow
-      case 'low':
-        return '#F44336'; // Red
-      default:
-        return '#757575'; // Gray
-    }
+  
+  // Handle ad viewing
+  const handleAdRequested = async (): Promise<boolean> => {
+    // In a real app, this would show an ad
+    // For now, we'll just simulate ad viewing
+    return new Promise((resolve) => {
+      Alert.alert(
+        "Watch Ad",
+        "In a real app, this would show an ad. Simulating ad view...",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // Simulate ad completion
+              setTimeout(() => {
+                resolve(true);
+              }, 1000);
+            }
+          }
+        ]
+      );
+    });
   };
+  
+  // Define poll option type
+  interface PollOption {
+    id: string;
+    text: string;
+    votes: number;
+  }
 
-  // Navigate to game details
-  const handleGamePress = (game: Game) => {
-    // In a real app, this would navigate to a game details screen
-    console.log("Game pressed:", game.id);
-  };
-
-  // Daily Insights Widget
-  const renderDailyInsightsWidget = () => {
-    if (!dailyInsights || !showInsights) return null;
-    
-    return (
-      <PremiumFeature>
-        <View style={styles.insightsContainer}>
-          <View style={styles.insightsHeader}>
-            <Text style={styles.insightsTitle}>Daily Betting Insights</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowInsights(false)}
-            >
-              <Ionicons name="close" size={16} color="#666" />
-            </TouchableOpacity>
-          </View>
+  // Handle community poll vote
+  const handlePollVote = (pollId: string, optionId: string) => {
+    // In a real app, this would send the vote to a server
+    // For now, we'll just update the local state
+    setCommunityPolls(prev =>
+      prev.map(poll => {
+        if (poll.id === pollId) {
+          const updatedOptions = poll.options.map((option: PollOption) => {
+            if (option.id === optionId) {
+              return { ...option, votes: option.votes + 1 };
+            }
+            return option;
+          });
           
-          <Text style={styles.insightsDate}>
-            {new Date(dailyInsights.date).toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </Text>
-          
-          <Text style={styles.sectionTitle}>Top Picks</Text>
-          {dailyInsights.top_picks.map((pick, index) => (
-            <View key={index} style={styles.pickContainer}>
-              <View style={styles.pickHeader}>
-                <Text style={styles.pickMatchup}>
-                  {pick.home_team} vs {pick.away_team}
-                </Text>
-                <View
-                  style={[
-                    styles.confidenceTag,
-                    { backgroundColor: getConfidenceColor(pick.confidence) }
-                  ]}
-                >
-                  <Text style={styles.confidenceTagText}>
-                    {pick.confidence.toUpperCase()}
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.pickText}>
-                <Text style={styles.bold}>Pick: </Text>{pick.pick}
-              </Text>
-              <Text style={styles.pickReasoning}>
-                {pick.reasoning}
-              </Text>
-            </View>
-          ))}
-          
-          <Text style={styles.sectionTitle}>Trending Bets</Text>
-          {dailyInsights.trending_bets.map((bet, index) => (
-            <View key={index} style={styles.trendingBet}>
-              <Ionicons name="trending-up" size={16} color="#3498db" />
-              <Text style={styles.trendingBetText}>{bet.description}</Text>
-            </View>
-          ))}
-        </View>
-      </PremiumFeature>
+          return {
+            ...poll,
+            options: updatedOptions,
+            totalVotes: poll.totalVotes + 1
+          };
+        }
+        return poll;
+      })
     );
   };
-
-  // For ScrollView implementation
-  const renderScrollView = (): JSX.Element => (
+  
+  // Navigate to subscription screen
+  const handleUpgrade = () => {
+    navigation.navigate('Subscription');
+  };
+  
+  return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: isDark ? '#121212' : '#f8f9fa' }]}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={handleRefresh}
-          colors={["#3498db"]}
+          colors={[colors.primary]}
         />
       }
     >
-      <View style={styles.headerRow}>
+      <View style={styles.headerContainer}>
         <Header
           title="Live Betting Odds"
           onRefresh={refresh}
           isLoading={loading}
         />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[
-              styles.viewModeButton, 
-              viewMode === 'all' && styles.activeViewModeButton
-            ]}
-            onPress={() => setViewMode('all')}
+        
+        {!hasPremium && (
+          <TouchableOpacity
+            style={[styles.upgradeButton, { backgroundColor: colors.primary }]}
+            onPress={handleUpgrade}
           >
-            <Ionicons 
-              name="globe-outline" 
-              size={16} 
-              color={viewMode === 'all' ? '#fff' : colors.primary} 
-            />
-            <Text 
-              style={[
-                styles.viewModeButtonText,
-                viewMode === 'all' && styles.activeViewModeButtonText
-              ]}
-            >
-              All
-            </Text>
+            <Ionicons name="flash" size={16} color="#fff" />
+            <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.viewModeButton, 
-              viewMode === 'local' && styles.activeViewModeButton,
-              localGames.length === 0 && styles.disabledButton
-            ]}
-            onPress={() => setViewMode('local')}
-            disabled={localGames.length === 0}
-          >
-            <Ionicons 
-              name="location-outline" 
-              size={16} 
-              color={viewMode === 'local' ? '#fff' : localGames.length === 0 ? '#ccc' : colors.primary} 
-            />
-            <Text 
-              style={[
-                styles.viewModeButtonText,
-                viewMode === 'local' && styles.activeViewModeButtonText,
-                localGames.length === 0 && styles.disabledButtonText
-              ]}
-            >
-              Local
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.comparisonButton}
-            onPress={() => navigation.navigate('BetComparison', { games: odds })}
-          >
-            <Ionicons name="analytics-outline" size={16} color="#fff" />
-            <Text style={styles.comparisonButtonText}>Bet Comparison</Text>
-          </TouchableOpacity>
-        </View>
+        )}
       </View>
       
-      {userLocation && userLocation.city && viewMode === 'local' && (
-        <Text style={styles.locationText}>
-          <Ionicons name="location" size={14} color={colors.primary} />
-          {' '}Showing games near {userLocation.city}, {userLocation.state}
-        </Text>
-      )}
-      
-      {/* Daily Insights Widget */}
-      {renderDailyInsightsWidget()}
-      
-      {loading && !refreshing && <LoadingIndicator message="Loading odds..." />}
-      
-      {error && <ErrorMessage message={error} />}
-      
-      {!loading && viewMode === 'all' && odds.length === 0 && !error && (
-        <EmptyState message="No odds data available" />
-      )}
-      
-      {!loading && viewMode === 'local' && localGames.length === 0 && !error && (
-        <EmptyState message="No local games found in your area" />
-      )}
-      
-      {viewMode === 'all' && odds.map((game, index) => (
-        <GameCard
-          key={`game-${index}`}
-          game={game}
-          onPress={handleGamePress}
+      {/* Daily Free Pick (for free users) */}
+      {!hasPremium && (
+        <DailyFreePick
+          games={odds}
+          onAdRequested={handleAdRequested}
         />
-      ))}
+      )}
       
-      {viewMode === 'local' && localGames.map((game, index) => (
-        <GameCard
-          key={`local-game-${index}`}
-          game={game}
-          onPress={handleGamePress}
-          isLocalGame={true}
-        />
-      ))}
+      {/* Trending Bets (for all users) */}
+      <TrendingBets
+        trendingBets={trendingBets}
+        showUpgradePrompt={!hasPremium}
+      />
+      
+      {/* Community Polls (for all users) */}
+      <CommunityPolls
+        polls={communityPolls}
+        onVote={handlePollVote}
+        isPremium={hasPremium}
+      />
+      
+      {/* AI Leaderboard (for all users, but with premium features) */}
+      <AILeaderboard
+        entries={leaderboardEntries}
+        isPremium={hasPremium}
+      />
+      
+      {/* Blurred Predictions (for free users) */}
+      {!hasPremium && blurredPredictions.length > 0 && (
+        <View style={styles.predictionsContainer}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="analytics" size={20} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              AI Predictions Preview
+            </Text>
+          </View>
+          
+          {blurredPredictions.map((game, index) => (
+            <BlurredPrediction
+              key={`blurred-${index}`}
+              prediction={game.ai_prediction}
+              isBlurred={true}
+              teamName={game.home_team}
+            />
+          ))}
+          
+          <TouchableOpacity
+            style={[styles.fullWidthButton, { backgroundColor: colors.primary }]}
+            onPress={handleUpgrade}
+          >
+            <Text style={styles.fullWidthButtonText}>
+              Unlock All AI Predictions
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      
+      {/* Premium Games (for premium users) */}
+      <FreemiumFeature
+        type="locked"
+        message="Upgrade to see all games with AI predictions"
+      >
+        {loading && !refreshing && (
+          <LoadingIndicator message="Loading odds..." />
+        )}
+        
+        {error && <ErrorMessage message={error} />}
+        
+        {!loading && odds.length === 0 && !error && (
+          <EmptyState message="No odds data available" />
+        )}
+        
+        {odds.map((game, index) => (
+          <GameCard
+            key={`game-${index}`}
+            game={game}
+            onPress={() => console.log("Game pressed:", game.id)}
+          />
+        ))}
+      </FreemiumFeature>
+      
+      {/* Upgrade Banner */}
+      {!hasPremium && (
+        <View style={[
+          styles.upgradeBanner,
+          { backgroundColor: colors.primary }
+        ]}>
+          <View style={styles.upgradeContent}>
+            <Ionicons name="star" size={24} color="#fff" />
+            <View style={styles.upgradeTextContainer}>
+              <Text style={styles.upgradeBannerTitle}>
+                Upgrade to Premium
+              </Text>
+              <Text style={styles.upgradeBannerText}>
+                Get unlimited AI predictions, real-time insights, and more
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.upgradeBannerButton}
+            onPress={handleUpgrade}
+          >
+            <Text style={styles.upgradeBannerButtonText}>Upgrade</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
-
-  // Use ScrollView for now since the list is likely small
-  // Switch to renderFlatList() if the list becomes large
-  return renderScrollView();
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 16,
   },
-  headerRow: {
+  headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  viewModeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#3498db',
-  },
-  activeViewModeButton: {
-    backgroundColor: '#3498db',
-  },
-  disabledButton: {
-    borderColor: '#ccc',
-    opacity: 0.7,
-  },
-  viewModeButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#3498db',
-    marginLeft: 4,
-  },
-  activeViewModeButtonText: {
-    color: '#fff',
-  },
-  disabledButtonText: {
-    color: '#ccc',
-  },
-  comparisonButton: {
-    backgroundColor: '#3498db',
+  upgradeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 4,
   },
-  comparisonButtonText: {
+  upgradeButtonText: {
     color: '#fff',
-    fontSize: 12,
     fontWeight: '600',
+    fontSize: 14,
     marginLeft: 4,
   },
-  locationText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    fontStyle: 'italic',
+  predictionsContainer: {
+    marginVertical: 8,
   },
-  insightsContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  insightsHeader: {
+  sectionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-  },
-  insightsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  closeButton: {
-    padding: 4,
-  },
-  insightsDate: {
-    fontSize: 14,
-    color: '#666',
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  fullWidthButton: {
+    paddingVertical: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  fullWidthButtonText: {
+    color: '#fff',
     fontWeight: '600',
-    color: '#333',
-    marginTop: 12,
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    paddingBottom: 4,
+    fontSize: 14,
   },
-  pickContainer: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 8,
-  },
-  pickHeader: {
+  upgradeBanner: {
+    borderRadius: 8,
+    padding: 16,
+    marginVertical: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
   },
-  pickMatchup: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  confidenceTag: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  confidenceTagText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  pickText: {
-    fontSize: 13,
-    color: '#333',
-    marginBottom: 4,
-  },
-  pickReasoning: {
-    fontSize: 12,
-    color: '#666',
-    fontStyle: 'italic',
-  },
-  trendingBet: {
+  upgradeContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    flex: 1,
   },
-  trendingBetText: {
-    fontSize: 13,
-    color: '#333',
-    marginLeft: 8,
+  upgradeTextContainer: {
+    marginLeft: 12,
+    flex: 1,
   },
-  bold: {
+  upgradeBannerTitle: {
+    color: '#fff',
     fontWeight: 'bold',
-  }
+    fontSize: 16,
+  },
+  upgradeBannerText: {
+    color: '#fff',
+    fontSize: 12,
+    opacity: 0.9,
+  },
+  upgradeBannerButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  upgradeBannerButtonText: {
+    fontWeight: '600',
+    fontSize: 14,
+  },
 });

@@ -76,12 +76,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Initialize theme state
   const [theme, setThemeState] = useState<ThemeType>('system');
   
-  // Determine if dark mode is active
-  const isDark = 
-    theme === 'dark' || (theme === 'system' && deviceColorScheme === 'dark');
-  
-  // Get current theme colors
-  const colors = isDark ? darkColors : lightColors;
+  // Use useMemo to prevent recalculations on every render
+  const themeData = React.useMemo(() => {
+    // Determine if dark mode is active
+    const isDark =
+      theme === 'dark' || (theme === 'system' && deviceColorScheme === 'dark');
+    
+    // Get current theme colors
+    const colors = isDark ? darkColors : lightColors;
+    
+    return { isDark, colors };
+  }, [theme, deviceColorScheme]);
   
   // Load saved theme from storage
   useEffect(() => {
@@ -110,7 +115,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
   
   return (
-    <ThemeContext.Provider value={{ theme, colors, isDark, setTheme }}>
+    <ThemeContext.Provider value={{
+      theme,
+      colors: themeData.colors,
+      isDark: themeData.isDark,
+      setTheme
+    }}>
       {children}
     </ThemeContext.Provider>
   );

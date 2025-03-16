@@ -27,18 +27,24 @@ const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
   const backgroundColor = useThemeColor({}, 'background');
 
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates after unmount
+    
     // Initial fetch of player data
     const fetchPlayers = async () => {
+      if (!isMounted) return;
+      
       try {
-        setLoading(true);
+        if (isMounted) setLoading(true);
         const playerData = await getGamePlusMinus(gameId);
-        setPlayers(playerData);
-        setError(null);
+        if (isMounted) {
+          setPlayers(playerData);
+          setError(null);
+        }
       } catch (err) {
         console.error('Error fetching player plus-minus data:', err);
-        setError('Failed to load player statistics');
+        if (isMounted) setError('Failed to load player statistics');
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -46,11 +52,12 @@ const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
 
     // Set up real-time listener for updates
     const unsubscribe = listenToPlayerPlusMinus(gameId, (updatedPlayers) => {
-      setPlayers(updatedPlayers);
+      if (isMounted) setPlayers(updatedPlayers);
     });
 
     // Clean up listener on unmount
     return () => {
+      isMounted = false; // Prevent state updates after unmount
       unsubscribe();
     };
   }, [gameId]);

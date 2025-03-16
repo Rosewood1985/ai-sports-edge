@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { DeviceType, getDeviceType, grid, responsiveSpacing } from '../utils/responsiveUtils';
+import { DeviceType, grid, responsiveSpacing, useResponsiveDimensions } from '../utils/responsiveUtils';
 
 interface RowProps {
   children: React.ReactNode;
@@ -25,7 +25,8 @@ interface ContainerProps {
  * Responsive container component that adapts to screen size
  */
 export const Container: React.FC<ContainerProps> = ({ children, style, fluid = false }) => {
-  const isTablet = getDeviceType() === DeviceType.TABLET;
+  const { deviceType } = useResponsiveDimensions();
+  const isTablet = deviceType === DeviceType.TABLET;
   
   return (
     <View
@@ -118,7 +119,6 @@ interface GridProps {
   rowGap?: number;
   style?: StyleProp<ViewStyle>;
 }
-
 export const Grid: React.FC<GridProps> = ({
   data,
   renderItem,
@@ -127,14 +127,15 @@ export const Grid: React.FC<GridProps> = ({
   rowGap = 16,
   style,
 }) => {
-  const isTablet = getDeviceType() === DeviceType.TABLET;
+  const { deviceType } = useResponsiveDimensions();
+  const isTablet = deviceType === DeviceType.TABLET;
   const defaultColumns = isTablet ? 3 : 2;
-  const columns = numColumns || defaultColumns;
+  const cols = numColumns || defaultColumns;
   
   // Group items into rows
   const rows = [];
-  for (let i = 0; i < data.length; i += columns) {
-    rows.push(data.slice(i, i + columns));
+  for (let i = 0; i < data.length; i += cols) {
+    rows.push(data.slice(i, i + cols));
   }
   
   return (
@@ -151,29 +152,29 @@ export const Grid: React.FC<GridProps> = ({
           ]}
         >
           {row.map((item, colIndex) => (
-            <View 
-              key={`col-${rowIndex}-${colIndex}`} 
+            <View
+              key={`col-${rowIndex}-${colIndex}`}
               style={[
                 styles.gridColumn,
-                { 
-                  width: `${(100 / columns)}%`,
-                  paddingHorizontal: columnGap / 2 
+                {
+                  width: `${(100 / cols)}%`,
+                  paddingHorizontal: columnGap / 2
                 }
               ]}
             >
-              {renderItem(item, rowIndex * columns + colIndex)}
+              {renderItem(item, rowIndex * cols + colIndex)}
             </View>
           ))}
           
           {/* Add empty columns to fill the row */}
-          {row.length < columns && Array(columns - row.length)
+          {row.length < cols && Array(cols - row.length)
             .fill(null)
             .map((_, index) => (
-              <View 
-                key={`empty-${rowIndex}-${index}`} 
+              <View
+                key={`empty-${rowIndex}-${index}`}
                 style={[
                   styles.gridColumn,
-                  { width: `${(100 / columns)}%`, paddingHorizontal: columnGap / 2 }
+                  { width: `${(100 / cols)}%`, paddingHorizontal: columnGap / 2 }
                 ]}
               />
             ))}
@@ -193,7 +194,8 @@ interface SectionProps {
 }
 
 export const Section: React.FC<SectionProps> = ({ children, title, style }) => {
-  const isTablet = getDeviceType() === DeviceType.TABLET;
+  const { deviceType } = useResponsiveDimensions();
+  const isTablet = deviceType === DeviceType.TABLET;
   
   return (
     <View

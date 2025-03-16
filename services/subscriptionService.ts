@@ -841,6 +841,137 @@ export const purchaseRoundBettingAccess = async (
   }
 };
 
+/**
+ * Check if user has viewed an ad today to unlock free content
+ * @param userId User ID
+ * @returns Whether the user has viewed an ad today
+ */
+export const hasViewedAdToday = async (userId: string): Promise<boolean> => {
+  try {
+    const adViewKey = `ad_view_${userId}`;
+    const lastAdView = await AsyncStorage.getItem(adViewKey);
+    
+    if (!lastAdView) {
+      return false;
+    }
+    
+    const lastAdViewDate = new Date(JSON.parse(lastAdView).timestamp);
+    const today = new Date();
+    
+    // Check if the last ad view was today
+    return (
+      lastAdViewDate.getDate() === today.getDate() &&
+      lastAdViewDate.getMonth() === today.getMonth() &&
+      lastAdViewDate.getFullYear() === today.getFullYear()
+    );
+  } catch (error) {
+    console.error('Error checking ad view:', error);
+    return false;
+  }
+};
+
+/**
+ * Mark that user has viewed an ad today
+ * @param userId User ID
+ * @returns Success status
+ */
+export const markAdAsViewed = async (userId: string): Promise<boolean> => {
+  try {
+    const adViewKey = `ad_view_${userId}`;
+    await AsyncStorage.setItem(
+      adViewKey,
+      JSON.stringify({ timestamp: new Date().toISOString() })
+    );
+    return true;
+  } catch (error) {
+    console.error('Error marking ad as viewed:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if user has used their free daily pick
+ * @param userId User ID
+ * @returns Whether the user has used their free daily pick
+ */
+export const hasUsedFreeDailyPick = async (userId: string): Promise<boolean> => {
+  try {
+    const freeDailyPickKey = `free_daily_pick_${userId}`;
+    const lastFreeDailyPick = await AsyncStorage.getItem(freeDailyPickKey);
+    
+    if (!lastFreeDailyPick) {
+      return false;
+    }
+    
+    const lastPickDate = new Date(JSON.parse(lastFreeDailyPick).timestamp);
+    const today = new Date();
+    
+    // Check if the last free daily pick was today
+    return (
+      lastPickDate.getDate() === today.getDate() &&
+      lastPickDate.getMonth() === today.getMonth() &&
+      lastPickDate.getFullYear() === today.getFullYear()
+    );
+  } catch (error) {
+    console.error('Error checking free daily pick:', error);
+    return false;
+  }
+};
+
+/**
+ * Mark that user has used their free daily pick
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Success status
+ */
+export const markFreeDailyPickAsUsed = async (userId: string, gameId: string): Promise<boolean> => {
+  try {
+    const freeDailyPickKey = `free_daily_pick_${userId}`;
+    await AsyncStorage.setItem(
+      freeDailyPickKey,
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        gameId
+      })
+    );
+    return true;
+  } catch (error) {
+    console.error('Error marking free daily pick as used:', error);
+    return false;
+  }
+};
+
+/**
+ * Get time until next free feature unlock
+ * @param userId User ID
+ * @param featureKey Feature key
+ * @returns Time in milliseconds until next unlock
+ */
+export const getNextUnlockTime = async (userId: string, featureKey: string): Promise<number> => {
+  try {
+    const unlockKey = `${featureKey}_${userId}`;
+    const lastUnlock = await AsyncStorage.getItem(unlockKey);
+    
+    if (!lastUnlock) {
+      return 0; // Feature has never been used, so it's available now
+    }
+    
+    const lastUnlockDate = new Date(JSON.parse(lastUnlock).timestamp);
+    const now = new Date();
+    
+    // Calculate time until next unlock (24 hours from last use)
+    const nextUnlockDate = new Date(lastUnlockDate);
+    nextUnlockDate.setDate(nextUnlockDate.getDate() + 1);
+    
+    const timeUntilUnlock = nextUnlockDate.getTime() - now.getTime();
+    
+    return timeUntilUnlock > 0 ? timeUntilUnlock : 0;
+  } catch (error) {
+    console.error('Error getting next unlock time:', error);
+    return 0;
+  }
+};
+
 export default {
   hasPremiumAccess,
   getSubscriptionStatus,
@@ -859,6 +990,11 @@ export default {
   purchasePlayerPlusMinusAccess,
   hasRoundBettingAccess,
   purchaseRoundBettingAccess,
+  hasViewedAdToday,
+  markAdAsViewed,
+  hasUsedFreeDailyPick,
+  markFreeDailyPickAsUsed,
+  getNextUnlockTime,
   SUBSCRIPTION_PLANS,
   ONE_TIME_PURCHASES,
   MICROTRANSACTIONS,

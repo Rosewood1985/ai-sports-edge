@@ -36,35 +36,45 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 
   // Check if user has premium access
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates after unmount
+    
     const checkPremiumAccess = async () => {
+      if (!isMounted) return;
+      
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
         
         if (!userId) {
-          setHasPremium(false);
+          if (isMounted) setHasPremium(false);
           return;
         }
         
         const premium = await hasPremiumAccess(userId);
-        setHasPremium(premium);
+        if (isMounted) setHasPremium(premium);
       } catch (error) {
         console.error('Error checking premium access:', error);
-        setHasPremium(false);
+        if (isMounted) setHasPremium(false);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     
     checkPremiumAccess();
     
-    // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged(() => {
-      checkPremiumAccess();
+    // Listen for auth state changes - but don't create nested calls
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      // Only check premium if auth state actually changed to a logged in user
+      if (user && isMounted) {
+        checkPremiumAccess();
+      }
     });
     
-    return () => unsubscribe();
-  }, []);
+    return () => {
+      isMounted = false; // Prevent state updates after unmount
+      unsubscribe();
+    };
+  }, []); // Empty dependency array is correct here
   
   // Navigate to subscription screen
   const handleUpgrade = () => {

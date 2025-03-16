@@ -1,7 +1,11 @@
 import { Game, AIPrediction, ConfidenceLevel, DailyInsight, GameResult } from '../types/odds';
 import { PropBetLine, PropBetPrediction, PropBetType } from '../types/playerProps';
 import { auth } from '../config/firebase';
-import { hasPremiumAccess } from './subscriptionService';
+import {
+  hasPremiumAccess,
+  hasUsedFreeDailyPick,
+  markFreeDailyPickAsUsed
+} from './subscriptionService';
 
 /**
  * Generate an AI prediction for a game
@@ -468,11 +472,197 @@ export const getSamplePropBets = (game: Game): PropBetLine[] => {
   return propBets;
 };
 
+/**
+ * Get free AI prediction for a game (limited to one per day)
+ * @param games - List of games
+ * @returns Game with AI prediction
+ */
+export const getFreeDailyPick = async (games: Game[]): Promise<Game | null> => {
+  try {
+    // Check if user is logged in
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      return null;
+    }
+    
+    // Check if user has already used their free daily pick
+    const hasUsedPick = await hasUsedFreeDailyPick(userId);
+    if (hasUsedPick) {
+      return null;
+    }
+    
+    // Select a random game for the free pick
+    if (games.length === 0) {
+      return null;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * games.length);
+    const selectedGame = games[randomIndex];
+    
+    // Generate prediction for the selected game
+    const prediction = await generateAIPrediction(selectedGame);
+    
+    // Mark the free daily pick as used
+    await markFreeDailyPickAsUsed(userId, selectedGame.id);
+    
+    return {
+      ...selectedGame,
+      ai_prediction: prediction
+    };
+  } catch (error) {
+    console.error('Error generating free daily pick:', error);
+    return null;
+  }
+};
+
+/**
+ * Get blurred AI predictions for a list of games (for free users)
+ * @param games - List of games
+ * @returns Games with blurred AI predictions
+ */
+export const getBlurredPredictions = async (games: Game[]): Promise<Game[]> => {
+  try {
+    // Generate predictions for each game but blur the confidence scores
+    const gamesWithBlurredPredictions = await Promise.all(
+      games.map(async (game) => {
+        const prediction = await generateAIPrediction(game);
+        
+        // Create a blurred version of the prediction
+        const blurredPrediction = {
+          ...prediction,
+          confidence_score: -1, // Hide the actual score
+          reasoning: 'Upgrade to premium to see detailed reasoning',
+          historical_accuracy: -1 // Hide the actual accuracy
+        };
+        
+        return {
+          ...game,
+          ai_prediction: blurredPrediction
+        };
+      })
+    );
+    
+    return gamesWithBlurredPredictions;
+  } catch (error) {
+    console.error('Error generating blurred predictions:', error);
+    return games;
+  }
+};
+
+/**
+ * Get trending bets data (available to free users)
+ * @returns Trending bets data
+ */
+export const getTrendingBets = async (): Promise<{game_id: string, description: string, percentage: number}[]> => {
+  // In a real app, this would fetch actual trending bets from an API
+  // For now, we'll generate sample trending bets
+  return [
+    { game_id: 'trend-1', description: 'Lakers vs Warriors', percentage: 78 },
+    { game_id: 'trend-2', description: 'Chiefs to win by 7+ points', percentage: 65 },
+    { game_id: 'trend-3', description: 'Yankees to score in the first inning', percentage: 52 },
+    { game_id: 'trend-4', description: 'Celtics vs Bucks under 220.5', percentage: 61 },
+    { game_id: 'trend-5', description: 'Cowboys -3.5 vs Eagles', percentage: 57 }
+  ];
+};
+
+/**
+ * Get community poll data
+ * @returns Community poll data
+ */
+export const getCommunityPolls = async (): Promise<{
+  id: string;
+  question: string;
+  options: {id: string, text: string, votes: number}[];
+  totalVotes: number;
+  aiPrediction?: string;
+}[]> => {
+  // In a real app, this would fetch actual community polls from an API
+  // For now, we'll generate sample polls
+  return [
+    {
+      id: 'poll-1',
+      question: 'Who will win tonight: Lakers or Warriors?',
+      options: [
+        { id: 'option-1', text: 'Lakers', votes: 342 },
+        { id: 'option-2', text: 'Warriors', votes: 289 }
+      ],
+      totalVotes: 631,
+      aiPrediction: 'Lakers'
+    },
+    {
+      id: 'poll-2',
+      question: 'Will the Chiefs cover the -7.5 spread vs Raiders?',
+      options: [
+        { id: 'option-1', text: 'Yes', votes: 187 },
+        { id: 'option-2', text: 'No', votes: 213 }
+      ],
+      totalVotes: 400,
+      aiPrediction: 'No'
+    },
+    {
+      id: 'poll-3',
+      question: 'Over/Under 220.5 points in Celtics vs Bucks?',
+      options: [
+        { id: 'option-1', text: 'Over', votes: 156 },
+        { id: 'option-2', text: 'Under', votes: 178 }
+      ],
+      totalVotes: 334,
+      aiPrediction: 'Under'
+    }
+  ];
+};
+
+/**
+ * Get AI vs public betting leaderboard data
+ * @returns Leaderboard data
+ */
+export const getAILeaderboard = async (): Promise<{
+  date: string;
+  aiAccuracy: number;
+  publicAccuracy: number;
+  isPremium: boolean;
+}[]> => {
+  // In a real app, this would fetch actual leaderboard data from an API
+  // For now, we'll generate sample data
+  const today = new Date();
+  const entries = [];
+  
+  // Generate entries for the past 7 days
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    
+    // Format date as MM/DD
+    const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
+    
+    // Generate random accuracy percentages
+    const aiAccuracy = 55 + Math.floor(Math.random() * 25); // 55-80%
+    const publicAccuracy = 45 + Math.floor(Math.random() * 15); // 45-60%
+    
+    // Make recent days premium-only
+    const isPremium = i < 3;
+    
+    entries.push({
+      date: formattedDate,
+      aiAccuracy,
+      publicAccuracy,
+      isPremium
+    });
+  }
+  
+  return entries;
+};
+
 export default {
   getAIPredictions,
   getLiveUpdates,
   getGameResult,
   getDailyInsights,
   getPropBetPredictions,
-  getSamplePropBets
+  getSamplePropBets,
+  getFreeDailyPick,
+  getBlurredPredictions,
+  getTrendingBets,
+  getCommunityPolls,
+  getAILeaderboard
 };

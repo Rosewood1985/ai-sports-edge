@@ -471,8 +471,9 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
                 )}
               </View>
             </View>
+          </TouchableOpacity>
         ))}
-      </View>
+        </View>
     );
   };
 

@@ -32,47 +32,63 @@ const PropBetList: React.FC<PropBetListProps> = ({ game }) => {
   
   // Check if user has premium access
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates after unmount
+    
     const checkPremiumAccess = async () => {
+      if (!isMounted) return;
+      
       try {
         const userId = auth.currentUser?.uid;
         
         if (!userId) {
-          setHasPremium(false);
+          if (isMounted) setHasPremium(false);
           return;
         }
         
         const premium = await hasPremiumAccess(userId);
-        setHasPremium(premium);
+        if (isMounted) setHasPremium(premium);
       } catch (error) {
         console.error('Error checking premium access:', error);
-        setHasPremium(false);
+        if (isMounted) setHasPremium(false);
       }
     };
     
     checkPremiumAccess();
+    
+    return () => {
+      isMounted = false; // Prevent state updates after unmount
+    };
   }, []);
   
   // Load prop bets and predictions
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates after unmount
+    
     const loadPropBets = async () => {
+      if (!isMounted) return;
+      
       try {
-        setLoading(true);
+        if (isMounted) setLoading(true);
         
         // Get sample prop bets for the game
         const samplePropBets = getSamplePropBets(game);
-        setPropBets(samplePropBets);
+        if (isMounted) setPropBets(samplePropBets);
         
         // Get predictions for the prop bets
         const propPredictions = await getPropBetPredictions(samplePropBets);
-        setPredictions(propPredictions);
+        if (isMounted) setPredictions(propPredictions);
       } catch (error) {
         console.error('Error loading prop bets:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     
     loadPropBets();
+    
+    return () => {
+      isMounted = false; // Prevent state updates after unmount
+    };
   }, [game]);
   
   // Navigate to subscription screen

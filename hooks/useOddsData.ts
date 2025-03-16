@@ -106,24 +106,26 @@ export const useOddsData = (
 
     if (enableLiveUpdates && data.length > 0) {
       intervalId = setInterval(() => {
-        const updatedGames = getLiveUpdates(data);
-        setData(updatedGames);
-      }, 30000); // Update every 30 seconds
+        // Use a functional update to avoid dependency on data
+        setData(currentData => getLiveUpdates(currentData));
+      }, 60000); // Update every 60 seconds instead of 30 seconds
     }
 
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [data, enableLiveUpdates]);
+  }, [enableLiveUpdates]); // Remove data from dependencies
 
-  // Helper function to filter games by user's selected leagues
-  const filterGamesByLeagues = useCallback((games: Game[]): Game[] => {
-    if (!filterByUserLeagues || selectedLeagueIds.length === 0) {
+  // Helper function moved inside loadData to break dependency cycle
+
+  // Helper function to filter games by leagues - moved inside loadData to break dependency cycle
+  const filterGamesByLeaguesInternal = (games: Game[], leagueIds: string[]): Game[] => {
+    if (!filterByUserLeagues || leagueIds.length === 0) {
       return games;
     }
 
     // Get sport keys from selected league IDs
-    const selectedSportKeys = selectedLeagueIds
+    const selectedSportKeys = leagueIds
       .map(id => leagueToSportKeyMap[id])
       .filter(key => key); // Filter out undefined values
 
@@ -133,7 +135,7 @@ export const useOddsData = (
 
     // Filter games by sport keys
     return games.filter(game => selectedSportKeys.includes(game.sport_key));
-  }, [filterByUserLeagues, selectedLeagueIds]);
+  };
 
   const loadData = useCallback(async (retry = false) => {
     if (retry) {
@@ -146,8 +148,8 @@ export const useOddsData = (
     setError(null);
     
     try {
-      // Fetch odds data
-      const response = await fetchOdds(sport, markets);
+      // Fetch odds data with cache enabled
+      const response = await fetchOdds(sport, markets, "us", true);
       
       if (response && response.success) {
         let processedData = response.data;
@@ -164,13 +166,26 @@ export const useOddsData = (
         
         // Filter by user's selected leagues if enabled
         if (filterByUserLeagues && selectedLeagueIds.length > 0) {
-          processedData = filterGamesByLeagues(processedData);
+          // Use internal function instead of the memoized one to break dependency cycle
+          processedData = filterGamesByLeaguesInternal(processedData, selectedLeagueIds);
         }
         
         setData(processedData);
         setRetryCount(0);
+        
+        // If data came from cache, show a message but don't treat as error
+        if (response.fromCache) {
+          setError("Using cached data. Live updates may be limited due to API rate limits.");
+        } else {
+          setError(null);
+        }
       } else {
-        throw new Error("No data received");
+        // If we got no data and hit rate limits, show a specific message
+        if (response.fromCache === false) {
+          throw new Error("API rate limit reached. Please try again later.");
+        } else {
+          throw new Error("No data received");
+        }
       }
     } catch (err: any) {
       console.error("Error fetching odds:", err);
@@ -184,7 +199,11 @@ export const useOddsData = (
         if (err.response) {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
-          setError(`API Error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
+          if (err.response.status === 429) {
+            setError("API rate limit reached. Please try again later.");
+          } else {
+            setError(`API Error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
+          }
         } else if (err.request) {
           // The request was made but no response was received
           setError("Network error. Please check your connection.");
@@ -196,15 +215,16 @@ export const useOddsData = (
     } finally {
       if (retryCount >= maxRetries) setLoading(false);
     }
-  }, [sport, markets, retryCount, maxRetries, enableLiveUpdates, enableAIPredictions, filterByUserLeagues, selectedLeagueIds, filterGamesByLeagues]);
+  }, [sport, markets, retryCount, maxRetries, enableLiveUpdates, enableAIPredictions, filterByUserLeagues, selectedLeagueIds]);
+  // Removed filterGamesByLeagues from dependencies
 
   // Refresh live data without reloading from API
   const refreshLiveData = useCallback(() => {
     if (data.length > 0) {
-      const updatedGames = getLiveUpdates(data);
-      setData(updatedGames);
+      // Use functional update to avoid dependency on data
+      setData(currentData => getLiveUpdates(currentData));
     }
-  }, [data]);
+  }, []);
 
   useEffect(() => {
     loadData();
