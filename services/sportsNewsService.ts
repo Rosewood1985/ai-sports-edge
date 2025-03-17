@@ -1,7 +1,30 @@
 import axios from 'axios';
-// We'll use mock data for now, so we don't need the API key
-// import { SPORTS_API_KEY } from '@env';
 import { trackEvent } from './analyticsService';
+
+// The Sports DB API base URL - free API with no key required
+const SPORTS_DB_API_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
+
+// Interface for The Sports DB API response
+interface TheSportsDBNewsResponse {
+  success: number;
+  news: TheSportsDBNewsItem[];
+}
+
+// Interface for The Sports DB news item
+interface TheSportsDBNewsItem {
+  idNews: string;
+  strTitle: string;
+  strDescriptionEN: string;
+  strSport: string;
+  strLeague: string;
+  strTeam: string;
+  strKeywords: string;
+  strNewsSource: string;
+  strSourceURL: string;
+  datePublished: string;
+  strPublished: string;
+  strPoster: string;
+}
 
 /**
  * News item interface
@@ -20,24 +43,86 @@ export interface NewsItem {
 }
 
 /**
- * Fetch sports news from the API
+ * Fetch sports news from The Sports DB API
  * @returns Array of news items
  */
 export const fetchSportsNews = async (): Promise<NewsItem[]> => {
   try {
-    // In a real implementation, this would call a sports API
-    // For now, we'll return mock data
-    
     // Track the event
     await trackEvent('sports_news_fetched', {
-      source: 'mock_data'
+      source: 'thesportsdb'
     });
     
-    return getMockNewsData();
+    // Fetch latest sports news from The Sports DB API
+    const response = await axios.get<TheSportsDBNewsResponse>(`${SPORTS_DB_API_BASE_URL}/latestnews.php`);
+    
+    if (response.data && response.data.news && response.data.news.length > 0) {
+      // Transform API response to our NewsItem format
+      return response.data.news.map(article => ({
+        id: article.idNews,
+        title: article.strTitle,
+        content: article.strDescriptionEN,
+        category: categorizeNews(article.strTitle, article.strDescriptionEN),
+        timestamp: article.datePublished,
+        teams: extractTeamsFromSportsDB(article),
+        players: extractPlayersFromKeywords(article.strKeywords),
+        source: article.strNewsSource || 'The Sports DB',
+        url: article.strSourceURL || `https://www.thesportsdb.com/news/${article.idNews}`,
+        aiSummary: undefined
+      }));
+    }
+    
+    console.log('No news data found, falling back to mock data');
+    return getMockNewsData(); // Fallback to mock data if API returns empty results
   } catch (error) {
     console.error('Error fetching sports news:', error);
-    return getMockNewsData();
+    return getMockNewsData(); // Fallback to mock data on error
   }
+};
+
+/**
+ * Extract teams from a Sports DB news item
+ * @param article The Sports DB news item
+ * @returns Array of team names
+ */
+const extractTeamsFromSportsDB = (article: TheSportsDBNewsItem): string[] => {
+  const teams: string[] = [];
+  
+  // Add the team from the article if available
+  if (article.strTeam && article.strTeam !== '') {
+    teams.push(article.strTeam);
+  }
+  
+  // Also check content for other team mentions
+  if (article.strDescriptionEN) {
+    const contentTeams = extractTeams(article.strDescriptionEN);
+    contentTeams.forEach(team => {
+      if (!teams.includes(team)) {
+        teams.push(team);
+      }
+    });
+  }
+  
+  return teams;
+};
+
+/**
+ * Extract players from keywords string
+ * @param keywords Comma-separated keywords
+ * @returns Array of player names
+ */
+const extractPlayersFromKeywords = (keywords: string | undefined): string[] => {
+  if (!keywords) return [];
+  
+  // Split keywords by comma and filter out non-player keywords
+  // This is a simple approach - in production, you'd use a more sophisticated algorithm
+  const possiblePlayers = keywords.split(',').map(k => k.trim());
+  
+  // Filter out common non-player keywords
+  return possiblePlayers.filter(keyword =>
+    keyword.length > 0 &&
+    !['news', 'update', 'breaking', 'sports', 'game', 'match', 'team', 'league'].includes(keyword.toLowerCase())
+  );
 };
 
 /**

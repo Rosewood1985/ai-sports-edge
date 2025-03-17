@@ -29,10 +29,10 @@ The AI Sports News feature provides users with sports news enhanced by AI-genera
 ### Backend Services
 
 #### 1. Sports News Service (`sportsNewsService.ts`)
-- Fetches sports news from external APIs
+- Fetches sports news from The Sports DB API (free, no API key required)
 - Categorizes news by type (injury, lineup, trade, general)
 - Extracts teams and players mentioned
-- Provides mock data for development
+- Falls back to mock data if API fails or returns empty results
 
 #### 2. AI Summary Service (`aiSummaryService.ts`)
 - Interfaces with OpenAI API via Firebase Functions
@@ -83,10 +83,11 @@ The AI Sports News feature provides users with sports news enhanced by AI-genera
 
 The AI Sports News feature relies on two main external APIs:
 
-1. **Sports News API**
-   - Provides raw news data
-   - Typically charged per request or with monthly quotas
-   - Estimated cost: $50-100/month depending on usage
+1. **The Sports DB API**
+   - Provides raw sports news data
+   - Completely free with no API key required
+   - No rate limits specified, but reasonable usage recommended
+   - Estimated cost: $0/month
 
 2. **OpenAI API**
    - Used for generating summaries
