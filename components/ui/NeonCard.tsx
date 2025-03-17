@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { colors, borderRadius, spacing, shadows } from '../../styles/theme';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   getOptimizedShadow,
   getOptimizedGlowIntensity,
@@ -40,7 +40,7 @@ const NeonCard: React.FC<NeonCardProps> = ({
   glowColor = colors.neon.blue,
   glowIntensity = 'medium',
   gradient = false,
-  gradientColors = ['#121212', '#1A1A1A'],
+  gradientColors = ['#121212', '#1A1A1A'] as const,
   style,
   contentStyle,
   onPress,
@@ -112,9 +112,14 @@ const NeonCard: React.FC<NeonCardProps> = ({
   // Render card with or without gradient
   const renderCardContent = () => {
     if (gradient) {
+      // Ensure we have at least two colors for the gradient
+      const colors: readonly [string, string] = Array.isArray(gradientColors) && gradientColors.length >= 2
+        ? [gradientColors[0], gradientColors[1]] as const
+        : ['#121212', '#1A1A1A'] as const;
+        
       return (
         <LinearGradient
-          colors={gradientColors}
+          colors={colors}
           style={[styles.gradient, contentStyle]}
         >
           {children}

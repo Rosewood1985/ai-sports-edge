@@ -11,7 +11,7 @@ import {
   Animated,
 } from 'react-native';
 import { colors, typography, borderRadius, spacing } from '../../styles/theme';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useHoverEffect, useGlowHoverEffect } from '../../utils/animationUtils';
 
 interface NeonButtonProps {
@@ -130,19 +130,21 @@ const NeonButton: React.FC<NeonButtonProps> = ({
   const buttonColors = getButtonColors();
   
   // Get gradient colors based on type or use provided colors
-  const getGradientColors = () => {
-    if (gradientColors) return gradientColors;
-    if (disabled) return [colors.button.disabled, colors.button.disabled];
+  const getGradientColors = (): readonly [string, string] => {
+    if (gradientColors && gradientColors.length >= 2)
+      return [gradientColors[0], gradientColors[1]] as const;
+    if (disabled)
+      return [colors.button.disabled, colors.button.disabled] as const;
     
     switch (type) {
       case 'primary':
-        return ['#00D4FF', '#00BFFF'];
+        return ['#00D4FF', '#00BFFF'] as const;
       case 'secondary':
-        return ['#00FF88', '#00CC88'];
+        return ['#00FF88', '#00CC88'] as const;
       case 'outline':
-        return ['transparent', 'transparent'];
+        return ['transparent', 'transparent'] as const;
       default:
-        return ['#00D4FF', '#00BFFF'];
+        return ['#00D4FF', '#00BFFF'] as const;
     }
   };
 

@@ -8,7 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { colors, spacing } from '../../styles/theme';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface NeonContainerProps extends ViewProps {
   gradient?: boolean;
@@ -44,9 +44,14 @@ const NeonContainer: React.FC<NeonContainerProps> = ({
   // Render container with or without gradient
   const renderContainer = () => {
     if (gradient) {
+      // Ensure we have at least two colors for the gradient
+      const gradientColorsArray: readonly [string, string] = Array.isArray(gradientColors) && gradientColors.length >= 2
+        ? [gradientColors[0], gradientColors[1]] as const
+        : [colors.background.primary, '#0D0D0D'] as const;
+        
       return (
         <LinearGradient
-          colors={gradientColors}
+          colors={gradientColorsArray}
           style={[styles.container, style]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
