@@ -9,13 +9,13 @@ import {
   Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { 
-  getUserSubscription, 
-  cancelSubscription, 
+import {
+  getUserSubscription,
+  cancelSubscription,
   Subscription,
   getUserPaymentMethods,
   PaymentMethod
-} from '../services/subscriptionService';
+} from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -81,7 +81,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
                 throw new Error('User not authenticated');
               }
 
-              await cancelSubscription(userId, subscription.id);
+              await cancelSubscription(userId);
               
               Alert.alert(
                 'Subscription Canceled',
@@ -104,8 +104,10 @@ const SubscriptionManagementScreen = (): JSX.Element => {
     );
   };
 
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (date: Date | number | undefined): string => {
+    if (!date) return 'N/A';
+    const dateObj = typeof date === 'number' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -152,7 +154,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
         <Text style={styles.cardTitle}>Current Subscription</Text>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Plan:</Text>
-          <Text style={styles.detailValue}>{subscription.plan.name}</Text>
+          <Text style={styles.detailValue}>{subscription.plan?.name || 'Unknown'}</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Status:</Text>
@@ -173,7 +175,8 @@ const SubscriptionManagementScreen = (): JSX.Element => {
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Price:</Text>
           <Text style={styles.detailValue}>
-            ${(subscription.plan.amount / 100).toFixed(2)}/{subscription.plan.interval}
+            ${((subscription.plan?.amount || subscription.plan?.price * 100 || 0) / 100).toFixed(2)}/
+            {subscription.plan?.interval || 'month'}
           </Text>
         </View>
         <View style={styles.detailRow}>

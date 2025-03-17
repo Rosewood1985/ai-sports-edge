@@ -11,7 +11,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
-import { SUBSCRIPTION_PLANS, createSubscription } from '../services/subscriptionService';
+import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
 
 type RootStackParamList = {
@@ -121,7 +121,8 @@ const PaymentScreen = (): JSX.Element => {
         <View style={styles.planSummaryRow}>
           <Text style={styles.planSummaryLabel}>Price:</Text>
           <Text style={styles.planSummaryValue}>
-            ${(selectedPlan.amount / 100).toFixed(2)}/{selectedPlan.interval}
+            ${(selectedPlan.amount || selectedPlan.price * 100) / 100}
+            /{selectedPlan.interval}
           </Text>
         </View>
       </View>

@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getFunctions } from 'firebase/functions';
 
 // Your Firebase config (replace with your actual values)
 const firebaseConfig = {
@@ -15,9 +16,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Get the auth and firestore instances
+// Get the auth, firestore, and functions instances
 const auth = getAuth(app);
 const firestore = getFirestore(app);
+const functions = getFunctions(app);
 
 // Export the Firebase services
-export { app, auth, firestore };
+export { app, auth, firestore, functions };

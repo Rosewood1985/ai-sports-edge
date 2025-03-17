@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/subscriptionService';
+import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
 
 type RootStackParamList = {
@@ -91,7 +91,7 @@ const SubscriptionScreen = (): JSX.Element => {
           <View style={styles.planHeader}>
             <Text style={styles.planName}>{plan.name}</Text>
             <Text style={styles.planPrice}>
-              ${(plan.amount / 100).toFixed(2)}
+              ${(plan.amount || plan.price * 100) / 100}
               <Text style={styles.planInterval}>
                 /{plan.interval}
               </Text>

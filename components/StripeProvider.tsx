@@ -1,9 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, ReactElement } from 'react';
 import { StripeProvider as StripeSDKProvider } from '@stripe/stripe-react-native';
-
-// Replace with your Stripe publishable key
-// In a production app, this should come from an environment variable
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51NxSdILkdIwIjOxOG8VKMq2pZ0XxuzQumDOtC9cRiRlSKpYfKyYMQvUeKjGQpLFrKVgxKvQXdLrF9zJ5U5VbKVgx00aBcdefgh';
+import { STRIPE_PUBLISHABLE_KEY } from '../config/stripe';
 
 interface StripeProviderProps {
   children: ReactNode;
@@ -17,7 +14,7 @@ interface StripeProviderProps {
 const StripeProvider = ({ children }: StripeProviderProps): JSX.Element => {
   return (
     <StripeSDKProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-      {children}
+      {children as ReactElement}
     </StripeSDKProvider>
   );
 };
