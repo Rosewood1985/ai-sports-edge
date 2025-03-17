@@ -11,6 +11,9 @@ export interface UserRewards {
   achievements: Achievement[];
   referralCount: number;
   freeAIPredictions: number;
+  referralCode?: string;
+  referredBy?: string;
+  subscriptionExtensions?: number;
 }
 
 export interface Achievement {

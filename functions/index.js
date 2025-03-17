@@ -7,6 +7,11 @@ admin.initializeApp();
 // Import function modules
 const stripeWebhooks = require('./stripeWebhooks');
 const stripeSubscriptions = require('./stripeSubscriptions');
+const subscriptionManagement = require('./subscriptionManagement');
+const subscriptionGifting = require('./subscriptionGifting');
+const autoResubscribe = require('./autoResubscribe');
+const referralProgram = require('./referralProgram');
+const subscriptionAnalytics = require('./subscriptionAnalytics');
 
 // Export all functions
 exports.stripeWebhook = stripeWebhooks.stripeWebhook;
@@ -15,6 +20,27 @@ exports.createSubscription = stripeSubscriptions.createSubscription;
 exports.cancelSubscription = stripeSubscriptions.cancelSubscription;
 exports.updatePaymentMethod = stripeSubscriptions.updatePaymentMethod;
 exports.createOneTimePayment = stripeSubscriptions.createOneTimePayment;
+
+// Export subscription management functions
+exports.updateSubscription = subscriptionManagement.updateSubscription;
+exports.pauseSubscription = subscriptionManagement.pauseSubscription;
+exports.resumeSubscription = subscriptionManagement.resumeSubscription;
+
+// Export subscription gifting functions
+exports.giftSubscription = subscriptionGifting.giftSubscription;
+
+// Export auto-resubscribe functions
+exports.handleAutoResubscribe = autoResubscribe.handleAutoResubscribe;
+exports.toggleAutoResubscribe = autoResubscribe.toggleAutoResubscribe;
+
+// Export referral program functions
+exports.generateReferralCode = referralProgram.generateReferralCode;
+exports.applyReferralCode = referralProgram.applyReferralCode;
+exports.processReferralReward = referralProgram.processReferralReward;
+
+// Export subscription analytics functions
+exports.trackSubscriptionEvent = subscriptionAnalytics.trackSubscriptionEvent;
+exports.generateSubscriptionReport = subscriptionAnalytics.generateSubscriptionReport;
 
 // Add any existing functions from the project
 try {

@@ -463,6 +463,8 @@ class RewardsService {
     unlockedAchievements: Achievement[];
     reward?: {
       discountAmount: number;
+      loyaltyPoints: number;
+      subscriptionExtension: boolean;
     }
   }> {
     try {
@@ -473,6 +475,22 @@ class RewardsService {
       
       // Increment referral count
       rewards.referralCount += 1;
+      
+      // Add loyalty points for the referral
+      const REFERRAL_LOYALTY_POINTS = 200;
+      rewards.loyaltyPoints += REFERRAL_LOYALTY_POINTS;
+      
+      // Track if user gets a subscription extension
+      let subscriptionExtension = false;
+      
+      // If user has subscriptionExtensions field, increment it
+      if (rewards.subscriptionExtensions !== undefined) {
+        rewards.subscriptionExtensions += 1;
+        subscriptionExtension = true;
+      } else {
+        rewards.subscriptionExtensions = 1;
+        subscriptionExtension = true;
+      }
       
       const unlockedAchievements: Achievement[] = [];
       
@@ -487,27 +505,81 @@ class RewardsService {
         rewards.loyaltyPoints += 250;
         
         // Track achievement unlocked
-        trackEvent('achievement_unlocked' as any, {
+        trackEvent('achievement_unlocked', {
           achievement_id: 'social_butterfly',
           referral_count: rewards.referralCount
         });
       }
       
+      // Track referral reward earned
+      trackEvent('referral_reward_earned', {
+        referral_count: rewards.referralCount,
+        loyalty_points: REFERRAL_LOYALTY_POINTS,
+        subscription_extension: subscriptionExtension
+      });
+      
       // Save updated rewards
       await this.saveUserRewards(rewards);
       
-      // Return $5 discount reward for each referral
       return {
         updatedReferralCount: rewards.referralCount,
         unlockedAchievements,
         reward: {
-          discountAmount: 5 // $5 off next AI bet
+          discountAmount: 5, // $5 off next AI bet
+          loyaltyPoints: REFERRAL_LOYALTY_POINTS,
+          subscriptionExtension
         }
       };
     } catch (error) {
       console.error('Error recording referral:', error);
       throw error;
     }
+  }
+  
+  /**
+   * Generate a referral code for a user
+   */
+  async generateReferralCode(userId: string): Promise<string> {
+    try {
+      let rewards = await this.getUserRewards(userId);
+      if (!rewards) {
+        rewards = await this.initializeUserRewards(userId);
+      }
+      
+      // If user already has a referral code, return it
+      if (rewards.referralCode) {
+        return rewards.referralCode;
+      }
+      
+      // Generate a new referral code
+      const referralCode = await this.createReferralCode(userId);
+      
+      // Save the referral code to the user's rewards
+      rewards.referralCode = referralCode;
+      await this.saveUserRewards(rewards);
+      
+      // Track event
+      trackEvent('referral_code_generated', {
+        referral_code: referralCode
+      });
+      
+      return referralCode;
+    } catch (error) {
+      console.error('Error generating referral code:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Create a unique referral code
+   */
+  private async createReferralCode(userId: string): Promise<string> {
+    // This would typically call the Firebase function, but for now we'll generate it locally
+    const prefix = 'SPORT';
+    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const userPart = userId.substring(0, 4);
+    
+    return `${prefix}-${randomPart}-${userPart}`;
   }
   
   /**

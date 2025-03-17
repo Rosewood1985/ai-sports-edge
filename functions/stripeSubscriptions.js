@@ -73,6 +73,7 @@ exports.createStripeCustomer = functions.https.onCall(async (data, context) => {
  * @param {string} data.userId - Firebase user ID
  * @param {string} data.paymentMethodId - Stripe payment method ID
  * @param {string} data.priceId - Stripe price ID
+ * @param {string} data.promoCode - Optional promotion code
  * @returns {Object} - Subscription details
  */
 exports.createSubscription = functions.https.onCall(async (data, context) => {
@@ -137,12 +138,35 @@ exports.createSubscription = functions.https.onCall(async (data, context) => {
       invoice_settings: { default_payment_method: data.paymentMethodId }
     });
 
-    // Create subscription
-    const subscription = await stripe.subscriptions.create({
+    // Create subscription with optional promo code
+    const subscriptionParams = {
       customer: customerId,
       items: [{ price: data.priceId }],
       expand: ['latest_invoice.payment_intent']
-    });
+    };
+
+    // Apply promotion code if provided
+    if (data.promoCode) {
+      try {
+        // Validate the promotion code
+        const promotionCodes = await stripe.promotionCodes.list({
+          code: data.promoCode,
+          active: true,
+          limit: 1
+        });
+
+        if (promotionCodes.data.length > 0) {
+          subscriptionParams.promotion_code = promotionCodes.data[0].id;
+        } else {
+          console.log(`Invalid or inactive promo code: ${data.promoCode}`);
+        }
+      } catch (promoError) {
+        console.error('Error validating promo code:', promoError);
+        // Continue without the promo code if there's an error
+      }
+    }
+
+    const subscription = await stripe.subscriptions.create(subscriptionParams);
 
     // Get the price details
     const price = await stripe.prices.retrieve(data.priceId, {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   Alert
 } from 'react-native';
@@ -18,6 +18,9 @@ import {
 } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
 import { Ionicons } from '@expo/vector-icons';
+import { AutoResubscribeToggle } from '../components/AutoResubscribeToggle';
+import { ReferralProgramCard } from '../components/ReferralProgramCard';
+import { trackEvent } from '../services/analyticsService';
 
 /**
  * SubscriptionManagementScreen component for managing subscriptions
@@ -216,12 +219,20 @@ const SubscriptionManagementScreen = (): JSX.Element => {
       )}
 
       {subscription.status === 'active' && (
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={handleCancelSubscription}
-        >
-          <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
-        </TouchableOpacity>
+        <>
+          <View style={styles.card}>
+            <AutoResubscribeToggle subscriptionId={subscription.id} />
+          </View>
+          
+          <ReferralProgramCard isSubscribed={true} />
+          
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={handleCancelSubscription}
+          >
+            <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
+          </TouchableOpacity>
+        </>
       )}
 
       <TouchableOpacity

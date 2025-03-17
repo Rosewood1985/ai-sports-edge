@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  ActivityIndicator 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
+import { ReferralProgramCard } from '../components/ReferralProgramCard';
+import { trackEvent } from '../services/analyticsService';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -49,6 +51,12 @@ const SubscriptionScreen = (): JSX.Element => {
   }, []);
 
   const handleSelectPlan = (planId: string) => {
+    // Track subscription started event
+    trackEvent('subscription_started', {
+      plan_id: planId,
+      plan_name: SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name || 'Unknown'
+    });
+    
     navigation.navigate('Payment', { planId });
   };
 
@@ -117,6 +125,10 @@ const SubscriptionScreen = (): JSX.Element => {
           </TouchableOpacity>
         </TouchableOpacity>
       ))}
+
+      {!hasSubscription && (
+        <ReferralProgramCard isSubscribed={false} />
+      )}
 
       <TouchableOpacity
         style={styles.policyLink}

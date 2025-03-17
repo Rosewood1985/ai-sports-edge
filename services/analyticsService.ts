@@ -2,7 +2,7 @@ import { auth } from '../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Analytics event types
-export type AnalyticsEventType = 
+export type AnalyticsEventType =
   // Onboarding events
   | 'onboarding_started'
   | 'onboarding_completed'
@@ -20,12 +20,25 @@ export type AnalyticsEventType =
   | 'subscription_started'
   | 'subscription_completed'
   | 'subscription_cancelled'
+  | 'subscription_renewed'
+  | 'subscription_auto_renewed'
   | 'payment_method_added'
+  | 'payment_failed'
+  | 'plan_upgraded'
+  | 'plan_downgraded'
+  | 'auto_resubscribe_enabled'
+  | 'auto_resubscribe_disabled'
   
   // Microtransaction events
   | 'single_prediction_purchased'
   | 'weekend_pass_purchased'
   | 'alert_package_purchased'
+  
+  // Referral events
+  | 'referral_code_generated'
+  | 'referral_code_applied'
+  | 'referral_converted'
+  | 'referral_reward_earned'
   
   // App usage events
   | 'app_opened'
@@ -35,7 +48,12 @@ export type AnalyticsEventType =
   | 'game_viewed'
   | 'odds_refreshed'
   | 'theme_changed'
-  | 'notification_settings_changed';
+  | 'notification_settings_changed'
+  
+  // Achievement events
+  | 'achievement_unlocked'
+  | 'loyalty_level_up'
+  | 'streak_reward_earned';
 
 // Analytics event interface
 export interface AnalyticsEvent {

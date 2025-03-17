@@ -1,6 +1,7 @@
 import { auth, firestore, functions } from '../config/firebase';
 import { CardFieldInput } from '@stripe/stripe-react-native';
 import firebase from 'firebase/app';
+import { trackEvent } from './analyticsService';
 
 // Product types
 export type ProductType = 'subscription' | 'one_time_purchase' | 'microtransaction';
@@ -63,6 +64,7 @@ export interface Subscription {
   cancelAtPeriodEnd: boolean;
   trialEnd: number | null;
   defaultPaymentMethod: string | null;
+  autoResubscribe?: boolean;
   // For backward compatibility with existing screens
   plan?: SubscriptionPlan;
   createdAt?: number;
@@ -667,6 +669,207 @@ export const updatePaymentMethod = async (
   }
 };
 
+/**
+ * Update a subscription (upgrade/downgrade)
+ * @param userId Firebase user ID
+ * @param subscriptionId Subscription ID
+ * @param newPriceId New price ID
+ * @param immediate Whether to apply changes immediately
+ * @returns Promise with update result
+ */
+export const updateSubscription = async (
+  userId: string,
+  subscriptionId: string,
+  newPriceId: string,
+  immediate: boolean = false
+): Promise<any> => {
+  try {
+    const updateSubscriptionFunc = functions.httpsCallable('updateSubscription');
+    const result = await updateSubscriptionFunc({
+      userId,
+      subscriptionId,
+      newPriceId,
+      immediate
+    });
+    return result.data;
+  } catch (error) {
+    console.error('Error updating subscription:', error);
+    throw error;
+  }
+};
+
+/**
+ * Pause a subscription
+ * @param userId Firebase user ID
+ * @param subscriptionId Subscription ID
+ * @param pauseDuration Duration to pause in days (optional)
+ * @returns Promise with pause result
+ */
+export const pauseSubscription = async (
+  userId: string,
+  subscriptionId: string,
+  pauseDuration?: number
+): Promise<any> => {
+  try {
+    const pauseSubscriptionFunc = functions.httpsCallable('pauseSubscription');
+    const result = await pauseSubscriptionFunc({
+      userId,
+      subscriptionId,
+      pauseDuration
+    });
+    return result.data;
+  } catch (error) {
+    console.error('Error pausing subscription:', error);
+    throw error;
+  }
+};
+
+/**
+ * Resume a paused subscription
+ * @param userId Firebase user ID
+ * @param subscriptionId Subscription ID
+ * @returns Promise with resume result
+ */
+export const resumeSubscription = async (
+  userId: string,
+  subscriptionId: string
+): Promise<any> => {
+  try {
+    const resumeSubscriptionFunc = functions.httpsCallable('resumeSubscription');
+    const result = await resumeSubscriptionFunc({
+      userId,
+      subscriptionId
+    });
+    return result.data;
+  } catch (error) {
+    console.error('Error resuming subscription:', error);
+    throw error;
+  }
+};
+
+/**
+ * Gift a subscription to another user
+ * @param userId Firebase user ID of the gifter
+ * @param recipientEmail Email of the recipient
+ * @param priceId Stripe price ID
+ * @param paymentMethodId Stripe payment method ID
+ * @param giftDuration Duration of the gift in months
+ * @returns Promise with gift details
+ */
+export const giftSubscription = async (
+  userId: string,
+  recipientEmail: string,
+  priceId: string,
+  paymentMethodId: string,
+  giftDuration: number
+): Promise<any> => {
+  try {
+    const giftSubscriptionFunc = functions.httpsCallable('giftSubscription');
+    const result = await giftSubscriptionFunc({
+      userId,
+      recipientEmail,
+      priceId,
+      paymentMethodId,
+      giftDuration
+    });
+    return result.data;
+  } catch (error) {
+    console.error('Error gifting subscription:', error);
+    throw error;
+  }
+};
+
+/**
+ * Toggle auto-resubscribe setting for a user's subscription
+ * @param userId Firebase user ID
+ * @param subscriptionId Subscription ID
+ * @param enabled Whether to enable or disable auto-resubscribe
+ * @returns Promise with toggle result
+ */
+export const toggleAutoResubscribe = async (
+  userId: string,
+  subscriptionId: string,
+  enabled: boolean
+): Promise<any> => {
+  try {
+    const toggleAutoResubscribeFunc = functions.httpsCallable('toggleAutoResubscribe');
+    const result = await toggleAutoResubscribeFunc({
+      userId,
+      subscriptionId,
+      enabled
+    });
+    
+    // Track the event
+    await trackEvent(
+      enabled ? 'auto_resubscribe_enabled' : 'auto_resubscribe_disabled',
+      {
+        subscriptionId
+      }
+    );
+    
+    return result.data;
+  } catch (error) {
+    console.error('Error toggling auto-resubscribe:', error);
+    throw error;
+  }
+};
+
+/**
+ * Generate a referral code for a user
+ * @param userId Firebase user ID
+ * @returns Promise with referral code details
+ */
+export const generateReferralCode = async (
+  userId: string
+): Promise<any> => {
+  try {
+    const generateReferralCodeFunc = functions.httpsCallable('generateReferralCode');
+    const result = await generateReferralCodeFunc({
+      userId
+    });
+    
+    // Track the event
+    await trackEvent('referral_code_generated', {
+      referralCode: result.data.referralCode
+    });
+    
+    return result.data;
+  } catch (error) {
+    console.error('Error generating referral code:', error);
+    throw error;
+  }
+};
+
+/**
+ * Apply a referral code
+ * @param userId Firebase user ID
+ * @param referralCode Referral code to apply
+ * @returns Promise with referral application result
+ */
+export const applyReferralCode = async (
+  userId: string,
+  referralCode: string
+): Promise<any> => {
+  try {
+    const applyReferralCodeFunc = functions.httpsCallable('applyReferralCode');
+    const result = await applyReferralCodeFunc({
+      newUserId: userId,
+      referralCode
+    });
+    
+    // Track the event
+    await trackEvent('referral_code_applied', {
+      referralCode,
+      referrerId: result.data.referrerId
+    });
+    
+    return result.data;
+  } catch (error) {
+    console.error('Error applying referral code:', error);
+    throw error;
+  }
+};
+
 export default {
   hasPremiumAccess,
   getSubscriptionStatus,
@@ -683,6 +886,13 @@ export default {
   purchaseMicrotransaction,
   hasGamePredictionAccess,
   updatePaymentMethod,
+  updateSubscription,
+  pauseSubscription,
+  resumeSubscription,
+  giftSubscription,
+  toggleAutoResubscribe,
+  generateReferralCode,
+  applyReferralCode,
   SUBSCRIPTION_PLANS,
   ONE_TIME_PURCHASES,
   MICROTRANSACTIONS,
