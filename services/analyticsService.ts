@@ -55,6 +55,11 @@ export type AnalyticsEventType =
   | 'sports_news_fetched'
   | 'sports_news_viewed'
   | 'sports_news_focus_changed'
+  | 'sports_preferences_updated'
+  | 'ai_sentiment_analysis_generated'
+  | 'ai_odds_impact_predicted'
+  | 'ai_historical_correlation_analyzed'
+  | 'ai_personalized_summary_generated'
   
   // Achievement events
   | 'achievement_unlocked'
