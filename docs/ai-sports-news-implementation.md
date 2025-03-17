@@ -114,17 +114,29 @@ To ensure good performance while managing costs:
    - Progressive image loading
    - Virtualized lists for smooth scrolling
 
-## Future Enhancements
+## Implemented Premium Features
 
-1. **Personalization**
+### 1. Personalization
    - User-specific news feed based on favorite teams/sports
+     - Users can filter news to only show their favorite teams
+     - Preferences are stored in Firestore and synchronized across devices
    - Personalized AI summaries focusing on user's betting history
-   - Smart notifications for high-impact news
+     - Analyzes user's betting patterns to provide relevant advice
+     - Highlights news relevance based on user's interests
+   - Smart notifications for high-impact news (coming soon)
 
-2. **Advanced AI Features**
+### 2. Advanced AI Features
    - Sentiment analysis for news articles
+     - Analyzes the overall sentiment (positive/negative/neutral)
+     - Provides confidence score and visual indicator
    - Automated odds impact prediction
-   - Historical correlation analysis
+     - Predicts how news might impact betting odds
+     - Categorizes impact as high/medium/low with reasoning
+   - Historical correlation analysis (coming soon)
+     - Will analyze similar past events and their outcomes
+     - Will provide data-driven predictions based on historical patterns
+
+## Future Enhancements
 
 3. **Social Integration**
    - Share news and AI insights with friends
