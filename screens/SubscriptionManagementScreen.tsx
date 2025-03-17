@@ -178,7 +178,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Price:</Text>
           <Text style={styles.detailValue}>
-            ${((subscription.plan?.amount || subscription.plan?.price * 100 || 0) / 100).toFixed(2)}/
+            ${((subscription.plan?.amount || (subscription.plan?.price || 0) * 100 || 0) / 100).toFixed(2)}/
             {subscription.plan?.interval || 'month'}
           </Text>
         </View>
@@ -234,6 +234,18 @@ const SubscriptionManagementScreen = (): JSX.Element => {
           </TouchableOpacity>
         </>
       )}
+
+      <TouchableOpacity
+        style={styles.giftButton}
+        onPress={() => {
+          // @ts-ignore - Navigation typing issue
+          navigation.navigate('GiftRedemption');
+        }}
+      >
+        <Text style={styles.giftButtonText}>
+          Redeem a Gift Subscription
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.policyLink}
@@ -371,6 +383,18 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: '#e74c3c',
     fontWeight: '600',
+  },
+  giftButton: {
+    backgroundColor: '#f39c12',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  giftButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
   policyLink: {
     alignItems: 'center',

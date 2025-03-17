@@ -35,7 +35,7 @@ import {
   NeonContainer 
 } from "../components/ui";
 import { colors, spacing, borderRadius } from "../styles/theme";
-import LinearGradient from "react-native-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 
 type OddsScreenProps = {
   navigation: StackNavigationProp<any, 'Odds'>;

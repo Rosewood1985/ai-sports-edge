@@ -39,6 +39,7 @@ export type AnalyticsEventType =
   | 'referral_code_applied'
   | 'referral_converted'
   | 'referral_reward_earned'
+  | 'gift_subscription_redeemed'
   
   // App usage events
   | 'app_opened'

@@ -28,6 +28,7 @@ exports.resumeSubscription = subscriptionManagement.resumeSubscription;
 
 // Export subscription gifting functions
 exports.giftSubscription = subscriptionGifting.giftSubscription;
+exports.redeemGiftSubscription = subscriptionGifting.redeemGiftSubscription;
 
 // Export auto-resubscribe functions
 exports.handleAutoResubscribe = autoResubscribe.handleAutoResubscribe;

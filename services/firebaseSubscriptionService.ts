@@ -870,6 +870,34 @@ export const applyReferralCode = async (
   }
 };
 
+/**
+ * Redeem a gift subscription
+ * @param userId Firebase user ID
+ * @param giftCode Gift code to redeem
+ * @returns Promise with redemption result
+ */
+export const redeemGiftSubscription = async (
+  userId: string,
+  giftCode: string
+): Promise<any> => {
+  try {
+    const redeemGiftSubscriptionFunc = functions.httpsCallable('redeemGiftSubscription');
+    const result = await redeemGiftSubscriptionFunc({
+      giftCode
+    });
+    
+    // Track the event
+    await trackEvent('gift_subscription_redeemed', {
+      giftCode
+    });
+    
+    return result.data;
+  } catch (error) {
+    console.error('Error redeeming gift subscription:', error);
+    throw error;
+  }
+};
+
 export default {
   hasPremiumAccess,
   getSubscriptionStatus,
@@ -890,6 +918,7 @@ export default {
   pauseSubscription,
   resumeSubscription,
   giftSubscription,
+  redeemGiftSubscription,
   toggleAutoResubscribe,
   generateReferralCode,
   applyReferralCode,

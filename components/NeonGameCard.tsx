@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { NeonText, NeonCard, NeonButton } from './ui';
 import { colors, spacing, borderRadius } from '../styles/theme';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Define navigation type
 type RootStackParamList = {

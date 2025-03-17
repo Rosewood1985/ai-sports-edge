@@ -624,6 +624,87 @@ class RewardsService {
       return false;
     }
   }
+
+  /**
+   * Get referral leaderboard
+   * @param limit Maximum number of entries to return
+   * @returns Array of leaderboard entries
+   */
+  async getReferralLeaderboard(limit: number = 10): Promise<Array<{
+    userId: string;
+    username: string;
+    referralCount: number;
+    rank: number;
+    isCurrentUser: boolean;
+  }>> {
+    try {
+      // In a real app, this would fetch from Firestore
+      // For now, we'll simulate with mock data and any local user data
+      
+      const currentUserId = auth.currentUser?.uid;
+      let userRewards: UserRewards | null = null;
+      
+      if (currentUserId) {
+        userRewards = await this.getUserRewards(currentUserId);
+      }
+      
+      // Mock leaderboard data
+      const mockLeaderboard = [
+        { userId: 'user1', username: 'BettingPro', referralCount: 24 },
+        { userId: 'user2', username: 'SportsFan99', referralCount: 18 },
+        { userId: 'user3', username: 'PredictionKing', referralCount: 15 },
+        { userId: 'user4', username: 'BetMaster', referralCount: 12 },
+        { userId: 'user5', username: 'OddsWizard', referralCount: 10 },
+        { userId: 'user6', username: 'StatsGuru', referralCount: 8 },
+        { userId: 'user7', username: 'PicksExpert', referralCount: 7 },
+        { userId: 'user8', username: 'BetInsider', referralCount: 6 },
+        { userId: 'user9', username: 'LineBreaker', referralCount: 5 },
+        { userId: 'user10', username: 'ParlaySage', referralCount: 4 }
+      ];
+      
+      // If we have user data, add it to the leaderboard
+      if (currentUserId && userRewards && userRewards.referralCount > 0) {
+        // Get user's display name or email
+        let username = 'You';
+        try {
+          const userRecord = await auth.currentUser?.getIdTokenResult();
+          if (userRecord && auth.currentUser?.displayName) {
+            username = auth.currentUser.displayName;
+          } else if (userRecord && auth.currentUser?.email) {
+            username = auth.currentUser.email.split('@')[0];
+          }
+        } catch (error) {
+          console.error('Error getting user details:', error);
+        }
+        
+        // Add current user to mock data if not already in top 10
+        const userInMock = mockLeaderboard.some(entry => entry.userId === currentUserId);
+        if (!userInMock) {
+          mockLeaderboard.push({
+            userId: currentUserId,
+            username,
+            referralCount: userRewards.referralCount
+          });
+        }
+      }
+      
+      // Sort by referral count (descending)
+      const sortedLeaderboard = mockLeaderboard.sort((a, b) => b.referralCount - a.referralCount);
+      
+      // Add rank and isCurrentUser flag
+      const rankedLeaderboard = sortedLeaderboard.map((entry, index) => ({
+        ...entry,
+        rank: index + 1,
+        isCurrentUser: entry.userId === currentUserId
+      }));
+      
+      // Return limited number of entries
+      return rankedLeaderboard.slice(0, limit);
+    } catch (error) {
+      console.error('Error getting referral leaderboard:', error);
+      return [];
+    }
+  }
 }
 
 export const rewardsService = new RewardsService();

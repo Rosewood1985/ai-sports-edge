@@ -171,6 +171,7 @@ const NeonLoginScreen = () => {
           <Animated.View style={[styles.iconContainer, iconsAnimation]}>
             {renderAnimatedIcon("robot", "FontAwesome5", "AI Picks")}
             {renderAnimatedIcon("chart-line", "FontAwesome5", "Track Bets")}
+            {renderAnimatedIcon("trophy", "FontAwesome5", "Rewards", () => navigation.navigate("Rewards" as never))}
             {renderAnimatedIcon("bullseye", "FontAwesome5", "Pro Analysis")}
             {renderAnimatedIcon("help-circle", "Ionicons", "Help & FAQ", () => navigation.navigate("FAQ" as never))}
           </Animated.View>

@@ -18,6 +18,7 @@ type RootStackParamList = {
   Payment: { planId: string };
   SubscriptionManagement: undefined;
   RefundPolicy: undefined;
+  GiftRedemption: undefined;
   // Other screens...
 };
 
@@ -130,14 +131,25 @@ const SubscriptionScreen = (): JSX.Element => {
         <ReferralProgramCard isSubscribed={false} />
       )}
 
-      <TouchableOpacity
-        style={styles.policyLink}
-        onPress={() => navigation.navigate('RefundPolicy')}
-      >
-        <Text style={styles.policyLinkText}>
-          View our Cancellation & Refund Policy
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.footerLinks}>
+        <TouchableOpacity
+          style={styles.giftButton}
+          onPress={() => navigation.navigate('GiftRedemption')}
+        >
+          <Text style={styles.giftButtonText}>
+            Redeem a Gift Subscription
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.policyLink}
+          onPress={() => navigation.navigate('RefundPolicy')}
+        >
+          <Text style={styles.policyLinkText}>
+            View our Cancellation & Refund Policy
+          </Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -259,13 +271,29 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+  footerLinks: {
+    marginVertical: 20,
+  },
+  giftButton: {
+    backgroundColor: '#f39c12',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  giftButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
   policyLink: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 10,
   },
   policyLinkText: {
     color: '#3498db',
     fontSize: 14,
+    textAlign: 'center',
   },
 });
 

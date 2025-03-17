@@ -96,7 +96,110 @@ exports.giftSubscription = functions.https.onCall(async (data, context) => {
   }
 });
 
+/**
+ * Redeem a gift subscription
+ * @param {Object} data - Request data
+ * @param {string} data.giftCode - Gift code to redeem
+ * @returns {Object} - Redemption details
+ */
+exports.redeemGiftSubscription = functions.https.onCall(async (data, context) => {
+  // Verify authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'The function must be called while authenticated.'
+    );
+  }
+
+  // Validate required fields
+  if (!data.giftCode) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'Gift code is required.'
+    );
+  }
+
+  try {
+    const db = admin.firestore();
+    const userId = context.auth.uid;
+    
+    // Get the gift subscription
+    const giftRef = db.collection('giftSubscriptions').doc(data.giftCode);
+    const giftDoc = await giftRef.get();
+    
+    if (!giftDoc.exists) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        'Gift subscription not found.'
+      );
+    }
+    
+    const giftData = giftDoc.data();
+    
+    // Check if already redeemed
+    if (giftData.redeemed) {
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        'Gift subscription has already been redeemed.'
+      );
+    }
+    
+    // Check if recipient email matches
+    if (giftData.recipientEmail !== context.auth.token.email) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        'This gift subscription is for a different email address.'
+      );
+    }
+    
+    // Calculate subscription end date based on gift duration
+    const now = new Date();
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + giftData.giftDuration);
+    
+    // Create subscription in Firestore
+    const subscriptionRef = db.collection('users').doc(userId)
+      .collection('subscriptions').doc();
+    
+    await subscriptionRef.set({
+      status: 'active',
+      priceId: giftData.priceId,
+      currentPeriodStart: admin.firestore.Timestamp.fromDate(now),
+      currentPeriodEnd: admin.firestore.Timestamp.fromDate(endDate),
+      cancelAtPeriodEnd: true, // Auto-cancel at the end of gift period
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      giftedBy: giftData.gifterId,
+      isGift: true
+    });
+    
+    // Update user's subscription status
+    await db.collection('users').doc(userId).update({
+      subscriptionStatus: 'active',
+      subscriptionId: subscriptionRef.id,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Mark gift as redeemed
+    await giftRef.update({
+      redeemed: true,
+      redeemedBy: userId,
+      redeemedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    return {
+      success: true,
+      subscriptionId: subscriptionRef.id,
+      expiresAt: endDate.getTime()
+    };
+  } catch (error) {
+    console.error('Error redeeming gift subscription:', error);
+    throw new functions.https.HttpsError('internal', error.message);
+  }
+});
+
 // Export the functions
 module.exports = {
-  giftSubscription: exports.giftSubscription
+  giftSubscription: exports.giftSubscription,
+  redeemGiftSubscription: exports.redeemGiftSubscription
 };

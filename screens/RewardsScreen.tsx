@@ -10,12 +10,15 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { auth } from '../config/firebase';
 import { rewardsService } from '../services/rewardsService';
 import { UserRewards, Achievement, RewardTier, LoyaltyLevel } from '../types/rewards';
 import Header from '../components/Header';
 import LoyaltyBadge from '../components/LoyaltyBadge';
 import AchievementBadge from '../components/AchievementBadge';
+import ReferralLeaderboard from '../components/ReferralLeaderboard';
 import { trackScreenView } from '../services/analyticsService';
 
 const LOYALTY_TIERS: RewardTier[] = [
@@ -61,11 +64,19 @@ const LOYALTY_TIERS: RewardTier[] = [
   }
 ];
 
+type RootStackParamList = {
+  ReferralLeaderboard: undefined;
+  // Other screens...
+};
+
+type RewardsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ReferralLeaderboard'>;
+
 const RewardsScreen: React.FC = () => {
   const [rewards, setRewards] = useState<UserRewards | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'loyalty' | 'achievements' | 'streaks'>('loyalty');
+  const [activeTab, setActiveTab] = useState<'loyalty' | 'achievements' | 'streaks' | 'referrals'>('loyalty');
   const { colors, isDark } = useTheme();
+  const navigation = useNavigation<RewardsScreenNavigationProp>();
   
   // Track screen view
   useEffect(() => {
@@ -236,6 +247,31 @@ const RewardsScreen: React.FC = () => {
           ]}
         >
           Streaks
+        </Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity
+        style={[
+          styles.tab,
+          activeTab === 'referrals' && [
+            styles.activeTab,
+            { borderBottomColor: colors.primary }
+          ]
+        ]}
+        onPress={() => setActiveTab('referrals')}
+      >
+        <Ionicons
+          name="people"
+          size={20}
+          color={activeTab === 'referrals' ? colors.primary : colors.text}
+        />
+        <Text
+          style={[
+            styles.tabText,
+            { color: activeTab === 'referrals' ? colors.primary : colors.text }
+          ]}
+        >
+          Referrals
         </Text>
       </TouchableOpacity>
     </View>
@@ -483,6 +519,49 @@ const RewardsScreen: React.FC = () => {
     );
   };
   
+  // Render referrals tab content
+  const renderReferralsContent = () => {
+    if (!rewards) return null;
+    
+    return (
+      <View style={styles.tabContent}>
+        <View style={styles.referralInfoContainer}>
+          <Text style={[styles.referralTitle, { color: colors.text }]}>
+            Your Referrals
+          </Text>
+          
+          <View style={styles.referralStatsContainer}>
+            <View style={styles.referralStatItem}>
+              <Text style={[styles.referralStatValue, { color: colors.primary }]}>
+                {rewards.referralCount || 0}
+              </Text>
+              <Text style={[styles.referralStatLabel, { color: colors.text }]}>
+                Total Referrals
+              </Text>
+            </View>
+            
+            {rewards.subscriptionExtensions && (
+              <View style={styles.referralStatItem}>
+                <Text style={[styles.referralStatValue, { color: colors.primary }]}>
+                  {rewards.subscriptionExtensions}
+                </Text>
+                <Text style={[styles.referralStatLabel, { color: colors.text }]}>
+                  Months Extended
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+        
+        <ReferralLeaderboard
+          limit={10}
+          showViewAll={true}
+          onViewAllPress={() => navigation.navigate('ReferralLeaderboard')}
+        />
+      </View>
+    );
+  };
+  
   // Render streaks tab content
   const renderStreaksContent = () => {
     if (!rewards) return null;
@@ -657,6 +736,7 @@ const RewardsScreen: React.FC = () => {
         {activeTab === 'loyalty' && renderLoyaltyContent()}
         {activeTab === 'achievements' && renderAchievementsContent()}
         {activeTab === 'streaks' && renderStreaksContent()}
+        {activeTab === 'referrals' && renderReferralsContent()}
       </ScrollView>
     </View>
   );
@@ -886,6 +966,35 @@ const styles = StyleSheet.create({
   streakRewardText: {
     marginLeft: 8,
     fontSize: 14,
+  },
+  // Referrals tab styles
+  referralInfoContainer: {
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#2A2A2A',
+    marginBottom: 16,
+  },
+  referralTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  referralStatsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 8,
+  },
+  referralStatItem: {
+    alignItems: 'center',
+    padding: 8,
+  },
+  referralStatValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  referralStatLabel: {
+    fontSize: 14,
+    marginTop: 4,
   },
 });
 

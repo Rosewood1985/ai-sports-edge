@@ -7,6 +7,10 @@ import { StatusBar, useColorScheme } from "react-native";
 import StripeProvider from "./components/StripeProvider";
 import NeonLoginScreen from "./screens/NeonLoginScreen";
 import NeonOddsScreen from "./screens/NeonOddsScreen";
+import RewardsScreen from "./screens/RewardsScreen";
+import ReferralLeaderboardScreen from "./screens/ReferralLeaderboardScreen";
+import FAQScreen from "./screens/FAQScreen";
+import GiftRedemptionScreen from "./screens/GiftRedemptionScreen";
 import { colors } from "./styles/theme";
 
 const Stack = createStackNavigator();
@@ -64,6 +68,38 @@ function App(): JSX.Element {
               component={NeonOddsScreen}
               options={{
                 title: "LIVE BETTING ODDS",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="Rewards"
+              component={RewardsScreen}
+              options={{
+                title: "REWARDS & ACHIEVEMENTS",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="ReferralLeaderboard"
+              component={ReferralLeaderboardScreen}
+              options={{
+                title: "REFERRAL LEADERBOARD",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="FAQ"
+              component={FAQScreen}
+              options={{
+                title: "FREQUENTLY ASKED QUESTIONS",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="GiftRedemption"
+              component={GiftRedemptionScreen}
+              options={{
+                title: "REDEEM GIFT",
                 headerBackTitle: "Back"
               }}
             />
