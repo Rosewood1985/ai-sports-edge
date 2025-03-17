@@ -1,200 +1,162 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  ScrollView, 
-  ActivityIndicator, 
+import {
+  View,
   Text,
+  StyleSheet,
+  SafeAreaView,
+  StatusBar,
   TouchableOpacity,
-  Share
+  Alert
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { auth } from '../config/firebase';
+import { Ionicons } from '@expo/vector-icons';
+import { useThemeColor } from '../hooks/useThemeColor';
 import { rewardsService } from '../services/rewardsService';
 import ReferralLeaderboard from '../components/ReferralLeaderboard';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { NeonText, NeonContainer, NeonButton } from '../components/ui';
+import ReferralPrivacySettings from '../components/ReferralPrivacySettings';
+import { LeaderboardEntry, LeaderboardPrivacy } from '../types/rewards';
 
 type RootStackParamList = {
-  SubscriptionScreen: undefined;
-  // Other screens...
+  RewardsScreen: undefined;
+  ReferralRewards: undefined;
 };
 
-type ReferralLeaderboardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SubscriptionScreen'>;
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 /**
- * ReferralLeaderboardScreen component displays the referral leaderboard and referral program details
+ * ReferralLeaderboardScreen displays the leaderboard of top referrers
  * @returns {JSX.Element} - Rendered component
  */
-const ReferralLeaderboardScreen = (): JSX.Element => {
-  const [referralCode, setReferralCode] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+const ReferralLeaderboardScreen: React.FC = () => {
+  const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
+  const [period, setPeriod] = useState<'weekly' | 'monthly' | 'allTime'>('allTime');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [privacyModalVisible, setPrivacyModalVisible] = useState<boolean>(false);
+  const [currentPrivacy, setCurrentPrivacy] = useState<LeaderboardPrivacy>('public');
   
-  const navigation = useNavigation<ReferralLeaderboardScreenNavigationProp>();
-  const primaryColor = useThemeColor({}, 'tint');
+  const navigation = useNavigation<NavigationProp>();
+  const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
+  const primaryColor = useThemeColor({}, 'tint');
   
   useEffect(() => {
-    checkSubscriptionStatus();
-    loadReferralCode();
-  }, []);
+    loadLeaderboardData();
+    loadPrivacySettings();
+  }, [period]);
   
-  const checkSubscriptionStatus = async () => {
+  const loadLeaderboardData = async () => {
     try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) return;
+      setLoading(true);
       
-      // In a real app, this would check the user's subscription status
-      // For now, we'll simulate this
-      const userRewards = await rewardsService.getUserRewards(userId);
-      setIsSubscribed(!!userRewards?.subscriptionExtensions || Math.random() > 0.5);
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-    }
-  };
-  
-  const loadReferralCode = async () => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) return;
+      // Get leaderboard data for the selected period
+      const leaderboardData = await rewardsService.getLeaderboardData();
       
-      const userRewards = await rewardsService.getUserRewards(userId);
-      if (userRewards?.referralCode) {
-        setReferralCode(userRewards.referralCode);
+      // Set the entries based on the selected period
+      switch (period) {
+        case 'weekly':
+          setLeaderboardEntries(leaderboardData.weekly);
+          break;
+        case 'monthly':
+          setLeaderboardEntries(leaderboardData.monthly);
+          break;
+        case 'allTime':
+        default:
+          setLeaderboardEntries(leaderboardData.allTime);
+          break;
       }
     } catch (error) {
-      console.error('Error loading referral code:', error);
-    }
-  };
-  
-  const handleGenerateReferralCode = async () => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) return;
-      
-      setIsGenerating(true);
-      const code = await rewardsService.generateReferralCode(userId);
-      setReferralCode(code);
-    } catch (error) {
-      console.error('Error generating referral code:', error);
+      console.error('Error loading leaderboard data:', error);
+      Alert.alert('Error', 'Failed to load leaderboard data. Please try again.');
     } finally {
-      setIsGenerating(false);
+      setLoading(false);
     }
   };
   
-  const handleShareReferralCode = async () => {
-    if (!referralCode) return;
-    
+  const loadPrivacySettings = async () => {
     try {
-      await Share.share({
-        message: `Join me on AI Sports Edge and get exclusive rewards! Use my referral code: ${referralCode}\n\nDownload the app: https://aisportsedge.com/download`
-      });
+      // In a real app, this would fetch from the user's settings
+      const userId = 'current-user-id'; // In a real app, get from auth
+      const userRewards = await rewardsService.getUserRewards(userId);
+      
+      if (userRewards && userRewards.leaderboardPrivacy) {
+        setCurrentPrivacy(userRewards.leaderboardPrivacy);
+      }
     } catch (error) {
-      console.error('Error sharing referral code:', error);
+      console.error('Error loading privacy settings:', error);
     }
   };
   
-  const handleSubscribe = () => {
-    navigation.navigate('SubscriptionScreen');
+  const handlePeriodChange = (newPeriod: 'weekly' | 'monthly' | 'allTime') => {
+    setPeriod(newPeriod);
+  };
+  
+  const handlePrivacySettingsPress = () => {
+    setPrivacyModalVisible(true);
+  };
+  
+  const handlePrivacyChange = async (privacy: LeaderboardPrivacy) => {
+    try {
+      // In a real app, this would update the user's settings
+      const userId = 'current-user-id'; // In a real app, get from auth
+      await rewardsService.updateLeaderboardPrivacy(userId, privacy);
+      
+      setCurrentPrivacy(privacy);
+      setPrivacyModalVisible(false);
+      
+      // Reload leaderboard data to reflect privacy changes
+      loadLeaderboardData();
+    } catch (error) {
+      console.error('Error updating privacy settings:', error);
+      Alert.alert('Error', 'Failed to update privacy settings. Please try again.');
+    }
+  };
+  
+  // Handle privacy change from the settings component
+  const handlePrivacySettingsChanged = (privacy: LeaderboardPrivacy) => {
+    setCurrentPrivacy(privacy);
+    loadLeaderboardData();
   };
   
   return (
-    <NeonContainer>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.header}>
-          <NeonText type="heading" glow={true}>Referral Leaderboard</NeonText>
-          <Text style={[styles.subtitle, { color: textColor }]}>
-            Refer friends and climb the ranks!
-          </Text>
-        </View>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color={textColor} />
+        </TouchableOpacity>
         
-        {/* Referral Program Info */}
-        <View style={styles.infoSection}>
-          <NeonText type="subheading" glow={true} style={styles.sectionTitle}>
-            How It Works
-          </NeonText>
-          
-          <Text style={[styles.infoText, { color: textColor }]}>
-            Invite friends to join AI Sports Edge. When they subscribe using your referral code, you'll both receive rewards:
-          </Text>
-          
-          <View style={styles.benefitsList}>
-            <View style={styles.benefitItem}>
-              <Ionicons name="calendar" size={20} color={primaryColor} style={styles.benefitIcon} />
-              <Text style={[styles.benefitText, { color: textColor }]}>
-                You get a 1-month subscription extension
-              </Text>
-            </View>
-            
-            <View style={styles.benefitItem}>
-              <Ionicons name="star" size={20} color={primaryColor} style={styles.benefitIcon} />
-              <Text style={[styles.benefitText, { color: textColor }]}>
-                You earn 200 loyalty points
-              </Text>
-            </View>
-            
-            <View style={styles.benefitItem}>
-              <Ionicons name="gift" size={20} color={primaryColor} style={styles.benefitIcon} />
-              <Text style={[styles.benefitText, { color: textColor }]}>
-                Your friend gets 100 loyalty points
-              </Text>
-            </View>
-          </View>
-        </View>
+        <Text style={[styles.headerTitle, { color: textColor }]}>
+          Referral Leaderboard
+        </Text>
         
-        {/* Referral Code Section */}
-        <View style={styles.codeSection}>
-          <NeonText type="subheading" glow={true} style={styles.sectionTitle}>
-            Your Referral Code
-          </NeonText>
-          
-          {isSubscribed ? (
-            <>
-              {referralCode ? (
-                <>
-                  <View style={styles.codeContainer}>
-                    <Text style={[styles.code, { color: primaryColor }]}>{referralCode}</Text>
-                  </View>
-                  
-                  <NeonButton
-                    title="Share Your Code"
-                    onPress={handleShareReferralCode}
-                    style={styles.shareButton}
-                    icon={<Ionicons name="share-social" size={18} color="#fff" />}
-                    iconPosition="left"
-                  />
-                </>
-              ) : (
-                <NeonButton
-                  title={isGenerating ? "Generating..." : "Generate Referral Code"}
-                  onPress={handleGenerateReferralCode}
-                  disabled={isGenerating}
-                  style={styles.generateButton}
-                />
-              )}
-            </>
-          ) : (
-            <View style={styles.subscribePromptContainer}>
-              <Text style={[styles.subscribePrompt, { color: textColor }]}>
-                Subscribe to generate your own referral code and start earning rewards!
-              </Text>
-              
-              <NeonButton
-                title="Subscribe Now"
-                onPress={handleSubscribe}
-                style={styles.subscribeButton}
-              />
-            </View>
-          )}
-        </View>
-        
-        {/* Leaderboard */}
-        <ReferralLeaderboard limit={20} />
-      </ScrollView>
-    </NeonContainer>
+        <TouchableOpacity 
+          style={styles.rewardsButton}
+          onPress={() => navigation.navigate('ReferralRewards')}
+        >
+          <Ionicons name="gift" size={24} color={textColor} />
+        </TouchableOpacity>
+      </View>
+      
+      <ReferralLeaderboard
+        entries={leaderboardEntries}
+        loading={loading}
+        period={period}
+        onPeriodChange={handlePeriodChange}
+        onPrivacySettingsPress={handlePrivacySettingsPress}
+      />
+      
+      <ReferralPrivacySettings
+        visible={privacyModalVisible}
+        onClose={() => setPrivacyModalVisible(false)}
+        onPrivacyChanged={handlePrivacySettingsChanged}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -202,81 +164,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  contentContainer: {
-    padding: 16,
-    paddingBottom: 32,
-  },
   header: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginTop: 8,
-    opacity: 0.8,
-  },
-  infoSection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    marginBottom: 12,
-  },
-  infoText: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  benefitsList: {
-    marginTop: 8,
-  },
-  benefitItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
   },
-  benefitIcon: {
-    marginRight: 12,
+  backButton: {
+    padding: 8,
   },
-  benefitText: {
-    fontSize: 14,
-    flex: 1,
-  },
-  codeSection: {
-    marginBottom: 24,
-  },
-  codeContainer: {
-    borderWidth: 1,
-    borderColor: '#444',
-    borderRadius: 8,
-    padding: 16,
-    marginVertical: 12,
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-  },
-  code: {
-    fontSize: 24,
+  headerTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    letterSpacing: 2,
-  },
-  shareButton: {
-    marginVertical: 12,
-  },
-  generateButton: {
-    marginVertical: 12,
-  },
-  subscribePromptContainer: {
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-    marginVertical: 12,
-  },
-  subscribePrompt: {
-    fontSize: 14,
+    flex: 1,
     textAlign: 'center',
-    marginBottom: 16,
   },
-  subscribeButton: {
-    marginTop: 8,
+  rewardsButton: {
+    padding: 8,
   },
 });
 

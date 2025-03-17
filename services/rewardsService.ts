@@ -1,11 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../config/firebase';
-import { 
-  UserRewards, 
-  LoyaltyLevel, 
-  Achievement, 
+import {
+  UserRewards,
+  LoyaltyLevel,
+  Achievement,
   RewardTier,
-  DailyStreakReward
+  DailyStreakReward,
+  BadgeType,
+  LeaderboardPrivacy,
+  ReferralMilestone,
+  LeaderboardEntry,
+  LeaderboardData
 } from '../types/rewards';
 import { trackEvent } from './analyticsService';
 
@@ -140,7 +145,10 @@ class RewardsService {
         lastLoginDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD
         achievements: ACHIEVEMENTS,
         referralCount: 0,
-        freeAIPredictions: 0
+        freeAIPredictions: 0,
+        badgeType: 'rookie',
+        leaderboardPrivacy: 'public',
+        eliteStatus: false
       };
       
       await this.saveUserRewards(initialRewards);
@@ -627,16 +635,14 @@ class RewardsService {
 
   /**
    * Get referral leaderboard
+   * @param period Leaderboard time period
    * @param limit Maximum number of entries to return
    * @returns Array of leaderboard entries
    */
-  async getReferralLeaderboard(limit: number = 10): Promise<Array<{
-    userId: string;
-    username: string;
-    referralCount: number;
-    rank: number;
-    isCurrentUser: boolean;
-  }>> {
+  async getReferralLeaderboard(
+    period: 'weekly' | 'monthly' | 'allTime' = 'allTime',
+    limit: number = 10
+  ): Promise<LeaderboardEntry[]> {
     try {
       // In a real app, this would fetch from Firestore
       // For now, we'll simulate with mock data and any local user data
@@ -650,31 +656,39 @@ class RewardsService {
       
       // Mock leaderboard data
       const mockLeaderboard = [
-        { userId: 'user1', username: 'BettingPro', referralCount: 24 },
-        { userId: 'user2', username: 'SportsFan99', referralCount: 18 },
-        { userId: 'user3', username: 'PredictionKing', referralCount: 15 },
-        { userId: 'user4', username: 'BetMaster', referralCount: 12 },
-        { userId: 'user5', username: 'OddsWizard', referralCount: 10 },
-        { userId: 'user6', username: 'StatsGuru', referralCount: 8 },
-        { userId: 'user7', username: 'PicksExpert', referralCount: 7 },
-        { userId: 'user8', username: 'BetInsider', referralCount: 6 },
-        { userId: 'user9', username: 'LineBreaker', referralCount: 5 },
-        { userId: 'user10', username: 'ParlaySage', referralCount: 4 }
+        { userId: 'user1', displayName: 'BettingPro', referralCount: 24, badgeType: 'hall-of-fame' as BadgeType },
+        { userId: 'user2', displayName: 'SportsFan99', referralCount: 18, badgeType: 'elite' as BadgeType },
+        { userId: 'user3', displayName: 'PredictionKing', referralCount: 15, badgeType: 'elite' as BadgeType },
+        { userId: 'user4', displayName: 'BetMaster', referralCount: 12, badgeType: 'elite' as BadgeType },
+        { userId: 'user5', displayName: 'OddsWizard', referralCount: 10, badgeType: 'elite' as BadgeType },
+        { userId: 'user6', displayName: 'StatsGuru', referralCount: 8, badgeType: 'rookie' as BadgeType },
+        { userId: 'user7', displayName: 'PicksExpert', referralCount: 7, badgeType: 'rookie' as BadgeType },
+        { userId: 'user8', displayName: 'BetInsider', referralCount: 6, badgeType: 'rookie' as BadgeType },
+        { userId: 'user9', displayName: 'LineBreaker', referralCount: 5, badgeType: 'rookie' as BadgeType },
+        { userId: 'user10', displayName: 'ParlaySage', referralCount: 4, badgeType: 'rookie' as BadgeType }
       ];
       
       // If we have user data, add it to the leaderboard
       if (currentUserId && userRewards && userRewards.referralCount > 0) {
         // Get user's display name or email
-        let username = 'You';
+        let displayName = 'You';
         try {
           const userRecord = await auth.currentUser?.getIdTokenResult();
           if (userRecord && auth.currentUser?.displayName) {
-            username = auth.currentUser.displayName;
+            displayName = auth.currentUser.displayName;
           } else if (userRecord && auth.currentUser?.email) {
-            username = auth.currentUser.email.split('@')[0];
+            displayName = auth.currentUser.email.split('@')[0];
           }
         } catch (error) {
           console.error('Error getting user details:', error);
+        }
+        
+        // Determine badge type based on referral count
+        let badgeType: BadgeType = 'rookie';
+        if (userRewards.referralCount >= 20) {
+          badgeType = 'hall-of-fame';
+        } else if (userRewards.referralCount >= 10) {
+          badgeType = 'elite';
         }
         
         // Add current user to mock data if not already in top 10
@@ -682,8 +696,9 @@ class RewardsService {
         if (!userInMock) {
           mockLeaderboard.push({
             userId: currentUserId,
-            username,
-            referralCount: userRewards.referralCount
+            displayName,
+            referralCount: userRewards.referralCount,
+            badgeType
           });
         }
       }
@@ -703,6 +718,166 @@ class RewardsService {
     } catch (error) {
       console.error('Error getting referral leaderboard:', error);
       return [];
+    }
+  }
+  /**
+   * Get user's referral milestone progress
+   */
+  async getReferralMilestoneProgress(userId: string): Promise<{
+    currentReferrals: number;
+    milestones: ReferralMilestone[];
+    nextMilestone: number | null;
+  }> {
+    try {
+      const rewards = await this.getUserRewards(userId);
+      if (!rewards) {
+        return {
+          currentReferrals: 0,
+          milestones: [],
+          nextMilestone: null
+        };
+      }
+      
+      const referralCount = rewards.referralCount || 0;
+      
+      // Define milestones
+      const milestones: ReferralMilestone[] = [
+        {
+          count: 3,
+          reward: {
+            type: 'subscription_extension',
+            description: 'Get 1 month free subscription',
+            duration: 30
+          },
+          isUnlocked: referralCount >= 3
+        },
+        {
+          count: 5,
+          reward: {
+            type: 'premium_trial',
+            description: 'Premium upgrade for 2 months',
+            duration: 60
+          },
+          isUnlocked: referralCount >= 5
+        },
+        {
+          count: 10,
+          reward: {
+            type: 'cash_or_upgrade',
+            description: '$25 or free Pro subscription',
+            amount: 25,
+            upgradeDuration: 30
+          },
+          isUnlocked: referralCount >= 10
+        },
+        {
+          count: 20,
+          reward: {
+            type: 'elite_status',
+            description: 'Elite status + special badge'
+          },
+          isUnlocked: referralCount >= 20
+        }
+      ];
+      
+      // Find next milestone
+      const nextMilestone = milestones.find(m => !m.isUnlocked)?.count || null;
+      
+      return {
+        currentReferrals: referralCount,
+        milestones,
+        nextMilestone
+      };
+    } catch (error) {
+      console.error('Error getting referral milestone progress:', error);
+      return {
+        currentReferrals: 0,
+        milestones: [],
+        nextMilestone: null
+      };
+    }
+  }
+
+  /**
+   * Update user's leaderboard privacy setting
+   */
+  async updateLeaderboardPrivacy(
+    userId: string,
+    privacy: LeaderboardPrivacy
+  ): Promise<boolean> {
+    try {
+      let rewards = await this.getUserRewards(userId);
+      if (!rewards) {
+        rewards = await this.initializeUserRewards(userId);
+      }
+      
+      rewards.leaderboardPrivacy = privacy;
+      await this.saveUserRewards(rewards);
+      
+      // Track event
+      trackEvent('leaderboard_privacy_updated' as any, {
+        privacy
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating leaderboard privacy:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get user's referral badge type
+   */
+  async getUserBadgeType(userId: string): Promise<BadgeType> {
+    try {
+      const rewards = await this.getUserRewards(userId);
+      if (!rewards) {
+        return 'rookie';
+      }
+      
+      // If user already has a badge type set, return it
+      if (rewards.badgeType) {
+        return rewards.badgeType;
+      }
+      
+      // Otherwise, determine badge type based on referral count
+      const referralCount = rewards.referralCount || 0;
+      
+      if (referralCount >= 20) {
+        return 'hall-of-fame';
+      } else if (referralCount >= 10) {
+        return 'elite';
+      } else {
+        return 'rookie';
+      }
+    } catch (error) {
+      console.error('Error getting user badge type:', error);
+      return 'rookie';
+    }
+  }
+
+  /**
+   * Get leaderboard data for all time periods
+   */
+  async getLeaderboardData(limit: number = 10): Promise<LeaderboardData> {
+    try {
+      // In a real app, this would fetch from Firestore for each time period
+      // For now, we'll use the same data for all periods
+      const allTimeEntries = await this.getReferralLeaderboard('allTime', limit);
+      
+      return {
+        weekly: allTimeEntries,
+        monthly: allTimeEntries,
+        allTime: allTimeEntries
+      };
+    } catch (error) {
+      console.error('Error getting leaderboard data:', error);
+      return {
+        weekly: [],
+        monthly: [],
+        allTime: []
+      };
     }
   }
 }

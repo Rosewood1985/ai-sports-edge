@@ -1,373 +1,445 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { auth } from '../config/firebase';
-import { rewardsService } from '../services/rewardsService';
-import { useThemeColor } from '../hooks/useThemeColor';
-import NeonCard from './ui/NeonCard';
-import NeonText from './ui/NeonText';
 import { LinearGradient } from 'expo-linear-gradient';
-
-interface LeaderboardEntry {
-  userId: string;
-  username: string;
-  referralCount: number;
-  rank: number;
-  isCurrentUser: boolean;
-}
-
-type LeaderboardColors = readonly [string, string];
+import { useThemeColor } from '../hooks/useThemeColor';
+import { LeaderboardEntry } from '../types/rewards';
+import ReferralBadge from './ReferralBadge';
+import LeaderboardPositionChange from './LeaderboardPositionChange';
+import NeonText from './ui/NeonText';
 
 interface ReferralLeaderboardProps {
-  limit?: number;
-  showViewAll?: boolean;
-  onViewAllPress?: () => void;
+  entries: LeaderboardEntry[];
+  loading: boolean;
+  period: 'weekly' | 'monthly' | 'allTime';
+  onPeriodChange: (period: 'weekly' | 'monthly' | 'allTime') => void;
+  onPrivacySettingsPress?: () => void;
 }
 
 /**
- * ReferralLeaderboard component displays a leaderboard of users with the most referrals
+ * ReferralLeaderboard component displays a leaderboard of top referrers
  * @param {ReferralLeaderboardProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({ 
-  limit = 10,
-  showViewAll = false,
-  onViewAllPress
+const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
+  entries,
+  loading,
+  period,
+  onPeriodChange,
+  onPrivacySettingsPress
 }) => {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [userRank, setUserRank] = useState<number | null>(null);
+  // State to track previous entries for position change animations
+  const [previousEntries, setPreviousEntries] = useState<LeaderboardEntry[]>([]);
+  const [showPositionChanges, setShowPositionChanges] = useState<boolean>(false);
   
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'background');
+  const { width } = Dimensions.get('window');
   
+  // Update previous entries when entries change
   useEffect(() => {
-    loadLeaderboard();
-  }, []);
-  
-  const loadLeaderboard = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    if (!loading && entries.length > 0) {
+      // Wait a bit before showing position changes to allow the list to render
+      setTimeout(() => {
+        setShowPositionChanges(true);
+      }, 500);
       
-      const userId = auth.currentUser?.uid;
-      const data = await rewardsService.getReferralLeaderboard(limit);
-      
-      // Find current user's rank
-      if (userId) {
-        const userEntry = data.find(entry => entry.userId === userId);
-        if (userEntry) {
-          setUserRank(userEntry.rank);
-        }
-      }
-      
-      setLeaderboard(data);
-    } catch (err) {
-      console.error('Error loading referral leaderboard:', err);
-      setError('Failed to load leaderboard. Please try again later.');
-    } finally {
-      setLoading(false);
+      // Store current entries as previous for next update
+      setPreviousEntries([...entries]);
     }
+  }, [entries, period]);
+  
+  // Reset position change animation when period changes
+  useEffect(() => {
+    setShowPositionChanges(false);
+  }, [period]);
+  
+  // Find previous rank for a user
+  const getPreviousRank = (userId: string): number => {
+    const previousEntry = previousEntries.find(entry => entry.userId === userId);
+    return previousEntry?.rank || 0;
   };
   
-  const renderRankBadge = (rank: number) => {
-    let badgeColor: LeaderboardColors;
-    let textColor = '#FFFFFF';
+  // Render top 3 podium
+  const renderPodium = () => {
+    const top3 = entries.slice(0, 3);
     
-    switch (rank) {
-      case 1:
-        badgeColor = ['#FFD700', '#FFA500'] as LeaderboardColors; // Gold gradient
-        break;
-      case 2:
-        badgeColor = ['#C0C0C0', '#A9A9A9'] as LeaderboardColors; // Silver gradient
-        break;
-      case 3:
-        badgeColor = ['#CD7F32', '#8B4513'] as LeaderboardColors; // Bronze gradient
-        break;
-      default:
-        badgeColor = ['#3498db', '#2980b9'] as LeaderboardColors; // Blue gradient
-        break;
+    // If we don't have 3 entries, pad with empty ones
+    while (top3.length < 3) {
+      top3.push({
+        userId: `empty-${top3.length}`,
+        displayName: '',
+        referralCount: 0,
+        rank: top3.length + 1,
+        badgeType: 'rookie',
+        isCurrentUser: false
+      });
     }
     
+    // Sort by rank (2nd place, 1st place, 3rd place) for display
+    const displayOrder = [top3[1], top3[0], top3[2]];
+    
     return (
-      <LinearGradient
-        colors={badgeColor}
-        style={styles.rankBadge}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Text style={[styles.rankText, { color: textColor }]}>{rank}</Text>
-      </LinearGradient>
+      <View style={styles.podiumContainer}>
+        {displayOrder.map((entry, index) => {
+          const position = index === 0 ? 2 : index === 1 ? 1 : 3;
+          const isEmpty = entry.userId.startsWith('empty-');
+          
+          // Determine podium height based on position
+          const podiumHeight = position === 1 ? 120 : position === 2 ? 100 : 80;
+          
+          // Determine medal color based on position
+          const medalColor = position === 1 
+            ? ['#f1c40f', '#e67e22'] as const // Gold
+            : position === 2 
+              ? ['#bdc3c7', '#95a5a6'] as const // Silver
+              : ['#cd7f32', '#a04000'] as const; // Bronze
+          
+          return (
+            <View key={entry.userId} style={[
+              styles.podiumItem,
+              { width: width / 3.5 }
+            ]}>
+              {!isEmpty && (
+                <View style={styles.podiumUser}>
+                  <ReferralBadge 
+                    type={entry.badgeType} 
+                    size="small" 
+                  />
+                  
+                  <Text 
+                    style={[styles.podiumName, { color: textColor }]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {entry.isCurrentUser ? 'You' : entry.displayName}
+                  </Text>
+                  
+                  <Text style={[styles.podiumCount, { color: primaryColor }]}>
+                    {entry.referralCount}
+                  </Text>
+                </View>
+              )}
+              
+              <LinearGradient
+                colors={medalColor}
+                style={[
+                  styles.podiumPlatform,
+                  { height: podiumHeight }
+                ]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.podiumPosition}>
+                  {position}
+                </Text>
+              </LinearGradient>
+            </View>
+          );
+        })}
+      </View>
     );
   };
   
-  const renderItem = ({ item }: { item: LeaderboardEntry }) => {
+  // Render leaderboard entry
+  const renderLeaderboardItem = ({ item, index }: { item: LeaderboardEntry, index: number }) => {
+    // Skip top 3 as they're shown in the podium
+    if (index < 3) return null;
+    
+    // Get previous rank for position change animation
+    const previousRank = getPreviousRank(item.userId);
+    
     return (
       <View style={[
         styles.leaderboardItem,
-        item.isCurrentUser && styles.currentUserItem
+        item.isCurrentUser && { backgroundColor: 'rgba(52, 152, 219, 0.1)' }
       ]}>
-        {renderRankBadge(item.rank)}
-        
-        <View style={styles.userInfo}>
-          <Text style={[styles.username, { color: textColor }]}>
-            {item.username}
-            {item.isCurrentUser && ' (You)'}
+        <View style={styles.rankContainer}>
+          <Text style={[styles.rank, { color: textColor }]}>
+            {item.rank}
           </Text>
+          
+          {showPositionChanges && previousRank > 0 && (
+            <LeaderboardPositionChange
+              previousRank={previousRank}
+              currentRank={item.rank}
+              showAnimation={showPositionChanges}
+            />
+          )}
         </View>
         
-        <View style={styles.statsContainer}>
-          <Text style={[styles.referralCount, { color: primaryColor }]}>
-            {item.referralCount}
-          </Text>
-          <Text style={[styles.referralLabel, { color: textColor }]}>
-            {item.referralCount === 1 ? 'referral' : 'referrals'}
-          </Text>
-        </View>
-      </View>
-    );
-  };
-  
-  const renderHeader = () => {
-    return (
-      <View style={styles.headerContainer}>
-        <NeonText type="subheading" glow={true} style={styles.title}>
-          Referral Leaderboard
-        </NeonText>
-        <Text style={[styles.subtitle, { color: textColor }]}>
-          Top referrers this month
+        <ReferralBadge
+          type={item.badgeType}
+          size="small"
+        />
+        
+        <Text
+          style={[
+            styles.displayName,
+            { color: textColor },
+            item.isCurrentUser && { fontWeight: 'bold' }
+          ]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {item.isCurrentUser ? 'You' : item.displayName}
+        </Text>
+        
+        <Text style={[styles.referralCount, { color: primaryColor }]}>
+          {item.referralCount}
         </Text>
       </View>
     );
   };
   
-  const renderFooter = () => {
-    if (!showViewAll) return null;
-    
-    return (
-      <TouchableOpacity 
-        style={styles.viewAllButton}
-        onPress={onViewAllPress}
-      >
-        <Text style={[styles.viewAllText, { color: primaryColor }]}>
-          View Full Leaderboard
-        </Text>
-        <Ionicons name="chevron-forward" size={16} color={primaryColor} />
-      </TouchableOpacity>
-    );
-  };
-  
-  const renderUserRank = () => {
-    if (userRank === null) return null;
-    
-    return (
-      <View style={styles.userRankContainer}>
-        <Text style={[styles.userRankText, { color: textColor }]}>
-          Your current rank: 
-          <Text style={{ color: primaryColor, fontWeight: 'bold' }}> #{userRank}</Text>
-        </Text>
-      </View>
-    );
-  };
-  
-  if (loading) {
-    return (
-      <NeonCard style={styles.container}>
-        {renderHeader()}
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={primaryColor} />
-          <Text style={[styles.loadingText, { color: textColor }]}>
-            Loading leaderboard...
-          </Text>
-        </View>
-      </NeonCard>
-    );
-  }
-  
-  if (error) {
-    return (
-      <NeonCard style={styles.container}>
-        {renderHeader()}
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={24} color="#FF3B30" />
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity 
-            style={[styles.retryButton, { backgroundColor: primaryColor }]}
-            onPress={loadLeaderboard}
-          >
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </NeonCard>
-    );
-  }
+  // Render empty state
+  const renderEmptyState = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="trophy-outline" size={64} color={textColor} style={{ opacity: 0.5 }} />
+      <Text style={[styles.emptyText, { color: textColor }]}>
+        No leaderboard data yet
+      </Text>
+      <Text style={[styles.emptySubtext, { color: textColor }]}>
+        Start referring friends to appear on the leaderboard
+      </Text>
+    </View>
+  );
   
   return (
-    <NeonCard style={styles.container}>
-      {renderHeader()}
-      
-      {leaderboard.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="trophy" size={40} color={primaryColor} style={styles.emptyIcon} />
-          <Text style={[styles.emptyText, { color: textColor }]}>
-            No referrals yet. Be the first to refer friends and earn rewards!
+    <View style={[styles.container, { backgroundColor }]}>
+      {/* Period Tabs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            period === 'weekly' && { borderBottomColor: primaryColor }
+          ]}
+          onPress={() => onPeriodChange('weekly')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: textColor },
+            period === 'weekly' && { color: primaryColor }
+          ]}>
+            Weekly
           </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            period === 'monthly' && { borderBottomColor: primaryColor }
+          ]}
+          onPress={() => onPeriodChange('monthly')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: textColor },
+            period === 'monthly' && { color: primaryColor }
+          ]}>
+            Monthly
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            period === 'allTime' && { borderBottomColor: primaryColor }
+          ]}
+          onPress={() => onPeriodChange('allTime')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: textColor },
+            period === 'allTime' && { color: primaryColor }
+          ]}>
+            All Time
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Privacy Settings Button */}
+      {onPrivacySettingsPress && (
+        <TouchableOpacity 
+          style={styles.privacyButton}
+          onPress={onPrivacySettingsPress}
+        >
+          <Ionicons name="settings-outline" size={16} color={textColor} />
+          <Text style={[styles.privacyButtonText, { color: textColor }]}>
+            Privacy Settings
+          </Text>
+        </TouchableOpacity>
+      )}
+      
+      {/* Leaderboard Title */}
+      <NeonText type="subheading" glow={true} style={styles.title}>
+        {period === 'weekly' 
+          ? 'Weekly Leaderboard' 
+          : period === 'monthly' 
+            ? 'Monthly Leaderboard' 
+            : 'All-Time Leaderboard'
+        }
+      </NeonText>
+      
+      {/* Podium for Top 3 */}
+      {!loading && entries.length > 0 && renderPodium()}
+      
+      {/* Leaderboard List */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={primaryColor} />
         </View>
       ) : (
-        <>
-          <FlatList
-            data={leaderboard}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.userId}
-            contentContainerStyle={styles.listContent}
-            scrollEnabled={false}
-          />
-          
-          {renderUserRank()}
-          {renderFooter()}
-        </>
+        <FlatList
+          data={entries}
+          renderItem={renderLeaderboardItem}
+          keyExtractor={item => item.userId}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={renderEmptyState}
+          showsVerticalScrollIndicator={false}
+        />
       )}
-    </NeonCard>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginVertical: 12,
+    flex: 1,
     padding: 16,
   },
-  headerContainer: {
+  tabsContainer: {
+    flexDirection: 'row',
     marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  privacyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    padding: 8,
+    marginBottom: 8,
+  },
+  privacyButtonText: {
+    fontSize: 12,
+    marginLeft: 4,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: 4,
   },
-  subtitle: {
+  podiumContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  podiumItem: {
+    alignItems: 'center',
+  },
+  podiumUser: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  podiumName: {
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: 2,
+    maxWidth: 80,
+  },
+  podiumCount: {
     fontSize: 14,
-    textAlign: 'center',
-    opacity: 0.7,
+    fontWeight: 'bold',
+  },
+  podiumPlatform: {
+    width: '80%',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  podiumPosition: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listContent: {
-    paddingBottom: 8,
+    flexGrow: 1,
   },
   leaderboardItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(150, 150, 150, 0.2)',
-  },
-  currentUserItem: {
-    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-    borderRadius: 8,
     paddingHorizontal: 8,
-    marginHorizontal: -8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
   },
-  rankBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
+  rankContainer: {
+    flexDirection: 'column',
     alignItems: 'center',
-    marginRight: 12,
+    width: 30,
   },
-  rankText: {
+  rank: {
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
-  userInfo: {
+  displayName: {
     flex: 1,
-  },
-  username: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  statsContainer: {
-    alignItems: 'flex-end',
+    fontSize: 14,
+    marginLeft: 12,
   },
   referralCount: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-  },
-  referralLabel: {
-    fontSize: 12,
-    opacity: 0.7,
-  },
-  userRankContainer: {
-    marginTop: 16,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-    alignItems: 'center',
-  },
-  userRankText: {
-    fontSize: 14,
-  },
-  viewAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16,
-    paddingVertical: 8,
-  },
-  viewAllText: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginRight: 4,
-  },
-  loadingContainer: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-  },
-  errorContainer: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  errorText: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#FF3B30',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  retryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
+    marginLeft: 8,
   },
   emptyContainer: {
-    padding: 24,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  emptyIcon: {
-    marginBottom: 12,
-    opacity: 0.5,
+    padding: 20,
   },
   emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  emptySubtext: {
     fontSize: 14,
-    textAlign: 'center',
     opacity: 0.7,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

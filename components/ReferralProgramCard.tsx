@@ -1,32 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Share, TextInput, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Clipboard,
+  Alert
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
 import { rewardsService } from '../services/rewardsService';
-import { generateReferralCode, applyReferralCode } from '../services/firebaseSubscriptionService';
-import { trackEvent } from '../services/analyticsService';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
-import NeonButton from './ui/NeonButton';
+import { useThemeColor } from '../hooks/useThemeColor';
 import NeonCard from './ui/NeonCard';
 import NeonText from './ui/NeonText';
-import { useThemeColor } from '../hooks/useThemeColor';
+import NeonButton from './ui/NeonButton';
+import ReferralShareOptions from './ReferralShareOptions';
 
 interface ReferralProgramCardProps {
-  isSubscribed?: boolean;
+  onViewLeaderboard?: () => void;
+  onViewMilestones?: () => void;
 }
 
-export const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({ isSubscribed = false }) => {
+/**
+ * ReferralProgramCard component displays the user's referral code and basic stats
+ * @param {ReferralProgramCardProps} props - Component props
+ * @returns {JSX.Element} - Rendered component
+ */
+const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({
+  onViewLeaderboard,
+  onViewMilestones
+}) => {
   const [referralCode, setReferralCode] = useState<string>('');
   const [referralCount, setReferralCount] = useState<number>(0);
-  const [inputCode, setInputCode] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isApplying, setIsApplying] = useState<boolean>(false);
-  const [hasAppliedCode, setHasAppliedCode] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [shareModalVisible, setShareModalVisible] = useState<boolean>(false);
   
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
-  const backgroundColor = useThemeColor({}, 'background');
-  const cardColor = useThemeColor({}, 'background');
   
   useEffect(() => {
     loadReferralData();
@@ -37,184 +48,154 @@ export const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({ isSubs
       const userId = auth.currentUser?.uid;
       if (!userId) return;
       
-      // Get user rewards to check if they already have a referral code
-      const userRewards = await rewardsService.getUserRewards(userId);
-      if (userRewards) {
-        setReferralCount(userRewards.referralCount || 0);
-        
-        // Check if user has already applied a referral code
-        if (userRewards.referredBy) {
-          setHasAppliedCode(true);
-        }
-        
-        // If user already has a referral code, use it
-        if (userRewards.referralCode) {
-          setReferralCode(userRewards.referralCode);
-          return;
-        }
+      // Get user rewards data
+      const rewards = await rewardsService.getUserRewards(userId);
+      
+      // Set referral code if it exists
+      if (rewards?.referralCode) {
+        setReferralCode(rewards.referralCode);
       }
       
-      // If user doesn't have a referral code yet and is subscribed, generate one
-      if (isSubscribed && !userRewards?.referralCode) {
-        await generateUserReferralCode();
-      }
+      // Set referral count
+      setReferralCount(rewards?.referralCount || 0);
+      
+      // Check if user is subscribed (simplified for now)
+      setIsSubscribed(true); // In a real app, check subscription status
     } catch (error) {
       console.error('Error loading referral data:', error);
     }
   };
   
-  const generateUserReferralCode = async () => {
+  const handleGenerateReferralCode = async () => {
     try {
-      setIsLoading(true);
       const userId = auth.currentUser?.uid;
       if (!userId) return;
       
-      // Generate a referral code
-      const result = await generateReferralCode(userId);
-      if (result && result.referralCode) {
-        setReferralCode(result.referralCode);
-        
-        // Track event
-        trackEvent('subscription_completed' as any, {
-          isNew: result.isNew,
-          event_subtype: 'referral_code_generated'
-        });
-      }
+      setIsGenerating(true);
+      const code = await rewardsService.generateReferralCode(userId);
+      setReferralCode(code);
     } catch (error) {
       console.error('Error generating referral code:', error);
       Alert.alert('Error', 'Failed to generate referral code. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsGenerating(false);
     }
   };
   
-  const handleShareReferral = async () => {
-    if (!referralCode) return;
-    
-    try {
-      const result = await Share.share({
-        message: `Join me on AI Sports Edge and get exclusive rewards! Use my referral code: ${referralCode}\n\nDownload the app: https://aisportsedge.com/download`
-      });
-      
-      if (result.action === Share.sharedAction) {
-        // Track sharing event
-        trackEvent('subscription_completed' as any, {
-          event_subtype: 'referral_code_shared',
-          method: result.activityType || 'unknown'
-        });
-      }
-    } catch (error) {
-      console.error('Error sharing referral code:', error);
-      Alert.alert('Error', 'Failed to share referral code. Please try again.');
-    }
+  const handleCopyReferralCode = () => {
+    Clipboard.setString(referralCode);
+    Alert.alert('Copied!', 'Referral code copied to clipboard');
   };
   
-  const handleApplyReferralCode = async () => {
-    if (!inputCode || hasAppliedCode) return;
-    
-    try {
-      setIsApplying(true);
-      const userId = auth.currentUser?.uid;
-      if (!userId) return;
-      
-      // Apply the referral code
-      const result = await applyReferralCode(userId, inputCode);
-      
-      if (result && result.success) {
-        setHasAppliedCode(true);
-        setInputCode('');
-        
-        // Track event
-        trackEvent('subscription_completed' as any, {
-          event_subtype: 'referral_code_applied',
-          referralCode: inputCode
-        });
-        
-        Alert.alert('Success', 'Referral code applied successfully! You\'ll receive your rewards when you subscribe.');
-      }
-    } catch (error) {
-      console.error('Error applying referral code:', error);
-      Alert.alert('Error', 'Failed to apply referral code. Please check the code and try again.');
-    } finally {
-      setIsApplying(false);
-    }
+  const handleShareReferralCode = () => {
+    setShareModalVisible(true);
+  };
+  
+  const handleCloseShareModal = () => {
+    setShareModalVisible(false);
   };
   
   return (
     <NeonCard style={styles.container}>
-      <NeonText style={styles.title}>Referral Program</NeonText>
-      
-      <ThemedView style={styles.section}>
-        <ThemedText style={styles.sectionTitle}>How It Works</ThemedText>
-        <ThemedText style={styles.description}>
-          Invite friends to join AI Sports Edge. When they subscribe using your referral code, you'll both receive rewards:
-        </ThemedText>
+      <View style={styles.header}>
+        <NeonText type="subheading" glow={true}>
+          Refer Friends & Earn Rewards
+        </NeonText>
         
-        <View style={styles.benefitsList}>
-          <ThemedText style={styles.benefitItem}>• You get a 1-month subscription extension</ThemedText>
-          <ThemedText style={styles.benefitItem}>• You earn 200 loyalty points</ThemedText>
-          <ThemedText style={styles.benefitItem}>• Your friend gets 100 loyalty points</ThemedText>
-        </View>
-      </ThemedView>
+        {onViewLeaderboard && (
+          <TouchableOpacity onPress={onViewLeaderboard} style={styles.leaderboardButton}>
+            <Ionicons name="trophy" size={20} color={primaryColor} />
+          </TouchableOpacity>
+        )}
+      </View>
+      
+      <Text style={[styles.description, { color: textColor }]}>
+        Invite friends to join AI Sports Edge. You'll both receive rewards when they subscribe!
+      </Text>
       
       {isSubscribed ? (
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Your Referral Code</ThemedText>
-          
+        <>
           {referralCode ? (
-            <>
+            <View style={styles.codeSection}>
+              <Text style={[styles.codeLabel, { color: textColor }]}>
+                Your Referral Code:
+              </Text>
+              
               <View style={styles.codeContainer}>
-                <ThemedText style={styles.code}>{referralCode}</ThemedText>
+                <Text style={[styles.code, { color: primaryColor }]}>
+                  {referralCode}
+                </Text>
+                
+                <View style={styles.codeActions}>
+                  <TouchableOpacity 
+                    onPress={handleCopyReferralCode}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="copy-outline" size={20} color={primaryColor} />
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    onPress={handleShareReferralCode}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="share-social-outline" size={20} color={primaryColor} />
+                  </TouchableOpacity>
+                </View>
               </View>
-              
-              <NeonButton 
-                onPress={handleShareReferral}
-                title="Share Your Code"
-                style={styles.shareButton}
-              />
-              
-              <ThemedText style={styles.statsText}>
-                You've referred {referralCount} {referralCount === 1 ? 'person' : 'people'} so far
-              </ThemedText>
-            </>
+            </View>
           ) : (
             <NeonButton
-              onPress={generateUserReferralCode}
-              title={isLoading ? "Generating..." : "Generate Referral Code"}
-              disabled={isLoading}
+              title={isGenerating ? "Generating..." : "Generate Referral Code"}
+              onPress={handleGenerateReferralCode}
+              disabled={isGenerating}
               style={styles.generateButton}
             />
           )}
-        </ThemedView>
-      ) : (
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.subscribePrompt}>
-            Subscribe to generate your own referral code and start earning rewards!
-          </ThemedText>
-        </ThemedView>
-      )}
-      
-      {!hasAppliedCode && (
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Have a Referral Code?</ThemedText>
           
-          <TextInput
-            style={[styles.input, { color: textColor, borderColor: primaryColor }]}
-            placeholder="Enter referral code"
-            placeholderTextColor="#888"
-            value={inputCode}
-            onChangeText={setInputCode}
-            autoCapitalize="characters"
-          />
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: primaryColor }]}>
+                {referralCount}
+              </Text>
+              <Text style={[styles.statLabel, { color: textColor }]}>
+                Friends Referred
+              </Text>
+            </View>
+            
+            {onViewMilestones && (
+              <TouchableOpacity 
+                style={styles.viewMilestonesButton}
+                onPress={onViewMilestones}
+              >
+                <Text style={[styles.viewMilestonesText, { color: primaryColor }]}>
+                  View Milestones
+                </Text>
+                <Ionicons name="chevron-forward" size={16} color={primaryColor} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </>
+      ) : (
+        <View style={styles.subscribePrompt}>
+          <Text style={[styles.subscribeText, { color: textColor }]}>
+            Subscribe to generate your own referral code and start earning rewards!
+          </Text>
           
           <NeonButton
-            onPress={handleApplyReferralCode}
-            title={isApplying ? "Applying..." : "Apply Code"}
-            disabled={isApplying || !inputCode}
-            style={styles.applyButton}
+            title="Subscribe Now"
+            onPress={() => {}} // Navigate to subscription screen
+            style={styles.subscribeButton}
           />
-        </ThemedView>
+        </View>
       )}
+      
+      {/* Share Options Modal */}
+      <ReferralShareOptions
+        visible={shareModalVisible}
+        onClose={handleCloseShareModal}
+        referralCode={referralCode}
+        appLink="https://aisportsedge.com/download"
+      />
     </NeonCard>
   );
 };
@@ -225,74 +206,92 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     padding: 16,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  leaderboardButton: {
+    padding: 8,
   },
   description: {
     fontSize: 14,
-    marginBottom: 12,
-    lineHeight: 20,
+    marginBottom: 16,
+    opacity: 0.8,
   },
-  benefitsList: {
-    marginTop: 8,
+  codeSection: {
     marginBottom: 16,
   },
-  benefitItem: {
+  codeLabel: {
     fontSize: 14,
-    marginBottom: 4,
-    lineHeight: 20,
+    marginBottom: 8,
   },
   codeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#444',
     borderRadius: 8,
     padding: 12,
-    marginVertical: 12,
-    alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   code: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-  shareButton: {
-    marginVertical: 12,
+  codeActions: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    padding: 8,
+    marginLeft: 8,
   },
   generateButton: {
-    marginVertical: 12,
+    marginBottom: 16,
   },
-  statsText: {
-    fontSize: 14,
-    textAlign: 'center',
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 8,
   },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  statLabel: {
+    fontSize: 12,
+    opacity: 0.8,
+  },
+  viewMilestonesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
+  viewMilestonesText: {
+    fontSize: 14,
+    marginRight: 4,
+  },
   subscribePrompt: {
-    fontSize: 16,
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginVertical: 12,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: 'rgba(52, 152, 219, 0.1)',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    marginVertical: 12,
   },
-  applyButton: {
-    marginVertical: 8,
+  subscribeText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  subscribeButton: {
+    minWidth: 150,
   },
 });
+
+export default ReferralProgramCard;

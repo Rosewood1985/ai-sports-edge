@@ -1,4 +1,6 @@
 export type LoyaltyLevel = 'Free' | 'Silver' | 'Gold' | 'Platinum';
+export type BadgeType = 'rookie' | 'elite' | 'hall-of-fame';
+export type LeaderboardPrivacy = 'public' | 'private' | 'anonymous';
 
 export interface UserRewards {
   userId: string;
@@ -14,6 +16,13 @@ export interface UserRewards {
   referralCode?: string;
   referredBy?: string;
   subscriptionExtensions?: number;
+  badgeType?: BadgeType;
+  eliteStatus?: boolean;
+  eliteStatusGrantedAt?: string;
+  leaderboardPrivacy?: LeaderboardPrivacy;
+  premiumTrial?: boolean;
+  premiumTrialStartedAt?: string;
+  premiumTrialEndsAt?: string;
 }
 
 export interface Achievement {
@@ -42,4 +51,39 @@ export interface DailyStreakReward {
     freeAIPredictions: number;
     loyaltyPoints: number;
   };
+}
+
+export interface ReferralMilestone {
+  count: number;
+  reward: ReferralReward;
+  isUnlocked: boolean;
+}
+
+export type ReferralRewardType =
+  | 'subscription_extension'
+  | 'premium_trial'
+  | 'cash_or_upgrade'
+  | 'elite_status';
+
+export interface ReferralReward {
+  type: ReferralRewardType;
+  description: string;
+  duration?: number;
+  amount?: number;
+  upgradeDuration?: number;
+}
+
+export interface LeaderboardEntry {
+  userId: string;
+  displayName: string;
+  referralCount: number;
+  rank: number;
+  badgeType: BadgeType;
+  isCurrentUser: boolean;
+}
+
+export interface LeaderboardData {
+  weekly: LeaderboardEntry[];
+  monthly: LeaderboardEntry[];
+  allTime: LeaderboardEntry[];
 }

@@ -363,9 +363,226 @@ function generateUniqueCode(userId) {
   return `${prefix}-${randomPart}-${userPart}`;
 }
 
+/**
+ * Process referral milestone rewards when a user's referral count changes
+ * This function is triggered by a Firestore document update in the users collection
+ */
+exports.processMilestoneReward = functions.firestore
+  .document('users/{userId}')
+  .onUpdate(async (change, context) => {
+    const { userId } = context.params;
+    const newData = change.after.data();
+    const previousData = change.before.data();
+    
+    // Check if referral count has changed
+    if (newData.referralCount === previousData.referralCount) {
+      return null; // No change in referral count
+    }
+    
+    try {
+      const db = admin.firestore();
+      
+      // Define milestones and rewards
+      const milestones = [
+        {
+          count: 3,
+          reward: {
+            type: 'subscription_extension',
+            duration: 30, // 1 month in days
+            description: '1 Month Free Subscription'
+          }
+        },
+        {
+          count: 5,
+          reward: {
+            type: 'premium_trial',
+            duration: 60, // 2 months in days
+            description: 'Premium Trial for 2 Months'
+          }
+        },
+        {
+          count: 10,
+          reward: {
+            type: 'cash_or_upgrade',
+            amount: 25, // $25
+            upgradeDuration: 30, // 1 month in days
+            description: 'Cash Reward ($25) or Free Pro Subscription'
+          }
+        },
+        {
+          count: 20,
+          reward: {
+            type: 'elite_status',
+            description: 'Elite Status + Special Badge'
+          }
+        }
+      ];
+      
+      // Check if any milestone has been reached
+      for (const milestone of milestones) {
+        if (
+          newData.referralCount >= milestone.count &&
+          previousData.referralCount < milestone.count
+        ) {
+          // Milestone reached
+          console.log(`User ${userId} reached milestone: ${milestone.count} referrals`);
+          
+          // Add milestone reward to user's rewards collection
+          await db.collection('users').doc(userId).collection('rewards').add({
+            type: 'milestone_reward',
+            milestone: milestone.count,
+            reward: milestone.reward,
+            status: 'pending',
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+          
+          // Create a notification for the user
+          await db.collection('users').doc(userId).collection('notifications').add({
+            type: 'milestone_reward',
+            title: 'Referral Milestone Reached!',
+            message: `Congratulations! You've reached ${milestone.count} referrals and earned: ${milestone.reward.description}`,
+            read: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+          
+          // Track the milestone in analytics
+          await db.collection('analytics').doc('referrals').collection('events').add({
+            type: 'milestone_reached',
+            userId,
+            milestone: milestone.count,
+            reward: milestone.reward,
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+          });
+          
+          // Process the reward based on type
+          switch (milestone.reward.type) {
+            case 'subscription_extension':
+              // Extend subscription by specified duration
+              await processSubscriptionExtension(userId, milestone.reward.duration);
+              break;
+              
+            case 'premium_trial':
+              // Grant premium trial
+              await processPremiumTrial(userId, milestone.reward.duration);
+              break;
+              
+            case 'cash_or_upgrade':
+              // This will be handled manually or through a user choice
+              // Mark as pending for now
+              break;
+              
+            case 'elite_status':
+              // Update user's status to elite
+              await db.collection('users').doc(userId).update({
+                eliteStatus: true,
+                badgeType: 'hall-of-fame',
+                eliteStatusGrantedAt: admin.firestore.FieldValue.serverTimestamp()
+              });
+              break;
+          }
+        }
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error processing milestone reward:', error);
+      return null;
+    }
+  });
+
+/**
+ * Helper function to process subscription extension
+ * @param {string} userId - User ID
+ * @param {number} durationDays - Duration in days to extend the subscription
+ * @returns {Promise<boolean>} - Success status
+ */
+async function processSubscriptionExtension(userId, durationDays) {
+  try {
+    const db = admin.firestore();
+    
+    // Get user's active subscription
+    const subscriptionsQuery = await db.collection('users').doc(userId)
+      .collection('subscriptions')
+      .where('status', '==', 'active')
+      .limit(1)
+      .get();
+    
+    if (subscriptionsQuery.empty) {
+      console.log(`No active subscription found for user ${userId}`);
+      return false;
+    }
+    
+    const subscriptionDoc = subscriptionsQuery.docs[0];
+    const subscriptionId = subscriptionDoc.id;
+    const subscriptionData = subscriptionDoc.data();
+    
+    // Calculate new end date
+    const currentPeriodEnd = subscriptionData.currentPeriodEnd.toDate();
+    const newPeriodEnd = new Date(currentPeriodEnd);
+    newPeriodEnd.setDate(newPeriodEnd.getDate() + durationDays);
+    
+    // Update subscription in Stripe
+    await stripe.subscriptions.update(subscriptionId, {
+      proration_behavior: 'none',
+      trial_end: Math.floor(newPeriodEnd.getTime() / 1000)
+    });
+    
+    // Update subscription in Firestore
+    await subscriptionDoc.ref.update({
+      currentPeriodEnd: admin.firestore.Timestamp.fromDate(newPeriodEnd),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      milestoneRewardApplied: true
+    });
+    
+    console.log(`Extended subscription ${subscriptionId} for user ${userId} by ${durationDays} days`);
+    return true;
+  } catch (error) {
+    console.error('Error processing subscription extension:', error);
+    return false;
+  }
+}
+
+/**
+ * Helper function to process premium trial
+ * @param {string} userId - User ID
+ * @param {number} durationDays - Duration in days for the premium trial
+ * @returns {Promise<boolean>} - Success status
+ */
+async function processPremiumTrial(userId, durationDays) {
+  try {
+    const db = admin.firestore();
+    
+    // Check if user already has premium
+    const userDoc = await db.collection('users').doc(userId).get();
+    const userData = userDoc.data();
+    
+    if (userData.premiumTier) {
+      // User already has premium, extend their subscription instead
+      return processSubscriptionExtension(userId, durationDays);
+    }
+    
+    // Grant premium trial
+    await db.collection('users').doc(userId).update({
+      premiumTrial: true,
+      premiumTrialStartedAt: admin.firestore.FieldValue.serverTimestamp(),
+      premiumTrialEndsAt: admin.firestore.Timestamp.fromDate(
+        new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000)
+      ),
+      badgeType: 'elite'
+    });
+    
+    console.log(`Granted premium trial to user ${userId} for ${durationDays} days`);
+    return true;
+  } catch (error) {
+    console.error('Error processing premium trial:', error);
+    return false;
+  }
+}
+
 // Export the functions
 module.exports = {
   generateReferralCode: exports.generateReferralCode,
   applyReferralCode: exports.applyReferralCode,
-  processReferralReward: exports.processReferralReward
+  processReferralReward: exports.processReferralReward,
+  processMilestoneReward: exports.processMilestoneReward
 };
