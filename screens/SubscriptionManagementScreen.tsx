@@ -227,6 +227,16 @@ const SubscriptionManagementScreen = (): JSX.Element => {
           <ReferralProgramCard isSubscribed={true} />
           
           <TouchableOpacity
+            style={styles.analyticsButton}
+            onPress={() => {
+              // @ts-ignore - Navigation typing issue
+              navigation.navigate('SubscriptionAnalytics');
+            }}
+          >
+            <Text style={styles.analyticsButtonText}>View Subscription Analytics</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
             style={styles.cancelButton}
             onPress={handleCancelSubscription}
           >
@@ -370,6 +380,17 @@ const styles = StyleSheet.create({
   updateButtonText: {
     color: '#333',
     fontWeight: '500',
+  },
+  analyticsButton: {
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  analyticsButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
   cancelButton: {
     backgroundColor: '#fff',

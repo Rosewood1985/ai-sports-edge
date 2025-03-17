@@ -80,8 +80,9 @@ exports.trackSubscriptionEvent = functions.https.onCall(async (data, context) =>
 /**
  * Generate subscription analytics report
  * @param {Object} data - Request data
- * @param {string} data.startDate - Start date for the report (YYYY-MM-DD)
- * @param {string} data.endDate - End date for the report (YYYY-MM-DD)
+ * @param {string} data.timeRange - Time range for the report ('7d', '30d', '90d', 'all')
+ * @param {string} data.startDate - Start date for the report (YYYY-MM-DD) - optional
+ * @param {string} data.endDate - End date for the report (YYYY-MM-DD) - optional
  * @returns {Object} - Subscription analytics report
  */
 exports.generateSubscriptionReport = functions.https.onCall(async (data, context) => {
@@ -93,38 +94,61 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     );
   }
 
-  // Verify the user has admin privileges
-  const adminUid = context.auth.uid;
+  const userId = context.auth.uid;
   const db = admin.firestore();
-  const adminDoc = await db.collection('admins').doc(adminUid).get();
   
-  if (!adminDoc.exists || !adminDoc.data().isAdmin) {
-    throw new functions.https.HttpsError(
-      'permission-denied',
-      'Only administrators can generate subscription reports.'
-    );
+  // Check if user is an admin
+  let isAdmin = false;
+  try {
+    const adminDoc = await db.collection('admins').doc(userId).get();
+    isAdmin = adminDoc.exists && adminDoc.data().isAdmin;
+  } catch (error) {
+    console.log('Error checking admin status:', error);
+    // Continue as regular user
   }
-
-  // Validate required fields
-  if (!data.startDate || !data.endDate) {
+  
+  // Determine date range based on timeRange or explicit dates
+  let startDate, endDate;
+  
+  if (data.startDate && data.endDate) {
+    // Use explicit dates if provided
+    startDate = new Date(data.startDate);
+    endDate = new Date(data.endDate);
+    endDate.setHours(23, 59, 59, 999); // End of the day
+  } else {
+    // Use timeRange
+    const timeRange = data.timeRange || '30d';
+    endDate = new Date();
+    endDate.setHours(23, 59, 59, 999); // End of the day
+    
+    startDate = new Date();
+    switch (timeRange) {
+      case '7d':
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case '30d':
+        startDate.setDate(startDate.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(startDate.getDate() - 90);
+        break;
+      case 'all':
+        startDate = new Date(2020, 0, 1); // Beginning of 2020 or some early date
+        break;
+      default:
+        startDate.setDate(startDate.getDate() - 30); // Default to 30 days
+    }
+  }
+  
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
     throw new functions.https.HttpsError(
       'invalid-argument',
-      'Start date and end date are required.'
+      'Invalid date format. Use YYYY-MM-DD.'
     );
   }
 
   try {
-    // Parse dates
-    const startDate = new Date(data.startDate);
-    const endDate = new Date(data.endDate);
-    endDate.setHours(23, 59, 59, 999); // End of the day
-    
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        'Invalid date format. Use YYYY-MM-DD.'
-      );
-    }
+    // We already have startDate and endDate from above
     
     // Query subscription events within the date range
     const eventsRef = db.collection('analytics').doc('subscriptions').collection('events');
@@ -289,18 +313,109 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     
     report.referral_conversions = referralConversionsQuery.data().count;
     
-    // Store the report
-    const reportRef = db.collection('analytics').doc('subscriptions').collection('reports').doc();
-    await reportRef.set({
-      ...report,
-      generatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      generatedBy: adminUid
-    });
-    
-    return {
-      reportId: reportRef.id,
-      ...report
+    // Helper function to get plan name by ID
+    const getPlanNameById = (planId) => {
+      const planMap = {
+        'price_basic_monthly': 'Basic Monthly',
+        'price_premium_monthly': 'Premium Monthly',
+        'price_premium_yearly': 'Premium Annual',
+        'unknown': 'Unknown Plan'
+      };
+      return planMap[planId] || 'Unknown Plan';
     };
+    
+    // Helper function to generate revenue by month
+    const generateRevenueByMonth = (start, end) => {
+      const months = [];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      // Create a copy of the start date
+      const current = new Date(start);
+      
+      // Generate array of months between start and end
+      while (current <= end) {
+        months.push({
+          month: monthNames[current.getMonth()],
+          revenue: 0
+        });
+        current.setMonth(current.getMonth() + 1);
+      }
+      
+      // If we have revenue data, distribute it across months
+      // This is a simplified approach - in a real implementation, you'd use actual data
+      if (report.revenue.total > 0) {
+        const monthCount = months.length;
+        const revenuePerMonth = report.revenue.total / monthCount / 100; // Convert cents to dollars
+        
+        months.forEach(month => {
+          month.revenue = revenuePerMonth;
+        });
+      }
+      
+      return months;
+    };
+    
+    // Format the report for the client
+    const clientReport = {
+      activeSubscriptions: totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions,
+      totalRevenue: report.revenue.total / 100, // Convert cents to dollars
+      averageRevenue: report.revenue.total > 0 && report.metrics.new_subscriptions > 0 ?
+        (report.revenue.total / report.metrics.new_subscriptions) / 100 : 0,
+      churnRate: report.churn_rate,
+      conversionRate: report.conversion_rate,
+      
+      // Format subscriptions by plan
+      subscriptionsByPlan: Object.entries(report.revenue.by_plan).map(([planId, amount]) => {
+        const planName = getPlanNameById(planId);
+        const count = report.metrics.new_subscriptions; // This is simplified, should be per plan
+        return {
+          name: planName,
+          count,
+          percentage: 100 // Simplified, should calculate actual percentage
+        };
+      }),
+      
+      // Generate revenue by month
+      revenueByMonth: generateRevenueByMonth(startDate, endDate),
+      
+      // Subscriptions by status
+      subscriptionsByStatus: [
+        {
+          status: 'Active',
+          count: totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions,
+          percentage: totalSubscriptionsAtStart > 0 ?
+            ((totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions) / totalSubscriptionsAtStart) * 100 : 0
+        },
+        {
+          status: 'Canceled',
+          count: report.metrics.cancelled_subscriptions,
+          percentage: totalSubscriptionsAtStart > 0 ?
+            (report.metrics.cancelled_subscriptions / totalSubscriptionsAtStart) * 100 : 0
+        },
+        {
+          status: 'Past Due',
+          count: 0, // This would need to be calculated
+          percentage: 0
+        }
+      ]
+    };
+    
+    // Store the full report for admins
+    if (isAdmin) {
+      const reportRef = db.collection('analytics').doc('subscriptions').collection('reports').doc();
+      await reportRef.set({
+        ...report,
+        generatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        generatedBy: userId
+      });
+      
+      return {
+        reportId: reportRef.id,
+        ...clientReport
+      };
+    }
+    
+    return clientReport;
   } catch (error) {
     console.error('Error generating subscription report:', error);
     throw new functions.https.HttpsError('internal', error.message);

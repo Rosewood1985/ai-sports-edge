@@ -11,6 +11,7 @@ import RewardsScreen from "./screens/RewardsScreen";
 import ReferralLeaderboardScreen from "./screens/ReferralLeaderboardScreen";
 import FAQScreen from "./screens/FAQScreen";
 import GiftRedemptionScreen from "./screens/GiftRedemptionScreen";
+import SubscriptionAnalyticsScreen from "./screens/SubscriptionAnalyticsScreen";
 import { colors } from "./styles/theme";
 
 const Stack = createStackNavigator();
@@ -100,6 +101,14 @@ function App(): JSX.Element {
               component={GiftRedemptionScreen}
               options={{
                 title: "REDEEM GIFT",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="SubscriptionAnalytics"
+              component={SubscriptionAnalyticsScreen}
+              options={{
+                title: "SUBSCRIPTION ANALYTICS",
                 headerBackTitle: "Back"
               }}
             />

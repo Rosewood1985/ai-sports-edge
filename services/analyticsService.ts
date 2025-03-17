@@ -28,6 +28,7 @@ export type AnalyticsEventType =
   | 'plan_downgraded'
   | 'auto_resubscribe_enabled'
   | 'auto_resubscribe_disabled'
+  | 'subscription_report_generated'
   
   // Microtransaction events
   | 'single_prediction_purchased'
