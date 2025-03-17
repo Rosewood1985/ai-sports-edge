@@ -14,6 +14,7 @@ export type AnalyticsEventType =
   | 'ai_prediction_shared'
   | 'daily_insights_viewed'
   | 'bet_comparison_viewed'
+  | 'ai_summary_generated'
   
   // Subscription events
   | 'subscription_page_viewed'
@@ -51,6 +52,9 @@ export type AnalyticsEventType =
   | 'odds_refreshed'
   | 'theme_changed'
   | 'notification_settings_changed'
+  | 'sports_news_fetched'
+  | 'sports_news_viewed'
+  | 'sports_news_focus_changed'
   
   // Achievement events
   | 'achievement_unlocked'

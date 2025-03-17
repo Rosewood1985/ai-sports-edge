@@ -313,6 +313,18 @@ const SettingsScreen = (): JSX.Element => {
       <View style={themedStyles.section}>
         <Text style={themedStyles.sectionTitle}>App</Text>
         {renderSettingItem(
+          'newspaper-outline',
+          'AI Sports News',
+          'Get AI-powered insights on sports news',
+          <TouchableOpacity onPress={() => {
+            // @ts-ignore - Navigation typing issue
+            navigation.navigate('SportsNews');
+          }}>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+        )}
+        
+        {renderSettingItem(
           'trophy-outline',
           'League Preferences',
           'Select which leagues to follow',

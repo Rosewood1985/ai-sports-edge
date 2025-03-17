@@ -12,6 +12,7 @@ import ReferralLeaderboardScreen from "./screens/ReferralLeaderboardScreen";
 import FAQScreen from "./screens/FAQScreen";
 import GiftRedemptionScreen from "./screens/GiftRedemptionScreen";
 import SubscriptionAnalyticsScreen from "./screens/SubscriptionAnalyticsScreen";
+import SportsNewsScreen from "./screens/SportsNewsScreen";
 import { colors } from "./styles/theme";
 
 const Stack = createStackNavigator();
@@ -109,6 +110,14 @@ function App(): JSX.Element {
               component={SubscriptionAnalyticsScreen}
               options={{
                 title: "SUBSCRIPTION ANALYTICS",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="SportsNews"
+              component={SportsNewsScreen}
+              options={{
+                title: "AI SPORTS NEWS",
                 headerBackTitle: "Back"
               }}
             />

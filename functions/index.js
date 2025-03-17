@@ -12,6 +12,7 @@ const subscriptionGifting = require('./subscriptionGifting');
 const autoResubscribe = require('./autoResubscribe');
 const referralProgram = require('./referralProgram');
 const subscriptionAnalytics = require('./subscriptionAnalytics');
+const aiSummary = require('./aiSummary');
 
 // Export all functions
 exports.stripeWebhook = stripeWebhooks.stripeWebhook;
@@ -42,6 +43,9 @@ exports.processReferralReward = referralProgram.processReferralReward;
 // Export subscription analytics functions
 exports.trackSubscriptionEvent = subscriptionAnalytics.trackSubscriptionEvent;
 exports.generateSubscriptionReport = subscriptionAnalytics.generateSubscriptionReport;
+
+// Export AI summary functions
+exports.generateAISummary = aiSummary.generateAISummary;
 
 // Add any existing functions from the project
 try {
