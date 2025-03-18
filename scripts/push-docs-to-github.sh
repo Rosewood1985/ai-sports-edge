@@ -24,6 +24,7 @@ git add docs/push-docs-to-github.md
 git add docs/update-instructions.md
 git add docs/update-summary.md
 git add docs/ml-sports-edge-implementation-summary.md
+git add docs/pinnacle-betmgm-integration.md
 
 # Add script files
 git add scripts/push-docs-to-github.sh
@@ -31,9 +32,10 @@ git add scripts/update-web-app.sh
 git add scripts/update-mobile-app.sh
 git add scripts/update-all.sh
 git add scripts/README.md
+git add scripts/run-pinnacle-betmgm-integration.sh
 
 # Commit the changes
-git commit -m "Add comprehensive documentation and update scripts for ESPN API and Bet365 API integration"
+git commit -m "Add comprehensive documentation and update scripts for ESPN API, Bet365 API, Pinnacle, and BetMGM integration"
 
 # Push to GitHub
 git push origin main

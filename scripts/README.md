@@ -63,6 +63,33 @@ This script:
 
 **Note:** The mobile app builds will continue on EAS servers after the script completes. You can check their status with `eas build:list`.
 
+### `run-pinnacle-betmgm-integration.sh`
+
+Runs the ML Sports Edge pipeline with Pinnacle and BetMGM integration.
+
+**Usage:**
+```bash
+./scripts/run-pinnacle-betmgm-integration.sh --sport basketball --league nba
+```
+
+Options:
+- `--sport`: Sport code (e.g., basketball, football)
+- `--league`: League code (e.g., nba, nfl)
+- `--target`: Target variable to predict (default: home_team_winning)
+- `--train`: Train new models
+- `--all`: Run for all configured sports and leagues
+- `--predictions`: Get latest predictions
+
+This script:
+1. Sets up the Python environment
+2. Installs dependencies
+3. Creates environment files from examples (if they don't exist)
+4. Runs the ML Sports Edge pipeline with Pinnacle and BetMGM integration
+5. Processes data from ESPN, Bet365, Pinnacle, and BetMGM
+6. Calculates EV (Expected Value) for bets by comparing BetMGM odds against devigged Pinnacle odds
+7. Trains models and makes predictions (if requested)
+8. Identifies value betting opportunities
+
 ## Other Scripts
 
 ### `build-web.js`
