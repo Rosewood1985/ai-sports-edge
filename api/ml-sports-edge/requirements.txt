@@ -1,0 +1,23 @@
+# Requirements for AI Sports Edge ML Model and Data Collection
+
+# Core dependencies
+numpy>=1.20.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
+tensorflow>=2.8.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# API and data collection
+requests>=2.27.0
+beautifulsoup4>=4.10.0
+lxml>=4.6.0
+aiohttp>=3.8.0
+
+# Data processing
+jsonschema>=4.4.0
+pyyaml>=6.0.0
+python-dateutil>=2.8.0
+
+# Sportsbookreview scraper dependencies
+tqdm>=4.62.0

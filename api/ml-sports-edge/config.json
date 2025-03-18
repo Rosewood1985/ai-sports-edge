@@ -1,0 +1,72 @@
+{
+  "sports": [
+    {
+      "name": "basketball",
+      "leagues": ["nba"],
+      "targets": ["home_team_winning", "total_score"]
+    },
+    {
+      "name": "football",
+      "leagues": ["nfl"],
+      "targets": ["home_team_winning", "total_score"]
+    },
+    {
+      "name": "baseball",
+      "leagues": ["mlb"],
+      "targets": ["home_team_winning", "total_score"]
+    },
+    {
+      "name": "soccer",
+      "leagues": ["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls"],
+      "targets": ["home_team_winning", "draw", "total_score"]
+    }
+  ],
+  "update_frequency": {
+    "data": 3600,
+    "models": 86400,
+    "predictions": 3600
+  },
+  "confidence_threshold": 0.7,
+  "model_parameters": {
+    "random_forest": {
+      "n_estimators": [100, 200, 300],
+      "max_depth": [null, 10, 20, 30],
+      "min_samples_split": [2, 5, 10]
+    },
+    "gradient_boosting": {
+      "n_estimators": [100, 200, 300],
+      "max_depth": [3, 5, 7, 9],
+      "learning_rate": [0.01, 0.05, 0.1, 0.2]
+    },
+    "logistic_regression": {
+      "C": [0.1, 1.0, 10.0],
+      "penalty": ["l1", "l2"],
+      "solver": ["liblinear"]
+    }
+  },
+  "feature_selection": {
+    "correlation_threshold": 0.95,
+    "missing_value_threshold": 0.3
+  },
+  "data_sources": {
+    "espn": {
+      "enabled": true,
+      "cache_duration": 3600
+    },
+    "bet365": {
+      "enabled": true,
+      "cache_duration": 900
+    }
+  },
+  "api": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "debug": false,
+    "endpoints": {
+      "predictions": "/api/predictions",
+      "value_bets": "/api/value_bets",
+      "models": "/api/models",
+      "data": "/api/data"
+    }
+  }
+}

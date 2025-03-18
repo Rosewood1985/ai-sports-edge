@@ -237,3 +237,162 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+// ML Sports Edge API endpoints
+app.get('/api/ml-sports-edge/predictions', (req, res) => {
+  const { sport, league } = req.query;
+  
+  // Execute the ML Sports Edge script to get predictions
+  const command = `./scripts/run-ml-sports-edge.sh --predictions --sport ${sport} --league ${league}`;
+  
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing ML Sports Edge script: ${error}`);
+      return res.status(500).json({ error: 'Failed to get predictions' });
+    }
+    
+    // Parse the output to extract predictions
+    // This is a simplified example - you would need to parse the actual output format
+    try {
+      // For now, return mock data
+      return res.json({
+        predictions: [
+          {
+            home_team_name: 'Team A',
+            away_team_name: 'Team B',
+            ensemble_prediction: 1,
+            ensemble_probability: 0.75,
+            home_odds: 1.5,
+            away_odds: 2.5,
+            date: new Date().toISOString()
+          },
+          {
+            home_team_name: 'Team C',
+            away_team_name: 'Team D',
+            ensemble_prediction: 0,
+            ensemble_probability: 0.35,
+            home_odds: 2.2,
+            away_odds: 1.7,
+            date: new Date().toISOString()
+          }
+        ]
+      });
+    } catch (e) {
+      console.error(`Error parsing predictions: ${e}`);
+      return res.status(500).json({ error: 'Failed to parse predictions' });
+    }
+  });
+});
+
+app.get('/api/ml-sports-edge/value_bets', (req, res) => {
+  const { sport, league } = req.query;
+  
+  // Execute the ML Sports Edge script to get value bets
+  const command = `./scripts/run-ml-sports-edge.sh --predictions --sport ${sport} --league ${league}`;
+  
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing ML Sports Edge script: ${error}`);
+      return res.status(500).json({ error: 'Failed to get value bets' });
+    }
+    
+    // Parse the output to extract value bets
+    // This is a simplified example - you would need to parse the actual output format
+    try {
+      // For now, return mock data
+      return res.json({
+        value_bets: [
+          {
+            home_team_name: 'Team A',
+            away_team_name: 'Team B',
+            home_odds: 1.5,
+            away_odds: 2.5,
+            home_value_bet: true,
+            away_value_bet: false,
+            ensemble_probability: 0.75,
+            home_value: 0.15,
+            away_value: 0
+          }
+        ]
+      });
+    } catch (e) {
+      console.error(`Error parsing value bets: ${e}`);
+      return res.status(500).json({ error: 'Failed to parse value bets' });
+    }
+  });
+});
+
+app.get('/api/ml-sports-edge/models', (req, res) => {
+  const { sport } = req.query;
+  
+  // Execute the ML Sports Edge script to get model information
+  const command = `./scripts/run-ml-sports-edge.sh --sport ${sport} --predictions`;
+  
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing ML Sports Edge script: ${error}`);
+      return res.status(500).json({ error: 'Failed to get model information' });
+    }
+    
+    // Parse the output to extract model information
+    // This is a simplified example - you would need to parse the actual output format
+    try {
+      // For now, return mock data
+      return res.json({
+        models: {
+          random_forest: {
+            evaluation: {
+              accuracy: 0.72,
+              precision: 0.75,
+              recall: 0.68,
+              f1: 0.71,
+              roc_auc: 0.78
+            }
+          },
+          gradient_boosting: {
+            evaluation: {
+              accuracy: 0.74,
+              precision: 0.77,
+              recall: 0.70,
+              f1: 0.73,
+              roc_auc: 0.80
+            }
+          },
+          logistic_regression: {
+            evaluation: {
+              accuracy: 0.68,
+              precision: 0.70,
+              recall: 0.65,
+              f1: 0.67,
+              roc_auc: 0.73
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.error(`Error parsing model information: ${e}`);
+      return res.status(500).json({ error: 'Failed to parse model information' });
+    }
+  });
+});
+
+app.post('/api/ml-sports-edge/run_pipeline', (req, res) => {
+  const { sport, league, target, train } = req.body;
+  
+  // Execute the ML Sports Edge script to run the pipeline
+  const trainFlag = train ? '--train' : '';
+  const command = `./scripts/run-ml-sports-edge.sh --sport ${sport} --league ${league} --target ${target || 'home_team_winning'} ${trainFlag}`;
+  
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing ML Sports Edge script: ${error}`);
+      return res.status(500).json({ error: 'Failed to run pipeline' });
+    }
+    
+    // Return success response
+    return res.json({
+      success: true,
+      message: 'Pipeline executed successfully',
+      details: stdout
+    });
+  });
+});

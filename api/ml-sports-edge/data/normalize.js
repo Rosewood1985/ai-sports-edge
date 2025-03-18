@@ -59,19 +59,19 @@ function loadCombinedData(sport) {
 }
 
 /**
- * Normalize team sports data (NBA, WNBA, MLB, NHL, NCAA)
+ * Base normalizer for all sports
  * @param {Object} sportData - Combined sport data
- * @returns {Array} - Normalized games data
+ * @returns {Array} - Normalized data
  */
-function normalizeTeamSportData(sportData) {
+function normalizeBaseData(sportData) {
   const { sport, sources } = sportData;
   const games = [];
   
-  console.log(`Normalizing team sport data for ${sport}...`);
+  console.log(`Normalizing base data for ${sport}...`);
   
   // Process ESPN data
-  if (sources.espn && sources.espn.events) {
-    sources.espn.events.forEach(event => {
+  if (sources.espn && sources.espn.scoreboard && sources.espn.scoreboard.events) {
+    sources.espn.scoreboard.events.forEach(event => {
       const gameId = event.id;
       const date = new Date(event.date);
       const competitors = event.competitions[0]?.competitors || [];
@@ -118,6 +118,16 @@ function normalizeTeamSportData(sportData) {
           sportRadar: false,
           nhlStats: false,
           ncaa: false
+        },
+        // Additional data from ESPN
+        espnData: {
+          gameId: gameId,
+          teams: {
+            home: homeTeam,
+            away: awayTeam
+          },
+          status: event.status,
+          venue: event.competitions[0]?.venue
         }
       };
       
@@ -126,185 +136,662 @@ function normalizeTeamSportData(sportData) {
     });
   }
   
-  // Enrich with odds data
-  if (sources.odds && Array.isArray(sources.odds)) {
-    sources.odds.forEach(oddsItem => {
-      // Find matching game
-      const game = games.find(g => 
-        (g.homeTeam.name.includes(oddsItem.home_team) || oddsItem.home_team.includes(g.homeTeam.name)) &&
-        (g.awayTeam.name.includes(oddsItem.away_team) || oddsItem.away_team.includes(g.awayTeam.name))
+  return games;
+}
+
+/**
+ * Normalize NBA data
+ * @param {Object} sportData - Combined sport data
+ * @returns {Array} - Normalized games data
+ */
+function normalizeNBAData(sportData) {
+  const { sources } = sportData;
+  
+  // Get base normalized data
+  const games = normalizeBaseData(sportData);
+  
+  console.log(`Normalizing NBA-specific data...`);
+  
+  // Enhance with NBA-specific data
+  games.forEach(game => {
+    // Add NBA-specific fields
+    game.nbaData = {
+      conference: null,
+      division: null,
+      seasonType: null,
+      seasonPhase: null
+    };
+    
+    // Add team statistics if available
+    if (sources.espn && sources.espn.statistics) {
+      const homeTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.homeTeam.id
       );
       
-      if (game) {
-        // Mark as having odds data
-        game.dataSource.odds = true;
-        
-        // Find the best odds (prefer FanDuel if available)
-        const bookmaker = oddsItem.bookmakers.find(b => 
-          b.key === 'fanduel' || b.title.toLowerCase().includes('fanduel')
-        ) || oddsItem.bookmakers[0];
-        
-        if (bookmaker) {
-          // Get spread
-          const spreadsMarket = bookmaker.markets.find(m => m.key === 'spreads');
-          if (spreadsMarket && spreadsMarket.outcomes) {
-            const homeSpread = spreadsMarket.outcomes.find(o => 
-              o.name.includes(game.homeTeam.name) || game.homeTeam.name.includes(o.name)
-            );
-            if (homeSpread) {
-              game.odds.spread = homeSpread.point;
-            }
-          }
-          
-          // Get over/under
-          const totalsMarket = bookmaker.markets.find(m => m.key === 'totals');
-          if (totalsMarket && totalsMarket.outcomes) {
-            game.odds.overUnder = totalsMarket.outcomes[0]?.point || null;
-          }
-          
-          // Get moneyline
-          const h2hMarket = bookmaker.markets.find(m => m.key === 'h2h');
-          if (h2hMarket && h2hMarket.outcomes) {
-            const homeOdds = h2hMarket.outcomes.find(o => 
-              o.name.includes(game.homeTeam.name) || game.homeTeam.name.includes(o.name)
-            );
-            const awayOdds = h2hMarket.outcomes.find(o => 
-              o.name.includes(game.awayTeam.name) || game.awayTeam.name.includes(o.name)
-            );
-            
-            if (homeOdds) {
-              game.odds.homeMoneyline = homeOdds.price;
-            }
-            
-            if (awayOdds) {
-              game.odds.awayMoneyline = awayOdds.price;
-            }
-          }
-          
-          // Add bookmaker info
-          game.odds.provider = bookmaker.title;
-          game.odds.lastUpdate = bookmaker.last_update;
-        }
-      }
-    });
-  }
-  
-  // Enrich with SportRadar data
-  if (sources.sportRadarSchedule) {
-    // Mark games as having SportRadar data
-    const sportRadarGames = sources.sportRadarSchedule.games || [];
-    
-    sportRadarGames.forEach(srGame => {
-      // Find matching game
-      const game = games.find(g => {
-        const homeMatch = g.homeTeam.name.includes(srGame.home.name) || srGame.home.name.includes(g.homeTeam.name);
-        const awayMatch = g.awayTeam.name.includes(srGame.away.name) || srGame.away.name.includes(g.awayTeam.name);
-        return homeMatch && awayMatch;
-      });
+      const awayTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
       
-      if (game) {
-        // Mark as having SportRadar data
-        game.dataSource.sportRadar = true;
-        
-        // Add SportRadar IDs
-        game.sportRadarId = srGame.id;
-        game.homeTeam.sportRadarId = srGame.home.id;
-        game.awayTeam.sportRadarId = srGame.away.id;
-        
-        // Add additional data if available
-        if (srGame.home_points !== undefined) {
-          game.homeTeam.score = srGame.home_points;
-        }
-        
-        if (srGame.away_points !== undefined) {
-          game.awayTeam.score = srGame.away_points;
-        }
-      }
-    });
-  }
-  
-  // Sport-specific enrichment
-  if (sport === 'NHL' && sources.nhlStats) {
-    // Enrich with NHL stats
-    if (sources.nhlStats.dates && sources.nhlStats.dates.length > 0) {
-      const nhlGames = sources.nhlStats.dates[0].games || [];
-      
-      nhlGames.forEach(nhlGame => {
-        // Find matching game
-        const game = games.find(g => {
-          const homeMatch = g.homeTeam.name.includes(nhlGame.teams.home.team.name) || 
-                           nhlGame.teams.home.team.name.includes(g.homeTeam.name);
-          const awayMatch = g.awayTeam.name.includes(nhlGame.teams.away.team.name) || 
-                           nhlGame.teams.away.team.name.includes(g.awayTeam.name);
-          return homeMatch && awayMatch;
-        });
-        
-        if (game) {
-          // Mark as having NHL stats data
-          game.dataSource.nhlStats = true;
-          
-          // Add NHL stats
-          game.nhlStats = {
-            gameId: nhlGame.gamePk,
-            homeTeamId: nhlGame.teams.home.team.id,
-            awayTeamId: nhlGame.teams.away.team.id,
-            homeScore: nhlGame.teams.home.score,
-            awayScore: nhlGame.teams.away.score,
-            period: nhlGame.linescore?.currentPeriod,
-            timeRemaining: nhlGame.linescore?.currentPeriodTimeRemaining,
-            homeShots: nhlGame.linescore?.teams?.home?.shotsOnGoal,
-            awayShots: nhlGame.linescore?.teams?.away?.shotsOnGoal,
-            homePowerPlay: nhlGame.linescore?.teams?.home?.powerPlay,
-            awayPowerPlay: nhlGame.linescore?.teams?.away?.powerPlay
-          };
-          
-          // Update scores if available
-          if (nhlGame.teams.home.score !== undefined) {
-            game.homeTeam.score = nhlGame.teams.home.score;
-          }
-          
-          if (nhlGame.teams.away.score !== undefined) {
-            game.awayTeam.score = nhlGame.teams.away.score;
-          }
-          
-          // Update status if game is in progress
-          if (nhlGame.status.abstractGameState === 'Live') {
-            game.status.state = 'in';
-            game.status.detail = `Period ${nhlGame.linescore?.currentPeriod}, ${nhlGame.linescore?.currentPeriodTimeRemaining}`;
-          }
-        }
-      });
-    }
-  }
-  
-  // NCAA-specific enrichment
-  if ((sport === 'NCAA_MENS' || sport === 'NCAA_WOMENS') && sources.ncaaSchedule) {
-    // Mark games as having NCAA data
-    const ncaaGames = sources.ncaaSchedule.games || [];
-    
-    ncaaGames.forEach(ncaaGame => {
-      // Find matching game
-      const game = games.find(g => {
-        const homeMatch = g.homeTeam.name.includes(ncaaGame.home.name) || ncaaGame.home.name.includes(g.homeTeam.name);
-        const awayMatch = g.awayTeam.name.includes(ncaaGame.away.name) || ncaaGame.away.name.includes(g.awayTeam.name);
-        return homeMatch && awayMatch;
-      });
-      
-      if (game) {
-        // Mark as having NCAA data
-        game.dataSource.ncaa = true;
-        
-        // Add NCAA-specific data
-        game.ncaa = {
-          tournamentRound: ncaaGame.tournament_round || null,
-          bracketRegion: ncaaGame.bracket_region || null,
-          isMarchMadness: isMarchMadnessPeriod()
+      if (homeTeamStats) {
+        game.homeTeam.stats = {
+          ppg: homeTeamStats.ppg,
+          rpg: homeTeamStats.rpg,
+          apg: homeTeamStats.apg,
+          spg: homeTeamStats.spg,
+          bpg: homeTeamStats.bpg,
+          tpg: homeTeamStats.tpg,
+          fgp: homeTeamStats.fgp,
+          tpp: homeTeamStats.tpp,
+          ftp: homeTeamStats.ftp
         };
       }
-    });
-  }
+      
+      if (awayTeamStats) {
+        game.awayTeam.stats = {
+          ppg: awayTeamStats.ppg,
+          rpg: awayTeamStats.rpg,
+          apg: awayTeamStats.apg,
+          spg: awayTeamStats.spg,
+          bpg: awayTeamStats.bpg,
+          tpg: awayTeamStats.tpg,
+          fgp: awayTeamStats.fgp,
+          tpp: awayTeamStats.tpp,
+          ftp: awayTeamStats.ftp
+        };
+      }
+    }
+    
+    // Add standings data if available
+    if (sources.espn && sources.espn.standings) {
+      const homeTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStanding) {
+        game.homeTeam.standing = {
+          wins: homeTeamStanding.wins,
+          losses: homeTeamStanding.losses,
+          winPercent: homeTeamStanding.winPercent,
+          gamesBehind: homeTeamStanding.gamesBehind,
+          streak: homeTeamStanding.streak
+        };
+        
+        // Add conference and division info
+        if (homeTeamStanding.conference) {
+          game.nbaData.conference = homeTeamStanding.conference.name;
+        }
+        
+        if (homeTeamStanding.division) {
+          game.nbaData.division = homeTeamStanding.division.name;
+        }
+      }
+      
+      if (awayTeamStanding) {
+        game.awayTeam.standing = {
+          wins: awayTeamStanding.wins,
+          losses: awayTeamStanding.losses,
+          winPercent: awayTeamStanding.winPercent,
+          gamesBehind: awayTeamStanding.gamesBehind,
+          streak: awayTeamStanding.streak
+        };
+      }
+    }
+    
+    // Add game details if available
+    if (sources.espn && sources.espn.gameDetails) {
+      const gameDetail = sources.espn.gameDetails.find(detail =>
+        detail.id === game.id
+      );
+      
+      if (gameDetail) {
+        game.nbaData.seasonType = gameDetail.seasonType;
+        game.nbaData.seasonPhase = gameDetail.seasonPhase;
+        
+        // Add player statistics
+        if (gameDetail.boxscore && gameDetail.boxscore.players) {
+          game.playerStats = gameDetail.boxscore.players;
+        }
+      }
+    }
+  });
   
   return games;
+}
+
+/**
+ * Normalize NFL data
+ * @param {Object} sportData - Combined sport data
+ * @returns {Array} - Normalized games data
+ */
+function normalizeNFLData(sportData) {
+  const { sources } = sportData;
+  
+  // Get base normalized data
+  const games = normalizeBaseData(sportData);
+  
+  console.log(`Normalizing NFL-specific data...`);
+  
+  // Enhance with NFL-specific data
+  games.forEach(game => {
+    // Add NFL-specific fields
+    game.nflData = {
+      conference: null,
+      division: null,
+      seasonType: null,
+      week: null
+    };
+    
+    // Add team statistics if available
+    if (sources.espn && sources.espn.statistics) {
+      const homeTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStats) {
+        game.homeTeam.stats = {
+          ppg: homeTeamStats.ppg,
+          ypg: homeTeamStats.ypg,
+          passingYpg: homeTeamStats.passingYpg,
+          rushingYpg: homeTeamStats.rushingYpg,
+          defensiveYpg: homeTeamStats.defensiveYpg,
+          defensivePassingYpg: homeTeamStats.defensivePassingYpg,
+          defensiveRushingYpg: homeTeamStats.defensiveRushingYpg,
+          turnovers: homeTeamStats.turnovers,
+          takeaways: homeTeamStats.takeaways
+        };
+      }
+      
+      if (awayTeamStats) {
+        game.awayTeam.stats = {
+          ppg: awayTeamStats.ppg,
+          ypg: awayTeamStats.ypg,
+          passingYpg: awayTeamStats.passingYpg,
+          rushingYpg: awayTeamStats.rushingYpg,
+          defensiveYpg: awayTeamStats.defensiveYpg,
+          defensivePassingYpg: awayTeamStats.defensivePassingYpg,
+          defensiveRushingYpg: awayTeamStats.defensiveRushingYpg,
+          turnovers: awayTeamStats.turnovers,
+          takeaways: awayTeamStats.takeaways
+        };
+      }
+    }
+    
+    // Add standings data if available
+    if (sources.espn && sources.espn.standings) {
+      const homeTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStanding) {
+        game.homeTeam.standing = {
+          wins: homeTeamStanding.wins,
+          losses: homeTeamStanding.losses,
+          ties: homeTeamStanding.ties,
+          winPercent: homeTeamStanding.winPercent,
+          pointsFor: homeTeamStanding.pointsFor,
+          pointsAgainst: homeTeamStanding.pointsAgainst
+        };
+        
+        // Add conference and division info
+        if (homeTeamStanding.conference) {
+          game.nflData.conference = homeTeamStanding.conference.name;
+        }
+        
+        if (homeTeamStanding.division) {
+          game.nflData.division = homeTeamStanding.division.name;
+        }
+      }
+      
+      if (awayTeamStanding) {
+        game.awayTeam.standing = {
+          wins: awayTeamStanding.wins,
+          losses: awayTeamStanding.losses,
+          ties: awayTeamStanding.ties,
+          winPercent: awayTeamStanding.winPercent,
+          pointsFor: awayTeamStanding.pointsFor,
+          pointsAgainst: awayTeamStanding.pointsAgainst
+        };
+      }
+    }
+    
+    // Add game details if available
+    if (sources.espn && sources.espn.gameDetails) {
+      const gameDetail = sources.espn.gameDetails.find(detail =>
+        detail.id === game.id
+      );
+      
+      if (gameDetail) {
+        game.nflData.seasonType = gameDetail.seasonType;
+        game.nflData.week = gameDetail.week;
+        
+        // Add player statistics
+        if (gameDetail.boxscore && gameDetail.boxscore.players) {
+          game.playerStats = gameDetail.boxscore.players;
+        }
+      }
+    }
+  });
+  
+  return games;
+}
+
+/**
+ * Normalize MLB data
+ * @param {Object} sportData - Combined sport data
+ * @returns {Array} - Normalized games data
+ */
+function normalizeMLBData(sportData) {
+  const { sources } = sportData;
+  
+  // Get base normalized data
+  const games = normalizeBaseData(sportData);
+  
+  console.log(`Normalizing MLB-specific data...`);
+  
+  // Enhance with MLB-specific data
+  games.forEach(game => {
+    // Add MLB-specific fields
+    game.mlbData = {
+      league: null,
+      division: null,
+      seasonType: null,
+      inning: null,
+      isTopInning: null
+    };
+    
+    // Add team statistics if available
+    if (sources.espn && sources.espn.statistics) {
+      const homeTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStats) {
+        game.homeTeam.stats = {
+          avg: homeTeamStats.avg,
+          runs: homeTeamStats.runs,
+          homeRuns: homeTeamStats.homeRuns,
+          rbi: homeTeamStats.rbi,
+          obp: homeTeamStats.obp,
+          slg: homeTeamStats.slg,
+          ops: homeTeamStats.ops,
+          era: homeTeamStats.era,
+          whip: homeTeamStats.whip,
+          strikeouts: homeTeamStats.strikeouts
+        };
+      }
+      
+      if (awayTeamStats) {
+        game.awayTeam.stats = {
+          avg: awayTeamStats.avg,
+          runs: awayTeamStats.runs,
+          homeRuns: awayTeamStats.homeRuns,
+          rbi: awayTeamStats.rbi,
+          obp: awayTeamStats.obp,
+          slg: awayTeamStats.slg,
+          ops: awayTeamStats.ops,
+          era: awayTeamStats.era,
+          whip: awayTeamStats.whip,
+          strikeouts: awayTeamStats.strikeouts
+        };
+      }
+    }
+    
+    // Add standings data if available
+    if (sources.espn && sources.espn.standings) {
+      const homeTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStanding) {
+        game.homeTeam.standing = {
+          wins: homeTeamStanding.wins,
+          losses: homeTeamStanding.losses,
+          winPercent: homeTeamStanding.winPercent,
+          gamesBehind: homeTeamStanding.gamesBehind,
+          streak: homeTeamStanding.streak
+        };
+        
+        // Add league and division info
+        if (homeTeamStanding.league) {
+          game.mlbData.league = homeTeamStanding.league.name;
+        }
+        
+        if (homeTeamStanding.division) {
+          game.mlbData.division = homeTeamStanding.division.name;
+        }
+      }
+      
+      if (awayTeamStanding) {
+        game.awayTeam.standing = {
+          wins: awayTeamStanding.wins,
+          losses: awayTeamStanding.losses,
+          winPercent: awayTeamStanding.winPercent,
+          gamesBehind: awayTeamStanding.gamesBehind,
+          streak: awayTeamStanding.streak
+        };
+      }
+    }
+    
+    // Add game details if available
+    if (sources.espn && sources.espn.gameDetails) {
+      const gameDetail = sources.espn.gameDetails.find(detail =>
+        detail.id === game.id
+      );
+      
+      if (gameDetail) {
+        game.mlbData.seasonType = gameDetail.seasonType;
+        
+        // Add inning information
+        if (gameDetail.status && gameDetail.status.type === 'STATUS_IN_PROGRESS') {
+          game.mlbData.inning = gameDetail.status.period;
+          game.mlbData.isTopInning = gameDetail.status.isTopInning;
+        }
+        
+        // Add player statistics
+        if (gameDetail.boxscore && gameDetail.boxscore.players) {
+          game.playerStats = gameDetail.boxscore.players;
+        }
+      }
+    }
+  });
+  
+  return games;
+}
+
+/**
+ * Normalize NHL data
+ * @param {Object} sportData - Combined sport data
+ * @returns {Array} - Normalized games data
+ */
+function normalizeNHLData(sportData) {
+  const { sources } = sportData;
+  
+  // Get base normalized data
+  const games = normalizeBaseData(sportData);
+  
+  console.log(`Normalizing NHL-specific data...`);
+  
+  // Enhance with NHL-specific data
+  games.forEach(game => {
+    // Add NHL-specific fields
+    game.nhlData = {
+      conference: null,
+      division: null,
+      seasonType: null,
+      period: null,
+      timeRemaining: null,
+      powerPlay: {
+        home: false,
+        away: false
+      }
+    };
+    
+    // Add NHL stats if available
+    if (sources.nhlStats) {
+      const nhlGame = sources.nhlStats.dates?.[0]?.games?.find(g => {
+        const homeMatch = g.teams.home.team.name.includes(game.homeTeam.name) ||
+                         game.homeTeam.name.includes(g.teams.home.team.name);
+        const awayMatch = g.teams.away.team.name.includes(game.awayTeam.name) ||
+                         game.awayTeam.name.includes(g.teams.away.team.name);
+        return homeMatch && awayMatch;
+      });
+      
+      if (nhlGame) {
+        game.nhlData.period = nhlGame.linescore?.currentPeriod;
+        game.nhlData.timeRemaining = nhlGame.linescore?.currentPeriodTimeRemaining;
+        game.nhlData.powerPlay.home = nhlGame.linescore?.teams?.home?.powerPlay || false;
+        game.nhlData.powerPlay.away = nhlGame.linescore?.teams?.away?.powerPlay || false;
+        
+        // Add shots on goal
+        game.homeTeam.shots = nhlGame.linescore?.teams?.home?.shotsOnGoal;
+        game.awayTeam.shots = nhlGame.linescore?.teams?.away?.shotsOnGoal;
+      }
+    }
+    
+    // Add team statistics if available
+    if (sources.espn && sources.espn.statistics) {
+      const homeTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStats) {
+        game.homeTeam.stats = {
+          goalsPerGame: homeTeamStats.goalsPerGame,
+          goalsAgainstPerGame: homeTeamStats.goalsAgainstPerGame,
+          powerPlayPct: homeTeamStats.powerPlayPct,
+          penaltyKillPct: homeTeamStats.penaltyKillPct,
+          shotsPerGame: homeTeamStats.shotsPerGame,
+          shotsAgainstPerGame: homeTeamStats.shotsAgainstPerGame,
+          faceoffWinPct: homeTeamStats.faceoffWinPct
+        };
+      }
+      
+      if (awayTeamStats) {
+        game.awayTeam.stats = {
+          goalsPerGame: awayTeamStats.goalsPerGame,
+          goalsAgainstPerGame: awayTeamStats.goalsAgainstPerGame,
+          powerPlayPct: awayTeamStats.powerPlayPct,
+          penaltyKillPct: awayTeamStats.penaltyKillPct,
+          shotsPerGame: awayTeamStats.shotsPerGame,
+          shotsAgainstPerGame: awayTeamStats.shotsAgainstPerGame,
+          faceoffWinPct: awayTeamStats.faceoffWinPct
+        };
+      }
+    }
+    
+    // Add standings data if available
+    if (sources.espn && sources.espn.standings) {
+      const homeTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStanding) {
+        game.homeTeam.standing = {
+          wins: homeTeamStanding.wins,
+          losses: homeTeamStanding.losses,
+          otLosses: homeTeamStanding.otLosses,
+          points: homeTeamStanding.points,
+          goalsFor: homeTeamStanding.goalsFor,
+          goalsAgainst: homeTeamStanding.goalsAgainst
+        };
+        
+        // Add conference and division info
+        if (homeTeamStanding.conference) {
+          game.nhlData.conference = homeTeamStanding.conference.name;
+        }
+        
+        if (homeTeamStanding.division) {
+          game.nhlData.division = homeTeamStanding.division.name;
+        }
+      }
+      
+      if (awayTeamStanding) {
+        game.awayTeam.standing = {
+          wins: awayTeamStanding.wins,
+          losses: awayTeamStanding.losses,
+          otLosses: awayTeamStanding.otLosses,
+          points: awayTeamStanding.points,
+          goalsFor: awayTeamStanding.goalsFor,
+          goalsAgainst: awayTeamStanding.goalsAgainst
+        };
+      }
+    }
+  });
+  
+  return games;
+}
+
+/**
+ * Normalize NCAA basketball data
+ * @param {Object} sportData - Combined sport data
+ * @returns {Array} - Normalized games data
+ */
+function normalizeNCAABasketballData(sportData) {
+  const { sport, sources } = sportData;
+  
+  // Get base normalized data
+  const games = normalizeBaseData(sportData);
+  
+  console.log(`Normalizing NCAA basketball data for ${sport}...`);
+  
+  // Enhance with NCAA-specific data
+  games.forEach(game => {
+    // Add NCAA-specific fields
+    game.ncaaData = {
+      conference: null,
+      tournamentRound: null,
+      bracketRegion: null,
+      isMarchMadness: isMarchMadnessPeriod()
+    };
+    
+    // Add NCAA data if available
+    if (sources.ncaaSchedule) {
+      const ncaaGame = sources.ncaaSchedule.games?.find(g => {
+        const homeMatch = g.home.name.includes(game.homeTeam.name) ||
+                         game.homeTeam.name.includes(g.home.name);
+        const awayMatch = g.away.name.includes(game.awayTeam.name) ||
+                         game.awayTeam.name.includes(g.away.name);
+        return homeMatch && awayMatch;
+      });
+      
+      if (ncaaGame) {
+        game.ncaaData.tournamentRound = ncaaGame.tournament_round || null;
+        game.ncaaData.bracketRegion = ncaaGame.bracket_region || null;
+      }
+    }
+    
+    // Add team statistics if available
+    if (sources.espn && sources.espn.statistics) {
+      const homeTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStats = sources.espn.statistics?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStats) {
+        game.homeTeam.stats = {
+          ppg: homeTeamStats.ppg,
+          rpg: homeTeamStats.rpg,
+          apg: homeTeamStats.apg,
+          spg: homeTeamStats.spg,
+          bpg: homeTeamStats.bpg,
+          tpg: homeTeamStats.tpg,
+          fgp: homeTeamStats.fgp,
+          tpp: homeTeamStats.tpp,
+          ftp: homeTeamStats.ftp
+        };
+      }
+      
+      if (awayTeamStats) {
+        game.awayTeam.stats = {
+          ppg: awayTeamStats.ppg,
+          rpg: awayTeamStats.rpg,
+          apg: awayTeamStats.apg,
+          spg: awayTeamStats.spg,
+          bpg: awayTeamStats.bpg,
+          tpg: awayTeamStats.tpg,
+          fgp: awayTeamStats.fgp,
+          tpp: awayTeamStats.tpp,
+          ftp: awayTeamStats.ftp
+        };
+      }
+    }
+    
+    // Add standings data if available
+    if (sources.espn && sources.espn.standings) {
+      const homeTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.homeTeam.id
+      );
+      
+      const awayTeamStanding = sources.espn.standings?.teams?.find(team =>
+        team.id === game.awayTeam.id
+      );
+      
+      if (homeTeamStanding) {
+        game.homeTeam.standing = {
+          wins: homeTeamStanding.wins,
+          losses: homeTeamStanding.losses,
+          winPercent: homeTeamStanding.winPercent,
+          conferenceWins: homeTeamStanding.conferenceWins,
+          conferenceLosses: homeTeamStanding.conferenceLosses
+        };
+        
+        // Add conference info
+        if (homeTeamStanding.conference) {
+          game.ncaaData.conference = homeTeamStanding.conference.name;
+        }
+      }
+      
+      if (awayTeamStanding) {
+        game.awayTeam.standing = {
+          wins: awayTeamStanding.wins,
+          losses: awayTeamStanding.losses,
+          winPercent: awayTeamStanding.winPercent,
+          conferenceWins: awayTeamStanding.conferenceWins,
+          conferenceLosses: awayTeamStanding.conferenceLosses
+        };
+      }
+    }
+  });
+  
+  return games;
+}
+
+/**
+ * Normalize team sports data (NBA, WNBA, MLB, NHL, NCAA)
+ * @param {Object} sportData - Combined sport data
+ * @returns {Array} - Normalized games data
+ */
+function normalizeTeamSportData(sportData) {
+  const { sport } = sportData;
+  
+  // Use sport-specific normalizers
+  switch (sport) {
+    case 'NBA':
+      return normalizeNBAData(sportData);
+    case 'WNBA':
+      return normalizeNBAData(sportData); // Use NBA normalizer for WNBA
+    case 'MLB':
+      return normalizeMLBData(sportData);
+    case 'NHL':
+      return normalizeNHLData(sportData);
+    case 'NCAA_MENS':
+    case 'NCAA_WOMENS':
+      return normalizeNCAABasketballData(sportData);
+    default:
+      // Fallback to base normalizer
+      return normalizeBaseData(sportData);
+  }
 }
 
 /**
@@ -599,7 +1086,13 @@ if (require.main === module) {
 module.exports = {
   normalizeData,
   normalizeAllSportsData,
+  normalizeBaseData,
   normalizeTeamSportData,
+  normalizeNBAData,
+  normalizeNFLData,
+  normalizeMLBData,
+  normalizeNHLData,
+  normalizeNCAABasketballData,
   normalizeFormula1Data,
   normalizeUFCData
 };

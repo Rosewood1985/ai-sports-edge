@@ -26,14 +26,71 @@ const API_CONFIG = {
   },
   ESPN_API: {
     BASE_URL: 'https://site.api.espn.com/apis/site/v2/sports',
+    HIDDEN_BASE_URL: 'https://sports.core.api.espn.com/v2/sports',
     ENDPOINTS: {
-      NBA: 'basketball/nba/scoreboard',
-      WNBA: 'basketball/wnba/scoreboard',
-      MLB: 'baseball/mlb/scoreboard',
-      NHL: 'hockey/nhl/scoreboard',
-      NCAA_MENS: 'basketball/mens-college-basketball/scoreboard',
-      NCAA_WOMENS: 'basketball/womens-college-basketball/scoreboard',
-      FORMULA1: 'racing/f1/scoreboard'
+      NBA: {
+        SCOREBOARD: 'basketball/nba/scoreboard',
+        TEAMS: 'basketball/nba/teams',
+        STANDINGS: 'basketball/nba/standings',
+        NEWS: 'basketball/nba/news',
+        STATISTICS: 'basketball/nba/statistics',
+        ATHLETES: 'basketball/nba/athletes'
+      },
+      WNBA: {
+        SCOREBOARD: 'basketball/wnba/scoreboard',
+        TEAMS: 'basketball/wnba/teams',
+        STANDINGS: 'basketball/wnba/standings',
+        NEWS: 'basketball/wnba/news',
+        STATISTICS: 'basketball/wnba/statistics',
+        ATHLETES: 'basketball/wnba/athletes'
+      },
+      MLB: {
+        SCOREBOARD: 'baseball/mlb/scoreboard',
+        TEAMS: 'baseball/mlb/teams',
+        STANDINGS: 'baseball/mlb/standings',
+        NEWS: 'baseball/mlb/news',
+        STATISTICS: 'baseball/mlb/statistics',
+        ATHLETES: 'baseball/mlb/athletes'
+      },
+      NHL: {
+        SCOREBOARD: 'hockey/nhl/scoreboard',
+        TEAMS: 'hockey/nhl/teams',
+        STANDINGS: 'hockey/nhl/standings',
+        NEWS: 'hockey/nhl/news',
+        STATISTICS: 'hockey/nhl/statistics',
+        ATHLETES: 'hockey/nhl/athletes'
+      },
+      NCAA_MENS: {
+        SCOREBOARD: 'basketball/mens-college-basketball/scoreboard',
+        TEAMS: 'basketball/mens-college-basketball/teams',
+        STANDINGS: 'basketball/mens-college-basketball/standings',
+        NEWS: 'basketball/mens-college-basketball/news',
+        STATISTICS: 'basketball/mens-college-basketball/statistics',
+        ATHLETES: 'basketball/mens-college-basketball/athletes'
+      },
+      NCAA_WOMENS: {
+        SCOREBOARD: 'basketball/womens-college-basketball/scoreboard',
+        TEAMS: 'basketball/womens-college-basketball/teams',
+        STANDINGS: 'basketball/womens-college-basketball/standings',
+        NEWS: 'basketball/womens-college-basketball/news',
+        STATISTICS: 'basketball/womens-college-basketball/statistics',
+        ATHLETES: 'basketball/womens-college-basketball/athletes'
+      },
+      FORMULA1: {
+        SCOREBOARD: 'racing/f1/scoreboard',
+        TEAMS: 'racing/f1/teams',
+        STANDINGS: 'racing/f1/standings',
+        NEWS: 'racing/f1/news',
+        ATHLETES: 'racing/f1/athletes'
+      }
+    },
+    HIDDEN_ENDPOINTS: {
+      GAME_DETAILS: '/events/{gameId}',
+      TEAM_DETAILS: '/teams/{teamId}',
+      ATHLETE_DETAILS: '/athletes/{athleteId}',
+      TEAM_ROSTER: '/teams/{teamId}/athletes',
+      TEAM_SCHEDULE: '/teams/{teamId}/events',
+      TEAM_STATISTICS: '/teams/{teamId}/statistics'
     }
   },
   NHL_API: {
@@ -249,34 +306,403 @@ async function fetchOddsData(sport) {
 }
 
 /**
- * Fetch game data from the ESPN API
+ * Fetch scoreboard data from the ESPN API
  * @param {string} sport - Sport key
- * @returns {Promise<Object>} - Game data
+ * @returns {Promise<Object>} - Scoreboard data
  */
-async function fetchESPNData(sport) {
+async function fetchESPNScoreboard(sport) {
   try {
-    const endpoint = API_CONFIG.ESPN_API.ENDPOINTS[sport];
-    if (!endpoint) {
-      console.log(`No ESPN API endpoint for ${sport}`);
+    const endpoints = API_CONFIG.ESPN_API.ENDPOINTS[sport];
+    if (!endpoints || !endpoints.SCOREBOARD) {
+      console.log(`No ESPN API scoreboard endpoint for ${sport}`);
       return null;
     }
 
-    const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoint}`;
+    const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.SCOREBOARD}`;
     
-    console.log(`Fetching ESPN data for ${sport}...`);
+    console.log(`Fetching ESPN scoreboard data for ${sport}...`);
     const data = await fetchWithRateLimit(
-      url, 
-      {}, 
+      url,
+      {},
       'ESPN_API'
     );
     
     // Save data to file
-    const filename = `${sport.toLowerCase()}_espn_${new Date().toISOString().split('T')[0]}.json`;
+    const filename = `${sport.toLowerCase()}_espn_scoreboard_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
     
     return data;
   } catch (error) {
-    console.error(`Error fetching ESPN data for ${sport}:`, error.message);
+    console.error(`Error fetching ESPN scoreboard data for ${sport}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch teams data from the ESPN API
+ * @param {string} sport - Sport key
+ * @returns {Promise<Object>} - Teams data
+ */
+async function fetchESPNTeams(sport) {
+  try {
+    const endpoints = API_CONFIG.ESPN_API.ENDPOINTS[sport];
+    if (!endpoints || !endpoints.TEAMS) {
+      console.log(`No ESPN API teams endpoint for ${sport}`);
+      return null;
+    }
+
+    const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.TEAMS}`;
+    
+    console.log(`Fetching ESPN teams data for ${sport}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `${sport.toLowerCase()}_espn_teams_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN teams data for ${sport}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch standings data from the ESPN API
+ * @param {string} sport - Sport key
+ * @returns {Promise<Object>} - Standings data
+ */
+async function fetchESPNStandings(sport) {
+  try {
+    const endpoints = API_CONFIG.ESPN_API.ENDPOINTS[sport];
+    if (!endpoints || !endpoints.STANDINGS) {
+      console.log(`No ESPN API standings endpoint for ${sport}`);
+      return null;
+    }
+
+    const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.STANDINGS}`;
+    
+    console.log(`Fetching ESPN standings data for ${sport}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `${sport.toLowerCase()}_espn_standings_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN standings data for ${sport}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch statistics data from the ESPN API
+ * @param {string} sport - Sport key
+ * @returns {Promise<Object>} - Statistics data
+ */
+async function fetchESPNStatistics(sport) {
+  try {
+    const endpoints = API_CONFIG.ESPN_API.ENDPOINTS[sport];
+    if (!endpoints || !endpoints.STATISTICS) {
+      console.log(`No ESPN API statistics endpoint for ${sport}`);
+      return null;
+    }
+
+    const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.STATISTICS}`;
+    
+    console.log(`Fetching ESPN statistics data for ${sport}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `${sport.toLowerCase()}_espn_statistics_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN statistics data for ${sport}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch game details from the ESPN Hidden API
+ * @param {string} gameId - Game ID
+ * @returns {Promise<Object>} - Game details
+ */
+async function fetchESPNGameDetails(gameId) {
+  try {
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.GAME_DETAILS.replace('{gameId}', gameId);
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+    
+    console.log(`Fetching ESPN game details for game ${gameId}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `espn_game_${gameId}_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN game details for game ${gameId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch team details from the ESPN Hidden API
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} - Team details
+ */
+async function fetchESPNTeamDetails(teamId) {
+  try {
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_DETAILS.replace('{teamId}', teamId);
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+    
+    console.log(`Fetching ESPN team details for team ${teamId}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `espn_team_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN team details for team ${teamId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch athlete details from the ESPN Hidden API
+ * @param {string} athleteId - Athlete ID
+ * @returns {Promise<Object>} - Athlete details
+ */
+async function fetchESPNAthleteDetails(athleteId) {
+  try {
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.ATHLETE_DETAILS.replace('{athleteId}', athleteId);
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+    
+    console.log(`Fetching ESPN athlete details for athlete ${athleteId}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `espn_athlete_${athleteId}_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN athlete details for athlete ${athleteId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch team roster from the ESPN Hidden API
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} - Team roster
+ */
+async function fetchESPNTeamRoster(teamId) {
+  try {
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_ROSTER.replace('{teamId}', teamId);
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+    
+    console.log(`Fetching ESPN team roster for team ${teamId}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `espn_team_roster_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN team roster for team ${teamId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch team schedule from the ESPN Hidden API
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} - Team schedule
+ */
+async function fetchESPNTeamSchedule(teamId) {
+  try {
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_SCHEDULE.replace('{teamId}', teamId);
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+    
+    console.log(`Fetching ESPN team schedule for team ${teamId}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `espn_team_schedule_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN team schedule for team ${teamId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch team statistics from the ESPN Hidden API
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} - Team statistics
+ */
+async function fetchESPNTeamStatistics(teamId) {
+  try {
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_STATISTICS.replace('{teamId}', teamId);
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+    
+    console.log(`Fetching ESPN team statistics for team ${teamId}...`);
+    const data = await fetchWithRateLimit(
+      url,
+      {},
+      'ESPN_API'
+    );
+    
+    // Save data to file
+    const filename = `espn_team_statistics_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ESPN team statistics for team ${teamId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch all ESPN data for a sport
+ * @param {string} sport - Sport key
+ * @returns {Promise<Object>} - All ESPN data
+ */
+async function fetchESPNData(sport) {
+  try {
+    console.log(`Fetching all ESPN data for ${sport}...`);
+    
+    // Create object to store all ESPN data
+    const espnData = {
+      scoreboard: null,
+      teams: null,
+      standings: null,
+      statistics: null
+    };
+    
+    // Fetch scoreboard data
+    espnData.scoreboard = await fetchESPNScoreboard(sport);
+    
+    // Fetch teams data
+    espnData.teams = await fetchESPNTeams(sport);
+    
+    // Fetch standings data
+    espnData.standings = await fetchESPNStandings(sport);
+    
+    // Fetch statistics data
+    espnData.statistics = await fetchESPNStatistics(sport);
+    
+    // For each game in the scoreboard, fetch detailed game data
+    if (espnData.scoreboard && espnData.scoreboard.events) {
+      const gameDetails = [];
+      
+      // Limit to 5 games to avoid rate limiting
+      const games = espnData.scoreboard.events.slice(0, 5);
+      
+      for (const game of games) {
+        const gameId = game.id;
+        const gameDetail = await fetchESPNGameDetails(gameId);
+        if (gameDetail) {
+          gameDetails.push(gameDetail);
+        }
+      }
+      
+      espnData.gameDetails = gameDetails;
+    }
+    
+    // For each team, fetch detailed team data (limit to 3 teams)
+    if (espnData.teams && espnData.teams.sports && espnData.teams.sports[0] && espnData.teams.sports[0].leagues && espnData.teams.sports[0].leagues[0] && espnData.teams.sports[0].leagues[0].teams) {
+      const teamDetails = [];
+      const teamRosters = [];
+      const teamSchedules = [];
+      const teamStatistics = [];
+      
+      // Limit to 3 teams to avoid rate limiting
+      const teams = espnData.teams.sports[0].leagues[0].teams.slice(0, 3);
+      
+      for (const team of teams) {
+        const teamId = team.team.id;
+        
+        // Fetch team details
+        const teamDetail = await fetchESPNTeamDetails(teamId);
+        if (teamDetail) {
+          teamDetails.push(teamDetail);
+        }
+        
+        // Fetch team roster
+        const teamRoster = await fetchESPNTeamRoster(teamId);
+        if (teamRoster) {
+          teamRosters.push(teamRoster);
+        }
+        
+        // Fetch team schedule
+        const teamSchedule = await fetchESPNTeamSchedule(teamId);
+        if (teamSchedule) {
+          teamSchedules.push(teamSchedule);
+        }
+        
+        // Fetch team statistics
+        const teamStatistic = await fetchESPNTeamStatistics(teamId);
+        if (teamStatistic) {
+          teamStatistics.push(teamStatistic);
+        }
+      }
+      
+      espnData.teamDetails = teamDetails;
+      espnData.teamRosters = teamRosters;
+      espnData.teamSchedules = teamSchedules;
+      espnData.teamStatistics = teamStatistics;
+    }
+    
+    // Save combined ESPN data to file
+    const filename = `${sport.toLowerCase()}_espn_all_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, espnData);
+    
+    return espnData;
+  } catch (error) {
+    console.error(`Error fetching all ESPN data for ${sport}:`, error.message);
     return null;
   }
 }
@@ -640,6 +1066,16 @@ if (require.main === module) {
 module.exports = {
   fetchOddsData,
   fetchESPNData,
+  fetchESPNScoreboard,
+  fetchESPNTeams,
+  fetchESPNStandings,
+  fetchESPNStatistics,
+  fetchESPNGameDetails,
+  fetchESPNTeamDetails,
+  fetchESPNAthleteDetails,
+  fetchESPNTeamRoster,
+  fetchESPNTeamSchedule,
+  fetchESPNTeamStatistics,
   fetchNHLStats,
   fetchSportRadarData,
   fetchNCAAData,
