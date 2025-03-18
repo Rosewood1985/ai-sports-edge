@@ -1,0 +1,225 @@
+.news-ticker-container {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.news-ticker-header {
+  align-items: center;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #e1e4e8;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.news-ticker-header h3 {
+  color: #333;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.preferences-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+}
+
+.preferences-button:hover {
+  color: #4a80ff;
+}
+
+.news-ticker {
+  overflow-x: auto;
+  padding: 12px;
+  white-space: nowrap;
+}
+
+.news-ticker::-webkit-scrollbar {
+  display: none;
+}
+
+.news-ticker {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.news-ticker-items {
+  display: inline-flex;
+  padding-right: 20px;
+}
+
+.news-ticker-item {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  color: #333;
+  display: inline-flex;
+  font-size: 0.9rem;
+  margin-right: 12px;
+  padding: 8px 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.news-ticker-item:hover {
+  background-color: #f0f5ff;
+  border-color: #c0d3ff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+}
+
+.news-ticker-item.betting-content {
+  background-color: #f0f5ff;
+  border-color: #c0d3ff;
+}
+
+.news-source {
+  background-color: #f0f2f5;
+  border-radius: 3px;
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 8px;
+  padding: 2px 6px;
+}
+
+.news-title {
+  font-weight: 500;
+}
+
+/* Loading state */
+.news-ticker-loading {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+}
+
+.news-ticker-loading .spinner {
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #4a80ff;
+  height: 24px;
+  margin-bottom: 12px;
+  width: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.news-ticker-loading p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Error state */
+.news-ticker-error {
+  color: #e53935;
+  font-size: 0.9rem;
+  padding: 16px;
+  text-align: center;
+}
+
+/* Empty state */
+.news-ticker-empty {
+  color: #666;
+  font-size: 0.9rem;
+  padding: 16px;
+  text-align: center;
+}
+
+/* Odds suggestions */
+.odds-suggestions {
+  background-color: #f0f5ff;
+  border-top: 1px solid #c0d3ff;
+  padding: 12px;
+}
+
+.odds-suggestions h4 {
+  color: #333;
+  font-size: 1rem;
+  margin: 0 0 12px 0;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.suggestion-item {
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  width: calc(33.333% - 8px);
+}
+
+.suggestion-game {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.suggestion-odds {
+  color: #4a80ff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.suggestion-action {
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.suggestion-action.bet {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.suggestion-action.avoid {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .news-ticker-item {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  .news-source {
+    font-size: 0.7rem;
+    padding: 1px 4px;
+  }
+  
+  .suggestion-item {
+    width: calc(50% - 6px);
+  }
+}
+
+@media (max-width: 480px) {
+  .suggestion-item {
+    width: 100%;
+  }
+}

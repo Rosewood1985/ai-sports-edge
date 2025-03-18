@@ -1,137 +1,168 @@
-# ML Sports Edge
+# ML Sports Edge API
 
-ML Sports Edge is an advanced machine learning system for sports prediction and betting analysis. It leverages multiple data sources, including ESPN API, Odds API, and historical data from sportsbookreview.com to train models that predict game outcomes with high accuracy.
+A custom machine learning API for AI Sports Edge that provides personalized betting suggestions and predictions.
+
+## Overview
+
+The ML Sports Edge API combines multiple data sources and implements machine learning to provide personalized betting suggestions to users of the AI Sports Edge platform. It analyzes historical game data, player statistics, and betting odds to generate predictions with confidence scores.
 
 ## Features
 
-- **Multi-Sport Support**: Supports NBA, NFL, MLB, NHL, NCAA Basketball, and NCAA Football
-- **Advanced Data Collection**: Fetches data from multiple sources including ESPN API, Odds API, and sportsbookreview.com
-- **Historical Data Analysis**: Collects and analyzes historical data going back to 2011
-- **Feature Engineering**: Extracts sport-specific features for optimal model performance
-- **Neural Network Models**: Uses deep learning models for accurate predictions
-- **Value Betting**: Identifies value betting opportunities based on model predictions
-- **Prediction API**: Provides predictions through a simple API for integration with the main application
+- **Game Outcome Prediction**: Predicts winners, scores, and betting lines
+- **Confidence Scoring**: Provides confidence levels for each prediction
+- **Feature Importance**: Identifies key factors influencing predictions
+- **Value Bet Analysis**: Calculates expected value of bets
+- **Personalized Recommendations**: Tailors suggestions based on user preferences and betting history
+- **Performance Tracking**: Monitors prediction accuracy and other metrics
 
-## Directory Structure
+## Architecture
 
+The API follows a modular architecture with the following components:
+
+- **Data Collection Layer**: Fetches data from external APIs and user profiles
+- **Data Processing Layer**: Normalizes data and extracts features
+- **Machine Learning Models**: Trains and evaluates prediction models
+- **Recommendation Engine**: Generates personalized betting suggestions
+- **API Layer**: Exposes RESTful endpoints for client applications
+
+## API Endpoints
+
+### Prediction Endpoints
+
+- `GET /api/predictions/games`: Get predictions for upcoming games
+- `GET /api/predictions/games/:gameId`: Get detailed prediction for a specific game
+- `GET /api/predictions/players/:playerId`: Get player performance predictions
+- `GET /api/predictions/sports/:sportType`: Get predictions filtered by sport type
+- `GET /api/predictions/trending`: Get trending predictions based on model confidence
+- `POST /api/predictions/feedback`: Submit feedback on a prediction
+
+### Recommendation Endpoints
+
+- `GET /api/recommendations/user/:userId`: Get personalized betting recommendations
+- `GET /api/recommendations/trending`: Get trending bets among users
+- `GET /api/recommendations/value`: Get value bets based on model vs. market odds
+- `GET /api/recommendations/sport/:sportType`: Get recommendations for a specific sport
+- `GET /api/recommendations/daily`: Get daily recommended picks
+- `POST /api/recommendations/feedback`: Submit feedback on a recommendation
+
+### User Endpoints
+
+- `GET /api/users/:userId/preferences`: Get user preferences
+- `PUT /api/users/:userId/preferences`: Update user preferences
+- `GET /api/users/:userId/history`: Get user betting history
+- `GET /api/users/:userId/stats`: Get user betting statistics
+
+### Admin Endpoints
+
+- `GET /api/admin/models/performance`: Get model performance metrics
+- `POST /api/admin/models/retrain`: Trigger model retraining
+- `GET /api/admin/data/sync`: Trigger data synchronization
+
+## Technology Stack
+
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB with Mongoose
+- **Machine Learning**: TensorFlow.js, ml-random-forest
+- **Authentication**: JWT
+- **Caching**: Node-Cache
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- MongoDB
+- API keys for sports data providers
+
+### Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/ai-sports-edge/ml-sports-edge.git
+   cd ml-sports-edge
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Create a `.env` file with the following variables:
+   ```
+   PORT=3001
+   MONGODB_URI=mongodb://localhost:27017/ml-sports-edge
+   JWT_SECRET=your_jwt_secret
+   ODDS_API_KEY=your_odds_api_key
+   ```
+
+4. Start the server:
+   ```
+   npm start
+   ```
+
+### Development
+
+For development with auto-restart:
 ```
-api/ml-sports-edge/
-├── data/                  # Data storage
-│   ├── raw/               # Raw data from APIs
-│   ├── historical/        # Historical data
-│   ├── features/          # Extracted features
-│   ├── normalized/        # Normalized data
-│   ├── predictions/       # Model predictions
-│   ├── plots/             # Training history plots
-│   └── sportsbookreview/  # Data from sportsbookreview.com
-├── models/                # ML models
-│   ├── trained/           # Trained model files
-│   └── features.js        # Feature extraction code
-└── scripts/               # Utility scripts
+npm run dev
 ```
 
-## Data Sources
+### Training Models
 
-### ESPN API
-
-The ESPN API provides comprehensive sports data including:
-- Game schedules and scores
-- Team and player statistics
-- Standings and rankings
-- Game details and play-by-play data
-
-### Odds API
-
-The Odds API provides betting odds from multiple bookmakers:
-- Moneyline odds
-- Point spreads
-- Over/under totals
-- Live odds updates
-
-### Sportsbookreview.com
-
-The sportsbookreview.com scraper collects historical odds data:
-- Historical odds going back to 2011
-- Data from multiple bookmakers
-- Line movement tracking
-- Closing odds
-
-## Models
-
-The system uses neural network models with the following architecture:
-- Input layer based on sport-specific features
-- 3 hidden layers with batch normalization and dropout
-- Binary classification output (home team win probability)
-
-## Usage
-
-### Data Collection
-
-To collect data for model training:
-
-```bash
-# Collect ESPN and Odds API data
-./scripts/update-all.sh
-
-# Collect historical data from sportsbookreview.com
-./scripts/run-sportsbookreview-scraper.sh --sport nba --start-date 2022-10-18 --end-date 2023-06-12
+To train the machine learning models:
+```
+npm run train
 ```
 
-### Model Training
+### Fetching Data
 
-To train the prediction models:
-
-```bash
-# Train models for all sports
-./scripts/train-models.sh
-
-# Train model for a specific sport
-./scripts/train-models.sh --sport nba --epochs 200 --batch-size 64
+To fetch fresh data from external APIs:
+```
+npm run fetch-data
 ```
 
-### Making Predictions
+## Deployment
 
-To make predictions for upcoming games:
+The API is deployed to the GoDaddy web app at [aisportsedge.app](https://aisportsedge.app).
 
-```bash
-# Make predictions for today's NBA games
-./scripts/make-predictions.sh --sport nba
-
-# Make predictions for a specific date
-./scripts/make-predictions.sh --sport nfl --date 2025-09-15
+To deploy:
+```
+./scripts/deploy-and-push.sh
 ```
 
-## Integration with AI Sports Edge
+This script will:
+1. Run tests
+2. Deploy to the GoDaddy web app
+3. Push changes to GitHub
+4. Create a deployment tag
 
-The ML Sports Edge component integrates with the main AI Sports Edge application through:
+## Machine Learning Models
 
-1. **Data Pipeline**: Automated data collection and model training
-2. **Prediction API**: REST API for retrieving predictions
-3. **Web Interface**: Visualization of predictions and betting recommendations
-4. **Mobile App**: Access to predictions on mobile devices
+The API uses several machine learning models:
 
-## Performance Metrics
+- **Spread Prediction**: Random Forest classifier to predict if the home team will cover the spread
+- **Over/Under Prediction**: Random Forest classifier to predict if the total score will go over or under the line
+- **Moneyline Prediction**: Random Forest classifier to predict the winner of the game
+- **Score Prediction**: Neural network to predict the final score of the game
 
-The models are evaluated using the following metrics:
-- Accuracy: Percentage of correctly predicted outcomes
-- Precision: Percentage of correct positive predictions
-- Recall: Percentage of actual positives correctly identified
-- F1 Score: Harmonic mean of precision and recall
-- ROC AUC: Area under the Receiver Operating Characteristic curve
+## Data Models
 
-## Future Improvements
+- **Game**: Represents a sports game with teams, odds, and results
+- **Prediction**: Represents a prediction for a game with confidence scores and factors
+- **User**: Represents a user with betting preferences and history
 
-Planned improvements to the ML Sports Edge system:
-- Player-level features and injury impact analysis
-- Weather data integration for outdoor sports
-- Ensemble models combining multiple prediction approaches
-- Real-time prediction updates based on line movements
-- Bayesian optimization for hyperparameter tuning
-- Reinforcement learning for optimal betting strategies
+## Contributing
 
-## Requirements
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Submit a pull request
 
-- Node.js 14+
-- Python 3.6+
-- TensorFlow 2.8+
-- Required Python packages listed in requirements.txt
+## License
+
+This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+
+## Contact
+
+For questions or support, contact [support@aisportsedge.app](mailto:support@aisportsedge.app).

@@ -1,480 +1,311 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Switch,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-  useColorScheme
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { resetOnboardingStatus } from '../services/onboardingService';
 import { auth } from '../config/firebase';
-import { useTheme, ThemeType } from '../contexts/ThemeContext';
-import {
-  getNotificationPreferences,
-  saveNotificationPreferences,
-  requestNotificationPermissions,
-  NotificationPreferences
-} from '../services/notificationService';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 
-/**
- * Settings screen component
- * @returns {JSX.Element} - Rendered component
- */
-const SettingsScreen = (): JSX.Element => {
-  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>({
-    enabled: true,
-    betAlerts: true,
-    gameStartAlerts: true,
-    promotionalAlerts: false,
-    dailyInsights: true,
-    highImpactNews: true,
-  });
-  const [loading, setLoading] = useState(false);
-  const [loadingPrefs, setLoadingPrefs] = useState(true);
-  const navigation = useNavigation();
-  const deviceTheme = useColorScheme();
-  const { theme, isDark, setTheme, colors } = useTheme();
+// Initialize Firestore
+const firestore = getFirestore();
+import { hasActiveSubscription } from '../services/subscriptionService';
+import { ThemedText } from '../components/ThemedText';
+import { ThemedView } from '../components/ThemedView';
+
+const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation<StackNavigationProp<any>>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [hasSubscription, setHasSubscription] = useState<boolean>(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
+  const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
   
-  // Load notification preferences
+  // Load user settings
   useEffect(() => {
-    const loadPreferences = async () => {
+    const loadUserSettings = async () => {
       try {
-        setLoadingPrefs(true);
-        const prefs = await getNotificationPreferences();
-        setNotificationPrefs(prefs);
+        setLoading(true);
+        
+        // Check if user is logged in
+        const userId = auth.currentUser?.uid;
+        if (!userId) {
+          setLoading(false);
+          return;
+        }
+        
+        // Check if user has an active subscription
+        const activeSubscription = await hasActiveSubscription(userId);
+        setHasSubscription(activeSubscription);
+        
+        // Load user settings from Firestore
+        const userDocRef = doc(firestore, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+        const userData = userDocSnap.data();
+        
+        if (userData) {
+          setNotificationsEnabled(userData.notificationsEnabled !== false);
+          setDarkModeEnabled(userData.darkModeEnabled === true);
+        }
       } catch (error) {
-        console.error('Error loading notification preferences:', error);
+        console.error('Error loading user settings:', error);
       } finally {
-        setLoadingPrefs(false);
+        setLoading(false);
       }
     };
     
-    loadPreferences();
+    loadUserSettings();
   }, []);
   
-  // Create theme-specific styles
-  const themedStyles = {
-    container: {
-      ...styles.container,
-      backgroundColor: colors.background,
-    },
-    title: {
-      ...styles.title,
-      color: colors.text,
-    },
-    section: {
-      ...styles.section,
-      backgroundColor: colors.card,
-      shadowColor: isDark ? 'rgba(0, 0, 0, 0.3)' : '#000',
-    },
-    sectionTitle: {
-      ...styles.sectionTitle,
-      color: colors.primary,
-    },
-    settingTitle: {
-      ...styles.settingTitle,
-      color: colors.text,
-    },
-    settingDescription: {
-      ...styles.settingDescription,
-      color: isDark ? '#aaa' : '#666',
-    },
-    versionText: {
-      ...styles.versionText,
-      color: isDark ? '#777' : '#999',
-    },
-  };
-
-  // Handle dark mode toggle
-  const handleDarkModeToggle = () => {
-    // Toggle between light and dark mode
-    setTheme(isDark ? 'light' : 'dark');
-  };
-
-  // Handle system theme toggle
-  const handleUseSystemTheme = (value: boolean) => {
-    if (value) {
-      setTheme('system');
-    } else {
-      setTheme(deviceTheme === 'dark' ? 'dark' : 'light');
-    }
-  };
-
-  const handlePushNotificationsToggle = async () => {
+  // Handle toggle notifications
+  const handleToggleNotifications = async (value: boolean) => {
     try {
-      const newValue = !notificationPrefs.enabled;
+      setNotificationsEnabled(value);
       
-      // If enabling notifications, request permissions
-      if (newValue) {
-        const permissionGranted = await requestNotificationPermissions();
-        if (!permissionGranted) {
-          Alert.alert(
-            'Permission Required',
-            'Please enable notifications in your device settings to receive updates.'
-          );
-          return;
-        }
+      // Update user settings in Firestore
+      const userId = auth.currentUser?.uid;
+      if (userId) {
+        const userDocRef = doc(firestore, 'users', userId);
+        await updateDoc(userDocRef, {
+          notificationsEnabled: value
+        });
       }
-      
-      // Update local state
-      setNotificationPrefs(prev => ({
-        ...prev,
-        enabled: newValue
-      }));
-      
-      // Save to storage
-      await saveNotificationPreferences({ enabled: newValue });
     } catch (error) {
-      console.error('Error toggling notifications:', error);
-      Alert.alert('Error', 'Failed to update notification settings');
+      console.error('Error updating notifications setting:', error);
+      Alert.alert('Error', 'Failed to update notifications setting.');
+      setNotificationsEnabled(!value); // Revert on error
     }
   };
   
-  // Handle specific notification type toggle
-  const handleNotificationTypeToggle = async (type: keyof Omit<NotificationPreferences, 'enabled'>) => {
+  // Handle toggle dark mode
+  const handleToggleDarkMode = async (value: boolean) => {
     try {
-      const newPrefs = {
-        ...notificationPrefs,
-        [type]: !notificationPrefs[type]
-      };
+      setDarkModeEnabled(value);
       
-      // Update local state
-      setNotificationPrefs(newPrefs);
-      
-      // Save to storage
-      await saveNotificationPreferences({ [type]: newPrefs[type] });
+      // Update user settings in Firestore
+      const userId = auth.currentUser?.uid;
+      if (userId) {
+        const userDocRef = doc(firestore, 'users', userId);
+        await updateDoc(userDocRef, {
+          darkModeEnabled: value
+        });
+      }
     } catch (error) {
-      console.error(`Error toggling ${type} notifications:`, error);
-      Alert.alert('Error', 'Failed to update notification settings');
+      console.error('Error updating dark mode setting:', error);
+      Alert.alert('Error', 'Failed to update dark mode setting.');
+      setDarkModeEnabled(!value); // Revert on error
     }
   };
-
-  const handleViewOnboarding = async () => {
-    setLoading(true);
-    try {
-      await resetOnboardingStatus();
-      navigation.navigate('Onboarding' as never);
-    } catch (error) {
-      console.error('Error resetting onboarding status:', error);
-      Alert.alert('Error', 'Failed to reset onboarding status');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
+  // Handle logout
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      navigation.navigate('Login' as never);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }]
+      });
     } catch (error) {
       console.error('Error signing out:', error);
-      Alert.alert('Error', 'Failed to sign out');
+      Alert.alert('Error', 'Failed to sign out. Please try again.');
     }
   };
-
-  const renderSettingItem = (
-    icon: string,
-    title: string,
-    description: string,
-    action: React.ReactNode
-  ) => (
-    <View style={{
-      ...styles.settingItem,
-      borderTopColor: isDark ? '#333' : '#f0f0f0',
-    }}>
-      <View style={styles.settingIconContainer}>
-        <Ionicons name={icon as any} size={24} color={colors.primary} />
-      </View>
-      <View style={styles.settingContent}>
-        <Text style={themedStyles.settingTitle}>{title}</Text>
-        <Text style={themedStyles.settingDescription}>{description}</Text>
-      </View>
-      <View style={styles.settingAction}>
-        {action}
-      </View>
-    </View>
-  );
-
+  
   if (loading) {
     return (
-      <View style={{
-        ...styles.loadingContainer,
-        backgroundColor: colors.background
-      }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      <ThemedView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4080ff" />
+      </ThemedView>
     );
   }
-
-  // No duplicate declarations needed here
-
+  
   return (
-    <ScrollView style={themedStyles.container}>
-      <Text style={themedStyles.title}>Settings</Text>
-      
-      <View style={themedStyles.section}>
-        <Text style={themedStyles.sectionTitle}>Appearance</Text>
-        {renderSettingItem(
-          'moon',
-          'Dark Mode',
-          'Switch to dark theme for better viewing at night',
-          <Switch
-            value={isDark}
-            onValueChange={handleDarkModeToggle}
-            trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-            thumbColor={isDark ? '#fff' : '#f4f3f4'}
-          />
-        )}
-        {renderSettingItem(
-          'sync',
-          'Use System Theme',
-          'Automatically switch theme based on device settings',
-          <Switch
-            value={theme === 'system'}
-            onValueChange={handleUseSystemTheme}
-            trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-            thumbColor={theme === 'system' ? '#fff' : '#f4f3f4'}
-          />
-        )}
-      </View>
-      
-      <View style={themedStyles.section}>
-        <Text style={themedStyles.sectionTitle}>Notifications</Text>
-        {renderSettingItem(
-          'notifications',
-          'Push Notifications',
-          'Enable or disable all notifications',
-          <Switch
-            value={notificationPrefs.enabled}
-            onValueChange={handlePushNotificationsToggle}
-            trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-            thumbColor={notificationPrefs.enabled ? '#fff' : '#f4f3f4'}
-          />
-        )}
+    <ThemedView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Account Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Account</ThemedText>
+          
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('Profile')}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="person-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Profile</ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => navigation.navigate(hasSubscription ? 'SubscriptionManagement' : 'Subscription')}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="card-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>
+                {hasSubscription ? 'Manage Subscription' : 'Subscribe'}
+              </ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+        </View>
         
-        {notificationPrefs.enabled && (
-          <>
-            {renderSettingItem(
-              'alarm',
-              'Game Start Alerts',
-              'Get notified when games are about to start',
-              <Switch
-                value={notificationPrefs.gameStartAlerts}
-                onValueChange={() => handleNotificationTypeToggle('gameStartAlerts')}
-                trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-                thumbColor={notificationPrefs.gameStartAlerts ? '#fff' : '#f4f3f4'}
-              />
-            )}
-            
-            {renderSettingItem(
-              'analytics',
-              'Betting Alerts',
-              'Get notified about favorable betting opportunities',
-              <Switch
-                value={notificationPrefs.betAlerts}
-                onValueChange={() => handleNotificationTypeToggle('betAlerts')}
-                trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-                thumbColor={notificationPrefs.betAlerts ? '#fff' : '#f4f3f4'}
-              />
-            )}
-            
-            {renderSettingItem(
-              'today',
-              'Daily Insights',
-              'Receive daily AI betting insights',
-              <Switch
-                value={notificationPrefs.dailyInsights}
-                onValueChange={() => handleNotificationTypeToggle('dailyInsights')}
-                trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-                thumbColor={notificationPrefs.dailyInsights ? '#fff' : '#f4f3f4'}
-              />
-            )}
-            
-            {renderSettingItem(
-              'megaphone',
-              'Promotional Alerts',
-              'Receive updates about new features and offers',
-              <Switch
-                value={notificationPrefs.promotionalAlerts}
-                onValueChange={() => handleNotificationTypeToggle('promotionalAlerts')}
-                trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-                thumbColor={notificationPrefs.promotionalAlerts ? '#fff' : '#f4f3f4'}
-              />
-            )}
-            
-            {renderSettingItem(
-              'flash',
-              'High-Impact News',
-              'Get notified about news that could significantly affect betting odds',
-              <Switch
-                value={notificationPrefs.highImpactNews}
-                onValueChange={() => handleNotificationTypeToggle('highImpactNews')}
-                trackColor={{ false: '#d9d9d9', true: '#3498db' }}
-                thumbColor={notificationPrefs.highImpactNews ? '#fff' : '#f4f3f4'}
-              />
-            )}
-          </>
-        )}
-      </View>
-      
-      <View style={themedStyles.section}>
-        <Text style={themedStyles.sectionTitle}>App</Text>
-        {renderSettingItem(
-          'newspaper-outline',
-          'AI Sports News',
-          'Get AI-powered insights on sports news',
-          <TouchableOpacity onPress={() => {
-            // @ts-ignore - Navigation typing issue
-            navigation.navigate('SportsNews');
-          }}>
+        {/* Gift Subscription Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Gift Subscriptions</ThemedText>
+          
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('GiftSubscription')}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="gift-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Gift a Subscription</ThemedText>
+            </View>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
-        )}
+          
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('RedeemGift')}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="ticket-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Redeem Gift Code</ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+        </View>
         
-        {renderSettingItem(
-          'trophy-outline',
-          'League Preferences',
-          'Select which leagues to follow',
-          <TouchableOpacity onPress={() => {
-            // @ts-ignore - Navigation typing issue
-            navigation.navigate('LeagueSelection');
-          }}>
+        {/* Preferences Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Preferences</ThemedText>
+          
+          <View style={styles.settingItem}>
+            <View style={styles.settingContent}>
+              <Ionicons name="notifications-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Notifications</ThemedText>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={handleToggleNotifications}
+              trackColor={{ false: '#ccc', true: '#4080ff' }}
+              thumbColor="#fff"
+            />
+          </View>
+          
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('LocationNotificationSettings')}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="location-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Location Notifications</ThemedText>
+            </View>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
-        )}
+          
+          <View style={styles.settingItem}>
+            <View style={styles.settingContent}>
+              <Ionicons name="moon-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Dark Mode</ThemedText>
+            </View>
+            <Switch
+              value={darkModeEnabled}
+              onValueChange={handleToggleDarkMode}
+              trackColor={{ false: '#ccc', true: '#4080ff' }}
+              thumbColor="#fff"
+            />
+          </View>
+        </View>
         
-        {renderSettingItem(
-          'information-circle',
-          'View Onboarding',
-          'Take the app tour again to learn about features',
-          <TouchableOpacity onPress={handleViewOnboarding}>
+        {/* Support Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Support</ThemedText>
+          
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingContent}>
+              <Ionicons name="help-circle-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Help Center</ThemedText>
+            </View>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
-        )}
+          
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingContent}>
+              <Ionicons name="mail-outline" size={24} color="#4080ff" />
+              <ThemedText style={styles.settingText}>Contact Support</ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+        </View>
         
-        {renderSettingItem(
-          'document-text',
-          'Terms & Conditions',
-          'Read our terms of service',
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={24} color="#999" />
-          </TouchableOpacity>
-        )}
+        {/* Logout Button */}
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
+          <ThemedText style={styles.logoutButtonText}>Log Out</ThemedText>
+        </TouchableOpacity>
         
-        {renderSettingItem(
-          'shield',
-          'Privacy Policy',
-          'Learn how we protect your data',
-          <TouchableOpacity>
-            <Ionicons name="chevron-forward" size={24} color="#999" />
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      <View style={themedStyles.section}>
-        <Text style={themedStyles.sectionTitle}>Account</Text>
-        {renderSettingItem(
-          'card',
-          'Manage Subscription',
-          'View and manage your subscription details',
-          <TouchableOpacity onPress={() => {
-            // @ts-ignore - Navigation typing issue
-            navigation.navigate('SubscriptionManagement');
-          }}>
-            <Ionicons name="chevron-forward" size={24} color="#999" />
-          </TouchableOpacity>
-        )}
-        {renderSettingItem(
-          'log-out',
-          'Logout',
-          'Sign out of your account',
-          <TouchableOpacity onPress={handleLogout}>
-            <Ionicons name="chevron-forward" size={24} color="#999" />
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      <Text style={themedStyles.versionText}>Version 1.0.0</Text>
-    </ScrollView>
+        {/* App Version */}
+        <ThemedText style={styles.versionText}>Version 1.0.0</ThemedText>
+      </ScrollView>
+    </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-    padding: 20,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
+  scrollContent: {
+    padding: 20,
   },
   section: {
     marginBottom: 24,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#3498db',
-    marginVertical: 12,
-    paddingHorizontal: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  settingIconContainer: {
-    width: 40,
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   settingContent: {
-    flex: 1,
-    marginLeft: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  settingTitle: {
+  settingText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 4,
-  },
-  settingDescription: {
-    fontSize: 14,
-    color: '#666',
-  },
-  settingAction: {
     marginLeft: 12,
+  },
+  logoutButton: {
+    backgroundColor: '#f44336',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   versionText: {
     textAlign: 'center',
     color: '#999',
-    marginVertical: 20,
-    fontSize: 14,
+    marginBottom: 24,
   },
 });
 

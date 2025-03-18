@@ -1,0 +1,315 @@
+/* Odds Components Styles */
+
+/* Common styles for all odds cards */
+.odds-card {
+  margin-bottom: 20px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.odds-card .card-header {
+  background-color: #1a1a2e;
+  color: white;
+  border-bottom: 2px solid rgba(0, 229, 255, 0.5);
+  padding: 15px;
+}
+
+.odds-card .card-header h5 {
+  margin-bottom: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.odds-card .card-body {
+  padding: 0;
+  background-color: #0f0f1a;
+  color: #e0e0e0;
+}
+
+/* Market selector */
+.market-selector {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.market-badge {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 5px 10px;
+}
+
+.market-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Tabs styling */
+.odds-card .nav-tabs {
+  border-bottom: none;
+  margin-top: 10px;
+}
+
+.odds-card .nav-tabs .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px 4px 0 0;
+  margin-right: 5px;
+  font-size: 14px;
+}
+
+.odds-card .nav-tabs .nav-link:hover {
+  color: white;
+  background-color: rgba(0, 229, 255, 0.1);
+  border: none;
+}
+
+.odds-card .nav-tabs .nav-link.active {
+  color: white;
+  background-color: rgba(0, 229, 255, 0.2);
+  border: none;
+  border-bottom: 2px solid rgba(0, 229, 255, 0.8);
+}
+
+/* Game/Race list */
+.game-list, .race-list {
+  padding: 0;
+}
+
+.game-item, .race-item {
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.game-item:hover, .race-item:hover {
+  background-color: rgba(0, 229, 255, 0.05);
+}
+
+.game-teams, .race-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.team {
+  flex: 1;
+}
+
+.home-team {
+  text-align: right;
+}
+
+.away-team {
+  text-align: left;
+}
+
+.vs {
+  margin: 0 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+.game-time, .race-time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.game-tournament {
+  margin-top: 5px;
+}
+
+/* Game/Race odds view */
+.game-odds, .race-odds {
+  padding: 15px;
+}
+
+.game-header, .race-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-header h6, .race-header h6 {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+/* Bookmakers */
+.bookmakers {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bookmaker {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bookmaker-name {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 8px 15px;
+  font-weight: 600;
+  font-size: 14px;
+  color: rgba(0, 229, 255, 0.9);
+  border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+}
+
+.outcomes {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.outcome {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.outcome-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.outcome-price {
+  margin: 0 15px;
+  font-weight: 600;
+  color: rgba(0, 229, 255, 0.9);
+}
+
+/* Championship odds */
+.championship-odds {
+  padding: 15px;
+}
+
+.championship-item {
+  margin-bottom: 20px;
+}
+
+/* WNBA specific styles */
+.wnba-odds-card .card-header {
+  background-color: #702963;
+  border-bottom-color: #ff5ca8;
+}
+
+.wnba-odds-card .market-badge {
+  background-color: #ff5ca8;
+}
+
+.wnba-odds-card .nav-tabs .nav-link.active {
+  background-color: rgba(255, 92, 168, 0.2);
+  border-bottom-color: #ff5ca8;
+}
+
+.wnba-odds-card .bookmaker-name {
+  color: #ff5ca8;
+  border-bottom-color: rgba(255, 92, 168, 0.2);
+}
+
+.wnba-odds-card .outcome-price {
+  color: #ff5ca8;
+}
+
+/* NCAA specific styles */
+.ncaa-odds-card .card-header {
+  background-color: #00274c;
+  border-bottom-color: #ffcb05;
+}
+
+.ncaa-odds-card .market-badge {
+  background-color: #ffcb05;
+  color: #00274c;
+}
+
+.ncaa-odds-card .nav-tabs .nav-link.active {
+  background-color: rgba(255, 203, 5, 0.2);
+  border-bottom-color: #ffcb05;
+}
+
+.ncaa-odds-card .bookmaker-name {
+  color: #ffcb05;
+  border-bottom-color: rgba(255, 203, 5, 0.2);
+}
+
+.ncaa-odds-card .outcome-price {
+  color: #ffcb05;
+}
+
+/* Formula 1 specific styles */
+.f1-odds-card .card-header {
+  background-color: #e10600;
+  border-bottom-color: #ffffff;
+}
+
+.f1-odds-card .market-badge {
+  background-color: #ffffff;
+  color: #e10600;
+}
+
+.f1-odds-card .nav-tabs .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-bottom-color: #ffffff;
+}
+
+.f1-odds-card .bookmaker-name {
+  color: #ffffff;
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.f1-odds-card .outcome-price {
+  color: #ffffff;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .odds-card .card-header h5 {
+    font-size: 16px;
+  }
+  
+  .market-selector {
+    flex-wrap: wrap;
+  }
+  
+  .market-badge {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  
+  .odds-card .nav-tabs .nav-link {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .game-teams, .race-name {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .home-team, .away-team {
+    text-align: left;
+  }
+  
+  .vs {
+    margin: 5px 0;
+  }
+  
+  .outcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .outcome-name, .outcome-price {
+    margin-bottom: 5px;
+  }
+}

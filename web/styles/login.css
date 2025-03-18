@@ -1,342 +1,383 @@
 /* Login Page Styles */
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #000428 0%, #004e92 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.login-page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('/ai_logo.webp') no-repeat center center;
-  background-size: 300px;
-  opacity: 0.05;
-  z-index: 0;
-}
 
 .login-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  font-family: 'Roboto', sans-serif;
+}
+
+.login-news-ticker {
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-content {
+  display: flex;
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.login-form-container {
+  flex: 1;
   max-width: 450px;
-  padding: var(--spacing-6);
-  z-index: 1;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.login-title {
-  color: var(--white);
-  text-align: center;
-  margin-bottom: var(--spacing-6);
-  font-size: var(--font-size-4xl);
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.7), 
-               0 0 20px rgba(0, 229, 255, 0.5),
-               0 0 30px rgba(0, 229, 255, 0.3);
-  animation: glow 1.5s ease-in-out infinite alternate;
+.login-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.login-subtitle {
-  color: var(--accent-color);
-  text-align: center;
-  margin-bottom: var(--spacing-8);
-  font-size: var(--font-size-sm);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.7);
+.login-logo img {
+  width: 50px;
+  height: 50px;
+  margin-right: 1rem;
 }
 
-.login-card {
-  background: rgba(30, 30, 30, 0.8);
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3),
-              0 0 40px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  transition: all 0.3s ease;
+.login-logo h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
 }
 
-.login-card:hover {
-  box-shadow: 0 0 25px rgba(0, 229, 255, 0.4),
-              0 0 50px rgba(0, 0, 0, 0.1);
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.login-card-header {
-  padding: var(--spacing-4);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
+.login-form h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 1rem 0;
 }
 
-.login-card-header h2 {
-  color: var(--white);
-  font-size: var(--font-size-xl);
-  margin-bottom: 0;
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+.login-error {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
 }
 
-.login-card-body {
-  padding: var(--spacing-6);
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.input-group {
-  position: relative;
-  margin-bottom: var(--spacing-5);
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a4a6a;
 }
 
-.input-icon {
-  position: absolute;
-  left: var(--spacing-3);
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--gray-500);
-  font-size: 1.2rem;
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
 }
 
-.login-input {
-  width: 100%;
-  padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) var(--spacing-8);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--border-radius-md);
-  color: var(--white);
-  font-size: var(--font-size-md);
-  transition: all 0.3s ease;
-}
-
-.login-input:focus {
+.form-group input:focus {
+  border-color: #4cc9f0;
   outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2);
-}
-
-.login-input::placeholder {
-  color: var(--gray-600);
+  box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
 }
 
 .login-button {
-  width: 100%;
-  padding: var(--spacing-3);
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-  color: var(--white);
+  background-color: #4cc9f0;
+  color: #ffffff;
   border: none;
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-md);
+  border-radius: 4px;
+  padding: 0.75rem;
+  font-size: 1rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-  margin-top: var(--spacing-4);
+  transition: background-color 0.2s ease;
 }
 
 .login-button:hover {
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+  background-color: #3db8df;
 }
 
-.login-button:active {
-  transform: translateY(0);
+.login-button:disabled {
+  background-color: #a0a0c0;
+  cursor: not-allowed;
 }
 
-.forgot-password {
-  text-align: center;
-  margin-top: var(--spacing-4);
+.login-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
 }
 
-.forgot-password a {
-  color: var(--gray-400);
-  font-size: var(--font-size-sm);
+.login-links a {
+  color: #4cc9f0;
   text-decoration: none;
-  transition: all 0.3s ease;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
 }
 
-.forgot-password a:hover {
-  color: var(--accent-color);
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+.login-links a:hover {
+  color: #3db8df;
+  text-decoration: underline;
 }
 
 .login-footer {
-  margin-top: var(--spacing-6);
+  margin-top: auto;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
   text-align: center;
 }
 
 .login-footer p {
-  color: var(--gray-400);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-2);
+  color: #4a4a6a;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
 }
 
-.login-footer a {
-  color: var(--accent-color);
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.3);
-}
-
-.login-footer a:hover {
-  color: var(--white);
-  text-shadow: 0 0 8px rgba(0, 229, 255, 0.7);
-}
-
-.feature-icons {
+.app-download-links {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  margin-top: var(--spacing-8);
-  padding: 0 var(--spacing-4);
+  justify-content: center;
+  gap: 1rem;
+}
+
+.app-download-button img {
+  height: 40px;
+}
+
+.login-features {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-features h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 1rem 0;
+}
+
+.feature {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
 }
 
 .feature-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: var(--spacing-2);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.feature-icon:hover {
-  transform: translateY(-5px);
-}
-
-.icon-circle {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(0, 102, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--spacing-2);
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-  transition: all 0.3s ease;
-}
-
-.feature-icon:hover .icon-circle {
-  background: rgba(0, 229, 255, 0.2);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-}
-
-.icon-text {
-  color: var(--gray-400);
-  font-size: var(--font-size-xs);
+  font-size: 2rem;
+  color: #4cc9f0;
+  min-width: 40px;
   text-align: center;
-  transition: all 0.3s ease;
 }
 
-.feature-icon:hover .icon-text {
-  color: var(--white);
-}
-
-/* Animations */
-@keyframes glow {
-  from {
-    text-shadow: 0 0 5px rgba(0, 229, 255, 0.7),
-                 0 0 10px rgba(0, 229, 255, 0.5),
-                 0 0 15px rgba(0, 229, 255, 0.3);
-  }
-  to {
-    text-shadow: 0 0 10px rgba(0, 229, 255, 0.7),
-                 0 0 20px rgba(0, 229, 255, 0.5),
-                 0 0 30px rgba(0, 229, 255, 0.3);
-  }
-}
-
-/* News Ticker Styles */
-.news-ticker-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  padding: var(--spacing-2) 0;
-  z-index: 10;
-  border-top: 1px solid rgba(0, 229, 255, 0.3);
-  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.news-ticker {
-  white-space: nowrap;
-  overflow: hidden;
-  position: relative;
-}
-
-.news-ticker-content {
-  display: inline-block;
-  animation: ticker 30s linear infinite;
-  padding-left: 100%;
-}
-
-.news-ticker-content:hover {
-  animation-play-state: paused;
-}
-
-.news-item {
-  display: inline-block;
-  margin-right: var(--spacing-6);
-  color: var(--white);
-  font-size: var(--font-size-sm);
-}
-
-.news-date {
-  color: var(--accent-color);
+.feature-text h3 {
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-right: var(--spacing-2);
+  color: #1a1a2e;
+  margin: 0 0 0.5rem 0;
 }
 
-.news-teams {
-  color: var(--white);
-}
-
-.news-time {
-  color: var(--gray-400);
-  margin-left: var(--spacing-2);
-}
-
-@keyframes ticker {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+.feature-text p {
+  font-size: 0.875rem;
+  color: #4a4a6a;
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* Responsive styles */
-@media (max-width: 575.98px) {
-  .login-container {
-    padding: var(--spacing-4);
+@media (max-width: 992px) {
+  .login-content {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
   }
   
-  .login-title {
-    font-size: var(--font-size-2xl);
+  .login-form-container {
+    max-width: 100%;
+    width: 100%;
   }
   
-  .feature-icons {
-    margin-top: var(--spacing-6);
+  .login-features {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-content {
+    padding: 1rem;
+  }
+  
+  .login-form-container,
+  .login-features {
+    padding: 1.5rem;
+  }
+  
+  .feature {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
   
   .feature-icon {
-    width: 25%;
+    margin-bottom: 0.5rem;
   }
   
-  .icon-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+  .login-links {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .login-container {
+    background-color: #121224;
+    color: #ffffff;
+  }
+  
+  .login-form-container,
+  .login-features {
+    background-color: #1a1a2e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .login-logo h1,
+  .login-form h2,
+  .login-features h2,
+  .feature-text h3 {
+    color: #ffffff;
+  }
+  
+  .form-group label,
+  .feature-text p,
+  .login-footer p {
+    color: #a0a0c0;
+  }
+  
+  .form-group input {
+    background-color: #2a2a4a;
+    border-color: #3a3a5a;
+    color: #ffffff;
+  }
+  
+  .form-group input:focus {
+    border-color: #4cc9f0;
+    box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+  }
+  
+  .login-error {
+    background-color: rgba(211, 47, 47, 0.2);
+    color: #ff6b6b;
+  }
+  
+  .login-footer {
+    border-top-color: #2a2a4a;
+  }
+}
+
+/* News preferences button */
+.news-preferences-button {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: rgba(26, 26, 46, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.2s ease;
+}
+
+.news-preferences-button:hover {
+  background: rgba(76, 201, 240, 0.3);
+}
+
+.news-preferences-icon {
+  font-size: 16px;
+}
+
+/* Modal overlay for RSS preferences */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Dark mode support for news preferences */
+@media (prefers-color-scheme: dark) {
+  .news-preferences-button {
+    background: rgba(42, 42, 74, 0.8);
+  }
+  
+  .news-preferences-button:hover {
+    background: rgba(76, 201, 240, 0.2);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .news-preferences-button {
+    background: #000000;
+    border: 1px solid #ffffff;
+  }
+  
+  .news-preferences-button:hover {
+    background: #333333;
+  }
+  
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay {
+    animation: none;
   }
 }

@@ -20,6 +20,7 @@ import SportsNewsScreen from "./screens/SportsNewsScreen";
 import Formula1Screen from "./screens/Formula1Screen";
 import PlayerStatsScreen from "./screens/PlayerStatsScreen";
 import AdvancedPlayerStatsScreen from "./screens/AdvancedPlayerStatsScreen";
+import PlayerHistoricalTrendsScreen from "./screens/PlayerHistoricalTrendsScreen";
 import NcaaBasketballScreen from "./screens/NcaaBasketballScreen";
 import PersonalizationScreen from "./screens/PersonalizationScreen";
 import PersonalizedHomeScreen from "./screens/PersonalizedHomeScreen";
@@ -39,6 +40,7 @@ type RootStackParamList = {
   Formula1: undefined;
   PlayerStats: { gameId: string; gameTitle?: string };
   AdvancedPlayerStats: { gameId: string; gameTitle?: string };
+  PlayerHistoricalTrends: { gameId: string; playerId: string; playerName?: string };
   NcaaBasketball: { gender?: 'mens' | 'womens' };
   Personalization: undefined;
   FavoriteSports: undefined;
@@ -187,6 +189,14 @@ function App(): JSX.Element {
               component={AdvancedPlayerStatsScreen}
               options={{
                 title: "ADVANCED METRICS",
+                headerBackTitle: "Back"
+              }}
+            />
+            <Stack.Screen
+              name="PlayerHistoricalTrends"
+              component={PlayerHistoricalTrendsScreen}
+              options={{
+                title: "HISTORICAL TRENDS",
                 headerBackTitle: "Back"
               }}
             />

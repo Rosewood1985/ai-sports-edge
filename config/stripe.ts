@@ -15,6 +15,7 @@ export const STRIPE_PRICE_IDS = {
   BASIC_MONTHLY: 'price_basic_monthly',
   PREMIUM_MONTHLY: 'price_premium_monthly',
   PREMIUM_YEARLY: 'price_premium_yearly',
+  GROUP_PRO_MONTHLY: 'price_group_pro_monthly', // New group subscription tier
   
   // One-time purchases
   WEEKEND_PASS: 'price_weekend_pass',

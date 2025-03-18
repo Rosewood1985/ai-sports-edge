@@ -19,6 +19,7 @@ type RootStackParamList = {
   SubscriptionManagement: undefined;
   RefundPolicy: undefined;
   GiftRedemption: undefined;
+  GroupSubscription: undefined;
   // Other screens...
 };
 
@@ -130,6 +131,21 @@ const SubscriptionScreen = (): JSX.Element => {
       {!hasSubscription && (
         <ReferralProgramCard isSubscribed={false} />
       )}
+
+      <View style={styles.groupSubscriptionCard}>
+        <Text style={styles.groupTitle}>Looking for a Group Plan?</Text>
+        <Text style={styles.groupDescription}>
+          Share premium features with friends or family. Get Pro access for up to 3 users for just $149.99/month.
+        </Text>
+        <TouchableOpacity
+          style={styles.groupButton}
+          onPress={() => navigation.navigate('GroupSubscription')}
+        >
+          <Text style={styles.groupButtonText}>
+            Create Group Subscription
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.footerLinks}>
         <TouchableOpacity
@@ -267,6 +283,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  groupSubscriptionCard: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 12,
+    padding: 20,
+    marginVertical: 20,
+    borderWidth: 1,
+    borderColor: '#bde0fe',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  groupTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  groupDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  groupButton: {
+    backgroundColor: '#8e44ad',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+  },
+  groupButtonText: {
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,

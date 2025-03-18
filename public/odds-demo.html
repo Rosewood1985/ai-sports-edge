@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sports Odds Demo - AI Sports Edge</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link href="/enhanced-styles.css" rel="stylesheet">
+  <link href="/styles/odds-components.css" rel="stylesheet">
+  
+  <style>
+    body {
+      background-color: #0a0a1a;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .header {
+      background-color: #1a1a2e;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      border-bottom: 2px solid rgba(0, 229, 255, 0.5);
+    }
+    
+    .header h1 {
+      color: white;
+      font-weight: 700;
+      text-align: center;
+      margin: 0;
+    }
+    
+    .header p {
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      margin: 10px 0 0;
+    }
+    
+    .section-title {
+      color: white;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .footer {
+      background-color: #1a1a2e;
+      padding: 20px 0;
+      margin-top: 50px;
+      border-top: 2px solid rgba(0, 229, 255, 0.5);
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <h1>AI Sports Edge - Odds Demo</h1>
+      <p>Explore WNBA, NCAA, and Formula 1 odds with FanDuel integration</p>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="container">
+    <!-- WNBA Odds Section -->
+    <section class="mb-5">
+      <h2 class="section-title">WNBA Odds</h2>
+      <div id="wnba-odds-container">
+        <div class="odds-card wnba-odds-card">
+          <div class="card-header">
+            <h5>WNBA Odds</h5>
+            <div class="market-selector">
+              <span class="badge bg-primary market-badge">Moneyline</span>
+              <span class="badge bg-secondary market-badge">Spread</span>
+              <span class="badge bg-secondary market-badge">Total</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="game-list">
+              <!-- Sample Game 1 -->
+              <div class="game-item">
+                <div class="game-teams">
+                  <div class="team home-team">Las Vegas Aces</div>
+                  <div class="vs">vs</div>
+                  <div class="team away-team">New York Liberty</div>
+                </div>
+                <div class="game-time">
+                  Mar 20, 2025, 7:00 PM
+                </div>
+              </div>
+              
+              <!-- Sample Game 2 -->
+              <div class="game-item">
+                <div class="game-teams">
+                  <div class="team home-team">Connecticut Sun</div>
+                  <div class="vs">vs</div>
+                  <div class="team away-team">Seattle Storm</div>
+                </div>
+                <div class="game-time">
+                  Mar 21, 2025, 8:30 PM
+                </div>
+              </div>
+              
+              <!-- Sample Game 3 -->
+              <div class="game-item">
+                <div class="game-teams">
+                  <div class="team home-team">Chicago Sky</div>
+                  <div class="vs">vs</div>
+                  <div class="team away-team">Phoenix Mercury</div>
+                </div>
+                <div class="game-time">
+                  Mar 22, 2025, 6:00 PM
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- NCAA Odds Section -->
+    <section class="mb-5">
+      <h2 class="section-title">NCAA Basketball Odds</h2>
+      <div id="ncaa-odds-container">
+        <div class="odds-card ncaa-odds-card">
+          <div class="card-header">
+            <h5>NCAA Basketball Odds</h5>
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Men's</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Women's</a>
+              </li>
+            </ul>
+            <div class="market-selector">
+              <span class="badge market-badge">Moneyline</span>
+              <span class="badge bg-secondary market-badge">Spread</span>
+              <span class="badge bg-secondary market-badge">Total</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Game Odds View -->
+            <div class="game-odds">
+              <div class="game-header">
+                <h6>Duke vs North Carolina</h6>
+                <div class="game-time">
+                  Mar 19, 2025, 9:00 PM
+                </div>
+                <div class="game-tournament mb-2">
+                  <span class="badge bg-info">NCAA Tournament - Sweet 16</span>
+                </div>
+              </div>
+              
+              <div class="bookmakers">
+                <!-- Sample Bookmaker 1 -->
+                <div class="bookmaker">
+                  <div class="bookmaker-name">FanDuel</div>
+                  <div class="outcomes">
+                    <div class="outcome">
+                      <div class="outcome-name">Duke</div>
+                      <div class="outcome-price">-110</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                    <div class="outcome">
+                      <div class="outcome-name">North Carolina</div>
+                      <div class="outcome-price">+120</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Sample Bookmaker 2 -->
+                <div class="bookmaker">
+                  <div class="bookmaker-name">DraftKings</div>
+                  <div class="outcomes">
+                    <div class="outcome">
+                      <div class="outcome-name">Duke</div>
+                      <div class="outcome-price">-115</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                    <div class="outcome">
+                      <div class="outcome-name">North Carolina</div>
+                      <div class="outcome-price">+125</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Formula 1 Odds Section -->
+    <section class="mb-5">
+      <h2 class="section-title">Formula 1 Odds</h2>
+      <div id="f1-odds-container">
+        <div class="odds-card f1-odds-card">
+          <div class="card-header">
+            <h5>F1 Race Winner Odds</h5>
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Race Winner</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Driver Championship</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Constructor Championship</a>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="race-odds">
+              <div class="race-header">
+                <h6>Monaco Grand Prix</h6>
+                <div class="race-time">
+                  May 25, 2025, 9:00 AM
+                </div>
+              </div>
+              
+              <div class="bookmakers">
+                <!-- Sample Bookmaker -->
+                <div class="bookmaker">
+                  <div class="bookmaker-name">FanDuel</div>
+                  <div class="outcomes">
+                    <div class="outcome">
+                      <div class="outcome-name">Max Verstappen</div>
+                      <div class="outcome-price">+150</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                    <div class="outcome">
+                      <div class="outcome-name">Lewis Hamilton</div>
+                      <div class="outcome-price">+300</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                    <div class="outcome">
+                      <div class="outcome-name">Charles Leclerc</div>
+                      <div class="outcome-price">+450</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                    <div class="outcome">
+                      <div class="outcome-name">Lando Norris</div>
+                      <div class="outcome-price">+800</div>
+                      <button class="btn btn-primary btn-sm">Bet Now</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 AI Sports Edge. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Sports API -->
+  <script src="/sports-api-v5.js"></script>
+  
+  <!-- React (for production demo) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <script>
+    // In a real implementation, we would use React to render the components
+    // This is just a static demo page
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Sports Odds Demo loaded');
+      
+      // Add click handlers for bet buttons
+      document.querySelectorAll('.btn-primary').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const outcome = this.closest('.outcome');
+          const outcomeName = outcome.querySelector('.outcome-name').textContent;
+          const outcomePrice = outcome.querySelector('.outcome-price').textContent;
+          const bookmaker = this.closest('.bookmaker').querySelector('.bookmaker-name').textContent;
+          
+          alert(`Bet placed on ${outcomeName} at ${outcomePrice} with ${bookmaker}`);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

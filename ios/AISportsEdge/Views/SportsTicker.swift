@@ -20,9 +20,11 @@ import Combine
 
 struct SportsTicker: View {
     @StateObject private var viewModel = SportsTickerViewModel()
+    @StateObject private var rssViewModel = RSSTickerViewModel()
     @State private var scrollOffset: CGFloat = 0
     @State private var contentWidth: CGFloat = 0
     @State private var containerWidth: CGFloat = 0
+    @State private var showNewsTab: Bool = false
     
     // Animation settings
     private let scrollDuration: Double = 60.0
@@ -32,14 +34,42 @@ struct SportsTicker: View {
         VStack(spacing: 0) {
             // Title bar
             HStack {
-                Text("UPCOMING GAMES")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
+                // Toggle between games and news
+                HStack(spacing: 16) {
+                    Button(action: {
+                        withAnimation {
+                            showNewsTab = false
+                        }
+                    }) {
+                        Text("UPCOMING GAMES")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(showNewsTab ? .gray : .white)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(showNewsTab ? Color.clear : Color.blue.opacity(0.3))
+                            .cornerRadius(4)
+                    }
+                    
+                    Button(action: {
+                        withAnimation {
+                            showNewsTab = true
+                        }
+                    }) {
+                        Text("SPORTS NEWS")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(showNewsTab ? .white : .gray)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(showNewsTab ? Color.blue.opacity(0.3) : Color.clear)
+                            .cornerRadius(4)
+                    }
+                }
                 
                 Spacer()
                 
-                if viewModel.isLoading {
+                if viewModel.isLoading || rssViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .scaleEffect(0.7)
@@ -53,15 +83,32 @@ struct SportsTicker: View {
             GeometryReader { geometry in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        if viewModel.games.isEmpty && !viewModel.isLoading {
-                            Text("No upcoming games found")
-                                .foregroundColor(.gray)
-                                .padding()
+                        if showNewsTab {
+                            // News content
+                            if rssViewModel.newsItems.isEmpty && !rssViewModel.isLoading {
+                                Text("No sports news found")
+                                    .foregroundColor(.gray)
+                                    .padding()
+                            } else {
+                                // Duplicate content for continuous scrolling
+                                ForEach(0..<3) { _ in
+                                    ForEach(rssViewModel.newsItems) { newsItem in
+                                        newsItemView(for: newsItem)
+                                    }
+                                }
+                            }
                         } else {
-                            // Duplicate content for continuous scrolling
-                            ForEach(0..<3) { _ in
-                                ForEach(viewModel.games) { game in
-                                    gameView(for: game)
+                            // Games content
+                            if viewModel.games.isEmpty && !viewModel.isLoading {
+                                Text("No upcoming games found")
+                                    .foregroundColor(.gray)
+                                    .padding()
+                            } else {
+                                // Duplicate content for continuous scrolling
+                                ForEach(0..<3) { _ in
+                                    ForEach(viewModel.games) { game in
+                                        gameView(for: game)
+                                    }
                                 }
                             }
                         }
@@ -86,6 +133,7 @@ struct SportsTicker: View {
         }
         .onAppear {
             viewModel.loadGames()
+            rssViewModel.loadNewsItems()
         }
     }
     
@@ -263,6 +311,78 @@ struct SportsTicker: View {
         }
     }
     
+    // News item view
+    private func newsItemView(for newsItem: RSSItem) -> some View {
+        HStack(spacing: 4) {
+            // Date
+            Text(newsItem.date)
+                .font(.caption2)
+                .fontWeight(.bold)
+                .foregroundColor(newsColor(for: newsItem.sport))
+            
+            // News headline
+            Text(newsItem.teams)
+                .font(.caption)
+                .foregroundColor(.white)
+                .lineLimit(1)
+            
+            // Time
+            Text(newsItem.time)
+                .font(.caption2)
+                .foregroundColor(.gray)
+            
+            // Sport
+            Text("| \(newsItem.sport)")
+                .font(.caption2)
+                .fontWeight(.medium)
+                .foregroundColor(newsColor(for: newsItem.sport))
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.black.opacity(0.3))
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if let link = newsItem.link, !link.isEmpty {
+                openNewsLink(link)
+            }
+        }
+    }
+    
+    // Get color for news item based on sport
+    private func newsColor(for sport: String) -> Color {
+        let upperSport = sport.uppercased()
+        
+        if upperSport.contains("NBA") || upperSport == "BASKETBALL" {
+            return Color(red: 0.79, green: 0.03, blue: 0.17) // NBA red
+        } else if upperSport.contains("MLB") || upperSport == "BASEBALL" {
+            return Color(red: 0.06, green: 0.32, blue: 0.73) // MLB blue
+        } else if upperSport.contains("NHL") || upperSport == "HOCKEY" {
+            return Color(red: 0.56, green: 0.56, blue: 0.56) // NHL silver
+        } else if upperSport.contains("NFL") || upperSport == "FOOTBALL" {
+            return Color(red: 0.0, green: 0.32, blue: 0.5) // NFL blue
+        } else if upperSport.contains("F1") || upperSport == "FORMULA 1" || upperSport == "RACING" {
+            return Color(red: 1.0, green: 0.12, blue: 0.0) // F1 red
+        } else if upperSport.contains("UFC") || upperSport == "MMA" {
+            return Color(red: 0.8, green: 0.0, blue: 0.0) // UFC red
+        } else if upperSport.contains("SOCCER") {
+            return Color(red: 0.0, green: 0.5, blue: 0.0) // Soccer green
+        } else {
+            return Color.blue
+        }
+    }
+    
+    // Open news link
+    private func openNewsLink(_ link: String) {
+        guard let url = URL(string: link) else { return }
+        
+        #if os(iOS)
+        UIApplication.shared.open(url)
+        #endif
+    }
+    
     // Open FanDuel link
     private func openFanduelLink(_ link: String) {
         guard let url = URL(string: link) else { return }
@@ -273,7 +393,7 @@ struct SportsTicker: View {
     }
 }
 
-// MARK: - ViewModel
+// MARK: - ViewModels
 class SportsTickerViewModel: ObservableObject {
     @Published var games: [Game] = []
     @Published var isLoading = false
@@ -299,6 +419,39 @@ class SportsTickerViewModel: ObservableObject {
                 }
             )
             .store(in: &cancellables)
+    }
+}
+
+// MARK: - RSS Ticker ViewModel
+class RSSTickerViewModel: ObservableObject {
+    @Published var newsItems: [RSSItem] = []
+    @Published var isLoading = false
+    
+    private var cancellables = Set<AnyCancellable>()
+    private let rssFeedService = RSSFeedService.shared
+    
+    func loadNewsItems() {
+        isLoading = true
+        
+        rssFeedService.fetchNewsTickerItems(limit: 20)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    self?.isLoading = false
+                    
+                    if case .failure(let error) = completion {
+                        print("Error loading news items: \(error.localizedDescription)")
+                    }
+                },
+                receiveValue: { [weak self] items in
+                    self?.newsItems = items
+                }
+            )
+            .store(in: &cancellables)
+    }
+    
+    func refreshNewsItems() {
+        loadNewsItems()
     }
 }
 

@@ -43,6 +43,15 @@
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
+.logo .app-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: var(--border-radius-md);
+  background-color: var(--white);
+  padding: 2px;
+}
+
 .logo:hover img {
   box-shadow: var(--box-shadow-md);
   transform: rotate(5deg);
@@ -342,6 +351,11 @@
   .logo img {
     width: 36px;
     height: 36px;
+  }
+  
+  .logo .app-logo {
+    width: 40px;
+    height: 40px;
   }
   
   .nav {

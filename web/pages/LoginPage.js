@@ -1,160 +1,176 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
 import NewsTicker from '../components/NewsTicker';
 import '../styles/login.css';
+import '../components/NewsTicker.css';
 
 /**
- * LoginPage component that displays a login form with email and password fields
+ * LoginPage component for user authentication
  * @returns {JSX.Element} The LoginPage component
  */
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Add title animation effect
+  // Check if user is already logged in
   useEffect(() => {
-    document.body.classList.add('login-body');
-    
-    return () => {
-      document.body.classList.remove('login-body');
-    };
-  }, []);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigate('/dashboard');
+      }
+    });
 
-  /**
-   * Handle form submission
-   * @param {Event} e - The form submission event
-   */
-  const handleSubmit = (e) => {
+    return () => unsubscribe();
+  }, [navigate]);
+
+  // Handle login form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
+    setLoading(true);
 
-    // Simple validation
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      setIsLoading(false);
-      return;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Login error:', err);
+      
+      // Provide user-friendly error messages
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError('Invalid email or password. Please try again.');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many failed login attempts. Please try again later.');
+      } else if (err.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your connection and try again.');
+      } else {
+        setError('Failed to log in. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-
-    // In a real app, this would make an API call to authenticate the user
-    // For now, we'll simulate a successful login after a short delay
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // Store authentication state in localStorage
-      localStorage.setItem('isAuthenticated', 'true');
-      
-      // Redirect to home page
-      navigate('/');
-    }, 1000);
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-header">
-          <h1 className="login-title">AI Sports Edge</h1>
-          <p className="login-subtitle">Powered by Advanced AI</p>
-        </div>
-
-        <div className="login-card">
-          <div className="login-card-header">
+    <div className="login-container">
+      {/* News Ticker at the top */}
+      <div className="login-news-ticker">
+        <NewsTicker
+          maxItems={10}
+          showSource={true}
+          autoScroll={true}
+          scrollSpeed={50}
+          pauseOnHover={true}
+          userPreferences={{
+            bettingContentOnly: false,
+            maxNewsItems: 20
+          }}
+        />
+      </div>
+      
+      <div className="login-content">
+        <div className="login-form-container">
+          <div className="login-logo">
+            <img src="/assets/logo.png" alt="AI Sports Edge Logo" />
+            <h1>AI Sports Edge</h1>
+          </div>
+          
+          <form className="login-form" onSubmit={handleSubmit}>
             <h2>Sign In</h2>
-          </div>
-          <div className="login-card-body">
-            {error && <div className="error-message">{error}</div>}
             
-            <form onSubmit={handleSubmit}>
-              <div className="input-group">
-                <span className="input-icon">
-                  <i className="fas fa-envelope"></i>
-                </span>
-                <input
-                  type="email"
-                  className="login-input"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="input-group">
-                <span className="input-icon">
-                  <i className="fas fa-lock"></i>
-                </span>
-                <input
-                  type="password"
-                  className="login-input"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <button 
-                type="submit" 
-                className="login-button"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Signing In...' : 'Sign In'}
-              </button>
-            </form>
+            {error && <div className="login-error">{error}</div>}
             
-            <div className="forgot-password">
-              <a href="#">Forgot Password?</a>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="login-button" 
+              disabled={loading}
+            >
+              {loading ? 'Signing In...' : 'Sign In'}
+            </button>
+            
+            <div className="login-links">
+              <Link to="/forgot-password">Forgot Password?</Link>
+              <Link to="/signup">Create Account</Link>
+            </div>
+          </form>
+          
+          <div className="login-footer">
+            <p>Get the latest sports predictions powered by AI</p>
+            <div className="app-download-links">
+              <a href="#" className="app-download-button">
+                <img src="/assets/app-store.png" alt="Download on App Store" />
+              </a>
+              <a href="#" className="app-download-button">
+                <img src="/assets/google-play.png" alt="Get it on Google Play" />
+              </a>
             </div>
           </div>
         </div>
         
-        <div className="login-footer">
-          <p>Don't have an account? <a href="#">Sign Up</a></p>
-        </div>
-        
-        <div className="feature-icons">
-          <div className="feature-icon">
-            <div className="icon-circle">
-              <i className="fas fa-robot"></i>
+        <div className="login-features">
+          <h2>Why Choose AI Sports Edge?</h2>
+          
+          <div className="feature">
+            <div className="feature-icon">📊</div>
+            <div className="feature-text">
+              <h3>AI-Powered Predictions</h3>
+              <p>Our advanced machine learning models analyze thousands of data points to provide accurate predictions.</p>
             </div>
-            <span className="icon-text">AI Picks</span>
           </div>
           
-          <div className="feature-icon">
-            <div className="icon-circle">
-              <i className="fas fa-chart-line"></i>
+          <div className="feature">
+            <div className="feature-icon">📱</div>
+            <div className="feature-text">
+              <h3>Real-Time Updates</h3>
+              <p>Get instant notifications and live updates for all your favorite sports and teams.</p>
             </div>
-            <span className="icon-text">Track Bets</span>
           </div>
           
-          <div className="feature-icon">
-            <div className="icon-circle">
-              <i className="fas fa-trophy"></i>
+          <div className="feature">
+            <div className="feature-icon">🏆</div>
+            <div className="feature-text">
+              <h3>Comprehensive Coverage</h3>
+              <p>From major leagues to niche sports, we've got you covered with in-depth analysis.</p>
             </div>
-            <span className="icon-text">Rewards</span>
           </div>
           
-          <div className="feature-icon">
-            <div className="icon-circle">
-              <i className="fas fa-bullseye"></i>
+          <div className="feature">
+            <div className="feature-icon">📈</div>
+            <div className="feature-text">
+              <h3>Advanced Analytics</h3>
+              <p>Access in-depth sports analytics and performance metrics to gain valuable insights.</p>
             </div>
-            <span className="icon-text">Pro Analysis</span>
-          </div>
-          
-          <div className="feature-icon">
-            <div className="icon-circle">
-              <i className="fas fa-question-circle"></i>
-            </div>
-            <span className="icon-text">Help & FAQ</span>
           </div>
         </div>
       </div>
-      
-      {/* News Ticker */}
-      <NewsTicker />
     </div>
   );
 };

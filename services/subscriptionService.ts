@@ -1,1192 +1,203 @@
 import { auth } from '../config/firebase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { generateRandomCode } from '../utils/codeGenerator';
 
-// Product types
-export type ProductType = 'subscription' | 'one_time_purchase' | 'microtransaction';
+// Initialize Firestore and Functions
+const firestore = getFirestore();
+const functions = getFunctions();
 
-// Subscription plan types
-export interface SubscriptionPlan {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  interval: 'month' | 'year';
-  features: string[];
-  popular?: boolean;
-  // For backward compatibility with existing screens
-  amount?: number;
-  productType: ProductType;
-}
-
-// One-time purchase types
-export interface OneTimePurchase {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  duration?: number; // Duration in hours (for weekend pass, etc.)
-  features: string[];
-  amount?: number; // For backward compatibility (in cents)
-  productType: ProductType;
-}
-
-// Microtransaction types
-export interface Microtransaction {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  amount?: number; // For backward compatibility (in cents)
-  productType: ProductType;
-}
-
-// Payment method type
-export interface PaymentMethod {
-  id: string;
-  brand: string;
-  last4: string;
-  expiryMonth: number;
-  expiryYear: number;
-  isDefault: boolean;
-}
-
-// Subscription type
-export interface Subscription {
-  id: string;
-  status: 'active' | 'canceled' | 'past_due' | 'trialing';
-  planId: string;
-  currentPeriodEnd: number;
-  cancelAtPeriodEnd: boolean;
-  trialEnd: number | null;
-  defaultPaymentMethod: string | null;
-  // For backward compatibility with existing screens
-  plan?: SubscriptionPlan;
-  createdAt?: number;
-}
-
-// Subscription status types
-export interface SubscriptionStatus {
-  active: boolean;
-  planId: string | null;
-  currentPeriodEnd: number | null;
-  cancelAtPeriodEnd: boolean;
-  trialEnd: number | null;
-}
-
-// Available subscription plans
-export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
-  {
-    id: 'basic-monthly',
-    name: 'Basic',
-    description: 'Essential features for casual bettors',
-    price: 4.99,
-    amount: 499, // For backward compatibility (in cents)
-    interval: 'month',
-    productType: 'subscription',
-    features: [
-      'AI-powered betting predictions',
-      'Real-time odds updates',
-      'Basic analytics'
-    ]
-  },
-  {
-    id: 'premium-monthly',
-    name: 'Premium',
-    description: 'Advanced features for serious bettors',
-    price: 9.99,
-    amount: 999, // For backward compatibility (in cents)
-    interval: 'month',
-    productType: 'subscription',
-    popular: true,
-    features: [
-      'All Basic features',
-      'Advanced analytics and insights',
-      'Personalized betting recommendations',
-      'Historical performance tracking',
-      'Email and push notifications'
-    ]
-  },
-  {
-    id: 'premium-yearly',
-    name: 'Premium Annual',
-    description: 'Our best value plan',
-    price: 99.99,
-    amount: 9999, // For backward compatibility (in cents)
-    interval: 'year',
-    productType: 'subscription',
-    features: [
-      'All Premium features',
-      '2 months free compared to monthly',
-      'Early access to new features',
-      'Priority support'
-    ]
-  }
-];
-
-// One-time purchase options
-export const ONE_TIME_PURCHASES: OneTimePurchase[] = [
-  {
-    id: 'weekend-pass',
-    name: 'Weekend Pass',
-    description: 'Full premium access for 48 hours',
-    price: 4.99,
-    amount: 499,
-    duration: 48, // 48 hours
-    productType: 'one_time_purchase',
-    features: [
-      'All premium features for 48 hours',
-      'AI predictions for all games',
-      'Real-time updates and alerts'
-    ]
-  },
-  {
-    id: 'game-day-pass',
-    name: 'Game Day Pass',
-    description: 'Premium access for 24 hours',
-    price: 2.99,
-    amount: 299,
-    duration: 24, // 24 hours
-    productType: 'one_time_purchase',
-    features: [
-      'All premium features for 24 hours',
-      'AI predictions for all games',
-      'Real-time updates and alerts'
-    ]
-  }
-];
-
-// Microtransaction options
-export const MICROTRANSACTIONS: Microtransaction[] = [
-  {
-    id: 'single-prediction',
-    name: 'Single AI Prediction',
-    description: 'One-time AI prediction for a specific game',
-    price: 2.99,
-    amount: 299,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'parlay-suggestion',
-    name: 'AI Parlay Suggestion',
-    description: 'AI-generated parlay based on real-time trends',
-    price: 4.99,
-    amount: 499,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'parlay-package',
-    name: 'Parlay Package (3)',
-    description: '3 AI-generated parlays with different risk levels',
-    price: 9.99,
-    amount: 999,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'alert-package-small',
-    name: 'Alert Package (5)',
-    description: '5 real-time betting opportunity alerts',
-    price: 4.99,
-    amount: 499,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'alert-package-large',
-    name: 'Alert Package (15)',
-    description: '15 real-time betting opportunity alerts',
-    price: 9.99,
-    amount: 999,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'player-plus-minus',
-    name: 'Single Game +/- Data',
-    description: 'Access to player plus-minus tracking for a specific game',
-    price: 1.99,
-    amount: 199,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'advanced-player-metrics',
-    name: 'Advanced Player Metrics',
-    description: 'Unlock advanced player statistics and historical trends for a specific game',
-    price: 0.99,
-    amount: 99,
-    productType: 'microtransaction'
-  },
-  {
-    id: 'player-comparison-tool',
-    name: 'Player Comparison Tool',
-    description: 'Side-by-side comparison of any two players with advanced metrics',
-    price: 0.99,
-    amount: 99,
-    productType: 'microtransaction'
-  }
-];
-
-// All available products
-export const ALL_PRODUCTS = [
-  ...SUBSCRIPTION_PLANS,
-  ...ONE_TIME_PURCHASES,
-  ...MICROTRANSACTIONS
+// Gift subscription amounts
+export const GIFT_SUBSCRIPTION_AMOUNTS = [
+  { label: '$25 (1 month)', value: 2500 },
+  { label: '$50 (2 months)', value: 5000 },
+  { label: '$75 (3 months)', value: 7500 },
+  { label: '$100 (4 months)', value: 10000 },
+  { label: '$150 (6 months)', value: 15000 },
+  { label: '$300 (1 year)', value: 30000 }
 ];
 
 /**
- * Check if a user has premium access
- * @param userId User ID
- * @returns Whether the user has premium access
+ * Check if a user has an active subscription
+ * @param userId User ID to check
+ * @returns Boolean indicating if the user has an active subscription
  */
-export const hasPremiumAccess = async (userId: string): Promise<boolean> => {
+export const hasActiveSubscription = async (userId: string): Promise<boolean> => {
   try {
-    // In a real app, this would check with a backend service
-    // For now, we'll use AsyncStorage to simulate subscription status
-    const subscriptionData = await AsyncStorage.getItem(`subscription_${userId}`);
+    // Get user document
+    const userDocRef = doc(firestore, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
     
-    if (!subscriptionData) {
+    if (!userDoc.exists()) {
       return false;
     }
     
-    const subscription = JSON.parse(subscriptionData) as SubscriptionStatus;
+    const userData = userDoc.data();
     
-    // Check if subscription is active and not expired
-    if (subscription.active) {
-      // If there's an end date, check if it's in the future
-      if (subscription.currentPeriodEnd) {
-        return subscription.currentPeriodEnd > Date.now();
+    // Check if user has an active subscription
+    if (userData.subscriptionStatus === 'active') {
+      // If there's a subscription ID, check if it's still valid
+      if (userData.subscriptionId) {
+        // Get the subscription document
+        const subscriptionsRef = collection(firestore, 'users', userId, 'subscriptions');
+        const subscriptionDoc = await getDoc(doc(subscriptionsRef, userData.subscriptionId));
+        
+        if (subscriptionDoc.exists()) {
+          const subscriptionData = subscriptionDoc.data();
+          
+          // Check if subscription is active and not expired
+          if (subscriptionData.status === 'active') {
+            // If there's an end date, check if it's in the future
+            if (subscriptionData.currentPeriodEnd) {
+              const endDate = subscriptionData.currentPeriodEnd.toDate();
+              return endDate > new Date();
+            }
+            
+            return true;
+          }
+        }
       }
-      return true;
     }
     
     return false;
   } catch (error) {
-    console.error('Error checking premium access:', error);
+    console.error('Error checking subscription status:', error);
     return false;
   }
 };
 
 /**
- * Get the current subscription status for a user
- * @param userId User ID
- * @returns Subscription status
+ * Create a gift subscription
+ * @param userId User ID of the purchaser
+ * @param paymentMethodId Stripe payment method ID
+ * @param amount Amount in cents
+ * @param recipientEmail Optional email of the recipient
+ * @param message Optional personal message
+ * @returns Gift subscription object
  */
-export const getSubscriptionStatus = async (userId: string): Promise<SubscriptionStatus | null> => {
+export const createGiftSubscription = async (
+  userId: string,
+  paymentMethodId: string,
+  amount: number,
+  recipientEmail?: string,
+  message?: string
+): Promise<any> => {
   try {
-    const subscriptionData = await AsyncStorage.getItem(`subscription_${userId}`);
+    // Generate a unique gift code
+    const code = generateRandomCode(8);
     
-    if (!subscriptionData) {
+    // Call the Cloud Function to create the gift subscription
+    const createGiftSubscriptionFn = httpsCallable(functions, 'createGiftSubscription');
+    const result = await createGiftSubscriptionFn({
+      paymentMethodId,
+      amount,
+      code,
+      recipientEmail,
+      message
+    });
+    
+    // Return the gift subscription data
+    return result.data;
+  } catch (error: any) {
+    console.error('Error creating gift subscription:', error);
+    throw new Error(error.message || 'Failed to create gift subscription');
+  }
+};
+
+/**
+ * Get a gift subscription by code
+ * @param code Gift subscription code
+ * @returns Gift subscription object or null if not found
+ */
+export const getGiftSubscriptionByCode = async (code: string): Promise<any> => {
+  try {
+    // Get the gift subscription document
+    const giftSubscriptionRef = doc(firestore, 'giftSubscriptions', code);
+    const giftSubscriptionDoc = await getDoc(giftSubscriptionRef);
+    
+    if (!giftSubscriptionDoc.exists()) {
       return null;
     }
     
-    return JSON.parse(subscriptionData) as SubscriptionStatus;
+    return giftSubscriptionDoc.data();
   } catch (error) {
-    console.error('Error getting subscription status:', error);
+    console.error('Error getting gift subscription:', error);
     return null;
   }
 };
 
 /**
- * Subscribe a user to a plan
- * @param userId User ID
- * @param planId Plan ID
- * @returns Success status
+ * Redeem a gift subscription
+ * @param userId User ID of the redeemer
+ * @param code Gift subscription code
+ * @returns Subscription object
  */
-export const subscribeToPlan = async (userId: string, planId: string): Promise<boolean> => {
+export const redeemGiftSubscription = async (userId: string, code: string): Promise<any> => {
   try {
-    // Find the plan
-    const plan = SUBSCRIPTION_PLANS.find(p => p.id === planId);
-    if (!plan) {
-      throw new Error(`Plan with ID ${planId} not found`);
-    }
+    // Call the Cloud Function to redeem the gift subscription
+    const redeemGiftSubscriptionFn = httpsCallable(functions, 'redeemGiftSubscription');
+    const result = await redeemGiftSubscriptionFn({ code });
     
-    // Calculate subscription end date
-    const now = Date.now();
-    let endDate = now;
-    
-    if (plan.interval === 'month') {
-      // Add 30 days
-      endDate = now + (30 * 24 * 60 * 60 * 1000);
-    } else if (plan.interval === 'year') {
-      // Add 365 days
-      endDate = now + (365 * 24 * 60 * 60 * 1000);
-    }
-    
-    // Create subscription status
-    const subscriptionStatus: SubscriptionStatus = {
-      active: true,
-      planId,
-      currentPeriodEnd: endDate,
-      cancelAtPeriodEnd: false,
-      trialEnd: null
-    };
-    
-    // Save to AsyncStorage
-    await AsyncStorage.setItem(
-      `subscription_${userId}`,
-      JSON.stringify(subscriptionStatus)
-    );
-    
-    return true;
-  } catch (error) {
-    console.error('Error subscribing to plan:', error);
-    return false;
+    // Return the subscription data
+    return result.data;
+  } catch (error: any) {
+    console.error('Error redeeming gift subscription:', error);
+    throw new Error(error.message || 'Failed to redeem gift subscription');
   }
 };
 
 /**
- * Cancel a subscription
+ * Get all gift subscriptions purchased by a user
  * @param userId User ID
- * @param subscriptionIdOrImmediate Subscription ID or immediate flag
- * @returns Success status
+ * @returns Array of gift subscriptions
  */
-export const cancelSubscription = async (
-  userId: string,
-  subscriptionIdOrImmediate?: string | boolean
-): Promise<boolean> => {
-  // Handle both function signatures for backward compatibility
-  const immediate = typeof subscriptionIdOrImmediate === 'boolean' ?
-    subscriptionIdOrImmediate : false;
+export const getPurchasedGiftSubscriptions = async (userId: string): Promise<any[]> => {
   try {
-    const subscriptionData = await AsyncStorage.getItem(`subscription_${userId}`);
+    // Query gift subscriptions purchased by the user
+    const giftSubscriptionsRef = collection(firestore, 'giftSubscriptions');
+    const q = query(giftSubscriptionsRef, where('purchasedBy', '==', userId));
+    const querySnapshot = await getDocs(q);
     
-    if (!subscriptionData) {
-      return false;
-    }
+    // Convert query snapshot to array of gift subscriptions
+    const giftSubscriptions: any[] = [];
+    querySnapshot.forEach((doc) => {
+      giftSubscriptions.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
     
-    const subscription = JSON.parse(subscriptionData) as SubscriptionStatus;
-    
-    if (immediate) {
-      // Cancel immediately
-      subscription.active = false;
-      subscription.currentPeriodEnd = null;
-    } else {
-      // Cancel at the end of the period
-      subscription.cancelAtPeriodEnd = true;
-    }
-    
-    // Save updated subscription
-    await AsyncStorage.setItem(
-      `subscription_${userId}`,
-      JSON.stringify(subscription)
-    );
-    
-    return true;
+    return giftSubscriptions;
   } catch (error) {
-    console.error('Error canceling subscription:', error);
-    return false;
-  }
-};
-
-/**
- * Get a subscription plan by ID
- * @param planId Plan ID
- * @returns Subscription plan
- */
-export const getPlanById = (planId: string): SubscriptionPlan | undefined => {
-  return SUBSCRIPTION_PLANS.find(plan => plan.id === planId);
-};
-
-/**
- * Start a free trial
- * @param userId User ID
- * @param planId Plan ID
- * @param trialDays Number of trial days
- * @returns Success status
- */
-export const startFreeTrial = async (
-  userId: string,
-  planId: string,
-  trialDays: number = 7
-): Promise<boolean> => {
-  try {
-    // Find the plan
-    const plan = SUBSCRIPTION_PLANS.find(p => p.id === planId);
-    if (!plan) {
-      throw new Error(`Plan with ID ${planId} not found`);
-    }
-    
-    // Calculate trial end date
-    const now = Date.now();
-    const trialEnd = now + (trialDays * 24 * 60 * 60 * 1000);
-    
-    // Create subscription status
-    const subscriptionStatus: SubscriptionStatus = {
-      active: true,
-      planId,
-      currentPeriodEnd: trialEnd,
-      cancelAtPeriodEnd: true, // Auto-cancel at the end of trial
-      trialEnd
-    };
-    
-    // Save to AsyncStorage
-    await AsyncStorage.setItem(
-      `subscription_${userId}`,
-      JSON.stringify(subscriptionStatus)
-    );
-    
-    return true;
-  } catch (error) {
-    console.error('Error starting free trial:', error);
-    return false;
-  }
-};
-
-/**
- * Get user subscription details
- * @param userId User ID
- * @returns User subscription details
- */
-export const getUserSubscription = async (userId: string): Promise<Subscription | null> => {
-  try {
-    const status = await getSubscriptionStatus(userId);
-    
-    if (!status || !status.active) {
-      return null;
-    }
-    
-    // Convert SubscriptionStatus to Subscription format for backward compatibility
-    const planId = status.planId || 'premium-monthly'; // Default to premium-monthly if no plan ID
-    const plan = getPlanById(planId);
-    
-    if (!plan) {
-      throw new Error(`Plan with ID ${planId} not found`);
-    }
-    
-    const now = Date.now();
-    
-    return {
-      id: `sub_${now}`, // Generate a fake ID
-      status: status.trialEnd && status.trialEnd > now ? 'trialing' : 'active',
-      planId: planId,
-      currentPeriodEnd: status.currentPeriodEnd || (now + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
-      cancelAtPeriodEnd: status.cancelAtPeriodEnd,
-      trialEnd: status.trialEnd,
-      defaultPaymentMethod: null,
-      plan: plan, // Always include the plan
-      createdAt: now - 7 * 24 * 60 * 60 * 1000 // Default to 7 days ago
-    };
-  } catch (error) {
-    console.error('Error getting user subscription:', error);
-    return null;
-  }
-};
-
-/**
- * Get user payment methods
- * @param userId User ID
- * @returns Array of payment methods
- */
-export const getUserPaymentMethods = async (userId: string): Promise<PaymentMethod[]> => {
-  try {
-    // In a real app, this would fetch from a backend service
-    // For now, return a mock payment method if the user has a subscription
-    const subscription = await getUserSubscription(userId);
-    
-    if (!subscription) {
-      return [];
-    }
-    
-    return [
-      {
-        id: 'pm_mock',
-        brand: 'visa',
-        last4: '4242',
-        expiryMonth: 12,
-        expiryYear: 2025,
-        isDefault: true
-      }
-    ];
-  } catch (error) {
-    console.error('Error getting payment methods:', error);
+    console.error('Error getting purchased gift subscriptions:', error);
     return [];
   }
 };
 
 /**
- * Create a subscription for a user
+ * Get all gift subscriptions redeemed by a user
  * @param userId User ID
- * @param planId Plan ID
- * @param paymentMethodId Payment method ID
- * @returns Success status
+ * @returns Array of gift subscriptions
  */
-export const createSubscription = async (
-  userId: string,
-  planId: string,
-  paymentMethodId?: string
-): Promise<boolean> => {
-  // This is just a wrapper around subscribeToPlan for backward compatibility
-  return subscribeToPlan(userId, planId);
-};
-
-/**
- * Purchase a one-time product
- * @param userId User ID
- * @param productId Product ID
- * @returns Success status
- */
-export const purchaseOneTimeProduct = async (
-  userId: string,
-  productId: string
-): Promise<boolean> => {
+export const getRedeemedGiftSubscriptions = async (userId: string): Promise<any[]> => {
   try {
-    // Find the product
-    const product = ONE_TIME_PURCHASES.find(p => p.id === productId);
-    if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
-    }
+    // Query gift subscriptions redeemed by the user
+    const giftSubscriptionsRef = collection(firestore, 'giftSubscriptions');
+    const q = query(giftSubscriptionsRef, where('redeemedBy', '==', userId));
+    const querySnapshot = await getDocs(q);
     
-    // Calculate expiration date
-    const now = Date.now();
-    const expirationDate = now + (product.duration || 24) * 60 * 60 * 1000;
-    
-    // Store the purchase
-    const purchaseData = {
-      id: `purchase_${now}`,
-      productId,
-      purchaseDate: now,
-      expirationDate,
-      active: true
-    };
-    
-    // Save to AsyncStorage
-    const purchasesKey = `one_time_purchases_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    existingPurchases.push(purchaseData);
-    
-    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
-    
-    return true;
-  } catch (error) {
-    console.error('Error purchasing one-time product:', error);
-    return false;
-  }
-};
-
-/**
- * Purchase a microtransaction
- * @param userId User ID
- * @param productId Product ID
- * @returns Success status
- */
-export const purchaseMicrotransaction = async (
-  userId: string,
-  productId: string
-): Promise<boolean> => {
-  try {
-    // Find the product
-    const product = MICROTRANSACTIONS.find(p => p.id === productId);
-    if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
-    }
-    
-    // Store the purchase
-    const purchaseData = {
-      id: `purchase_${Date.now()}`,
-      productId,
-      purchaseDate: Date.now(),
-      used: false
-    };
-    
-    // Save to AsyncStorage
-    const purchasesKey = `microtransactions_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    existingPurchases.push(purchaseData);
-    
-    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
-    
-    return true;
-  } catch (error) {
-    console.error('Error purchasing microtransaction:', error);
-    return false;
-  }
-};
-
-/**
- * Check if user has access to a specific game prediction
- * @param userId User ID
- * @param gameId Game ID
- * @returns Whether the user has access
- */
-export const hasGamePredictionAccess = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // First check if user has premium access
-    const hasPremium = await hasPremiumAccess(userId);
-    if (hasPremium) {
-      return true;
-    }
-    
-    // Check one-time purchases
-    const purchasesKey = `one_time_purchases_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    // Check if user has an active one-time purchase
-    const now = Date.now();
-    const hasActiveOneTimePurchase = existingPurchases.some(
-      (purchase: any) => purchase.active && purchase.expirationDate > now
-    );
-    
-    if (hasActiveOneTimePurchase) {
-      return true;
-    }
-    
-    // Check microtransactions
-    const microtransactionsKey = `microtransactions_${userId}`;
-    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
-    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
-    
-    // Check if user has an unused single prediction purchase
-    const hasUnusedPrediction = existingMicrotransactions.some(
-      (purchase: any) => !purchase.used && purchase.productId === 'single-prediction'
-    );
-    
-    return hasUnusedPrediction;
-  } catch (error) {
-    console.error('Error checking game prediction access:', error);
-    return false;
-  }
-};
-
-/**
- * Format a date for display
- * @param date Date to format
- * @returns Formatted date string
- */
-export const formatDate = (date?: Date | number): string => {
-  if (!date) {
-    return 'N/A';
-  }
-  
-  const dateObj = typeof date === 'number' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
-
-/**
- * Check if user has access to player plus-minus data for a specific game
- * @param userId User ID
- * @param gameId Game ID
- * @returns Whether the user has access
- */
-export const hasPlayerPlusMinusAccess = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // First check if user has premium access (Premium Monthly, Premium Annual, Weekend Pass, or Game Day Pass)
-    const hasPremium = await hasPremiumAccess(userId);
-    if (hasPremium) {
-      // Get the subscription to check if it's a premium plan
-      const subscription = await getUserSubscription(userId);
-      if (subscription && (
-        subscription.planId === 'premium-monthly' ||
-        subscription.planId === 'premium-yearly'
-      )) {
-        return true;
-      }
-      
-      // Check one-time purchases (Weekend Pass or Game Day Pass)
-      const purchasesKey = `one_time_purchases_${userId}`;
-      const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-      const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-      
-      // Check if user has an active one-time purchase
-      const now = Date.now();
-      const hasActiveOneTimePurchase = existingPurchases.some(
-        (purchase: any) => purchase.active && purchase.expirationDate > now &&
-        (purchase.productId === 'weekend-pass' || purchase.productId === 'game-day-pass')
-      );
-      
-      if (hasActiveOneTimePurchase) {
-        return true;
-      }
-    }
-    
-    // Check if user has purchased player plus-minus access for this specific game
-    const microtransactionsKey = `microtransactions_${userId}`;
-    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
-    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
-    
-    // Check if user has an unused player plus-minus purchase for this game
-    const hasUnusedPlusMinusAccess = existingMicrotransactions.some(
-      (purchase: any) => !purchase.used &&
-      purchase.productId === 'player-plus-minus' &&
-      purchase.gameId === gameId
-    );
-    
-    return hasUnusedPlusMinusAccess;
-  } catch (error) {
-    console.error('Error checking player plus-minus access:', error);
-    return false;
-  }
-};
-
-/**
- * Purchase player plus-minus access for a specific game
- * @param userId User ID
- * @param gameId Game ID
- * @returns Success status
- */
-export const purchasePlayerPlusMinusAccess = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // Find the product
-    const product = MICROTRANSACTIONS.find(p => p.id === 'player-plus-minus');
-    if (!product) {
-      throw new Error('Player plus-minus product not found');
-    }
-    
-    // Store the purchase
-    const purchaseData = {
-      id: `purchase_${Date.now()}`,
-      productId: 'player-plus-minus',
-      gameId: gameId, // Store the game ID to track which game this purchase is for
-      purchaseDate: Date.now(),
-      used: false
-    };
-    
-    // Save to AsyncStorage
-    const purchasesKey = `microtransactions_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    existingPurchases.push(purchaseData);
-    
-    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
-    
-    return true;
-  } catch (error) {
-    console.error('Error purchasing player plus-minus access:', error);
-    return false;
-  }
-};
-
-/**
- * Check if user has access to round betting for a specific fight
- * @param userId User ID
- * @param fightId Fight ID
- * @returns Whether the user has access
- */
-export const hasRoundBettingAccess = async (
-  userId: string,
-  fightId: string
-): Promise<boolean> => {
-  try {
-    // First check if user has premium access
-    const hasPremium = await hasPremiumAccess(userId);
-    if (hasPremium) {
-      return true;
-    }
-    
-    // Check if user has purchased round betting for this fight
-    const microtransactionsKey = `microtransactions_${userId}`;
-    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
-    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
-    
-    // Check if user has an unused round betting purchase for this fight
-    const hasUnusedRoundBettingAccess = existingMicrotransactions.some(
-      (purchase: any) => !purchase.used &&
-      purchase.productId === 'round-betting' &&
-      purchase.fightId === fightId
-    );
-    
-    return hasUnusedRoundBettingAccess;
-  } catch (error) {
-    console.error('Error checking round betting access:', error);
-    return false;
-  }
-};
-
-/**
- * Purchase round betting access for a specific fight
- * @param userId User ID
- * @param fightId Fight ID
- * @returns Success status
- */
-export const purchaseRoundBettingAccess = async (
-  userId: string,
-  fightId: string
-): Promise<boolean> => {
-  try {
-    // Find the product
-    const product = MICROTRANSACTIONS.find(p => p.id === 'round-betting');
-    if (!product) {
-      // Add round-betting product if it doesn't exist
-      MICROTRANSACTIONS.push({
-        id: 'round-betting',
-        name: 'Round Betting',
-        description: 'Access to round-by-round betting for a specific fight',
-        price: 1.99,
-        amount: 199,
-        productType: 'microtransaction'
+    // Convert query snapshot to array of gift subscriptions
+    const giftSubscriptions: any[] = [];
+    querySnapshot.forEach((doc) => {
+      giftSubscriptions.push({
+        id: doc.id,
+        ...doc.data()
       });
-    }
+    });
     
-    // Store the purchase
-    const purchaseData = {
-      id: `purchase_${Date.now()}`,
-      productId: 'round-betting',
-      fightId: fightId,
-      purchaseDate: Date.now(),
-      used: false
-    };
-    
-    // Save to AsyncStorage
-    const purchasesKey = `microtransactions_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    existingPurchases.push(purchaseData);
-    
-    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
-    
-    return true;
+    return giftSubscriptions;
   } catch (error) {
-    console.error('Error purchasing round betting access:', error);
-    return false;
+    console.error('Error getting redeemed gift subscriptions:', error);
+    return [];
   }
-};
-
-/**
- * Check if user has viewed an ad today to unlock free content
- * @param userId User ID
- * @returns Whether the user has viewed an ad today
- */
-export const hasViewedAdToday = async (userId: string): Promise<boolean> => {
-  try {
-    const adViewKey = `ad_view_${userId}`;
-    const lastAdView = await AsyncStorage.getItem(adViewKey);
-    
-    if (!lastAdView) {
-      return false;
-    }
-    
-    const lastAdViewDate = new Date(JSON.parse(lastAdView).timestamp);
-    const today = new Date();
-    
-    // Check if the last ad view was today
-    return (
-      lastAdViewDate.getDate() === today.getDate() &&
-      lastAdViewDate.getMonth() === today.getMonth() &&
-      lastAdViewDate.getFullYear() === today.getFullYear()
-    );
-  } catch (error) {
-    console.error('Error checking ad view:', error);
-    return false;
-  }
-};
-
-/**
- * Mark that user has viewed an ad today
- * @param userId User ID
- * @returns Success status
- */
-export const markAdAsViewed = async (userId: string): Promise<boolean> => {
-  try {
-    const adViewKey = `ad_view_${userId}`;
-    await AsyncStorage.setItem(
-      adViewKey,
-      JSON.stringify({ timestamp: new Date().toISOString() })
-    );
-    return true;
-  } catch (error) {
-    console.error('Error marking ad as viewed:', error);
-    return false;
-  }
-};
-
-/**
- * Check if user has used their free daily pick
- * @param userId User ID
- * @returns Whether the user has used their free daily pick
- */
-export const hasUsedFreeDailyPick = async (userId: string): Promise<boolean> => {
-  try {
-    const freeDailyPickKey = `free_daily_pick_${userId}`;
-    const lastFreeDailyPick = await AsyncStorage.getItem(freeDailyPickKey);
-    
-    if (!lastFreeDailyPick) {
-      return false;
-    }
-    
-    const lastPickDate = new Date(JSON.parse(lastFreeDailyPick).timestamp);
-    const today = new Date();
-    
-    // Check if the last free daily pick was today
-    return (
-      lastPickDate.getDate() === today.getDate() &&
-      lastPickDate.getMonth() === today.getMonth() &&
-      lastPickDate.getFullYear() === today.getFullYear()
-    );
-  } catch (error) {
-    console.error('Error checking free daily pick:', error);
-    return false;
-  }
-};
-
-/**
- * Mark that user has used their free daily pick
- * @param userId User ID
- * @param gameId Game ID
- * @returns Success status
- */
-export const markFreeDailyPickAsUsed = async (userId: string, gameId: string): Promise<boolean> => {
-  try {
-    const freeDailyPickKey = `free_daily_pick_${userId}`;
-    await AsyncStorage.setItem(
-      freeDailyPickKey,
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        gameId
-      })
-    );
-    return true;
-  } catch (error) {
-    console.error('Error marking free daily pick as used:', error);
-    return false;
-  }
-};
-
-/**
- * Get time until next free feature unlock
- * @param userId User ID
- * @param featureKey Feature key
- * @returns Time in milliseconds until next unlock
- */
-export const getNextUnlockTime = async (userId: string, featureKey: string): Promise<number> => {
-  try {
-    const unlockKey = `${featureKey}_${userId}`;
-    const lastUnlock = await AsyncStorage.getItem(unlockKey);
-    
-    if (!lastUnlock) {
-      return 0; // Feature has never been used, so it's available now
-    }
-    
-    const lastUnlockDate = new Date(JSON.parse(lastUnlock).timestamp);
-    const now = new Date();
-    
-    // Calculate time until next unlock (24 hours from last use)
-    const nextUnlockDate = new Date(lastUnlockDate);
-    nextUnlockDate.setDate(nextUnlockDate.getDate() + 1);
-    
-    const timeUntilUnlock = nextUnlockDate.getTime() - now.getTime();
-    
-    return timeUntilUnlock > 0 ? timeUntilUnlock : 0;
-  } catch (error) {
-    console.error('Error getting next unlock time:', error);
-    return 0;
-  }
-};
-
-/**
- * Check if user has access to advanced player metrics for a specific game
- * @param userId User ID
- * @param gameId Game ID
- * @returns Whether the user has access
- */
-export const hasAdvancedPlayerMetricsAccess = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // First check if user has premium access (Premium Monthly or Premium Annual)
-    const hasPremium = await hasPremiumAccess(userId);
-    if (hasPremium) {
-      // Get the subscription to check if it's a premium plan
-      const subscription = await getUserSubscription(userId);
-      if (subscription && (
-        subscription.planId === 'premium-monthly' ||
-        subscription.planId === 'premium-yearly'
-      )) {
-        return true;
-      }
-    }
-    
-    // Check if user has purchased advanced player metrics for this game
-    const microtransactionsKey = `microtransactions_${userId}`;
-    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
-    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
-    
-    // Check if user has an unused advanced player metrics purchase for this game
-    const hasUnusedAdvancedMetricsAccess = existingMicrotransactions.some(
-      (purchase: any) => !purchase.used &&
-      purchase.productId === 'advanced-player-metrics' &&
-      purchase.gameId === gameId
-    );
-    
-    return hasUnusedAdvancedMetricsAccess;
-  } catch (error) {
-    console.error('Error checking advanced player metrics access:', error);
-    return false;
-  }
-};
-
-/**
- * Purchase advanced player metrics access for a specific game
- * @param userId User ID
- * @param gameId Game ID
- * @returns Success status
- */
-export const purchaseAdvancedPlayerMetrics = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // Find the product
-    const product = MICROTRANSACTIONS.find(p => p.id === 'advanced-player-metrics');
-    if (!product) {
-      throw new Error('Advanced player metrics product not found');
-    }
-    
-    // Store the purchase
-    const purchaseData = {
-      id: `purchase_${Date.now()}`,
-      productId: 'advanced-player-metrics',
-      gameId: gameId,
-      purchaseDate: Date.now(),
-      used: false
-    };
-    
-    // Save to AsyncStorage
-    const purchasesKey = `microtransactions_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    existingPurchases.push(purchaseData);
-    
-    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
-    
-    return true;
-  } catch (error) {
-    console.error('Error purchasing advanced player metrics:', error);
-    return false;
-  }
-};
-
-/**
- * Check if user has access to player comparison tool for a specific game
- * @param userId User ID
- * @param gameId Game ID
- * @returns Whether the user has access
- */
-export const hasPlayerComparisonAccess = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // First check if user has premium access (Premium Monthly or Premium Annual)
-    const hasPremium = await hasPremiumAccess(userId);
-    if (hasPremium) {
-      // Get the subscription to check if it's a premium plan
-      const subscription = await getUserSubscription(userId);
-      if (subscription && (
-        subscription.planId === 'premium-monthly' ||
-        subscription.planId === 'premium-yearly'
-      )) {
-        return true;
-      }
-    }
-    
-    // Check if user has purchased player comparison for this game
-    const microtransactionsKey = `microtransactions_${userId}`;
-    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
-    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
-    
-    // Check if user has an unused player comparison purchase for this game
-    const hasUnusedPlayerComparisonAccess = existingMicrotransactions.some(
-      (purchase: any) => !purchase.used &&
-      purchase.productId === 'player-comparison-tool' &&
-      purchase.gameId === gameId
-    );
-    
-    return hasUnusedPlayerComparisonAccess;
-  } catch (error) {
-    console.error('Error checking player comparison access:', error);
-    return false;
-  }
-};
-
-/**
- * Purchase player comparison access for a specific game
- * @param userId User ID
- * @param gameId Game ID
- * @returns Success status
- */
-export const purchasePlayerComparison = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
-  try {
-    // Find the product
-    const product = MICROTRANSACTIONS.find(p => p.id === 'player-comparison-tool');
-    if (!product) {
-      throw new Error('Player comparison product not found');
-    }
-    
-    // Store the purchase
-    const purchaseData = {
-      id: `purchase_${Date.now()}`,
-      productId: 'player-comparison-tool',
-      gameId: gameId,
-      purchaseDate: Date.now(),
-      used: false
-    };
-    
-    // Save to AsyncStorage
-    const purchasesKey = `microtransactions_${userId}`;
-    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
-    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
-    
-    existingPurchases.push(purchaseData);
-    
-    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
-    
-    return true;
-  } catch (error) {
-    console.error('Error purchasing player comparison:', error);
-    return false;
-  }
-};
-
-export default {
-  hasPremiumAccess,
-  getSubscriptionStatus,
-  subscribeToPlan,
-  cancelSubscription,
-  getPlanById,
-  startFreeTrial,
-  getUserSubscription,
-  getUserPaymentMethods,
-  createSubscription,
-  formatDate,
-  purchaseOneTimeProduct,
-  purchaseMicrotransaction,
-  hasGamePredictionAccess,
-  hasPlayerPlusMinusAccess,
-  purchasePlayerPlusMinusAccess,
-  hasAdvancedPlayerMetricsAccess,
-  purchaseAdvancedPlayerMetrics,
-  hasPlayerComparisonAccess,
-  purchasePlayerComparison,
-  hasRoundBettingAccess,
-  purchaseRoundBettingAccess,
-  hasViewedAdToday,
-  markAdAsViewed,
-  hasUsedFreeDailyPick,
-  markFreeDailyPickAsUsed,
-  getNextUnlockTime,
-  SUBSCRIPTION_PLANS,
-  ONE_TIME_PURCHASES,
-  MICROTRANSACTIONS,
-  ALL_PRODUCTS
 };

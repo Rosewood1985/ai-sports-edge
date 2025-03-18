@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const notificationService = require('./notificationService');
+const personalizedNotificationService = require('./personalizedNotificationService');
 
 /**
  * Trigger notification when new predictions are available
@@ -27,16 +27,18 @@ exports.sendPredictionNotifications = functions.firestore
     
     console.log(`Sending prediction notification to ${userIds.length} users`);
     
-    // Send notification
-    return notificationService.sendToUsers({
-      title: 'New Prediction Available',
-      message: `Check out our prediction for ${prediction.homeTeam} vs ${prediction.awayTeam}`,
+    // Send personalized notification
+    return personalizedNotificationService.sendPersonalizedNotifications({
+      userIds,
+      type: 'prediction',
       data: {
         predictionId: context.params.predictionId,
         sport: prediction.sport,
+        homeTeam: prediction.homeTeam,
+        awayTeam: prediction.awayTeam,
+        teams: [prediction.homeTeam, prediction.awayTeam],
         screen: 'Odds'
-      },
-      userIds
+      }
     });
   });
 
@@ -73,16 +75,19 @@ exports.sendValueBetNotifications = functions.firestore
     
     console.log(`Sending value bet notification to ${userIds.length} premium users`);
     
-    // Send notification
-    return notificationService.sendToUsers({
-      title: 'Value Betting Opportunity',
-      message: `We've identified a ${Math.round(valueBet.value * 100)}% edge on ${valueBet.team}`,
+    // Send personalized notification
+    return personalizedNotificationService.sendPersonalizedNotifications({
+      userIds,
+      type: 'valueBet',
       data: {
         betId: context.params.betId,
         sport: valueBet.sport,
+        team: valueBet.team,
+        teams: [valueBet.team],
+        edge: Math.round(valueBet.value * 100),
+        odds: valueBet.odds,
         screen: 'Odds'
-      },
-      userIds
+      }
     });
   });
 
@@ -132,16 +137,20 @@ exports.sendGameStartReminders = functions.pubsub
       
       console.log(`Sending game reminder to ${userIds.length} users for ${game.homeTeam} vs ${game.awayTeam}`);
       
-      // Send notification
-      return notificationService.sendToUsers({
-        title: 'Game Starting Soon',
-        message: `${game.homeTeam} vs ${game.awayTeam} starts in 30 minutes`,
+      // Send personalized notification
+      return personalizedNotificationService.sendPersonalizedNotifications({
+        userIds,
+        type: 'gameReminder',
         data: {
           gameId: doc.id,
           sport: game.sport,
+          homeTeam: game.homeTeam,
+          awayTeam: game.awayTeam,
+          teams: [game.homeTeam, game.awayTeam],
+          homeRecord: game.homeRecord || '',
+          awayRecord: game.awayRecord || '',
           screen: 'Odds'
-        },
-        userIds
+        }
       });
     });
     
@@ -218,13 +227,21 @@ exports.sendModelPerformanceUpdates = functions.pubsub
     
     console.log(`Sending model performance update to ${userIds.length} users`);
     
-    // Send notification
-    return notificationService.sendToUsers({
-      title: 'Weekly Model Performance Update',
-      message: performanceMessage,
+    // Send personalized notification
+    return personalizedNotificationService.sendPersonalizedNotifications({
+      userIds,
+      type: 'modelPerformance',
       data: {
+        accuracy: accuracy.toFixed(1),
+        correct: correctPredictions,
+        total: totalPredictions,
+        sportBreakdown: Object.entries(sportPerformance)
+          .map(([sport, data]) => {
+            const sportAccuracy = (data.correct / data.total) * 100;
+            return `${sport}: ${sportAccuracy.toFixed(1)}% (${data.correct}/${data.total})`;
+          })
+          .join('\n'),
         screen: 'PersonalizedHome'
-      },
-      userIds
+      }
     });
   });

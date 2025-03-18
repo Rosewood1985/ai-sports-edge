@@ -134,6 +134,23 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Exclusive access to Rugby data and predictions',
       'Exclusive access to Cricket data and predictions'
     ]
+  },
+  {
+    id: 'group-pro-monthly',
+    name: 'Group Pro',
+    description: 'Share premium features with friends or family',
+    price: 149.99,
+    amount: 14999, // For backward compatibility (in cents)
+    interval: 'month',
+    productType: 'subscription',
+    priceId: 'price_group_pro_monthly', // Replace with actual Stripe price ID
+    features: [
+      'All Premium features for up to 3 users',
+      'Each user gets full access to premium features',
+      'Save $49.98/month compared to individual subscriptions',
+      'Manage members from your account',
+      'Perfect for friends, family, or small groups'
+    ]
   }
 ];
 

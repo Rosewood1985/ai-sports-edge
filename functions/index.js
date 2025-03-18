@@ -10,6 +10,7 @@ const stripeSubscriptions = require('./stripeSubscriptions');
 const stripePayments = require('./stripePayments');
 const subscriptionManagement = require('./subscriptionManagement');
 const subscriptionGifting = require('./subscriptionGifting');
+const groupSubscriptions = require('./groupSubscriptions');
 const autoResubscribe = require('./autoResubscribe');
 const referralProgram = require('./referralProgram');
 const referralRewards = require('./referralRewards');
@@ -36,11 +37,17 @@ exports.stripeOddsWebhook = stripePayments.stripeWebhook;
 exports.updateSubscription = subscriptionManagement.updateSubscription;
 exports.pauseSubscription = subscriptionManagement.pauseSubscription;
 exports.resumeSubscription = subscriptionManagement.resumeSubscription;
-
 // Export subscription gifting functions
 exports.giftSubscription = subscriptionGifting.giftSubscription;
 exports.redeemGiftSubscription = subscriptionGifting.redeemGiftSubscription;
 
+// Export group subscription functions
+exports.createGroupSubscription = groupSubscriptions.createGroupSubscription;
+exports.addGroupMember = groupSubscriptions.addGroupMember;
+exports.removeGroupMember = groupSubscriptions.removeGroupMember;
+exports.cancelGroupSubscription = groupSubscriptions.cancelGroupSubscription;
+
+// Export auto-resubscribe functions
 // Export auto-resubscribe functions
 exports.handleAutoResubscribe = autoResubscribe.handleAutoResubscribe;
 exports.toggleAutoResubscribe = autoResubscribe.toggleAutoResubscribe;

@@ -7,21 +7,25 @@ import { AdvancedPlayerMetrics } from '../services/playerStatsService';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 
 interface AdvancedPlayerMetricsCardProps {
   playerData: AdvancedPlayerMetrics;
   onPress?: () => void;
   expanded?: boolean;
+  showHistoricalTrendsButton?: boolean;
 }
 
 /**
  * Component to display advanced player metrics
  */
-const AdvancedPlayerMetricsCard: React.FC<AdvancedPlayerMetricsCardProps> = ({ 
-  playerData, 
+const AdvancedPlayerMetricsCard: React.FC<AdvancedPlayerMetricsCardProps> = ({
+  playerData,
   onPress,
-  expanded = false
+  expanded = false,
+  showHistoricalTrendsButton = true
 }) => {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const backgroundColor = useThemeColor({ light: '#fff', dark: '#1c1c1e' }, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
@@ -305,7 +309,24 @@ const AdvancedPlayerMetricsCard: React.FC<AdvancedPlayerMetricsCardProps> = ({
         {/* Recent Performance Chart */}
         {hasChartData && pointsData && (
           <View style={styles.section}>
-            <ThemedText style={styles.sectionTitle}>Recent Performance</ThemedText>
+            <View style={styles.sectionHeader}>
+              <ThemedText style={styles.sectionTitle}>Recent Performance</ThemedText>
+              {showHistoricalTrendsButton && (
+                <TouchableOpacity
+                  style={styles.historicalTrendsButton}
+                  onPress={() => {
+                    navigation.navigate('PlayerHistoricalTrends', {
+                      gameId: playerData.gameId,
+                      playerId: playerData.playerId,
+                      playerName: playerData.playerName
+                    });
+                  }}
+                >
+                  <ThemedText style={styles.historicalTrendsButtonText}>View Trends</ThemedText>
+                  <Ionicons name="analytics" size={16} color={primaryColor} />
+                </TouchableOpacity>
+              )}
+            </View>
             
             <View style={styles.chartContainer}>
               <LineChart
@@ -352,6 +373,26 @@ const AdvancedPlayerMetricsCard: React.FC<AdvancedPlayerMetricsCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  historicalTrendsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(10, 126, 164, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  historicalTrendsButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0a7ea4',
+    marginRight: 4,
+  },
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const { exec } = require('child_process');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -35,10 +36,34 @@ try {
   console.warn('firebase-admin not installed, running in development mode');
   admin = null;
 }
-
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
+
+// Import RSS feed routes
+let rssRoutes;
+try {
+  rssRoutes = require('./api/rssFeeds');
+  console.log('RSS feed routes loaded successfully');
+} catch (error) {
+  console.warn('RSS feed routes not loaded:', error.message);
+  rssRoutes = null;
+}
+
+// Use RSS feed routes if available
+if (rssRoutes) {
+  app.use('/api/rss-feeds', rssRoutes);
+  console.log('RSS feed routes registered at /api/rss-feeds');
+}
+
+// Import and start RSS feed cron job
+try {
+  const { startRssFeedCronJob } = require('./jobs/rssFeedCronJob.js');
+  startRssFeedCronJob();
+  console.log('RSS feed cron job started');
+} catch (error) {
+  console.warn('RSS feed cron job not started:', error.message);
+}
 
 // API endpoints
 app.post('/api/create-payment', async (req, res) => {

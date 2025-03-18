@@ -15,6 +15,7 @@ import { useColorScheme } from '../hooks/useColorScheme';
 import { StackScreenProps } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
+import PlayerComparisonView from '../components/PlayerComparisonView';
 import subscriptionService from '../services/subscriptionService';
 import { 
   AdvancedPlayerMetrics, 
@@ -23,7 +24,7 @@ import {
   comparePlayerMetrics
 } from '../services/playerStatsService';
 import AdvancedPlayerMetricsCard from '../components/AdvancedPlayerMetricsCard';
-import PlayerComparisonView from '../components/PlayerComparisonView';
+import EnhancedPlayerComparison from '../components/EnhancedPlayerComparison';
 import EmptyState from '../components/EmptyState';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -74,7 +75,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
   useEffect(() => {
     const checkAccess = async () => {
       setLoading(true);
-      const user = auth.currentUser;
+      const user = auth?.currentUser;
       
       if (!user) {
         setHasAccess(false);
@@ -190,7 +191,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
   
   // Purchase advanced metrics access
   const purchaseAdvancedMetrics = async () => {
-    const user = auth.currentUser;
+    const user = auth?.currentUser;
     
     if (!user) {
       Alert.alert('Error', 'You must be logged in to make a purchase.');
@@ -232,7 +233,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
   
   // Purchase player comparison access
   const purchasePlayerComparison = async () => {
-    const user = auth.currentUser;
+    const user = auth?.currentUser;
     
     if (!user) {
       Alert.alert('Error', 'You must be logged in to make a purchase.');
@@ -538,7 +539,10 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
             </View>
             
             {comparisonData && (
-              <PlayerComparisonView comparisonData={comparisonData} />
+              <EnhancedPlayerComparison
+                comparisonData={comparisonData}
+                loading={comparisonLoading}
+              />
             )}
           </View>
         </TouchableOpacity>
