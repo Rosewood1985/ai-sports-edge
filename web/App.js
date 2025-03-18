@@ -4,6 +4,7 @@ import { BettingAffiliateProvider } from '../contexts/BettingAffiliateContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotificationPermission from '../components/NotificationPermission';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import FeaturesPage from './pages/FeaturesPage';
@@ -115,6 +116,7 @@ const App = () => {
       <div className="app">
         {/* Only show Header and Footer if not on login page */}
         {!isLoginPage && <Header />}
+        {!isLoginPage && <NotificationPermission />}
         <main className={`main-content ${isLoginPage ? 'login-main' : ''}`}>
           <Routes>
             {/* Login route */}

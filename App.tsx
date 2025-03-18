@@ -8,6 +8,7 @@ import { PersonalizationProvider } from "./contexts/PersonalizationContext";
 import { BettingAffiliateProvider } from "./contexts/BettingAffiliateContext";
 import { StatusBar, useColorScheme } from "react-native";
 import StripeProvider from "./components/StripeProvider";
+import OneSignalProvider from "./components/OneSignalProvider";
 import NeonLoginScreen from "./screens/NeonLoginScreen";
 import NeonOddsScreen from "./screens/NeonOddsScreen";
 import RewardsScreen from "./screens/RewardsScreen";
@@ -22,6 +23,7 @@ import AdvancedPlayerStatsScreen from "./screens/AdvancedPlayerStatsScreen";
 import NcaaBasketballScreen from "./screens/NcaaBasketballScreen";
 import PersonalizationScreen from "./screens/PersonalizationScreen";
 import PersonalizedHomeScreen from "./screens/PersonalizedHomeScreen";
+import NotificationSettingsScreen from "./screens/NotificationSettingsScreen";
 import { colors } from "./styles/theme";
 
 // Define the type for the navigation stack parameters
@@ -44,6 +46,7 @@ type RootStackParamList = {
   RiskToleranceSettings: undefined;
   OddsFormatSettings: undefined;
   PersonalizedHome: undefined;
+  NotificationSettings: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -73,7 +76,8 @@ function App(): JSX.Element {
       <PersonalizationProvider>
         <BettingAffiliateProvider>
           <StripeProvider>
-            <NavigationContainer theme={NeonTheme}>
+            <OneSignalProvider>
+              <NavigationContainer theme={NeonTheme}>
           <Stack.Navigator
             screenOptions={{
               headerStyle: {
@@ -202,8 +206,17 @@ function App(): JSX.Element {
                 headerBackTitle: "Back"
               }}
             />
+            <Stack.Screen
+              name="NotificationSettings"
+              component={NotificationSettingsScreen}
+              options={{
+                title: "NOTIFICATION SETTINGS",
+                headerBackTitle: "Back"
+              }}
+            />
           </Stack.Navigator>
-            </NavigationContainer>
+              </NavigationContainer>
+            </OneSignalProvider>
           </StripeProvider>
         </BettingAffiliateProvider>
       </PersonalizationProvider>

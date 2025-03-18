@@ -16,6 +16,7 @@ const referralRewards = require('./referralRewards');
 const subscriptionAnalytics = require('./subscriptionAnalytics');
 const aiSummary = require('./aiSummary');
 const leaderboardUpdates = require('./leaderboardUpdates');
+const notifications = require('./notifications');
 
 // Export all functions
 exports.stripeWebhook = stripeWebhooks.stripeWebhook;
@@ -64,6 +65,12 @@ exports.generateAISummary = aiSummary.generateAISummary;
 
 // Export leaderboard update functions
 exports.updateReferralLeaderboard = leaderboardUpdates.updateReferralLeaderboard;
+
+// Export notification functions
+exports.sendPredictionNotifications = notifications.sendPredictionNotifications;
+exports.sendValueBetNotifications = notifications.sendValueBetNotifications;
+exports.sendGameStartReminders = notifications.sendGameStartReminders;
+exports.sendModelPerformanceUpdates = notifications.sendModelPerformanceUpdates;
 
 // Add any existing functions from the project
 try {

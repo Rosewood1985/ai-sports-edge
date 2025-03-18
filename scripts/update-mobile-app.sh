@@ -1,38 +1,105 @@
 #!/bin/bash
-# Script to update the mobile app with all changes
+# Script to update the mobile app with the latest changes
 
 # Navigate to the project root directory
 cd /Users/lisadario/Desktop/ai-sports-edge
 
-# Install dependencies (if needed)
-echo "Installing dependencies..."
-npm install
+# Set text colors for better readability
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-# Install EAS CLI locally if not already in the project
-if ! npm list eas-cli > /dev/null 2>&1; then
-    echo "EAS CLI not found in project dependencies. Installing locally..."
-    npm install --save-dev eas-cli
+# Function to display section headers
+section() {
+    echo -e "\n${BLUE}==== $1 ====${NC}\n"
+}
+
+# Check if npm is installed
+if ! command -v npm &> /dev/null; then
+    echo -e "${RED}npm is not installed. Please install Node.js and npm to run this script.${NC}"
+    exit 1
 fi
 
-# Set path to local EAS CLI
-EAS_CLI="npx eas"
+# Check if eas-cli is installed
+if ! command -v eas &> /dev/null; then
+    section "Installing EAS CLI"
+    npm install -g eas-cli
+    
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to install EAS CLI.${NC}"
+        exit 1
+    fi
+    
+    echo -e "${GREEN}EAS CLI installed successfully.${NC}"
+fi
 
-# Login to EAS (if needed)
-echo "Checking EAS login status..."
-$EAS_CLI whoami || $EAS_CLI login
+# Check if user is logged in to EAS
+eas whoami &> /dev/null
+if [ $? -ne 0 ]; then
+    section "Logging in to EAS"
+    eas login
+    
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to log in to EAS.${NC}"
+        exit 1
+    fi
+    
+    echo -e "${GREEN}Logged in to EAS successfully.${NC}"
+fi
 
-# Build and submit the iOS app
-echo "Building and submitting iOS app..."
-$EAS_CLI build --platform ios --profile ios-beta
+# Update dependencies
+section "Updating Dependencies"
+npm install
 
-# Build and submit the Android app
-echo "Building and submitting Android app..."
-$EAS_CLI build --platform android --profile android-beta
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to update dependencies.${NC}"
+    exit 1
+fi
 
-# Push an update to existing apps
-echo "Pushing update to existing apps..."
-$EAS_CLI update
+echo -e "${GREEN}Dependencies updated successfully.${NC}"
 
-echo "Mobile app updates have been submitted!"
-echo "Note: The builds will take some time to complete on the EAS servers."
-echo "You can check the status of your builds with '$EAS_CLI build:list'"
+# Build for iOS
+section "Building for iOS"
+echo -e "Building iOS app with OneSignal integration..."
+
+eas build --platform ios --profile ios-beta
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to build iOS app.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}iOS app built successfully.${NC}"
+
+# Build for Android
+section "Building for Android"
+echo -e "Building Android app with OneSignal integration..."
+
+eas build --platform android --profile android-beta
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to build Android app.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}Android app built successfully.${NC}"
+
+# Update OTA
+section "Updating OTA"
+echo -e "Updating app with Over-the-Air updates..."
+
+eas update
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to update OTA.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}OTA update successful.${NC}"
+
+section "Update Complete"
+echo -e "${GREEN}The mobile app has been updated successfully.${NC}"
+echo -e "You can view the build status in the EAS dashboard."
+echo -e "Once the builds are complete, you can download the apps from the EAS dashboard."
