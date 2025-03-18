@@ -8,28 +8,31 @@ cd /Users/lisadario/Desktop/ai-sports-edge
 echo "Installing dependencies..."
 npm install
 
-# Check if EAS CLI is installed
-if ! command -v eas &> /dev/null; then
-    echo "EAS CLI not found. Installing..."
-    npm install -g eas-cli
+# Install EAS CLI locally if not already in the project
+if ! npm list eas-cli > /dev/null 2>&1; then
+    echo "EAS CLI not found in project dependencies. Installing locally..."
+    npm install --save-dev eas-cli
 fi
+
+# Set path to local EAS CLI
+EAS_CLI="npx eas"
 
 # Login to EAS (if needed)
 echo "Checking EAS login status..."
-eas whoami || eas login
+$EAS_CLI whoami || $EAS_CLI login
 
 # Build and submit the iOS app
 echo "Building and submitting iOS app..."
-eas build --platform ios --profile ios-beta
+$EAS_CLI build --platform ios --profile ios-beta
 
 # Build and submit the Android app
 echo "Building and submitting Android app..."
-eas build --platform android --profile android-beta
+$EAS_CLI build --platform android --profile android-beta
 
 # Push an update to existing apps
 echo "Pushing update to existing apps..."
-eas update
+$EAS_CLI update
 
 echo "Mobile app updates have been submitted!"
 echo "Note: The builds will take some time to complete on the EAS servers."
-echo "You can check the status of your builds with 'eas build:list'"
+echo "You can check the status of your builds with '$EAS_CLI build:list'"

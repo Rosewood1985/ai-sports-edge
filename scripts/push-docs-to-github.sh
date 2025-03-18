@@ -22,6 +22,7 @@ git add docs/sports-api-ml-business-impact.md
 git add docs/sports-api-ml-integration-summary.md
 git add docs/push-docs-to-github.md
 git add docs/update-instructions.md
+git add docs/update-summary.md
 
 # Add script files
 git add scripts/push-docs-to-github.sh
