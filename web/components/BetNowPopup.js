@@ -1,64 +1,163 @@
 /**
- * BetNowPopup Component
+ * BetNowPopup Component for Web
  * Displays a popup with a "Bet Now" button after a purchase or other conversion event
+ * Enhanced for seamless transitions after purchases
  */
 
 import React, { useState, useEffect } from 'react';
-import { useBettingAffiliate } from '../../contexts/BettingAffiliateContext';
-import BetNowButton from './BetNowButton';
-import '../styles/BetNowPopup.css';
+import { useLocation } from 'react-router-dom';
+import { FANDUEL_CONFIG } from '../../config/affiliateConfig';
 
 /**
- * BetNowPopup component
- * @param {Object} props Component props
- * @param {boolean} props.show Whether to show the popup
- * @param {function} props.onClose Function to call when popup is closed
- * @param {string} props.teamId Optional team ID for team-colored buttons
- * @param {string} props.message Custom message to display in the popup
- * @returns {JSX.Element} Rendered component
+ * BetNowPopup Component
  */
 const BetNowPopup = ({
   show,
   onClose,
   teamId,
-  message = "Ready to place your bet? Get started now!"
+  userId,
+  gameId,
+  message = "Ready to place your bet? Get started now!",
+  autoShow = false
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const { trackButtonImpression } = useBettingAffiliate();
+  // Get current location
+  const location = useLocation();
   
+  // State
+  const [visible, setVisible] = useState(autoShow);
+  const [animationClass, setAnimationClass] = useState(autoShow ? 'instant-show' : '');
+  
+  // Close popup when navigating away from the page
+  useEffect(() => {
+    // When location changes, close the popup
+    handleClose();
+  }, [location.pathname]);
+
   // Handle visibility changes
   useEffect(() => {
-    if (show) {
-      setIsVisible(true);
-      trackButtonImpression('popup', teamId);
+    if (show || autoShow) {
+      setVisible(true);
+      setAnimationClass(autoShow ? 'instant-show' : 'fade-in');
+      
+      // Track impression
+      if (window.bettingAffiliateService) {
+        window.bettingAffiliateService.trackButtonImpression('popup', teamId, userId, gameId);
+      }
+      
+      // Add class to body to indicate popup is open
+      document.body.classList.add('bet-now-popup-open');
     } else {
-      setIsVisible(false);
+      setAnimationClass('fade-out');
+      
+      // Delay hiding to allow animation to complete
+      const timer = setTimeout(() => {
+        setVisible(false);
+        // Remove class from body when popup is closed
+        document.body.classList.remove('bet-now-popup-open');
+      }, 300);
+      
+      // Store the timer ID to clear it if needed
+      if (window.globalTimeouts) {
+        window.globalTimeouts.push(timer);
+      } else {
+        window.globalTimeouts = [timer];
+      }
+      
+      return () => {
+        clearTimeout(timer);
+        // Ensure class is removed when component unmounts
+        document.body.classList.remove('bet-now-popup-open');
+      };
     }
-  }, [show, teamId, trackButtonImpression]);
+  }, [show, autoShow, teamId, userId, gameId]);
+  
+  // Auto-close timer for autoShow mode
+  useEffect(() => {
+    let timer;
+    if (autoShow && visible) {
+      // Auto-close after 5 minutes if not interacted with
+      timer = setTimeout(() => {
+        handleClose();
+      }, 5 * 60 * 1000);
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [autoShow, visible]);
   
   // Handle close
   const handleClose = () => {
-    setIsVisible(false);
-    if (onClose) onClose();
+    // Only proceed if the popup is visible
+    if (!visible) return;
+    
+    setAnimationClass('fade-out');
+    
+    // Delay hiding to allow animation to complete
+    const timer = setTimeout(() => {
+      setVisible(false);
+      // Ensure the body class is removed
+      document.body.classList.remove('bet-now-popup-open');
+      if (onClose) onClose();
+    }, 300);
+    
+    // Store the timer ID to clear it if needed
+    if (window.globalTimeouts) {
+      window.globalTimeouts.push(timer);
+    } else {
+      window.globalTimeouts = [timer];
+    }
   };
   
-  // If not visible, don't render anything
-  if (!isVisible) return null;
+  // Handle bet now click
+  const handleBetNowClick = () => {
+    try {
+      // Track affiliate link click
+      if (window.bettingAffiliateService) {
+        window.bettingAffiliateService.trackButtonClick('popup', FANDUEL_CONFIG.AFFILIATE_ID, teamId, userId, gameId);
+      }
+      
+      // Generate affiliate URL
+      let baseUrl = FANDUEL_CONFIG.BASE_URL;
+      
+      // Add affiliate parameters
+      const affiliateUrl = `${baseUrl}?aff_id=${FANDUEL_CONFIG.AFFILIATE_ID}&subId=${userId}-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton&utm_content=web-popup`;
+      
+      // Track conversion
+      if (window.bettingAffiliateService) {
+        window.bettingAffiliateService.trackConversion('popup_to_bet', 0, userId);
+      }
+      
+      // Open URL in new tab
+      window.open(affiliateUrl, '_blank');
+      
+      // Close popup
+      handleClose();
+    } catch (error) {
+      console.error('Error redirecting to FanDuel:', error);
+      alert('Unable to open FanDuel. Please try again.');
+    }
+  };
+  
+  // Don't render if not visible
+  if (!visible) {
+    return null;
+  }
   
   return (
-    <div className="bet-now-popup-overlay">
-      <div className="bet-now-popup">
+    <div className={`bet-now-popup-overlay ${animationClass}`}>
+      <div className={`bet-now-popup ${animationClass}`}>
         <button className="bet-now-popup-close" onClick={handleClose}>×</button>
         <div className="bet-now-popup-content">
           <h3>Boost Your Winnings!</h3>
           <p>{message}</p>
           <div className="bet-now-popup-button">
-            <BetNowButton 
-              size="large" 
-              position="inline" 
-              contentType="popup" 
-              teamId={teamId}
-            />
+            <button 
+              className="bet-now-button bet-now-button--large" 
+              onClick={handleBetNowClick}
+            >
+              BET NOW
+            </button>
           </div>
         </div>
       </div>

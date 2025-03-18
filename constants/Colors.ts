@@ -23,4 +23,14 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+  neon: {
+    blue: '#00E5FF',
+    orange: '#FF9500',
+    green: '#00FF7F',
+    pink: '#FF00AA',
+    purple: '#9D00FF',
+    yellow: '#FFFF00',
+  }
 };
+
+export default Colors;

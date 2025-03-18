@@ -1,7 +1,8 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Expo QR Code</title>
+    <title>AI Sports Edge - Expo QR Code</title>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
         body {
@@ -12,54 +13,77 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f5f5f5;
+            background-color: #121212;
+            color: white;
         }
         .container {
-            background-color: white;
+            background-color: #1e1e1e;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         h1 {
-            color: #333;
+            color: #0088ff;
             margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(0, 136, 255, 0.9);
         }
         .qr-container {
             margin: 20px 0;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
         }
         .instructions {
             margin-top: 20px;
-            color: #666;
+            color: #b0b0b0;
             max-width: 500px;
             line-height: 1.5;
+        }
+        .url {
+            color: #0088ff;
+            font-weight: bold;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+        .button {
+            background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 136, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(0, 136, 255, 0.9);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Expo Go QR Code</h1>
+        <h1>AI Sports Edge</h1>
         <div class="qr-container" id="qrcode"></div>
         <div class="instructions">
             <p>Scan this QR code with your mobile device's camera app to open the project in Expo Go.</p>
-            <p>Make sure you have the Expo Go app installed on your device.</p>
-            <p>The QR code connects to: <span id="expo-url">exp://10.0.0.84:8081</span></p>
+            <p>Make sure you have the <a href="https://expo.dev/client" style="color: #0088ff;">Expo Go</a> app installed on your device.</p>
+            <p>The QR code connects to:</p>
+            <div class="url">exp://exp.host/@aisportsedge/ai-sports-edge</div>
         </div>
+        <button class="button" onclick="window.location.href='exp://exp.host/@aisportsedge/ai-sports-edge'">Open in Expo Go</button>
     </div>
 
     <script>
         // Generate QR code
         function generateQRCode() {
-            // Current Expo URL with the correct IP address and port
-            // Updated after fixing LinearGradient component issues
-            const expoUrl = "exp://10.0.0.84:8081";
-            
-            // Update the URL text
-            document.getElementById('expo-url').textContent = expoUrl;
-            
-            // Generate QR code
             const qr = qrcode(0, 'L');
-            qr.addData(expoUrl);
+            qr.addData('exp://exp.host/@aisportsedge/ai-sports-edge');
             qr.make();
             
             // Display QR code
@@ -71,3 +95,4 @@
     </script>
 </body>
 </html>
+  

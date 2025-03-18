@@ -113,6 +113,17 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     // Track the click
     trackButtonClick(position, teamId, userId, gameId);
     
+    // Check if this is after a purchase using cross-platform sync
+    let isPurchased = false;
+    if (gameId) {
+      try {
+        const { crossPlatformSyncService } = require('../services/crossPlatformSyncService');
+        isPurchased = crossPlatformSyncService.hasPurchasedOdds(gameId);
+      } catch (error) {
+        console.warn('Could not check purchase status:', error);
+      }
+    }
+    
     // Generate affiliate URL
     const baseUrl = 'https://fanduel.com/';
     const affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
@@ -122,6 +133,11 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
       userId,
       gameId
     );
+    
+    // Track conversion if this is after a purchase
+    if (isPurchased) {
+      bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
+    }
     
     // Open URL
     Linking.openURL(affiliateUrl);

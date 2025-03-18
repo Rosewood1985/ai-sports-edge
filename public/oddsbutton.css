@@ -1,0 +1,204 @@
+/**
+ * Styles for OddsButton and BetNowPopup components
+ */
+
+/* OddsButton Styles */
+.odds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #007bff;
+  color: white;
+}
+
+.odds-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.odds-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Size variations */
+.odds-button--small {
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 100px;
+}
+
+.odds-button--medium {
+  padding: 10px 16px;
+  font-size: 14px;
+  min-width: 120px;
+}
+
+.odds-button--large {
+  padding: 12px 20px;
+  font-size: 16px;
+  min-width: 150px;
+}
+
+/* Loading state */
+.odds-button--loading {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.odds-button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Bet Now Button Styles */
+.bet-now-button {
+  background-color: #ff0055;
+  color: white;
+  box-shadow: 0 0 10px #ff0055, 0 0 20px rgba(255, 0, 85, 0.5);
+  animation: pulse 2s infinite;
+}
+
+.bet-now-button:hover {
+  background-color: #ff3377;
+  box-shadow: 0 0 15px #ff0055, 0 0 30px rgba(255, 0, 85, 0.7);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px #ff0055, 0 0 20px rgba(255, 0, 85, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px #ff0055, 0 0 30px rgba(255, 0, 85, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 10px #ff0055, 0 0 20px rgba(255, 0, 85, 0.5);
+  }
+}
+
+/* BetNowPopup Styles */
+.bet-now-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.bet-now-popup {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.7);
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.bet-now-popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.bet-now-popup-close:hover {
+  color: white;
+}
+
+.bet-now-popup-content {
+  text-align: center;
+}
+
+.bet-now-popup-content h3 {
+  color: white;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 24px;
+}
+
+.bet-now-popup-content p {
+  color: #ccc;
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.bet-now-popup-button {
+  margin-top: 24px;
+}
+
+.bet-now-popup-button .bet-now-button {
+  width: 100%;
+}
+
+/* Animation classes */
+.fade-in {
+  opacity: 1;
+}
+
+.fade-in .bet-now-popup {
+  transform: translateY(0);
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-out .bet-now-popup {
+  transform: translateY(20px);
+}
+
+.instant-show {
+  opacity: 1;
+}
+
+.instant-show .bet-now-popup {
+  transform: translateY(0);
+  animation: highlight 0.5s ease;
+}
+
+@keyframes highlight {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 0, 85, 1);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.7);
+  }
+}

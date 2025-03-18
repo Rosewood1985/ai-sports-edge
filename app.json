@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ai-sports-edge",
+    "name": "AI Sports Edge",
     "slug": "ai-sports-edge",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,10 +8,23 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "enabled": false,
+      "checkAutomatically": "ON_ERROR_RECOVERY",
+      "url": "https://u.expo.dev/7b3e1b15-0546-4614-9eee-dd8aed4037e9"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aisportsedge.app",
-      "googleServicesFile": "./firebase-config/GoogleService-Info.plist"
+      "googleServicesFile": "./firebase-config/GoogleService-Info.plist",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +32,8 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.aisportsedge.app",
-      "googleServicesFile": "./firebase-config/google-services.json"
+      "googleServicesFile": "./firebase-config/google-services.json",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
@@ -37,7 +51,13 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
-    }
+      "typedRoutes": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7b3e1b15-0546-4614-9eee-dd8aed4037e9"
+      }
+    },
+    "owner": "aisportsedge"
   }
 }

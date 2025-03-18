@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Sports Edge - Test Payment Flow</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="oddsbutton.css">
+  <script src="cross-platform-sync.js"></script>
+  <style>
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .game-card {
+      background-color: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .game-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .game-time {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    .teams {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .team {
+      text-align: center;
+      flex: 1;
+    }
+    
+    .team-name {
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 8px;
+    }
+    
+    .vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #999;
+      padding: 0 10px;
+    }
+    
+    .odds-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    
+    .purchase-status {
+      text-align: center;
+      margin-top: 16px;
+      padding: 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .purchased {
+      background-color: rgba(0, 255, 0, 0.1);
+      color: #00cc00;
+    }
+    
+    .not-purchased {
+      background-color: rgba(255, 0, 0, 0.1);
+      color: #ff3333;
+    }
+    
+    .instructions {
+      background-color: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    
+    .instructions h2 {
+      margin-top: 0;
+    }
+    
+    .instructions ol {
+      padding-left: 20px;
+    }
+    
+    .instructions li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Sports Edge - Test Payment Flow</h1>
+    
+    <div class="instructions">
+      <h2>Instructions</h2>
+      <ol>
+        <li>This page demonstrates the seamless transition from "Get Odds" to "BET NOW" after purchase.</li>
+        <li>Click the "Get Odds" button to simulate a purchase.</li>
+        <li>Notice how the button immediately changes to "BET NOW" without requiring a page refresh.</li>
+        <li>A popup will automatically appear after purchase, encouraging you to place a bet.</li>
+        <li>The purchase status is synchronized across platforms using our cross-platform sync service.</li>
+        <li>Try refreshing the page - your purchase status will persist!</li>
+      </ol>
+    </div>
+    
+    <div class="game-card">
+      <div class="game-header">
+        <div class="game-title">NBA Regular Season</div>
+        <div class="game-time">Today, 7:30 PM ET</div>
+      </div>
+      
+      <div class="teams">
+        <div class="team">
+          <div class="team-name">Los Angeles Lakers</div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="team">
+          <div class="team-name">Boston Celtics</div>
+        </div>
+      </div>
+      
+      <div id="purchase-status" class="purchase-status not-purchased">
+        Not Purchased
+      </div>
+      
+      <div class="odds-container">
+        <button id="odds-button" class="odds-button odds-button--medium">Get Odds</button>
+      </div>
+    </div>
+    
+    <div class="game-card">
+      <div class="game-header">
+        <div class="game-title">NFL Regular Season</div>
+        <div class="game-time">Tomorrow, 4:25 PM ET</div>
+      </div>
+      
+      <div class="teams">
+        <div class="team">
+          <div class="team-name">Kansas City Chiefs</div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="team">
+          <div class="team-name">San Francisco 49ers</div>
+        </div>
+      </div>
+      
+      <div id="purchase-status-2" class="purchase-status not-purchased">
+        Not Purchased
+      </div>
+      
+      <div class="odds-container">
+        <button id="odds-button-2" class="odds-button odds-button--medium">Get Odds</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- BetNowPopup Template -->
+  <div id="bet-now-popup" class="bet-now-popup-overlay" style="display: none;">
+    <div class="bet-now-popup">
+      <button class="bet-now-popup-close" onclick="closePopup()">×</button>
+      <div class="bet-now-popup-content">
+        <h3>Boost Your Winnings!</h3>
+        <p id="popup-message">Your odds are ready! Place your bet now for the best experience.</p>
+        <div class="bet-now-popup-button">
+          <button id="bet-now-button" class="bet-now-button bet-now-button--large" onclick="handleBetNow()">
+            BET NOW
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Game IDs
+    const GAME_ID_1 = 'nba_lakers_celtics_20250317';
+    const GAME_ID_2 = 'nfl_chiefs_49ers_20250318';
+    
+    // Mock user ID
+    const USER_ID = localStorage.getItem('mockUserId') || `user_${Math.random().toString(36).substring(2)}`;
+    localStorage.setItem('mockUserId', USER_ID);
+    
+    // Elements
+    const oddsButton = document.getElementById('odds-button');
+    const oddsButton2 = document.getElementById('odds-button-2');
+    const purchaseStatus = document.getElementById('purchase-status');
+    const purchaseStatus2 = document.getElementById('purchase-status-2');
+    const betNowPopup = document.getElementById('bet-now-popup');
+    const popupMessage = document.getElementById('popup-message');
+    
+    // Current game ID for popup
+    let currentGameId = '';
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize cross-platform sync
+      if (window.crossPlatformSyncService) {
+        window.crossPlatformSyncService.initialize(USER_ID).then(() => {
+          // Check purchase status
+          updatePurchaseStatus();
+        });
+      }
+      
+      // Set up button click handlers
+      oddsButton.addEventListener('click', () => handleOddsButtonClick(GAME_ID_1));
+      oddsButton2.addEventListener('click', () => handleOddsButtonClick(GAME_ID_2));
+    });
+    
+    // Update purchase status based on cross-platform sync
+    function updatePurchaseStatus() {
+      if (window.crossPlatformSyncService) {
+        // Check game 1
+        const isPurchased1 = window.crossPlatformSyncService.hasPurchasedOdds(GAME_ID_1);
+        if (isPurchased1) {
+          purchaseStatus.textContent = 'Purchased';
+          purchaseStatus.className = 'purchase-status purchased';
+          oddsButton.textContent = 'BET NOW';
+          oddsButton.className = 'odds-button odds-button--medium bet-now-button';
+        }
+        
+        // Check game 2
+        const isPurchased2 = window.crossPlatformSyncService.hasPurchasedOdds(GAME_ID_2);
+        if (isPurchased2) {
+          purchaseStatus2.textContent = 'Purchased';
+          purchaseStatus2.className = 'purchase-status purchased';
+          oddsButton2.textContent = 'BET NOW';
+          oddsButton2.className = 'odds-button odds-button--medium bet-now-button';
+        }
+      }
+    }
+    
+    // Handle odds button click
+    function handleOddsButtonClick(gameId) {
+      const button = gameId === GAME_ID_1 ? oddsButton : oddsButton2;
+      const status = gameId === GAME_ID_1 ? purchaseStatus : purchaseStatus2;
+      
+      // Check if already purchased
+      if (button.textContent === 'BET NOW') {
+        handleBetNowClick(gameId);
+        return;
+      }
+      
+      // Simulate payment processing
+      button.disabled = true;
+      button.innerHTML = '<div class="odds-button__spinner"></div>';
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        // Record purchase
+        if (window.crossPlatformSyncService) {
+          window.crossPlatformSyncService.recordOddsPurchase(gameId);
+        }
+        
+        // Update UI
+        button.disabled = false;
+        button.textContent = 'BET NOW';
+        button.className = 'odds-button odds-button--medium bet-now-button';
+        status.textContent = 'Purchased';
+        status.className = 'purchase-status purchased';
+        
+        // Show popup
+        currentGameId = gameId;
+        showPopup(true);
+      }, 1500);
+    }
+    
+    // Handle bet now button click
+    function handleBetNowClick(gameId) {
+      // Generate affiliate URL
+      const baseUrl = 'https://fanduel.com/';
+      const affiliateUrl = `${baseUrl}?aff_id=AISPORTSEDGE&subId=${USER_ID}-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton&utm_content=web`;
+      
+      // Open URL in new tab
+      window.open(affiliateUrl, '_blank');
+    }
+    
+    // Show popup
+    function showPopup(justPurchased = false) {
+      betNowPopup.style.display = 'flex';
+      
+      // Set message based on whether this is right after purchase
+      if (justPurchased) {
+        popupMessage.textContent = 'Your odds are ready! Place your bet now for the best experience.';
+        betNowPopup.classList.add('instant-show');
+      } else {
+        popupMessage.textContent = 'Ready to place your bet? Get started now!';
+        betNowPopup.classList.add('fade-in');
+      }
+    }
+    
+    // Close popup
+    function closePopup() {
+      betNowPopup.classList.remove('fade-in', 'instant-show');
+      betNowPopup.classList.add('fade-out');
+      
+      // Delay hiding to allow animation to complete
+      setTimeout(() => {
+        betNowPopup.style.display = 'none';
+        betNowPopup.classList.remove('fade-out');
+      }, 300);
+    }
+    
+    // Handle bet now button in popup
+    function handleBetNow() {
+      handleBetNowClick(currentGameId);
+      closePopup();
+    }
+  </script>
+</body>
+</html>

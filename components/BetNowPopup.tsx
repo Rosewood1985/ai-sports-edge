@@ -1,39 +1,47 @@
 /**
  * BetNowPopup Component for React Native
  * Displays a popup with a "Bet Now" button after a purchase or other conversion event
+ * Enhanced for seamless transitions after purchases
  */
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Modal, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Animated, 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
   Dimensions,
   Platform
 } from 'react-native';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 import BetNowButton from './BetNowButton';
 import { useThemeColor } from '../hooks/useThemeColor';
+import { bettingAffiliateService } from '../services/bettingAffiliateService';
 
 interface BetNowPopupProps {
   show: boolean;
   onClose: () => void;
   teamId?: string;
+  userId?: string;
+  gameId?: string;
   message?: string;
+  autoShow?: boolean; // Whether to show the popup automatically without animation delay
 }
 
 const BetNowPopup: React.FC<BetNowPopupProps> = ({
   show,
   onClose,
   teamId,
-  message = "Ready to place your bet? Get started now!"
+  userId,
+  gameId,
+  message = "Ready to place your bet? Get started now!",
+  autoShow = false
 }) => {
-  const [visible, setVisible] = useState(false);
-  const fadeAnim = new Animated.Value(0);
-  const slideAnim = new Animated.Value(50);
+  const [visible, setVisible] = useState(autoShow);
+  const fadeAnim = new Animated.Value(autoShow ? 1 : 0);
+  const slideAnim = new Animated.Value(autoShow ? 0 : 50);
   const { trackButtonImpression } = useBettingAffiliate();
   
   // Get theme colors
@@ -43,20 +51,20 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
   
   // Handle visibility changes
   useEffect(() => {
-    if (show) {
+    if (show || autoShow) {
       setVisible(true);
-      trackButtonImpression('popup', teamId);
+      trackButtonImpression('popup', teamId, userId, gameId);
       
-      // Animate in
+      // Animate in - faster for autoShow
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 300,
+          duration: autoShow ? 150 : 300,
           useNativeDriver: true,
         }),
         Animated.timing(slideAnim, {
           toValue: 0,
-          duration: 300,
+          duration: autoShow ? 150 : 300,
           useNativeDriver: true,
         })
       ]).start();
@@ -77,10 +85,46 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
         setVisible(false);
       });
     }
-  }, [show, fadeAnim, slideAnim, teamId, trackButtonImpression]);
+  }, [show, autoShow, fadeAnim, slideAnim, teamId, userId, gameId, trackButtonImpression]);
+  
+  // Track if user has interacted with the popup
+  const hasInteracted = useRef(false);
+  
+  // Auto-close timer for autoShow mode
+  useEffect(() => {
+    let timer: number | undefined;
+    if (autoShow && visible) {
+      // Auto-close after 5 minutes if not interacted with
+      timer = setTimeout(() => {
+        if (!hasInteracted.current) {
+          handleClose();
+        }
+      }, 5 * 60 * 1000) as unknown as number;
+      
+      // Check if this is after a purchase using cross-platform sync
+      if (gameId) {
+        try {
+          const { crossPlatformSyncService } = require('../services/crossPlatformSyncService');
+          const isPurchased = crossPlatformSyncService.hasPurchasedOdds(gameId);
+          
+          if (isPurchased) {
+            // Track conversion opportunity
+            bettingAffiliateService.trackConversion('popup_shown_after_purchase', 0, userId);
+          }
+        } catch (error) {
+          console.warn('Could not check purchase status:', error);
+        }
+      }
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [autoShow, visible, gameId, userId]);
   
   // Handle close
   const handleClose = () => {
+    hasInteracted.current = true;
     if (onClose) onClose();
   };
   
@@ -117,11 +161,13 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
             <Text style={[styles.message, { color: textColor }]}>{message}</Text>
             
             <View style={styles.buttonContainer}>
-              <BetNowButton 
-                size="large" 
-                position="inline" 
-                contentType="popup" 
+              <BetNowButton
+                size="large"
+                position="inline"
+                contentType="popup"
                 teamId={teamId}
+                userId={userId}
+                gameId={gameId}
               />
             </View>
           </View>

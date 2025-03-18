@@ -33,6 +33,7 @@ const SettingsScreen = (): JSX.Element => {
     gameStartAlerts: true,
     promotionalAlerts: false,
     dailyInsights: true,
+    highImpactNews: true,
   });
   const [loading, setLoading] = useState(false);
   const [loadingPrefs, setLoadingPrefs] = useState(true);
@@ -304,6 +305,18 @@ const SettingsScreen = (): JSX.Element => {
                 onValueChange={() => handleNotificationTypeToggle('promotionalAlerts')}
                 trackColor={{ false: '#d9d9d9', true: '#3498db' }}
                 thumbColor={notificationPrefs.promotionalAlerts ? '#fff' : '#f4f3f4'}
+              />
+            )}
+            
+            {renderSettingItem(
+              'flash',
+              'High-Impact News',
+              'Get notified about news that could significantly affect betting odds',
+              <Switch
+                value={notificationPrefs.highImpactNews}
+                onValueChange={() => handleNotificationTypeToggle('highImpactNews')}
+                trackColor={{ false: '#d9d9d9', true: '#3498db' }}
+                thumbColor={notificationPrefs.highImpactNews ? '#fff' : '#f4f3f4'}
               />
             )}
           </>

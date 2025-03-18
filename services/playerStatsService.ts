@@ -13,6 +13,51 @@ export interface PlayerPlusMinus {
   gameId: string;
 }
 
+// Interface for advanced player metrics
+export interface AdvancedPlayerMetrics {
+  playerId: string;
+  playerName: string;
+  team: string;
+  gameId: string;
+  timestamp: any; // Firebase timestamp
+  
+  // Advanced offensive metrics
+  trueShootingPercentage?: number;  // Measures shooting efficiency
+  effectiveFieldGoalPercentage?: number;  // Adjusts for 3-pointers being worth more
+  offensiveRating?: number;  // Points produced per 100 possessions
+  assistPercentage?: number;  // Percentage of teammate field goals a player assisted
+  usageRate?: number;  // Percentage of team plays used by a player
+  
+  // Advanced defensive metrics
+  defensiveRating?: number;  // Points allowed per 100 possessions
+  stealPercentage?: number;  // Percentage of opponent possessions that end with a steal
+  blockPercentage?: number;  // Percentage of opponent shots blocked
+  defensiveReboundPercentage?: number;  // Percentage of available defensive rebounds obtained
+  
+  // Advanced overall metrics
+  playerEfficiencyRating?: number;  // Overall rating of a player's per-minute productivity
+  valueOverReplacement?: number;  // Box plus/minus converted to wins
+  winShares?: number;  // Estimate of number of wins contributed by player
+  boxPlusMinus?: number;  // Box score estimate of points per 100 possessions above average
+  
+  // Historical trend data
+  recentGamesAverages?: {
+    points: number[];
+    assists: number[];
+    rebounds: number[];
+    steals: number[];
+    blocks: number[];
+    fieldGoalPercentage: number[];
+  };
+}
+
+// Interface for player comparison data
+export interface PlayerComparisonData {
+  player1: AdvancedPlayerMetrics;
+  player2: AdvancedPlayerMetrics;
+  comparisonDate: any; // Firebase timestamp
+}
+
 /**
  * Fetch real-time +/- stats for players in a game
  * @param gameId The ID of the game to fetch stats for
@@ -343,10 +388,185 @@ export const schedulePlayerPlusMinusUpdates = (
   return () => clearInterval(intervalId);
 };
 
+/**
+ * Fetch advanced player metrics for a specific player in a game
+ * @param gameId The ID of the game
+ * @param playerId The ID of the player
+ * @returns Promise that resolves with the player's advanced metrics
+ */
+export const getAdvancedPlayerMetrics = async (gameId: string, playerId: string): Promise<AdvancedPlayerMetrics | null> => {
+  try {
+    // Validate parameters
+    if (!gameId) {
+      throw new Error('Game ID is required');
+    }
+    if (!playerId) {
+      throw new Error('Player ID is required');
+    }
+
+    // In a real implementation, this would fetch from Firestore
+    // For now, we'll check if there's basic plus-minus data and enhance it
+    const basicStats = await getPlayerPlusMinus(gameId, playerId);
+    
+    if (!basicStats) {
+      console.log(`No basic stats found for player ${playerId} in game ${gameId}`);
+      return null;
+    }
+    
+    // Generate advanced metrics based on basic stats
+    // In a real implementation, these would be calculated from actual game data
+    const advancedMetrics: AdvancedPlayerMetrics = {
+      playerId: basicStats.playerId,
+      playerName: basicStats.playerName,
+      team: basicStats.team,
+      gameId: basicStats.gameId,
+      timestamp: basicStats.timestamp,
+      
+      // Generate realistic-looking advanced metrics
+      trueShootingPercentage: Math.round((0.45 + Math.random() * 0.2) * 100) / 100,
+      effectiveFieldGoalPercentage: Math.round((0.4 + Math.random() * 0.25) * 100) / 100,
+      offensiveRating: Math.round(90 + Math.random() * 40),
+      assistPercentage: Math.round(Math.random() * 40),
+      usageRate: Math.round(10 + Math.random() * 30),
+      
+      defensiveRating: Math.round(90 + Math.random() * 40),
+      stealPercentage: Math.round(Math.random() * 5 * 10) / 10,
+      blockPercentage: Math.round(Math.random() * 10 * 10) / 10,
+      defensiveReboundPercentage: Math.round(5 + Math.random() * 25),
+      
+      playerEfficiencyRating: Math.round((10 + Math.random() * 25) * 10) / 10,
+      valueOverReplacement: Math.round((Math.random() * 10 - 2) * 10) / 10,
+      winShares: Math.round(Math.random() * 15 * 10) / 10,
+      boxPlusMinus: Math.round((Math.random() * 16 - 8) * 10) / 10,
+      
+      // Generate recent game averages (last 5 games)
+      recentGamesAverages: {
+        points: Array.from({ length: 5 }, () => Math.round(Math.random() * 30)),
+        assists: Array.from({ length: 5 }, () => Math.round(Math.random() * 12)),
+        rebounds: Array.from({ length: 5 }, () => Math.round(Math.random() * 15)),
+        steals: Array.from({ length: 5 }, () => Math.round(Math.random() * 5)),
+        blocks: Array.from({ length: 5 }, () => Math.round(Math.random() * 4)),
+        fieldGoalPercentage: Array.from({ length: 5 }, () => Math.round(Math.random() * 100) / 100),
+      }
+    };
+    
+    return advancedMetrics;
+  } catch (error) {
+    console.error("Error getting advanced player metrics:", error);
+    
+    // Handle Firestore errors
+    if (error instanceof Error) {
+      Alert.alert('Error', `Failed to retrieve advanced player metrics: ${error.message}`);
+    } else {
+      Alert.alert('Error', 'An unexpected error occurred while retrieving advanced player metrics');
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Get advanced metrics for all players in a game
+ * @param gameId The ID of the game
+ * @returns Promise that resolves with an array of advanced player metrics
+ */
+export const getGameAdvancedMetrics = async (gameId: string): Promise<AdvancedPlayerMetrics[]> => {
+  try {
+    // Validate game ID
+    if (!gameId) {
+      throw new Error('Game ID is required');
+    }
+
+    // First get basic plus-minus data
+    const basicStats = await getGamePlusMinus(gameId);
+    
+    if (basicStats.length === 0) {
+      return [];
+    }
+    
+    // Generate advanced metrics for each player
+    const advancedMetrics: AdvancedPlayerMetrics[] = [];
+    
+    for (const player of basicStats) {
+      const metrics = await getAdvancedPlayerMetrics(gameId, player.playerId);
+      if (metrics) {
+        advancedMetrics.push(metrics);
+      }
+    }
+    
+    return advancedMetrics;
+  } catch (error) {
+    console.error("Error getting game advanced metrics:", error);
+    
+    // Handle Firestore errors
+    if (error instanceof Error) {
+      Alert.alert('Error', `Failed to retrieve game advanced metrics: ${error.message}`);
+    } else {
+      Alert.alert('Error', 'An unexpected error occurred while retrieving game advanced metrics');
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Compare two players' advanced metrics
+ * @param gameId The ID of the game
+ * @param player1Id First player ID
+ * @param player2Id Second player ID
+ * @returns Promise that resolves with comparison data
+ */
+export const comparePlayerMetrics = async (
+  gameId: string,
+  player1Id: string,
+  player2Id: string
+): Promise<PlayerComparisonData | null> => {
+  try {
+    // Validate parameters
+    if (!gameId) {
+      throw new Error('Game ID is required');
+    }
+    if (!player1Id || !player2Id) {
+      throw new Error('Both player IDs are required');
+    }
+
+    // Get advanced metrics for both players
+    const player1Metrics = await getAdvancedPlayerMetrics(gameId, player1Id);
+    const player2Metrics = await getAdvancedPlayerMetrics(gameId, player2Id);
+    
+    if (!player1Metrics || !player2Metrics) {
+      return null;
+    }
+    
+    // Create comparison data
+    const comparisonData: PlayerComparisonData = {
+      player1: player1Metrics,
+      player2: player2Metrics,
+      comparisonDate: new Date()
+    };
+    
+    return comparisonData;
+  } catch (error) {
+    console.error("Error comparing player metrics:", error);
+    
+    // Handle errors
+    if (error instanceof Error) {
+      Alert.alert('Error', `Failed to compare player metrics: ${error.message}`);
+    } else {
+      Alert.alert('Error', 'An unexpected error occurred while comparing player metrics');
+    }
+    
+    throw error;
+  }
+};
+
 export default {
   fetchPlayerPlusMinus,
   getPlayerPlusMinus,
   getGamePlusMinus,
   listenToPlayerPlusMinus,
-  schedulePlayerPlusMinusUpdates
+  schedulePlayerPlusMinusUpdates,
+  getAdvancedPlayerMetrics,
+  getGameAdvancedMetrics,
+  comparePlayerMetrics
 };

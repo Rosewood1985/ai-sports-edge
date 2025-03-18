@@ -144,6 +144,20 @@ const SportsNewsScreen: React.FC = () => {
             const oddsImpact = await predictOddsImpact(item);
             newAnalytics[item.id].oddsImpact = oddsImpact;
             
+            // Generate historical correlation analysis
+            const historicalCorrelation = await analyzeHistoricalCorrelations(item);
+            newAnalytics[item.id].historicalCorrelation = historicalCorrelation;
+            
+            // Send notification for high-impact news
+            if (oddsImpact.impactLevel === 'high' || oddsImpact.impactLevel === 'medium') {
+              const { scheduleHighImpactNewsNotification } = await import('../services/notificationService');
+              await scheduleHighImpactNewsNotification(
+                item.title,
+                oddsImpact.impactLevel,
+                item.teams
+              );
+            }
+            
             // If personalized mode is enabled, generate personalized summary
             if (personalizedMode) {
               const personalizedSummary = await generatePersonalizedSummary(item);
@@ -398,6 +412,68 @@ const SportsNewsScreen: React.FC = () => {
                 <Text style={styles.oddsImpactReasoning}>
                   {analytics.oddsImpact.reasoning}
                 </Text>
+              </View>
+            )}
+            
+            {/* Historical Correlation Analysis */}
+            {analytics.historicalCorrelation && (
+              <View style={[styles.analyticsSection, styles.historicalSection]}>
+                <View style={styles.analyticsSectionHeader}>
+                  <Ionicons
+                    name="time-outline"
+                    size={16}
+                    color="#16a085"
+                  />
+                  <Text style={[styles.analyticsSectionTitle, { color: '#16a085' }]}>
+                    Historical Analysis
+                  </Text>
+                  <View style={[
+                    styles.correlationBadge,
+                    {
+                      backgroundColor:
+                        analytics.historicalCorrelation.correlationStrength === 'strong' ? 'rgba(46, 204, 113, 0.2)' :
+                        analytics.historicalCorrelation.correlationStrength === 'moderate' ? 'rgba(243, 156, 18, 0.2)' :
+                        analytics.historicalCorrelation.correlationStrength === 'weak' ? 'rgba(189, 195, 199, 0.2)' :
+                        'rgba(189, 195, 199, 0.2)'
+                    }
+                  ]}>
+                    <Text style={[
+                      styles.correlationText,
+                      {
+                        color:
+                          analytics.historicalCorrelation.correlationStrength === 'strong' ? '#27ae60' :
+                          analytics.historicalCorrelation.correlationStrength === 'moderate' ? '#d35400' :
+                          analytics.historicalCorrelation.correlationStrength === 'weak' ? '#7f8c8d' :
+                          '#7f8c8d'
+                      }
+                    ]}>
+                      {analytics.historicalCorrelation.correlationStrength.toUpperCase()} CORRELATION
+                    </Text>
+                  </View>
+                </View>
+                
+                <Text style={styles.predictedOutcomeText}>
+                  <Text style={styles.predictedOutcomeLabel}>Predicted Outcome: </Text>
+                  {analytics.historicalCorrelation.predictedOutcome}
+                  <Text style={styles.confidenceText}> ({Math.round(analytics.historicalCorrelation.confidence * 100)}% confidence)</Text>
+                </Text>
+                
+                <Text style={styles.similarEventsTitle}>Similar Historical Events:</Text>
+                {analytics.historicalCorrelation.similarEvents.map((event, index) => (
+                  <View key={index} style={styles.similarEventItem}>
+                    <Text style={styles.similarEventDescription}>{event.description}</Text>
+                    <View style={styles.similarEventDetails}>
+                      <Text style={styles.similarEventDate}>{event.date}</Text>
+                      <Text style={styles.similarEventOutcome}>{event.outcome}</Text>
+                      <Text style={[
+                        styles.similarEventImpact,
+                        { color: event.oddsImpact >= 0 ? '#27ae60' : '#e74c3c' }
+                      ]}>
+                        {event.oddsImpact >= 0 ? '+' : ''}{event.oddsImpact.toFixed(1)}% odds change
+                      </Text>
+                    </View>
+                  </View>
+                ))}
               </View>
             )}
             
@@ -830,7 +906,16 @@ const styles = StyleSheet.create({
   personalizedSection: {
     borderLeftColor: '#9b59b6',
   },
+  historicalSection: {
+    borderLeftColor: '#16a085',
+  },
   relevanceBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 'auto',
+  },
+  correlationBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -840,10 +925,66 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
+  correlationText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
   personalizedSummaryText: {
     fontSize: 14,
     color: '#333',
     marginBottom: 8,
+  },
+  predictedOutcomeText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 12,
+  },
+  predictedOutcomeLabel: {
+    fontWeight: '600',
+    color: '#16a085',
+  },
+  confidenceText: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
+  },
+  similarEventsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16a085',
+    marginBottom: 8,
+  },
+  similarEventItem: {
+    marginBottom: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(189, 195, 199, 0.3)',
+  },
+  similarEventDescription: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 4,
+  },
+  similarEventDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  similarEventDate: {
+    fontSize: 12,
+    color: '#666',
+    flex: 1,
+  },
+  similarEventOutcome: {
+    fontSize: 12,
+    color: '#333',
+    flex: 2,
+  },
+  similarEventImpact: {
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
+    textAlign: 'right',
   },
   bettingAdviceTitle: {
     fontSize: 14,

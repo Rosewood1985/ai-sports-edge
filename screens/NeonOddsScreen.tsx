@@ -327,6 +327,74 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
           </View>
         )}
         
+        {/* Sports Navigation */}
+        <View style={styles.section}>
+          {renderSectionHeader('Sports Categories', 'grid')}
+          
+          <View style={styles.sportsGrid}>
+            <TouchableOpacity
+              style={styles.sportCard}
+              onPress={() => navigation.navigate('Formula1')}
+            >
+              <LinearGradient
+                colors={['#121212', '#1a1a1a']}
+                style={styles.sportCardGradient}
+              >
+                <Ionicons name="car-sport" size={28} color="#FF3B30" />
+                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                  Formula 1
+                </NeonText>
+              </LinearGradient>
+            </TouchableOpacity>
+            
+            {/* Placeholder for other sports */}
+            <TouchableOpacity style={[styles.sportCard, { opacity: 0.5 }]}>
+              <LinearGradient
+                colors={['#121212', '#1a1a1a']}
+                style={styles.sportCardGradient}
+              >
+                <Ionicons name="flag" size={28} color={colors.neon.yellow} />
+                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                  NASCAR
+                </NeonText>
+              </LinearGradient>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={[styles.sportCard, { opacity: 0.5 }]}>
+              <LinearGradient
+                colors={['#121212', '#1a1a1a']}
+                style={styles.sportCardGradient}
+              >
+                <Ionicons name="football" size={28} color={colors.neon.green} />
+                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                  Rugby
+                </NeonText>
+              </LinearGradient>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={[styles.sportCard, { opacity: 0.5 }]}>
+              <LinearGradient
+                colors={['#121212', '#1a1a1a']}
+                style={styles.sportCardGradient}
+              >
+                <Ionicons name="baseball" size={28} color={colors.neon.blue} />
+                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                  Cricket
+                </NeonText>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          
+          {!hasPremium && (
+            <View style={styles.premiumSportsNote}>
+              <Ionicons name="information-circle" size={16} color={colors.neon.yellow} />
+              <NeonText type="caption" color={colors.text.secondary} style={{ marginLeft: 8 }}>
+                Premium Annual subscription required for NASCAR, Rugby, and Cricket
+              </NeonText>
+            </View>
+          )}
+        </View>
+        
         {/* Games List */}
         <View style={styles.section}>
           {renderSectionHeader('Live Games', 'basketball')}
@@ -426,5 +494,38 @@ const styles = StyleSheet.create({
   upgradeTextContainer: {
     marginLeft: spacing.sm,
     flex: 1,
+  },
+  // New styles for sports grid
+  sportsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  sportCard: {
+    width: '48%',
+    marginBottom: spacing.sm,
+    borderRadius: borderRadius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border.default,
+  },
+  sportCardGradient: {
+    padding: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 100,
+  },
+  sportCardText: {
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
+  premiumSportsNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 204, 0, 0.1)',
+    padding: spacing.sm,
+    borderRadius: borderRadius.sm,
+    marginTop: spacing.xs,
   },
 });

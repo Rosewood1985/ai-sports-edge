@@ -204,6 +204,22 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 1.99,
     amount: 199,
     productType: 'microtransaction'
+  },
+  {
+    id: 'advanced-player-metrics',
+    name: 'Advanced Player Metrics',
+    description: 'Unlock advanced player statistics and historical trends for a specific game',
+    price: 0.99,
+    amount: 99,
+    productType: 'microtransaction'
+  },
+  {
+    id: 'player-comparison-tool',
+    name: 'Player Comparison Tool',
+    description: 'Side-by-side comparison of any two players with advanced metrics',
+    price: 0.99,
+    amount: 99,
+    productType: 'microtransaction'
   }
 ];
 
@@ -972,6 +988,176 @@ export const getNextUnlockTime = async (userId: string, featureKey: string): Pro
   }
 };
 
+/**
+ * Check if user has access to advanced player metrics for a specific game
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Whether the user has access
+ */
+export const hasAdvancedPlayerMetricsAccess = async (
+  userId: string,
+  gameId: string
+): Promise<boolean> => {
+  try {
+    // First check if user has premium access (Premium Monthly or Premium Annual)
+    const hasPremium = await hasPremiumAccess(userId);
+    if (hasPremium) {
+      // Get the subscription to check if it's a premium plan
+      const subscription = await getUserSubscription(userId);
+      if (subscription && (
+        subscription.planId === 'premium-monthly' ||
+        subscription.planId === 'premium-yearly'
+      )) {
+        return true;
+      }
+    }
+    
+    // Check if user has purchased advanced player metrics for this game
+    const microtransactionsKey = `microtransactions_${userId}`;
+    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
+    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
+    
+    // Check if user has an unused advanced player metrics purchase for this game
+    const hasUnusedAdvancedMetricsAccess = existingMicrotransactions.some(
+      (purchase: any) => !purchase.used &&
+      purchase.productId === 'advanced-player-metrics' &&
+      purchase.gameId === gameId
+    );
+    
+    return hasUnusedAdvancedMetricsAccess;
+  } catch (error) {
+    console.error('Error checking advanced player metrics access:', error);
+    return false;
+  }
+};
+
+/**
+ * Purchase advanced player metrics access for a specific game
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Success status
+ */
+export const purchaseAdvancedPlayerMetrics = async (
+  userId: string,
+  gameId: string
+): Promise<boolean> => {
+  try {
+    // Find the product
+    const product = MICROTRANSACTIONS.find(p => p.id === 'advanced-player-metrics');
+    if (!product) {
+      throw new Error('Advanced player metrics product not found');
+    }
+    
+    // Store the purchase
+    const purchaseData = {
+      id: `purchase_${Date.now()}`,
+      productId: 'advanced-player-metrics',
+      gameId: gameId,
+      purchaseDate: Date.now(),
+      used: false
+    };
+    
+    // Save to AsyncStorage
+    const purchasesKey = `microtransactions_${userId}`;
+    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
+    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
+    
+    existingPurchases.push(purchaseData);
+    
+    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
+    
+    return true;
+  } catch (error) {
+    console.error('Error purchasing advanced player metrics:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if user has access to player comparison tool for a specific game
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Whether the user has access
+ */
+export const hasPlayerComparisonAccess = async (
+  userId: string,
+  gameId: string
+): Promise<boolean> => {
+  try {
+    // First check if user has premium access (Premium Monthly or Premium Annual)
+    const hasPremium = await hasPremiumAccess(userId);
+    if (hasPremium) {
+      // Get the subscription to check if it's a premium plan
+      const subscription = await getUserSubscription(userId);
+      if (subscription && (
+        subscription.planId === 'premium-monthly' ||
+        subscription.planId === 'premium-yearly'
+      )) {
+        return true;
+      }
+    }
+    
+    // Check if user has purchased player comparison for this game
+    const microtransactionsKey = `microtransactions_${userId}`;
+    const existingMicrotransactionsData = await AsyncStorage.getItem(microtransactionsKey);
+    const existingMicrotransactions = existingMicrotransactionsData ? JSON.parse(existingMicrotransactionsData) : [];
+    
+    // Check if user has an unused player comparison purchase for this game
+    const hasUnusedPlayerComparisonAccess = existingMicrotransactions.some(
+      (purchase: any) => !purchase.used &&
+      purchase.productId === 'player-comparison-tool' &&
+      purchase.gameId === gameId
+    );
+    
+    return hasUnusedPlayerComparisonAccess;
+  } catch (error) {
+    console.error('Error checking player comparison access:', error);
+    return false;
+  }
+};
+
+/**
+ * Purchase player comparison access for a specific game
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Success status
+ */
+export const purchasePlayerComparison = async (
+  userId: string,
+  gameId: string
+): Promise<boolean> => {
+  try {
+    // Find the product
+    const product = MICROTRANSACTIONS.find(p => p.id === 'player-comparison-tool');
+    if (!product) {
+      throw new Error('Player comparison product not found');
+    }
+    
+    // Store the purchase
+    const purchaseData = {
+      id: `purchase_${Date.now()}`,
+      productId: 'player-comparison-tool',
+      gameId: gameId,
+      purchaseDate: Date.now(),
+      used: false
+    };
+    
+    // Save to AsyncStorage
+    const purchasesKey = `microtransactions_${userId}`;
+    const existingPurchasesData = await AsyncStorage.getItem(purchasesKey);
+    const existingPurchases = existingPurchasesData ? JSON.parse(existingPurchasesData) : [];
+    
+    existingPurchases.push(purchaseData);
+    
+    await AsyncStorage.setItem(purchasesKey, JSON.stringify(existingPurchases));
+    
+    return true;
+  } catch (error) {
+    console.error('Error purchasing player comparison:', error);
+    return false;
+  }
+};
+
 export default {
   hasPremiumAccess,
   getSubscriptionStatus,
@@ -988,6 +1174,10 @@ export default {
   hasGamePredictionAccess,
   hasPlayerPlusMinusAccess,
   purchasePlayerPlusMinusAccess,
+  hasAdvancedPlayerMetricsAccess,
+  purchaseAdvancedPlayerMetrics,
+  hasPlayerComparisonAccess,
+  purchasePlayerComparison,
   hasRoundBettingAccess,
   purchaseRoundBettingAccess,
   hasViewedAdToday,

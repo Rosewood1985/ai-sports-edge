@@ -7,12 +7,15 @@ admin.initializeApp();
 // Import function modules
 const stripeWebhooks = require('./stripeWebhooks');
 const stripeSubscriptions = require('./stripeSubscriptions');
+const stripePayments = require('./stripePayments');
 const subscriptionManagement = require('./subscriptionManagement');
 const subscriptionGifting = require('./subscriptionGifting');
 const autoResubscribe = require('./autoResubscribe');
 const referralProgram = require('./referralProgram');
+const referralRewards = require('./referralRewards');
 const subscriptionAnalytics = require('./subscriptionAnalytics');
 const aiSummary = require('./aiSummary');
+const leaderboardUpdates = require('./leaderboardUpdates');
 
 // Export all functions
 exports.stripeWebhook = stripeWebhooks.stripeWebhook;
@@ -21,6 +24,12 @@ exports.createSubscription = stripeSubscriptions.createSubscription;
 exports.cancelSubscription = stripeSubscriptions.cancelSubscription;
 exports.updatePaymentMethod = stripeSubscriptions.updatePaymentMethod;
 exports.createOneTimePayment = stripeSubscriptions.createOneTimePayment;
+
+// Export odds payment functions
+exports.createPayment = stripePayments.createPayment;
+exports.updatePurchaseRecord = stripePayments.updatePurchaseRecord;
+exports.checkPurchaseStatus = stripePayments.checkPurchaseStatus;
+exports.stripeOddsWebhook = stripePayments.stripeWebhook;
 
 // Export subscription management functions
 exports.updateSubscription = subscriptionManagement.updateSubscription;
@@ -39,6 +48,12 @@ exports.toggleAutoResubscribe = autoResubscribe.toggleAutoResubscribe;
 exports.generateReferralCode = referralProgram.generateReferralCode;
 exports.applyReferralCode = referralProgram.applyReferralCode;
 exports.processReferralReward = referralProgram.processReferralReward;
+exports.processMilestoneReward = referralProgram.processMilestoneReward;
+
+// Export referral rewards functions
+exports.processReferralDiscount = referralRewards.processReferralDiscount;
+exports.applyReferralDiscount = referralRewards.applyReferralDiscount;
+exports.processSubscriptionExtension = referralRewards.processSubscriptionExtension;
 
 // Export subscription analytics functions
 exports.trackSubscriptionEvent = subscriptionAnalytics.trackSubscriptionEvent;
@@ -46,6 +61,9 @@ exports.generateSubscriptionReport = subscriptionAnalytics.generateSubscriptionR
 
 // Export AI summary functions
 exports.generateAISummary = aiSummary.generateAISummary;
+
+// Export leaderboard update functions
+exports.updateReferralLeaderboard = leaderboardUpdates.updateReferralLeaderboard;
 
 // Add any existing functions from the project
 try {

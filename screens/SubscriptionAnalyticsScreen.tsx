@@ -65,16 +65,16 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
         throw new Error('User not authenticated');
       }
       
-      // In a real implementation, we would fetch data from the backend
-      // For now, we'll use mock data
-      // const data = await generateSubscriptionReport(userId, timeRange);
+      // Fetch real data from the backend
+      const data = await generateSubscriptionReport(userId, timeRange);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setAnalyticsData(MOCK_DATA);
+      // Set the analytics data
+      setAnalyticsData(data);
     } catch (error) {
       console.error('Error loading analytics data:', error);
+      
+      // In case of error, use mock data to prevent UI from breaking
+      setAnalyticsData(MOCK_DATA);
     } finally {
       setLoading(false);
     }

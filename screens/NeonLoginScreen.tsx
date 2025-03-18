@@ -81,7 +81,7 @@ const NeonLoginScreen = () => {
 
   const handleSignIn = () => {
     // In a real app, this would validate credentials
-    navigation.navigate('Odds' as never);
+    navigation.navigate('PersonalizedHome' as never);
   };
 
   return (

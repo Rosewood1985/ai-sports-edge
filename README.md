@@ -1,231 +1,136 @@
 # AI Sports Edge
 
-A comprehensive sports betting app with AI-powered predictions, UFC fight tracking, and player prop bet analysis.
+AI Sports Edge is a mobile application that provides AI-powered sports betting predictions, analytics, and insights for smarter betting decisions.
 
 ## Features
 
-### 1. UFC API Integration
-
-- **Sherdog API Integration**: Real-time fighter data, records, and upcoming events
-- **Odds API Integration**: Live betting odds for UFC events
-- **Fighter Search**: Search functionality with fallback mechanisms
-- **Event Tracking**: Comprehensive event data including venue, date, and fight cards
-
-### 2. Player Prop Bet Predictions (Premium Feature)
-
-- **AI-Powered Analysis**: Machine learning models for player performance predictions
-- **Multiple Sports Support**: Basketball, football, baseball, and hockey prop bets
-- **Confidence Ratings**: High, medium, and low confidence indicators with reasoning
-- **Premium Access Control**: Exclusive content for paid subscribers
-
-### 3. Gamified Rewards Program
-
-- **Tiered Loyalty System**: Free → Silver → Gold → Platinum progression
-- **Daily Streaks**: Rewards for consistent app usage (7, 20, and 30 days)
-- **UFC Engagement**: Special rewards for UFC betting activity
-- **Referral System**: Incentives for bringing new users to the platform
-
-## UI/UX Enhancements
-
-### Responsive Design for Mobile & Tablet
-
-The app is fully optimized for both mobile and tablet layouts:
-
-- **Adaptive Layouts**: Different layouts for phones and tablets
-- **Responsive Typography**: Font sizes adjust based on device type
-- **Flexible Grids**: Column counts change based on available space
-- **Orientation Support**: Layouts adapt to portrait and landscape modes
-- **Touch Optimization**: Larger touch targets on tablets
-
-See [Responsive UI Optimizations](docs/responsive-ui-optimizations.md) for detailed implementation.
-
-### High-Contrast & Readable Design
-
-#### Fighter Card Improvements
-- Enhanced visual hierarchy with contrasting backgrounds
-- Increased font size and letter spacing for fighter names
-- Improved nickname display with better color contrast
-- Highlighted container for fighter records
-- Better image presentation with borders and default avatars
-
-#### VS Section Enhancements
-- Subtle background color for the VS section
-- Enhanced VS text with larger font, better weight, and text shadow
-- Dedicated container for weight class information
-- Redesigned title fight badge with gold color, border, and shadow effects
-
-#### Event Selection Improvements
-- Added shadows and improved border radius
-- Enhanced text with better font sizes and spacing
-- Used opacity for secondary information to create hierarchy
-- Improved selected state visibility
-
-#### Overall Screen Enhancements
-- Subtle background gradient at the top of the screen
-- Enhanced header with a border and improved title styling
-- Improved refresh button with a background color
-- Proper spacing between sections
-
-### Fast & Minimalist
-
-- Card-based design with clear information hierarchy
-- Focused content with minimal clutter
-- Optimized whitespace for better readability
-- Performance optimizations for faster loading
-
-### Engaging & Interactive
-
-- Visual feedback for user actions
-- Micro-interactions for favoriting fighters
-- Animated state changes for better engagement
-- Progress indicators for live events
-
-### Personalized & Dynamic
-
-- Favorite fighter system with visual indicators
-- Personalized recommendations based on user preferences
-- Custom notifications for favorite fighters' upcoming fights
-- Adaptive content based on user behavior
-
-## Technical Implementation
-
-### Firebase Integration
-
-The app uses Firebase for authentication, database, and cloud functions:
-
-- **Authentication**: User sign-up, sign-in, and account management
-- **Firestore**: Real-time database for storing user data, FAQs, and app content
-- **Cloud Functions**: Serverless backend for processing data and handling complex operations
-
-See [Firebase Integration Documentation](docs/firebase-integration.md) for detailed implementation.
-
-### API Integration
-
-```typescript
-// Example of Sherdog API integration
-async fetchFighterFromSherdog(fighterId: string): Promise<UFCFighter> {
-  try {
-    const fighter = await fetchFromSherdogApi<any>(`/fighters/${fighterId}`);
-    return {
-      id: `fighter-${fighter.id}`,
-      name: fighter.name,
-      nickname: fighter.nickname || '',
-      weightClass: fighter.weight_class || 'Unknown',
-      record: fighter.record || '0-0-0',
-      imageUrl: fighter.image_url || '',
-      country: fighter.nationality || 'Unknown',
-      isActive: fighter.status === 'active'
-    };
-  } catch (error) {
-    console.error(`Error fetching fighter from Sherdog:`, error);
-    throw error;
-  }
-}
-```
-
-### UI Components
-
-```typescript
-// Example of high-contrast fighter card component
-<View style={[
-  styles.fighterContainer,
-  { backgroundColor: isDark ? '#1A1A1A' : '#F8F8F8', borderRadius: 8 }
-]}>
-  <TouchableOpacity
-    style={[
-      styles.favoriteButton,
-      { 
-        backgroundColor: favoriteFighters.includes(fighter.id) 
-          ? 'rgba(255, 215, 0, 0.2)' 
-          : 'transparent',
-        borderRadius: 20
-      }
-    ]}
-    onPress={() => toggleFavoriteFighter(fighter.id)}
-  >
-    <Ionicons
-      name={favoriteFighters.includes(fighter.id) ? 'star' : 'star-outline'}
-      size={22}
-      color={favoriteFighters.includes(fighter.id) ? '#FFD700' : colors.primary}
-    />
-  </TouchableOpacity>
-  <View style={styles.fighterInfo}>
-    <Text style={[
-      styles.fighterName, 
-      { 
-        color: colors.text,
-        fontSize: 17,
-        letterSpacing: 0.3
-      }
-    ]}>
-      {fighter.name}
-    </Text>
-    {fighter.nickname && (
-      <Text style={[
-        styles.fighterNickname, 
-        { 
-          color: isDark ? '#D0D0D0' : '#505050',
-          fontSize: 13
-        }
-      ]}>
-        "{fighter.nickname}"
-      </Text>
-    )}
-    <View style={styles.recordContainer}>
-      <Text style={[
-        styles.fighterRecord, 
-        { 
-          color: isDark ? '#FFFFFF' : '#000000',
-          fontWeight: '600',
-          backgroundColor: isDark ? 'rgba(52, 152, 219, 0.2)' : 'rgba(52, 152, 219, 0.1)',
-          paddingHorizontal: 8,
-          paddingVertical: 2,
-          borderRadius: 4
-        }
-      ]}>
-        {fighter.record}
-      </Text>
-    </View>
-  </View>
-</View>
-```
+- **AI Predictions**: Advanced machine learning algorithms analyze vast amounts of data to provide accurate betting predictions.
+- **Real-Time Analytics**: Get up-to-the-minute stats, odds, and analysis to make informed betting decisions.
+- **Multi-Sport Coverage**: From NFL to Formula 1, we cover all major sports with specialized prediction models for each.
+- **Community Insights**: Connect with other bettors, share strategies, and learn from the community's collective wisdom.
+- **Personalized Betting Insights**: Custom risk assessment, personalized betting unit recommendations, and tailored notifications.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm or yarn
-- Expo CLI
+- [Expo Go](https://expo.dev/client) app installed on your iOS or Android device
 
 ### Installation
 
+1. Scan the QR code with your mobile device's camera app to open the project in Expo Go.
+2. Alternatively, you can open the Expo Go app and scan the QR code from within the app.
+3. You can also open the app directly by visiting: `exp://exp.host/@aisportsedge/ai-sports-edge`
+
+## Development
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm or yarn
+- Expo CLI (`npm install -g expo-cli`)
+
+### Setup
+
 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/ai-sports-edge.git
-cd ai-sports-edge
+2. Set up environment variables (see below)
+3. Install dependencies:
+   ```
+   npm install
+   ```
+4. Start the development server:
+   ```
+   npx expo start
+   ```
+
+### Environment Variables
+
+This project uses environment variables to manage sensitive configuration like API keys. Follow these steps to set up your environment:
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file and add your actual API keys and configuration values:
+   ```
+   # Stripe API Keys
+   STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+   STRIPE_SECRET_KEY=sk_test_your_secret_key_here
+   STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+
+   # FanDuel Affiliate
+   FANDUEL_AFFILIATE_ID=your_affiliate_id_here
+   
+   # Other configuration...
+   ```
+
+3. **IMPORTANT: Never commit your `.env` file to Git!** The `.env` file is already added to `.gitignore` to prevent accidental commits.
+
+#### Production Deployment
+
+For production environments, set environment variables through your hosting platform:
+
+- **Firebase**: Use Firebase Functions configuration
+  ```bash
+  firebase functions:config:set stripe.secret_key="sk_live_your_key_here" stripe.webhook_secret="whsec_your_webhook_secret_here"
+  ```
+
+- **Expo/EAS**: Set environment variables in your EAS build configuration
+  ```json
+  {
+    "builds": {
+      "production": {
+        "env": {
+          "STRIPE_PUBLISHABLE_KEY": "pk_live_your_key_here"
+        }
+      }
+    }
+  }
+  ```
+
+#### Security Best Practices
+
+- **Never hardcode API keys** in your source code
+- **Use different keys** for development and production
+- **Rotate keys periodically** for enhanced security
+- **Restrict API key permissions** to only what's needed
+
+### Building for Production
+
+#### iOS
+
+```
+npx eas build --platform ios --profile ios-beta
 ```
 
-2. Install dependencies
-```bash
-npm install
-# or
-yarn install
+#### Android
+
+```
+npx eas build --platform android --profile preview
 ```
 
-3. Start the development server
-```bash
-npm start
-# or
-yarn start
+### Deploying Updates
+
+```
+npx eas update
 ```
 
-4. Open the app on your device using Expo Go or run in a simulator
+## Web Version
 
-## Future Enhancements
+A web version of the app is available at:
+- [https://aisportsedge-app.web.app](https://aisportsedge-app.web.app)
 
-- Live fight tracking with real-time updates
-- Enhanced AI models for more accurate predictions
-- Social features for sharing bets and predictions
-- Advanced statistics and historical analysis
-- Integration with more sports and betting markets
+To build and deploy the web version:
+
+```
+npm run deploy
+```
+
+## License
+
+This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+
+## Contact
+
+For support or inquiries, please contact: samuel@aisportsedge.app

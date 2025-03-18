@@ -1,0 +1,203 @@
+/**
+ * BetNowPopup Component Styles
+ * Enhanced for seamless transitions after purchases
+ */
+
+.bet-now-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+  /* Ensure it's removed when not visible */
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+/* When fading out, disable pointer events and hide completely */
+.bet-now-popup-overlay.fade-out {
+  pointer-events: none;
+  opacity: 0 !important;
+  z-index: -1 !important; /* Move it behind other content when fading out */
+}
+
+/* Add styles for when popup is open */
+body.bet-now-popup-open {
+  overflow: hidden; /* Prevent scrolling when popup is open */
+}
+
+/* Ensure popup is only visible on pricing page or when explicitly shown */
+body:not(.pricing-page):not(.bet-now-popup-open) .bet-now-popup-overlay {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Instant show variant without fade animation */
+.bet-now-popup-overlay.instant-show {
+  animation: quickFadeIn 0.15s ease-out;
+}
+
+.bet-now-popup {
+  background-color: var(--white, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.4s ease-out;
+}
+
+/* Instant show variant without slide animation */
+.bet-now-popup.instant-show {
+  animation: quickSlideUp 0.2s ease-out;
+}
+
+.bet-now-popup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #FF0055 0%, #FF3300 100%);
+}
+
+.bet-now-popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--gray-600, #666);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.bet-now-popup-close:hover {
+  background-color: var(--gray-200, #eee);
+  color: var(--gray-800, #333);
+}
+
+.bet-now-popup-content {
+  padding: 30px;
+  text-align: center;
+}
+
+.bet-now-popup-content h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: var(--gray-900, #222);
+}
+
+.bet-now-popup-content p {
+  font-size: 16px;
+  margin-bottom: 25px;
+  color: var(--gray-700, #444);
+  line-height: 1.5;
+}
+
+.bet-now-popup-button {
+  margin: 0 auto;
+  max-width: 300px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.bet-now-popup-overlay.fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.bet-now-popup.fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+@keyframes quickFadeIn {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes quickSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .bet-now-popup {
+    width: 95%;
+  }
+  
+  .bet-now-popup-content {
+    padding: 20px;
+  }
+  
+  .bet-now-popup-content h3 {
+    font-size: 20px;
+  }
+}
+
+/* Accessibility - respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .bet-now-popup-overlay,
+  .bet-now-popup,
+  .bet-now-popup-overlay.instant-show,
+  .bet-now-popup.instant-show {
+    animation: none;
+  }
+}

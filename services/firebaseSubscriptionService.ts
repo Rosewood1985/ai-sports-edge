@@ -1,4 +1,5 @@
-import { auth, firestore, functions } from '../config/firebase';
+import { auth, firestore, functions, isDevMode } from '../config/firebase';
+import { isFirebaseInitialized } from '../utils/environmentUtils';
 import { CardFieldInput } from '@stripe/stripe-react-native';
 import firebase from 'firebase/app';
 import { trackEvent } from './analyticsService';
@@ -127,7 +128,11 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'All Premium features',
       '2 months free compared to monthly',
       'Early access to new features',
-      'Priority support'
+      'Priority support',
+      'Exclusive access to Formula 1 data and predictions',
+      'Exclusive access to NASCAR data and predictions',
+      'Exclusive access to Rugby data and predictions',
+      'Exclusive access to Cricket data and predictions'
     ]
   }
 ];
@@ -221,6 +226,82 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     amount: 199,
     productType: 'microtransaction',
     priceId: 'price_player_plus_minus' // Replace with actual Stripe price ID
+  },
+  // Formula 1 microtransactions
+  {
+    id: 'formula1-race-prediction',
+    name: 'Formula 1 Race Prediction',
+    description: 'AI-powered prediction for a specific Formula 1 race',
+    price: 3.99,
+    amount: 399,
+    productType: 'microtransaction',
+    priceId: 'price_formula1_race_prediction'
+  },
+  {
+    id: 'formula1-driver-stats',
+    name: 'Formula 1 Driver Stats Package',
+    description: 'Detailed performance analytics for all F1 drivers',
+    price: 2.99,
+    amount: 299,
+    productType: 'microtransaction',
+    priceId: 'price_formula1_driver_stats'
+  },
+  // NASCAR microtransactions
+  {
+    id: 'nascar-race-prediction',
+    name: 'NASCAR Race Prediction',
+    description: 'AI-powered prediction for a specific NASCAR race',
+    price: 3.99,
+    amount: 399,
+    productType: 'microtransaction',
+    priceId: 'price_nascar_race_prediction'
+  },
+  {
+    id: 'nascar-driver-stats',
+    name: 'NASCAR Driver Stats Package',
+    description: 'Detailed performance analytics for all NASCAR drivers',
+    price: 2.99,
+    amount: 299,
+    productType: 'microtransaction',
+    priceId: 'price_nascar_driver_stats'
+  },
+  // Rugby microtransactions
+  {
+    id: 'rugby-match-prediction',
+    name: 'Rugby Match Prediction',
+    description: 'AI-powered prediction for a specific Rugby match',
+    price: 2.99,
+    amount: 299,
+    productType: 'microtransaction',
+    priceId: 'price_rugby_match_prediction'
+  },
+  {
+    id: 'rugby-team-analysis',
+    name: 'Rugby Team Analysis',
+    description: 'In-depth analysis of a Rugby team\'s performance and strategy',
+    price: 3.99,
+    amount: 399,
+    productType: 'microtransaction',
+    priceId: 'price_rugby_team_analysis'
+  },
+  // Cricket microtransactions
+  {
+    id: 'cricket-match-prediction',
+    name: 'Cricket Match Prediction',
+    description: 'AI-powered prediction for a specific Cricket match',
+    price: 2.99,
+    amount: 299,
+    productType: 'microtransaction',
+    priceId: 'price_cricket_match_prediction'
+  },
+  {
+    id: 'cricket-player-stats',
+    name: 'Cricket Player Stats Package',
+    description: 'Detailed performance analytics for Cricket players',
+    price: 3.99,
+    amount: 399,
+    productType: 'microtransaction',
+    priceId: 'price_cricket_player_stats'
   }
 ];
 
@@ -238,6 +319,12 @@ export const ALL_PRODUCTS = [
  */
 export const hasPremiumAccess = async (userId: string): Promise<boolean> => {
   try {
+    // In development mode or if Firebase is not initialized, always return true
+    if (isDevMode || !isFirebaseInitialized(firestore)) {
+      console.log('Development mode: Simulating premium access');
+      return true;
+    }
+    
     // Check for active subscription
     const subscription = await getUserSubscription(userId);
     if (subscription && subscription.status === 'active') {
@@ -246,6 +333,8 @@ export const hasPremiumAccess = async (userId: string): Promise<boolean> => {
     
     // Check for active one-time purchases
     const db = firestore;
+    if (!db) return false;
+    
     const now = new Date();
     
     const purchasesSnapshot = await db.collection('users').doc(userId)
@@ -417,7 +506,26 @@ export const startFreeTrial = async (
  */
 export const getUserSubscription = async (userId: string): Promise<Subscription | null> => {
   try {
+    // In development mode or if Firebase is not initialized, return mock subscription
+    if (isDevMode || !isFirebaseInitialized(firestore)) {
+      console.log('Development mode: Returning mock subscription');
+      // Return a mock premium subscription
+      return {
+        id: 'mock-subscription-id',
+        status: 'active',
+        planId: 'premium-yearly',
+        currentPeriodEnd: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
+        cancelAtPeriodEnd: false,
+        trialEnd: null,
+        defaultPaymentMethod: 'mock-payment-method',
+        plan: SUBSCRIPTION_PLANS.find(p => p.id === 'premium-yearly'),
+        createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000 // 60 days ago
+      };
+    }
+    
     const db = firestore;
+    if (!db) return null;
+    
     const userDoc = await db.collection('users').doc(userId).get();
     
     if (!userDoc.exists || !userDoc.data()?.subscriptionId) {
