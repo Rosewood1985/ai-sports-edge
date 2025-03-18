@@ -290,6 +290,26 @@ const indexHtml = `<!DOCTYPE html>
             <a href="#download" class="button secondary-button">Get Started</a>
           </div>
         </div>
+        
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Group Pro</h3>
+            <p class="pricing-price">$149.99<span>/month</span></p>
+            <p class="pricing-subtitle">For up to 3 users ($49.99 each)</p>
+          </div>
+          <div class="pricing-features">
+            <ul>
+              <li>All Pro features for up to 3 users</li>
+              <li>Each user gets full access to premium features</li>
+              <li>Save $49.98/month compared to individual subscriptions</li>
+              <li>Manage members from your account</li>
+              <li>Perfect for friends, family, or small groups</li>
+            </ul>
+          </div>
+          <div class="pricing-cta">
+            <a href="#download" class="button secondary-button">Get Started</a>
+          </div>
+        </div>
       </div>
       
       <div class="annual-discount">
@@ -1578,6 +1598,13 @@ function setupPricingCarousel() {
   .pricing-price span {
     font-size: 1rem;
     opacity: 0.7;
+  }
+  
+  .pricing-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    margin-top: var(--spacing-1);
+    margin-bottom: var(--spacing-3);
   }
   
   .pricing-features {
