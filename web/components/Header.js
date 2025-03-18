@@ -59,6 +59,9 @@ const Header = () => {
                 <Link to="/odds" className={isActive('/odds')} onClick={closeMenu}>Live Odds</Link>
               </li>
               <li className="nav-item">
+                <Link to="/predictions" className={isActive('/predictions')} onClick={closeMenu}>AI Predictions</Link>
+              </li>
+              <li className="nav-item">
                 <Link to="/pricing" className={isActive('/pricing')} onClick={closeMenu}>Pricing</Link>
               </li>
               <li className="nav-item">

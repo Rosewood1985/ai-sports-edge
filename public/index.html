@@ -20,23 +20,26 @@
   <meta property="twitter:description" content="Get accurate sports betting predictions powered by AI. Improve your betting strategy with advanced analytics and real-time insights.">
   <meta property="twitter:image" content="https://aisportsedge.app/og-image.jpg">
   
-  <title>AI Sports Edge - AI-Powered Sports Betting Predictions</title>
+  <title>AI Sports Edge - Login</title>
   
   <!-- Favicon -->
-  <link rel="icon" href="https://expo.dev/static/images/favicon-76x76.png">
-  <link rel="apple-touch-icon" href="https://expo.dev/static/images/favicon-76x76.png">
+  <link rel="icon" href="ai_logo.webp">
+  <link rel="apple-touch-icon" href="ai_logo.webp">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="oddsbutton.css">
+  <link rel="stylesheet" href="login.css">
   
-  <!-- Cross-Platform Sync -->
-  <script src="cross-platform-sync.js"></script>
+  <!-- Sports API -->
+  <script src="sports-api.js"></script>
   
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -54,648 +57,125 @@
       "description": "AI-powered sports betting predictions and analytics"
     }
   </script>
-
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
-
 </head>
-<body>
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <a href="/" class="logo">
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMDA0MkZGIi8+CjxwYXRoIGQ9Ik0xNjYuNjY3IDMzMy4zMzNIMTI1VjQxNi42NjdIMTY2LjY2N1YzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI1MCAzMzMuMzMzSDIwOC4zMzNWMzc1SDI1MFYzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMzMy4zMzMgMjkxLjY2N0gyOTEuNjY3VjQxNi42NjdIMzMzLjMzM1YyOTEuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTM3NSA0MTYuNjY3SDEyNVY0NTguMzMzSDM3NVY0MTYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTIwOC4zMzMgMjUwQzIwOC4zMzMgMjM3LjIzOSAyMTguNTcyIDIyNyAyMzEuMzMzIDIyN0MyNDQuMDk0IDIyNyAyNTQuMzMzIDIzNy4yMzkgMjU0LjMzMyAyNTBDMjU0LjMzMyAyNjIuNzYxIDI0NC4wOTQgMjczIDIzMS4zMzMgMjczQzIxOC41NzIgMjczIDIwOC4zMzMgMjYyLjc2MSAyMDguMzMzIDI1MFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yNTAgMjA4LjMzM0MyNTAgMTk1LjU3MiAyNjAuMjM5IDE4NS4zMzMgMjczIDE4NS4zMzNDMjg1Ljc2MSAxODUuMzMzIDI5NiAxOTUuNTcyIDI5NiAyMDguMzMzQzI5NiAyMjEuMDk0IDI4NS43NjEgMjMxLjMzMyAyNzMgMjMxLjMzM0MyNjAuMjM5IDIzMS4zMzMgMjUwIDIyMS4wOTQgMjUwIDIwOC4zMzNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjkxLjY2NyAxNjYuNjY3QzI5MS42NjcgMTUzLjkwNiAzMDEuOTA2IDE0My42NjcgMzE0LjY2NyAxNDMuNjY3QzMyNy40MjggMTQzLjY2NyAzMzcuNjY3IDE1My45MDYgMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTc5LjQyOCAzMjcuNDI4IDE4OS42NjcgMzE0LjY2NyAxODkuNjY3QzMwMS45MDYgMTg5LjY2NyAyOTEuNjY3IDE3OS40MjggMjkxLjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMxNC42NjcgMTQzLjY2N0MzMTQuNjY3IDEzMC45MDYgMzI0LjkwNiAxMjAuNjY3IDMzNy42NjcgMTIwLjY2N0MzNTAuNDI4IDEyMC42NjcgMzYwLjY2NyAxMzAuOTA2IDM2MC42NjcgMTQzLjY2N0MzNjAuNjY3IDE1Ni40MjggMzUwLjQyOCAxNjYuNjY3IDMzNy42NjcgMTY2LjY2N0MzMjQuOTA2IDE2Ni42NjcgMzE0LjY2NyAxNTYuNDI4IDMxNC42NjcgMTQzLjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMTQuNjY3IDE0My42NjdDMzE0LjY2NyAxMzAuOTA2IDMyNC45MDYgMTIwLjY2NyAzMzcuNjY3IDEyMC42NjdDMzUwLjQyOCAxMjAuNjY3IDM2MC42NjcgMTMwLjkwNiAzNjAuNjY3IDE0My42NjdDMzYwLjY2NyAxNTYuNDI4IDM1MC40MjggMTY2LjY2NyAzMzcuNjY3IDE2Ni42NjdDMzI0LjkwNiAxNjYuNjY3IDMxNC42NjcgMTU2LjQyOCAzMTQuNjY3IDE0My42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTUzLjkwNiAzNDcuOTA2IDE0My42NjcgMzYwLjY2NyAxNDMuNjY3QzM3My40MjggMTQzLjY2NyAzODMuNjY3IDE1My45MDYgMzgzLjY2NyAxNjYuNjY3QzM4My42NjcgMTc5LjQyOCAzNzMuNDI4IDE4OS42NjcgMzYwLjY2NyAxODkuNjY3QzM0Ny45MDYgMTg5LjY2NyAzMzcuNjY3IDE3OS40MjggMzM3LjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI5MS42NjcgMTY2LjY2N0MyOTEuNjY3IDE1My45MDYgMzAxLjkwNiAxNDMuNjY3IDMxNC42NjcgMTQzLjY2N0MzMjcuNDI4IDE0My42NjcgMzM3LjY2NyAxNTMuOTA2IDMzNy42NjcgMTY2LjY2N0MzMzcuNjY3IDE3OS40MjggMzI3LjQyOCAxODkuNjY3IDMxNC42NjcgMTg5LjY2N0MzMDEuOTA2IDE4OS42NjcgMjkxLjY2NyAxNzkuNDI4IDI5MS42NjcgMTY2LjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMzcuNjY3IDE2Ni42NjdDMzM3LjY2NyAxNTMuOTA2IDM0Ny45MDYgMTQzLjY2NyAzNjAuNjY3IDE0My42NjdDMzczLjQyOCAxNDMuNjY3IDM4My42NjcgMTUzLjkwNiAzODMuNjY3IDE2Ni42NjdDMzgzLjY2NyAxNzkuNDI4IDM3My40MjggMTg5LjY2NyAzNjAuNjY3IDE4OS42NjdDMzQ3LjkwNiAxODkuNjY3IDMzNy42NjcgMTc5LjQyOCAzMzcuNjY3IDE2Ni42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="AI Sports Edge Logo">
-          <span>AI Sports Edge</span>
-        </a>
-        <nav class="nav">
-          <ul class="nav-list">
-            <li class="nav-item"><a href="/" class="active">Home</a></li>
-            <li class="nav-item"><a href="#features">Features</a></li>
-            <li class="nav-item"><a href="#pricing">Pricing</a></li>
-            <li class="nav-item"><a href="#about">About</a></li>
-            <li class="nav-item"><a href="#live-odds">Live Odds</a></li>
-            <li class="nav-item"><a href="#download" class="download-button">Download</a></li>
-          </ul>
-        </nav>
+<body class="login-body">
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-header">
+        <h1 class="login-title">AI Sports Edge</h1>
+        <p class="login-subtitle">POWERED BY ADVANCED AI</p>
       </div>
-    </div>
-  </header>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1>AI-Powered Sports Betting Predictions</h1>
-          <p class="hero-subtitle">
-            Get accurate predictions, analytics, and insights for smarter betting decisions.
-          </p>
-          <div class="hero-buttons">
-            <a href="#download" class="button primary-button">Download App</a>
-            <a href="#features" class="button secondary-button">Learn More</a>
-          </div>
+      <div class="login-card">
+        <div class="login-card-header">
+          <h2>Sign In</h2>
         </div>
-        <div class="hero-right">
-          <div class="hero-image">
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMDA0MkZGIi8+CjxwYXRoIGQ9Ik0xNjYuNjY3IDMzMy4zMzNIMTI1VjQxNi42NjdIMTY2LjY2N1YzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI1MCAzMzMuMzMzSDIwOC4zMzNWMzc1SDI1MFYzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMzMy4zMzMgMjkxLjY2N0gyOTEuNjY3VjQxNi42NjdIMzMzLjMzM1YyOTEuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTM3NSA0MTYuNjY3SDEyNVY0NTguMzMzSDM3NVY0MTYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTIwOC4zMzMgMjUwQzIwOC4zMzMgMjM3LjIzOSAyMTguNTcyIDIyNyAyMzEuMzMzIDIyN0MyNDQuMDk0IDIyNyAyNTQuMzMzIDIzNy4yMzkgMjU0LjMzMyAyNTBDMjU0LjMzMyAyNjIuNzYxIDI0NC4wOTQgMjczIDIzMS4zMzMgMjczQzIxOC41NzIgMjczIDIwOC4zMzMgMjYyLjc2MSAyMDguMzMzIDI1MFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yNTAgMjA4LjMzM0MyNTAgMTk1LjU3MiAyNjAuMjM5IDE4NS4zMzMgMjczIDE4NS4zMzNDMjg1Ljc2MSAxODUuMzMzIDI5NiAxOTUuNTcyIDI5NiAyMDguMzMzQzI5NiAyMjEuMDk0IDI4NS43NjEgMjMxLjMzMyAyNzMgMjMxLjMzM0MyNjAuMjM5IDIzMS4zMzMgMjUwIDIyMS4wOTQgMjUwIDIwOC4zMzNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjkxLjY2NyAxNjYuNjY3QzI5MS42NjcgMTUzLjkwNiAzMDEuOTA2IDE0My42NjcgMzE0LjY2NyAxNDMuNjY3QzMyNy40MjggMTQzLjY2NyAzMzcuNjY3IDE1My45MDYgMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTc5LjQyOCAzMjcuNDI4IDE4OS42NjcgMzE0LjY2NyAxODkuNjY3QzMwMS45MDYgMTg5LjY2NyAyOTEuNjY3IDE3OS40MjggMjkxLjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMxNC42NjcgMTQzLjY2N0MzMTQuNjY3IDEzMC45MDYgMzI0LjkwNiAxMjAuNjY3IDMzNy42NjcgMTIwLjY2N0MzNTAuNDI4IDEyMC42NjcgMzYwLjY2NyAxMzAuOTA2IDM2MC42NjcgMTQzLjY2N0MzNjAuNjY3IDE1Ni40MjggMzUwLjQyOCAxNjYuNjY3IDMzNy42NjcgMTY2LjY2N0MzMjQuOTA2IDE2Ni42NjcgMzE0LjY2NyAxNTYuNDI4IDMxNC42NjcgMTQzLjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMTQuNjY3IDE0My42NjdDMzE0LjY2NyAxMzAuOTA2IDMyNC45MDYgMTIwLjY2NyAzMzcuNjY3IDEyMC42NjdDMzUwLjQyOCAxMjAuNjY3IDM2MC42NjcgMTMwLjkwNiAzNjAuNjY3IDE0My42NjdDMzYwLjY2NyAxNTYuNDI4IDM1MC40MjggMTY2LjY2NyAzMzcuNjY3IDE2Ni42NjdDMzI0LjkwNiAxNjYuNjY3IDMxNC42NjcgMTU2LjQyOCAzMTQuNjY3IDE0My42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTUzLjkwNiAzNDcuOTA2IDE0My42NjcgMzYwLjY2NyAxNDMuNjY3QzM3My40MjggMTQzLjY2NyAzODMuNjY3IDE1My45MDYgMzgzLjY2NyAxNjYuNjY3QzM4My42NjcgMTc5LjQyOCAzNzMuNDI4IDE4OS42NjcgMzYwLjY2NyAxODkuNjY3QzM0Ny45MDYgMTg5LjY2NyAzMzcuNjY3IDE3OS40MjggMzM3LjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI5MS42NjcgMTY2LjY2N0MyOTEuNjY3IDE1My45MDYgMzAxLjkwNiAxNDMuNjY3IDMxNC42NjcgMTQzLjY2N0MzMjcuNDI4IDE0My42NjcgMzM3LjY2NyAxNTMuOTA2IDMzNy42NjcgMTY2LjY2N0MzMzcuNjY3IDE3OS40MjggMzI3LjQyOCAxODkuNjY3IDMxNC42NjcgMTg5LjY2N0MzMDEuOTA2IDE4OS42NjcgMjkxLjY2NyAxNzkuNDI4IDI5MS42NjcgMTY2LjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMzcuNjY3IDE2Ni42NjdDMzM3LjY2NyAxNTMuOTA2IDM0Ny45MDYgMTQzLjY2NyAzNjAuNjY3IDE0My42NjdDMzczLjQyOCAxNDMuNjY3IDM4My42NjcgMTUzLjkwNiAzODMuNjY3IDE2Ni42NjdDMzgzLjY2NyAxNzkuNDI4IDM3My40MjggMTg5LjY2NyAzNjAuNjY3IDE4OS42NjdDMzQ3LjkwNiAxODkuNjY3IDMzNy42NjcgMTc5LjQyOCAzMzcuNjY3IDE2Ni42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="AI Sports Edge" style="width: 150px; height: 150px;">
-          </div>
-          <div class="news-feed">
-            <h3 class="news-feed-title">Latest Sports News</h3>
-            <div class="news-item">
-              <span class="news-date">MAR 17</span>
-              <p class="news-headline">Lakers secure playoff spot with win over Nuggets</p>
+        <div class="login-card-body">
+          <form id="loginForm">
+            <div class="input-group">
+              <span class="input-icon">
+                <i class="fas fa-envelope"></i>
+              </span>
+              <input
+                type="email"
+                class="login-input"
+                placeholder="Email"
+                required
+              />
             </div>
-            <div class="news-item">
-              <span class="news-date">MAR 16</span>
-              <p class="news-headline">NFL Draft: Top QB prospects showcase skills at Pro Day</p>
+            
+            <div class="input-group">
+              <span class="input-icon">
+                <i class="fas fa-lock"></i>
+              </span>
+              <input
+                type="password"
+                class="login-input"
+                placeholder="Password"
+                required
+              />
             </div>
-            <div class="news-item">
-              <span class="news-date">MAR 15</span>
-              <p class="news-headline">Formula 1: Hamilton dominates in Australian GP qualifying</p>
-            </div>
-            <a href="#" class="news-more">More News →</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  <section id="features" class="features-overview">
-    <div class="container">
-      <h2 class="section-title">Why Choose AI Sports Edge?</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">AI</div>
-          <h3>AI Predictions</h3>
-          <p>Advanced machine learning algorithms analyze vast amounts of data to provide accurate betting predictions.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">RT</div>
-          <h3>Real-Time Analytics</h3>
-          <p>Get up-to-the-minute stats, odds, and analysis to make informed betting decisions.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">MS</div>
-          <h3>Multi-Sport Coverage</h3>
-          <p>From NFL to Formula 1, we cover all major sports with specialized prediction models for each.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">CI</div>
-          <h3>Community Insights</h3>
-          <p>Connect with other bettors, share strategies, and learn from the community's collective wisdom.</p>
-        </div>
-      </div>
-      
-      <div class="features-detail">
-        <div class="feature-detail-item">
-          <h3>Advanced AI Algorithms</h3>
-          <p>Our proprietary machine learning models are trained on millions of historical data points, including player statistics, team performance, weather conditions, and more. These models are continuously refined to improve prediction accuracy.</p>
-          <ul>
-            <li>Neural networks for pattern recognition</li>
-            <li>Ensemble methods for robust predictions</li>
-            <li>Bayesian inference for probability estimation</li>
-            <li>Reinforcement learning for adaptive strategies</li>
-          </ul>
-        </div>
-        
-        <div class="feature-detail-item">
-          <h3>Comprehensive Sports Coverage</h3>
-          <p>We cover all major sports leagues and events, with specialized models for each sport's unique characteristics:</p>
-          <div class="sports-grid">
-            <div class="sport-item">
-              <h4>NFL</h4>
-              <p>Point spreads, over/unders, player props</p>
-            </div>
-            <div class="sport-item">
-              <h4>NBA</h4>
-              <p>Game winners, point totals, player performance</p>
-            </div>
-            <div class="sport-item">
-              <h4>MLB</h4>
-              <p>Moneylines, run totals, pitcher analysis</p>
-            </div>
-            <div class="sport-item">
-              <h4>NHL</h4>
-              <p>Puck lines, goal totals, power play predictions</p>
-            </div>
-            <div class="sport-item">
-              <h4>Soccer</h4>
-              <p>Match results, goal totals, corner kicks</p>
-            </div>
-            <div class="sport-item">
-              <h4>Formula 1</h4>
-              <p>Race winners, podium finishes, qualifying results</p>
-            </div>
-            <div class="sport-item">
-              <h4>UFC/MMA</h4>
-              <p>Fight outcomes, method of victory, round predictions</p>
-            </div>
-            <div class="sport-item">
-              <h4>Horse Racing</h4>
-              <p>Race winners, exactas, trifectas</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="feature-detail-item">
-          <h3>Personalized Betting Insights</h3>
-          <p>Our app learns from your betting history to provide personalized recommendations and insights tailored to your preferences and betting style.</p>
-          <ul>
-            <li>Custom risk assessment based on your bankroll</li>
-            <li>Personalized betting unit recommendations</li>
-            <li>Tailored notifications for your favorite teams and leagues</li>
-            <li>Performance tracking and analysis of your betting patterns</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  <section id="pricing" class="pricing-section">
-    <div class="container">
-      <h2 class="section-title">Simple, Transparent Pricing</h2>
-      <p class="section-subtitle">Choose the plan that fits your betting strategy and budget.</p>
-      
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3>Free</h3>
-            <p class="pricing-price">$0<span>/month</span></p>
-          </div>
-          <div class="pricing-features">
-            <ul>
-              <li>Basic AI predictions</li>
-              <li>Limited sports coverage</li>
-              <li>Daily free pick</li>
-              <li>Community access</li>
-              <li>Basic stats and odds</li>
-            </ul>
-          </div>
-          <div class="pricing-cta">
-            <a href="#download" class="button secondary-button">Get Started</a>
-          </div>
-        </div>
-        
-        <div class="pricing-card popular">
-          <div class="popular-badge">Most Popular</div>
-          <div class="pricing-header">
-            <h3>Pro</h3>
-            <p class="pricing-price">$19.99<span>/month</span></p>
-          </div>
-          <div class="pricing-features">
-            <ul>
-              <li>Advanced AI predictions</li>
-              <li>All major sports coverage</li>
-              <li>Unlimited daily picks</li>
-              <li>Community access</li>
-              <li>Real-time analytics</li>
-              <li>Bankroll management tools</li>
-              <li>Betting history tracking</li>
-            </ul>
-          </div>
-          <div class="pricing-cta">
-            <a href="#download" class="button primary-button">Get Started</a>
-          </div>
-        </div>
-        
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3>Elite</h3>
-            <p class="pricing-price">$39.99<span>/month</span></p>
-          </div>
-          <div class="pricing-features">
-            <ul>
-              <li>Premium AI predictions</li>
-              <li>All sports coverage (including niche)</li>
-              <li>Unlimited daily picks</li>
-              <li>VIP community access</li>
-              <li>Advanced real-time analytics</li>
-              <li>Advanced bankroll management</li>
-              <li>Betting history tracking</li>
-              <li>Personalized betting strategy</li>
-              <li>Priority customer support</li>
-            </ul>
-          </div>
-          <div class="pricing-cta">
-            <a href="#download" class="button secondary-button">Get Started</a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="annual-discount">
-        <h3>Save 20% with Annual Plans</h3>
-        <p>Get two months free when you subscribe to an annual plan.</p>
-        <a href="#download" class="button primary-button">View Annual Plans</a>
-      </div>
-    </div>
-  </section>
-  
-  <section id="about" class="about-section">
-    <div class="container">
-      <h2 class="section-title">About AI Sports Edge</h2>
-      <p class="section-subtitle">Revolutionizing sports betting with artificial intelligence and data science.</p>
-      
-      <div class="about-grid">
-        <div class="about-item">
-          <h3>Our Mission</h3>
-          <p>At AI Sports Edge, we're on a mission to transform the sports betting landscape by combining cutting-edge artificial intelligence with comprehensive sports analytics. We believe that informed betting decisions lead to better outcomes, and our goal is to provide bettors of all experience levels with the tools and insights they need to succeed.</p>
-          <p>We're committed to promoting responsible gambling practices while helping our users make data-driven decisions that maximize their chances of success.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="live-odds" class="app-section">
-    <div class="container">
-      <h2 class="section-title">Live Odds & Predictions</h2>
-      <p class="section-subtitle">Get AI-powered insights for upcoming games. Purchase odds to see our detailed predictions and analysis.</p>
-      
-      <div class="games-grid">
-        <!-- Game Card 1 -->
-        <div class="game-card">
-          <div class="game-header">
-            <span class="game-sport">NFL</span>
-            <span class="game-time">Tomorrow, 3:30 PM</span>
-          </div>
-          
-          <div class="game-teams">
-            <div class="team home">
-              <span class="team-name">Kansas City Chiefs</span>
-              <span class="team-score">24</span>
-            </div>
-            <div class="vs">VS</div>
-            <div class="team away">
-              <span class="team-name">San Francisco 49ers</span>
-              <span class="team-score">17</span>
-            </div>
-          </div>
-          
-          <div class="game-odds">
-            <div class="odds-item">
-              <span class="odds-label">Spread:</span>
-              <span class="odds-value">Chiefs -3.5</span>
-            </div>
-            <div class="odds-item">
-              <span class="odds-label">Total:</span>
-              <span class="odds-value">O/U 49.5</span>
-            </div>
-          </div>
-          
-          <div class="game-actions">
-            <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game1', 'Kansas City Chiefs', 'San Francisco 49ers')">
-              Get Odds
+            
+            <button 
+              type="submit" 
+              class="login-button"
+            >
+              Sign In
             </button>
-          </div>
-        </div>
-        
-        <!-- Game Card 2 -->
-        <div class="game-card">
-          <div class="game-header">
-            <span class="game-sport">NBA</span>
-            <span class="game-time">2 days from now, 7:00 PM</span>
-          </div>
+          </form>
           
-          <div class="game-teams">
-            <div class="team home">
-              <span class="team-name">Los Angeles Lakers</span>
-              <span class="team-score">112</span>
-            </div>
-            <div class="vs">VS</div>
-            <div class="team away">
-              <span class="team-name">Boston Celtics</span>
-              <span class="team-score">108</span>
-            </div>
-          </div>
-          
-          <div class="game-odds">
-            <div class="odds-item">
-              <span class="odds-label">Spread:</span>
-              <span class="odds-value">Lakers -2.5</span>
-            </div>
-            <div class="odds-item">
-              <span class="odds-label">Total:</span>
-              <span class="odds-value">O/U 220.5</span>
-            </div>
-          </div>
-          
-          <div class="game-actions">
-            <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game2', 'Los Angeles Lakers', 'Boston Celtics')">
-              Get Odds
-            </button>
-          </div>
-        </div>
-        
-        <!-- Game Card 3 -->
-        <div class="game-card">
-          <div class="game-header">
-            <span class="game-sport">MLB</span>
-            <span class="game-time">3 days from now, 1:05 PM</span>
-          </div>
-          
-          <div class="game-teams">
-            <div class="team home">
-              <span class="team-name">New York Yankees</span>
-              <span class="team-score">5</span>
-            </div>
-            <div class="vs">VS</div>
-            <div class="team away">
-              <span class="team-name">Boston Red Sox</span>
-              <span class="team-score">3</span>
-            </div>
-          </div>
-          
-          <div class="game-odds">
-            <div class="odds-item">
-              <span class="odds-label">Spread:</span>
-              <span class="odds-value">Yankees -1.5</span>
-            </div>
-            <div class="odds-item">
-              <span class="odds-label">Total:</span>
-              <span class="odds-value">O/U 8.5</span>
-            </div>
-          </div>
-          
-          <div class="game-actions">
-            <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game3', 'New York Yankees', 'Boston Red Sox')">
-              Get Odds
-            </button>
+          <div class="forgot-password">
+            <a href="#">Forgot Password?</a>
           </div>
         </div>
       </div>
       
-      <div class="odds-cta">
-        <h2>Want More Predictions?</h2>
-        <p>Download our mobile app for comprehensive coverage and advanced features.</p>
-        <a href="#download" class="button primary-button">Download App</a>
+      <div class="login-footer">
+        <p>Don't have an account? <a href="#">Sign Up</a></p>
+      </div>
+      
+      <div class="feature-icons">
+        <div class="feature-icon">
+          <div class="icon-circle">
+            <i class="fas fa-robot"></i>
+          </div>
+          <span class="icon-text">AI Picks</span>
+        </div>
+        
+        <div class="feature-icon">
+          <div class="icon-circle">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <span class="icon-text">Track Bets</span>
+        </div>
+        
+        <div class="feature-icon">
+          <div class="icon-circle">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <span class="icon-text">Rewards</span>
+        </div>
+        
+        <div class="feature-icon">
+          <div class="icon-circle">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <span class="icon-text">Pro Analysis</span>
+        </div>
+        
+        <div class="feature-icon">
+          <div class="icon-circle">
+            <i class="fas fa-question-circle"></i>
+          </div>
+          <span class="icon-text">Help & FAQ</span>
+        </div>
       </div>
     </div>
-  </section>
-  
-  <section id="download" class="download-section">
-    <div class="container">
-      <h2 class="section-title">Download AI Sports Edge</h2>
-      <p class="section-subtitle">Get started with AI-powered sports betting predictions today.</p>
-      
-      <div class="download-options">
-        <div class="qr-code">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=exp://exp.host/@aisportsedge/ai-sports-edge" alt="Expo Go QR Code">
-          <p>Scan with your phone camera or Expo Go app</p>
-        </div>
-        
-        <div class="download-steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <p>Download <a href="https://expo.dev/client" target="_blank">Expo Go</a> from the App Store or Google Play</p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <p>Open Expo Go and scan the QR code</p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <p>Enjoy AI Sports Edge with all features enabled</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="download-button-container">
-        <a href="exp://exp.host/@aisportsedge/ai-sports-edge" class="button primary-button">Open in Expo Go</a>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h3 class="footer-title">AI Sports Edge</h3>
-          <p class="footer-description">
-            Your ultimate sports betting companion powered by AI. Get predictions, analytics, and insights for smarter betting decisions.
-          </p>
-        </div>
-        
-        <div class="footer-section">
-          <h3 class="footer-title">Contact</h3>
-          <ul class="footer-contact">
-            <li>
-              <a href="mailto:samuel@aisportsedge.app">samuel@aisportsedge.app</a>
-            </li>
-            <li>
-              <span>San Francisco, CA</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2025 AI Sports Edge. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
-<script>
-// DNS Propagation Check
-document.addEventListener('DOMContentLoaded', function() {
-  // Check if we're on the custom domain
-  const isCustomDomain = window.location.hostname === 'aisportsedge.app';
-  
-  if (!isCustomDomain) {
-    // Create DNS status banner
-    const dnsBanner = document.createElement('div');
-    dnsBanner.className = 'dns-banner';
-    dnsBanner.innerHTML = '<p>⚠️ You are viewing this site on a temporary URL. DNS propagation for aisportsedge.app is in progress.</p>';
     
-    // Add banner to the top of the body
-    document.body.insertBefore(dnsBanner, document.body.firstChild);
-    
-    // Add banner styles
-    const bannerStyles = document.createElement('style');
-    bannerStyles.textContent = `
-      .dns-banner {
-        background-color: #fff3cd;
-        color: #856404;
-        padding: 10px;
-        text-align: center;
-        font-size: 14px;
-        position: relative;
-        z-index: 1000;
-      }
-    `;
-    document.head.appendChild(bannerStyles);
-  }
-});
+    <!-- News Ticker -->
+    <div class="news-ticker-container">
+      <div class="news-ticker">
+        <div class="news-ticker-content">
+          <!-- Sports data will be loaded from the API -->
+          <div class="news-item loading-message">
+            <span>Loading sports data...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-// Mobile menu functionality
-document.addEventListener('DOMContentLoaded', function() {
-  // Add mobile menu toggle
-  const header = document.querySelector('.header');
-  const nav = document.querySelector('.nav');
-  
-  // Create mobile menu button
-  const mobileMenuBtn = document.createElement('button');
-  mobileMenuBtn.className = 'mobile-menu-btn';
-  mobileMenuBtn.innerHTML = '<span></span><span></span><span></span>';
-  mobileMenuBtn.setAttribute('aria-label', 'Toggle menu');
-  
-  // Add mobile menu button to header
-  header.querySelector('.header-content').insertBefore(mobileMenuBtn, nav);
-  
-  // Toggle mobile menu
-  mobileMenuBtn.addEventListener('click', function() {
-    nav.classList.toggle('active');
-    mobileMenuBtn.classList.toggle('active');
-  });
-  
-  // Add smooth scrolling to anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+  <script>
+    // Handle login form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
-      // Close mobile menu if open
-      nav.classList.remove('active');
-      mobileMenuBtn.classList.remove('active');
+      // Store authentication state in localStorage
+      localStorage.setItem('isAuthenticated', 'true');
       
-      // Scroll to target
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
-      });
+      // Redirect to home page
+      window.location.href = '/home.html';
     });
-  });
-  
-  // Add active class to nav items based on scroll position
-  const sections = document.querySelectorAll('section[id]');
-  window.addEventListener('scroll', function() {
-    const scrollY = window.pageYOffset;
-    
-    sections.forEach(section => {
-      const sectionHeight = section.offsetHeight;
-      const sectionTop = section.offsetTop - 100;
-      const sectionId = section.getAttribute('id');
-      
-      if(scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-        document.querySelector('.nav-item a[href="#' + sectionId + '"]')?.classList.add('active');
-      } else {
-        document.querySelector('.nav-item a[href="#' + sectionId + '"]')?.classList.remove('active');
-      }
-    });
-  });
-  
-  // Add loading animation for QR code
-  const qrCode = document.querySelector('.qr-code');
-  const qrCodeImg = qrCode?.querySelector('img');
-  
-  if (qrCodeImg) {
-    qrCodeImg.addEventListener('click', function() {
-      qrCode.classList.add('loading');
-      setTimeout(() => {
-        qrCode.classList.remove('loading');
-      }, 2000);
-    });
-  }
-  
-  // Setup pricing carousel
-  setupPricingCarousel();
-});
-
-// Pricing carousel functionality
-function setupPricingCarousel() {
-  const pricingSection = document.getElementById('pricing');
-  if (!pricingSection) return;
-  
-  const pricingGrid = pricingSection.querySelector('.pricing-grid');
-  if (!pricingGrid) return;
-  
-  // Get all pricing cards
-  const pricingCards = pricingGrid.querySelectorAll('.pricing-card');
-  if (pricingCards.length < 2) return;
-  
-  // Create carousel container
-  const carouselContainer = document.createElement('div');
-  carouselContainer.className = 'carousel-container';
-  
-  // Create carousel track
-  const carouselTrack = document.createElement('div');
-  carouselTrack.className = 'carousel-track';
-  
-  // Create navigation buttons
-  const prevButton = document.createElement('button');
-  prevButton.className = 'carousel-button prev';
-  prevButton.innerHTML = '&lt;';
-  prevButton.setAttribute('aria-label', 'Previous plan');
-  
-  const nextButton = document.createElement('button');
-  nextButton.className = 'carousel-button next';
-  nextButton.innerHTML = '&gt;';
-  nextButton.setAttribute('aria-label', 'Next plan');
-  
-  // Add elements to DOM
-  carouselContainer.appendChild(prevButton);
-  carouselContainer.appendChild(carouselTrack);
-  carouselContainer.appendChild(nextButton);
-  
-  // Replace pricing grid with carousel
-  const carouselWrapper = document.createElement('div');
-  carouselWrapper.className = 'pricing-carousel';
-  carouselWrapper.appendChild(carouselContainer);
-  
-  pricingGrid.parentNode.insertBefore(carouselWrapper, pricingGrid);
-  
-  // Move pricing cards to carousel track
-  pricingCards.forEach(card => {
-    carouselTrack.appendChild(card);
-  });
-  
-  // Remove original pricing grid
-  pricingGrid.remove();
-  
-  // Set initial state
-  let currentIndex = 0;
-  const totalCards = pricingCards.length;
-  
-  // Function to update carousel display
-  function updateCarousel() {
-    pricingCards.forEach((card, index) => {
-      // Remove all classes
-      card.classList.remove('active', 'prev', 'next');
-      
-      if (index === currentIndex) {
-        card.classList.add('active');
-      } else if (index === (currentIndex - 1 + totalCards) % totalCards) {
-        card.classList.add('prev');
-      } else if (index === (currentIndex + 1) % totalCards) {
-        card.classList.add('next');
-      }
-    });
-  }
-  
-  // Initialize carousel
-  updateCarousel();
-  
-  // Add event listeners for navigation
-  prevButton.addEventListener('click', () => {
-    currentIndex = (currentIndex - 1 + totalCards) % totalCards;
-    updateCarousel();
-  });
-  
-  nextButton.addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % totalCards;
-    updateCarousel();
-  });
-  
-  // Auto-rotate every 5 seconds
-  setInterval(() => {
-    currentIndex = (currentIndex + 1) % totalCards;
-    updateCarousel();
-  }, 5000);
-}
-</script>
-<script src="oddsbutton.js"></script>
+  </script>
 </body>
 </html>

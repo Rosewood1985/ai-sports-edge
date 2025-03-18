@@ -1,14 +1,17 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { BettingAffiliateProvider } from '../contexts/BettingAffiliateContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import FeaturesPage from './pages/FeaturesPage';
 import PricingPage from './pages/PricingPage';
 import AboutPage from './pages/AboutPage';
 import DownloadPage from './pages/DownloadPage';
 import OddsPage from './pages/OddsPage';
+import PredictionsPage from './pages/PredictionsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const App = () => {
@@ -23,7 +26,8 @@ const App = () => {
       'pricing-page',
       'about-page',
       'download-page',
-      'odds-page'
+      'odds-page',
+      'predictions-page'
     );
     
     // Add class based on current path
@@ -39,6 +43,8 @@ const App = () => {
       document.body.classList.add('download-page');
     } else if (location.pathname === '/odds') {
       document.body.classList.add('odds-page');
+    } else if (location.pathname === '/predictions') {
+      document.body.classList.add('predictions-page');
     }
     
     // Clean up any overlays or modals when navigating between pages
@@ -101,22 +107,61 @@ const App = () => {
     };
   }, [location.pathname]);
   
+  // Check if the current route is the login page
+  const isLoginPage = location.pathname === '/login';
+
   return (
     <BettingAffiliateProvider>
       <div className="app">
-        <Header />
-        <main className="main-content">
+        {/* Only show Header and Footer if not on login page */}
+        {!isLoginPage && <Header />}
+        <main className={`main-content ${isLoginPage ? 'login-main' : ''}`}>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/features" element={<FeaturesPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/download" element={<DownloadPage />} />
-            <Route path="/odds" element={<OddsPage />} />
+            {/* Login route */}
+            <Route path="/login" element={<LoginPage />} />
+            
+            {/* Protected routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/features" element={
+              <ProtectedRoute>
+                <FeaturesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/pricing" element={
+              <ProtectedRoute>
+                <PricingPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/about" element={
+              <ProtectedRoute>
+                <AboutPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/download" element={
+              <ProtectedRoute>
+                <DownloadPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/odds" element={
+              <ProtectedRoute>
+                <OddsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/predictions" element={
+              <ProtectedRoute>
+                <PredictionsPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Not found route */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
-        <Footer />
+        {!isLoginPage && <Footer />}
       </div>
     </BettingAffiliateProvider>
   );
