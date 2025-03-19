@@ -14,14 +14,15 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { auth } from '../config/firebase';
+import { auth, functions } from '../config/firebase';
+import { httpsCallable } from 'firebase/functions';
 import { createGroupSubscription, addGroupMember, removeGroupMember, getGroupSubscription, MAX_GROUP_MEMBERS } from '../services/groupSubscriptionService';
 import { useStripe } from '@stripe/stripe-react-native';
 import { ThemedView } from '../components/ThemedView';
 import { ThemedText } from '../components/ThemedText';
 import { useTheme } from '../contexts/ThemeContext';
 // Import analytics service
-import * as Analytics from '../services/analyticsService';
+import { analyticsService } from '../services/analyticsService';
 
 /**
  * GroupSubscriptionScreen component
@@ -107,20 +108,49 @@ const GroupSubscriptionScreen: React.FC = () => {
         return;
       }
       
-      // Initialize payment sheet
-      const { error: initError, paymentOption } = await initPaymentSheet({
-        merchantDisplayName: 'AI Sports Edge',
-        customerId: userId,
-        customerEphemeralKeySecret: 'ek_test_ephemeral_key',
-        paymentIntentClientSecret: 'pi_test_client_secret',
-        defaultBillingDetails: {
-          name: auth.currentUser?.displayName || '',
-        },
-      });
-      
-      if (initError) {
-        console.error('Error initializing payment sheet:', initError);
-        Alert.alert('Error', 'Failed to initialize payment. Please try again.');
+      // Call backend to prepare payment
+      try {
+        // Call the Firebase function to prepare the payment
+        const preparePaymentFn = httpsCallable<
+          { userId: string; memberEmails: string[] },
+          {
+            customerId: string;
+            ephemeralKey: string;
+            clientSecret: string;
+          }
+        >(functions, 'prepareGroupSubscriptionPayment');
+        
+        const paymentData = await preparePaymentFn({
+          userId,
+          memberEmails: memberEmails
+        });
+        
+        if (!paymentData.data || !paymentData.data.clientSecret || !paymentData.data.ephemeralKey) {
+          throw new Error('Invalid payment data received from server');
+        }
+        
+        // Initialize payment sheet with dynamic values from backend
+        const { error: initError, paymentOption } = await initPaymentSheet({
+          merchantDisplayName: 'AI Sports Edge',
+          customerId: paymentData.data.customerId,
+          customerEphemeralKeySecret: paymentData.data.ephemeralKey,
+          paymentIntentClientSecret: paymentData.data.clientSecret,
+          defaultBillingDetails: {
+            name: auth.currentUser?.displayName || '',
+          },
+          allowsDelayedPaymentMethods: false,
+          style: 'automatic'
+        });
+        
+        if (initError) {
+          console.error('Error initializing payment sheet:', initError);
+          Alert.alert('Payment Error', `Failed to initialize payment: ${initError.message}. Please try again.`);
+          setLoading(false);
+          return;
+        }
+      } catch (error: any) {
+        console.error('Error preparing payment:', error);
+        Alert.alert('Payment Setup Error', `Failed to prepare payment: ${error.message}. Please try again.`);
         setLoading(false);
         return;
       }
@@ -135,17 +165,22 @@ const GroupSubscriptionScreen: React.FC = () => {
         return;
       }
       
+      // For production, we would get the payment method ID from the Stripe API
+      // Since we're using a test environment, we'll use a test payment method ID
+      const paymentMethodId = 'pm_' + Date.now().toString(); // Generate a unique ID for testing
+      
       // Create group subscription
       const result = await createGroupSubscription(
         userId,
-        'pm_card_visa', // This would be the actual payment method ID in production
+        paymentMethodId,
         memberEmails
       );
       
-      // Track event - commented out for now as the analytics service might not have this method
-      // Analytics.trackEvent('group_subscription_created', {
-      //   member_count: memberEmails.length + 1, // +1 for the owner
-      // });
+      // Track event
+      analyticsService.trackEvent('group_subscription_created', {
+        member_count: memberEmails.length + 1, // +1 for the owner
+        subscription_type: 'group_pro'
+      });
       
       // Set group ID and data
       setGroupId(result.subscriptionId);

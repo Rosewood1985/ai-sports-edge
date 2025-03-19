@@ -11,6 +11,7 @@ const stripePayments = require('./stripePayments');
 const subscriptionManagement = require('./subscriptionManagement');
 const subscriptionGifting = require('./subscriptionGifting');
 const groupSubscriptions = require('./groupSubscriptions');
+const prepareGroupSubscriptionPayment = require('./prepareGroupSubscriptionPayment');
 const autoResubscribe = require('./autoResubscribe');
 const referralProgram = require('./referralProgram');
 const referralRewards = require('./referralRewards');
@@ -18,6 +19,9 @@ const subscriptionAnalytics = require('./subscriptionAnalytics');
 const aiSummary = require('./aiSummary');
 const leaderboardUpdates = require('./leaderboardUpdates');
 const notifications = require('./notifications');
+const notificationService = require('./notificationService');
+const personalizedNotificationService = require('./personalizedNotificationService');
+const notificationTemplates = require('./notificationTemplates');
 
 // Export all functions
 exports.stripeWebhook = stripeWebhooks.stripeWebhook;
@@ -46,6 +50,7 @@ exports.createGroupSubscription = groupSubscriptions.createGroupSubscription;
 exports.addGroupMember = groupSubscriptions.addGroupMember;
 exports.removeGroupMember = groupSubscriptions.removeGroupMember;
 exports.cancelGroupSubscription = groupSubscriptions.cancelGroupSubscription;
+exports.prepareGroupSubscriptionPayment = prepareGroupSubscriptionPayment.prepareGroupSubscriptionPayment;
 
 // Export auto-resubscribe functions
 // Export auto-resubscribe functions
@@ -78,6 +83,13 @@ exports.sendPredictionNotifications = notifications.sendPredictionNotifications;
 exports.sendValueBetNotifications = notifications.sendValueBetNotifications;
 exports.sendGameStartReminders = notifications.sendGameStartReminders;
 exports.sendModelPerformanceUpdates = notifications.sendModelPerformanceUpdates;
+
+// Export personalized notification functions
+exports.sendPersonalizedNotification = personalizedNotificationService.sendPersonalizedNotification;
+exports.sendPersonalizedNotifications = personalizedNotificationService.sendPersonalizedNotifications;
+exports.sendReferralNotification = personalizedNotificationService.sendReferralNotification;
+exports.trackNotificationEngagement = personalizedNotificationService.trackNotificationEngagement;
+exports.sendLocationBasedNotifications = personalizedNotificationService.sendLocationBasedNotifications;
 
 // Add any existing functions from the project
 try {
