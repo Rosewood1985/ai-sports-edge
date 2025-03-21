@@ -90,9 +90,9 @@ Updated `navigation/AppNavigator.tsx` to include the new group subscription scre
 
 ```typescript
 <Stack.Screen
-  name="LocationNotificationSettings"
-  component={LocationNotificationSettings}
-  options={{ title: 'Location Notifications' }}
+  name="GroupSubscription"
+  component={GroupSubscriptionScreen}
+  options={{ title: 'Group Subscription' }}
 />
 ```
 
@@ -132,7 +132,11 @@ The implementation has been tested for:
 
 Potential future enhancements include:
 
-1. Group owner transfer functionality
+1. ✅ Group owner transfer functionality (Implemented)
+   - Allows transferring ownership to another group member
+   - Updates billing information and permissions
+   - Sends notifications to both previous and new owners
+
 2. Customizable member permissions
 3. Usage analytics for group owners
 4. Tiered pricing based on actual member count

@@ -16,7 +16,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { auth, functions } from '../config/firebase';
 import { httpsCallable } from 'firebase/functions';
-import { createGroupSubscription, addGroupMember, removeGroupMember, getGroupSubscription, MAX_GROUP_MEMBERS } from '../services/groupSubscriptionService';
+import { createGroupSubscription, addGroupMember, removeGroupMember, getGroupSubscription, transferGroupOwnership, MAX_GROUP_MEMBERS } from '../services/groupSubscriptionService';
 import { useStripe } from '@stripe/stripe-react-native';
 import { ThemedView } from '../components/ThemedView';
 import { ThemedText } from '../components/ThemedText';
@@ -38,6 +38,7 @@ const GroupSubscriptionScreen: React.FC = () => {
   const [groupData, setGroupData] = useState<any>(null);
   const [memberEmails, setMemberEmails] = useState<string[]>(['', '']);
   const [newMemberEmail, setNewMemberEmail] = useState<string>('');
+  const [transferringOwnership, setTransferringOwnership] = useState<boolean>(false);
   const [step, setStep] = useState<'info' | 'payment' | 'manage'>('info');
   
   // Load existing group subscription if any
@@ -252,6 +253,72 @@ const GroupSubscriptionScreen: React.FC = () => {
     }
   };
   
+  // Handle transfer ownership
+  const handleTransferOwnership = async (email: string) => {
+    try {
+      if (!groupId) return;
+      
+      setLoading(true);
+      
+      const userId = auth.currentUser?.uid;
+      
+      if (!userId) {
+        navigation.navigate('Login');
+        return;
+      }
+      
+      // Confirm transfer
+      Alert.alert(
+        'Transfer Ownership',
+        `Are you sure you want to transfer ownership to ${email}? You will no longer be the owner of this group subscription.`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+            onPress: () => setLoading(false),
+          },
+          {
+            text: 'Transfer',
+            style: 'default',
+            onPress: async () => {
+              try {
+                setTransferringOwnership(true);
+                
+                // Transfer ownership
+                const result = await transferGroupOwnership(groupId, email, userId);
+                
+                // Update group data
+                setGroupData(result);
+                
+                // Show success message
+                Alert.alert(
+                  'Ownership Transferred',
+                  `You have successfully transferred ownership to ${email}.`,
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => navigation.goBack(),
+                    },
+                  ]
+                );
+              } catch (error: any) {
+                console.error('Error transferring ownership:', error);
+                Alert.alert('Error', error.message || 'Failed to transfer ownership. Please try again.');
+              } finally {
+                setTransferringOwnership(false);
+                setLoading(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error('Error transferring ownership:', error);
+      Alert.alert('Error', error.message || 'Failed to transfer ownership. Please try again.');
+      setLoading(false);
+    }
+  };
+
   // Handle remove member
   const handleRemoveMember = async (email: string) => {
     try {
@@ -482,13 +549,22 @@ const GroupSubscriptionScreen: React.FC = () => {
                   <Ionicons name="person" size={24} color={colors.primary} />
                   <ThemedText style={styles.memberEmail}>{email}</ThemedText>
                 </View>
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => handleRemoveMember(email)}
-                  disabled={loading}
-                >
-                  <Ionicons name="close-circle" size={24} color={colors.error} />
-                </TouchableOpacity>
+                <View style={styles.memberActions}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleTransferOwnership(email)}
+                    disabled={loading || transferringOwnership}
+                  >
+                    <Ionicons name="swap-horizontal" size={24} color={colors.primary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleRemoveMember(email)}
+                    disabled={loading}
+                  >
+                    <Ionicons name="close-circle" size={24} color={colors.error} />
+                  </TouchableOpacity>
+                </View>
               </View>
             ))}
             
@@ -770,6 +846,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  memberActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionButton: {
+    padding: 4,
+    marginLeft: 8,
   },
   removeButton: {
     padding: 4,

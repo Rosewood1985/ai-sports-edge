@@ -246,3 +246,31 @@ export const hasGroupPremiumAccess = async (userEmail: string): Promise<boolean>
     return false;
   }
 };
+
+/**
+ * Transfer ownership of a group subscription to another member
+ * @param groupId Group subscription ID
+ * @param newOwnerEmail Email of the new owner
+ * @param currentOwnerId User ID of the current owner (for verification)
+ * @returns Updated group subscription object
+ */
+export const transferGroupOwnership = async (
+  groupId: string,
+  newOwnerEmail: string,
+  currentOwnerId: string
+): Promise<any> => {
+  try {
+    // Call the Cloud Function to transfer ownership
+    const transferGroupOwnershipFn = httpsCallable(functions, 'transferGroupOwnership');
+    const result = await transferGroupOwnershipFn({
+      groupId,
+      newOwnerEmail
+    });
+    
+    // Return the updated group subscription data
+    return result.data;
+  } catch (error: any) {
+    console.error('Error transferring group ownership:', error);
+    throw new Error(error.message || 'Failed to transfer group ownership');
+  }
+};

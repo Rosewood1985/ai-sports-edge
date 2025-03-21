@@ -150,3 +150,13 @@
   3. Formatted text sharing with statistics
 - **Reasoning**: Formatted text sharing provides a clean, consistent way to share betting performance without privacy concerns of screenshots.
 - **Implications**: This approach enhances social engagement but requires implementing sharing functionality and ensuring privacy.
+
+#### Decision: Implement Group Subscription Ownership Transfer
+- **Decision**: Add functionality to transfer group subscription ownership to another member.
+- **Context**: Group owners may want to transfer billing responsibility to another member while maintaining the group.
+- **Alternatives Considered**:
+  1. No ownership transfer (require cancellation and recreation)
+  2. Admin role assignment without billing transfer
+  3. Full ownership transfer including billing responsibilities
+- **Reasoning**: Full ownership transfer provides the most flexibility and addresses real-world scenarios where billing responsibility needs to change.
+- **Implications**: This approach requires careful handling of Stripe customer and subscription updates, but provides a seamless experience for users.
