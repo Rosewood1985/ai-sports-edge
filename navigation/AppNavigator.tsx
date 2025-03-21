@@ -1,120 +1,173 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 
 // Import screens
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import DashboardScreen from '../screens/DashboardScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import GiftSubscriptionScreen from '../screens/GiftSubscriptionScreen';
-import RedeemGiftScreen from '../screens/RedeemGiftScreen';
-import PaymentScreen from '../screens/PaymentScreen';
-import SubscriptionScreen from '../screens/SubscriptionScreen';
-import SubscriptionManagementScreen from '../screens/SubscriptionManagementScreen';
-import LocationNotificationSettings from '../screens/LocationNotificationSettings';
-
-// Import components
-import ProtectedRoute from '../components/ProtectedRoute';
+import { HomeScreen, SearchScreen, ProfileScreen, SettingsScreen } from '../screens';
+import ParlayOddsScreen from '../screens/ParlayOddsScreen';
+import AnalyticsDashboardScreen from '../screens/AnalyticsDashboardScreen';
+import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
+import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
+import BettingAnalyticsScreen from '../screens/BettingAnalyticsScreen';
 
 // Create navigators
-const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+// Location stack navigator
+const LocationStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="LocationHome"
+      component={LocalTeamOddsScreen}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="NearbyVenues"
+      component={NearbyVenuesScreen}
+      options={{
+        title: 'Nearby Venues',
+        headerTintColor: '#007bff',
+      }}
+    />
+  </Stack.Navigator>
+);
+
+// Stack navigators for each tab
+const HomeStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Home"
+      component={HomeScreen}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ParlayOdds"
+      component={ParlayOddsScreen}
+      options={{
+        title: 'Parlay Builder',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="AnalyticsDashboard"
+      component={AnalyticsDashboardScreen}
+      options={{
+        title: 'Analytics Dashboard',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="LocalTeamOdds"
+      component={LocalTeamOddsScreen}
+      options={{
+        title: 'Local Team Odds',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="NearbyVenues"
+      component={NearbyVenuesScreen}
+      options={{
+        title: 'Nearby Venues',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="BettingAnalytics"
+      component={BettingAnalyticsScreen}
+      options={{
+        title: 'Betting Analytics',
+        headerTintColor: '#007bff',
+      }}
+    />
+  </Stack.Navigator>
+);
+
+const SearchStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen 
+      name="Search" 
+      component={SearchScreen} 
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
+const ProfileStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen 
+      name="Profile" 
+      component={ProfileScreen} 
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
+const SettingsStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen 
+      name="Settings" 
+      component={SettingsScreen} 
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
 
 // Main tab navigator
-const TabNavigator = () => {
+const AppNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName: keyof typeof Ionicons.glyphMap = 'help-circle';
 
-          if (route.name === 'Dashboard') {
+          if (route.name === 'HomeTab') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Profile') {
+          } else if (route.name === 'SearchTab') {
+            iconName = focused ? 'search' : 'search-outline';
+          } else if (route.name === 'LocationTab') {
+            iconName = focused ? 'location' : 'location-outline';
+          } else if (route.name === 'ProfileTab') {
             iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === 'Settings') {
+          } else if (route.name === 'SettingsTab') {
             iconName = focused ? 'settings' : 'settings-outline';
           }
 
-          // Use type assertion to fix TypeScript error
-          return <Ionicons name={iconName as any} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#4080ff',
+        tabBarActiveTintColor: '#007bff',
         tabBarInactiveTintColor: 'gray',
+        headerShown: false,
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen 
+        name="HomeTab" 
+        component={HomeStack} 
+        options={{ tabBarLabel: 'Home' }}
+      />
+      <Tab.Screen
+        name="SearchTab"
+        component={SearchStack}
+        options={{ tabBarLabel: 'Search' }}
+      />
+      <Tab.Screen
+        name="LocationTab"
+        component={LocationStack}
+        options={{ tabBarLabel: 'Nearby' }}
+      />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileStack}
+        options={{ tabBarLabel: 'Profile' }}
+      />
+      <Tab.Screen 
+        name="SettingsTab" 
+        component={SettingsStack} 
+        options={{ tabBarLabel: 'Settings' }}
+      />
     </Tab.Navigator>
-  );
-};
-
-// Main app navigator
-const AppNavigator = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        {/* Auth screens */}
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="Register" 
-          component={RegisterScreen} 
-          options={{ headerShown: false }}
-        />
-        
-        {/* Main app screens */}
-        <Stack.Screen
-          name="Main"
-          component={TabNavigator}
-          options={{ headerShown: false }}
-        />
-        
-        {/* Subscription screens */}
-        <Stack.Screen
-          name="Subscription"
-          component={SubscriptionScreen}
-          options={{ title: 'Subscription Plans' }}
-        />
-        <Stack.Screen
-          name="SubscriptionManagement"
-          component={SubscriptionManagementScreen}
-          options={{ title: 'Manage Subscription' }}
-        />
-        <Stack.Screen
-          name="Payment"
-          component={PaymentScreen}
-          options={{ title: 'Payment' }}
-        />
-        
-        {/* Gift subscription screens */}
-        <Stack.Screen
-          name="GiftSubscription"
-          component={GiftSubscriptionScreen}
-          options={{ title: 'Gift a Subscription' }}
-        />
-        <Stack.Screen
-          name="RedeemGift"
-          component={RedeemGiftScreen}
-          options={{ title: 'Redeem Gift' }}
-        />
-        
-        {/* Settings screens */}
-        <Stack.Screen
-          name="LocationNotificationSettings"
-          component={LocationNotificationSettings}
-          options={{ title: 'Location Notifications' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
   );
 };
 
