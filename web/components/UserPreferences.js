@@ -18,7 +18,8 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
     favoriteTeams: [],
     maxItems: 10,
     useLocation: true,
-    localTeams: []
+    localTeams: [],
+    useESPN: true
   };
 
   // Merge default preferences with user preferences
@@ -88,6 +89,13 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
    */
   const handleLocationChange = () => {
     setUserPrefs({ ...userPrefs, useLocation: !userPrefs.useLocation });
+  };
+  
+  /**
+   * Handle ESPN data usage toggle change
+   */
+  const handleESPNChange = () => {
+    setUserPrefs({ ...userPrefs, useESPN: !userPrefs.useESPN });
   };
 
   /**
@@ -247,10 +255,30 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
           
           <div className="privacy-notice">
             <p>
-              <strong>Privacy Notice:</strong> Your location data is used only to personalize 
-              your news feed with local team content. We do not store your precise location 
-              or share it with third parties. You can opt out at any time by unchecking the 
+              <strong>Privacy Notice:</strong> Your location data is used only to personalize
+              your news feed with local team content. We do not store your precise location
+              or share it with third parties. You can opt out at any time by unchecking the
               box above.
+            </p>
+          </div>
+        </div>
+        
+        <div className="preferences-section">
+          <h3>ESPN Integration</h3>
+          
+          <label className="espn-option">
+            <input
+              type="checkbox"
+              checked={userPrefs.useESPN}
+              onChange={handleESPNChange}
+            />
+            Show ESPN calculated odds in news ticker
+          </label>
+          
+          <div className="espn-info">
+            <p>
+              When enabled, the news ticker will display calculated odds based on ESPN data for your selected sports.
+              This provides additional betting insights powered by ESPN's statistics.
             </p>
           </div>
         </div>

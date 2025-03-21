@@ -19,6 +19,8 @@ import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 import BetNowButton from './BetNowButton';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
+import { fanduelCookieService } from '../services/fanduelCookieService';
+import { microtransactionService } from '../services/microtransactionService';
 
 interface BetNowPopupProps {
   show: boolean;
@@ -54,6 +56,30 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
     if (show || autoShow) {
       setVisible(true);
       trackButtonImpression('popup', teamId, userId, gameId);
+      
+      // Initialize cookies for FanDuel if this is a new popup
+      if (userId && gameId && teamId) {
+        fanduelCookieService.initializeCookies(userId, gameId, teamId)
+          .then(() => {
+            // Track popup shown with cookies
+            fanduelCookieService.trackInteraction('popup_shown', {
+              teamId,
+              gameId,
+              autoShow,
+            });
+            
+            // Track microtransaction opportunity
+            microtransactionService.trackInteraction('impression', {
+              type: 'bet_now_popup',
+              gameId,
+              teamId,
+              cookieEnabled: true,
+            }, { id: userId });
+          })
+          .catch(error => {
+            console.error('Error initializing FanDuel cookies:', error);
+          });
+      }
       
       // Animate in - faster for autoShow
       Animated.parallel([
@@ -125,6 +151,25 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
   // Handle close
   const handleClose = () => {
     hasInteracted.current = true;
+    
+    // Track popup close
+    if (userId && gameId) {
+      // Track interaction in FanDuel cookie service
+      fanduelCookieService.trackInteraction('popup_closed', {
+        teamId,
+        gameId,
+        autoShow,
+      });
+      
+      // Track microtransaction interaction
+      microtransactionService.trackInteraction('dismiss', {
+        type: 'bet_now_popup',
+        gameId,
+        teamId,
+        cookieEnabled: true,
+      }, { id: userId });
+    }
+    
     if (onClose) onClose();
   };
   

@@ -1,230 +1,427 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Switch, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { colors } from '../styles/theme';
-import { auth, firestore } from '../config/firebase';
-import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
-import { OneSignal } from 'react-native-onesignal';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Switch, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import pushNotificationService, { NotificationPreferences } from '../services/pushNotificationService';
+import { analyticsService } from '../services/analyticsService';
+import { ThemedText } from '../components/ThemedText';
+import { ThemedView } from '../components/ThemedView';
+import Header from '../components/Header';
 
 /**
- * NotificationSettingsScreen component
- * Allows users to manage their notification preferences
+ * Notification Settings Screen
+ * 
+ * This screen allows users to configure their notification preferences.
  */
 const NotificationSettingsScreen: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [settings, setSettings] = useState({
-    predictions: true,
-    valueBets: true,
-    gameReminders: true,
-    scoreUpdates: false,
-    modelPerformance: true
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    enabled: true,
+    gameAlerts: true,
+    betReminders: true,
+    specialOffers: true,
+    newsUpdates: true,
+    scoreUpdates: true,
+    playerAlerts: true
   });
-  
+
+  // Load notification preferences
   useEffect(() => {
-    // Load user preferences from Firestore
     const loadPreferences = async () => {
       try {
-        const user = auth?.currentUser;
-        if (!user || !firestore) {
-          setLoading(false);
-          return;
-        }
+        setLoading(true);
         
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
+        // Check notification permission
+        const permission = await pushNotificationService.requestPermission();
+        setHasPermission(permission);
         
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          if (userData.preferences && userData.preferences.notifications) {
-            setSettings(userData.preferences.notifications);
-          }
-        }
+        // Get notification preferences
+        const prefs = await pushNotificationService.getNotificationPreferences();
+        setPreferences(prefs);
         
-        setLoading(false);
+        // Track screen view
+        analyticsService.trackScreenView('notification_settings');
       } catch (error) {
         console.error('Error loading notification preferences:', error);
+        Alert.alert('Error', 'Failed to load notification preferences. Please try again.');
+      } finally {
         setLoading(false);
       }
     };
     
     loadPreferences();
   }, []);
-  
-  const updateSetting = async (key: string, value: boolean) => {
+
+  // Save notification preferences
+  const savePreferences = async () => {
     try {
-      // Update local state
-      setSettings(prev => ({
-        ...prev,
-        [key]: value
-      }));
+      setSaving(true);
       
-      // Update OneSignal tags
-      OneSignal.User.addTag(key, value ? 'true' : 'false');
+      await pushNotificationService.saveNotificationPreferences(preferences);
       
-      // Update Firestore
-      const user = auth?.currentUser;
-      if (!user || !firestore) return;
+      // Track event
+      analyticsService.trackEvent('notification_settings_updated', {
+        enabled: preferences.enabled,
+        gameAlerts: preferences.gameAlerts,
+        betReminders: preferences.betReminders,
+        specialOffers: preferences.specialOffers,
+        newsUpdates: preferences.newsUpdates,
+        scoreUpdates: preferences.scoreUpdates,
+        playerAlerts: preferences.playerAlerts
+      });
       
-      const userDocRef = doc(firestore, 'users', user.uid);
-      
-      // Check if the document exists
-      const userDoc = await getDoc(userDocRef);
-      
-      if (userDoc.exists()) {
-        // Update existing document
-        await updateDoc(userDocRef, {
-          [`preferences.notifications.${key}`]: value
-        });
-      } else {
-        // Create new document
-        await setDoc(userDocRef, {
-          preferences: {
-            notifications: {
-              [key]: value
-            }
-          }
-        }, { merge: true });
-      }
+      Alert.alert('Success', 'Notification preferences saved successfully.');
     } catch (error) {
-      console.error('Error updating notification setting:', error);
+      console.error('Error saving notification preferences:', error);
+      Alert.alert('Error', 'Failed to save notification preferences. Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
-  
+
+  // Toggle a preference
+  const togglePreference = (key: keyof NotificationPreferences) => {
+    setPreferences(prev => {
+      // If toggling the main enabled switch, update all preferences
+      if (key === 'enabled') {
+        const newEnabled = !prev.enabled;
+        return {
+          ...prev,
+          enabled: newEnabled,
+          // If enabling, keep current preferences, if disabling, disable all
+          gameAlerts: newEnabled ? prev.gameAlerts : false,
+          betReminders: newEnabled ? prev.betReminders : false,
+          specialOffers: newEnabled ? prev.specialOffers : false,
+          newsUpdates: newEnabled ? prev.newsUpdates : false,
+          scoreUpdates: newEnabled ? prev.scoreUpdates : false,
+          playerAlerts: newEnabled ? prev.playerAlerts : false
+        };
+      }
+      
+      // Otherwise, just toggle the specific preference
+      return {
+        ...prev,
+        [key]: !prev[key]
+      };
+    });
+  };
+
+  // Request notification permission
+  const requestPermission = async () => {
+    try {
+      const permission = await pushNotificationService.requestPermission();
+      setHasPermission(permission);
+      
+      if (permission) {
+        Alert.alert('Success', 'Notification permission granted.');
+      } else {
+        Alert.alert(
+          'Permission Denied',
+          'Please enable notifications in your device settings to receive updates.',
+          [
+            { text: 'OK' }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      Alert.alert('Error', 'Failed to request notification permission. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-        <ActivityIndicator size="large" color={colors.neon.blue} />
-      </View>
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0a7ea4" />
+        <ThemedText style={styles.loadingText}>Loading notification settings...</ThemedText>
+      </SafeAreaView>
     );
   }
-  
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <Text style={[styles.title, { color: colors.text.primary }]}>Notification Settings</Text>
+    <SafeAreaView style={styles.container}>
+      <Header
+        title="Notification Settings"
+        onRefresh={() => {}}
+        isLoading={loading}
+      />
       
-      <View style={styles.settingItem}>
-        <View style={styles.settingTextContainer}>
-          <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Predictions</Text>
-          <Text style={[styles.settingDescription, { color: colors.text.secondary }]}>
-            Receive notifications when new predictions are available
-          </Text>
-        </View>
-        <Switch
-          value={settings.predictions}
-          onValueChange={(value) => updateSetting('predictions', value)}
-          trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
-          thumbColor={colors.background.primary}
-        />
-      </View>
-      
-      <View style={styles.settingItem}>
-        <View style={styles.settingTextContainer}>
-          <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Value Bets</Text>
-          <Text style={[styles.settingDescription, { color: colors.text.secondary }]}>
-            Get notified about high-value betting opportunities
-          </Text>
-        </View>
-        <Switch
-          value={settings.valueBets}
-          onValueChange={(value) => updateSetting('valueBets', value)}
-          trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
-          thumbColor={colors.background.primary}
-        />
-      </View>
-      
-      <View style={styles.settingItem}>
-        <View style={styles.settingTextContainer}>
-          <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Game Reminders</Text>
-          <Text style={[styles.settingDescription, { color: colors.text.secondary }]}>
-            Receive reminders 30 minutes before game start
-          </Text>
-        </View>
-        <Switch
-          value={settings.gameReminders}
-          onValueChange={(value) => updateSetting('gameReminders', value)}
-          trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
-          thumbColor={colors.background.primary}
-        />
-      </View>
-      
-      <View style={styles.settingItem}>
-        <View style={styles.settingTextContainer}>
-          <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Score Updates</Text>
-          <Text style={[styles.settingDescription, { color: colors.text.secondary }]}>
-            Get real-time score updates for games you're following
-          </Text>
-        </View>
-        <Switch
-          value={settings.scoreUpdates}
-          onValueChange={(value) => updateSetting('scoreUpdates', value)}
-          trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
-          thumbColor={colors.background.primary}
-        />
-      </View>
-      
-      <View style={styles.settingItem}>
-        <View style={styles.settingTextContainer}>
-          <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Model Performance</Text>
-          <Text style={[styles.settingDescription, { color: colors.text.secondary }]}>
-            Receive weekly updates on prediction model performance
-          </Text>
-        </View>
-        <Switch
-          value={settings.modelPerformance}
-          onValueChange={(value) => updateSetting('modelPerformance', value)}
-          trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
-          thumbColor={colors.background.primary}
-        />
-      </View>
-      
-      <View style={styles.infoContainer}>
-        <Text style={[styles.infoText, { color: colors.text.secondary }]}>
-          You can change these settings at any time. Notifications help you stay updated on the latest predictions and betting opportunities.
-        </Text>
-      </View>
-    </ScrollView>
+      <ScrollView style={styles.scrollView}>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Notification Status</ThemedText>
+          
+          <View style={styles.permissionContainer}>
+            <ThemedText style={styles.permissionText}>
+              {hasPermission
+                ? 'Notifications are enabled for this app'
+                : 'Notifications are disabled for this app'}
+            </ThemedText>
+            
+            {!hasPermission && (
+              <ThemedText
+                style={styles.permissionButton}
+                onPress={requestPermission}
+              >
+                Enable Notifications
+              </ThemedText>
+            )}
+          </View>
+        </ThemedView>
+        
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Notification Preferences</ThemedText>
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={styles.preferenceLabel}>Enable All Notifications</ThemedText>
+            <Switch
+              value={preferences.enabled}
+              onValueChange={() => togglePreference('enabled')}
+              disabled={!hasPermission || saving}
+            />
+          </View>
+          
+          <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+              Game Alerts
+            </ThemedText>
+            <Switch
+              value={preferences.enabled && preferences.gameAlerts}
+              onValueChange={() => togglePreference('gameAlerts')}
+              disabled={!preferences.enabled || !hasPermission || saving}
+            />
+          </View>
+          
+          <View style={styles.preferenceDescription}>
+            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+              Receive alerts for game starts, scores, and results
+            </ThemedText>
+          </View>
+          
+          <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+              Betting Reminders
+            </ThemedText>
+            <Switch
+              value={preferences.enabled && preferences.betReminders}
+              onValueChange={() => togglePreference('betReminders')}
+              disabled={!preferences.enabled || !hasPermission || saving}
+            />
+          </View>
+          
+          <View style={styles.preferenceDescription}>
+            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+              Receive reminders about upcoming bets and opportunities
+            </ThemedText>
+          </View>
+          
+          <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+              Special Offers
+            </ThemedText>
+            <Switch
+              value={preferences.enabled && preferences.specialOffers}
+              onValueChange={() => togglePreference('specialOffers')}
+              disabled={!preferences.enabled || !hasPermission || saving}
+            />
+          </View>
+          
+          <View style={styles.preferenceDescription}>
+            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+              Receive notifications about promotions and special offers
+            </ThemedText>
+          </View>
+          
+          <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+              News Updates
+            </ThemedText>
+            <Switch
+              value={preferences.enabled && preferences.newsUpdates}
+              onValueChange={() => togglePreference('newsUpdates')}
+              disabled={!preferences.enabled || !hasPermission || saving}
+            />
+          </View>
+          
+          <View style={styles.preferenceDescription}>
+            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+              Receive notifications about sports news and updates
+            </ThemedText>
+          </View>
+          
+          <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+              Score Updates
+            </ThemedText>
+            <Switch
+              value={preferences.enabled && preferences.scoreUpdates}
+              onValueChange={() => togglePreference('scoreUpdates')}
+              disabled={!preferences.enabled || !hasPermission || saving}
+            />
+          </View>
+          
+          <View style={styles.preferenceDescription}>
+            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+              Receive real-time score updates for your favorite teams
+            </ThemedText>
+          </View>
+          
+          <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
+          
+          <View style={styles.preferenceItem}>
+            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+              Player Alerts
+            </ThemedText>
+            <Switch
+              value={preferences.enabled && preferences.playerAlerts}
+              onValueChange={() => togglePreference('playerAlerts')}
+              disabled={!preferences.enabled || !hasPermission || saving}
+            />
+          </View>
+          
+          <View style={styles.preferenceDescription}>
+            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+              Receive alerts about player injuries, trades, and performance
+            </ThemedText>
+          </View>
+        </ThemedView>
+        
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>About Notifications</ThemedText>
+          
+          <ThemedText style={styles.aboutText}>
+            AI Sports Edge sends notifications to keep you updated on games, betting opportunities, and important news.
+            You can customize which notifications you receive using the preferences above.
+          </ThemedText>
+          
+          <ThemedText style={styles.aboutText}>
+            You can change your notification settings at any time from this screen.
+          </ThemedText>
+        </ThemedView>
+        
+        <ThemedView style={styles.saveButtonContainer}>
+          <ThemedText
+            style={[
+              styles.saveButton,
+              (saving || !hasPermission) && styles.disabledButton
+            ]}
+            onPress={savePreferences}
+            disabled={saving || !hasPermission}
+          >
+            {saving ? 'Saving...' : 'Save Preferences'}
+          </ThemedText>
+        </ThemedView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    marginHorizontal: 16,
+    marginVertical: 8,
     padding: 16,
+    borderRadius: 8,
   },
-  title: {
-    fontSize: 24,
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 16,
   },
-  settingItem: {
+  permissionContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  permissionText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  permissionButton: {
+    fontSize: 16,
+    color: '#0a7ea4',
+    fontWeight: 'bold',
+    padding: 8,
+  },
+  preferenceItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 8,
   },
-  settingTextContainer: {
-    flex: 1,
-    marginRight: 16,
+  preferenceLabel: {
+    fontSize: 16,
+    fontWeight: '500',
   },
-  settingTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
+  preferenceDescription: {
+    marginBottom: 8,
   },
-  settingDescription: {
+  descriptionText: {
     fontSize: 14,
+    color: '#666',
   },
-  infoContainer: {
-    marginTop: 24,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 8,
   },
-  infoText: {
+  disabled: {
+    opacity: 0.5,
+  },
+  disabledText: {
+    opacity: 0.5,
+  },
+  aboutText: {
     fontSize: 14,
     lineHeight: 20,
-  }
+    marginBottom: 8,
+  },
+  saveButtonContainer: {
+    marginHorizontal: 16,
+    marginVertical: 24,
+    alignItems: 'center',
+  },
+  saveButton: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: '#0a7ea4',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    overflow: 'hidden',
+    textAlign: 'center',
+    width: '100%',
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
 });
 
 export default NotificationSettingsScreen;

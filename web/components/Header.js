@@ -39,7 +39,7 @@ const Header = () => {
       <div className="container">
         <div className="header-content">
           <Link to="/" className="logo" onClick={closeMenu}>
-            <img src="/ai_logo.webp" alt="AI Sports Edge Logo" className="app-logo" />
+            <img src="/images/ai_logo.webp" alt="AI Sports Edge Logo" width="40" height="40" className="app-logo" />
             <span>AI Sports Edge</span>
           </Link>
           

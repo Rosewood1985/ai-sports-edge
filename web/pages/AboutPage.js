@@ -116,9 +116,8 @@ const AboutPage = () => {
       <section className="about-mission">
         <div className="container">
           <div className="mission-content">
-            <h2>Our Mission</h2>
-            <p>At AI Sports Edge, we're on a mission to transform the sports betting landscape by combining cutting-edge artificial intelligence with comprehensive sports analytics. We believe that informed betting decisions lead to better outcomes, and our goal is to provide bettors of all experience levels with the tools and insights they need to succeed.</p>
-            <p>We're committed to promoting responsible gambling practices while helping our users make data-driven decisions that maximize their chances of success.</p>
+            <h2>About Us</h2>
+            <p>AI Sports Edge combines cutting-edge artificial intelligence with comprehensive sports analytics to provide bettors with powerful tools and insights.</p>
           </div>
         </div>
       </section>

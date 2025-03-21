@@ -36,6 +36,15 @@
               "value": "max-age=3600"
             }
           ]
+        },
+        {
+          "source": "/es/**",
+          "headers": [
+            {
+              "key": "Content-Language",
+              "value": "es"
+            }
+          ]
         }
       ]
     },

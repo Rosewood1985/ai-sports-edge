@@ -347,7 +347,7 @@ class PersonalizedNotificationService {
       return null;
     }
     
-    const promises = userIds.map(userId => 
+    const promises = userIds.map(userId =>
       this.sendPersonalizedNotification({
         userId,
         type,
@@ -356,6 +356,66 @@ class PersonalizedNotificationService {
     );
     
     return Promise.all(promises);
+  }
+
+  /**
+   * Send a referral notification to a user
+   * @param {Object} options - Notification options
+   * @param {string} options.userId - User ID of the referrer
+   * @param {string} options.referredUserId - User ID of the referred user
+   * @param {string} options.type - Notification type (newReferral, referralReward, milestoneReached, leaderboardRankChange)
+   * @param {Object} options.data - Additional notification data
+   * @returns {Promise} - Promise that resolves when notification is sent
+   */
+  async sendReferralNotification(options) {
+    const { userId, referredUserId, type, data = {} } = options;
+    
+    if (!userId) {
+      console.log('No user ID provided for referral notification');
+      return null;
+    }
+    
+    try {
+      // Get referrer user data
+      const userDoc = await admin.firestore().collection('users').doc(userId).get();
+      if (!userDoc.exists) {
+        console.log(`User ${userId} not found`);
+        return null;
+      }
+      
+      const userData = userDoc.data();
+      
+      // Get referred user data if available
+      let referredUserData = null;
+      if (referredUserId) {
+        const referredUserDoc = await admin.firestore().collection('users').doc(referredUserId).get();
+        if (referredUserDoc.exists) {
+          referredUserData = referredUserDoc.data();
+        }
+      }
+      
+      // Prepare notification data
+      const notificationData = {
+        ...data,
+        type,
+        isReferralNotification: true
+      };
+      
+      // Add referred user name if available
+      if (referredUserData) {
+        notificationData.referredName = referredUserData.displayName || 'A new user';
+      }
+      
+      // Send the personalized notification
+      return this.sendPersonalizedNotification({
+        userId,
+        type,
+        data: notificationData
+      });
+    } catch (error) {
+      console.error('Error sending referral notification:', error);
+      return null;
+    }
   }
   
   /**

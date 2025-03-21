@@ -257,6 +257,31 @@
   margin: 0;
 }
 
+.espn-option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.espn-option input {
+  margin-right: 8px;
+}
+
+.espn-info {
+  background-color: #f0f5ff;
+  border: 1px solid #c0d3ff;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-top: 16px;
+  padding: 12px;
+}
+
+.espn-info p {
+  margin: 0;
+}
+
 .user-preferences-footer {
   background-color: #f8f9fa;
   border-top: 1px solid #e1e4e8;

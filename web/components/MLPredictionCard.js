@@ -9,6 +9,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faInfoCircle, faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import { getGamePredictionById, submitPredictionFeedback } from '../services/MLPredictionService';
 
+// Debug logging for React Bootstrap components
+console.log('[MLPredictionCard] React Bootstrap components available:', {
+  Card: !!Card,
+  Badge: !!Badge,
+  Button: !!Button,
+  Collapse: !!Collapse,
+  Progress: !!Progress,
+  Tooltip: !!Tooltip
+});
+
+// Debug logging for FontAwesome
+console.log('[MLPredictionCard] FontAwesome available:', {
+  FontAwesomeIcon: !!FontAwesomeIcon,
+  icons: {
+    faChartLine: !!faChartLine,
+    faInfoCircle: !!faInfoCircle,
+    faThumbsUp: !!faThumbsUp,
+    faThumbsDown: !!faThumbsDown
+  }
+});
+
 // Confidence level colors
 const getConfidenceColor = (confidence) => {
   if (confidence >= 0.7) return 'success';
@@ -45,17 +66,27 @@ const MLPredictionCard = ({
   const [loading, setLoading] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   
+  // Debug logging for props
+  console.log('[MLPredictionCard] Initialized with props:', { 
+    predictionId: prediction?.id, 
+    type, 
+    detailed, 
+    interactive 
+  });
+  
   // Fetch detailed prediction if needed
   useEffect(() => {
     if (detailed && !detailedPrediction && prediction?.id) {
+      console.log(`[MLPredictionCard] Fetching detailed prediction for ${prediction.id}`);
       setLoading(true);
       getGamePredictionById(prediction.id)
         .then(data => {
+          console.log(`[MLPredictionCard] Received detailed prediction for ${prediction.id}:`, data);
           setDetailedPrediction(data);
           setLoading(false);
         })
         .catch(error => {
-          console.error('Error fetching detailed prediction:', error);
+          console.error('[MLPredictionCard] Error fetching detailed prediction:', error);
           setLoading(false);
         });
     }
@@ -63,7 +94,12 @@ const MLPredictionCard = ({
   
   // Handle feedback submission
   const handleFeedback = (rating) => {
-    if (!prediction?.id) return;
+    if (!prediction?.id) {
+      console.warn('[MLPredictionCard] Cannot submit feedback: missing prediction ID');
+      return;
+    }
+    
+    console.log(`[MLPredictionCard] Submitting feedback for ${prediction.id}:`, { rating });
     
     const feedback = {
       predictionId: prediction.id,
@@ -74,19 +110,22 @@ const MLPredictionCard = ({
     
     // Get token from localStorage (in a real app, use a proper auth system)
     const token = localStorage.getItem('authToken');
+    console.log('[MLPredictionCard] Auth token available:', !!token);
     
     submitPredictionFeedback(feedback, token)
       .then(() => {
+        console.log('[MLPredictionCard] Feedback submitted successfully');
         setFeedbackSubmitted(true);
         if (onFeedback) onFeedback(feedback);
       })
       .catch(error => {
-        console.error('Error submitting feedback:', error);
+        console.error('[MLPredictionCard] Error submitting feedback:', error);
       });
   };
   
   // Render different card based on prediction type
   const renderPredictionCard = () => {
+    console.log(`[MLPredictionCard] Rendering prediction card of type: ${type}`);
     switch (type) {
       case 'game':
         return renderGamePrediction();
@@ -104,7 +143,16 @@ const MLPredictionCard = ({
   // Render game prediction
   const renderGamePrediction = () => {
     const data = detailedPrediction || prediction;
-    if (!data) return null;
+    if (!data) {
+      console.warn('[MLPredictionCard] No data available for game prediction');
+      return null;
+    }
+    
+    console.log('[MLPredictionCard] Rendering game prediction:', {
+      homeTeam: data.homeTeam?.name,
+      awayTeam: data.awayTeam?.name,
+      hasPredictions: !!data.predictions
+    });
     
     const { homeTeam, awayTeam, predictions } = data;
     
@@ -194,7 +242,10 @@ const MLPredictionCard = ({
               variant="outline-secondary" 
               size="sm" 
               className="mt-3 w-100"
-              onClick={() => setExpandedDetails(!expandedDetails)}
+              onClick={() => {
+                console.log('[MLPredictionCard] Toggling expanded details:', !expandedDetails);
+                setExpandedDetails(!expandedDetails);
+              }}
             >
               {expandedDetails ? 'Hide Analysis' : 'Show Analysis'}
             </Button>
@@ -232,7 +283,16 @@ const MLPredictionCard = ({
   // Render player prediction
   const renderPlayerPrediction = () => {
     const data = detailedPrediction || prediction;
-    if (!data) return null;
+    if (!data) {
+      console.warn('[MLPredictionCard] No data available for player prediction');
+      return null;
+    }
+    
+    console.log('[MLPredictionCard] Rendering player prediction:', {
+      playerName: data.name,
+      team: data.team,
+      hasPredictions: !!data.predictions
+    });
     
     return (
       <>
@@ -299,7 +359,10 @@ const MLPredictionCard = ({
               variant="outline-secondary" 
               size="sm" 
               className="mt-3 w-100"
-              onClick={() => setExpandedDetails(!expandedDetails)}
+              onClick={() => {
+                console.log('[MLPredictionCard] Toggling expanded details:', !expandedDetails);
+                setExpandedDetails(!expandedDetails);
+              }}
             >
               {expandedDetails ? 'Hide Analysis' : 'Show Analysis'}
             </Button>
@@ -334,7 +397,16 @@ const MLPredictionCard = ({
   // Render race prediction (Formula 1)
   const renderRacePrediction = () => {
     const data = detailedPrediction || prediction;
-    if (!data) return null;
+    if (!data) {
+      console.warn('[MLPredictionCard] No data available for race prediction');
+      return null;
+    }
+    
+    console.log('[MLPredictionCard] Rendering race prediction:', {
+      raceName: data.raceName,
+      trackName: data.trackName,
+      hasPredictions: !!data.predictions
+    });
     
     return (
       <>
@@ -401,7 +473,17 @@ const MLPredictionCard = ({
   // Render fight prediction (UFC)
   const renderFightPrediction = () => {
     const data = detailedPrediction || prediction;
-    if (!data) return null;
+    if (!data) {
+      console.warn('[MLPredictionCard] No data available for fight prediction');
+      return null;
+    }
+    
+    console.log('[MLPredictionCard] Rendering fight prediction:', {
+      eventName: data.eventName,
+      fighter1: data.fighter1?.name,
+      fighter2: data.fighter2?.name,
+      hasPredictions: !!data.predictions
+    });
     
     return (
       <>

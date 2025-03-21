@@ -18,6 +18,8 @@ import {
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
+import { fanduelCookieService } from '../services/fanduelCookieService';
+import { microtransactionService } from '../services/microtransactionService';
 
 interface BetNowButtonProps {
   size?: 'small' | 'medium' | 'large';
@@ -92,7 +94,7 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     pulseAnimation.start();
     
     // Set up surge animation (occasional)
-    let surgeInterval: number;
+    let surgeInterval: NodeJS.Timeout;
     if (buttonSettings.animation === 'surge') {
       surgeInterval = setInterval(() => {
         if (Math.random() > 0.8) {
@@ -113,6 +115,15 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     // Track the click
     trackButtonClick(position, teamId, userId, gameId);
     
+    // Track microtransaction interaction
+    microtransactionService.trackInteraction('click', {
+      type: 'bet_now',
+      contentType,
+      teamId,
+      gameId,
+      cookieEnabled: true,
+    }, { id: userId });
+    
     // Check if this is after a purchase using cross-platform sync
     let isPurchased = false;
     if (gameId) {
@@ -124,23 +135,75 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
       }
     }
     
-    // Generate affiliate URL
-    const baseUrl = 'https://fanduel.com/';
-    const affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
-      baseUrl,
-      affiliateCode,
+    // Track FanDuel interaction
+    await fanduelCookieService.trackInteraction('bet_button_click', {
       teamId,
-      userId,
-      gameId
-    );
+      gameId,
+      position,
+      isPurchased,
+    });
+    
+    // Generate URL with cookies
+    let affiliateUrl;
+    const baseUrl = 'https://fanduel.com/';
+    
+    // Check if we have cookie data
+    const cookieData = await fanduelCookieService.getCookieData();
+    if (cookieData) {
+      // Generate URL with cookies
+      affiliateUrl = await fanduelCookieService.generateUrlWithCookies(baseUrl);
+    } else {
+      // Initialize cookies first
+      await fanduelCookieService.initializeCookies(
+        userId || 'anonymous',
+        gameId || 'unknown',
+        teamId || 'unknown'
+      );
+      
+      // Then generate affiliate link
+      affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
+        baseUrl,
+        affiliateCode,
+        teamId,
+        userId,
+        gameId
+      );
+    }
     
     // Track conversion if this is after a purchase
     if (isPurchased) {
       bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
+      
+      // Track microtransaction conversion
+      microtransactionService.trackInteraction('conversion', {
+        type: 'bet_now',
+        contentType,
+        teamId,
+        gameId,
+        cookieEnabled: true,
+      }, { id: userId });
     }
     
-    // Open URL
-    Linking.openURL(affiliateUrl);
+    try {
+      // Open URL
+      await Linking.openURL(affiliateUrl);
+      
+      // Track successful redirect
+      await fanduelCookieService.trackInteraction('redirect_success', {
+        teamId,
+        gameId,
+        url: affiliateUrl,
+      });
+    } catch (error) {
+      console.error('Error opening URL:', error);
+      
+      // Track failed redirect
+      await fanduelCookieService.trackInteraction('redirect_failed', {
+        teamId,
+        gameId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
   };
   
   // Determine button styles based on props

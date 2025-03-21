@@ -13,6 +13,18 @@ import {
 } from '../services/MLPredictionService';
 import '../styles/predictions.css';
 
+// Debug logging for React Bootstrap components
+console.log('[PredictionsPage] React Bootstrap components available:', {
+  Container: !!Container,
+  Row: !!Row,
+  Col: !!Col,
+  Nav: !!Nav,
+  Tab: !!Tab,
+  Spinner: !!Spinner,
+  Alert: !!Alert,
+  Form: !!Form
+});
+
 const PredictionsPage = () => {
   const [activeTab, setActiveTab] = useState('trending');
   const [predictions, setPredictions] = useState({
@@ -44,8 +56,11 @@ const PredictionsPage = () => {
   });
   const [detailedView, setDetailedView] = useState(false);
   
+  console.log('[PredictionsPage] Component initialized with activeTab:', activeTab);
+  
   // Load predictions for the active tab
   useEffect(() => {
+    console.log('[PredictionsPage] Active tab changed to:', activeTab);
     loadPredictions(activeTab);
   }, [activeTab]);
   
@@ -53,16 +68,19 @@ const PredictionsPage = () => {
   const loadPredictions = async (tab) => {
     // Skip if already loaded
     if (predictions[tab].length > 0) {
+      console.log(`[PredictionsPage] Predictions for ${tab} already loaded, skipping`);
       return;
     }
     
     // Set loading state
+    console.log(`[PredictionsPage] Loading predictions for ${tab}`);
     setLoading(prevState => ({ ...prevState, [tab]: true }));
     setError(prevState => ({ ...prevState, [tab]: null }));
     
     try {
       let data = [];
       
+      console.log(`[PredictionsPage] Fetching ${tab} predictions`);
       switch (tab) {
         case 'trending':
           data = await getTrendingPredictions();
@@ -89,10 +107,12 @@ const PredictionsPage = () => {
           data = [];
       }
       
+      console.log(`[PredictionsPage] Received ${data.length} predictions for ${tab}`);
+      
       // Update predictions
       setPredictions(prevState => ({ ...prevState, [tab]: data }));
     } catch (err) {
-      console.error(`Error loading ${tab} predictions:`, err);
+      console.error(`[PredictionsPage] Error loading ${tab} predictions:`, err);
       setError(prevState => ({ 
         ...prevState, 
         [tab]: 'Failed to load predictions. Please try again later.' 
@@ -104,12 +124,13 @@ const PredictionsPage = () => {
   
   // Handle tab change
   const handleTabChange = (tab) => {
+    console.log(`[PredictionsPage] Tab changed from ${activeTab} to ${tab}`);
     setActiveTab(tab);
   };
   
   // Handle feedback submission
   const handleFeedback = (feedback) => {
-    console.log('Feedback submitted:', feedback);
+    console.log('[PredictionsPage] Feedback submitted:', feedback);
     // In a real app, you might want to update the UI or refresh the predictions
   };
   
@@ -122,25 +143,37 @@ const PredictionsPage = () => {
   };
   
   // Render loading spinner
-  const renderLoading = () => (
-    <div className="text-center my-5">
-      <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </Spinner>
-      <p className="mt-2">Loading predictions...</p>
-    </div>
-  );
+  const renderLoading = () => {
+    console.log('[PredictionsPage] Rendering loading spinner');
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p className="mt-2">Loading predictions...</p>
+      </div>
+    );
+  };
   
   // Render error message
-  const renderError = (message) => (
-    <Alert variant="danger" className="my-3">
-      <Alert.Heading>Error</Alert.Heading>
-      <p>{message}</p>
-    </Alert>
-  );
+  const renderError = (message) => {
+    console.log('[PredictionsPage] Rendering error message:', message);
+    return (
+      <Alert variant="danger" className="my-3">
+        <Alert.Heading>Error</Alert.Heading>
+        <p>{message}</p>
+      </Alert>
+    );
+  };
   
   // Render predictions
   const renderPredictions = (tab) => {
+    console.log(`[PredictionsPage] Rendering predictions for ${tab}`, {
+      loading: loading[tab],
+      error: error[tab],
+      count: predictions[tab].length
+    });
+    
     if (loading[tab]) {
       return renderLoading();
     }
@@ -159,16 +192,24 @@ const PredictionsPage = () => {
     
     return (
       <Row>
-        {predictions[tab].map((prediction, index) => (
-          <Col md={6} lg={4} key={prediction.id || index}>
-            <MLPredictionCard
-              prediction={prediction}
-              type={getPredictionType(tab, prediction)}
-              detailed={detailedView}
-              onFeedback={handleFeedback}
-            />
-          </Col>
-        ))}
+        {predictions[tab].map((prediction, index) => {
+          const predictionType = getPredictionType(tab, prediction);
+          console.log(`[PredictionsPage] Rendering prediction card ${index}`, {
+            id: prediction.id,
+            type: predictionType
+          });
+          
+          return (
+            <Col md={6} lg={4} key={prediction.id || index}>
+              <MLPredictionCard
+                prediction={prediction}
+                type={predictionType}
+                detailed={detailedView}
+                onFeedback={handleFeedback}
+              />
+            </Col>
+          );
+        })}
       </Row>
     );
   };
@@ -183,7 +224,10 @@ const PredictionsPage = () => {
           id="detailed-view-switch"
           label="Detailed View"
           checked={detailedView}
-          onChange={(e) => setDetailedView(e.target.checked)}
+          onChange={(e) => {
+            console.log('[PredictionsPage] Detailed view changed:', e.target.checked);
+            setDetailedView(e.target.checked);
+          }}
         />
       </div>
       

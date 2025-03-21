@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Home Page -->
+  <url>
+    <loc>https://aisportsedge.app/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Features Page -->
+  <url>
+    <loc>https://aisportsedge.app/features</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/features"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/features"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/es/features</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/features"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/features"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Pricing Page -->
+  <url>
+    <loc>https://aisportsedge.app/pricing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/pricing"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/pricing"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/es/pricing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/pricing"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/pricing"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Login Page -->
+  <url>
+    <loc>https://aisportsedge.app/login</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/login"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/login"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/es/login</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/login"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/login"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

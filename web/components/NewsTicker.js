@@ -3,6 +3,7 @@ import axios from 'axios';
 import UserPreferences from './UserPreferences';
 import geolocationService from '../../services/geolocationService';
 import '../styles/news-ticker.css';
+import espnApiWrapper from '../../api/ml-sports-edge/data/espnApiWrapper';
 
 /**
  * News ticker component for displaying scrolling news headlines
@@ -11,6 +12,7 @@ import '../styles/news-ticker.css';
 const NewsTicker = () => {
   const [newsItems, setNewsItems] = useState([]);
   const [oddsSuggestions, setOddsSuggestions] = useState([]);
+  const [espnOdds, setEspnOdds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -23,7 +25,8 @@ const NewsTicker = () => {
       favoriteTeams: [],
       maxItems: 10,
       useLocation: true,
-      localTeams: []
+      localTeams: [],
+      useESPN: true
     };
   });
   
@@ -80,6 +83,43 @@ const NewsTicker = () => {
     
     loadLocationData();
   }, [preferences.useLocation]);
+  
+  // Load ESPN data when preferences change
+  useEffect(() => {
+    const loadESPNData = async () => {
+      if (preferences.useESPN) {
+        try {
+          // Determine which sport to fetch based on preferences
+          let sport = 'basketball';
+          let league = 'nba';
+          
+          if (preferences.sports && preferences.sports.length > 0) {
+            const sportMapping = {
+              'NBA': { sport: 'basketball', league: 'nba' },
+              'NFL': { sport: 'football', league: 'nfl' },
+              'MLB': { sport: 'baseball', league: 'mlb' },
+              'NHL': { sport: 'hockey', league: 'nhl' }
+            };
+            
+            // Use the first preferred sport
+            const preferredSport = preferences.sports[0];
+            if (sportMapping[preferredSport]) {
+              sport = sportMapping[preferredSport].sport;
+              league = sportMapping[preferredSport].league;
+            }
+          }
+          
+          // Calculate odds based on ESPN data
+          const calculatedOdds = await espnApiWrapper.calculateOdds(sport, league);
+          setEspnOdds(calculatedOdds);
+        } catch (error) {
+          console.error('Error loading ESPN data:', error);
+        }
+      }
+    };
+    
+    loadESPNData();
+  }, [preferences.useESPN, preferences.sports]);
   
   /**
    * Fetch news items from the API
@@ -291,6 +331,48 @@ const NewsTicker = () => {
                 <span className={`suggestion-action ${suggestion.suggestion}`}>
                   {suggestion.suggestion === 'bet' ? 'Consider Betting' : 'Avoid'}
                 </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* ESPN calculated odds */}
+      {espnOdds.length > 0 && (
+        <div className="espn-odds">
+          <h4>ESPN Calculated Odds</h4>
+          <div className="espn-odds-list">
+            {espnOdds.map((odds, index) => (
+              <div key={index} className="espn-odds-item">
+                <div className="espn-odds-game">
+                  <img src={odds.homeTeam.logo} alt={odds.homeTeam.name} className="team-logo" />
+                  <span className="vs">vs</span>
+                  <img src={odds.awayTeam.logo} alt={odds.awayTeam.name} className="team-logo" />
+                </div>
+                <div className="espn-odds-details">
+                  <div className="espn-odds-teams">
+                    {odds.homeTeam.name} vs {odds.awayTeam.name}
+                  </div>
+                  <div className="espn-odds-values">
+                    <span className="espn-odds-moneyline">
+                      ML: {odds.odds.homeMoneyline > 0 ? '+' : ''}{odds.odds.homeMoneyline} / {odds.odds.awayMoneyline > 0 ? '+' : ''}{odds.odds.awayMoneyline}
+                    </span>
+                    <span className="espn-odds-spread">
+                      Spread: {odds.odds.spread > 0 ? '+' : ''}{odds.odds.spread}
+                    </span>
+                    <span className="espn-odds-overunder">
+                      O/U: {odds.odds.overUnder}
+                    </span>
+                  </div>
+                  <a
+                    href={odds.espnGameLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="espn-game-link"
+                  >
+                    View on ESPN
+                  </a>
+                </div>
               </div>
             ))}
           </div>

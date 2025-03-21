@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  SafeAreaView, 
-  ScrollView, 
-  TouchableOpacity, 
-  Modal, 
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
   Alert,
   ActivityIndicator
 } from 'react-native';
@@ -16,10 +16,11 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
 import PlayerComparisonView from '../components/PlayerComparisonView';
-import subscriptionService from '../services/subscriptionService';
-import { 
-  AdvancedPlayerMetrics, 
-  getGameAdvancedMetrics, 
+import * as subscriptionService from '../services/subscriptionService';
+import advancedPlayerStatsService from '../services/advancedPlayerStatsService';
+import {
+  AdvancedPlayerMetrics,
+  getGameAdvancedMetrics,
   getAdvancedPlayerMetrics,
   comparePlayerMetrics
 } from '../services/playerStatsService';
@@ -27,6 +28,7 @@ import AdvancedPlayerMetricsCard from '../components/AdvancedPlayerMetricsCard';
 import EnhancedPlayerComparison from '../components/EnhancedPlayerComparison';
 import EmptyState from '../components/EmptyState';
 import ErrorMessage from '../components/ErrorMessage';
+import UpgradePrompt from '../components/UpgradePrompt';
 
 // Import the RootStackParamList from the navigator file
 type RootStackParamList = {
@@ -60,6 +62,10 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
   const [hasComparisonAccess, setHasComparisonAccess] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [comparisonLoading, setComparisonLoading] = useState(false);
+  const [viewsRemaining, setViewsRemaining] = useState<number | null>(null);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [showViewWarning, setShowViewWarning] = useState(false);
+  const [hasReachedViewLimit, setHasReachedViewLimit] = useState(false);
   
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -83,9 +89,16 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
         setLoading(false);
         return;
       }
+
+      // Check view limit for free users
+      const viewLimitCheck = await advancedPlayerStatsService.checkFreeViewLimit(user.uid);
+      setViewsRemaining(viewLimitCheck.viewsRemaining);
+      setShowViewWarning(viewLimitCheck.showWarning);
+      setHasReachedViewLimit(viewLimitCheck.hasReachedLimit);
       
-      const metricsAccess = await subscriptionService.hasAdvancedPlayerMetricsAccess(user.uid, gameId);
-      const comparisonAccess = await subscriptionService.hasPlayerComparisonAccess(user.uid, gameId);
+      // Check if user has access to features
+      const metricsAccess = await advancedPlayerStatsService.hasAdvancedPlayerMetricsAccess(user.uid, gameId);
+      const comparisonAccess = await advancedPlayerStatsService.hasPlayerComparisonAccess(user.uid, gameId);
       
       setHasAccess(metricsAccess);
       setHasComparisonAccess(comparisonAccess);
@@ -99,6 +112,38 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           console.error('Error loading advanced player metrics:', error);
           Alert.alert('Error', 'Failed to load advanced player statistics');
         }
+      } else if (!viewLimitCheck.hasReachedLimit) {
+        // If user doesn't have premium access but hasn't reached view limit,
+        // increment the view count and load the data
+        try {
+          // Increment view count
+          const newViewCount = await advancedPlayerStatsService.incrementFreeViewCount(user.uid);
+          
+          // Update remaining views
+          const remainingViews = Math.max(0, advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT - newViewCount);
+          setViewsRemaining(remainingViews);
+          
+          // Show warning if approaching limit
+          if (remainingViews <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && remainingViews > 0) {
+            setShowViewWarning(true);
+          } else if (remainingViews <= 0) {
+            setHasReachedViewLimit(true);
+          }
+          
+          // Load player data
+          const playerData = await getGameAdvancedMetrics(gameId);
+          setPlayers(playerData);
+          
+          // Track feature usage
+          await advancedPlayerStatsService.trackFeatureUsage(
+            user.uid,
+            gameId,
+            'advanced_metrics'
+          );
+        } catch (error) {
+          console.error('Error loading advanced player metrics:', error);
+          Alert.alert('Error', 'Failed to load advanced player statistics');
+        }
       }
       
       setLoading(false);
@@ -106,6 +151,21 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
     
     checkAccess();
   }, [gameId]);
+  
+  // Show upgrade prompt when view limit is reached or warning is shown
+  useEffect(() => {
+    if (hasReachedViewLimit) {
+      // Show upgrade prompt immediately if view limit is reached
+      setShowUpgradePrompt(true);
+    } else if (showViewWarning && viewsRemaining !== null) {
+      // Show upgrade prompt after a short delay if warning should be shown
+      const timer = setTimeout(() => {
+        setShowUpgradePrompt(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasReachedViewLimit, showViewWarning, viewsRemaining]);
   
   // Handle player selection
   const handlePlayerPress = (player: AdvancedPlayerMetrics) => {
@@ -183,6 +243,11 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
     setUpgradeModalVisible(false);
   };
   
+  // Close upgrade prompt
+  const closeUpgradePrompt = () => {
+    setShowUpgradePrompt(false);
+  };
+  
   // Navigate to subscription screen
   const navigateToSubscription = () => {
     closeUpgradeModal();
@@ -199,7 +264,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
     }
     
     try {
-      const success = await subscriptionService.purchaseAdvancedPlayerMetrics(user.uid, gameId);
+      const success = await advancedPlayerStatsService.purchaseAdvancedPlayerMetrics(user.uid, gameId);
       
       if (success) {
         Alert.alert(
@@ -241,7 +306,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
     }
     
     try {
-      const success = await subscriptionService.purchasePlayerComparison(user.uid, gameId);
+      const success = await advancedPlayerStatsService.purchasePlayerComparison(user.uid, gameId);
       
       if (success) {
         Alert.alert(
@@ -547,6 +612,17 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           </View>
         </TouchableOpacity>
       </Modal>
+      
+      {/* Upgrade Prompt */}
+      {showUpgradePrompt && (
+        <UpgradePrompt
+          onClose={closeUpgradePrompt}
+          gameId={gameId}
+          featureType="advanced-metrics"
+          viewsRemaining={viewsRemaining}
+          hasReachedLimit={hasReachedViewLimit}
+        />
+      )}
     </SafeAreaView>
   );
 };

@@ -9,6 +9,8 @@ const fs = require('fs');
 const path = require('path');
 
 // API configuration
+const bet365ApiWrapper = require('./bet365ApiWrapper');
+
 const API_CONFIG = {
   ODDS_API: {
     BASE_URL: 'https://api.the-odds-api.com/v4',
@@ -22,6 +24,18 @@ const API_CONFIG = {
       NCAA_WOMENS: 'basketball_ncaaw',
       FORMULA1: 'motorsport_f1',
       UFC: 'mma_mixed_martial_arts'
+    }
+  },
+  BET365_API: {
+    SPORTS: {
+      NBA: 'basketball',
+      WNBA: 'basketball',
+      MLB: 'baseball',
+      NHL: 'hockey',
+      NCAA_MENS: 'basketball',
+      NCAA_WOMENS: 'basketball',
+      FORMULA1: 'motorsport',
+      UFC: 'mma'
     }
   },
   ESPN_API: {
@@ -204,7 +218,8 @@ const rateLimiters = {
   NHL_API: createRateLimiter(10, 60 * 1000), // 10 requests per minute
   SPORTRADAR_API: createRateLimiter(5, 60 * 1000), // 5 requests per minute
   NCAA_BASKETBALL_API: createRateLimiter(5, 60 * 1000), // 5 requests per minute
-  SHERDOG_API: createRateLimiter(10, 60 * 1000) // 10 requests per minute
+  SHERDOG_API: createRateLimiter(10, 60 * 1000), // 10 requests per minute
+  BET365_API: createRateLimiter(3, 60 * 1000) // 3 requests per minute (more conservative)
 };
 
 /**
@@ -935,6 +950,12 @@ async function fetchAllDataForSport(sport) {
     sportData.sources.odds = oddsData;
   }
   
+  // Fetch Bet365 odds data
+  const bet365Data = await fetchBet365Data(sport);
+  if (bet365Data) {
+    sportData.sources.bet365 = bet365Data;
+  }
+  
   // Fetch ESPN data
   const espnData = await fetchESPNData(sport);
   if (espnData) {
@@ -1063,6 +1084,38 @@ if (require.main === module) {
     });
 }
 
+/**
+ * Fetch odds data from Bet365
+ * @param {string} sport - Sport key
+ * @returns {Promise<Object>} - Bet365 odds data
+ */
+async function fetchBet365Data(sport) {
+  try {
+    const sportKey = API_CONFIG.BET365_API.SPORTS[sport];
+    if (!sportKey) {
+      console.log(`No Bet365 API mapping for ${sport}`);
+      return null;
+    }
+
+    console.log(`Fetching Bet365 odds data for ${sport}...`);
+    
+    // Apply rate limiting
+    await rateLimiters.BET365_API();
+    
+    // Use the Bet365 API wrapper to get odds
+    const data = await bet365ApiWrapper.getOdds(sportKey);
+    
+    // Save data to file
+    const filename = `${sport.toLowerCase()}_bet365_odds_${new Date().toISOString().split('T')[0]}.json`;
+    saveToFile(filename, data);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching Bet365 odds data for ${sport}:`, error.message);
+    return null;
+  }
+}
+
 module.exports = {
   fetchOddsData,
   fetchESPNData,
@@ -1081,6 +1134,7 @@ module.exports = {
   fetchNCAAData,
   fetchSherdogData,
   fetchHistoricalResults,
+  fetchBet365Data,
   fetchAllDataForSport,
   fetchAllSportsData
 };

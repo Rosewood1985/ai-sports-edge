@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { BettingAffiliateProvider } from '../contexts/BettingAffiliateContext';
+import { useTranslation } from 'react-i18next';
+import { BettingAffiliateProvider } from './contexts/BettingAffiliateContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import ProtectedRoute from './components/ProtectedRoute';
-import NotificationPermission from '../components/NotificationPermission';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import FeaturesPage from './pages/FeaturesPage';
@@ -17,6 +18,17 @@ import NotFoundPage from './pages/NotFoundPage';
 
 const App = () => {
   const location = useLocation();
+  const { i18n } = useTranslation();
+  
+  // Set language based on URL
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.startsWith('/es/')) {
+      i18n.changeLanguage('es');
+    } else {
+      i18n.changeLanguage('en');
+    }
+  }, [location.pathname, i18n]);
   
   // Add page-specific class to body based on current route
   useEffect(() => {
@@ -31,20 +43,23 @@ const App = () => {
       'predictions-page'
     );
     
-    // Add class based on current path
-    if (location.pathname === '/') {
+    // Normalize path by removing language prefix
+    const path = location.pathname.replace(/^\/es/, '');
+    
+    // Add class based on normalized path
+    if (path === '/' || path === '') {
       document.body.classList.add('home-page');
-    } else if (location.pathname === '/features') {
+    } else if (path === '/features') {
       document.body.classList.add('features-page');
-    } else if (location.pathname === '/pricing') {
+    } else if (path === '/pricing') {
       document.body.classList.add('pricing-page');
-    } else if (location.pathname === '/about') {
+    } else if (path === '/about') {
       document.body.classList.add('about-page');
-    } else if (location.pathname === '/download') {
+    } else if (path === '/download') {
       document.body.classList.add('download-page');
-    } else if (location.pathname === '/odds') {
+    } else if (path === '/odds') {
       document.body.classList.add('odds-page');
-    } else if (location.pathname === '/predictions') {
+    } else if (path === '/predictions') {
       document.body.classList.add('predictions-page');
     }
     
@@ -108,21 +123,52 @@ const App = () => {
     };
   }, [location.pathname]);
   
-  // Check if the current route is the login page
-  const isLoginPage = location.pathname === '/login';
+  // Check if the current route is the login page (in any language)
+  const isLoginPage = location.pathname === '/login' || location.pathname === '/es/login';
+
+  // Simple notification permission component for web with translations
+  const NotificationPermission = () => {
+    const [showBanner, setShowBanner] = useState(false);
+    const { t } = useTranslation('common');
+    
+    useEffect(() => {
+      // Check if browser supports notifications
+      if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        setShowBanner(true);
+      }
+    }, []);
+    
+    const requestPermission = () => {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          setShowBanner(false);
+        }
+      });
+    };
+    
+    if (!showBanner) return null;
+    
+    return (
+      <div className="notification-banner">
+        <p>{t('notifications.enableMessage')}</p>
+        <button onClick={requestPermission}>{t('notifications.enableButton')}</button>
+        <button className="close-button" onClick={() => setShowBanner(false)}>×</button>
+      </div>
+    );
+  };
 
   return (
     <BettingAffiliateProvider>
       <div className="app">
-        {/* Only show Header and Footer if not on login page */}
+        {/* Only show Header, LanguageSwitcher, and Footer if not on login page */}
         {!isLoginPage && <Header />}
+        {!isLoginPage && <LanguageSwitcher />}
         {!isLoginPage && <NotificationPermission />}
         <main className={`main-content ${isLoginPage ? 'login-main' : ''}`}>
           <Routes>
-            {/* Login route */}
+            {/* English routes */}
             <Route path="/login" element={<LoginPage />} />
             
-            {/* Protected routes */}
             <Route path="/" element={
               <ProtectedRoute>
                 <HomePage />
@@ -158,6 +204,48 @@ const App = () => {
                 <PredictionsPage />
               </ProtectedRoute>
             } />
+            
+            {/* Spanish routes */}
+            <Route path="/es/login" element={<LoginPage />} />
+            
+            <Route path="/es/" element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/features" element={
+              <ProtectedRoute>
+                <FeaturesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/pricing" element={
+              <ProtectedRoute>
+                <PricingPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/about" element={
+              <ProtectedRoute>
+                <AboutPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/download" element={
+              <ProtectedRoute>
+                <DownloadPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/odds" element={
+              <ProtectedRoute>
+                <OddsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/predictions" element={
+              <ProtectedRoute>
+                <PredictionsPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Redirects */}
+            <Route path="/es" element={<Navigate to="/es/" replace />} />
             
             {/* Not found route */}
             <Route path="*" element={<NotFoundPage />} />

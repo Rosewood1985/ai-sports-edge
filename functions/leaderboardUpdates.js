@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const personalizedNotificationService = require('./personalizedNotificationService');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -88,6 +89,18 @@ exports.updateReferralLeaderboard = functions.pubsub
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
       
+      // Get previous leaderboard entries to check for rank changes
+      const previousAllTimeEntries = new Map();
+      const previousAllTimeSnapshot = await allTimeLeaderboardRef.collection('entries').get();
+      
+      previousAllTimeSnapshot.forEach(doc => {
+        const data = doc.data();
+        previousAllTimeEntries.set(doc.id, data);
+      });
+      
+      // Track notification promises
+      const notificationPromises = [];
+      
       // Add users to leaderboards
       for (const user of users) {
         // Skip users who have opted out
@@ -96,8 +109,8 @@ exports.updateReferralLeaderboard = functions.pubsub
         }
         
         // Anonymize usernames for those who prefer it
-        const displayName = user.leaderboardPrivacy === 'anonymous' 
-          ? `User${user.userId.substring(0, 4)}` 
+        const displayName = user.leaderboardPrivacy === 'anonymous'
+          ? `User${user.userId.substring(0, 4)}`
           : user.displayName;
         
         // Add to all-time leaderboard
@@ -134,10 +147,35 @@ exports.updateReferralLeaderboard = functions.pubsub
           badgeType: user.badgeType,
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
+        
+        // Check for significant rank changes and send notifications
+        const previousEntry = previousAllTimeEntries.get(user.userId);
+        if (previousEntry && previousEntry.rank !== user.rank) {
+          const rankChange = previousEntry.rank - user.rank; // Positive means improved rank
+          
+          // Only notify for significant changes (improved by 3+ positions or dropped by 5+ positions)
+          if (rankChange >= 3 || rankChange <= -5) {
+            notificationPromises.push(
+              personalizedNotificationService.sendReferralNotification({
+                userId: user.userId,
+                type: 'leaderboardRankChange',
+                data: {
+                  oldRank: previousEntry.rank,
+                  newRank: user.rank,
+                  period: 'all-time',
+                  improved: rankChange > 0
+                }
+              })
+            );
+          }
+        }
       }
       
       // Commit the batch
       await batch.commit();
+      
+      // Send notifications after batch is committed
+      await Promise.all(notificationPromises);
       
       console.log(`Updated leaderboards with ${users.length} users`);
       return { success: true, usersProcessed: users.length };

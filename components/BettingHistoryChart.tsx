@@ -1,416 +1,539 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
-import { useTheme } from '../contexts/ThemeContext';
+import { View, Text, StyleSheet, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
+import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
+import { bettingAnalyticsService, TimePeriodFilter, BetType, BetStatus, BetResult } from '../services/bettingAnalyticsService';
 import { ThemedText } from './ThemedText';
-import { BankrollData } from '../types/horseRacing';
+import { ThemedView } from './ThemedView';
 
 interface BettingHistoryChartProps {
-  bankrollData: BankrollData;
-  timeRange?: 'week' | 'month' | 'year' | 'all';
+  timePeriod?: TimePeriodFilter['period'];
+  chartType?: 'profit' | 'winRate' | 'betType' | 'sport';
+  height?: number;
+  width?: number;
 }
 
 /**
- * Component to display betting history charts
+ * Component that displays betting history charts
  */
 const BettingHistoryChart: React.FC<BettingHistoryChartProps> = ({
-  bankrollData,
-  timeRange = 'month'
+  timePeriod = 'month',
+  chartType = 'profit',
+  height = 220,
+  width = Dimensions.get('window').width - 40,
 }) => {
-  const { colors, isDark } = useTheme();
-  const [activeChart, setActiveChart] = useState<'roi' | 'winRate' | 'balance'>('balance');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [chartData, setChartData] = useState<any>(null);
   
-  // Filter history based on time range
-  const filteredHistory = React.useMemo(() => {
-    if (!bankrollData.bettingHistory || bankrollData.bettingHistory.length === 0) {
-      return [];
+  useEffect(() => {
+    loadChartData();
+  }, [timePeriod, chartType]);
+  
+  /**
+   * Load chart data based on chart type and time period
+   */
+  const loadChartData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const period: TimePeriodFilter = { period: timePeriod };
+      const bets = await bettingAnalyticsService.getUserBets({
+        status: BetStatus.SETTLED,
+        timePeriod: period
+      });
+      
+      if (bets.length === 0) {
+        setChartData(null);
+        setLoading(false);
+        return;
+      }
+      
+      let data;
+      
+      switch (chartType) {
+        case 'profit':
+          data = generateProfitChartData(bets);
+          break;
+        case 'winRate':
+          data = generateWinRateChartData(bets);
+          break;
+        case 'betType':
+          data = generateBetTypeChartData(bets);
+          break;
+        case 'sport':
+          data = generateSportChartData(bets);
+          break;
+        default:
+          data = generateProfitChartData(bets);
+      }
+      
+      setChartData(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading chart data:', error);
+      setError('Failed to load chart data. Please try again later.');
+      setLoading(false);
     }
-    
-    const now = new Date();
-    const history = [...bankrollData.bettingHistory].sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
+  };
+  
+  /**
+   * Generate profit chart data
+   */
+  const generateProfitChartData = (bets: any[]) => {
+    // Sort bets by date (oldest first)
+    const sortedBets = [...bets].sort((a, b) => 
+      a.createdAt.toMillis() - b.createdAt.toMillis()
     );
     
-    switch (timeRange) {
-      case 'week':
-        const oneWeekAgo = new Date(now);
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        return history.filter(item => new Date(item.date) >= oneWeekAgo);
-      
-      case 'month':
-        const oneMonthAgo = new Date(now);
-        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-        return history.filter(item => new Date(item.date) >= oneMonthAgo);
-      
-      case 'year':
-        const oneYearAgo = new Date(now);
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        return history.filter(item => new Date(item.date) >= oneYearAgo);
-      
-      case 'all':
-      default:
-        return history;
-    }
-  }, [bankrollData.bettingHistory, timeRange]);
-  
-  // Prepare chart data
-  const chartData = React.useMemo(() => {
-    if (filteredHistory.length === 0) {
-      return {
-        labels: ['No Data'],
-        datasets: [{ data: [0] }]
-      };
-    }
+    // Group bets by day/week depending on time period
+    const groupedBets = groupBetsByTimeUnit(sortedBets, timePeriod);
     
-    // Get dates for labels (format as MM/DD)
-    const labels = filteredHistory.map(item => {
-      const date = new Date(item.date);
-      return `${date.getMonth() + 1}/${date.getDate()}`;
+    // Calculate cumulative profit
+    let cumulativeProfit = 0;
+    const labels: string[] = [];
+    const data: number[] = [];
+    
+    Object.entries(groupedBets).forEach(([date, betsInPeriod]) => {
+      const periodProfit = betsInPeriod.reduce((sum, bet) => {
+        if (bet.result === 'win') {
+          return sum + (bet.potentialWinnings - bet.amount);
+        } else if (bet.result === 'loss') {
+          return sum - bet.amount;
+        }
+        return sum;
+      }, 0);
+      
+      cumulativeProfit += periodProfit;
+      labels.push(formatDateLabel(date, timePeriod));
+      data.push(cumulativeProfit);
     });
-    
-    // Get data based on active chart
-    let data: number[] = [];
-    
-    switch (activeChart) {
-      case 'roi':
-        data = filteredHistory.map(item => item.roi * 100); // Convert to percentage
-        break;
-      
-      case 'winRate':
-        data = filteredHistory.map(item => 
-          item.betsPlaced > 0 ? (item.betsWon / item.betsPlaced) * 100 : 0
-        );
-        break;
-      
-      case 'balance':
-      default:
-        // Calculate cumulative profit/loss
-        let runningBalance = bankrollData.totalDeposited;
-        data = filteredHistory.map(item => {
-          runningBalance += item.netProfit;
-          return runningBalance;
-        });
-        break;
-    }
     
     return {
       labels,
-      datasets: [{ data }]
+      datasets: [
+        {
+          data,
+          color: (opacity = 1) => (cumulativeProfit >= 0 ? `rgba(76, 175, 80, ${opacity})` : `rgba(244, 67, 54, ${opacity})`),
+          strokeWidth: 2,
+        },
+      ],
+      legend: ['Cumulative Profit'],
     };
-  }, [filteredHistory, activeChart, bankrollData.totalDeposited]);
+  };
   
-  // Get chart color based on data trend
-  const getChartColor = () => {
-    if (chartData.datasets[0].data.length <= 1) {
-      return colors.primary;
-    }
+  /**
+   * Generate win rate chart data
+   */
+  const generateWinRateChartData = (bets: any[]) => {
+    // Sort bets by date (oldest first)
+    const sortedBets = [...bets].sort((a, b) => 
+      a.createdAt.toMillis() - b.createdAt.toMillis()
+    );
     
-    const firstValue = chartData.datasets[0].data[0];
-    const lastValue = chartData.datasets[0].data[chartData.datasets[0].data.length - 1];
+    // Group bets by day/week depending on time period
+    const groupedBets = groupBetsByTimeUnit(sortedBets, timePeriod);
     
-    if (lastValue > firstValue) {
-      return '#2ecc71'; // Green for positive trend
-    } else if (lastValue < firstValue) {
-      return '#e74c3c'; // Red for negative trend
+    // Calculate win rate for each period
+    const labels: string[] = [];
+    const data: number[] = [];
+    
+    Object.entries(groupedBets).forEach(([date, betsInPeriod]) => {
+      const totalBets = betsInPeriod.length;
+      const winningBets = betsInPeriod.filter(bet => bet.result === 'win').length;
+      const winRate = totalBets > 0 ? (winningBets / totalBets) * 100 : 0;
+      
+      labels.push(formatDateLabel(date, timePeriod));
+      data.push(winRate);
+    });
+    
+    return {
+      labels,
+      datasets: [
+        {
+          data,
+          color: (opacity = 1) => `rgba(64, 128, 255, ${opacity})`,
+          strokeWidth: 2,
+        },
+      ],
+      legend: ['Win Rate (%)'],
+    };
+  };
+  
+  /**
+   * Generate bet type chart data
+   */
+  const generateBetTypeChartData = (bets: any[]) => {
+    // Count bets by type
+    const betTypeCounts: Record<string, number> = {};
+    
+    bets.forEach(bet => {
+      const betType = bet.betType;
+      betTypeCounts[betType] = (betTypeCounts[betType] || 0) + 1;
+    });
+    
+    // Format data for pie chart
+    const data = Object.entries(betTypeCounts).map(([betType, count], index) => {
+      const colors = [
+        '#FF6384', // red
+        '#36A2EB', // blue
+        '#FFCE56', // yellow
+        '#4BC0C0', // teal
+        '#9966FF', // purple
+        '#FF9F40', // orange
+      ];
+      
+      return {
+        name: formatBetTypeName(betType),
+        count,
+        color: colors[index % colors.length],
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      };
+    });
+    
+    return data;
+  };
+  
+  /**
+   * Generate sport chart data
+   */
+  const generateSportChartData = (bets: any[]) => {
+    // Count bets by sport
+    const sportCounts: Record<string, number> = {};
+    
+    bets.forEach(bet => {
+      const sport = bet.sport;
+      sportCounts[sport] = (sportCounts[sport] || 0) + 1;
+    });
+    
+    // Format data for pie chart
+    const data = Object.entries(sportCounts).map(([sport, count], index) => {
+      const colors = [
+        '#FF6384', // red
+        '#36A2EB', // blue
+        '#FFCE56', // yellow
+        '#4BC0C0', // teal
+        '#9966FF', // purple
+        '#FF9F40', // orange
+      ];
+      
+      return {
+        name: sport,
+        count,
+        color: colors[index % colors.length],
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      };
+    });
+    
+    return data;
+  };
+  
+  /**
+   * Group bets by time unit (day, week, month)
+   */
+  const groupBetsByTimeUnit = (bets: any[], period: string) => {
+    const groupedBets: Record<string, any[]> = {};
+    
+    bets.forEach(bet => {
+      const date = new Date(bet.createdAt.toMillis());
+      let key;
+      
+      switch (period) {
+        case 'week':
+          // Group by day
+          key = date.toISOString().split('T')[0];
+          break;
+        case 'month':
+          // Group by day
+          key = date.toISOString().split('T')[0];
+          break;
+        case 'year':
+          // Group by week
+          const weekNumber = getWeekNumber(date);
+          key = `${date.getFullYear()}-W${weekNumber}`;
+          break;
+        case 'all':
+          // Group by month
+          key = `${date.getFullYear()}-${date.getMonth() + 1}`;
+          break;
+        default:
+          key = date.toISOString().split('T')[0];
+      }
+      
+      if (!groupedBets[key]) {
+        groupedBets[key] = [];
+      }
+      
+      groupedBets[key].push(bet);
+    });
+    
+    return groupedBets;
+  };
+  
+  /**
+   * Get week number for a date
+   */
+  const getWeekNumber = (date: Date) => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
+  
+  /**
+   * Format date label based on time period
+   */
+  const formatDateLabel = (dateStr: string, period: string) => {
+    if (period === 'week' || period === 'month') {
+      // For day format: MM/DD
+      const date = new Date(dateStr);
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    } else if (period === 'year') {
+      // For week format: WW
+      return `W${dateStr.split('W')[1]}`;
     } else {
-      return colors.primary; // Primary color for neutral trend
+      // For month format: MM/YY
+      const [year, month] = dateStr.split('-');
+      return `${month}/${year.slice(2)}`;
     }
   };
   
-  // Get chart title
-  const getChartTitle = () => {
-    switch (activeChart) {
-      case 'roi':
-        return 'Return on Investment (%)';
-      case 'winRate':
-        return 'Win Rate (%)';
-      case 'balance':
+  /**
+   * Format bet type name
+   */
+  const formatBetTypeName = (betType: string) => {
+    switch (betType) {
+      case BetType.MONEYLINE:
+        return 'Moneyline';
+      case BetType.SPREAD:
+        return 'Spread';
+      case BetType.OVER_UNDER:
+        return 'Over/Under';
+      case BetType.PROP:
+        return 'Prop';
+      case BetType.PARLAY:
+        return 'Parlay';
+      case BetType.FUTURES:
+        return 'Futures';
       default:
-        return 'Bankroll Balance ($)';
+        return betType.charAt(0).toUpperCase() + betType.slice(1);
     }
   };
   
-  // Get chart description
-  const getChartDescription = () => {
-    if (chartData.datasets[0].data.length <= 1 || chartData.labels[0] === 'No Data') {
-      return 'Not enough data to analyze trends.';
-    }
-    
-    const firstValue = chartData.datasets[0].data[0];
-    const lastValue = chartData.datasets[0].data[chartData.datasets[0].data.length - 1];
-    const change = lastValue - firstValue;
-    const percentChange = firstValue !== 0 ? (change / Math.abs(firstValue)) * 100 : 0;
-    
-    switch (activeChart) {
-      case 'roi':
-        if (change > 0) {
-          return `Your ROI has improved by ${percentChange.toFixed(1)}% over this period.`;
-        } else if (change < 0) {
-          return `Your ROI has decreased by ${Math.abs(percentChange).toFixed(1)}% over this period.`;
-        } else {
-          return 'Your ROI has remained stable over this period.';
-        }
-      
-      case 'winRate':
-        if (change > 0) {
-          return `Your win rate has improved by ${percentChange.toFixed(1)}% over this period.`;
-        } else if (change < 0) {
-          return `Your win rate has decreased by ${Math.abs(percentChange).toFixed(1)}% over this period.`;
-        } else {
-          return 'Your win rate has remained stable over this period.';
-        }
-      
-      case 'balance':
-      default:
-        if (change > 0) {
-          return `Your bankroll has grown by $${change.toFixed(2)} (${percentChange.toFixed(1)}%) over this period.`;
-        } else if (change < 0) {
-          return `Your bankroll has decreased by $${Math.abs(change).toFixed(2)} (${Math.abs(percentChange).toFixed(1)}%) over this period.`;
-        } else {
-          return 'Your bankroll has remained stable over this period.';
-        }
-    }
-  };
-  
-  // Get chart statistics
-  const getChartStatistics = () => {
-    if (chartData.datasets[0].data.length <= 1 || chartData.labels[0] === 'No Data') {
-      return [];
-    }
-    
-    const data = chartData.datasets[0].data;
-    
-    // Calculate statistics
-    const sum = data.reduce((acc, val) => acc + val, 0);
-    const avg = sum / data.length;
-    const min = Math.min(...data);
-    const max = Math.max(...data);
-    
-    // Calculate standard deviation
-    const squaredDiffs = data.map(val => Math.pow(val - avg, 2));
-    const avgSquaredDiff = squaredDiffs.reduce((acc, val) => acc + val, 0) / squaredDiffs.length;
-    const stdDev = Math.sqrt(avgSquaredDiff);
-    
-    switch (activeChart) {
-      case 'roi':
-        return [
-          { label: 'Average ROI', value: `${avg.toFixed(1)}%` },
-          { label: 'Best ROI', value: `${max.toFixed(1)}%` },
-          { label: 'Worst ROI', value: `${min.toFixed(1)}%` },
-          { label: 'Volatility', value: `${stdDev.toFixed(1)}%` }
-        ];
-      
-      case 'winRate':
-        return [
-          { label: 'Average Win Rate', value: `${avg.toFixed(1)}%` },
-          { label: 'Best Win Rate', value: `${max.toFixed(1)}%` },
-          { label: 'Worst Win Rate', value: `${min.toFixed(1)}%` },
-          { label: 'Consistency', value: `${(100 - stdDev).toFixed(1)}%` }
-        ];
-      
-      case 'balance':
-      default:
-        return [
-          { label: 'Average Balance', value: `$${avg.toFixed(2)}` },
-          { label: 'Highest Balance', value: `$${max.toFixed(2)}` },
-          { label: 'Lowest Balance', value: `$${min.toFixed(2)}` },
-          { label: 'Volatility', value: `$${stdDev.toFixed(2)}` }
-        ];
-    }
-  };
-  
-  // No data to display
-  if (!bankrollData.bettingHistory || bankrollData.bettingHistory.length === 0) {
+  /**
+   * Render loading state
+   */
+  if (loading) {
     return (
-      <View style={styles.noDataContainer}>
-        <ThemedText style={styles.noDataText}>
-          No betting history available. Place bets to see your performance charts.
-        </ThemedText>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4080ff" />
       </View>
     );
   }
   
+  /**
+   * Render error state
+   */
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <ThemedText style={styles.errorText}>{error}</ThemedText>
+      </View>
+    );
+  }
+  
+  /**
+   * Render empty state
+   */
+  if (!chartData || (Array.isArray(chartData) && chartData.length === 0) || 
+      (chartData.datasets && chartData.datasets[0].data.length === 0)) {
+    return (
+      <View style={styles.emptyContainer}>
+        <ThemedText style={styles.emptyText}>No betting data available for this time period</ThemedText>
+      </View>
+    );
+  }
+  
+  /**
+   * Chart configuration
+   */
+  const chartConfig = {
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    decimalPlaces: chartType === 'profit' ? 2 : 0,
+    color: (opacity = 1) => `rgba(64, 128, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+    propsForDots: {
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#ffa726',
+    },
+  };
+  
+  /**
+   * Render chart based on type
+   */
+  // Get chart title and description
+  const getChartTitleAndDescription = () => {
+    switch (chartType) {
+      case 'profit':
+        return {
+          title: 'Profit History',
+          description: chartData.datasets[0].data[chartData.datasets[0].data.length - 1] >= 0
+            ? `Overall profit: $${chartData.datasets[0].data[chartData.datasets[0].data.length - 1].toFixed(2)}`
+            : `Overall loss: $${Math.abs(chartData.datasets[0].data[chartData.datasets[0].data.length - 1]).toFixed(2)}`
+        };
+      case 'winRate':
+        const avgWinRate = chartData.datasets[0].data.reduce((sum: number, rate: number) => sum + rate, 0) / chartData.datasets[0].data.length;
+        return {
+          title: 'Win Rate History',
+          description: `Average win rate: ${avgWinRate.toFixed(1)}%`
+        };
+      case 'betType':
+        const totalBets = chartData.reduce((sum: number, item: any) => sum + item.count, 0);
+        const topType = chartData.sort((a: any, b: any) => b.count - a.count)[0];
+        return {
+          title: 'Bet Types',
+          description: `Most common: ${topType.name} (${((topType.count / totalBets) * 100).toFixed(1)}%)`
+        };
+      case 'sport':
+        const totalSportBets = chartData.reduce((sum: number, item: any) => sum + item.count, 0);
+        const topSport = chartData.sort((a: any, b: any) => b.count - a.count)[0];
+        return {
+          title: 'Sports',
+          description: `Most bet: ${topSport.name} (${((topSport.count / totalSportBets) * 100).toFixed(1)}%)`
+        };
+      default:
+        return { title: 'Betting History', description: '' };
+    }
+  };
+  
+  const { title, description } = getChartTitleAndDescription();
+  
   return (
-    <View style={styles.container}>
-      {/* Chart type selector */}
-      <View style={styles.chartTypeSelector}>
-        <TouchableOpacity
-          style={[
-            styles.chartTypeButton,
-            activeChart === 'balance' && [
-              styles.activeChartTypeButton,
-              { borderBottomColor: colors.primary }
-            ]
-          ]}
-          onPress={() => setActiveChart('balance')}
-        >
-          <ThemedText
-            style={[
-              styles.chartTypeText,
-              activeChart === 'balance' && { color: colors.primary, fontWeight: 'bold' }
-            ]}
-          >
-            Balance
-          </ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[
-            styles.chartTypeButton,
-            activeChart === 'winRate' && [
-              styles.activeChartTypeButton,
-              { borderBottomColor: colors.primary }
-            ]
-          ]}
-          onPress={() => setActiveChart('winRate')}
-        >
-          <ThemedText
-            style={[
-              styles.chartTypeText,
-              activeChart === 'winRate' && { color: colors.primary, fontWeight: 'bold' }
-            ]}
-          >
-            Win Rate
-          </ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[
-            styles.chartTypeButton,
-            activeChart === 'roi' && [
-              styles.activeChartTypeButton,
-              { borderBottomColor: colors.primary }
-            ]
-          ]}
-          onPress={() => setActiveChart('roi')}
-        >
-          <ThemedText
-            style={[
-              styles.chartTypeText,
-              activeChart === 'roi' && { color: colors.primary, fontWeight: 'bold' }
-            ]}
-          >
-            ROI
-          </ThemedText>
-        </TouchableOpacity>
+    <ThemedView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <ThemedText style={styles.title}>{title}</ThemedText>
+        {description && (
+          <ThemedText style={styles.description}>{description}</ThemedText>
+        )}
       </View>
       
-      {/* Chart title */}
-      <ThemedText style={styles.chartTitle}>{getChartTitle()}</ThemedText>
-      
-      {/* Chart */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <LineChart
-          data={chartData}
-          width={Math.max(Dimensions.get('window').width - 32, chartData.labels.length * 60)}
-          height={220}
-          chartConfig={{
-            backgroundColor: isDark ? '#222222' : '#FFFFFF',
-            backgroundGradientFrom: isDark ? '#222222' : '#FFFFFF',
-            backgroundGradientTo: isDark ? '#222222' : '#FFFFFF',
-            decimalPlaces: activeChart === 'balance' ? 2 : 1,
-            color: (opacity = 1) => getChartColor(),
-            labelColor: (opacity = 1) => colors.text,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: getChartColor(),
-            },
-          }}
-          bezier
-          style={styles.chart}
-        />
+        {(chartType === 'profit' || chartType === 'winRate') && (
+          <LineChart
+            data={chartData}
+            width={Math.max(width, chartData.labels.length * 60)}
+            height={height}
+            chartConfig={chartConfig}
+            bezier
+            style={styles.chart}
+            yAxisSuffix={chartType === 'profit' ? '$' : '%'}
+            renderDotContent={({x, y, index}) => (
+              <View key={index} style={[styles.tooltipContainer, { top: y - 35, left: x - 40 }]}>
+                <ThemedText style={styles.tooltipText}>
+                  {chartType === 'profit'
+                    ? `$${chartData.datasets[0].data[index].toFixed(2)}`
+                    : `${chartData.datasets[0].data[index].toFixed(1)}%`
+                  }
+                </ThemedText>
+              </View>
+            )}
+          />
+        )}
+        
+        {(chartType === 'betType' || chartType === 'sport') && (
+          <PieChart
+            data={chartData}
+            width={width}
+            height={height}
+            chartConfig={chartConfig}
+            accessor="count"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+            hasLegend={true}
+            center={[width / 4, 0]}
+          />
+        )}
       </ScrollView>
-      
-      {/* Chart description */}
-      <ThemedText style={styles.chartDescription}>{getChartDescription()}</ThemedText>
-      
-      {/* Chart statistics */}
-      <View style={styles.statisticsContainer}>
-        {getChartStatistics().map((stat, index) => (
-          <View key={index} style={styles.statisticItem}>
-            <ThemedText style={styles.statisticLabel}>{stat.label}</ThemedText>
-            <ThemedText style={styles.statisticValue}>{stat.value}</ThemedText>
-          </View>
-        ))}
-      </View>
-    </View>
+    </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 16,
-    paddingHorizontal: 16,
-  },
-  chartTypeSelector: {
-    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(150, 150, 150, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  chartTypeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
+  headerContainer: {
+    marginBottom: 16,
   },
-  activeChartTypeButton: {
-    borderBottomWidth: 2,
-  },
-  chartTypeText: {
-    fontSize: 14,
-  },
-  chartTitle: {
+  title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
-  },
-  chartDescription: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 16,
-    opacity: 0.8,
-  },
-  statisticsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  statisticItem: {
-    width: '48%',
-    marginBottom: 16,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: 'rgba(150, 150, 150, 0.1)',
-  },
-  statisticLabel: {
-    fontSize: 12,
-    opacity: 0.7,
     marginBottom: 4,
   },
-  statisticValue: {
-    fontSize: 16,
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+  },
+  chart: {
+    borderRadius: 8,
+  },
+  tooltipContainer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 4,
+    padding: 4,
+    width: 80,
+    alignItems: 'center',
+    opacity: 0.9,
+    zIndex: 999,
+  },
+  tooltipText: {
+    color: '#fff',
+    fontSize: 12,
     fontWeight: 'bold',
   },
-  noDataContainer: {
-    padding: 20,
-    alignItems: 'center',
+  loadingContainer: {
+    height: 220,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  noDataText: {
-    fontSize: 16,
+  errorContainer: {
+    height: 220,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  errorText: {
+    color: '#e74c3c',
     textAlign: 'center',
-    opacity: 0.7,
+  },
+  emptyContainer: {
+    height: 220,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  emptyText: {
+    color: '#999',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

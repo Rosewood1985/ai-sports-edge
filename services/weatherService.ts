@@ -1,194 +1,330 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firestore } from '../config/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { analyticsService } from './analyticsService';
 
-// Free weather API endpoint
-const WEATHER_API_BASE_URL = 'https://api.openweathermap.org/data/2.5';
-// This would be stored in environment variables in a real app
+// Cache keys
+const WEATHER_CACHE_KEY_PREFIX = 'weather_cache_';
+const WEATHER_CACHE_EXPIRY_KEY_PREFIX = 'weather_cache_expiry_';
+const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+
+// API configuration
+// Note: In a real implementation, this would be stored in environment variables
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY || 'your_api_key_here';
+const WEATHER_API_BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 /**
- * Get current weather for a location
- * @param lat Latitude
- * @param lon Longitude
+ * Weather data interface
+ */
+export interface WeatherData {
+  temperature: number;
+  feelsLike: number;
+  humidity: number;
+  windSpeed: number;
+  windDirection: number;
+  precipitation: number;
+  condition: string;
+  conditionIcon: string;
+  location: string;
+  timestamp: Date;
+}
+
+/**
+ * Weather performance correlation interface
+ */
+export interface WeatherPerformanceCorrelation {
+  metric: string;
+  correlation: number;
+  confidence: number;
+  insight: string;
+}
+
+/**
+ * Get weather data for a specific venue
+ * @param venueId Venue ID
+ * @param forceRefresh Force refresh from API
  * @returns Weather data
  */
-export const getCurrentWeather = async (lat: number, lon: number) => {
+export const getVenueWeather = async (
+  venueId: string,
+  forceRefresh: boolean = false
+): Promise<WeatherData> => {
   try {
+    // Try to get from cache first
+    if (!forceRefresh) {
+      const cachedData = await getCachedWeather(venueId);
+      if (cachedData) {
+        return cachedData;
+      }
+    }
+    
+    // Get venue details from Firestore
+    const db = firestore;
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+    
+    const venueDoc = await getDoc(doc(db, 'venues', venueId));
+    if (!venueDoc.exists()) {
+      throw new Error(`Venue not found: ${venueId}`);
+    }
+    
+    const venueData = venueDoc.data();
+    const { latitude, longitude, name } = venueData;
+    
+    if (!latitude || !longitude) {
+      throw new Error(`Venue coordinates not available: ${venueId}`);
+    }
+    
+    // Call weather API
     const response = await axios.get(`${WEATHER_API_BASE_URL}/weather`, {
       params: {
-        lat,
-        lon,
+        lat: latitude,
+        lon: longitude,
         appid: WEATHER_API_KEY,
-        units: 'imperial' // Use imperial units for US sports
+        units: 'imperial' // Use imperial units (Fahrenheit)
       }
     });
     
-    return response.data;
+    // Parse response
+    const weatherData: WeatherData = {
+      temperature: response.data.main.temp,
+      feelsLike: response.data.main.feels_like,
+      humidity: response.data.main.humidity,
+      windSpeed: response.data.wind.speed,
+      windDirection: response.data.wind.deg,
+      precipitation: response.data.rain ? response.data.rain['1h'] || 0 : 0,
+      condition: response.data.weather[0].main,
+      conditionIcon: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
+      location: name,
+      timestamp: new Date()
+    };
+    
+    // Cache the data
+    await cacheWeatherData(venueId, weatherData);
+    
+    // Track API call in analytics
+    await analyticsService.trackEvent('weather_api_call', {
+      venueId,
+      location: name
+    });
+    
+    return weatherData;
   } catch (error) {
-    console.error('Error fetching weather data:', error);
-    return null;
+    console.error('Error getting venue weather:', error);
+    throw error;
   }
 };
 
 /**
- * Get weather forecast for a location
- * @param lat Latitude
- * @param lon Longitude
- * @returns Forecast data
+ * Get weather data for a specific game
+ * @param gameId Game ID
+ * @param forceRefresh Force refresh from API
+ * @returns Weather data
  */
-export const getWeatherForecast = async (lat: number, lon: number) => {
+export const getGameWeather = async (
+  gameId: string,
+  forceRefresh: boolean = false
+): Promise<WeatherData> => {
   try {
-    const response = await axios.get(`${WEATHER_API_BASE_URL}/forecast`, {
-      params: {
-        lat,
-        lon,
-        appid: WEATHER_API_KEY,
-        units: 'imperial'
+    // Try to get from cache first
+    if (!forceRefresh) {
+      const cachedData = await getCachedWeather(`game_${gameId}`);
+      if (cachedData) {
+        return cachedData;
       }
-    });
+    }
     
-    return response.data;
+    // Get game details from Firestore
+    const db = firestore;
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+    
+    const gameDoc = await getDoc(doc(db, 'games', gameId));
+    if (!gameDoc.exists()) {
+      throw new Error(`Game not found: ${gameId}`);
+    }
+    
+    const gameData = gameDoc.data();
+    const { venueId } = gameData;
+    
+    if (!venueId) {
+      throw new Error(`Game venue not available: ${gameId}`);
+    }
+    
+    // Get weather for the venue
+    const weatherData = await getVenueWeather(venueId, forceRefresh);
+    
+    // Cache the data for the game
+    await cacheWeatherData(`game_${gameId}`, weatherData);
+    
+    return weatherData;
   } catch (error) {
-    console.error('Error fetching weather forecast:', error);
-    return null;
+    console.error('Error getting game weather:', error);
+    throw error;
   }
 };
 
 /**
- * Get weather impact on game
- * @param gameId Game ID
- * @returns Weather impact analysis
+ * Get weather performance correlations for a player
+ * @param playerId Player ID
+ * @param weatherCondition Weather condition
+ * @returns Weather performance correlations
  */
-export const getWeatherImpact = async (gameId: string) => {
+export const getWeatherPerformanceInsights = async (
+  playerId: string,
+  weatherCondition: string
+): Promise<WeatherPerformanceCorrelation[]> => {
   try {
-    // Get game venue coordinates
-    const game = await getGameDetails(gameId);
-    if (!game || !game.venue || !game.venue.coordinates) {
-      return null;
+    // Get player performance data from Firestore
+    const db = firestore;
+    if (!db) {
+      throw new Error('Firestore not initialized');
     }
     
-    const { lat, lon } = game.venue.coordinates;
-    
-    // Get current weather
-    const weather = await getCurrentWeather(lat, lon);
-    if (!weather) {
-      return null;
+    // Get player details
+    const playerDoc = await getDoc(doc(db, 'players', playerId));
+    if (!playerDoc.exists()) {
+      throw new Error(`Player not found: ${playerId}`);
     }
     
-    // Analyze weather impact
-    return analyzeWeatherImpact(weather, game);
-  } catch (error) {
-    console.error('Error analyzing weather impact:', error);
-    return null;
-  }
-};
-
-/**
- * Analyze weather impact on game
- * @param weather Weather data
- * @param game Game data
- * @returns Weather impact analysis
- */
-const analyzeWeatherImpact = (weather: any, game: any) => {
-  // This would be a more sophisticated analysis in a real implementation
-  const { main, wind, weather: conditions } = weather;
-  const { temp, humidity } = main;
-  const { speed: windSpeed } = wind;
-  const condition = conditions[0].main;
-  
-  // Define the impact factor type
-  type ImpactFactor = {
-    factor: string;
-    value: any;
-    impact: string;
-    description: string;
-  };
-
-  // Basic impact analysis
-  const impact = {
-    overall: 'neutral' as 'neutral' | 'moderate' | 'significant',
-    factors: [] as ImpactFactor[],
-    favoredTeam: null as string | null,
-    description: ''
-  };
-  
-  // Temperature impact
-  if (temp < 40) {
-    impact.factors.push({
-      factor: 'temperature',
-      value: temp,
-      impact: 'negative',
-      description: 'Cold temperatures may affect player performance'
-    });
-  } else if (temp > 90) {
-    impact.factors.push({
-      factor: 'temperature',
-      value: temp,
-      impact: 'negative',
-      description: 'Hot temperatures may cause fatigue'
-    });
-  }
-  
-  // Wind impact
-  if (windSpeed > 15) {
-    impact.factors.push({
-      factor: 'wind',
-      value: windSpeed,
-      impact: 'negative',
-      description: 'High winds may affect passing and kicking'
-    });
-  }
-  
-  // Precipitation impact
-  if (['Rain', 'Snow', 'Thunderstorm'].includes(condition)) {
-    impact.factors.push({
-      factor: 'precipitation',
-      value: condition,
-      impact: 'negative',
-      description: `${condition} may affect ball handling and field conditions`
-    });
-  }
-  
-  // Overall impact
-  if (impact.factors.length > 0) {
-    const negativeFactors = impact.factors.filter(f => f.impact === 'negative');
-    if (negativeFactors.length > 1) {
-      impact.overall = 'significant';
-    } else {
-      impact.overall = 'moderate';
+    // Check if we have weather correlations in Firestore
+    const correlationsDoc = await getDoc(doc(db, 'weatherCorrelations', playerId));
+    
+    if (correlationsDoc.exists()) {
+      const correlationsData = correlationsDoc.data();
+      
+      // If we have correlations for the specific weather condition
+      if (correlationsData[weatherCondition]) {
+        return correlationsData[weatherCondition];
+      }
     }
     
-    // Generate description
-    impact.description = `Weather conditions may ${impact.overall === 'significant' ? 'significantly' : 'moderately'} impact this game.`;
-  } else {
-    impact.description = 'Weather conditions are not expected to significantly impact this game.';
-  }
-  
-  return impact;
-};
-
-/**
- * Get game details
- * @param gameId Game ID
- * @returns Game details
- */
-const getGameDetails = async (gameId: string) => {
-  // This would fetch game details from your game service
-  // For now, we'll return mock data
-  return {
-    id: gameId,
-    venue: {
-      name: 'Mock Stadium',
-      coordinates: {
-        lat: 40.7128,
-        lon: -74.0060
+    // If no correlations found, generate some mock insights
+    // In a real implementation, this would use historical data and ML algorithms
+    const mockCorrelations: WeatherPerformanceCorrelation[] = [
+      {
+        metric: 'Points',
+        correlation: weatherCondition === 'Rain' ? -0.15 : 0.05,
+        confidence: 0.7,
+        insight: weatherCondition === 'Rain' 
+          ? 'Player tends to score fewer points in rainy conditions'
+          : 'Weather has minimal impact on scoring'
       },
-      isIndoor: false
+      {
+        metric: 'Field Goal %',
+        correlation: weatherCondition === 'Rain' ? -0.22 : 0.02,
+        confidence: 0.8,
+        insight: weatherCondition === 'Rain'
+          ? 'Shooting percentage decreases significantly in rainy conditions'
+          : 'Weather has minimal impact on shooting accuracy'
+      },
+      {
+        metric: 'Assists',
+        correlation: 0.03,
+        confidence: 0.5,
+        insight: 'Weather conditions show no significant impact on assist numbers'
+      }
+    ];
+    
+    // Store the mock correlations in Firestore for future use
+    if (db) {
+      await setDoc(doc(db, 'weatherCorrelations', playerId), {
+        [weatherCondition]: mockCorrelations,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
     }
-  };
+    
+    // Track analytics event
+    await analyticsService.trackEvent('weather_correlation_generated', {
+      playerId,
+      weatherCondition
+    });
+    
+    return mockCorrelations;
+  } catch (error) {
+    console.error('Error getting weather performance insights:', error);
+    return [];
+  }
+};
+
+/**
+ * Cache weather data
+ * @param key Cache key
+ * @param data Weather data
+ */
+const cacheWeatherData = async (key: string, data: WeatherData): Promise<void> => {
+  try {
+    const cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${key}`;
+    const expiryKey = `${WEATHER_CACHE_EXPIRY_KEY_PREFIX}${key}`;
+    const expiryTime = Date.now() + CACHE_DURATION_MS;
+    
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
+    await AsyncStorage.setItem(expiryKey, expiryTime.toString());
+  } catch (error) {
+    console.error('Error caching weather data:', error);
+  }
+};
+
+/**
+ * Get cached weather data
+ * @param key Cache key
+ * @returns Cached weather data or null if not found or expired
+ */
+const getCachedWeather = async (key: string): Promise<WeatherData | null> => {
+  try {
+    const cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${key}`;
+    const expiryKey = `${WEATHER_CACHE_EXPIRY_KEY_PREFIX}${key}`;
+    
+    const expiryTimeStr = await AsyncStorage.getItem(expiryKey);
+    if (!expiryTimeStr) {
+      return null;
+    }
+    
+    const expiryTime = parseInt(expiryTimeStr, 10);
+    if (Date.now() > expiryTime) {
+      // Cache expired
+      await AsyncStorage.removeItem(cacheKey);
+      await AsyncStorage.removeItem(expiryKey);
+      return null;
+    }
+    
+    const cachedDataStr = await AsyncStorage.getItem(cacheKey);
+    if (!cachedDataStr) {
+      return null;
+    }
+    
+    return JSON.parse(cachedDataStr) as WeatherData;
+  } catch (error) {
+    console.error('Error getting cached weather data:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear weather cache
+ */
+export const clearWeatherCache = async (): Promise<void> => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const weatherKeys = keys.filter(key => 
+      key.startsWith(WEATHER_CACHE_KEY_PREFIX) || 
+      key.startsWith(WEATHER_CACHE_EXPIRY_KEY_PREFIX)
+    );
+    
+    if (weatherKeys.length > 0) {
+      await AsyncStorage.multiRemove(weatherKeys);
+    }
+  } catch (error) {
+    console.error('Error clearing weather cache:', error);
+  }
 };
 
 export default {
-  getCurrentWeather,
-  getWeatherForecast,
-  getWeatherImpact
+  getVenueWeather,
+  getGameWeather,
+  getWeatherPerformanceInsights,
+  clearWeatherCache
 };

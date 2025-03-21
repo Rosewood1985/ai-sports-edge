@@ -7,7 +7,7 @@
 import { STRIPE_PUBLISHABLE_KEY as ENV_STRIPE_KEY } from '@env';
 
 // Stripe publishable key - loaded from environment variables
-export const STRIPE_PUBLISHABLE_KEY = ENV_STRIPE_KEY || 'pk_test_placeholder_key';
+export const STRIPE_PUBLISHABLE_KEY = ENV_STRIPE_KEY || 'pk_live_51R3nPsEQcCDah3pyvQ59Ju2bGs5YZKys6OGhJfIL8RhsfHawGDfeSLxLAmouy50UPEvzT5J5klnIzsl5BWxiHgEW00oSQeW9xi';
 
 // Stripe price IDs for subscription plans
 export const STRIPE_PRICE_IDS = {

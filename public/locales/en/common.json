@@ -1,0 +1,41 @@
+{
+  "buttons": {
+    "downloadApp": "Download App",
+    "learnMore": "Learn More",
+    "login": "Login",
+    "signup": "Sign Up",
+    "betNow": "Bet Now",
+    "getStarted": "Get Started"
+  },
+  "navigation": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "about": "About",
+    "download": "Download",
+    "odds": "Odds",
+    "predictions": "Predictions",
+    "login": "Login"
+  },
+  "footer": {
+    "copyright": "© 2025 AI Sports Edge. All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordLength": "Password must be at least 8 characters",
+    "passwordMatch": "Passwords do not match",
+    "loginFailed": "Login failed. Please check your credentials."
+  },
+  "languageSwitcher": {
+    "switchToSpanish": "Español",
+    "switchToEnglish": "English"
+  },
+  "notifications": {
+    "enableMessage": "Enable notifications to get updates on your favorite teams and games",
+    "enableButton": "Enable Notifications"
+  }
+}

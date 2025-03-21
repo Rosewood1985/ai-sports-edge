@@ -68,6 +68,31 @@ const NOTIFICATION_TEMPLATES = {
     message: 'Betting opportunity for {team} in your area',
     titleWithFavorite: '{team} Betting Opportunity Near You',
     messageWithOdds: 'Local betting opportunity: {team} at odds {odds}'
+  },
+  // Referral Program Notifications
+  newReferral: {
+    title: 'New Referral',
+    message: 'Someone has used your referral code!',
+    titleWithName: 'New Referral: {referredName}',
+    messageWithDetails: '{referredName} has used your referral code! You\'ll receive your reward when they subscribe.'
+  },
+  referralReward: {
+    title: 'Referral Reward',
+    message: 'Your referral has subscribed! You\'ve earned rewards.',
+    titleWithName: 'Reward from {referredName}',
+    messageWithDetails: 'Your referral {referredName} has subscribed! You\'ve earned {rewardPoints} loyalty points and a {rewardDuration}-day subscription extension.'
+  },
+  milestoneReached: {
+    title: 'Referral Milestone Reached',
+    message: 'Congratulations! You\'ve reached a referral milestone.',
+    titleWithCount: '{count} Referrals Milestone',
+    messageWithReward: 'Congratulations! You\'ve reached {count} referrals and earned: {rewardDescription}'
+  },
+  leaderboardRankChange: {
+    title: 'Leaderboard Update',
+    message: 'Your position on the referral leaderboard has changed.',
+    titleWithRank: 'New Rank: #{newRank}',
+    messageWithDetails: 'You\'ve moved from #{oldRank} to #{newRank} on the {period} leaderboard!'
   }
 };
 

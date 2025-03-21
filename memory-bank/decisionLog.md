@@ -54,20 +54,49 @@
 - **Reasoning**: Mocking file system operations provides a consistent testing environment and allows tests to run without depending on the actual file contents.
 - **Implications**: Tests may not catch issues if the mock content doesn't accurately reflect the actual file content. The mocks will need to be updated if the file content changes significantly.
 
-## Pre-Deployment Completion Plan
+## Pre-Deployment Documentation and Implementation
 
 ### March 21, 2025
 
-#### Decision: Prioritize Subscription Features for Implementation
-- **Decision**: Prioritize the implementation of subscription bundles and usage-based billing before other features.
-- **Context**: The subscription model is a core part of the business model and revenue generation.
+#### Decision: Create Comprehensive Pre-Deployment Documentation
+- **Decision**: Create a set of detailed documentation files to guide the pre-deployment process.
+- **Context**: The project is approaching deployment and needs clear documentation of what has been completed and what remains to be done.
 - **Alternatives Considered**:
-  1. Prioritize enhanced player statistics
-  2. Prioritize geolocation features
-  3. Prioritize betting analytics
-  4. Prioritize subscription features
-- **Reasoning**: Subscription features directly impact revenue and user conversion, making them the highest priority for implementation.
-- **Implications**: This prioritization will delay the implementation of other features, but will ensure that the core revenue-generating features are in place for launch.
+  1. Create a single comprehensive document
+  2. Create multiple focused documents for different aspects
+  3. Use a project management tool instead of documentation
+- **Reasoning**: Multiple focused documents provide better organization and make it easier to track specific aspects of the pre-deployment process.
+- **Implications**: This approach requires maintaining multiple documents but provides clearer guidance for different teams and stakeholders.
+
+#### Decision: Implement Enhanced Caching System
+- **Decision**: Create a dedicated caching service with memory and persistent storage capabilities.
+- **Context**: Multiple services need efficient caching to reduce API calls and improve performance.
+- **Alternatives Considered**:
+  1. Implement caching within each service
+  2. Use a third-party caching library
+  3. Create a custom caching service
+- **Reasoning**: A dedicated caching service provides a consistent approach across the application and avoids duplication of caching logic.
+- **Implications**: This approach requires additional implementation work but provides significant benefits in terms of performance and code organization.
+
+#### Decision: Implement Advanced Data Visualization Components
+- **Decision**: Create specialized chart components for different types of data visualization.
+- **Context**: Users need to visualize complex betting data in meaningful ways to gain insights.
+- **Alternatives Considered**:
+  1. Use basic chart components only
+  2. Use a third-party visualization library
+  3. Create custom visualization components
+- **Reasoning**: Custom visualization components provide the best user experience and allow for specialized visualizations tailored to betting analytics.
+- **Implications**: This approach requires more development effort but results in a better user experience and more powerful analytics capabilities.
+
+#### Decision: Revise Deployment Timeline to Four Weeks
+- **Decision**: Extend the deployment timeline from two weeks to four weeks to accommodate additional features.
+- **Context**: After comprehensive analysis, it became clear that the remaining features require more time than initially estimated.
+- **Alternatives Considered**:
+  1. Maintain the original two-week timeline and cut features
+  2. Extend the timeline to four weeks to include all planned features
+  3. Implement a phased release with core features first
+- **Reasoning**: A four-week timeline allows for proper implementation of all planned features without compromising quality.
+- **Implications**: This approach delays the launch but ensures a more complete and polished product at release.
 
 #### Decision: Implement Usage-Based Billing with Stripe Metered Subscriptions
 - **Decision**: Use Stripe's metered subscriptions feature for implementing usage-based billing.
@@ -160,3 +189,171 @@
   3. Full ownership transfer including billing responsibilities
 - **Reasoning**: Full ownership transfer provides the most flexibility and addresses real-world scenarios where billing responsibility needs to change.
 - **Implications**: This approach requires careful handling of Stripe customer and subscription updates, but provides a seamless experience for users.
+
+### March 21, 2025 - Accessibility Implementation
+
+#### Decision: Create a Dedicated Accessibility Service
+- **Decision**: Implement a dedicated accessibility service to manage accessibility preferences and features.
+- **Context**: Accessibility features need to be consistently applied across the app and respect both system and user preferences.
+- **Alternatives Considered**:
+  1. Implement accessibility features directly in components
+  2. Use a third-party accessibility library
+  3. Create a custom accessibility service
+- **Reasoning**: A dedicated service provides centralized management of accessibility preferences, consistent application of features, and better integration with system settings.
+- **Implications**: This approach requires additional implementation work but provides significant benefits in terms of maintainability and user experience.
+
+#### Decision: Implement Accessible Component Wrappers
+- **Decision**: Create accessible component wrappers (AccessibleView, AccessibleText) rather than modifying existing components.
+- **Context**: Many components need accessibility enhancements, but modifying each one individually would be time-consuming and error-prone.
+- **Alternatives Considered**:
+  1. Modify existing components directly
+  2. Create higher-order components for accessibility
+  3. Create wrapper components
+- **Reasoning**: Wrapper components provide a clean, reusable approach that can be applied consistently across the app without modifying existing components.
+- **Implications**: This approach may add some additional components to the component tree but provides better separation of concerns and easier maintenance.
+
+#### Decision: Implement Comprehensive Accessibility Audit Tool
+- **Decision**: Create a custom accessibility audit tool rather than relying solely on manual testing.
+- **Context**: Ensuring WCAG compliance requires thorough testing of many aspects of the app.
+- **Alternatives Considered**:
+  1. Manual testing only
+  2. Third-party accessibility testing tools
+  3. Custom audit tool
+- **Reasoning**: A custom audit tool can be tailored to our specific app structure and requirements, providing more relevant and actionable results.
+- **Implications**: This approach requires more upfront development effort but will save time in the long run by automating accessibility testing.
+
+#### Decision: Create Separate User-Facing Accessibility Documentation
+- **Decision**: Create separate accessibility documentation for end users, distinct from developer documentation.
+- **Context**: Both developers and end users need guidance on accessibility features, but their needs are different.
+- **Alternatives Considered**:
+  1. Combined documentation for all audiences
+  2. No user-facing documentation
+  3. Separate documentation for different audiences
+- **Reasoning**: Separate documentation allows us to provide appropriate information to each audience, with technical details for developers and usage guidance for end users.
+- **Implications**: This approach requires maintaining multiple documents but provides clearer guidance for different audiences.
+
+### March 21, 2025 - Push Notification System Implementation
+
+#### Decision: Use OneSignal for Cross-Platform Push Notifications
+- **Decision**: Implement push notifications using OneSignal rather than platform-specific solutions.
+- **Context**: The app needs to send push notifications to both iOS and web platforms.
+- **Alternatives Considered**:
+  1. Use Firebase Cloud Messaging (FCM)
+  2. Use platform-specific solutions (APNs for iOS, Web Push API for web)
+  3. Use OneSignal as a unified solution
+- **Reasoning**: OneSignal provides a unified API for all platforms, simplifies implementation, and offers advanced features like segmentation and analytics.
+- **Implications**: This approach adds a third-party dependency but significantly reduces development time and complexity.
+
+#### Decision: Implement Cloud Functions for Scheduled Notifications
+- **Decision**: Use Firebase Cloud Functions to process and send scheduled notifications.
+- **Context**: The app needs to send notifications at specific times, even when the app is not running.
+- **Alternatives Considered**:
+  1. Use a cron job on a server
+  2. Use Firebase Cloud Functions
+  3. Use a third-party scheduling service
+- **Reasoning**: Firebase Cloud Functions integrate well with our existing Firebase infrastructure and provide reliable, scalable execution of scheduled tasks.
+- **Implications**: This approach leverages our existing Firebase setup but requires implementing and maintaining Cloud Functions.
+
+#### Decision: Store Notification Preferences in Firestore
+- **Decision**: Store user notification preferences in Firestore rather than local storage.
+- **Context**: User notification preferences need to be consistent across devices and persisted between app installations.
+- **Alternatives Considered**:
+  1. Store preferences in local storage only
+  2. Store preferences in OneSignal tags
+  3. Store preferences in Firestore
+- **Reasoning**: Firestore provides reliable, synchronized storage that works across devices and persists between app installations.
+- **Implications**: This approach requires additional Firestore reads/writes but provides better user experience and data consistency.
+
+#### Decision: Create a Dedicated Notification Settings Screen
+- **Decision**: Implement a dedicated screen for notification settings rather than including them in a general settings screen.
+- **Context**: Users need fine-grained control over which notifications they receive.
+- **Alternatives Considered**:
+  1. Include notification settings in a general settings screen
+  2. Use a modal dialog for notification settings
+  3. Create a dedicated notification settings screen
+- **Reasoning**: A dedicated screen provides more space for detailed settings and better organization of notification preferences.
+- **Implications**: This approach adds another screen to the app but provides a better user experience for managing notifications.
+
+### March 21, 2025 - Deep Linking System Implementation
+
+#### Decision: Support Both Custom URL Scheme and Universal Links
+- **Decision**: Implement both custom URL scheme (aisportsedge://) and universal links (https://aisportsedge.app) for deep linking.
+- **Context**: The app needs to support deep linking from various sources, including emails, social media, and other apps.
+- **Alternatives Considered**:
+  1. Use custom URL scheme only
+  2. Use universal links only
+  3. Support both approaches
+- **Reasoning**: Supporting both approaches provides maximum compatibility across platforms and use cases, with universal links offering better security and user experience on iOS.
+- **Implications**: This approach requires more implementation work but provides better user experience and broader compatibility.
+
+#### Decision: Implement UTM Parameter Tracking
+- **Decision**: Add support for UTM parameters in deep links for marketing campaign tracking.
+- **Context**: Marketing campaigns need to track the effectiveness of different channels and campaigns.
+- **Alternatives Considered**:
+  1. No campaign tracking
+  2. Custom parameter tracking
+  3. Standard UTM parameter tracking
+- **Reasoning**: UTM parameters are an industry standard for campaign tracking and are widely supported by analytics tools.
+- **Implications**: This approach integrates well with analytics tools but requires implementing UTM parameter parsing and tracking.
+
+#### Decision: Create a Centralized Deep Link Handler
+- **Decision**: Implement a centralized deep link handler component rather than handling deep links in individual screens.
+- **Context**: Deep links can target various screens in the app and need consistent handling.
+- **Alternatives Considered**:
+  1. Handle deep links in individual screens
+  2. Use a navigation service for deep links
+  3. Create a centralized handler component
+- **Reasoning**: A centralized handler provides consistent processing of deep links, simplifies navigation logic, and makes it easier to track and debug deep link handling.
+- **Implications**: This approach adds a component to the app but provides better organization and maintainability of deep link handling.
+
+#### Decision: Store Deep Link History in Firestore
+- **Decision**: Store deep link history in Firestore for analytics and debugging purposes.
+- **Context**: Understanding how users interact with deep links is important for optimizing marketing and user experience.
+- **Alternatives Considered**:
+  1. No history tracking
+  2. Track history in analytics only
+  3. Store history in Firestore
+- **Reasoning**: Storing history in Firestore provides detailed data for analysis and debugging, beyond what is typically available in analytics tools.
+- **Implications**: This approach adds Firestore reads/writes but provides valuable data for improving the app.
+
+### March 21, 2025 - Offline Mode Implementation
+
+#### Decision: Implement a Dedicated Offline Service
+- **Decision**: Create a dedicated offline service to manage offline functionality rather than implementing it in individual services.
+- **Context**: Multiple features need offline support, including data caching, offline operations, and network status monitoring.
+- **Alternatives Considered**:
+  1. Implement offline functionality in each service
+  2. Use a third-party offline library
+  3. Create a custom offline service
+- **Reasoning**: A dedicated service provides centralized management of offline functionality, consistent behavior across the app, and better code organization.
+- **Implications**: This approach requires additional implementation work but provides significant benefits in terms of maintainability and user experience.
+
+#### Decision: Use AsyncStorage for Offline Data Caching
+- **Decision**: Use AsyncStorage for caching data for offline access.
+- **Context**: The app needs to store data locally for offline access.
+- **Alternatives Considered**:
+  1. Use SQLite for structured storage
+  2. Use Redux persistence
+  3. Use AsyncStorage for simple key-value storage
+- **Reasoning**: AsyncStorage provides a simple, reliable solution for caching data that works well for our needs without adding complexity.
+- **Implications**: This approach is simpler to implement but may not scale as well for very large datasets compared to SQLite.
+
+#### Decision: Implement a Sync Queue for Offline Operations
+- **Decision**: Create a sync queue for storing operations performed while offline.
+- **Context**: Users need to be able to perform operations while offline, which need to be synchronized when back online.
+- **Alternatives Considered**:
+  1. Disable operations while offline
+  2. Use a third-party sync solution
+  3. Implement a custom sync queue
+- **Reasoning**: A custom sync queue provides the most flexibility and control over how operations are stored and synchronized.
+- **Implications**: This approach requires implementing and maintaining a sync system but provides better offline functionality.
+
+#### Decision: Create User-Configurable Offline Settings
+- **Decision**: Implement a settings screen for users to configure offline mode behavior.
+- **Context**: Different users have different needs and preferences for offline functionality.
+- **Alternatives Considered**:
+  1. Use fixed offline behavior
+  2. Automatically adjust based on usage patterns
+  3. Provide user-configurable settings
+- **Reasoning**: User-configurable settings provide the most flexibility and allow users to optimize offline behavior for their specific needs.
+- **Implications**: This approach adds complexity to the UI but provides better user experience and control.

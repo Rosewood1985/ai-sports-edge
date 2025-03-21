@@ -22,6 +22,8 @@ import axios from 'axios';
 import { analyticsService } from '../services/analyticsService';
 import { gameUrlService, BettingSite } from '../services/gameUrlService';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
+import { fanduelCookieService } from '../services/fanduelCookieService';
+import { microtransactionService } from '../services/microtransactionService';
 import { FANDUEL_CONFIG, STRIPE_CONFIG, API_CONFIG } from '../config/affiliateConfig';
 import { useThemeColor } from '../hooks/useThemeColor';
 import Colors from '../constants/Colors';
@@ -106,6 +108,18 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         timestamp: Date.now(),
       });
       
+      // Track microtransaction interaction
+      const opportunityData = {
+        type: 'odds_access',
+        gameId: game.id,
+        price: STRIPE_CONFIG.PRICING.ODDS_ACCESS,
+        title: 'Get Odds',
+        description: `Odds for ${game.homeTeam} vs ${game.awayTeam}`,
+        cookieEnabled: true,
+      };
+      
+      microtransactionService.trackInteraction('click', opportunityData, { id: userId });
+      
       // Create payment intent on server
       const { data } = await axios.post(API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.CREATE_PAYMENT, {
         userId,
@@ -140,6 +154,9 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           timestamp: Date.now(),
         });
         
+        // Track microtransaction cancellation
+        microtransactionService.trackInteraction('cancel', opportunityData, { id: userId });
+        
         // Only show alert if not cancelled by user
         if (error.code !== 'Canceled') {
           Alert.alert('Payment Failed', error.message);
@@ -152,6 +169,16 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           price: STRIPE_CONFIG.PRICING.ODDS_ACCESS,
           timestamp: Date.now(),
         });
+        
+        // Track microtransaction purchase
+        microtransactionService.trackInteraction('purchase', opportunityData, { id: userId });
+        
+        // Initialize cookies for FanDuel
+        await fanduelCookieService.initializeCookies(
+          userId,
+          game.id,
+          game.homeTeam
+        );
         
         // Update state immediately without showing alert
         console.log('Payment successful, updating button state');
@@ -233,28 +260,73 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         }
       }
       
-      // Generate affiliate link
-      const affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
-        baseUrl,
+      // Track FanDuel interaction
+      await fanduelCookieService.trackInteraction('redirect_initiated', {
+        gameId: game.id,
+        teamId: game.homeTeam,
         affiliateId,
-        undefined, // No team ID needed as we're using game-specific URL
-        userId,
-        game.id
-      );
+      });
+      
+      // Generate URL with cookies
+      let affiliateUrl;
+      
+      // Check if we have cookie data
+      const cookieData = await fanduelCookieService.getCookieData();
+      if (cookieData) {
+        // Generate URL with cookies
+        affiliateUrl = await fanduelCookieService.generateUrlWithCookies(baseUrl);
+      } else {
+        // Initialize cookies first
+        await fanduelCookieService.initializeCookies(userId, game.id, game.homeTeam);
+        
+        // Then generate affiliate link
+        affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
+          baseUrl,
+          affiliateId,
+          undefined, // No team ID needed as we're using game-specific URL
+          userId,
+          game.id
+        );
+      }
       
       // Track conversion
       bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
+      
+      // Track microtransaction conversion
+      microtransactionService.trackInteraction('conversion', {
+        type: 'odds_access',
+        gameId: game.id,
+        cookieEnabled: true,
+      }, { id: userId });
       
       // Open URL
       const supported = await Linking.canOpenURL(affiliateUrl);
       if (supported) {
         await Linking.openURL(affiliateUrl);
+        
+        // Track successful redirect
+        await fanduelCookieService.trackInteraction('redirect_success', {
+          gameId: game.id,
+          url: affiliateUrl,
+        });
       } else {
         Alert.alert('Error', 'Unable to open FanDuel. Please try again.');
+        
+        // Track failed redirect
+        await fanduelCookieService.trackInteraction('redirect_failed', {
+          gameId: game.id,
+          error: 'URL not supported',
+        });
       }
     } catch (error) {
       console.error('Error redirecting to FanDuel:', error);
       Alert.alert('Error', 'Unable to open FanDuel. Please try again.');
+      
+      // Track error
+      await fanduelCookieService.trackInteraction('redirect_error', {
+        gameId: game.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     } finally {
       setIsLoading(false);
     }

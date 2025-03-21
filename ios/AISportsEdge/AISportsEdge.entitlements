@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:aisportsedge.app</string>
+		<string>applinks:www.aisportsedge.app</string>
+		<string>applinks:aisportsedge.com</string>
+		<string>applinks:www.aisportsedge.com</string>
+		<string>applinks:links.aisportsedge.app</string>
+		<string>applinks:app.aisportsedge.app</string>
+	</array>
+</dict>
+</plist>

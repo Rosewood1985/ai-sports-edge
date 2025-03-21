@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { geoipService } from '../utils/geoip/geoipService';
 
 const IPGEOLOCATION_API_KEY = process.env.REACT_APP_IPGEOLOCATION_API_KEY;
 const IPGEOLOCATION_API_URL = 'https://api.ipgeolocation.io/ipgeo';
@@ -8,17 +9,47 @@ const IPGEOLOCATION_API_URL = 'https://api.ipgeolocation.io/ipgeo';
  */
 class GeolocationService {
   /**
+   * Get the client's IP address
+   * @returns {Promise<string>} Client IP address
+   */
+  async getClientIP() {
+    try {
+      // Try to get the IP from ipify.org
+      const response = await axios.get('https://api.ipify.org?format=json');
+      
+      if (response.status === 200 && response.data && response.data.ip) {
+        return response.data.ip;
+      }
+      
+      // Fallback to another service if ipify.org fails
+      const fallbackResponse = await axios.get('https://api64.ipify.org?format=json');
+      
+      if (fallbackResponse.status === 200 && fallbackResponse.data && fallbackResponse.data.ip) {
+        return fallbackResponse.data.ip;
+      }
+      
+      // If all else fails, return a default IP for testing
+      console.warn('Could not determine client IP, using default IP for testing');
+      return '8.8.8.8'; // Google DNS IP for testing
+    } catch (error) {
+      console.error('Error getting client IP:', error);
+      return '8.8.8.8'; // Google DNS IP for testing
+    }
+  }
+  /**
    * Get user location based on IP address
+   * @param {boolean} useGPS - Whether to attempt to use device GPS (not implemented yet)
+   * @param {boolean} forceIPLookup - Whether to force IP-based lookup even if cached data exists
    * @returns {Promise<Object>} User location data
    */
-  async getUserLocation() {
+  async getUserLocation(useGPS = false, forceIPLookup = false) {
     try {
       // Check if we have cached location data
       const cachedLocation = localStorage.getItem('userLocation');
       const cachedTimestamp = localStorage.getItem('userLocationTimestamp');
       
-      // If we have cached data and it's less than 24 hours old, use it
-      if (cachedLocation && cachedTimestamp) {
+      // If we have cached data and it's less than 24 hours old, use it (unless forceIPLookup is true)
+      if (!forceIPLookup && cachedLocation && cachedTimestamp) {
         const now = Date.now();
         const timestamp = parseInt(cachedTimestamp, 10);
         
@@ -27,7 +58,87 @@ class GeolocationService {
         }
       }
       
-      // Otherwise, fetch new location data
+      // Try to use GPS-based location if useGPS is true
+      if (useGPS) {
+        try {
+          // Import Expo Location dynamically to avoid issues in environments where it's not available
+          const Location = await import('expo-location');
+          
+          // Request permission to access the device's location
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          
+          if (status === 'granted') {
+            // Get the current position
+            const location = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced
+            });
+            
+            // Get the address from the coordinates
+            const [address] = await Location.reverseGeocodeAsync({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude
+            });
+            
+            if (address) {
+              const locationData = {
+                city: address.city || 'Unknown',
+                state: address.region || address.subregion || 'Unknown',
+                country: address.country || 'Unknown',
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                accuracy: location.coords.accuracy,
+                source: 'gps'
+              };
+              
+              // Cache the location data
+              localStorage.setItem('userLocation', JSON.stringify(locationData));
+              localStorage.setItem('userLocationTimestamp', Date.now().toString());
+              
+              return locationData;
+            }
+          } else {
+            console.warn('Location permission not granted, falling back to IP-based geolocation');
+          }
+        } catch (gpsError) {
+          console.warn('Error getting GPS location, falling back to IP-based geolocation:', gpsError);
+        }
+      }
+      
+      // If GPS failed or is not enabled, try to use the GeoIP service (MaxMind database)
+      try {
+        // Get the client's IP address
+        const clientIP = await this.getClientIP();
+        
+        // Initialize the GeoIP service if not already initialized
+        if (!geoipService.isInitialized()) {
+          await geoipService.initialize();
+        }
+        
+        // Get location data from the GeoIP service
+        const geoIPLocation = await geoipService.getLocationFromIP(clientIP);
+        
+        if (geoIPLocation) {
+          const locationData = {
+            city: geoIPLocation.city,
+            state: geoIPLocation.state,
+            country: geoIPLocation.country,
+            latitude: geoIPLocation.latitude,
+            longitude: geoIPLocation.longitude,
+            timezone: geoIPLocation.timezone
+          };
+          
+          // Cache the location data
+          localStorage.setItem('userLocation', JSON.stringify(locationData));
+          localStorage.setItem('userLocationTimestamp', Date.now().toString());
+          
+          return locationData;
+        }
+      } catch (geoIPError) {
+        console.warn('GeoIP service failed, falling back to IPGeolocation API:', geoIPError);
+      }
+      
+      // If GeoIP service fails, fall back to IPGeolocation API
       const response = await axios.get(IPGEOLOCATION_API_URL, {
         params: {
           apiKey: IPGEOLOCATION_API_KEY
@@ -291,6 +402,19 @@ class GeolocationService {
    */
   deg2rad(deg) {
     return deg * (Math.PI / 180);
+  }
+
+  /**
+   * Clear cached location data
+   */
+  clearCache() {
+    try {
+      localStorage.removeItem('userLocation');
+      localStorage.removeItem('userLocationTimestamp');
+      console.log('Geolocation cache cleared');
+    } catch (error) {
+      console.error('Error clearing geolocation cache:', error);
+    }
   }
 }
 

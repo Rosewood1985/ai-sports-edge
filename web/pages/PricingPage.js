@@ -1,17 +1,34 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import '../styles/pricing.css';
 import BetNowButton from '../components/BetNowButton';
 import { useBettingAffiliate } from '../../contexts/BettingAffiliateContext';
+import { SUBSCRIPTION_PLANS, getMonthlyPlans, getYearlyPlans, getGroupPlan } from '../services/subscriptionService';
 
 const PricingPage = () => {
   const { showBetButton } = useBettingAffiliate();
   const location = useLocation();
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  const [annualPlan, setAnnualPlan] = useState(null);
+  const [groupPlan, setGroupPlan] = useState(null);
   
-  // Clean up any pricing-related elements when navigating away
   useEffect(() => {
-    // This effect runs when the component mounts
+    // Get monthly plans (excluding group plan)
+    const monthlyPlans = getMonthlyPlans().filter(plan => plan.id !== 'group-pro-monthly');
+    setSubscriptionPlans(monthlyPlans);
+    
+    // Get annual plan
+    const yearlyPlans = getYearlyPlans();
+    if (yearlyPlans.length > 0) {
+      setAnnualPlan(yearlyPlans[0]);
+    }
+    
+    // Get group plan
+    const group = getGroupPlan();
+    if (group) {
+      setGroupPlan(group);
+    }
     
     // Return a cleanup function that runs when the component unmounts
     return () => {
@@ -32,6 +49,7 @@ const PricingPage = () => {
       window.pricingTimeouts = [];
     };
   }, [location]);
+
   return (
     <>
       <Helmet>
@@ -53,118 +71,102 @@ const PricingPage = () => {
       <section className="pricing-plans">
         <div className="container">
           <div className="plans-grid">
-            <div className="plan-card">
-              <div className="plan-header">
-                <h2 className="plan-name">Free</h2>
-                <p className="plan-price">$0<span>/month</span></p>
+            {subscriptionPlans.map((plan, index) => (
+              <div 
+                key={plan.id} 
+                className={`plan-card ${plan.popular ? 'popular' : ''}`}
+              >
+                {plan.popular && <div className="popular-badge">Most Popular</div>}
+                <div className="plan-header">
+                  <h2 className="plan-name">{plan.name}</h2>
+                  <p className="plan-price">
+                    ${plan.price}<span>/{plan.interval}</span>
+                  </p>
+                </div>
+                <div className="plan-description">
+                  <p>{plan.description}</p>
+                </div>
+                <div className="plan-features">
+                  <ul>
+                    {plan.features.map((feature, i) => (
+                      <li key={i}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="plan-cta">
+                  <Link 
+                    to="/download" 
+                    className={`button ${plan.popular ? 'primary-button' : 'secondary-button'}`}
+                  >
+                    Get Started
+                  </Link>
+                  {showBetButton('pricing') && (
+                    <div className="plan-bet-button">
+                      <BetNowButton
+                        size="medium"
+                        position="inline"
+                        contentType="pricing"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="plan-features">
-                <ul>
-                  <li>Basic AI predictions</li>
-                  <li>Limited sports coverage</li>
-                  <li>Daily free pick</li>
-                  <li>Community access</li>
-                  <li>Basic stats and odds</li>
-                </ul>
-              </div>
-              <div className="plan-cta">
-                <Link to="/download" className="button secondary-button">Get Started</Link>
-                {showBetButton('pricing') && (
-                  <div className="plan-bet-button">
-                    <BetNowButton
-                      size="medium"
-                      position="inline"
-                      contentType="pricing"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="plan-card popular">
-              <div className="popular-badge">Most Popular</div>
-              <div className="plan-header">
-                <h2 className="plan-name">Pro</h2>
-                <p className="plan-price">$19.99<span>/month</span></p>
-              </div>
-              <div className="plan-features">
-                <ul>
-                  <li>Advanced AI predictions</li>
-                  <li>All major sports coverage</li>
-                  <li>Unlimited daily picks</li>
-                  <li>Community access</li>
-                  <li>Real-time analytics</li>
-                  <li>Bankroll management tools</li>
-                  <li>Betting history tracking</li>
-                </ul>
-              </div>
-              <div className="plan-cta">
-                <Link to="/download" className="button primary-button">Get Started</Link>
-                {showBetButton('pricing') && (
-                  <div className="plan-bet-button">
-                    <BetNowButton
-                      size="medium"
-                      position="inline"
-                      contentType="pricing"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="plan-card">
-              <div className="plan-header">
-                <h2 className="plan-name">Elite</h2>
-                <p className="plan-price">$39.99<span>/month</span></p>
-              </div>
-              <div className="plan-features">
-                <ul>
-                  <li>Premium AI predictions</li>
-                  <li>All sports coverage (including niche)</li>
-                  <li>Unlimited daily picks</li>
-                  <li>VIP community access</li>
-                  <li>Advanced real-time analytics</li>
-                  <li>Advanced bankroll management</li>
-                  <li>Betting history tracking</li>
-                  <li>Personalized betting strategy</li>
-                  <li>Priority customer support</li>
-                </ul>
-              </div>
-              <div className="plan-cta">
-                <Link to="/download" className="button secondary-button">Get Started</Link>
-                {showBetButton('pricing') && (
-                  <div className="plan-bet-button">
-                    <BetNowButton
-                      size="medium"
-                      position="inline"
-                      contentType="pricing"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
       
-      <section className="annual-discount" id="annual-discount-section">
-        <div className="container">
-          <div className="discount-content">
-            <h2>Save 20% with Annual Plans</h2>
-            <p>Get two months free when you subscribe to an annual plan.</p>
-            <div className="discount-buttons">
-              <Link to="/download" className="button primary-button">View Annual Plans</Link>
-              {showBetButton('pricing') && (
-                <BetNowButton
-                  size="large"
-                  position="inline"
-                  contentType="pricing"
-                />
-              )}
+      {annualPlan && (
+        <section className="annual-discount" id="annual-discount-section">
+          <div className="container">
+            <div className="discount-content">
+              <h2>Save with our Annual Plan</h2>
+              <p>Get {annualPlan.name} for ${annualPlan.price}/year and save compared to monthly billing.</p>
+              <div className="discount-buttons">
+                <Link to="/download" className="button primary-button">View Annual Plan</Link>
+                {showBetButton('pricing') && (
+                  <BetNowButton
+                    size="large"
+                    position="inline"
+                    contentType="pricing"
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+      
+      {groupPlan && (
+        <section className="group-subscription" id="group-subscription-section">
+          <div className="container">
+            <div className="group-content">
+              <h2>Group Subscription</h2>
+              <div className="group-plan-card">
+                <div className="group-plan-header">
+                  <h3 className="group-plan-name">{groupPlan.name}</h3>
+                  <p className="group-plan-price">
+                    ${groupPlan.price}<span>/month</span>
+                  </p>
+                </div>
+                <div className="group-plan-description">
+                  <p>{groupPlan.description}</p>
+                </div>
+                <div className="group-plan-features">
+                  <ul>
+                    {groupPlan.features.map((feature, i) => (
+                      <li key={i}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="group-plan-cta">
+                  <Link to="/download" className="button group-button">Create Group Subscription</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
       
       <section className="pricing-faq">
         <div className="container">
@@ -178,7 +180,7 @@ const PricingPage = () => {
             
             <div className="faq-item">
               <h3>Is there a free trial available?</h3>
-              <p>Yes, we offer a 7-day free trial for all new users. You can experience all the features of the Pro plan before deciding to subscribe.</p>
+              <p>Yes, we offer a 7-day free trial for all new users. You can experience all the features of the Premium plan before deciding to subscribe.</p>
             </div>
             
             <div className="faq-item">
@@ -193,7 +195,7 @@ const PricingPage = () => {
             
             <div className="faq-item">
               <h3>Can I share my account with others?</h3>
-              <p>Our subscriptions are for individual use only. Sharing accounts is against our terms of service and may result in account termination.</p>
+              <p>Individual subscriptions are for personal use only. For sharing with friends or family, check out our Group Subscription option which allows up to 3 users.</p>
             </div>
             
             <div className="faq-item">

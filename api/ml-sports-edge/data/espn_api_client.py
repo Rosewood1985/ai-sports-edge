@@ -2,11 +2,25 @@
 """
 ESPN API Client
 A module for fetching data from ESPN's hidden API
+
+Usage:
+  python espn_api_client.py --get-sports
+  python espn_api_client.py --get-leagues basketball
+  python espn_api_client.py --get-teams basketball nba
+  python espn_api_client.py --get-team basketball nba 1
+  python espn_api_client.py --get-scoreboard basketball nba [YYYYMMDD]
+  python espn_api_client.py --get-game basketball nba 401468631
+  python espn_api_client.py --get-standings basketball nba
+  python espn_api_client.py --get-player-stats basketball nba 3975
+  python espn_api_client.py --get-schedule basketball nba [YYYY]
+  python espn_api_client.py --get-news basketball nba
 """
 
 import os
+import sys
 import json
 import logging
+import argparse
 import requests
 from typing import Dict, List, Any, Optional, Union
 from datetime import datetime, timedelta
@@ -240,17 +254,89 @@ class ESPNApiClient:
             return {}
 
 
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description='ESPN API Client')
+    
+    # Add arguments
+    parser.add_argument('--get-sports', action='store_true', help='Get list of sports')
+    parser.add_argument('--get-leagues', metavar='SPORT', help='Get leagues for a sport')
+    parser.add_argument('--get-teams', nargs=2, metavar=('SPORT', 'LEAGUE'), help='Get teams for a league')
+    parser.add_argument('--get-team', nargs=3, metavar=('SPORT', 'LEAGUE', 'TEAM_ID'), help='Get details for a team')
+    parser.add_argument('--get-scoreboard', nargs='+', metavar='SPORT LEAGUE [DATE]', help='Get scoreboard for a league')
+    parser.add_argument('--get-game', nargs=3, metavar=('SPORT', 'LEAGUE', 'GAME_ID'), help='Get details for a game')
+    parser.add_argument('--get-standings', nargs=2, metavar=('SPORT', 'LEAGUE'), help='Get standings for a league')
+    parser.add_argument('--get-player-stats', nargs=3, metavar=('SPORT', 'LEAGUE', 'PLAYER_ID'), help='Get stats for a player')
+    parser.add_argument('--get-schedule', nargs='+', metavar='SPORT LEAGUE [SEASON]', help='Get schedule for a league')
+    parser.add_argument('--get-news', nargs=2, metavar=('SPORT', 'LEAGUE'), help='Get news for a league')
+    
+    return parser.parse_args()
+
 def main():
-    """Main function to test the ESPN API client"""
+    """Main function to handle command line arguments"""
+    args = parse_args()
     client = ESPNApiClient()
     
-    # Test getting NBA scoreboard
-    nba_scoreboard = client.get_scoreboard('basketball', 'nba')
-    print(json.dumps(nba_scoreboard, indent=2))
+    result = None
     
-    # Test getting NFL teams
-    nfl_teams = client.get_teams('football', 'nfl')
-    print(json.dumps(nfl_teams, indent=2))
+    if args.get_sports:
+        result = client.get_sports()
+    elif args.get_leagues:
+        result = client.get_leagues(args.get_leagues)
+    elif args.get_teams:
+        sport, league = args.get_teams
+        result = client.get_teams(sport, league)
+    elif args.get_team:
+        sport, league, team_id = args.get_team
+        result = client.get_team(sport, league, team_id)
+    elif args.get_scoreboard:
+        if len(args.get_scoreboard) == 2:
+            sport, league = args.get_scoreboard
+            result = client.get_scoreboard(sport, league)
+        elif len(args.get_scoreboard) == 3:
+            sport, league, date = args.get_scoreboard
+            result = client.get_scoreboard(sport, league, date)
+        else:
+            print("Error: Invalid number of arguments for --get-scoreboard")
+            sys.exit(1)
+    elif args.get_game:
+        sport, league, game_id = args.get_game
+        result = client.get_game(sport, league, game_id)
+    elif args.get_standings:
+        sport, league = args.get_standings
+        result = client.get_standings(sport, league)
+    elif args.get_player_stats:
+        sport, league, player_id = args.get_player_stats
+        result = client.get_player_stats(sport, league, player_id)
+    elif args.get_schedule:
+        if len(args.get_schedule) == 2:
+            sport, league = args.get_schedule
+            result = client.get_schedule(sport, league)
+        elif len(args.get_schedule) == 3:
+            sport, league, season = args.get_schedule
+            result = client.get_schedule(sport, league, season)
+        else:
+            print("Error: Invalid number of arguments for --get-schedule")
+            sys.exit(1)
+    elif args.get_news:
+        sport, league = args.get_news
+        result = client.get_news(sport, league)
+    else:
+        # If no arguments provided, run a simple test
+        print("No arguments provided. Running test...")
+        
+        # Test getting NBA scoreboard
+        nba_scoreboard = client.get_scoreboard('basketball', 'nba')
+        print(json.dumps(nba_scoreboard, indent=2))
+        
+        # Test getting NFL teams
+        nfl_teams = client.get_teams('football', 'nfl')
+        print(json.dumps(nfl_teams, indent=2))
+        
+        return
+    
+    # Print result as JSON
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

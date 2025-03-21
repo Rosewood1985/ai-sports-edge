@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "title": "Pricing - AI Sports Edge",
+    "description": "Choose the perfect AI Sports Edge plan for your betting needs. From free predictions to premium analytics, we have options for every bettor.",
+    "keywords": "sports betting pricing, AI predictions cost, betting analytics plans, sports edge subscription",
+    "ogTitle": "Pricing - AI Sports Edge",
+    "ogDescription": "Choose the perfect AI Sports Edge plan for your betting needs. From free predictions to premium analytics, we have options for every bettor."
+  },
+  "hero": {
+    "title": "Choose Your Plan",
+    "subtitle": "Select the perfect plan to elevate your betting strategy with AI-powered insights."
+  },
+  "plans": {
+    "free": {
+      "title": "Free",
+      "price": "$0",
+      "period": "forever",
+      "description": "Basic predictions and features for casual bettors.",
+      "features": {
+        "feature1": "Daily free pick",
+        "feature2": "Basic game predictions",
+        "feature3": "Limited historical data",
+        "feature4": "Community access"
+      },
+      "button": "Get Started"
+    },
+    "pro": {
+      "title": "Pro",
+      "price": "$19.99",
+      "period": "per month",
+      "description": "Advanced predictions and analytics for serious bettors.",
+      "features": {
+        "feature1": "All Free features",
+        "feature2": "Advanced predictions for all games",
+        "feature3": "Player performance metrics",
+        "feature4": "Betting history analytics",
+        "feature5": "Email alerts and notifications",
+        "feature6": "Priority customer support"
+      },
+      "button": "Subscribe Now",
+      "popular": "Most Popular"
+    },
+    "elite": {
+      "title": "Elite",
+      "price": "$39.99",
+      "period": "per month",
+      "description": "Premium features and exclusive content for professional bettors.",
+      "features": {
+        "feature1": "All Pro features",
+        "feature2": "Prop bet recommendations",
+        "feature3": "Advanced player statistics",
+        "feature4": "Parlay optimizers",
+        "feature5": "Expert analysis and insights",
+        "feature6": "Early access to new features",
+        "feature7": "24/7 priority support"
+      },
+      "button": "Go Elite"
+    }
+  },
+  "annualDiscount": {
+    "title": "Save with Annual Billing",
+    "description": "Get 2 months free when you choose annual billing.",
+    "proAnnual": "$199.99/year",
+    "eliteAnnual": "$399.99/year",
+    "switchToAnnual": "Switch to Annual",
+    "switchToMonthly": "Switch to Monthly"
+  },
+  "comparison": {
+    "title": "Plan Comparison",
+    "feature": "Feature",
+    "free": "Free",
+    "pro": "Pro",
+    "elite": "Elite",
+    "features": {
+      "dailyPicks": "Daily Free Pick",
+      "gamePredictions": "Game Predictions",
+      "playerMetrics": "Player Performance Metrics",
+      "bettingHistory": "Betting History Analytics",
+      "alerts": "Alerts & Notifications",
+      "propBets": "Prop Bet Recommendations",
+      "advancedStats": "Advanced Player Statistics",
+      "parlayOptimizer": "Parlay Optimizer",
+      "expertAnalysis": "Expert Analysis",
+      "support": "Customer Support"
+    },
+    "availability": {
+      "yes": "Yes",
+      "no": "No",
+      "limited": "Limited",
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "premium": "Premium",
+      "standard": "Standard",
+      "priority": "Priority",
+      "24/7": "24/7 Priority"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "questions": {
+      "q1": "Can I cancel my subscription at any time?",
+      "a1": "Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period.",
+      "q2": "Is there a free trial for paid plans?",
+      "a2": "Yes, we offer a 7-day free trial for both Pro and Elite plans. No credit card required to start your trial.",
+      "q3": "What payment methods do you accept?",
+      "a3": "We accept all major credit cards, PayPal, and Apple Pay.",
+      "q4": "Can I switch between plans?",
+      "a4": "Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll be charged the prorated difference. When downgrading, the change will take effect at the end of your current billing period.",
+      "q5": "Do you offer refunds?",
+      "a5": "We offer a 30-day money-back guarantee if you're not satisfied with your subscription."
+    }
+  },
+  "cta": {
+    "title": "Ready to Elevate Your Betting Strategy?",
+    "description": "Join thousands of bettors who are making smarter decisions with AI Sports Edge.",
+    "button": "Choose Your Plan"
+  }
+}

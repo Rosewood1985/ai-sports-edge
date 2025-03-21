@@ -23,7 +23,12 @@
       "googleServicesFile": "./firebase-config/GoogleService-Info.plist",
       "buildNumber": "1",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to find nearby sports venues and local teams.",
+        "NSLocationAlwaysUsageDescription": "This app uses your location to find nearby sports venues and local teams."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyBhpjKTEw4mdCz-pfhYp7ZgHpKYvturILg"
       }
     },
     "android": {
@@ -33,11 +38,22 @@
       },
       "package": "com.aisportsedge.app",
       "googleServicesFile": "./firebase-config/google-services.json",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBhpjKTEw4mdCz-pfhYp7ZgHpKYvturILg"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBhpjKTEw4mdCz-pfhYp7ZgHpKYvturILg"
+        }
+      }
     },
     "plugins": [
       [
@@ -56,7 +72,10 @@
     "extra": {
       "eas": {
         "projectId": "7b3e1b15-0546-4614-9eee-dd8aed4037e9"
-      }
+      },
+      "ipgeolocationApiKey": "IPGEOLOCATION_API_KEY",
+      "googleMapsApiKey": "AIzaSyBhpjKTEw4mdCz-pfhYp7ZgHpKYvturILg",
+      "mapboxApiKey": "MAPBOX_API_KEY"
     },
     "owner": "aisportsedge"
   }

@@ -3,10 +3,14 @@ import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { hasAdvancedPlayerMetricsAccess, purchaseAdvancedPlayerMetrics } from '../services/subscriptionService';
-import { hasHistoricalTrendsAccess } from '../services/advancedAnalyticsService';
-import { incrementViewCounter, shouldShowUpgradePrompt } from '../services/viewCounterService';
+import advancedPlayerStatsService from '../services/advancedPlayerStatsService';
+import { incrementUserViewCount, shouldShowUpgradePrompt } from '../services/viewCounterService';
 import UpgradePrompt from './UpgradePrompt';
+import ViewLimitIndicator from './ViewLimitIndicator';
+import WeatherInsights from './WeatherInsights';
+import HistoricalTrendsChart from './HistoricalTrendsChart';
+import { auth } from '../config/firebase';
+import { analyticsService } from '../services/analyticsService';
 
 interface PlayerStats {
   points: number;
@@ -59,29 +63,55 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
 
   useEffect(() => {
     const checkAccess = async () => {
-      // Check if user has access to advanced metrics
-      const hasAdvancedAccess = await hasAdvancedPlayerMetricsAccess(userId, gameId);
-      
-      // Check if user has access to historical trends
-      const hasHistoricalAccess = await hasHistoricalTrendsAccess(userId, gameId);
-      
-      setHasAccess({
-        advanced: hasAdvancedAccess,
-        historical: hasHistoricalAccess
-      });
-      
-      // Increment view counter
-      await incrementViewCounter();
-      
-      // Check if we should show upgrade prompt
-      const shouldShowPrompt = await shouldShowUpgradePrompt();
-      if (shouldShowPrompt) {
-        setShowUpgradePrompt(true);
+      try {
+        // Get current user ID
+        const currentUserId = auth.currentUser?.uid || userId;
+        
+        // Check if user has access to advanced metrics
+        const hasAdvancedAccess = await advancedPlayerStatsService.hasAdvancedPlayerMetricsAccess(
+          currentUserId || 'guest',
+          gameId
+        );
+        
+        // Check if user has access to historical trends
+        const hasHistoricalAccess = await advancedPlayerStatsService.hasHistoricalTrendsAccess(
+          currentUserId || 'guest',
+          gameId
+        );
+        
+        setHasAccess({
+          advanced: hasAdvancedAccess,
+          historical: hasHistoricalAccess
+        });
+        
+        // Increment view counter
+        await incrementUserViewCount(currentUserId, 'player_statistics');
+        
+        // Track view in analytics
+        await analyticsService.trackEvent('viewed_player_statistics', {
+          gameId,
+          playerId: player.id,
+          authenticated: !!currentUserId
+        });
+        
+        // Check if we should show upgrade prompt
+        const promptCheck = await shouldShowUpgradePrompt(currentUserId);
+        if (promptCheck.show) {
+          setShowUpgradePrompt(true);
+          
+          // Track prompt display in analytics
+          await analyticsService.trackEvent('upgrade_prompt_triggered', {
+            reason: promptCheck.reason,
+            featureType: 'player_statistics'
+          });
+        }
+      } catch (error) {
+        console.error('Error checking access:', error);
       }
     };
     
     checkAccess();
-  }, [userId, gameId]);
+  }, [userId, gameId, player.id]);
 
   const handleTabPress = async (tab: 'basic' | 'advanced' | 'historical') => {
     if (tab === 'advanced' && !hasAccess.advanced) {
@@ -217,10 +247,17 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
         <View style={styles.insightContainer}>
           <ThemedText style={styles.insightTitle}>Performance Insight</ThemedText>
           <ThemedText style={styles.insightText}>
-            {player.name} is performing above average in offensive efficiency metrics, 
+            {player.name} is performing above average in offensive efficiency metrics,
             with a True Shooting % that ranks in the top 25% of players at his position.
           </ThemedText>
         </View>
+        
+        {/* Weather Insights */}
+        <WeatherInsights
+          gameId={gameId}
+          playerId={player.id}
+          playerName={player.name}
+        />
       </View>
     );
   };
@@ -274,8 +311,8 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
               <ThemedText style={styles.historicalTableCell}>{game.ast}</ThemedText>
               <ThemedText style={[
                 styles.historicalTableCell,
-                game.plusMinus > 0 ? styles.positivePlusMinus : 
-                game.plusMinus < 0 ? styles.negativePlusMinus : 
+                game.plusMinus > 0 ? styles.positivePlusMinus :
+                game.plusMinus < 0 ? styles.negativePlusMinus :
                 styles.neutralPlusMinus
               ]}>
                 {game.plusMinus > 0 ? '+' : ''}{game.plusMinus}
@@ -287,12 +324,29 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
         <View style={styles.trendContainer}>
           <ThemedText style={styles.trendTitle}>Trend Analysis</ThemedText>
           <ThemedText style={styles.trendText}>
-            {player.name} is showing an upward trend in scoring, with a 15.2% increase in points 
+            {player.name} is showing an upward trend in scoring, with a 15.2% increase in points
             over the last 5 games compared to the previous 5-game stretch.
           </ThemedText>
         </View>
+        
+        {/* Enhanced Historical Trends Chart */}
+        <View style={styles.chartContainer}>
+          <ThemedText style={styles.chartTitle}>Enhanced Trend Visualization</ThemedText>
+          <HistoricalTrendsChart
+            playerId={player.id}
+            playerName={player.name}
+            gameId={gameId}
+            onError={(error) => console.error('Historical trends error:', error)}
+          />
+        </View>
       </View>
     );
+  };
+
+  // Handle upgrade button press
+  const handleUpgradePress = () => {
+    setUpgradePromptType('all');
+    setShowUpgradePrompt(true);
   };
 
   return (
@@ -302,17 +356,29 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
         <ThemedText style={styles.playerInfo}>{player.team} | #{player.jerseyNumber} | {player.position}</ThemedText>
       </View>
       
+      {/* View Limit Indicator - Compact version in the corner */}
+      <ViewLimitIndicator
+        onUpgradePress={handleUpgradePress}
+        compact={true}
+      />
+      
       <View style={styles.tabContainer}>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'basic' && styles.activeTab]} 
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'basic' && styles.activeTab]}
           onPress={() => handleTabPress('basic')}
+          accessibilityLabel="Basic stats tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'basic' }}
         >
           <ThemedText style={[styles.tabText, activeTab === 'basic' && styles.activeTabText]}>Basic</ThemedText>
         </TouchableOpacity>
         
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'advanced' && styles.activeTab]} 
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'advanced' && styles.activeTab]}
           onPress={() => handleTabPress('advanced')}
+          accessibilityLabel="Advanced stats tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'advanced' }}
         >
           <View style={styles.tabContent}>
             <ThemedText style={[styles.tabText, activeTab === 'advanced' && styles.activeTabText]}>Advanced</ThemedText>
@@ -320,9 +386,12 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
           </View>
         </TouchableOpacity>
         
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'historical' && styles.activeTab]} 
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'historical' && styles.activeTab]}
           onPress={() => handleTabPress('historical')}
+          accessibilityLabel="Historical stats tab"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'historical' }}
         >
           <View style={styles.tabContent}>
             <ThemedText style={[styles.tabText, activeTab === 'historical' && styles.activeTabText]}>Historical</ThemedText>
@@ -335,11 +404,21 @@ const EnhancedPlayerStatistics: React.FC<EnhancedPlayerStatisticsProps> = ({
         {activeTab === 'basic' && renderBasicStats()}
         {activeTab === 'advanced' && renderAdvancedStats()}
         {activeTab === 'historical' && renderHistoricalStats()}
+        
+        {/* Full View Limit Indicator at the bottom of basic stats */}
+        {activeTab === 'basic' && (
+          <View style={styles.viewLimitContainer}>
+            <ViewLimitIndicator
+              onUpgradePress={handleUpgradePress}
+              compact={false}
+            />
+          </View>
+        )}
       </ScrollView>
       
       {showUpgradePrompt && (
-        <UpgradePrompt 
-          onClose={() => setShowUpgradePrompt(false)} 
+        <UpgradePrompt
+          onClose={() => setShowUpgradePrompt(false)}
           gameId={gameId}
           featureType={upgradePromptType}
         />
@@ -566,6 +645,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  viewLimitContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    paddingBottom: 16,
+  },
+  chartContainer: {
+    marginTop: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 16,
+    textAlign: 'center',
   },
 });
 

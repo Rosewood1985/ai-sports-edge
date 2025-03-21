@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#007bff">
+  <meta name="theme-color" content="#0088ff">
   <meta name="description" content="AI Sports Edge - AI-Powered Sports Betting Predictions and Analytics">
   
   <!-- Open Graph / Facebook -->
@@ -23,16 +23,17 @@
   <title>AI Sports Edge - AI-Powered Sports Betting Predictions</title>
   
   <!-- Favicon -->
-  <link rel="icon" href="https://expo.dev/static/images/favicon-76x76.png">
-  <link rel="apple-touch-icon" href="https://expo.dev/static/images/favicon-76x76.png">
+  <link rel="icon" href="/images/ai_logo.webp">
+  <link rel="apple-touch-icon" href="/images/ai_logo.webp">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="neon-ui.css">
   
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -60,443 +61,609 @@
   gtag('config', 'G-XXXXXXXXXX');
 </script>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+<!-- Fix for handleOddsButtonClick function -->
+<script>
+  // Initialize cross-platform services for the static HTML page
+  window.crossPlatformSyncService = {
+    hasPurchasedOdds: function(gameId) {
+      try {
+        const purchases = JSON.parse(localStorage.getItem('purchasedOdds') || '[]');
+        console.log('[CrossPlatformSync] Checking if game is purchased:', gameId, purchases.includes(gameId));
+        return purchases.includes(gameId);
+      } catch (error) {
+        console.error('[CrossPlatformSync] Error checking purchased odds:', error);
+        return false;
+      }
+    },
+    recordOddsPurchase: function(gameId) {
+      try {
+        const purchases = JSON.parse(localStorage.getItem('purchasedOdds') || '[]');
+        if (!purchases.includes(gameId)) {
+          purchases.push(gameId);
+          localStorage.setItem('purchasedOdds', JSON.stringify(purchases));
+          console.log('[CrossPlatformSync] Recorded purchase for game:', gameId);
+          
+          // Dispatch event to notify other components
+          window.dispatchEvent(new CustomEvent('purchasedOddsUpdated', {
+            detail: { purchasedOdds: purchases.map(id => ({ gameId: id })) }
+          }));
+        }
+      } catch (error) {
+        console.error('[CrossPlatformSync] Error recording purchase:', error);
+      }
+    }
+  };
+
+  // Analytics service for tracking events
+  window.analyticsService = {
+    trackEvent: function(eventName, data) {
+      console.log(`[Analytics] ${eventName}:`, data);
+      // In a real implementation, this would send data to an analytics service
+    },
+    trackUserAction: function(action, data) {
+      console.log(`[Analytics] User Action - ${action}:`, data);
+      // In a real implementation, this would send data to an analytics service
+    }
+  };
+
+  // Betting affiliate service for tracking affiliate links
+  window.bettingAffiliateService = {
+    trackButtonClick: function(location, affiliateId, gameId, userId, eventId) {
+      console.log(`[Affiliate] Button click:`, { location, affiliateId, gameId, userId, eventId });
+      // In a real implementation, this would send data to an affiliate tracking service
+    },
+    trackConversion: function(type, value, userId) {
+      console.log(`[Affiliate] Conversion:`, { type, value, userId });
+      // In a real implementation, this would send data to an affiliate tracking service
+    }
+  };
+
+  // Handle odds button clicks
+  window.handleOddsButtonClick = function(button, gameId, homeTeam, awayTeam) {
+    console.log('[OddsButton] Button clicked for game:', { gameId, homeTeam, awayTeam });
+    
+    // Check if already purchased
+    const isPurchased = window.crossPlatformSyncService.hasPurchasedOdds(gameId);
+    
+    if (isPurchased) {
+      console.log('[OddsButton] Game already purchased, redirecting to FanDuel');
+      // Open FanDuel in a new tab
+      const affiliateUrl = `https://sportsbook.fanduel.com/?aff_id=PLACEHOLDER_AFFILIATE_ID&subId=user123-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton&utm_content=web`;
+      window.open(affiliateUrl, '_blank');
+      
+      // Track affiliate click
+      if (window.bettingAffiliateService) {
+        window.bettingAffiliateService.trackButtonClick('odds_button', 'PLACEHOLDER_AFFILIATE_ID', gameId, 'user123', gameId);
+      }
+    } else {
+      console.log('[OddsButton] Game not purchased, simulating payment');
+      
+      // Track analytics event
+      if (window.analyticsService) {
+        window.analyticsService.trackEvent('odds_purchase_initiated', {
+          gameId: gameId,
+          userId: 'user123',
+          timestamp: Date.now(),
+        });
+      }
+      
+      // Change button text to show loading
+      const originalText = button.textContent.trim();
+      button.innerHTML = '<div class="odds-button__spinner"></div>';
+      button.disabled = true;
+      
+      // Simulate payment processing
+      setTimeout(function() {
+        // Record purchase
+        window.crossPlatformSyncService.recordOddsPurchase(gameId);
+        
+        // Update button
+        button.innerHTML = 'BET NOW';
+        button.disabled = false;
+        button.classList.add('bet-now-button');
+        
+        // Track successful purchase
+        if (window.analyticsService) {
+          window.analyticsService.trackEvent('odds_purchase_completed', {
+            gameId: gameId,
+            userId: 'user123',
+            price: 199, // $1.99
+            timestamp: Date.now(),
+          });
+        }
+        
+        // Show popup
+        alert(`Your odds are ready! Place your bet now for the best experience.\n\nGame: ${homeTeam} vs ${awayTeam}`);
+      }, 1500);
+    }
+  };
+</script>
+
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <a href="/" class="logo">
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMDA0MkZGIi8+CjxwYXRoIGQ9Ik0xNjYuNjY3IDMzMy4zMzNIMTI1VjQxNi42NjdIMTY2LjY2N1YzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI1MCAzMzMuMzMzSDIwOC4zMzNWMzc1SDI1MFYzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMzMy4zMzMgMjkxLjY2N0gyOTEuNjY3VjQxNi42NjdIMzMzLjMzM1YyOTEuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTM3NSA0MTYuNjY3SDEyNVY0NTguMzMzSDM3NVY0MTYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTIwOC4zMzMgMjUwQzIwOC4zMzMgMjM3LjIzOSAyMTguNTcyIDIyNyAyMzEuMzMzIDIyN0MyNDQuMDk0IDIyNyAyNTQuMzMzIDIzNy4yMzkgMjU0LjMzMyAyNTBDMjU0LjMzMyAyNjIuNzYxIDI0NC4wOTQgMjczIDIzMS4zMzMgMjczQzIxOC41NzIgMjczIDIwOC4zMzMgMjYyLjc2MSAyMDguMzMzIDI1MFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yNTAgMjA4LjMzM0MyNTAgMTk1LjU3MiAyNjAuMjM5IDE4NS4zMzMgMjczIDE4NS4zMzNDMjg1Ljc2MSAxODUuMzMzIDI5NiAxOTUuNTcyIDI5NiAyMDguMzMzQzI5NiAyMjEuMDk0IDI4NS43NjEgMjMxLjMzMyAyNzMgMjMxLjMzM0MyNjAuMjM5IDIzMS4zMzMgMjUwIDIyMS4wOTQgMjUwIDIwOC4zMzNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjkxLjY2NyAxNjYuNjY3QzI5MS42NjcgMTUzLjkwNiAzMDEuOTA2IDE0My42NjcgMzE0LjY2NyAxNDMuNjY3QzMyNy40MjggMTQzLjY2NyAzMzcuNjY3IDE1My45MDYgMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTc5LjQyOCAzMjcuNDI4IDE4OS42NjcgMzE0LjY2NyAxODkuNjY3QzMwMS45MDYgMTg5LjY2NyAyOTEuNjY3IDE3OS40MjggMjkxLjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMxNC42NjcgMTQzLjY2N0MzMTQuNjY3IDEzMC45MDYgMzI0LjkwNiAxMjAuNjY3IDMzNy42NjcgMTIwLjY2N0MzNTAuNDI4IDEyMC42NjcgMzYwLjY2NyAxMzAuOTA2IDM2MC42NjcgMTQzLjY2N0MzNjAuNjY3IDE1Ni40MjggMzUwLjQyOCAxNjYuNjY3IDMzNy42NjcgMTY2LjY2N0MzMjQuOTA2IDE2Ni42NjcgMzE0LjY2NyAxNTYuNDI4IDMxNC42NjcgMTQzLjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMTQuNjY3IDE0My42NjdDMzE0LjY2NyAxMzAuOTA2IDMyNC45MDYgMTIwLjY2NyAzMzcuNjY3IDEyMC42NjdDMzUwLjQyOCAxMjAuNjY3IDM2MC42NjcgMTMwLjkwNiAzNjAuNjY3IDE0My42NjdDMzYwLjY2NyAxNTYuNDI4IDM1MC40MjggMTY2LjY2NyAzMzcuNjY3IDE2Ni42NjdDMzI0LjkwNiAxNjYuNjY3IDMxNC42NjcgMTU2LjQyOCAzMTQuNjY3IDE0My42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTUzLjkwNiAzNDcuOTA2IDE0My42NjcgMzYwLjY2NyAxNDMuNjY3QzM3My40MjggMTQzLjY2NyAzODMuNjY3IDE1My45MDYgMzgzLjY2NyAxNjYuNjY3QzM4My42NjcgMTc5LjQyOCAzNzMuNDI4IDE4OS42NjcgMzYwLjY2NyAxODkuNjY3QzM0Ny45MDYgMTg5LjY2NyAzMzcuNjY3IDE3OS40MjggMzM3LjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI5MS42NjcgMTY2LjY2N0MyOTEuNjY3IDE1My45MDYgMzAxLjkwNiAxNDMuNjY3IDMxNC42NjcgMTQzLjY2N0MzMjcuNDI4IDE0My42NjcgMzM3LjY2NyAxNTMuOTA2IDMzNy42NjcgMTY2LjY2N0MzMzcuNjY3IDE3OS40MjggMzI3LjQyOCAxODkuNjY3IDMxNC42NjcgMTg5LjY2N0MzMDEuOTA2IDE4OS42NjcgMjkxLjY2NyAxNzkuNDI4IDI5MS42NjcgMTY2LjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMzcuNjY3IDE2Ni42NjdDMzM3LjY2NyAxNTMuOTA2IDM0Ny45MDYgMTQzLjY2NyAzNjAuNjY3IDE0My42NjdDMzczLjQyOCAxNDMuNjY3IDM4My42NjcgMTUzLjkwNiAzODMuNjY3IDE2Ni42NjdDMzgzLjY2NyAxNzkuNDI4IDM3My40MjggMTg5LjY2NyAzNjAuNjY3IDE4OS42NjdDMzQ3LjkwNiAxODkuNjY3IDMzNy42NjcgMTc5LjQyOCAzMzcuNjY3IDE2Ni42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="AI Sports Edge Logo">
-          <span>AI Sports Edge</span>
-        </a>
-        <nav class="nav">
-          <ul class="nav-list">
-            <li class="nav-item"><a href="/" class="active">Home</a></li>
-            <li class="nav-item"><a href="#features">Features</a></li>
-            <li class="nav-item"><a href="#pricing">Pricing</a></li>
-            <li class="nav-item"><a href="#about">About</a></li>
-            <li class="nav-item"><a href="#live-odds">Live Odds</a></li>
-            <li class="nav-item"><a href="#download" class="download-button">Download</a></li>
-          </ul>
-        </nav>
+  <div id="app-content" style="display: none;">
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <a href="/" class="logo">
+            <img src="/images/ai_logo.webp" alt="AI Sports Edge Logo" style="width: 40px; height: 40px;">
+            <span>AI Sports Edge</span>
+          </a>
+          <nav class="nav">
+            <ul class="nav-list">
+              <li class="nav-item"><a href="/" class="active">Home</a></li>
+              <li class="nav-item"><a href="#features">Features</a></li>
+              <li class="nav-item"><a href="#pricing">Pricing</a></li>
+              <li class="nav-item"><a href="#about">About</a></li>
+              <li class="nav-item"><a href="#live-odds">Live Odds</a></li>
+              <li class="nav-item"><a href="#download" class="download-button">Download</a></li>
+            </ul>
+          </nav>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1>AI-Powered Sports Betting Predictions</h1>
-          <p class="hero-subtitle">
-            Get accurate predictions, analytics, and insights for smarter betting decisions.
-          </p>
-          <div class="hero-buttons">
-            <a href="#download" class="button primary-button">Download App</a>
-            <a href="#features" class="button secondary-button">Learn More</a>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>AI-Powered Sports Betting Predictions</h1>
+            <p class="hero-subtitle">
+              Get accurate predictions, analytics, and insights for smarter betting decisions.
+            </p>
+            <div class="hero-buttons">
+              <a href="#download" class="button primary-button">Download App</a>
+              <a href="#features" class="button secondary-button">Learn More</a>
+            </div>
           </div>
-        </div>
-        <div class="hero-right">
-          <div class="hero-image">
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMDA0MkZGIi8+CjxwYXRoIGQ9Ik0xNjYuNjY3IDMzMy4zMzNIMTI1VjQxNi42NjdIMTY2LjY2N1YzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI1MCAzMzMuMzMzSDIwOC4zMzNWMzc1SDI1MFYzMzMuMzMzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMzMy4zMzMgMjkxLjY2N0gyOTEuNjY3VjQxNi42NjdIMzMzLjMzM1YyOTEuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTM3NSA0MTYuNjY3SDEyNVY0NTguMzMzSDM3NVY0MTYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTIwOC4zMzMgMjUwQzIwOC4zMzMgMjM3LjIzOSAyMTguNTcyIDIyNyAyMzEuMzMzIDIyN0MyNDQuMDk0IDIyNyAyNTQuMzMzIDIzNy4yMzkgMjU0LjMzMyAyNTBDMjU0LjMzMyAyNjIuNzYxIDI0NC4wOTQgMjczIDIzMS4zMzMgMjczQzIxOC41NzIgMjczIDIwOC4zMzMgMjYyLjc2MSAyMDguMzMzIDI1MFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yNTAgMjA4LjMzM0MyNTAgMTk1LjU3MiAyNjAuMjM5IDE4NS4zMzMgMjczIDE4NS4zMzNDMjg1Ljc2MSAxODUuMzMzIDI5NiAxOTUuNTcyIDI5NiAyMDguMzMzQzI5NiAyMjEuMDk0IDI4NS43NjEgMjMxLjMzMyAyNzMgMjMxLjMzM0MyNjAuMjM5IDIzMS4zMzMgMjUwIDIyMS4wOTQgMjUwIDIwOC4zMzNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjkxLjY2NyAxNjYuNjY3QzI5MS42NjcgMTUzLjkwNiAzMDEuOTA2IDE0My42NjcgMzE0LjY2NyAxNDMuNjY3QzMyNy40MjggMTQzLjY2NyAzMzcuNjY3IDE1My45MDYgMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTc5LjQyOCAzMjcuNDI4IDE4OS42NjcgMzE0LjY2NyAxODkuNjY3QzMwMS45MDYgMTg5LjY2NyAyOTEuNjY3IDE3OS40MjggMjkxLjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMxNC42NjcgMTQzLjY2N0MzMTQuNjY3IDEzMC45MDYgMzI0LjkwNiAxMjAuNjY3IDMzNy42NjcgMTIwLjY2N0MzNTAuNDI4IDEyMC42NjcgMzYwLjY2NyAxMzAuOTA2IDM2MC42NjcgMTQzLjY2N0MzNjAuNjY3IDE1Ni40MjggMzUwLjQyOCAxNjYuNjY3IDMzNy42NjcgMTY2LjY2N0MzMjQuOTA2IDE2Ni42NjcgMzE0LjY2NyAxNTYuNDI4IDMxNC42NjcgMTQzLjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMTQuNjY3IDE0My42NjdDMzE0LjY2NyAxMzAuOTA2IDMyNC45MDYgMTIwLjY2NyAzMzcuNjY3IDEyMC42NjdDMzUwLjQyOCAxMjAuNjY3IDM2MC42NjcgMTMwLjkwNiAzNjAuNjY3IDE0My42NjdDMzYwLjY2NyAxNTYuNDI4IDM1MC40MjggMTY2LjY2NyAzMzcuNjY3IDE2Ni42NjdDMzI0LjkwNiAxNjYuNjY3IDMxNC42NjcgMTU2LjQyOCAzMTQuNjY3IDE0My42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzM3LjY2NyAxNjYuNjY3QzMzNy42NjcgMTUzLjkwNiAzNDcuOTA2IDE0My42NjcgMzYwLjY2NyAxNDMuNjY3QzM3My40MjggMTQzLjY2NyAzODMuNjY3IDE1My45MDYgMzgzLjY2NyAxNjYuNjY3QzM4My42NjcgMTc5LjQyOCAzNzMuNDI4IDE4OS42NjcgMzYwLjY2NyAxODkuNjY3QzM0Ny45MDYgMTg5LjY2NyAzMzcuNjY3IDE3OS40MjggMzM3LjY2NyAxNjYuNjY3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI5MS42NjcgMTY2LjY2N0MyOTEuNjY3IDE1My45MDYgMzAxLjkwNiAxNDMuNjY3IDMxNC42NjcgMTQzLjY2N0MzMjcuNDI4IDE0My42NjcgMzM3LjY2NyAxNTMuOTA2IDMzNy42NjcgMTY2LjY2N0MzMzcuNjY3IDE3OS40MjggMzI3LjQyOCAxODkuNjY3IDMxNC42NjcgMTg5LjY2N0MzMDEuOTA2IDE4OS42NjcgMjkxLjY2NyAxNzkuNDI4IDI5MS42NjcgMTY2LjY2N1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMzcuNjY3IDE2Ni42NjdDMzM3LjY2NyAxNTMuOTA2IDM0Ny45MDYgMTQzLjY2NyAzNjAuNjY3IDE0My42NjdDMzczLjQyOCAxNDMuNjY3IDM4My42NjcgMTUzLjkwNiAzODMuNjY3IDE2Ni42NjdDMzgzLjY2NyAxNzkuNDI4IDM3My40MjggMTg5LjY2NyAzNjAuNjY3IDE4OS42NjdDMzQ3LjkwNiAxODkuNjY3IDMzNy42NjcgMTc5LjQyOCAzMzcuNjY3IDE2Ni42NjdaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="AI Sports Edge" style="width: 150px; height: 150px;">
-          </div>
-          <div class="news-feed">
-            <h3 class="news-feed-title">Latest Sports News</h3>
-            <div class="news-item">
-              <span class="news-date">MAR 17</span>
-              <p class="news-headline">Lakers secure playoff spot with win over Nuggets</p>
+          <div class="hero-right">
+            <div class="hero-image">
+              <img src="/images/ai_logo.webp" alt="AI Sports Edge" style="width: 150px; height: 150px;">
             </div>
-            <div class="news-item">
-              <span class="news-date">MAR 16</span>
-              <p class="news-headline">NFL Draft: Top QB prospects showcase skills at Pro Day</p>
+            <div class="news-feed">
+              <h3 class="news-feed-title">Latest Sports News</h3>
+              <div class="news-item">
+                <span class="news-date">MAR 17</span>
+                <p class="news-headline">Lakers secure playoff spot with win over Nuggets</p>
+              </div>
+              <div class="news-item">
+                <span class="news-date">MAR 16</span>
+                <p class="news-headline">NFL Draft: Top QB prospects showcase skills at Pro Day</p>
+              </div>
+              <div class="news-item">
+                <span class="news-date">MAR 15</span>
+                <p class="news-headline">Formula 1: Hamilton dominates in Australian GP qualifying</p>
+              </div>
+              <a href="#" class="news-more">More News →</a>
             </div>
-            <div class="news-item">
-              <span class="news-date">MAR 15</span>
-              <p class="news-headline">Formula 1: Hamilton dominates in Australian GP qualifying</p>
-            </div>
-            <a href="#" class="news-more">More News →</a>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-  
-  <section id="features" class="features-overview">
-    <div class="container">
-      <h2 class="section-title">Why Choose AI Sports Edge?</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">AI</div>
-          <h3>AI Predictions</h3>
-          <p>Advanced machine learning algorithms analyze vast amounts of data to provide accurate betting predictions.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">RT</div>
-          <h3>Real-Time Analytics</h3>
-          <p>Get up-to-the-minute stats, odds, and analysis to make informed betting decisions.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">MS</div>
-          <h3>Multi-Sport Coverage</h3>
-          <p>From NFL to Formula 1, we cover all major sports with specialized prediction models for each.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">CI</div>
-          <h3>Community Insights</h3>
-          <p>Connect with other bettors, share strategies, and learn from the community's collective wisdom.</p>
-        </div>
-      </div>
-      
-      <div class="features-detail">
-        <div class="feature-detail-item">
-          <h3>Advanced AI Algorithms</h3>
-          <p>Our proprietary machine learning models are trained on millions of historical data points, including player statistics, team performance, weather conditions, and more. These models are continuously refined to improve prediction accuracy.</p>
-          <ul>
-            <li>Neural networks for pattern recognition</li>
-            <li>Ensemble methods for robust predictions</li>
-            <li>Bayesian inference for probability estimation</li>
-            <li>Reinforcement learning for adaptive strategies</li>
-          </ul>
-        </div>
-        
-        <div class="feature-detail-item">
-          <h3>Comprehensive Sports Coverage</h3>
-          <p>We cover all major sports leagues and events, with specialized models for each sport's unique characteristics:</p>
-          <div class="sports-grid">
-            <div class="sport-item">
-              <h4>NFL</h4>
-              <p>Point spreads, over/unders, player props</p>
-            </div>
-            <div class="sport-item">
-              <h4>NBA</h4>
-              <p>Game winners, point totals, player performance</p>
-            </div>
-            <div class="sport-item">
-              <h4>MLB</h4>
-              <p>Moneylines, run totals, pitcher analysis</p>
-            </div>
-            <div class="sport-item">
-              <h4>NHL</h4>
-              <p>Puck lines, goal totals, power play predictions</p>
-            </div>
-            <div class="sport-item">
-              <h4>Soccer</h4>
-              <p>Match results, goal totals, corner kicks</p>
-            </div>
-            <div class="sport-item">
-              <h4>Formula 1</h4>
-              <p>Race winners, podium finishes, qualifying results</p>
-            </div>
-            <div class="sport-item">
-              <h4>UFC/MMA</h4>
-              <p>Fight outcomes, method of victory, round predictions</p>
-            </div>
-            <div class="sport-item">
-              <h4>Horse Racing</h4>
-              <p>Race winners, exactas, trifectas</p>
-            </div>
+    </section>
+    
+    <section id="features" class="features-overview">
+      <div class="container">
+        <h2 class="section-title">Why Choose AI Sports Edge?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">AI</div>
+            <h3>AI Predictions</h3>
+            <p>Advanced machine learning algorithms analyze vast amounts of data to provide accurate betting predictions.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">RT</div>
+            <h3>Real-Time Analytics</h3>
+            <p>Get up-to-the-minute stats, odds, and analysis to make informed betting decisions.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">MS</div>
+            <h3>Multi-Sport Coverage</h3>
+            <p>From NFL to Formula 1, we cover all major sports with specialized prediction models for each.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">CI</div>
+            <h3>Community Insights</h3>
+            <p>Connect with other bettors, share strategies, and learn from the community's collective wisdom.</p>
           </div>
         </div>
         
-        <div class="feature-detail-item">
-          <h3>Personalized Betting Insights</h3>
-          <p>Our app learns from your betting history to provide personalized recommendations and insights tailored to your preferences and betting style.</p>
-          <ul>
-            <li>Custom risk assessment based on your bankroll</li>
-            <li>Personalized betting unit recommendations</li>
-            <li>Tailored notifications for your favorite teams and leagues</li>
-            <li>Performance tracking and analysis of your betting patterns</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  <section id="pricing" class="pricing-section">
-    <div class="container">
-      <h2 class="section-title">Simple, Transparent Pricing</h2>
-      <p class="section-subtitle">Choose the plan that fits your betting strategy and budget.</p>
-      
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3>Free</h3>
-            <p class="pricing-price">$0<span>/month</span></p>
-          </div>
-          <div class="pricing-features">
+        <div class="features-detail">
+          <div class="feature-detail-item">
+            <h3>Advanced AI Algorithms</h3>
+            <p>Our proprietary machine learning models are trained on millions of historical data points, including player statistics, team performance, weather conditions, and more. These models are continuously refined to improve prediction accuracy.</p>
             <ul>
-              <li>Basic AI predictions</li>
-              <li>Limited sports coverage</li>
-              <li>Daily free pick</li>
-              <li>Community access</li>
-              <li>Basic stats and odds</li>
+              <li>Neural networks for pattern recognition</li>
+              <li>Ensemble methods for robust predictions</li>
+              <li>Bayesian inference for probability estimation</li>
+              <li>Reinforcement learning for adaptive strategies</li>
             </ul>
           </div>
-          <div class="pricing-cta">
-            <a href="#download" class="button secondary-button">Get Started</a>
+          
+          <div class="feature-detail-item">
+            <h3>Comprehensive Sports Coverage</h3>
+            <p>We cover all major sports leagues and events, with specialized models for each sport's unique characteristics:</p>
+            <div class="sports-grid">
+              <div class="sport-item">
+                <h4>NFL</h4>
+                <p>Point spreads, over/unders, player props</p>
+              </div>
+              <div class="sport-item">
+                <h4>NBA</h4>
+                <p>Game winners, point totals, player performance</p>
+              </div>
+              <div class="sport-item">
+                <h4>MLB</h4>
+                <p>Moneylines, run totals, pitcher analysis</p>
+              </div>
+              <div class="sport-item">
+                <h4>NHL</h4>
+                <p>Puck lines, goal totals, power play predictions</p>
+              </div>
+              <div class="sport-item">
+                <h4>Soccer</h4>
+                <p>Match results, goal totals, corner kicks</p>
+              </div>
+              <div class="sport-item">
+                <h4>Formula 1</h4>
+                <p>Race winners, podium finishes, qualifying results</p>
+              </div>
+              <div class="sport-item">
+                <h4>UFC/MMA</h4>
+                <p>Fight outcomes, method of victory, round predictions</p>
+              </div>
+              <div class="sport-item">
+                <h4>Horse Racing</h4>
+                <p>Race winners, exactas, trifectas</p>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <div class="pricing-card popular">
-          <div class="popular-badge">Most Popular</div>
-          <div class="pricing-header">
-            <h3>Pro</h3>
-            <p class="pricing-price">$19.99<span>/month</span></p>
-          </div>
-          <div class="pricing-features">
+          
+          <div class="feature-detail-item">
+            <h3>Personalized Betting Insights</h3>
+            <p>Our app learns from your betting history to provide personalized recommendations and insights tailored to your preferences and betting style.</p>
             <ul>
-              <li>Advanced AI predictions</li>
-              <li>All major sports coverage</li>
-              <li>Unlimited daily picks</li>
-              <li>Community access</li>
-              <li>Real-time analytics</li>
-              <li>Bankroll management tools</li>
-              <li>Betting history tracking</li>
+              <li>Custom risk assessment based on your bankroll</li>
+              <li>Personalized betting unit recommendations</li>
+              <li>Tailored notifications for your favorite teams and leagues</li>
+              <li>Performance tracking and analysis of your betting patterns</li>
             </ul>
           </div>
-          <div class="pricing-cta">
-            <a href="#download" class="button primary-button">Get Started</a>
+        </div>
+      </div>
+    </section>
+    
+    <section id="pricing" class="pricing-section">
+      <div class="container">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <p class="section-subtitle">Choose the plan that fits your betting strategy and budget.</p>
+        
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h3>Free</h3>
+              <p class="pricing-price">$0<span>/month</span></p>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li>Basic AI predictions</li>
+                <li>Limited sports coverage</li>
+                <li>Daily free pick</li>
+                <li>Community access</li>
+                <li>Basic stats and odds</li>
+              </ul>
+            </div>
+            <div class="pricing-cta">
+              <a href="#download" class="button secondary-button">Get Started</a>
+            </div>
+          </div>
+          
+          <div class="pricing-card popular">
+            <div class="popular-badge">Most Popular</div>
+            <div class="pricing-header">
+              <h3>Pro</h3>
+              <p class="pricing-price">$19.99<span>/month</span></p>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li>Advanced AI predictions</li>
+                <li>All major sports coverage</li>
+                <li>Unlimited daily picks</li>
+                <li>Community access</li>
+                <li>Real-time analytics</li>
+                <li>Bankroll management tools</li>
+                <li>Betting history tracking</li>
+              </ul>
+            </div>
+            <div class="pricing-cta">
+              <a href="#download" class="button primary-button">Get Started</a>
+            </div>
+          </div>
+          
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h3>Elite</h3>
+              <p class="pricing-price">$39.99<span>/month</span></p>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li>Premium AI predictions</li>
+                <li>All sports coverage (including niche)</li>
+                <li>Unlimited daily picks</li>
+                <li>VIP community access</li>
+                <li>Advanced real-time analytics</li>
+                <li>Advanced bankroll management</li>
+                <li>Betting history tracking</li>
+                <li>Personalized betting strategy</li>
+                <li>Priority customer support</li>
+              </ul>
+            </div>
+            <div class="pricing-cta">
+              <a href="#download" class="button secondary-button">Get Started</a>
+            </div>
+          </div>
+          
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h3>Group Pro</h3>
+              <p class="pricing-price">$149.99<span>/month</span></p>
+              <p class="pricing-subtitle">For up to 3 users ($49.99 each)</p>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li>All Pro features for up to 3 users</li>
+                <li>Each user gets full access to premium features</li>
+                <li>Save $49.98/month compared to individual subscriptions</li>
+                <li>Manage members from your account</li>
+                <li>Perfect for friends, family, or small groups</li>
+              </ul>
+            </div>
+            <div class="pricing-cta">
+              <a href="#download" class="button secondary-button">Get Started</a>
+            </div>
           </div>
         </div>
         
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3>Elite</h3>
-            <p class="pricing-price">$39.99<span>/month</span></p>
-          </div>
-          <div class="pricing-features">
-            <ul>
-              <li>Premium AI predictions</li>
-              <li>All sports coverage (including niche)</li>
-              <li>Unlimited daily picks</li>
-              <li>VIP community access</li>
-              <li>Advanced real-time analytics</li>
-              <li>Advanced bankroll management</li>
-              <li>Betting history tracking</li>
-              <li>Personalized betting strategy</li>
-              <li>Priority customer support</li>
-            </ul>
-          </div>
-          <div class="pricing-cta">
-            <a href="#download" class="button secondary-button">Get Started</a>
+        <div class="annual-discount">
+          <h3>Save 20% with Annual Plans</h3>
+          <p>Get two months free when you subscribe to an annual plan.</p>
+          <a href="#download" class="button primary-button">View Annual Plans</a>
+        </div>
+      </div>
+    </section>
+    
+    <section id="about" class="about-section">
+      <div class="container">
+        <h2 class="section-title">About AI Sports Edge</h2>
+        <p class="section-subtitle">Revolutionizing sports betting with artificial intelligence and data science.</p>
+        
+        <div class="about-grid">
+          <div class="about-item">
+            <h3>About Us</h3>
+            <p>AI Sports Edge combines cutting-edge artificial intelligence with comprehensive sports analytics to provide bettors with powerful tools and insights.</p>
           </div>
         </div>
       </div>
-      
-      <div class="annual-discount">
-        <h3>Save 20% with Annual Plans</h3>
-        <p>Get two months free when you subscribe to an annual plan.</p>
-        <a href="#download" class="button primary-button">View Annual Plans</a>
-      </div>
-    </div>
-  </section>
-  
-  <section id="about" class="about-section">
-    <div class="container">
-      <h2 class="section-title">About AI Sports Edge</h2>
-      <p class="section-subtitle">Revolutionizing sports betting with artificial intelligence and data science.</p>
-      
-      <div class="about-grid">
-        <div class="about-item">
-          <h3>Our Mission</h3>
-          <p>At AI Sports Edge, we're on a mission to transform the sports betting landscape by combining cutting-edge artificial intelligence with comprehensive sports analytics. We believe that informed betting decisions lead to better outcomes, and our goal is to provide bettors of all experience levels with the tools and insights they need to succeed.</p>
-          <p>We're committed to promoting responsible gambling practices while helping our users make data-driven decisions that maximize their chances of success.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="live-odds" class="app-section">
-    <div class="container">
-      <h2 class="section-title">Live Odds & Predictions</h2>
-      <p class="section-subtitle">Get AI-powered insights for upcoming games. Purchase odds to see our detailed predictions and analysis.</p>
-      
-      <div class="games-grid">
-        <!-- Game Card 1 -->
-        <div class="game-card">
-          <div class="game-header">
-            <span class="game-sport">NFL</span>
-            <span class="game-time">Tomorrow, 3:30 PM</span>
+    <section id="live-odds" class="app-section">
+      <div class="container">
+        <h2 class="section-title">Live Odds & Predictions</h2>
+        <p class="section-subtitle">Get AI-powered insights for upcoming games. Purchase odds to see our detailed predictions and analysis.</p>
+        
+        <div class="games-grid">
+          <!-- Game Card 1 -->
+          <div class="game-card">
+            <div class="game-header">
+              <span class="game-sport">NFL</span>
+              <span class="game-time">Tomorrow, 3:30 PM</span>
+            </div>
+            
+            <div class="game-teams">
+              <div class="team home">
+                <span class="team-name">Kansas City Chiefs</span>
+                <span class="team-score">24</span>
+              </div>
+              <div class="vs">VS</div>
+              <div class="team away">
+                <span class="team-name">San Francisco 49ers</span>
+                <span class="team-score">17</span>
+              </div>
+            </div>
+            
+            <div class="game-odds">
+              <div class="odds-item">
+                <span class="odds-label">Spread:</span>
+                <span class="odds-value">Chiefs -3.5</span>
+              </div>
+              <div class="odds-item">
+                <span class="odds-label">Total:</span>
+                <span class="odds-value">O/U 49.5</span>
+              </div>
+            </div>
+            
+            <div class="game-actions">
+              <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game1', 'Kansas City Chiefs', 'San Francisco 49ers')">
+                Get Odds
+              </button>
+            </div>
           </div>
           
-          <div class="game-teams">
-            <div class="team home">
-              <span class="team-name">Kansas City Chiefs</span>
-              <span class="team-score">24</span>
+          <!-- Game Card 2 -->
+          <div class="game-card">
+            <div class="game-header">
+              <span class="game-sport">NBA</span>
+              <span class="game-time">2 days from now, 7:00 PM</span>
             </div>
-            <div class="vs">VS</div>
-            <div class="team away">
-              <span class="team-name">San Francisco 49ers</span>
-              <span class="team-score">17</span>
+            
+            <div class="game-teams">
+              <div class="team home">
+                <span class="team-name">Los Angeles Lakers</span>
+                <span class="team-score">112</span>
+              </div>
+              <div class="vs">VS</div>
+              <div class="team away">
+                <span class="team-name">Boston Celtics</span>
+                <span class="team-score">108</span>
+              </div>
+            </div>
+            
+            <div class="game-odds">
+              <div class="odds-item">
+                <span class="odds-label">Spread:</span>
+                <span class="odds-value">Lakers -2.5</span>
+              </div>
+              <div class="odds-item">
+                <span class="odds-label">Total:</span>
+                <span class="odds-value">O/U 220.5</span>
+              </div>
+            </div>
+            
+            <div class="game-actions">
+              <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game2', 'Los Angeles Lakers', 'Boston Celtics')">
+                Get Odds
+              </button>
             </div>
           </div>
           
-          <div class="game-odds">
-            <div class="odds-item">
-              <span class="odds-label">Spread:</span>
-              <span class="odds-value">Chiefs -3.5</span>
+          <!-- Game Card 3 -->
+          <div class="game-card">
+            <div class="game-header">
+              <span class="game-sport">MLB</span>
+              <span class="game-time">3 days from now, 1:05 PM</span>
             </div>
-            <div class="odds-item">
-              <span class="odds-label">Total:</span>
-              <span class="odds-value">O/U 49.5</span>
+            
+            <div class="game-teams">
+              <div class="team home">
+                <span class="team-name">New York Yankees</span>
+                <span class="team-score">5</span>
+              </div>
+              <div class="vs">VS</div>
+              <div class="team away">
+                <span class="team-name">Boston Red Sox</span>
+                <span class="team-score">3</span>
+              </div>
             </div>
-          </div>
-          
-          <div class="game-actions">
-            <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game1', 'Kansas City Chiefs', 'San Francisco 49ers')">
-              Get Odds
-            </button>
+            
+            <div class="game-odds">
+              <div class="odds-item">
+                <span class="odds-label">Spread:</span>
+                <span class="odds-value">Yankees -1.5</span>
+              </div>
+              <div class="odds-item">
+                <span class="odds-label">Total:</span>
+                <span class="odds-value">O/U 8.5</span>
+              </div>
+            </div>
+            
+            <div class="game-actions">
+              <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game3', 'New York Yankees', 'Boston Red Sox')">
+                Get Odds
+              </button>
+            </div>
           </div>
         </div>
         
-        <!-- Game Card 2 -->
-        <div class="game-card">
-          <div class="game-header">
-            <span class="game-sport">NBA</span>
-            <span class="game-time">2 days from now, 7:00 PM</span>
+        <div class="odds-cta">
+          <h2>Want More Predictions?</h2>
+          <p>Download our mobile app for comprehensive coverage and advanced features.</p>
+          <a href="#download" class="button primary-button">Download App</a>
+        </div>
+      </div>
+    </section>
+    
+    <section id="download" class="download-section">
+      <div class="container">
+        <h2 class="section-title">Download AI Sports Edge</h2>
+        <p class="section-subtitle">Get started with AI-powered sports betting predictions today.</p>
+        
+        <div class="download-options">
+          <div class="qr-code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=exp://exp.host/@aisportsedge/ai-sports-edge" alt="Expo Go QR Code">
+            <p>Scan with your phone camera or Expo Go app</p>
           </div>
           
-          <div class="game-teams">
-            <div class="team home">
-              <span class="team-name">Los Angeles Lakers</span>
-              <span class="team-score">112</span>
+          <div class="download-steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <p>Download <a href="https://expo.dev/client" target="_blank">Expo Go</a> from the App Store or Google Play</p>
             </div>
-            <div class="vs">VS</div>
-            <div class="team away">
-              <span class="team-name">Boston Celtics</span>
-              <span class="team-score">108</span>
+            <div class="step">
+              <div class="step-number">2</div>
+              <p>Open Expo Go and scan the QR code</p>
             </div>
-          </div>
-          
-          <div class="game-odds">
-            <div class="odds-item">
-              <span class="odds-label">Spread:</span>
-              <span class="odds-value">Lakers -2.5</span>
+            <div class="step">
+              <div class="step-number">3</div>
+              <p>Enjoy AI Sports Edge with all features enabled</p>
             </div>
-            <div class="odds-item">
-              <span class="odds-label">Total:</span>
-              <span class="odds-value">O/U 220.5</span>
-            </div>
-          </div>
-          
-          <div class="game-actions">
-            <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game2', 'Los Angeles Lakers', 'Boston Celtics')">
-              Get Odds
-            </button>
           </div>
         </div>
         
-        <!-- Game Card 3 -->
-        <div class="game-card">
-          <div class="game-header">
-            <span class="game-sport">MLB</span>
-            <span class="game-time">3 days from now, 1:05 PM</span>
-          </div>
-          
-          <div class="game-teams">
-            <div class="team home">
-              <span class="team-name">New York Yankees</span>
-              <span class="team-score">5</span>
-            </div>
-            <div class="vs">VS</div>
-            <div class="team away">
-              <span class="team-name">Boston Red Sox</span>
-              <span class="team-score">3</span>
-            </div>
-          </div>
-          
-          <div class="game-odds">
-            <div class="odds-item">
-              <span class="odds-label">Spread:</span>
-              <span class="odds-value">Yankees -1.5</span>
-            </div>
-            <div class="odds-item">
-              <span class="odds-label">Total:</span>
-              <span class="odds-value">O/U 8.5</span>
-            </div>
-          </div>
-          
-          <div class="game-actions">
-            <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game3', 'New York Yankees', 'Boston Red Sox')">
-              Get Odds
-            </button>
-          </div>
+        <div class="download-button-container">
+          <a href="exp://exp.host/@aisportsedge/ai-sports-edge" class="button primary-button">Open in Expo Go</a>
         </div>
       </div>
-      
-      <div class="odds-cta">
-        <h2>Want More Predictions?</h2>
-        <p>Download our mobile app for comprehensive coverage and advanced features.</p>
-        <a href="#download" class="button primary-button">Download App</a>
-      </div>
-    </div>
-  </section>
-  
-  <section id="download" class="download-section">
-    <div class="container">
-      <h2 class="section-title">Download AI Sports Edge</h2>
-      <p class="section-subtitle">Get started with AI-powered sports betting predictions today.</p>
-      
-      <div class="download-options">
-        <div class="qr-code">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=exp://exp.host/@aisportsedge/ai-sports-edge" alt="Expo Go QR Code">
-          <p>Scan with your phone camera or Expo Go app</p>
-        </div>
-        
-        <div class="download-steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <p>Download <a href="https://expo.dev/client" target="_blank">Expo Go</a> from the App Store or Google Play</p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <p>Open Expo Go and scan the QR code</p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <p>Enjoy AI Sports Edge with all features enabled</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="download-button-container">
-        <a href="exp://exp.host/@aisportsedge/ai-sports-edge" class="button primary-button">Open in Expo Go</a>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h3 class="footer-title">AI Sports Edge</h3>
-          <p class="footer-description">
-            Your ultimate sports betting companion powered by AI. Get predictions, analytics, and insights for smarter betting decisions.
-          </p>
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3 class="footer-title">AI Sports Edge</h3>
+            <p class="footer-description">
+              Your ultimate sports betting companion powered by AI. Get predictions, analytics, and insights for smarter betting decisions.
+            </p>
+          </div>
         </div>
         
-        <div class="footer-section">
-          <h3 class="footer-title">Contact</h3>
-          <ul class="footer-contact">
-            <li>
-              <a href="mailto:samuel@aisportsedge.app">samuel@aisportsedge.app</a>
-            </li>
-            <li>
-              <span>San Francisco, CA</span>
-            </li>
-          </ul>
+        <div class="footer-bottom">
+          <p>&copy; 2025 AI Sports Edge. All rights reserved.</p>
         </div>
       </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2025 AI Sports Edge. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+    </footer>
+  </div>
+
+  <!-- Loading spinner while checking auth -->
+  <div id="loading-spinner" style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #121212;">
+    <div style="width: 50px; height: 50px; border: 3px solid rgba(0, 136, 255, 0.3); border-radius: 50%; border-top-color: #0088ff; animation: spin 1s ease-in-out infinite;"></div>
+  </div>
+
 <script>
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyA1234567890abcdefghijklmnopqrstuvwxyz",
+  authDomain: "ai-sports-edge.firebaseapp.com",
+  projectId: "ai-sports-edge",
+  storageBucket: "ai-sports-edge.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef1234567890"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Check authentication state
+firebase.auth().onAuthStateChanged((user) => {
+  // Hide loading spinner
+  document.getElementById('loading-spinner').style.display = 'none';
+  
+  if (user) {
+    // User is signed in, show content
+    console.log('User is signed in:', user.email);
+    document.getElementById('app-content').style.display = 'block';
+  } else {
+    // User is not signed in, redirect to login page
+    console.log('User is not signed in, redirecting to login page');
+    window.location.href = '/login.html';
+  }
+});
+
 // DNS Propagation Check
 document.addEventListener('DOMContentLoaded', function() {
   // Check if we're on the custom domain
