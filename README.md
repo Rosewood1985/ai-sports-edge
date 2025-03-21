@@ -1,6 +1,6 @@
 # AI Sports Edge
 
-AI Sports Edge is a mobile application that provides AI-powered sports betting predictions, analytics, and insights for smarter betting decisions.
+AI Sports Edge is a mobile and web application that provides AI-powered sports betting predictions, analytics, and insights for smarter betting decisions.
 
 ## Features
 
@@ -9,6 +9,19 @@ AI Sports Edge is a mobile application that provides AI-powered sports betting p
 - **Multi-Sport Coverage**: From NFL to Formula 1, we cover all major sports with specialized prediction models for each.
 - **Community Insights**: Connect with other bettors, share strategies, and learn from the community's collective wisdom.
 - **Personalized Betting Insights**: Custom risk assessment, personalized betting unit recommendations, and tailored notifications.
+- **Enhanced Player Statistics**: Detailed player performance metrics and comparison tools.
+- **Location-Based Features**: Find nearby venues and get local team odds.
+- **Betting Analytics Dashboard**: Track your betting performance with advanced visualization tools.
+- **Multi-user Subscription Options**: Share premium features with friends and family.
+
+## Project Status
+
+AI Sports Edge is currently in pre-deployment phase. For detailed information about the project status, check the following documentation:
+
+- [Pre-Deployment Status](docs/pre-deployment-status.md): Overview of completed and remaining tasks
+- [Deployment Checklist](docs/deployment-checklist.md): Comprehensive checklist for web and iOS deployment
+- [Technical Debt Inventory](docs/technical-debt.md): Tracking of technical debt items to address
+- [Remaining Features Implementation Plan](docs/remaining-features-implementation-plan.md): Detailed plan for completing remaining features
 
 ## Getting Started
 
@@ -130,7 +143,3 @@ npm run deploy
 ## License
 
 This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
-
-## Contact
-
-For support or inquiries, please contact: samuel@aisportsedge.app
