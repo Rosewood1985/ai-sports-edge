@@ -100,6 +100,86 @@ The UFC screen has been optimized for both mobile and tablet layouts:
 </View>
 ```
 
+### Odds Comparison Component
+
+The OddsComparisonComponent has been optimized for responsive layouts:
+
+#### Mobile Layout:
+- Stacked sportsbook cards
+- Compact header with dropdown sport selector
+- Optimized touch targets for betting buttons
+- Vertical layout for odds comparison
+
+#### Tablet Layout:
+- Side-by-side sportsbook cards
+- Expanded header with horizontal sport selector
+- Larger touch targets and typography
+- Grid layout for multiple games
+
+```typescript
+// Example of responsive layout in OddsComparisonComponent
+<View style={[styles.container, responsiveStyles.container]}>
+  <View style={responsiveStyles.headerContainer}>
+    <SportSelector
+      selectedSport={selectedSport}
+      onSelectSport={handleSportSelection}
+      layout={isTablet ? 'horizontal' : 'dropdown'}
+    />
+    <View style={responsiveStyles.headerButtons}>
+      <TouchableOpacity
+        style={styles.headerButton}
+        onPress={() => setShowPersonalizationModal(true)}
+      >
+        <Ionicons name="settings-outline" size={isTablet ? 28 : 24} color={colors.primary} />
+      </TouchableOpacity>
+    </View>
+  </View>
+  
+  <View style={[styles.oddsContainer, responsiveStyles.oddsContainer]}>
+    {/* Responsive odds layout */}
+  </View>
+</View>
+```
+
+### Personalization Settings
+
+The PersonalizationSettings component adapts to different screen sizes:
+
+#### Mobile Layout:
+- Full-screen modal
+- Tab navigation for different settings categories
+- Stacked option items
+- Optimized for touch interaction
+
+#### Tablet Layout:
+- Centered modal with larger width
+- Side-by-side layout for some settings
+- Enhanced typography and spacing
+- Keyboard shortcut support
+
+```typescript
+// Example of responsive layout in PersonalizationSettings
+<Modal
+  visible={showPersonalizationModal}
+  animationType="slide"
+  transparent={isTablet}
+  onRequestClose={onClose}
+>
+  <View style={[
+    styles.modalContainer,
+    isTablet && styles.tabletModalContainer
+  ]}>
+    <View style={[
+      styles.modalContent,
+      isTablet && styles.tabletModalContent,
+      { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }
+    ]}>
+      {/* Settings content */}
+    </View>
+  </View>
+</Modal>
+```
+
 ## Implementation Details
 
 ### 1. Device Detection
@@ -142,6 +222,30 @@ We've optimized performance for responsive layouts:
 - Styles are memoized to prevent unnecessary recalculations
 - Layout changes are batched to minimize render cycles
 - Heavy computations are avoided during orientation changes
+- Code splitting with lazy loading for components not immediately visible
+- Memory management with automatic cleanup for long-running sessions
+- Time-based memoization (TTL) for expensive operations
+- Efficient rendering with React.memo and useMemo for responsive components
+
+```typescript
+// Example of code splitting with lazy loading
+export const LazyOddsMovementAlerts = createLazyComponent(
+  () => import('./OddsMovementAlerts'),
+  { text: 'Loading alerts...' }
+);
+
+// Example of memory management with TTL
+const processOddsData = memoizeWithTTL(
+  (data: Game[]) => {
+    // Expensive data processing
+    return processedData;
+  },
+  // Cache key function
+  (data: Game[]) => `${selectedSport}_${data[0]?.id || 'unknown'}`,
+  // 2-minute TTL
+  2 * 60 * 1000
+);
+```
 
 ## Testing
 
@@ -152,6 +256,52 @@ The responsive layouts have been tested on:
 - Different orientations (portrait and landscape)
 - Various screen sizes and pixel densities
 
+We've implemented a comprehensive testing infrastructure for responsive layouts:
+
+```typescript
+// Example of cross-platform responsive testing
+describe('OddsComparisonComponent (Cross-Platform)', () => {
+  // Test for iOS tablet
+  it('renders correctly on iPad', () => {
+    // Mock iPad environment
+    jest.spyOn(Dimensions, 'get').mockReturnValue({
+      width: 1024,
+      height: 768,
+      scale: 2,
+      fontScale: 1
+    });
+    Platform.OS = 'ios';
+    Platform.isPad = true;
+    
+    const { getByTestId } = render(<OddsComparisonComponent />);
+    
+    // Verify tablet-specific layout elements
+    expect(getByTestId('tablet-layout')).toBeTruthy();
+    expect(getByTestId('horizontal-sport-selector')).toBeTruthy();
+  });
+  
+  // Test for Android phone
+  it('renders correctly on Android phone', () => {
+    // Mock Android phone environment
+    jest.spyOn(Dimensions, 'get').mockReturnValue({
+      width: 360,
+      height: 640,
+      scale: 2,
+      fontScale: 1
+    });
+    Platform.OS = 'android';
+    
+    const { getByTestId } = render(<OddsComparisonComponent />);
+    
+    // Verify phone-specific layout elements
+    expect(getByTestId('phone-layout')).toBeTruthy();
+    expect(getByTestId('dropdown-sport-selector')).toBeTruthy();
+  });
+});
+```
+
+For more details on testing, see the [Testing Guide](docs/testing-guide.md).
+
 ## Future Improvements
 
 Planned enhancements for the responsive system:
@@ -161,3 +311,8 @@ Planned enhancements for the responsive system:
 3. Create device-specific navigation patterns (bottom tabs on phones, side navigation on tablets)
 4. Implement split-screen support for tablets
 5. Add keyboard shortcut support for tablet users with keyboards
+6. Enhance personalization options with device-specific defaults
+7. Implement responsive A/B testing for different device types
+8. Add advanced analytics for device-specific user behavior
+9. Optimize code splitting based on device capabilities
+10. Implement responsive voice interaction for hands-free usage

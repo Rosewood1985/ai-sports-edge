@@ -13,6 +13,11 @@ AI Sports Edge is a mobile and web application that provides AI-powered sports b
 - **Location-Based Features**: Find nearby venues and get local team odds.
 - **Betting Analytics Dashboard**: Track your betting performance with advanced visualization tools.
 - **Multi-user Subscription Options**: Share premium features with friends and family.
+- **Personalization Options**: Set default sports and sportsbooks for a customized experience.
+- **Performance Optimization**: Enjoy fast loading times with code splitting and memory management.
+- **Analytics Integration**: Comprehensive tracking of user behavior for continuous improvement.
+- **A/B Testing Framework**: Data-driven UI optimization for the best user experience.
+- **Cross-Platform Testing**: Robust testing across iOS, Android, and web platforms.
 
 ## Project Status
 
@@ -22,6 +27,13 @@ AI Sports Edge is currently in pre-deployment phase. For detailed information ab
 - [Deployment Checklist](docs/deployment-checklist.md): Comprehensive checklist for web and iOS deployment
 - [Technical Debt Inventory](docs/technical-debt.md): Tracking of technical debt items to address
 - [Remaining Features Implementation Plan](docs/remaining-features-implementation-plan.md): Detailed plan for completing remaining features
+
+### Recent Implementations
+
+- [Analytics and A/B Testing](docs/analytics-and-ab-testing.md): Comprehensive analytics and A/B testing implementation
+- [Personalization Options](docs/personalization-options.md): User preference management for default sports and sportsbooks
+- [Performance Optimizations](docs/performance-optimizations.md): Code splitting, lazy loading, and memory management
+- [Testing Guide](docs/testing-guide.md): Comprehensive testing infrastructure for unit, cross-platform, and offline testing
 
 ## Getting Started
 
@@ -108,6 +120,23 @@ For production environments, set environment variables through your hosting plat
 - **Use different keys** for development and production
 - **Rotate keys periodically** for enhanced security
 - **Restrict API key permissions** to only what's needed
+
+### Testing
+
+The project includes a comprehensive testing infrastructure:
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test file
+npm test -- path/to/test/file.test.tsx
+
+# Run tests with coverage
+npm test -- --coverage
+```
+
+For detailed information about testing, see the [Testing Guide](docs/testing-guide.md).
 
 ### Building for Production
 
