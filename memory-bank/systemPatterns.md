@@ -90,7 +90,7 @@ This pattern provides:
 - Clear output for test results
 ## Implementation Patterns
 
-### Weather Integration for Sports Odds
+### Secure Weather Integration for Sports Odds
 ```javascript
 /**
  * Get weather adjustment factor for a specific sport and condition
@@ -100,12 +100,37 @@ This pattern provides:
  */
 async getWeatherAdjustmentFactor(sport, weatherData) {
   try {
+    // Validate sport parameter
+    if (!sport || typeof sport !== 'string') {
+      console.error('Invalid sport parameter:', sport);
+      return { factor: 1.0, impact: 'none', description: 'Invalid sport parameter' };
+    }
+
+    // Validate supported sports
+    const supportedSports = ['MLB', 'NFL', 'NBA', 'WNBA', 'NCAA_MENS', 'NCAA_WOMENS',
+                            'NHL', 'FORMULA_1', 'SOCCER_EPL', 'SOCCER_MLS',
+                            'HORSE_RACING', 'UFC'];
+    
+    if (!supportedSports.includes(sport)) {
+      console.error('Unsupported sport:', sport);
+      return { factor: 1.0, impact: 'none', description: 'Unsupported sport' };
+    }
+
     if (!weatherData) {
       return { factor: 1.0, impact: 'none', description: 'No weather data available' };
     }
 
-    // Get the weather condition
-    const { condition, temperature, windSpeed, precipitation } = weatherData;
+    // Validate weatherData object
+    if (typeof weatherData !== 'object') {
+      console.error('Invalid weatherData parameter:', typeof weatherData);
+      return { factor: 1.0, impact: 'none', description: 'Invalid weather data' };
+    }
+
+    // Get the weather condition with safe defaults
+    const condition = weatherData.condition || 'Unknown';
+    const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
+    const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
+    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
     
     // Default adjustment (no impact)
     let factor = 1.0;
@@ -137,19 +162,20 @@ async getWeatherAdjustmentFactor(sport, weatherData) {
         return { factor: 1.0, impact: 'none', description: 'No specific weather adjustment for this sport' };
     }
   } catch (error) {
-    console.error('Error getting weather adjustment factor:', error);
+    // Log error without exposing sensitive details
+    console.error('Error getting weather adjustment factor:', error.message || 'Unknown error');
     return { factor: 1.0, impact: 'none', description: 'Error calculating weather adjustment' };
   }
 }
 ```
 
 This pattern provides:
-- Centralized weather adjustment logic
-- Sport-specific weather impact handling
-- Graceful error handling with sensible defaults
-- Clear documentation of weather impact on odds
-
-### Sport-Specific Weather Adjustments
+- Comprehensive input validation for all parameters
+- Type checking and safe defaults for all weather properties
+- Explicit validation of supported sports
+- Secure error handling that prevents information leakage
+- Centralized weather adjustment logic with proper security controls
+### Secure Sport-Specific Weather Adjustments
 ```javascript
 /**
  * Get baseball weather adjustment
@@ -157,7 +183,21 @@ This pattern provides:
  * @returns {Object} Weather adjustment factors
  */
 getBaseballWeatherAdjustment(weatherData) {
-  const { condition, temperature, windSpeed, precipitation } = weatherData;
+  // Validate input
+  if (!weatherData || typeof weatherData !== 'object') {
+    return {
+      factor: 1.0,
+      impact: 'none',
+      description: 'Invalid weather data for baseball adjustment'
+    };
+  }
+
+  // Extract weather properties with safe defaults
+  const condition = weatherData.condition || 'Unknown';
+  const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
+  const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
+  const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+  
   let factor = 1.0;
   let impact = 'none';
   let description = 'Normal baseball conditions';
@@ -187,15 +227,60 @@ getBaseballWeatherAdjustment(weatherData) {
     description = 'Rain typically reduces scoring and increases pitching advantage';
   }
 
+  // Ensure factor is within reasonable bounds
+  factor = Math.max(0.5, Math.min(factor, 2.0));
+
   return { factor, impact, description };
+}
+```
+```
+
+This pattern provides:
+- Input validation with proper error handling
+- Safe defaults for all weather properties
+- Bounds checking to prevent extreme adjustment values
+- Detailed sport-specific weather adjustments with security controls
+- Descriptive impact information for user display
+
+### Secure Weather API Response Handling
+```javascript
+/**
+ * Sanitize weather data before returning to client
+ * @param {Object} weatherData - Raw weather data from API
+ * @returns {Object} Sanitized weather data
+ */
+function sanitizeWeatherData(weatherData) {
+  // Validate input
+  if (!weatherData || typeof weatherData !== 'object') {
+    return {
+      temperature: 0,
+      condition: 'Unknown',
+      timestamp: new Date().toISOString()
+    };
+  }
+  
+  // Extract only the properties we need with safe defaults
+  return {
+    temperature: typeof weatherData.temperature === 'number' ? weatherData.temperature : 0,
+    feelsLike: typeof weatherData.feelsLike === 'number' ? weatherData.feelsLike : 0,
+    humidity: typeof weatherData.humidity === 'number' ? weatherData.humidity : 0,
+    windSpeed: typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0,
+    windDirection: weatherData.windDirection || 'Unknown',
+    precipitation: typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0,
+    condition: weatherData.condition || 'Unknown',
+    conditionIcon: weatherData.conditionIcon || 'default-icon',
+    location: weatherData.location || 'Unknown',
+    timestamp: weatherData.timestamp || new Date().toISOString()
+  };
 }
 ```
 
 This pattern provides:
-- Detailed sport-specific weather adjustments
-- Clear documentation of weather impact factors
-- Quantifiable adjustment factors for odds calculation
-- Descriptive impact information for user display
+- Data sanitization to prevent injection attacks
+- Type checking for all weather properties
+- Safe defaults for missing or invalid data
+- Removal of potentially sensitive or unnecessary data
+- Consistent data structure for client-side processing
 
 ### Webhook Handling
 ```javascript
