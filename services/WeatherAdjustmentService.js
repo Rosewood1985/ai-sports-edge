@@ -17,12 +17,37 @@ class WeatherAdjustmentService {
    */
   async getWeatherAdjustmentFactor(sport, weatherData) {
     try {
+      // Validate sport parameter
+      if (!sport || typeof sport !== 'string') {
+        console.error('Invalid sport parameter:', sport);
+        return { factor: 1.0, impact: 'none', description: 'Invalid sport parameter' };
+      }
+
+      // Validate supported sports
+      const supportedSports = ['MLB', 'NFL', 'NBA', 'WNBA', 'NCAA_MENS', 'NCAA_WOMENS',
+                              'NHL', 'FORMULA_1', 'SOCCER_EPL', 'SOCCER_MLS',
+                              'HORSE_RACING', 'UFC'];
+      
+      if (!supportedSports.includes(sport)) {
+        console.error('Unsupported sport:', sport);
+        return { factor: 1.0, impact: 'none', description: 'Unsupported sport' };
+      }
+
       if (!weatherData) {
         return { factor: 1.0, impact: 'none', description: 'No weather data available' };
       }
 
-      // Get the weather condition
-      const { condition, temperature, windSpeed, precipitation } = weatherData;
+      // Validate weatherData object
+      if (typeof weatherData !== 'object') {
+        console.error('Invalid weatherData parameter:', typeof weatherData);
+        return { factor: 1.0, impact: 'none', description: 'Invalid weather data' };
+      }
+
+      // Get the weather condition with safe defaults
+      const condition = weatherData.condition || 'Unknown';
+      const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
+      const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
+      const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
       
       // Default adjustment (no impact)
       let factor = 1.0;
@@ -89,7 +114,21 @@ class WeatherAdjustmentService {
    * @returns {Object} Weather adjustment factors
    */
   getBaseballWeatherAdjustment(weatherData) {
-    const { condition, temperature, windSpeed, precipitation } = weatherData;
+    // Validate input
+    if (!weatherData || typeof weatherData !== 'object') {
+      return {
+        factor: 1.0,
+        impact: 'none',
+        description: 'Invalid weather data for baseball adjustment'
+      };
+    }
+
+    // Extract weather properties with safe defaults
+    const condition = weatherData.condition || 'Unknown';
+    const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
+    const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
+    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+    
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal baseball conditions';
@@ -119,6 +158,9 @@ class WeatherAdjustmentService {
       description = 'Rain typically reduces scoring and increases pitching advantage';
     }
 
+    // Ensure factor is within reasonable bounds
+    factor = Math.max(0.5, Math.min(factor, 2.0));
+
     return { factor, impact, description };
   }
 
@@ -128,7 +170,21 @@ class WeatherAdjustmentService {
    * @returns {Object} Weather adjustment factors
    */
   getFootballWeatherAdjustment(weatherData) {
-    const { condition, temperature, windSpeed, precipitation } = weatherData;
+    // Validate input
+    if (!weatherData || typeof weatherData !== 'object') {
+      return {
+        factor: 1.0,
+        impact: 'none',
+        description: 'Invalid weather data for football adjustment'
+      };
+    }
+
+    // Extract weather properties with safe defaults
+    const condition = weatherData.condition || 'Unknown';
+    const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
+    const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
+    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+    
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal football conditions';
@@ -154,6 +210,9 @@ class WeatherAdjustmentService {
       description = 'Precipitation significantly affects ball handling and scoring';
     }
 
+    // Ensure factor is within reasonable bounds
+    factor = Math.max(0.5, Math.min(factor, 2.0));
+
     return { factor, impact, description };
   }
 
@@ -163,7 +222,19 @@ class WeatherAdjustmentService {
    * @returns {Object} Weather adjustment factors
    */
   getFormula1WeatherAdjustment(weatherData) {
-    const { condition, precipitation } = weatherData;
+    // Validate input
+    if (!weatherData || typeof weatherData !== 'object') {
+      return {
+        factor: 1.0,
+        impact: 'none',
+        description: 'Invalid weather data for Formula 1 adjustment'
+      };
+    }
+
+    // Extract weather properties with safe defaults
+    const condition = weatherData.condition || 'Unknown';
+    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+    
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal racing conditions';
@@ -179,6 +250,9 @@ class WeatherAdjustmentService {
       description = 'Changing cloud cover can affect track temperature and grip';
     }
 
+    // Ensure factor is within reasonable bounds
+    factor = Math.max(0.5, Math.min(factor, 3.0)); // Allow higher upper bound for F1 due to high unpredictability
+
     return { factor, impact, description };
   }
 
@@ -188,7 +262,20 @@ class WeatherAdjustmentService {
    * @returns {Object} Weather adjustment factors
    */
   getSoccerWeatherAdjustment(weatherData) {
-    const { condition, windSpeed, precipitation } = weatherData;
+    // Validate input
+    if (!weatherData || typeof weatherData !== 'object') {
+      return {
+        factor: 1.0,
+        impact: 'none',
+        description: 'Invalid weather data for soccer adjustment'
+      };
+    }
+
+    // Extract weather properties with safe defaults
+    const condition = weatherData.condition || 'Unknown';
+    const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
+    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+    
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal soccer conditions';
@@ -207,6 +294,9 @@ class WeatherAdjustmentService {
       description = 'Wet field conditions typically reduce scoring';
     }
 
+    // Ensure factor is within reasonable bounds
+    factor = Math.max(0.7, Math.min(factor, 1.5));
+
     return { factor, impact, description };
   }
 
@@ -216,7 +306,19 @@ class WeatherAdjustmentService {
    * @returns {Object} Weather adjustment factors
    */
   getHorseRacingWeatherAdjustment(weatherData) {
-    const { condition, precipitation } = weatherData;
+    // Validate input
+    if (!weatherData || typeof weatherData !== 'object') {
+      return {
+        factor: 1.0,
+        impact: 'none',
+        description: 'Invalid weather data for horse racing adjustment'
+      };
+    }
+
+    // Extract weather properties with safe defaults
+    const condition = weatherData.condition || 'Unknown';
+    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+    
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal track conditions';
@@ -232,6 +334,9 @@ class WeatherAdjustmentService {
       description = 'Changing weather conditions can affect track performance';
     }
 
+    // Ensure factor is within reasonable bounds
+    factor = Math.max(0.5, Math.min(factor, 2.5));
+
     return { factor, impact, description };
   }
 
@@ -240,10 +345,47 @@ class WeatherAdjustmentService {
    * @param {string} gameId - Game ID
    * @param {string} sport - Sport key
    * @param {Array} odds - Original odds
-   * @returns {Promise<Array>} Weather-adjusted odds
+   * @returns {Promise<Object>} Weather-adjusted odds and metadata
    */
   async getWeatherAdjustedOdds(gameId, sport, odds) {
     try {
+      // Validate parameters
+      if (!gameId || typeof gameId !== 'string') {
+        console.error('Invalid gameId parameter:', gameId);
+        return {
+          odds,
+          weatherAdjustment: {
+            factor: 1.0,
+            impact: 'none',
+            description: 'Invalid game ID'
+          }
+        };
+      }
+
+      if (!sport || typeof sport !== 'string') {
+        console.error('Invalid sport parameter:', sport);
+        return {
+          odds,
+          weatherAdjustment: {
+            factor: 1.0,
+            impact: 'none',
+            description: 'Invalid sport parameter'
+          }
+        };
+      }
+
+      if (!Array.isArray(odds)) {
+        console.error('Invalid odds parameter:', typeof odds);
+        return {
+          odds: [],
+          weatherAdjustment: {
+            factor: 1.0,
+            impact: 'none',
+            description: 'Invalid odds data'
+          }
+        };
+      }
+
       // Get weather data for the game
       const weatherData = await weatherService.getGameWeather(gameId);
       
@@ -263,29 +405,52 @@ class WeatherAdjustmentService {
       
       // Apply adjustment to odds
       const adjustedOdds = odds.map(outcome => {
+        // Validate outcome object
+        if (!outcome || typeof outcome !== 'object') {
+          return outcome;
+        }
+
         // Only adjust the price if there's a significant impact
         if (adjustment.impact === 'none' || adjustment.impact === 'mild') {
           return outcome;
         }
         
-        // Calculate adjusted price
-        const adjustedPrice = outcome.price * adjustment.factor;
+        // Calculate adjusted price (ensure price is a number)
+        const originalPrice = typeof outcome.price === 'number' ? outcome.price : 0;
+        const adjustedPrice = originalPrice * adjustment.factor;
         
         return {
           ...outcome,
-          originalPrice: outcome.price,
+          originalPrice,
           price: adjustedPrice,
           weatherAdjusted: true
         };
       });
       
+      // Sanitize weather data before returning (remove any sensitive information)
+      const sanitizedWeatherData = {
+        temperature: weatherData.temperature,
+        feelsLike: weatherData.feelsLike,
+        humidity: weatherData.humidity,
+        windSpeed: weatherData.windSpeed,
+        windDirection: weatherData.windDirection,
+        precipitation: weatherData.precipitation,
+        condition: weatherData.condition,
+        conditionIcon: weatherData.conditionIcon,
+        location: weatherData.location,
+        timestamp: weatherData.timestamp
+      };
+      
       return {
         odds: adjustedOdds,
         weatherAdjustment: adjustment,
-        weatherData
+        weatherData: sanitizedWeatherData
       };
     } catch (error) {
-      console.error(`Error getting weather-adjusted odds for game ${gameId}:`, error);
+      // Log error without exposing sensitive details
+      console.error(`Error getting weather-adjusted odds for game ${gameId}:`,
+                    error.message || 'Unknown error');
+      
       return {
         odds,
         weatherAdjustment: {
