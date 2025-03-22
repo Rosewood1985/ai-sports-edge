@@ -6,9 +6,13 @@ import { ParamListBase } from "@react-navigation/native";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { PersonalizationProvider } from "./contexts/PersonalizationContext";
 import { BettingAffiliateProvider } from "./contexts/BettingAffiliateContext";
-import { StatusBar, useColorScheme } from "react-native";
+import { I18nProvider, useI18n } from "./contexts/I18nContext";
+import { StatusBar, useColorScheme, View } from "react-native";
 import StripeProvider from "./components/StripeProvider";
 import OneSignalProvider from "./components/OneSignalProvider";
+import { LanguageRedirect } from "./components/LanguageRedirect";
+import LanguageSelector from "./components/LanguageSelector";
+import LanguageChangeListener from "./components/LanguageChangeListener";
 import NeonLoginScreen from "./screens/NeonLoginScreen";
 import NeonOddsScreen from "./screens/NeonOddsScreen";
 import RewardsScreen from "./screens/RewardsScreen";
@@ -67,169 +71,193 @@ const NeonTheme = {
   },
 };
 
+// Language selector component for the header
+const HeaderLanguageSelector = () => {
+  return (
+    <LanguageSelector compact={true} style={{ marginRight: 10 }} />
+  );
+};
+
+// Main navigation component with i18n support
+const AppNavigator = () => {
+  const { t, language, setLanguage } = useI18n();
+  
+  return (
+    <>
+      <LanguageRedirect currentLanguage={language} setLanguage={setLanguage} />
+      <LanguageChangeListener />
+      <StatusBar barStyle="light-content" backgroundColor={colors.background.primary} />
+      <NavigationContainer theme={NeonTheme}>
+        <Stack.Navigator
+          screenOptions={({ navigation }) => ({
+            headerStyle: {
+              backgroundColor: colors.background.secondary,
+              elevation: 0, // Remove shadow on Android
+              shadowOpacity: 0, // Remove shadow on iOS
+              borderBottomWidth: 1,
+              borderBottomColor: colors.neon.blue,
+            },
+            headerTintColor: colors.neon.blue,
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+            cardStyle: { backgroundColor: colors.background.primary },
+            // Add language selector to header right
+            headerRight: () => <HeaderLanguageSelector />,
+          })}
+        >
+          <Stack.Screen
+            name="Login"
+            component={NeonLoginScreen}
+            options={{
+              title: t("screens.login.title"),
+              headerShown: false, // Hide header for login screen
+            }}
+          />
+          <Stack.Screen
+            name="PersonalizedHome"
+            component={PersonalizedHomeScreen}
+            options={{
+              title: t("screens.home.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="Odds"
+            component={NeonOddsScreen}
+            options={{
+              title: t("screens.odds.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="Rewards"
+            component={RewardsScreen}
+            options={{
+              title: t("screens.rewards.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="ReferralLeaderboard"
+            component={ReferralLeaderboardScreen}
+            options={{
+              title: t("screens.referralLeaderboard.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="FAQ"
+            component={FAQScreen}
+            options={{
+              title: t("screens.faq.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="GiftRedemption"
+            component={GiftRedemptionScreen}
+            options={{
+              title: t("screens.giftRedemption.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="SubscriptionAnalytics"
+            component={SubscriptionAnalyticsScreen}
+            options={{
+              title: t("screens.subscriptionAnalytics.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="SportsNews"
+            component={SportsNewsScreen}
+            options={{
+              title: t("screens.sportsNews.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="Formula1"
+            component={Formula1Screen}
+            options={{
+              title: t("screens.formula1.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="PlayerStats"
+            component={PlayerStatsScreen}
+            options={{
+              title: t("screens.playerStats.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="AdvancedPlayerStats"
+            component={AdvancedPlayerStatsScreen}
+            options={{
+              title: t("screens.advancedPlayerStats.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="PlayerHistoricalTrends"
+            component={PlayerHistoricalTrendsScreen}
+            options={{
+              title: t("screens.playerHistoricalTrends.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="NcaaBasketball"
+            component={NcaaBasketballScreen}
+            options={{
+              title: t("screens.ncaaBasketball.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="Personalization"
+            component={PersonalizationScreen}
+            options={{
+              title: t("screens.personalization.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+          <Stack.Screen
+            name="NotificationSettings"
+            component={NotificationSettingsScreen}
+            options={{
+              title: t("screens.notificationSettings.title"),
+              headerBackTitle: t("common.back")
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
+  );
+};
+
 /**
- * Main App component with neon UI design
+ * Main App component with neon UI design and internationalization support
  * @returns {JSX.Element} - Rendered component
  */
 function App(): JSX.Element {
   return (
     <ThemeProvider>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background.primary} />
-      <PersonalizationProvider>
-        <BettingAffiliateProvider>
-          <StripeProvider>
-            <OneSignalProvider>
-              <NavigationContainer theme={NeonTheme}>
-          <Stack.Navigator
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: colors.background.secondary,
-                elevation: 0, // Remove shadow on Android
-                shadowOpacity: 0, // Remove shadow on iOS
-                borderBottomWidth: 1,
-                borderBottomColor: colors.neon.blue,
-              },
-              headerTintColor: colors.neon.blue,
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-              cardStyle: { backgroundColor: colors.background.primary }
-            }}
-          >
-            <Stack.Screen
-              name="Login"
-              component={NeonLoginScreen}
-              options={{
-                title: "AI SPORTS EDGE",
-                headerShown: false, // Hide header for login screen
-              }}
-            />
-            <Stack.Screen
-              name="PersonalizedHome"
-              component={PersonalizedHomeScreen}
-              options={{
-                title: "AI SPORTS EDGE",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="Odds"
-              component={NeonOddsScreen}
-              options={{
-                title: "LIVE BETTING ODDS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="Rewards"
-              component={RewardsScreen}
-              options={{
-                title: "REWARDS & ACHIEVEMENTS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="ReferralLeaderboard"
-              component={ReferralLeaderboardScreen}
-              options={{
-                title: "REFERRAL LEADERBOARD",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="FAQ"
-              component={FAQScreen}
-              options={{
-                title: "FREQUENTLY ASKED QUESTIONS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="GiftRedemption"
-              component={GiftRedemptionScreen}
-              options={{
-                title: "REDEEM GIFT",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="SubscriptionAnalytics"
-              component={SubscriptionAnalyticsScreen}
-              options={{
-                title: "SUBSCRIPTION ANALYTICS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="SportsNews"
-              component={SportsNewsScreen}
-              options={{
-                title: "AI SPORTS NEWS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="Formula1"
-              component={Formula1Screen}
-              options={{
-                title: "FORMULA 1",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="PlayerStats"
-              component={PlayerStatsScreen}
-              options={{
-                title: "PLAYER STATISTICS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="AdvancedPlayerStats"
-              component={AdvancedPlayerStatsScreen}
-              options={{
-                title: "ADVANCED METRICS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="PlayerHistoricalTrends"
-              component={PlayerHistoricalTrendsScreen}
-              options={{
-                title: "HISTORICAL TRENDS",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="NcaaBasketball"
-              component={NcaaBasketballScreen}
-              options={{
-                title: "NCAA BASKETBALL",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="Personalization"
-              component={PersonalizationScreen}
-              options={{
-                title: "PERSONALIZATION",
-                headerBackTitle: "Back"
-              }}
-            />
-            <Stack.Screen
-              name="NotificationSettings"
-              component={NotificationSettingsScreen}
-              options={{
-                title: "NOTIFICATION SETTINGS",
-                headerBackTitle: "Back"
-              }}
-            />
-          </Stack.Navigator>
-              </NavigationContainer>
-            </OneSignalProvider>
-          </StripeProvider>
-        </BettingAffiliateProvider>
-      </PersonalizationProvider>
+      <I18nProvider>
+        <PersonalizationProvider>
+          <BettingAffiliateProvider>
+            <StripeProvider>
+              <OneSignalProvider>
+                <AppNavigator />
+              </OneSignalProvider>
+            </StripeProvider>
+          </BettingAffiliateProvider>
+        </PersonalizationProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 }

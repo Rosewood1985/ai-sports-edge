@@ -1,276 +1,290 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Calendar } from 'react-native-calendars';
+import { useTheme } from '../contexts/ThemeContext';
+import Colors from '../constants/Colors';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { TimePeriodFilter } from '../services/bettingAnalyticsService';
 
-// Import DateTimePicker conditionally to avoid TypeScript errors
-let DateTimePicker: any;
-try {
-  DateTimePicker = require('@react-native-community/datetimepicker').default;
-} catch (error) {
-  console.warn('DateTimePicker not available, using fallback');
-  // Fallback implementation if the module is not available
-  DateTimePicker = ({ value, onChange }: any) => (
-    <ThemedText>Date picker not available</ThemedText>
-  );
-}
+// Define time period types
+export type TimePeriod = 'today' | 'week' | 'month' | 'year' | 'all' | 'custom';
 
-/**
- * Date range selector props
- */
 interface DateRangeSelectorProps {
-  timePeriod: TimePeriodFilter['period'] | 'custom';
-  startDate?: Date;
-  endDate?: Date;
-  onSelectPeriod: (period: TimePeriodFilter['period'] | 'custom') => void;
-  onSelectCustomRange: (startDate: Date, endDate: Date) => void;
+  selectedPeriod: string;
+  onSelectPeriod: (period: TimePeriod) => void;
+  onSelectCustomRange?: (start: Date, end: Date) => void;
+  customDateRange?: { start: Date; end: Date } | null;
 }
 
 /**
- * Component for selecting date ranges for analytics
+ * DateRangeSelector component for selecting time periods or custom date ranges
  */
 const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
-  timePeriod,
-  startDate,
-  endDate,
+  selectedPeriod,
   onSelectPeriod,
-  onSelectCustomRange
+  onSelectCustomRange,
+  customDateRange,
 }) => {
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
-  const [tempStartDate, setTempStartDate] = useState(startDate || new Date());
-  const [tempEndDate, setTempEndDate] = useState(endDate || new Date());
-  const [showCustomModal, setShowCustomModal] = useState(false);
+  // State
+  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const [selectedStartDate, setSelectedStartDate] = useState<string | null>(null);
+  const [selectedEndDate, setSelectedEndDate] = useState<string | null>(null);
+  const [markedDates, setMarkedDates] = useState<any>({});
   
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = '#0a7ea4';
+  // Get theme colors
+  const { colors, isDark } = useTheme();
+  const backgroundColor = isDark ? '#1A1A1A' : '#FFFFFF';
+  const textColor = isDark ? '#FFFFFF' : '#000000';
   
-  /**
-   * Format date for display
-   */
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
+  // Time period options
+  const periods = [
+    { key: 'today', label: 'Today' },
+    { key: 'week', label: 'This Week' },
+    { key: 'month', label: 'This Month' },
+    { key: 'year', label: 'This Year' },
+    { key: 'all', label: 'All Time' },
+  ];
+  
+  // Show calendar modal
+  const showCalendar = () => {
+    // Reset selection
+    setSelectedStartDate(null);
+    setSelectedEndDate(null);
+    setMarkedDates({});
+    setIsCalendarVisible(true);
+  };
+  
+  // Hide calendar modal
+  const hideCalendar = () => {
+    setIsCalendarVisible(false);
+  };
+  
+  // Handle date selection
+  const handleDateSelect = (day: any) => {
+    const dateString = day.dateString;
+    
+    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+      // Start new selection
+      setSelectedStartDate(dateString);
+      setSelectedEndDate(null);
+      setMarkedDates({
+        [dateString]: {
+          selected: true,
+          startingDay: true,
+          color: Colors.neon.blue,
+          textColor: 'white',
+        },
+      });
+    } else {
+      // Complete the selection
+      const start = new Date(selectedStartDate);
+      const end = new Date(dateString);
+      
+      // Ensure start date is before end date
+      if (start > end) {
+        setSelectedStartDate(dateString);
+        setSelectedEndDate(selectedStartDate);
+      } else {
+        setSelectedEndDate(dateString);
+      }
+      
+      // Mark the range
+      const markedDatesObj: any = {};
+      const startDate = start < end ? start : end;
+      const endDate = start < end ? end : start;
+      
+      let currentDate = new Date(startDate);
+      
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        if (dateStr === startDate.toISOString().split('T')[0]) {
+          markedDatesObj[dateStr] = {
+            selected: true,
+            startingDay: true,
+            color: Colors.neon.blue,
+            textColor: 'white',
+          };
+        } else if (dateStr === endDate.toISOString().split('T')[0]) {
+          markedDatesObj[dateStr] = {
+            selected: true,
+            endingDay: true,
+            color: Colors.neon.blue,
+            textColor: 'white',
+          };
+        } else {
+          markedDatesObj[dateStr] = {
+            selected: true,
+            color: `${Colors.neon.blue}50`,
+            textColor: 'white',
+          };
+        }
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      setMarkedDates(markedDatesObj);
+    }
+  };
+  
+  // Apply selected date range
+  const applyDateRange = () => {
+    if (selectedStartDate && selectedEndDate && onSelectCustomRange) {
+      const start = new Date(selectedStartDate);
+      const end = new Date(selectedEndDate);
+      
+      // Ensure start date is before end date
+      if (start > end) {
+        onSelectCustomRange(end, start);
+      } else {
+        onSelectCustomRange(start, end);
+      }
+      
+      hideCalendar();
+    }
+  };
+  
+  // Format date for display
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      year: 'numeric',
     });
   };
   
-  /**
-   * Handle period button press
-   */
-  const handlePeriodPress = (period: TimePeriodFilter['period'] | 'custom') => {
-    if (period === 'custom') {
-      setShowCustomModal(true);
-    } else {
-      onSelectPeriod(period);
+  // Get custom range display text
+  const getCustomRangeText = () => {
+    if (customDateRange) {
+      return `${formatDate(customDateRange.start)} - ${formatDate(customDateRange.end)}`;
     }
-  };
-  
-  /**
-   * Handle start date change
-   */
-  const handleStartDateChange = (event: any, selectedDate?: Date) => {
-    setShowStartPicker(Platform.OS === 'ios');
-    
-    if (selectedDate) {
-      setTempStartDate(selectedDate);
-      
-      // Ensure end date is not before start date
-      if (tempEndDate < selectedDate) {
-        setTempEndDate(selectedDate);
-      }
-    }
-  };
-  
-  /**
-   * Handle end date change
-   */
-  const handleEndDateChange = (event: any, selectedDate?: Date) => {
-    setShowEndPicker(Platform.OS === 'ios');
-    
-    if (selectedDate) {
-      // Ensure end date is not before start date
-      if (selectedDate >= tempStartDate) {
-        setTempEndDate(selectedDate);
-      }
-    }
-  };
-  
-  /**
-   * Apply custom date range
-   */
-  const applyCustomRange = () => {
-    onSelectCustomRange(tempStartDate, tempEndDate);
-    onSelectPeriod('custom');
-    setShowCustomModal(false);
-  };
-  
-  /**
-   * Get period button style
-   */
-  const getPeriodButtonStyle = (period: TimePeriodFilter['period'] | 'custom') => {
-    return [
-      styles.periodButton,
-      timePeriod === period ? styles.activePeriodButton : null
-    ];
-  };
-  
-  /**
-   * Get period button text style
-   */
-  const getPeriodButtonTextStyle = (period: TimePeriodFilter['period'] | 'custom') => {
-    return [
-      styles.periodButtonText,
-      timePeriod === period ? styles.activePeriodButtonText : null
-    ];
+    return 'Custom Range';
   };
   
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Time Period</ThemedText>
-      
-      <View style={styles.periodButtonsContainer}>
-        <TouchableOpacity
-          style={getPeriodButtonStyle('today')}
-          onPress={() => handlePeriodPress('today')}
-        >
-          <ThemedText style={getPeriodButtonTextStyle('today')}>Today</ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={getPeriodButtonStyle('week')}
-          onPress={() => handlePeriodPress('week')}
-        >
-          <ThemedText style={getPeriodButtonTextStyle('week')}>Week</ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={getPeriodButtonStyle('month')}
-          onPress={() => handlePeriodPress('month')}
-        >
-          <ThemedText style={getPeriodButtonTextStyle('month')}>Month</ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={getPeriodButtonStyle('year')}
-          onPress={() => handlePeriodPress('year')}
-        >
-          <ThemedText style={getPeriodButtonTextStyle('year')}>Year</ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={getPeriodButtonStyle('all')}
-          onPress={() => handlePeriodPress('all')}
-        >
-          <ThemedText style={getPeriodButtonTextStyle('all')}>All</ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={getPeriodButtonStyle('custom')}
-          onPress={() => handlePeriodPress('custom')}
-        >
-          <ThemedText style={getPeriodButtonTextStyle('custom')}>Custom</ThemedText>
-        </TouchableOpacity>
-      </View>
-      
-      {timePeriod === 'custom' && startDate && endDate && (
-        <ThemedView style={styles.customRangeInfo}>
-          <ThemedText style={styles.customRangeText}>
-            {formatDate(startDate)} - {formatDate(endDate)}
-          </ThemedText>
+    <View style={styles.container}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.periodSelector}
+        contentContainerStyle={styles.periodSelectorContent}
+      >
+        {periods.map((period) => (
           <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => setShowCustomModal(true)}
+            key={period.key}
+            style={[
+              styles.periodOption,
+              selectedPeriod === period.key && styles.selectedPeriod,
+              { backgroundColor },
+            ]}
+            onPress={() => onSelectPeriod(period.key as TimePeriod)}
           >
-            <Ionicons name="pencil" size={16} color={primaryColor} />
+            <Text
+              style={[
+                styles.periodText,
+                { color: textColor },
+                selectedPeriod === period.key && styles.selectedPeriodText,
+              ]}
+            >
+              {period.label}
+            </Text>
           </TouchableOpacity>
-        </ThemedView>
-      )}
+        ))}
+        
+        <TouchableOpacity
+          style={[
+            styles.periodOption,
+            selectedPeriod === 'custom' && styles.selectedPeriod,
+            { backgroundColor },
+          ]}
+          onPress={showCalendar}
+        >
+          <Text
+            style={[
+              styles.periodText,
+              { color: textColor },
+              selectedPeriod === 'custom' && styles.selectedPeriodText,
+            ]}
+          >
+            {selectedPeriod === 'custom' ? getCustomRangeText() : 'Custom Range'}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
       
-      {/* Custom Date Range Modal */}
       <Modal
-        visible={showCustomModal}
+        visible={isCalendarVisible}
         transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowCustomModal(false)}
+        animationType="slide"
+        onRequestClose={hideCalendar}
       >
         <View style={styles.modalOverlay}>
-          <ThemedView style={styles.modalContent}>
-            <ThemedText style={styles.modalTitle}>Select Date Range</ThemedText>
-            
-            <View style={styles.datePickerContainer}>
-              <ThemedText style={styles.datePickerLabel}>Start Date</ThemedText>
-              
-              <TouchableOpacity
-                style={styles.datePickerButton}
-                onPress={() => setShowStartPicker(true)}
-              >
-                <ThemedText style={styles.dateText}>
-                  {formatDate(tempStartDate)}
-                </ThemedText>
-                <Ionicons name="calendar" size={20} color={primaryColor} />
+          <ThemedView style={styles.calendarContainer}>
+            <View style={styles.calendarHeader}>
+              <ThemedText style={styles.calendarTitle}>Select Date Range</ThemedText>
+              <TouchableOpacity onPress={hideCalendar}>
+                <Ionicons name="close" size={24} color={textColor} />
               </TouchableOpacity>
-              
-              {showStartPicker && (
-                <DateTimePicker
-                  value={tempStartDate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleStartDateChange}
-                  maximumDate={new Date()}
-                />
-              )}
             </View>
             
-            <View style={styles.datePickerContainer}>
-              <ThemedText style={styles.datePickerLabel}>End Date</ThemedText>
-              
-              <TouchableOpacity
-                style={styles.datePickerButton}
-                onPress={() => setShowEndPicker(true)}
-              >
-                <ThemedText style={styles.dateText}>
-                  {formatDate(tempEndDate)}
-                </ThemedText>
-                <Ionicons name="calendar" size={20} color={primaryColor} />
-              </TouchableOpacity>
-              
-              {showEndPicker && (
-                <DateTimePicker
-                  value={tempEndDate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleEndDateChange}
-                  minimumDate={tempStartDate}
-                  maximumDate={new Date()}
-                />
-              )}
-            </View>
+            <Calendar
+              markingType="period"
+              markedDates={markedDates}
+              onDayPress={handleDateSelect}
+              theme={{
+                calendarBackground: backgroundColor,
+                textSectionTitleColor: textColor,
+                selectedDayBackgroundColor: Colors.neon.blue,
+                selectedDayTextColor: '#ffffff',
+                todayTextColor: Colors.neon.blue,
+                dayTextColor: textColor,
+                textDisabledColor: '#d9e1e8',
+                dotColor: Colors.neon.blue,
+                selectedDotColor: '#ffffff',
+                arrowColor: Colors.neon.blue,
+                monthTextColor: textColor,
+                indicatorColor: Colors.neon.blue,
+                textDayFontWeight: '300',
+                textMonthFontWeight: 'bold',
+                textDayHeaderFontWeight: '300',
+                textDayFontSize: 16,
+                textMonthFontSize: 16,
+                textDayHeaderFontSize: 16,
+              }}
+            />
             
-            <View style={styles.modalButtonsContainer}>
+            <View style={styles.calendarFooter}>
               <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setShowCustomModal(false)}
+                style={[styles.calendarButton, styles.cancelButton]}
+                onPress={hideCalendar}
               >
-                <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+                <Text style={styles.calendarButtonText}>Cancel</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
-                style={styles.applyButton}
-                onPress={applyCustomRange}
+                style={[
+                  styles.calendarButton,
+                  styles.applyButton,
+                  (!selectedStartDate || !selectedEndDate) && styles.disabledButton,
+                ]}
+                onPress={applyDateRange}
+                disabled={!selectedStartDate || !selectedEndDate}
               >
-                <ThemedText style={styles.applyButtonText}>Apply</ThemedText>
+                <Text style={styles.calendarButtonText}>Apply</Text>
               </TouchableOpacity>
             </View>
           </ThemedView>
         </View>
       </Modal>
-    </ThemedView>
+    </View>
   );
 };
 
@@ -278,115 +292,84 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  periodSelector: {
+    maxHeight: 50,
   },
-  periodButtonsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 8,
+  periodSelectorContent: {
+    paddingHorizontal: 16,
   },
-  periodButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+  periodOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     marginRight: 8,
-    marginBottom: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
-  activePeriodButton: {
-    backgroundColor: '#0a7ea4',
-    borderColor: '#0a7ea4',
+  selectedPeriod: {
+    backgroundColor: Colors.neon.blue,
   },
-  periodButtonText: {
+  periodText: {
     fontSize: 14,
   },
-  activePeriodButtonText: {
-    color: '#fff',
+  selectedPeriodText: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
-  },
-  customRangeInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  customRangeText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
-  editButton: {
-    marginLeft: 8,
-    padding: 4,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    width: '80%',
-    padding: 20,
+  calendarContainer: {
+    width: '90%',
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    padding: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  datePickerContainer: {
-    marginBottom: 16,
-  },
-  datePickerLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  datePickerButton: {
+  calendarHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    marginBottom: 16,
   },
-  dateText: {
-    fontSize: 16,
+  calendarTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  modalButtonsContainer: {
+  calendarFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
+    justifyContent: 'flex-end',
+    marginTop: 16,
+  },
+  calendarButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginLeft: 8,
   },
   cancelButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  cancelButtonText: {
-    fontSize: 16,
+    backgroundColor: '#f0f0f0',
   },
   applyButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#0a7ea4',
+    backgroundColor: Colors.neon.blue,
   },
-  applyButtonText: {
-    fontSize: 16,
-    color: '#fff',
+  disabledButton: {
+    opacity: 0.5,
+  },
+  calendarButtonText: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
 });

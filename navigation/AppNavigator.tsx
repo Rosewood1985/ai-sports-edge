@@ -10,6 +10,7 @@ import AnalyticsDashboardScreen from '../screens/AnalyticsDashboardScreen';
 import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
 import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
 import BettingAnalyticsScreen from '../screens/BettingAnalyticsScreen';
+import OddsComparisonScreen from '../screens/OddsComparisonScreen';
 
 // Create navigators
 const Tab = createBottomTabNavigator();
@@ -79,6 +80,14 @@ const HomeStack = () => (
       component={BettingAnalyticsScreen}
       options={{
         title: 'Betting Analytics',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="OddsComparison"
+      component={OddsComparisonScreen}
+      options={{
+        title: 'Odds Comparison',
         headerTintColor: '#007bff',
       }}
     />

@@ -1,532 +1,360 @@
+/**
+ * Personalization Service
+ * 
+ * This service manages user preferences and personalization options.
+ * It allows users to set default sportsbooks, sports, and other preferences.
+ */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-import { analyticsService } from './analyticsService';
+import { auth } from '../config/firebase';
+import { analyticsService, AnalyticsEventType } from './analyticsService';
 
-/**
- * User preferences interface
- */
+// User preferences interface
 export interface UserPreferences {
-  // Theme preferences
-  darkMode: boolean;
-  accentColor: string;
-  
-  // Content preferences
-  favoriteLeagues: string[];
-  favoriteSports: string[];
-  favoriteTeams: string[];
-  
-  // Notification preferences
-  enablePushNotifications: boolean;
-  notifyBeforeGames: boolean;
-  notifyForFavoriteTeams: boolean;
-  notifyForBettingOpportunities: boolean;
-  
-  // Betting preferences
-  riskTolerance: 'low' | 'medium' | 'high';
-  defaultBetUnit: number;
-  preferredOddsFormat: 'american' | 'decimal' | 'fractional';
-  
-  // Display preferences
-  showLiveScores: boolean;
-  showPredictionConfidence: boolean;
-  showBettingHistory: boolean;
-  
-  // Privacy preferences
-  shareDataForBetterPredictions: boolean;
-  anonymousUsageStats: boolean;
+  defaultSport?: string;
+  defaultSportsbook?: 'draftkings' | 'fanduel' | null;
+  favoriteTeams?: string[];
+  favoriteLeagues?: string[];
+  hiddenSportsbooks?: ('draftkings' | 'fanduel')[];
+  defaultOddsFormat?: 'american' | 'decimal' | 'fractional';
+  defaultView?: 'odds' | 'props' | 'parlays';
+  notificationPreferences?: {
+    oddsMovements: boolean;
+    gameStart: boolean;
+    gameEnd: boolean;
+    specialOffers: boolean;
+  };
+  displayPreferences?: {
+    darkMode?: boolean;
+    compactView?: boolean;
+    showBetterOddsHighlight?: boolean;
+  };
+  lastUpdated?: number;
 }
 
-/**
- * Default user preferences
- */
-const DEFAULT_PREFERENCES: UserPreferences = {
-  // Theme preferences
-  darkMode: true,
-  accentColor: '#0088ff',
-  
-  // Content preferences
-  favoriteLeagues: [],
-  favoriteSports: [],
-  favoriteTeams: [],
-  
-  // Notification preferences
-  enablePushNotifications: true,
-  notifyBeforeGames: true,
-  notifyForFavoriteTeams: true,
-  notifyForBettingOpportunities: true,
-  
-  // Betting preferences
-  riskTolerance: 'medium',
-  defaultBetUnit: 10,
-  preferredOddsFormat: 'american',
-  
-  // Display preferences
-  showLiveScores: true,
-  showPredictionConfidence: true,
-  showBettingHistory: true,
-  
-  // Privacy preferences
-  shareDataForBetterPredictions: true,
-  anonymousUsageStats: true,
-};
-
-/**
- * User betting history interface
- */
-export interface BettingHistoryItem {
-  id: string;
-  date: string;
-  sport: string;
-  league: string;
-  teams: string[];
-  betType: string;
-  odds: number;
-  stake: number;
-  result: 'win' | 'loss' | 'push' | 'pending';
-  payout?: number;
-  aiRecommended: boolean;
-  notes?: string;
-}
-
-/**
- * User profile interface
- */
-export interface UserProfile {
-  displayName?: string;
-  avatar?: string;
-  joinDate: string;
-  subscriptionTier: 'free' | 'pro' | 'elite';
-  subscriptionExpiry?: string;
-  totalBets: number;
-  winRate: number;
-  roi: number;
-  badges: string[];
-  achievements: string[];
-  referralCode?: string;
-  referralCount: number;
-}
-
-/**
- * Personalized content interface
- */
-export interface PersonalizedContent {
-  recommendedBets: any[];
-  trendingBets: any[];
-  upcomingGames: any[];
-  relevantNews: any[];
-  insights: any[];
-}
-
-/**
- * Storage keys
- */
-const STORAGE_KEYS = {
-  USER_PREFERENCES: 'user_preferences',
-  BETTING_HISTORY: 'betting_history',
-  USER_PROFILE: 'user_profile',
-};
-
-/**
- * Personalization service
- */
 class PersonalizationService {
-  private preferences: UserPreferences | null = null;
-  private bettingHistory: BettingHistoryItem[] = [];
-  private userProfile: UserProfile | null = null;
+  private static instance: PersonalizationService;
+  private userPreferences: UserPreferences = {};
+  private isInitialized: boolean = false;
+  private readonly STORAGE_KEY = 'user_preferences';
   
-  /**
-   * Initialize the personalization service
-   */
-  async initialize(): Promise<void> {
+  // Get singleton instance
+  public static getInstance(): PersonalizationService {
+    if (!PersonalizationService.instance) {
+      PersonalizationService.instance = new PersonalizationService();
+    }
+    return PersonalizationService.instance;
+  }
+  
+  // Initialize personalization service
+  public async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+    
     try {
       // Load user preferences
-      await this.loadPreferences();
+      await this.loadUserPreferences();
       
-      // Load betting history
-      await this.loadBettingHistory();
+      this.isInitialized = true;
       
-      // Load user profile
-      await this.loadUserProfile();
-      
-      // Log initialization
       console.log('Personalization service initialized');
     } catch (error) {
       console.error('Error initializing personalization service:', error);
     }
   }
   
-  /**
-   * Load user preferences from storage
-   */
-  private async loadPreferences(): Promise<void> {
-    try {
-      const storedPreferences = await AsyncStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
+  // Get user preferences
+  public async getUserPreferences(): Promise<UserPreferences> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    
+    return this.userPreferences;
+  }
+  
+  // Set user preferences
+  public async setUserPreferences(preferences: Partial<UserPreferences>): Promise<void> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    
+    // Merge new preferences with existing ones
+    this.userPreferences = {
+      ...this.userPreferences,
+      ...preferences,
+      lastUpdated: Date.now()
+    };
+    
+    // Save user preferences
+    await this.saveUserPreferences();
+    
+    // Track preference changes in analytics
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'preferences_updated',
+      ...Object.keys(preferences).reduce((obj, key) => {
+        obj[`preference_${key}`] = preferences[key as keyof UserPreferences];
+        return obj;
+      }, {} as Record<string, any>)
+    });
+  }
+  
+  // Set default sport
+  public async setDefaultSport(sport: string): Promise<void> {
+    await this.setUserPreferences({ defaultSport: sport });
+    
+    // Track specific preference change
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'default_sport_set',
+      sport
+    });
+  }
+  
+  // Set default sportsbook
+  public async setDefaultSportsbook(sportsbook: 'draftkings' | 'fanduel' | null): Promise<void> {
+    await this.setUserPreferences({ defaultSportsbook: sportsbook });
+    
+    // Track specific preference change
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'default_sportsbook_set',
+      sportsbook: sportsbook || 'none'
+    });
+  }
+  
+  // Add favorite team
+  public async addFavoriteTeam(team: string): Promise<void> {
+    const favoriteTeams = [...(this.userPreferences.favoriteTeams || [])];
+    
+    if (!favoriteTeams.includes(team)) {
+      favoriteTeams.push(team);
+      await this.setUserPreferences({ favoriteTeams });
       
-      if (storedPreferences) {
-        this.preferences = JSON.parse(storedPreferences);
+      // Track specific preference change
+      await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'favorite_team_added',
+        team
+      });
+    }
+  }
+  
+  // Remove favorite team
+  public async removeFavoriteTeam(team: string): Promise<void> {
+    const favoriteTeams = [...(this.userPreferences.favoriteTeams || [])];
+    const index = favoriteTeams.indexOf(team);
+    
+    if (index !== -1) {
+      favoriteTeams.splice(index, 1);
+      await this.setUserPreferences({ favoriteTeams });
+      
+      // Track specific preference change
+      await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'favorite_team_removed',
+        team
+      });
+    }
+  }
+  
+  // Add favorite league
+  public async addFavoriteLeague(league: string): Promise<void> {
+    const favoriteLeagues = [...(this.userPreferences.favoriteLeagues || [])];
+    
+    if (!favoriteLeagues.includes(league)) {
+      favoriteLeagues.push(league);
+      await this.setUserPreferences({ favoriteLeagues });
+      
+      // Track specific preference change
+      await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'favorite_league_added',
+        league
+      });
+    }
+  }
+  
+  // Remove favorite league
+  public async removeFavoriteLeague(league: string): Promise<void> {
+    const favoriteLeagues = [...(this.userPreferences.favoriteLeagues || [])];
+    const index = favoriteLeagues.indexOf(league);
+    
+    if (index !== -1) {
+      favoriteLeagues.splice(index, 1);
+      await this.setUserPreferences({ favoriteLeagues });
+      
+      // Track specific preference change
+      await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'favorite_league_removed',
+        league
+      });
+    }
+  }
+  
+  // Hide sportsbook
+  public async hideSportsbook(sportsbook: 'draftkings' | 'fanduel'): Promise<void> {
+    const hiddenSportsbooks = [...(this.userPreferences.hiddenSportsbooks || [])];
+    
+    if (!hiddenSportsbooks.includes(sportsbook)) {
+      hiddenSportsbooks.push(sportsbook);
+      await this.setUserPreferences({ hiddenSportsbooks });
+      
+      // Track specific preference change
+      await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'sportsbook_hidden',
+        sportsbook
+      });
+    }
+  }
+  
+  // Show sportsbook
+  public async showSportsbook(sportsbook: 'draftkings' | 'fanduel'): Promise<void> {
+    const hiddenSportsbooks = [...(this.userPreferences.hiddenSportsbooks || [])];
+    const index = hiddenSportsbooks.indexOf(sportsbook);
+    
+    if (index !== -1) {
+      hiddenSportsbooks.splice(index, 1);
+      await this.setUserPreferences({ hiddenSportsbooks });
+      
+      // Track specific preference change
+      await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'sportsbook_shown',
+        sportsbook
+      });
+    }
+  }
+  
+  // Set notification preferences
+  public async setNotificationPreferences(preferences: Partial<UserPreferences['notificationPreferences']>): Promise<void> {
+    const notificationPreferences = {
+      ...(this.userPreferences.notificationPreferences || {
+        oddsMovements: true,
+        gameStart: true,
+        gameEnd: true,
+        specialOffers: true
+      }),
+      ...preferences
+    };
+    
+    await this.setUserPreferences({ notificationPreferences });
+    
+    // Track specific preference change
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'notification_preferences_updated',
+      ...Object.entries(preferences || {}).reduce((obj, [key, value]) => {
+        obj[`notification_${key}`] = value;
+        return obj;
+      }, {} as Record<string, any>)
+    });
+  }
+  
+  // Set display preferences
+  public async setDisplayPreferences(preferences: Partial<UserPreferences['displayPreferences']>): Promise<void> {
+    const displayPreferences = {
+      ...(this.userPreferences.displayPreferences || {
+        darkMode: false,
+        compactView: false,
+        showBetterOddsHighlight: true
+      }),
+      ...preferences
+    };
+    
+    await this.setUserPreferences({ displayPreferences });
+    
+    // Track specific preference change
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'display_preferences_updated',
+      ...Object.entries(preferences || {}).reduce((obj, [key, value]) => {
+        obj[`display_${key}`] = value;
+        return obj;
+      }, {} as Record<string, any>)
+    });
+  }
+  
+  // Reset user preferences to defaults
+  public async resetPreferences(): Promise<void> {
+    this.userPreferences = {
+      defaultSport: 'basketball_nba',
+      defaultSportsbook: null,
+      favoriteTeams: [],
+      favoriteLeagues: [],
+      hiddenSportsbooks: [],
+      defaultOddsFormat: 'american',
+      defaultView: 'odds',
+      notificationPreferences: {
+        oddsMovements: true,
+        gameStart: true,
+        gameEnd: true,
+        specialOffers: true
+      },
+      displayPreferences: {
+        darkMode: false,
+        compactView: false,
+        showBetterOddsHighlight: true
+      },
+      lastUpdated: Date.now()
+    };
+    
+    // Save user preferences
+    await this.saveUserPreferences();
+    
+    // Track reset event
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'preferences_reset'
+    });
+  }
+  
+  // Load user preferences from storage
+  private async loadUserPreferences(): Promise<void> {
+    try {
+      const userId = auth.currentUser?.uid;
+      const storageKey = userId ? `${this.STORAGE_KEY}_${userId}` : this.STORAGE_KEY;
+      
+      const preferencesString = await AsyncStorage.getItem(storageKey);
+      
+      if (preferencesString) {
+        this.userPreferences = JSON.parse(preferencesString);
       } else {
-        // Use default preferences if none are stored
-        this.preferences = DEFAULT_PREFERENCES;
-        await this.savePreferences();
-      }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-      this.preferences = DEFAULT_PREFERENCES;
-    }
-  }
-  
-  /**
-   * Save user preferences to storage
-   */
-  private async savePreferences(): Promise<void> {
-    try {
-      if (this.preferences) {
-        await AsyncStorage.setItem(STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(this.preferences));
-      }
-    } catch (error) {
-      console.error('Error saving preferences:', error);
-    }
-  }
-  
-  /**
-   * Load betting history from storage
-   */
-  private async loadBettingHistory(): Promise<void> {
-    try {
-      const storedHistory = await AsyncStorage.getItem(STORAGE_KEYS.BETTING_HISTORY);
-      
-      if (storedHistory) {
-        this.bettingHistory = JSON.parse(storedHistory);
-      }
-    } catch (error) {
-      console.error('Error loading betting history:', error);
-    }
-  }
-  
-  /**
-   * Save betting history to storage
-   */
-  private async saveBettingHistory(): Promise<void> {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.BETTING_HISTORY, JSON.stringify(this.bettingHistory));
-    } catch (error) {
-      console.error('Error saving betting history:', error);
-    }
-  }
-  
-  /**
-   * Load user profile from storage
-   */
-  private async loadUserProfile(): Promise<void> {
-    try {
-      const storedProfile = await AsyncStorage.getItem(STORAGE_KEYS.USER_PROFILE);
-      
-      if (storedProfile) {
-        this.userProfile = JSON.parse(storedProfile);
-      } else {
-        // Create default profile if none exists
-        this.userProfile = {
-          joinDate: new Date().toISOString(),
-          subscriptionTier: 'free',
-          totalBets: 0,
-          winRate: 0,
-          roi: 0,
-          badges: [],
-          achievements: [],
-          referralCount: 0,
-        };
-        await this.saveUserProfile();
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    }
-  }
-  
-  /**
-   * Save user profile to storage
-   */
-  private async saveUserProfile(): Promise<void> {
-    try {
-      if (this.userProfile) {
-        await AsyncStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(this.userProfile));
-      }
-    } catch (error) {
-      console.error('Error saving user profile:', error);
-    }
-  }
-  
-  /**
-   * Get user preferences
-   */
-  getPreferences(): UserPreferences {
-    return this.preferences || DEFAULT_PREFERENCES;
-  }
-  
-  /**
-   * Update user preferences
-   */
-  async updatePreferences(newPreferences: Partial<UserPreferences>): Promise<void> {
-    try {
-      if (!this.preferences) {
-        this.preferences = DEFAULT_PREFERENCES;
-      }
-      
-      // Merge new preferences with existing ones
-      this.preferences = {
-        ...this.preferences,
-        ...newPreferences,
-      } as UserPreferences;
-      
-      // Save updated preferences
-      await this.savePreferences();
-      
-      // Track preference changes for analytics
-      analyticsService.trackEvent('preferences_updated', {
-        changedFields: Object.keys(newPreferences),
-        platform: Platform.OS,
-      });
-    } catch (error) {
-      console.error('Error updating preferences:', error);
-    }
-  }
-  
-  /**
-   * Get betting history
-   */
-  getBettingHistory(): BettingHistoryItem[] {
-    return this.bettingHistory;
-  }
-  
-  /**
-   * Add betting history item
-   */
-  async addBettingHistoryItem(item: Omit<BettingHistoryItem, 'id'>): Promise<void> {
-    try {
-      // Create new item with ID
-      const newItem: BettingHistoryItem = {
-        ...item,
-        id: `bet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      };
-      
-      // Add to history
-      this.bettingHistory.unshift(newItem);
-      
-      // Save updated history
-      await this.saveBettingHistory();
-      
-      // Update user profile stats
-      if (this.userProfile) {
-        this.userProfile.totalBets += 1;
-        
-        // Only update win rate and ROI for completed bets
-        if (newItem.result !== 'pending') {
-          const wins = this.bettingHistory.filter(bet => bet.result === 'win').length;
-          this.userProfile.winRate = wins / this.userProfile.totalBets;
-          
-          // Calculate ROI
-          const totalInvested = this.bettingHistory.reduce((sum, bet) => sum + bet.stake, 0);
-          const totalReturns = this.bettingHistory.reduce((sum, bet) => {
-            if (bet.result === 'win' && bet.payout) {
-              return sum + bet.payout;
-            }
-            return sum;
-          }, 0);
-          
-          this.userProfile.roi = totalInvested > 0 ? (totalReturns - totalInvested) / totalInvested : 0;
-        }
-        
-        await this.saveUserProfile();
-      }
-      
-      // Track for analytics
-      analyticsService.trackEvent('bet_placed', {
-        sport: item.sport,
-        league: item.league,
-        betType: item.betType,
-        stake: item.stake,
-        aiRecommended: item.aiRecommended,
-      });
-    } catch (error) {
-      console.error('Error adding betting history item:', error);
-    }
-  }
-  
-  /**
-   * Update betting history item
-   */
-  async updateBettingHistoryItem(id: string, updates: Partial<BettingHistoryItem>): Promise<void> {
-    try {
-      // Find item index
-      const index = this.bettingHistory.findIndex(item => item.id === id);
-      
-      if (index !== -1) {
-        // Update item
-        this.bettingHistory[index] = {
-          ...this.bettingHistory[index],
-          ...updates,
+        // Initialize with default preferences
+        this.userPreferences = {
+          defaultSport: 'basketball_nba',
+          defaultSportsbook: null,
+          favoriteTeams: [],
+          favoriteLeagues: [],
+          hiddenSportsbooks: [],
+          defaultOddsFormat: 'american',
+          defaultView: 'odds',
+          notificationPreferences: {
+            oddsMovements: true,
+            gameStart: true,
+            gameEnd: true,
+            specialOffers: true
+          },
+          displayPreferences: {
+            darkMode: false,
+            compactView: false,
+            showBetterOddsHighlight: true
+          },
+          lastUpdated: Date.now()
         };
         
-        // Save updated history
-        await this.saveBettingHistory();
-        
-        // Update user profile stats if result changed
-        if (updates.result && this.userProfile) {
-          const wins = this.bettingHistory.filter(bet => bet.result === 'win').length;
-          this.userProfile.winRate = wins / this.userProfile.totalBets;
-          
-          // Calculate ROI
-          const totalInvested = this.bettingHistory.reduce((sum, bet) => sum + bet.stake, 0);
-          const totalReturns = this.bettingHistory.reduce((sum, bet) => {
-            if (bet.result === 'win' && bet.payout) {
-              return sum + bet.payout;
-            }
-            return sum;
-          }, 0);
-          
-          this.userProfile.roi = totalInvested > 0 ? (totalReturns - totalInvested) / totalInvested : 0;
-          
-          await this.saveUserProfile();
-        }
-        
-        // Track for analytics
-        analyticsService.trackEvent('bet_updated', {
-          betId: id,
-          updatedFields: Object.keys(updates),
-        });
+        // Save default preferences
+        await this.saveUserPreferences();
       }
     } catch (error) {
-      console.error('Error updating betting history item:', error);
+      console.error('Error loading user preferences:', error);
     }
   }
   
-  /**
-   * Get user profile
-   */
-  getUserProfile(): UserProfile | null {
-    return this.userProfile;
-  }
-  
-  /**
-   * Update user profile
-   */
-  async updateUserProfile(updates: Partial<UserProfile>): Promise<void> {
+  // Save user preferences to storage
+  private async saveUserPreferences(): Promise<void> {
     try {
-      if (this.userProfile) {
-        // Merge updates with existing profile
-        this.userProfile = {
-          ...this.userProfile,
-          ...updates,
-        };
-        
-        // Save updated profile
-        await this.saveUserProfile();
-        
-        // Track for analytics
-        analyticsService.trackEvent('profile_updated', {
-          updatedFields: Object.keys(updates),
-        });
-      }
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-    }
-  }
-  
-  /**
-   * Get personalized content based on user preferences and history
-   */
-  async getPersonalizedContent(): Promise<PersonalizedContent> {
-    try {
-      // This would typically call an API to get personalized content
-      // For now, we'll return mock data based on user preferences
+      const userId = auth.currentUser?.uid;
+      const storageKey = userId ? `${this.STORAGE_KEY}_${userId}` : this.STORAGE_KEY;
       
-      const prefs = this.getPreferences();
-      const favoriteSports = prefs.favoriteSports;
-      const favoriteTeams = prefs.favoriteTeams;
-      
-      // Track content request for analytics
-      analyticsService.trackEvent('personalized_content_requested', {
-        favoriteSportsCount: favoriteSports.length,
-        favoriteTeamsCount: favoriteTeams.length,
-      });
-      
-      // Return mock personalized content
-      return {
-        recommendedBets: [],
-        trendingBets: [],
-        upcomingGames: [],
-        relevantNews: [],
-        insights: [],
-      };
+      await AsyncStorage.setItem(
+        storageKey,
+        JSON.stringify(this.userPreferences)
+      );
     } catch (error) {
-      console.error('Error getting personalized content:', error);
-      return {
-        recommendedBets: [],
-        trendingBets: [],
-        upcomingGames: [],
-        relevantNews: [],
-        insights: [],
-      };
-    }
-  }
-  
-  /**
-   * Add achievement to user profile
-   */
-  async addAchievement(achievement: string): Promise<void> {
-    try {
-      if (this.userProfile && !this.userProfile.achievements.includes(achievement)) {
-        this.userProfile.achievements.push(achievement);
-        await this.saveUserProfile();
-        
-        // Track for analytics
-        analyticsService.trackEvent('achievement_earned', {
-          achievement,
-        });
-      }
-    } catch (error) {
-      console.error('Error adding achievement:', error);
-    }
-  }
-  
-  /**
-   * Add badge to user profile
-   */
-  async addBadge(badge: string): Promise<void> {
-    try {
-      if (this.userProfile && !this.userProfile.badges.includes(badge)) {
-        this.userProfile.badges.push(badge);
-        await this.saveUserProfile();
-        
-        // Track for analytics
-        analyticsService.trackEvent('badge_earned', {
-          badge,
-        });
-      }
-    } catch (error) {
-      console.error('Error adding badge:', error);
-    }
-  }
-  
-  /**
-   * Get personalized recommendations based on betting history
-   */
-  async getPersonalizedRecommendations(): Promise<any[]> {
-    try {
-      // This would typically call an AI service to get recommendations
-      // For now, we'll return mock data
-      
-      // Track recommendation request for analytics
-      analyticsService.trackEvent('recommendations_requested', {
-        historyItemsCount: this.bettingHistory.length,
-      });
-      
-      // Return mock recommendations
-      return [];
-    } catch (error) {
-      console.error('Error getting personalized recommendations:', error);
-      return [];
+      console.error('Error saving user preferences:', error);
     }
   }
 }
 
-export const personalizationService = new PersonalizationService();
+// Export singleton instance
+export const personalizationService = PersonalizationService.getInstance();

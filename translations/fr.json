@@ -1,0 +1,70 @@
+{
+  "dashboard": {
+    "title": "Tableau de Bord Analytique",
+    "tabs": {
+      "overview": "Aperçu",
+      "betting": "Paris",
+      "engagement": "Engagement",
+      "revenue": "Revenus"
+    },
+    "timePeriods": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "last7Days": "7 Derniers Jours",
+      "last30Days": "30 Derniers Jours",
+      "thisMonth": "Ce Mois",
+      "lastMonth": "Mois Dernier",
+      "custom": "Personnalisé"
+    },
+    "metrics": {
+      "totalRevenue": "Revenus Totaux",
+      "totalBets": "Paris Totaux",
+      "winRate": "Taux de Réussite",
+      "averageOdds": "Cotes Moyennes",
+      "profitMargin": "Marge Bénéficiaire",
+      "roi": "ROI",
+      "dailyActiveUsers": "Utilisateurs Actifs Quotidiens",
+      "avgSession": "Session Moyenne",
+      "totalUsers": "Utilisateurs Totaux",
+      "conversionRate": "Taux de Conversion"
+    },
+    "charts": {
+      "revenueOverTime": "Revenus au Fil du Temps",
+      "betsByType": "Paris par Type",
+      "winRateBySport": "Taux de Réussite par Sport",
+      "profitByBetType": "Profit par Type de Paris",
+      "bettingActivityHeatmap": "Carte Thermique d'Activité de Paris",
+      "monthlyPerformance": "Performance Mensuelle",
+      "userEngagementOverTime": "Engagement Utilisateur au Fil du Temps",
+      "platformDistribution": "Distribution par Plateforme",
+      "featureUsage": "Utilisation des Fonctionnalités",
+      "userEngagementStats": "Statistiques d'Engagement Utilisateur",
+      "revenueByType": "Revenus par Type",
+      "revenueTrend": "Tendance des Revenus",
+      "microtransactionPerformance": "Performance des Microtransactions"
+    },
+    "labels": {
+      "profit": "Profit",
+      "winRate": "Taux de Réussite",
+      "loading": "Chargement du graphique...",
+      "loadingDashboard": "Chargement des données du tableau de bord...",
+      "realTimeUpdates": "Mises à Jour en Temps Réel",
+      "refresh": "Actualiser",
+      "selectDateRange": "Sélectionner une Plage de Dates",
+      "apply": "Appliquer",
+      "cancel": "Annuler",
+      "from": "De",
+      "to": "À",
+      "monthlyActiveUsers": "Utilisateurs Actifs Mensuels",
+      "sessionsPerUser": "Sessions par Utilisateur",
+      "churnRate": "Taux d'Attrition",
+      "returningUsers": "Utilisateurs Récurrents",
+      "impressions": "Impressions",
+      "clicks": "Clics",
+      "purchases": "Achats",
+      "revenue": "Revenus",
+      "clickRate": "Taux de Clic",
+      "conversionRate": "Taux de Conversion"
+    }
+  }
+}

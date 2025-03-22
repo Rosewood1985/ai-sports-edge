@@ -1,264 +1,245 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import Svg, { Rect, Text as SvgText, G, Line } from 'react-native-svg';
+import React, { useMemo, useState, useRef } from 'react';
+import { View, StyleSheet, Dimensions, Text, Pressable, AccessibilityInfo, findNodeHandle, Platform } from 'react-native';
+import { ContributionGraph } from 'react-native-chart-kit';
+import { useTheme } from '../contexts/ThemeContext';
+import { useI18n } from '../contexts/I18nContext';
+import Colors from '../constants/Colors';
 import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
-import { useThemeColor } from '../hooks/useThemeColor';
 
-/**
- * Heat map data cell interface
- */
-interface HeatMapCell {
-  x: number;
-  y: number;
-  value: number;
-  label?: string;
-  data?: any; // Additional data for the cell
-}
-
-/**
- * Heat map chart props
- */
 interface HeatMapChartProps {
-  data: HeatMapCell[];
-  width?: number;
-  height?: number;
-  xLabels?: string[];
-  yLabels?: string[];
+  data: { [date: string]: number };
   title?: string;
-  colorRange?: string[];
-  onCellPress?: (cell: HeatMapCell) => void;
-  showValues?: boolean;
+  startDate?: Date;
+  numDays?: number;
+  chartColor?: string;
 }
 
 /**
- * Heat map chart component for visualizing data intensity across two dimensions
+ * HeatMapChart component for visualizing activity frequency over time
  */
 const HeatMapChart: React.FC<HeatMapChartProps> = ({
   data,
-  width = Dimensions.get('window').width - 40,
-  height = 300,
-  xLabels = [],
-  yLabels = [],
-  title,
-  colorRange = ['#FFFFFF', '#36A2EB', '#4BC0C0', '#FFCE56', '#FF6384'],
-  onCellPress,
-  showValues = true
+  title = 'Activity Heatmap',
+  startDate,
+  numDays = 105,
+  chartColor = Colors.neon.blue,
 }) => {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
+  // Get translations
+  const { t } = useI18n();
   
-  // Calculate chart dimensions
-  const padding = 60;
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
+  // Get theme colors
+  const { colors, isDark } = useTheme();
+  const backgroundColor = isDark ? '#1A1A1A' : '#FFFFFF';
+  const textColor = isDark ? '#FFFFFF' : '#000000';
   
-  // Find min and max values
-  const values = data.map(d => d.value);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
+  // Get screen width
+  const screenWidth = Dimensions.get('window').width - 32; // Adjust for padding
   
-  // Find unique x and y values if labels not provided
-  const uniqueX = [...new Set(data.map(d => d.x))].sort((a, b) => a - b);
-  const uniqueY = [...new Set(data.map(d => d.y))].sort((a, b) => a - b);
+  // State for keyboard navigation
+  const [focusedDay, setFocusedDay] = useState<number | null>(null);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+  const chartRef = useRef(null);
   
-  // Use provided labels or generate from data
-  const finalXLabels = xLabels.length > 0 ? xLabels : uniqueX.map(x => x.toString());
-  const finalYLabels = yLabels.length > 0 ? yLabels : uniqueY.map(y => y.toString());
-  
-  // Calculate cell dimensions
-  const cellWidth = chartWidth / finalXLabels.length;
-  const cellHeight = chartHeight / finalYLabels.length;
-  
-  // Color scale function
-  const getColor = (value: number) => {
-    if (minValue === maxValue) return colorRange[0];
+  // Check if screen reader is enabled
+  React.useEffect(() => {
+    const checkScreenReader = async () => {
+      const screenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(screenReaderEnabled);
+    };
     
-    const normalizedValue = (value - minValue) / (maxValue - minValue);
-    const colorIndex = Math.min(
-      Math.floor(normalizedValue * (colorRange.length - 1)),
-      colorRange.length - 2
+    checkScreenReader();
+    
+    // Listen for screen reader changes
+    const subscription = AccessibilityInfo.addEventListener(
+      'screenReaderChanged',
+      checkScreenReader
     );
     
-    // Interpolate between colors
-    const startColor = hexToRgb(colorRange[colorIndex]);
-    const endColor = hexToRgb(colorRange[colorIndex + 1]);
-    const ratio = (normalizedValue * (colorRange.length - 1)) % 1;
-    
-    if (!startColor || !endColor) return colorRange[0];
-    
-    const r = Math.round(startColor.r + ratio * (endColor.r - startColor.r));
-    const g = Math.round(startColor.g + ratio * (endColor.g - startColor.g));
-    const b = Math.round(startColor.b + ratio * (endColor.b - startColor.b));
-    
-    return `rgb(${r}, ${g}, ${b})`;
-  };
+    return () => {
+      subscription.remove();
+    };
+  }, []);
   
-  // Convert hex color to RGB
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
-  };
+  // Convert data object to array format required by ContributionGraph
+  // Memoize to prevent unnecessary recalculations
+  const formattedData = useMemo(() => {
+    return Object.entries(data).map(([date, count]) => ({
+      date,
+      count,
+    }));
+  }, [data]);
   
-  // Handle cell press
-  const handleCellPress = (cell: HeatMapCell) => {
-    if (onCellPress) {
-      onCellPress(cell);
+  // Convert hex color to rgba - memoized helper function
+  const hexToRgb = useMemo(() => {
+    return (hex: string) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16),
+          }
+        : { r: 0, g: 123, b: 255 }; // Default to blue
+    };
+  }, []);
+  
+  // Chart configuration - memoized to prevent recreation on each render
+  const chartConfig = useMemo(() => {
+    return {
+      backgroundColor: backgroundColor,
+      backgroundGradientFrom: backgroundColor,
+      backgroundGradientTo: backgroundColor,
+      decimalPlaces: 0,
+      color: (opacity = 1) => {
+        const rgb = hexToRgb(chartColor);
+        return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+      },
+      labelColor: (opacity = 1) => `rgba(${isDark ? '255, 255, 255' : '0, 0, 0'}, ${opacity})`,
+      style: {
+        borderRadius: 16,
+      },
+    };
+  }, [backgroundColor, chartColor, isDark, hexToRgb]);
+  
+  // Calculate end date based on start date and number of days - memoized
+  const endDate = useMemo(() => {
+    const end = startDate ? new Date(startDate) : new Date();
+    end.setDate(end.getDate() + numDays);
+    return end;
+  }, [startDate, numDays]);
+  
+  // Create an accessible summary of the data for screen readers
+  const accessibleSummary = useMemo(() => {
+    const totalActivities = Object.values(data).reduce((sum, count) => sum + count, 0);
+    const activeDays = Object.values(data).filter(count => count > 0).length;
+    const mostActiveDate = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
+    
+    return t('charts.heatmap.accessibleSummary', {
+      totalActivities,
+      activeDays,
+      totalDays: numDays,
+      mostActiveDate: mostActiveDate ? `${mostActiveDate[0]} with ${mostActiveDate[1]} activities` : 'None'
+    });
+  }, [data, numDays, t]);
+  
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!focusedDay && focusedDay !== 0) {
+      setFocusedDay(0);
+      return;
     }
-  };
-  
-  // Format value for display
-  const formatValue = (value: number) => {
-    if (value === Math.round(value)) {
-      return value.toString();
+    
+    switch (e.key) {
+      case 'ArrowRight':
+        setFocusedDay(prev => (prev !== null && prev < numDays - 1) ? prev + 1 : prev);
+        break;
+      case 'ArrowLeft':
+        setFocusedDay(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
+        break;
+      case 'ArrowUp':
+        setFocusedDay(prev => (prev !== null && prev >= 7) ? prev - 7 : prev);
+        break;
+      case 'ArrowDown':
+        setFocusedDay(prev => (prev !== null && prev < numDays - 7) ? prev + 7 : prev);
+        break;
+      case 'Enter':
+      case ' ':
+        // Announce the focused day's data
+        if (focusedDay !== null) {
+          const focusedDate = new Date(startDate || new Date());
+          focusedDate.setDate(focusedDate.getDate() + focusedDay);
+          const dateString = focusedDate.toISOString().split('T')[0];
+          const count = data[dateString] || 0;
+          
+          AccessibilityInfo.announceForAccessibility(
+            `${dateString}: ${count} ${count === 1 ? 'activity' : 'activities'}`
+          );
+        }
+        break;
     }
-    return value.toFixed(1);
   };
   
   return (
-    <ThemedView style={styles.container}>
-      {title && <ThemedText style={styles.title}>{title}</ThemedText>}
+    <View
+      style={[styles.container, { backgroundColor }]}
+      accessible={true}
+      accessibilityLabel={title}
+      accessibilityHint={t('charts.heatmap.accessibilityHint')}
+    >
+      {title && (
+        <ThemedText
+          style={styles.title}
+          accessibilityRole="header"
+        >
+          {title}
+        </ThemedText>
+      )}
       
-      <Svg width={width} height={height}>
-        {/* Y-axis labels */}
-        {finalYLabels.map((label, index) => (
-          <SvgText
-            key={`y-label-${index}`}
-            x={padding - 10}
-            y={padding + index * cellHeight + cellHeight / 2}
-            fontSize="10"
-            textAnchor="end"
-            alignmentBaseline="middle"
-            fill={textColor}
-          >
-            {label}
-          </SvgText>
-        ))}
-        
-        {/* X-axis labels */}
-        {finalXLabels.map((label, index) => (
-          <SvgText
-            key={`x-label-${index}`}
-            x={padding + index * cellWidth + cellWidth / 2}
-            y={height - padding + 20}
-            fontSize="10"
-            textAnchor="middle"
-            fill={textColor}
-          >
-            {label}
-          </SvgText>
-        ))}
-        
-        {/* Grid lines */}
-        {finalYLabels.map((_, index) => (
-          <Line
-            key={`h-line-${index}`}
-            x1={padding}
-            y1={padding + index * cellHeight}
-            x2={width - padding}
-            y2={padding + index * cellHeight}
-            stroke="#e0e0e0"
-            strokeWidth="1"
-          />
-        ))}
-        <Line
-          x1={padding}
-          y1={height - padding}
-          x2={width - padding}
-          y2={height - padding}
-          stroke="#e0e0e0"
-          strokeWidth="1"
-        />
-        
-        {finalXLabels.map((_, index) => (
-          <Line
-            key={`v-line-${index}`}
-            x1={padding + index * cellWidth}
-            y1={padding}
-            x2={padding + index * cellWidth}
-            y2={height - padding}
-            stroke="#e0e0e0"
-            strokeWidth="1"
-          />
-        ))}
-        <Line
-          x1={width - padding}
-          y1={padding}
-          x2={width - padding}
-          y2={height - padding}
-          stroke="#e0e0e0"
-          strokeWidth="1"
-        />
-        
-        {/* Heat map cells */}
-        {data.map((cell, index) => {
-          const xIndex = uniqueX.indexOf(cell.x);
-          const yIndex = uniqueY.indexOf(cell.y);
-          
-          if (xIndex === -1 || yIndex === -1) return null;
-          
-          const x = padding + xIndex * cellWidth;
-          const y = padding + yIndex * cellHeight;
-          const color = getColor(cell.value);
-          
-          return (
-            <G key={index} onPress={() => handleCellPress(cell)}>
-              <Rect
-                x={x}
-                y={y}
-                width={cellWidth}
-                height={cellHeight}
-                fill={color}
-                stroke="#e0e0e0"
-                strokeWidth="1"
-              />
-              {showValues && (
-                <SvgText
-                  x={x + cellWidth / 2}
-                  y={y + cellHeight / 2}
-                  fontSize="10"
-                  textAnchor="middle"
-                  alignmentBaseline="middle"
-                  fill={cell.value > (maxValue - minValue) * 0.7 + minValue ? '#fff' : '#000'}
-                  fontWeight="bold"
-                >
-                  {formatValue(cell.value)}
-                </SvgText>
-              )}
-            </G>
-          );
-        })}
-      </Svg>
+      {/* Screen reader summary */}
+      {isScreenReaderEnabled && (
+        <View accessibilityRole="summary" accessibilityLabel={accessibleSummary} />
+      )}
       
-      <View style={styles.legendContainer}>
-        <ThemedText style={styles.legendTitle}>Value Range</ThemedText>
-        <View style={styles.legendGradient}>
-          {colorRange.map((color, index) => (
+      {/* Keyboard navigable chart wrapper */}
+      <View
+        ref={chartRef}
+        accessible={!isScreenReaderEnabled}
+        accessibilityLabel={t('charts.heatmap.accessibilityLabel')}
+        accessibilityHint={t('charts.heatmap.keyboardHint')}
+        onAccessibilityTap={() => setFocusedDay(0)}
+        // Note: tabIndex and onKeyDown are web-only props
+        // They will work in React Native Web but are not part of the React Native type definitions
+        {...(Platform.OS === 'web' ? {
+          tabIndex: 0,
+          onKeyDown: handleKeyDown
+        } : {})}
+      >
+        <ContributionGraph
+          values={formattedData}
+          endDate={endDate}
+          numDays={numDays}
+          width={screenWidth}
+          height={220}
+          chartConfig={chartConfig}
+          tooltipDataAttrs={(value: any) => {
+            // Type assertion to fix TypeScript error
+            return {
+              'data-tip': `${value.date}: ${value.count} activities`,
+              'aria-label': `${value.date}: ${value.count} activities`,
+            } as any;
+          }}
+          style={styles.chart}
+        />
+      </View>
+      
+      <View
+        style={styles.legend}
+        accessible={true}
+        accessibilityLabel={t('charts.heatmap.legendLabel')}
+      >
+        <ThemedText style={styles.legendText}>{t('charts.heatmap.less')}</ThemedText>
+        <View style={styles.legendItems}>
+          {[0.2, 0.4, 0.6, 0.8, 1].map((opacity, index) => (
             <View
               key={index}
               style={[
-                styles.legendColorBlock,
-                { backgroundColor: color }
+                styles.legendItem,
+                {
+                  backgroundColor: chartConfig.color(opacity),
+                },
               ]}
+              accessibilityLabel={`${t('charts.heatmap.intensity')} ${index + 1}`}
             />
           ))}
         </View>
-        <View style={styles.legendLabels}>
-          <ThemedText style={styles.legendText}>{minValue}</ThemedText>
-          <ThemedText style={styles.legendText}>{maxValue}</ThemedText>
-        </View>
+        <ThemedText style={styles.legendText}>{t('charts.heatmap.more')}</ThemedText>
       </View>
-    </ThemedView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -272,36 +253,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
-    textAlign: 'center',
   },
-  legendContainer: {
-    marginTop: 16,
+  chart: {
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  legend: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  legendTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  legendGradient: {
-    flexDirection: 'row',
-    height: 20,
-    width: '80%',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  legendColorBlock: {
-    flex: 1,
-    height: '100%',
-  },
-  legendLabels: {
-    flexDirection: 'row',
-    width: '80%',
-    justifyContent: 'space-between',
-    marginTop: 4,
+    justifyContent: 'center',
+    marginTop: 8,
   },
   legendText: {
     fontSize: 12,
+    marginHorizontal: 8,
+  },
+  legendItems: {
+    flexDirection: 'row',
+  },
+  legendItem: {
+    width: 16,
+    height: 16,
+    marginHorizontal: 2,
+    borderRadius: 2,
   },
 });
 

@@ -323,6 +323,114 @@ This pattern provides:
 - Integration with the app's theme system
 - Loading state handling
 
+## Internationalization Patterns
+
+### Translation Context
+```typescript
+// contexts/I18nContext.tsx
+export const I18nProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [language, setLanguageState] = useState<Language>(i18n.getLanguage());
+  const [isRTL, setIsRTL] = useState<boolean>(i18n.isRTLLanguage());
+  
+  const setLanguage = (lang: Language) => {
+    i18n.setLanguage(lang);
+    setLanguageState(lang);
+    setIsRTL(i18n.isRTLLanguage());
+  };
+  
+  return (
+    <I18nContext.Provider
+      value={{
+        language,
+        setLanguage,
+        t: (key, params) => i18n.translate(key, params),
+        formatNumber: (value, options) => i18n.formatNumber(value, options),
+        formatCurrency: (value, currencyCode) => i18n.formatCurrency(value, currencyCode),
+        formatDate: (date, options) => i18n.formatDate(date, options),
+        isRTL,
+      }}
+    >
+      {children}
+    </I18nContext.Provider>
+  );
+};
+```
+
+This pattern provides:
+- Centralized language management
+- Consistent translation across the app
+- Localized formatting for numbers, dates, and currencies
+- Support for right-to-left languages
+- Clean component code with the useI18n hook
+
+### Language Detection
+```typescript
+// components/LanguageRedirect.tsx
+export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
+  currentLanguage,
+  setLanguage
+}) => {
+  // Get device locale
+  const getDeviceLocale = (): string => {
+    // iOS
+    if (Platform.OS === 'ios') {
+      return (
+        NativeModules.SettingsManager.settings.AppleLocale ||
+        NativeModules.SettingsManager.settings.AppleLanguages[0] ||
+        'en'
+      );
+    }
+    // Android
+    if (Platform.OS === 'android') {
+      return NativeModules.I18nManager.localeIdentifier || 'en';
+    }
+    // Web - use navigator.language if available
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
+      return navigator.language || 'en';
+    }
+    
+    return 'en'; // Default to English
+  };
+
+  useEffect(() => {
+    // Only run on web platform
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      // Extract language from URL path
+      const path = window.location.pathname;
+      const pathSegments = path.split('/').filter((segment: string) => segment.length > 0);
+      const pathLang = pathSegments.length > 0 ? pathSegments[0] : '';
+      
+      if (pathLang === 'en' || pathLang === 'es') {
+        // Set language based on URL
+        if (pathLang !== currentLanguage) {
+          setLanguage(pathLang as Language);
+        }
+      } else {
+        // Determine language based on device locale
+        const deviceLocale = getDeviceLocale().split('-')[0];
+        const redirectLang = deviceLocale === 'es' ? 'es' : 'en';
+        
+        if (redirectLang !== currentLanguage) {
+          setLanguage(redirectLang as Language);
+        }
+        
+        // Redirect to language-specific URL
+        const newPath = `/${redirectLang}${path === '/' ? '' : path}`;
+        window.history.replaceState(null, '', newPath);
+      }
+    }
+  }, [currentLanguage, setLanguage]);
+  
+  return null;
+};
+```
+
+This pattern ensures:
+- Automatic language detection based on URL or device settings
+- Consistent language experience across platforms
+- SEO-friendly URL structure for web
+- Proper handling of language changes
+
 ## Accessibility Patterns
 
 ### Accessibility Service
@@ -360,6 +468,516 @@ This pattern ensures:
 - Proper screen reader support
 - Respect for user preferences
 - Clean component code without repetitive accessibility logic
+
+## Performance Optimization Patterns
+
+### Code Splitting with Lazy Loading
+```typescript
+// utils/codeSplitting.tsx
+export function createLazyComponent<T extends ComponentType<any>>(
+  factory: () => Promise<{ default: T }>,
+  fallback: { text?: string; component?: ReactNode } = {}
+): React.FC<ComponentProps<T>> {
+  const LazyComponent = lazy(factory);
+  
+  return (props) => {
+    const fallbackComponent = fallback.component || (
+      <View style={styles.fallbackContainer}>
+        <ActivityIndicator size="small" color="#007AFF" />
+        {fallback.text && <Text style={styles.fallbackText}>{fallback.text}</Text>}
+      </View>
+    );
+    
+    return (
+      <Suspense fallback={fallbackComponent}>
+        <LazyComponent {...props} />
+      </Suspense>
+    );
+  };
+}
+```
+
+This pattern provides:
+- Reduced initial bundle size
+- Faster initial load times
+- On-demand loading of components
+- Consistent loading experience
+
+### Memory Management with TTL
+```typescript
+// utils/memoryManagement.ts
+export function memoizeWithTTL<T extends (...args: any[]) => any>(
+  fn: T,
+  keyFn: (...args: Parameters<T>) => string,
+  ttl: number = 5 * 60 * 1000 // 5 minutes default
+): T {
+  const cache: Record<string, { value: ReturnType<T>; timestamp: number }> = {};
+  
+  return ((...args: Parameters<T>): ReturnType<T> => {
+    const key = keyFn(...args);
+    const now = Date.now();
+    
+    // Check if cached value exists and is still valid
+    if (cache[key] && now - cache[key].timestamp < ttl) {
+      return cache[key].value;
+    }
+    
+    // Calculate new value
+    const result = fn(...args);
+    
+    // Cache the result
+    cache[key] = {
+      value: result,
+      timestamp: now
+    };
+    
+    // Clean up old cache entries
+    Object.keys(cache).forEach(cacheKey => {
+      if (now - cache[cacheKey].timestamp > ttl) {
+        delete cache[cacheKey];
+      }
+    });
+    
+    return result;
+  }) as T;
+}
+```
+
+This pattern ensures:
+- Efficient caching of expensive operations
+- Automatic cache invalidation
+- Memory leak prevention
+- Improved performance for repeated operations
+
+## Analytics and A/B Testing Patterns
+
+### Event Tracking
+```typescript
+// services/analyticsService.ts
+export const trackEvent = async (
+  eventType: AnalyticsEventType,
+  properties: Record<string, any> = {}
+): Promise<void> => {
+  try {
+    // Add common properties
+    const enhancedProperties = {
+      ...properties,
+      platform: Platform.OS,
+      app_version: Constants.manifest.version,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Log event for debugging in development
+    if (__DEV__) {
+      console.log(`[Analytics] ${eventType}:`, enhancedProperties);
+    }
+    
+    // Store event in local queue
+    await storeEventInQueue(eventType, enhancedProperties);
+    
+    // Process queue if conditions are met
+    await processEventQueue();
+    
+  } catch (error) {
+    console.error('Error tracking analytics event:', error);
+  }
+};
+```
+
+This pattern provides:
+- Consistent event tracking across the app
+- Offline support with queuing
+- Debug information in development
+- Error handling to prevent app crashes
+
+### A/B Testing Experiment Management
+```typescript
+// services/abTestingService.ts
+export const getVariantForUser = async (
+  experimentId: string
+): Promise<ExperimentVariant | null> => {
+  try {
+    // Check if user already has an assigned variant
+    const storedVariant = await AsyncStorage.getItem(`experiment_${experimentId}`);
+    if (storedVariant) {
+      return JSON.parse(storedVariant);
+    }
+    
+    // Get experiment configuration
+    const experiment = await getExperiment(experimentId);
+    if (!experiment || !experiment.isActive) {
+      return null;
+    }
+    
+    // Check if user is in target audience
+    if (!isUserInTargetAudience(experiment.targetAudience)) {
+      return null;
+    }
+    
+    // Assign variant based on weights
+    const variant = assignVariantByWeight(experiment.variants);
+    if (!variant) {
+      return null;
+    }
+    
+    // Store assigned variant
+    await AsyncStorage.setItem(`experiment_${experimentId}`, JSON.stringify(variant));
+    
+    // Track impression
+    await trackImpression(experimentId, variant.id);
+    
+    return variant;
+  } catch (error) {
+    console.error('Error getting variant for user:', error);
+    return null;
+  }
+};
+```
+
+This pattern ensures:
+- Consistent variant assignment
+- Persistent user experience
+- Proper targeting based on audience criteria
+- Accurate tracking of impressions
+
+## Personalization Patterns
+
+### User Preferences Management
+```typescript
+// services/personalizationService.ts
+export const setUserPreferences = async (
+  preferences: Partial<UserPreferences>
+): Promise<void> => {
+  try {
+    // Get current preferences
+    const currentPreferences = await getUserPreferences();
+    
+    // Merge with new preferences
+    const updatedPreferences = {
+      ...currentPreferences,
+      ...preferences,
+      lastUpdated: Date.now()
+    };
+    
+    // Save to storage
+    const userId = auth.currentUser?.uid;
+    const storageKey = userId ? `user_preferences_${userId}` : 'user_preferences';
+    await AsyncStorage.setItem(storageKey, JSON.stringify(updatedPreferences));
+    
+    // Track preference changes
+    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+      event_name: 'preferences_updated',
+      ...Object.keys(preferences).reduce((obj, key) => {
+        obj[`preference_${key}`] = preferences[key as keyof UserPreferences];
+        return obj;
+      }, {} as Record<string, any>)
+    });
+  } catch (error) {
+    console.error('Error setting user preferences:', error);
+  }
+};
+```
+
+This pattern provides:
+- Consistent preference management
+- User-specific preferences when logged in
+- Device-specific preferences when not logged in
+- Analytics tracking for preference changes
+
+### Chart Accessibility
+```typescript
+// components/HeatMapChart.tsx
+// Create an accessible summary of the data for screen readers
+const accessibleSummary = useMemo(() => {
+  const totalActivities = Object.values(data).reduce((sum, count) => sum + count, 0);
+  const activeDays = Object.values(data).filter(count => count > 0).length;
+  const mostActiveDate = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
+  
+  return t('charts.heatmap.accessibleSummary', {
+    totalActivities,
+    activeDays,
+    totalDays: numDays,
+    mostActiveDate: mostActiveDate ? `${mostActiveDate[0]} with ${mostActiveDate[1]} activities` : 'None'
+  });
+}, [data, numDays, t]);
+
+// Handle keyboard navigation
+const handleKeyDown = (e: React.KeyboardEvent) => {
+  if (!focusedDay && focusedDay !== 0) {
+    setFocusedDay(0);
+    return;
+  }
+  
+  switch (e.key) {
+    case 'ArrowRight':
+      setFocusedDay(prev => (prev !== null && prev < numDays - 1) ? prev + 1 : prev);
+      break;
+    case 'ArrowLeft':
+      setFocusedDay(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
+      break;
+    // ... more key handlers
+  }
+};
+
+// Component JSX
+return (
+  <View
+    accessible={true}
+    accessibilityLabel={title}
+    accessibilityHint={t('charts.heatmap.accessibilityHint')}
+  >
+    {/* Screen reader summary */}
+    {isScreenReaderEnabled && (
+      <View accessibilityRole="summary" accessibilityLabel={accessibleSummary} />
+    )}
+    
+    {/* Keyboard navigable chart wrapper */}
+    <View
+      ref={chartRef}
+      accessible={!isScreenReaderEnabled}
+      accessibilityLabel={t('charts.heatmap.accessibilityLabel')}
+      accessibilityHint={t('charts.heatmap.keyboardHint')}
+      onAccessibilityTap={() => setFocusedDay(0)}
+      {...(Platform.OS === 'web' ? {
+        tabIndex: 0,
+        onKeyDown: handleKeyDown
+      } : {})}
+    >
+      {/* Chart content */}
+    </View>
+  </View>
+);
+```
+
+This pattern provides:
+- Comprehensive accessibility for data visualizations
+- Keyboard navigation for interactive charts
+- Screen reader support with detailed data summaries
+- Platform-specific accessibility optimizations
+- Integration with internationalization for translated accessibility text
+
+## UI/UX Animation Patterns
+
+### Chart Transition Pattern
+```tsx
+// components/ChartTransition.tsx
+const ChartTransition: React.FC<ChartTransitionProps> = ({
+  children,
+  delay = 0,
+  index = 0,
+  style,
+  visible = true,
+}) => {
+  // Animation values
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const translateYAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  
+  // Get accessibility preferences
+  const { isReducedMotionEnabled } = useAccessibilityService();
+  
+  // Calculate total delay including index
+  const totalDelay = delay + (index * 100);
+  
+  // Run animation when component mounts or when visibility changes
+  useEffect(() => {
+    if (visible) {
+      // Create animations
+      const animations = [];
+      
+      // Fade animation (always used)
+      animations.push(
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: isReducedMotionEnabled ? 0 : 400,
+          delay: isReducedMotionEnabled ? 0 : totalDelay,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.cubic),
+        })
+      );
+      
+      // Only add motion animations if reduced motion is not enabled
+      if (!isReducedMotionEnabled) {
+        // Slide up animation
+        animations.push(
+          Animated.timing(translateYAnim, {
+            toValue: 0,
+            duration: 500,
+            delay: totalDelay,
+            useNativeDriver: true,
+            easing: Easing.out(Easing.cubic),
+          })
+        );
+        
+        // Scale animation
+        animations.push(
+          Animated.timing(scaleAnim, {
+            toValue: 1,
+            duration: 500,
+            delay: totalDelay,
+            useNativeDriver: true,
+            easing: Easing.out(Easing.cubic),
+          })
+        );
+      } else {
+        // Immediately set final values for reduced motion
+        translateYAnim.setValue(0);
+        scaleAnim.setValue(1);
+      }
+      
+      // Run all animations in parallel
+      Animated.parallel(animations).start();
+    }
+  }, [visible, totalDelay, isReducedMotionEnabled]);
+  
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          opacity: opacityAnim,
+          transform: [
+            { translateY: translateYAnim },
+            { scale: scaleAnim },
+          ],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+};
+```
+
+This pattern provides:
+- Smooth entrance animations for chart components
+- Staggered animations based on index
+- Accessibility considerations with reduced motion support
+- Performance optimization with native driver
+- Consistent animation style across the application
+
+### Tab Transition Pattern
+```tsx
+// components/TabTransition.tsx
+const TabTransition: React.FC<TabTransitionProps> = ({
+  children,
+  active,
+  style,
+}) => {
+  // Animation values
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const translateXAnim = useRef(new Animated.Value(20)).current;
+  
+  // Get accessibility preferences
+  const { isReducedMotionEnabled } = useAccessibilityService();
+  
+  // Run animation when active state changes
+  useEffect(() => {
+    if (active) {
+      // Create animations
+      const animations = [];
+      
+      // Fade animation (always used)
+      animations.push(
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: isReducedMotionEnabled ? 0 : 300,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.cubic),
+        })
+      );
+      
+      // Only add motion animations if reduced motion is not enabled
+      if (!isReducedMotionEnabled) {
+        // Slide animation
+        animations.push(
+          Animated.timing(translateXAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+            easing: Easing.out(Easing.cubic),
+          })
+        );
+      } else {
+        // Immediately set final values for reduced motion
+        translateXAnim.setValue(0);
+      }
+      
+      // Run all animations in parallel
+      Animated.parallel(animations).start();
+    } else {
+      // Reset animations if not active
+      opacityAnim.setValue(0);
+      translateXAnim.setValue(20);
+    }
+  }, [active, isReducedMotionEnabled]);
+  
+  // Don't render anything if not active
+  if (!active) {
+    return null;
+  }
+  
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          opacity: opacityAnim,
+          transform: [
+            { translateX: translateXAnim },
+          ],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+};
+```
+
+This pattern provides:
+- Smooth transitions between tabs
+- Conditional rendering based on active state
+- Accessibility considerations with reduced motion support
+- Performance optimization with native driver
+- Clean component API for tab content
+
+### Staggered Animation Pattern
+```tsx
+// Implementation in EnhancedAnalyticsDashboardScreen.tsx
+<View style={styles.metricsRow}>
+  <ChartTransition index={0} delay={100} style={styles.metricCardWrapper}>
+    <ThemedView style={styles.metricCard}>
+      <View style={styles.metricHeader}>
+        <Ionicons name="cash" size={24} color={Colors.neon.green} />
+        <ThemedText style={styles.metricTitle}>Total Revenue</ThemedText>
+      </View>
+      <ThemedText style={[styles.metricValue, { color: Colors.neon.green }]}>
+        ${dashboardData.revenue.total_revenue.toFixed(2)}
+      </ThemedText>
+    </ThemedView>
+  </ChartTransition>
+  
+  <ChartTransition index={1} delay={100} style={styles.metricCardWrapper}>
+    <ThemedView style={styles.metricCard}>
+      <View style={styles.metricHeader}>
+        <Ionicons name="trending-up" size={24} color={Colors.neon.blue} />
+        <ThemedText style={styles.metricTitle}>Win Rate</ThemedText>
+      </View>
+      <ThemedText style={[styles.metricValue, { color: Colors.neon.blue }]}>
+        {dashboardData.betting_performance.win_rate.toFixed(1)}%
+      </ThemedText>
+    </ThemedView>
+  </ChartTransition>
+</View>
+```
+
+This pattern provides:
+- Visually appealing staggered entrance for related elements
+- Consistent timing and easing for a cohesive feel
+- Improved user experience with progressive content reveal
+- Accessibility considerations with reduced motion support
+- Performance optimization with native driver
 
 ### Accessible Component Wrappers
 ```tsx

@@ -357,3 +357,247 @@
   3. Provide user-configurable settings
 - **Reasoning**: User-configurable settings provide the most flexibility and allow users to optimize offline behavior for their specific needs.
 - **Implications**: This approach adds complexity to the UI but provides better user experience and control.
+
+### March 21, 2025 - Analytics Dashboard Enhancements
+
+#### Decision: Implement Memoization for Performance Optimization
+- **Decision**: Use React's useMemo and useCallback hooks to optimize performance in visualization components.
+- **Context**: Chart components were causing unnecessary re-renders and recalculations, affecting dashboard performance.
+- **Alternatives Considered**:
+  1. Use React.memo for component memoization
+  2. Implement shouldComponentUpdate lifecycle method
+  3. Use useMemo and useCallback hooks for fine-grained optimization
+- **Reasoning**: useMemo and useCallback provide the most precise control over what gets memoized, allowing optimization of specific calculations and functions without affecting component flexibility.
+- **Implications**: This approach improves performance significantly but requires careful management of dependencies to ensure memoization works correctly.
+
+#### Decision: Implement Lazy Loading for Chart Components
+- **Decision**: Use React.lazy and Suspense to lazy-load chart components.
+- **Context**: The dashboard includes multiple heavy visualization components that aren't all immediately visible.
+- **Alternatives Considered**:
+  1. Load all components eagerly
+  2. Use a third-party lazy loading library
+  3. Use React's built-in lazy loading
+- **Reasoning**: React.lazy provides a simple, built-in solution that integrates well with the existing codebase and reduces initial load time.
+- **Implications**: This approach improves initial load time but requires adding Suspense boundaries and fallback components.
+
+#### Decision: Implement Error Handling with Caching
+- **Decision**: Enhance the analytics service with caching to handle API failures gracefully.
+- **Context**: API calls occasionally fail, leading to empty charts and poor user experience.
+- **Alternatives Considered**:
+  1. Show error messages on failure
+  2. Retry API calls automatically
+  3. Implement caching with fallback to cached data
+- **Reasoning**: Caching with fallback provides the best user experience by ensuring data is always available, even when API calls fail.
+- **Implications**: This approach improves reliability but requires managing cache invalidation and ensuring data freshness.
+
+### March 21, 2025 - Internationalization Implementation
+
+#### Decision: Implement URL-Based Language Selection
+- **Decision**: Use language prefixes in URLs for language selection on the web platform.
+- **Context**: The application needs to support multiple languages and be SEO-friendly.
+- **Alternatives Considered**:
+  1. Use query parameters for language selection
+  2. Use browser language detection only
+  3. Use URL path prefixes for language selection
+- **Reasoning**: URL path prefixes provide the most SEO-friendly approach and align with best practices for multilingual websites.
+- **Implications**: This approach requires URL rewriting and handling in the routing system but provides clear language indicators in URLs.
+
+#### Decision: Create a Native Module for iOS Language Detection
+- **Decision**: Implement a native module to detect language changes on iOS.
+- **Context**: iOS apps need to respond to system language changes without requiring a restart.
+- **Alternatives Considered**:
+  1. Detect language only at app startup
+  2. Use a third-party library for language detection
+  3. Create a custom native module
+- **Reasoning**: A custom native module provides the most direct access to iOS locale change notifications and ensures the app stays in sync with system settings.
+- **Implications**: This approach requires additional native code but provides the best user experience for iOS users.
+
+#### Decision: Implement a Multilingual XML Sitemap
+- **Decision**: Create a script to generate a multilingual XML sitemap with hreflang annotations.
+- **Context**: Search engines need clear signals about language alternatives for proper indexing.
+- **Alternatives Considered**:
+  1. Use separate sitemaps for each language
+  2. Use a simple sitemap without language annotations
+  3. Create a comprehensive multilingual sitemap
+- **Reasoning**: A comprehensive multilingual sitemap with hreflang annotations provides the clearest signals to search engines about language relationships.
+- **Implications**: This approach requires additional implementation work but significantly improves SEO for multilingual content.
+
+### March 21, 2025 - Accessibility Enhancements for Charts
+
+#### Decision: Implement Keyboard Navigation for Charts
+- **Decision**: Add keyboard navigation support to chart components.
+- **Context**: Charts need to be accessible to users who rely on keyboard navigation.
+- **Alternatives Considered**:
+  1. Provide text alternatives only
+  2. Use third-party accessible chart libraries
+  3. Enhance existing charts with keyboard navigation
+- **Reasoning**: Enhancing existing charts provides the best balance of visual appeal and accessibility without requiring a complete rewrite.
+- **Implications**: This approach requires additional implementation work but makes charts accessible to a wider audience.
+
+#### Decision: Create Accessible Summaries for Charts
+- **Decision**: Implement detailed accessible summaries for chart data.
+- **Context**: Screen reader users need access to the information presented in charts.
+- **Alternatives Considered**:
+  1. Provide basic alt text only
+  2. Create separate accessible views
+  3. Implement comprehensive data summaries
+- **Reasoning**: Comprehensive data summaries provide the most complete access to chart information for screen reader users.
+- **Implications**: This approach requires careful data processing to create meaningful summaries but provides the best experience for screen reader users.
+
+#### Decision: Integrate Accessibility with Internationalization
+- **Decision**: Connect accessibility features with the internationalization system.
+- **Context**: Accessibility text needs to be translated for non-English users.
+- **Alternatives Considered**:
+  1. Use separate translation systems
+  2. Hardcode accessibility text in each language
+  3. Integrate with the main translation system
+- **Reasoning**: Integration with the main translation system ensures consistency and maintainability of accessibility text across languages.
+- **Implications**: This approach requires additional translation keys but provides a consistent experience for all users regardless of language.
+
+### March 21, 2025 - UI/UX Polishing Implementation
+
+#### Decision: Create Dedicated Animation Components
+- **Decision**: Create dedicated animation components (ChartTransition, TabTransition) rather than implementing animations directly in UI components.
+- **Context**: The application needs smooth transitions and animations for a polished user experience.
+- **Alternatives Considered**:
+  1. Implement animations directly in UI components
+  2. Use a third-party animation library
+  3. Create dedicated animation components
+- **Reasoning**: Dedicated animation components provide reusability, consistency, and better separation of concerns, making it easier to maintain and extend animations across the application.
+- **Implications**: This approach adds some additional components to the component tree but provides better organization and maintainability of animations.
+
+#### Decision: Implement Accessibility-Aware Animations
+- **Decision**: Make all animations respect the user's accessibility preferences, particularly the "Reduce Motion" setting.
+- **Context**: Animations can cause discomfort or even health issues for users with vestibular disorders or other conditions.
+- **Alternatives Considered**:
+  1. Use standard animations for all users
+  2. Provide a separate toggle for animations
+  3. Respect the system's "Reduce Motion" setting
+- **Reasoning**: Respecting the system's "Reduce Motion" setting provides the best user experience for users with accessibility needs, as it works with their existing system preferences.
+- **Implications**: This approach requires additional logic to check for reduced motion preferences and provide alternative experiences, but it ensures the application is accessible to all users.
+
+#### Decision: Create useAccessibilityService Hook
+- **Decision**: Create a custom hook for the accessibilityService to make it easier to use in components.
+- **Context**: The accessibilityService provides important functionality for accessibility features, but its API is not React-friendly.
+- **Alternatives Considered**:
+  1. Use the accessibilityService directly in components
+  2. Create a context provider for accessibility
+  3. Create a custom hook
+- **Reasoning**: A custom hook provides a React-friendly way to use the accessibilityService, with proper state management and cleanup.
+- **Implications**: This approach adds a small amount of code but makes it much easier to use accessibility features in components.
+
+#### Decision: Use Staggered Animations for Dashboard Elements
+- **Decision**: Implement staggered animations for dashboard elements to create a more engaging entrance.
+- **Context**: The dashboard has multiple elements that appear at once, which can be overwhelming and less visually appealing.
+- **Alternatives Considered**:
+  1. Animate all elements simultaneously
+  2. Use a single animation for the entire dashboard
+  3. Use staggered animations for related elements
+- **Reasoning**: Staggered animations provide a more engaging and polished user experience, guiding the user's attention through the interface in a natural way.
+- **Implications**: This approach requires more complex animation logic but creates a more professional and engaging user experience.
+
+#### Decision: Use Native Driver for Animations
+- **Decision**: Use the native driver for all animations to improve performance.
+
+### March 21, 2025 - Performance Optimization Implementation
+
+#### Decision: Implement Code Splitting with Lazy Loading
+- **Decision**: Create a utility for lazy loading components to reduce initial load time.
+- **Context**: The application has many components that aren't needed immediately, leading to large bundle sizes and slow initial load times.
+- **Alternatives Considered**:
+  1. Use React.lazy directly in components
+  2. Use a third-party code splitting library
+  3. Create a custom utility for lazy loading
+- **Reasoning**: A custom utility provides a consistent approach to lazy loading with proper error handling, loading states, and TypeScript support.
+- **Implications**: This approach improves initial load time but requires careful management of component dependencies and loading states.
+
+#### Decision: Implement Memory Management with TTL
+- **Decision**: Create a utility for memoizing expensive operations with time-based invalidation.
+- **Context**: Some operations, like data processing for charts, are expensive but don't need to be recalculated frequently.
+- **Alternatives Considered**:
+  1. Use React.memo for component memoization
+  2. Use a third-party caching library
+  3. Create a custom memoization utility with TTL
+- **Reasoning**: A custom utility provides precise control over what gets memoized and when it expires, allowing for efficient use of memory.
+- **Implications**: This approach improves performance but requires careful management of cache invalidation to ensure data freshness.
+
+#### Decision: Create Comprehensive Testing Infrastructure
+- **Decision**: Implement a robust testing infrastructure with unit, cross-platform, and offline tests.
+- **Context**: The application needs thorough testing to ensure reliability across platforms and network conditions.
+- **Alternatives Considered**:
+  1. Focus on manual testing
+  2. Implement basic unit tests only
+  3. Create a comprehensive testing infrastructure
+- **Reasoning**: A comprehensive testing infrastructure provides confidence in the application's reliability and helps catch issues early.
+- **Implications**: This approach requires more upfront development effort but saves time in the long run by preventing bugs and regressions.
+
+### March 21, 2025 - Analytics and A/B Testing Implementation
+
+#### Decision: Create a Centralized Analytics Service
+- **Decision**: Implement a centralized analytics service for tracking events, user properties, and conversion funnels.
+- **Context**: The application needs consistent tracking of user behavior for optimization and business insights.
+- **Alternatives Considered**:
+  1. Use a third-party analytics SDK directly
+  2. Implement tracking in individual components
+  3. Create a centralized service
+- **Reasoning**: A centralized service provides consistent tracking across the application, with proper error handling, offline support, and abstraction from specific analytics providers.
+- **Implications**: This approach requires additional implementation work but provides better organization, maintainability, and flexibility.
+
+#### Decision: Implement A/B Testing Framework
+- **Decision**: Create a custom A/B testing framework for experimenting with UI variations.
+- **Context**: The application needs to test different UI variations to optimize conversion rates and user experience.
+- **Alternatives Considered**:
+  1. Use a third-party A/B testing service
+  2. Implement simple feature flags
+  3. Create a custom A/B testing framework
+- **Reasoning**: A custom framework provides the most flexibility and control over experiments, with proper integration with the application's architecture.
+- **Implications**: This approach requires more implementation work but allows for more sophisticated experiments and better integration with the application.
+
+#### Decision: Store Experiment Assignments in AsyncStorage
+- **Decision**: Use AsyncStorage to store experiment variant assignments for consistency across sessions.
+- **Context**: Users need to see the same variant across sessions to avoid confusion and ensure valid experiment results.
+- **Alternatives Considered**:
+  1. Assign variants randomly each session
+  2. Store assignments in memory only
+  3. Store assignments in AsyncStorage
+- **Reasoning**: AsyncStorage provides persistent storage that works across sessions, ensuring consistent user experience and valid experiment results.
+- **Implications**: This approach requires additional storage operations but provides better user experience and more reliable experiment data.
+
+### March 21, 2025 - Personalization Options Implementation
+
+#### Decision: Create a Dedicated Personalization Service
+- **Decision**: Implement a centralized personalization service for managing user preferences.
+- **Context**: Users need to customize their experience with default sports, sportsbooks, and other preferences.
+- **Alternatives Considered**:
+  1. Store preferences in component state
+  2. Use a general settings service
+  3. Create a dedicated personalization service
+- **Reasoning**: A dedicated service provides centralized management of preferences, consistent application across the app, and better organization of code.
+- **Implications**: This approach requires additional implementation work but provides significant benefits in terms of user experience and code organization.
+
+#### Decision: Use React Context for Personalization
+- **Decision**: Create a React context for providing personalization features throughout the app.
+- **Context**: Many components need access to personalization features, but passing props would be cumbersome.
+- **Alternatives Considered**:
+  1. Pass preferences as props
+  2. Use Redux for state management
+  3. Use React Context
+- **Reasoning**: React Context provides a clean, React-native way to share personalization features without prop drilling or adding a complex state management library.
+- **Implications**: This approach adds some context providers to the component tree but makes it much easier to access personalization features in components.
+
+#### Decision: Implement Default Sport and Sportsbook Selection
+- **Decision**: Allow users to set default sports and sportsbooks for a personalized experience.
+- **Context**: Users often have preferred sports and sportsbooks that they want to see by default.
+- **Alternatives Considered**:
+  1. Use most recently selected options
+  2. Use popularity-based defaults
+  3. Allow explicit user selection
+- **Reasoning**: Explicit user selection provides the most personalized experience and respects user preferences.
+- **Implications**: This approach requires implementing preference selection UI but provides a better user experience.
+- **Context**: Animations can cause performance issues, especially on lower-end devices.
+- **Alternatives Considered**:
+  1. Use JavaScript-driven animations
+  2. Use CSS animations (web only)
+  3. Use native-driven animations
+- **Reasoning**: Native-driven animations run on the native UI thread, providing better performance and smoother animations, especially on mobile devices.
+- **Implications**: This approach limits the properties that can be animated (only transform and opacity) but provides significant performance benefits.

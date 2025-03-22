@@ -1,0 +1,107 @@
+{
+  "dashboard": {
+    "title": "Analytics Dashboard",
+    "tabs": {
+      "overview": "Overview",
+      "betting": "Betting",
+      "engagement": "Engagement",
+      "revenue": "Revenue"
+    },
+    "timePeriods": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "custom": "Custom"
+    },
+    "metrics": {
+      "totalRevenue": "Total Revenue",
+      "totalBets": "Total Bets",
+      "winRate": "Win Rate",
+      "averageOdds": "Average Odds",
+      "profitMargin": "Profit Margin",
+      "roi": "ROI",
+      "dailyActiveUsers": "Daily Active Users",
+      "avgSession": "Avg. Session",
+      "totalUsers": "Total Users",
+      "conversionRate": "Conversion Rate"
+    },
+    "charts": {
+      "revenueOverTime": "Revenue Over Time",
+      "betsByType": "Bets by Type",
+      "winRateBySport": "Win Rate by Sport",
+      "profitByBetType": "Profit by Bet Type",
+      "bettingActivityHeatmap": "Betting Activity Heatmap",
+      "monthlyPerformance": "Monthly Performance",
+      "userEngagementOverTime": "User Engagement Over Time",
+      "platformDistribution": "Platform Distribution",
+      "featureUsage": "Feature Usage",
+      "userEngagementStats": "User Engagement Stats",
+      "revenueByType": "Revenue by Type",
+      "revenueTrend": "Revenue Trend",
+      "microtransactionPerformance": "Microtransaction Performance"
+    },
+    "labels": {
+      "profit": "Profit",
+      "winRate": "Win Rate",
+      "loading": "Loading chart...",
+      "loadingDashboard": "Loading dashboard data...",
+      "realTimeUpdates": "Real-time Updates",
+      "refresh": "Refresh",
+      "selectDateRange": "Select Date Range",
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "from": "From",
+      "to": "To",
+      "monthlyActiveUsers": "Monthly Active Users",
+      "sessionsPerUser": "Sessions per User",
+      "churnRate": "Churn Rate",
+      "returningUsers": "Returning Users",
+      "impressions": "Impressions",
+      "clicks": "Clicks",
+      "purchases": "Purchases",
+      "revenue": "Revenue",
+      "clickRate": "Click Rate",
+      "conversionRate": "Conversion Rate"
+    },
+    "accessibility": {
+      "chartNavigation": "Use arrow keys to navigate between data points",
+      "chartDetails": "Press Enter or Space to hear details about the selected data point",
+      "heatmapSummary": "This heatmap shows activity frequency over time",
+      "bubbleChartSummary": "This bubble chart shows data points with varying sizes",
+      "lineChartSummary": "This line chart shows trends over time",
+      "barChartSummary": "This bar chart compares values across categories",
+      "pieChartSummary": "This pie chart shows the proportion of each category"
+    },
+    "charts": {
+      "heatmap": {
+        "accessibilityLabel": "Activity heatmap. Use arrow keys to navigate between days.",
+        "accessibilityHint": "A heatmap showing activity frequency over time",
+        "keyboardHint": "Press Enter or Space to hear details about the selected day.",
+        "legendLabel": "Heatmap color intensity legend",
+        "less": "Less",
+        "more": "More",
+        "intensity": "Intensity level",
+        "accessibleSummary": "This heatmap shows {{totalActivities}} activities over {{activeDays}} active days out of {{totalDays}} total days. The most active day was {{mostActiveDate}}."
+      },
+      "bubble": {
+        "accessibilityLabel": "Bubble chart. Use arrow keys to navigate between bubbles.",
+        "accessibilityHint": "A bubble chart showing data points with varying sizes",
+        "keyboardHint": "Press Enter or Space to hear details about the selected bubble.",
+        "legendLabel": "Bubble size legend",
+        "smaller": "Smaller",
+        "larger": "Larger",
+        "accessibleSummary": "This bubble chart shows {{totalItems}} items. The largest item is {{largestItem}} with a value of {{largestValue}}."
+      },
+      "historical": {
+        "accessibilityLabel": "Historical trends chart. Use arrow keys to navigate between data points.",
+        "accessibilityHint": "A line chart showing trends over time",
+        "keyboardHint": "Press Enter or Space to hear details about the selected data point.",
+        "legendLabel": "Chart legend",
+        "accessibleSummary": "This chart shows {{metric}} trends over time. The highest value is {{highestValue}} on {{highestDate}}."
+      }
+    }
+  }
+}

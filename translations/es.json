@@ -1,0 +1,107 @@
+{
+  "dashboard": {
+    "title": "Panel de Análisis",
+    "tabs": {
+      "overview": "Resumen",
+      "betting": "Apuestas",
+      "engagement": "Participación",
+      "revenue": "Ingresos"
+    },
+    "timePeriods": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "last7Days": "Últimos 7 Días",
+      "last30Days": "Últimos 30 Días",
+      "thisMonth": "Este Mes",
+      "lastMonth": "Mes Pasado",
+      "custom": "Personalizado"
+    },
+    "metrics": {
+      "totalRevenue": "Ingresos Totales",
+      "totalBets": "Apuestas Totales",
+      "winRate": "Tasa de Victorias",
+      "averageOdds": "Cuotas Promedio",
+      "profitMargin": "Margen de Beneficio",
+      "roi": "ROI",
+      "dailyActiveUsers": "Usuarios Activos Diarios",
+      "avgSession": "Sesión Promedio",
+      "totalUsers": "Usuarios Totales",
+      "conversionRate": "Tasa de Conversión"
+    },
+    "charts": {
+      "revenueOverTime": "Ingresos a lo Largo del Tiempo",
+      "betsByType": "Apuestas por Tipo",
+      "winRateBySport": "Tasa de Victorias por Deporte",
+      "profitByBetType": "Beneficio por Tipo de Apuesta",
+      "bettingActivityHeatmap": "Mapa de Calor de Actividad de Apuestas",
+      "monthlyPerformance": "Rendimiento Mensual",
+      "userEngagementOverTime": "Participación de Usuarios a lo Largo del Tiempo",
+      "platformDistribution": "Distribución por Plataforma",
+      "featureUsage": "Uso de Funciones",
+      "userEngagementStats": "Estadísticas de Participación de Usuarios",
+      "revenueByType": "Ingresos por Tipo",
+      "revenueTrend": "Tendencia de Ingresos",
+      "microtransactionPerformance": "Rendimiento de Microtransacciones"
+    },
+    "labels": {
+      "profit": "Beneficio",
+      "winRate": "Tasa de Victorias",
+      "loading": "Cargando gráfico...",
+      "loadingDashboard": "Cargando datos del panel...",
+      "realTimeUpdates": "Actualizaciones en Tiempo Real",
+      "refresh": "Actualizar",
+      "selectDateRange": "Seleccionar Rango de Fechas",
+      "apply": "Aplicar",
+      "cancel": "Cancelar",
+      "from": "Desde",
+      "to": "Hasta",
+      "monthlyActiveUsers": "Usuarios Activos Mensuales",
+      "sessionsPerUser": "Sesiones por Usuario",
+      "churnRate": "Tasa de Abandono",
+      "returningUsers": "Usuarios Recurrentes",
+      "impressions": "Impresiones",
+      "clicks": "Clics",
+      "purchases": "Compras",
+      "revenue": "Ingresos",
+      "clickRate": "Tasa de Clics",
+      "conversionRate": "Tasa de Conversión"
+    },
+    "accessibility": {
+      "chartNavigation": "Use las teclas de flecha para navegar entre puntos de datos",
+      "chartDetails": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado",
+      "heatmapSummary": "Este mapa de calor muestra la frecuencia de actividad a lo largo del tiempo",
+      "bubbleChartSummary": "Este gráfico de burbujas muestra puntos de datos con tamaños variables",
+      "lineChartSummary": "Este gráfico de líneas muestra tendencias a lo largo del tiempo",
+      "barChartSummary": "Este gráfico de barras compara valores entre categorías",
+      "pieChartSummary": "Este gráfico circular muestra la proporción de cada categoría"
+    }
+  },
+  "charts": {
+    "heatmap": {
+      "accessibilityLabel": "Mapa de calor de actividad. Use las teclas de flecha para navegar entre días.",
+      "accessibilityHint": "Un mapa de calor que muestra la frecuencia de actividad a lo largo del tiempo",
+      "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el día seleccionado.",
+      "legendLabel": "Leyenda de intensidad de color del mapa de calor",
+      "less": "Menos",
+      "more": "Más",
+      "intensity": "Nivel de intensidad",
+      "accessibleSummary": "Este mapa de calor muestra {{totalActivities}} actividades durante {{activeDays}} días activos de un total de {{totalDays}} días. El día más activo fue {{mostActiveDate}}."
+    },
+    "bubble": {
+      "accessibilityLabel": "Gráfico de burbujas. Use las teclas de flecha para navegar entre burbujas.",
+      "accessibilityHint": "Un gráfico de burbujas que muestra puntos de datos con tamaños variables",
+      "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre la burbuja seleccionada.",
+      "legendLabel": "Leyenda de tamaño de burbuja",
+      "smaller": "Más pequeño",
+      "larger": "Más grande",
+      "accessibleSummary": "Este gráfico de burbujas muestra {{totalItems}} elementos. El elemento más grande es {{largestItem}} con un valor de {{largestValue}}."
+    },
+    "historical": {
+      "accessibilityLabel": "Gráfico de tendencias históricas. Use las teclas de flecha para navegar entre puntos de datos.",
+      "accessibilityHint": "Un gráfico de líneas que muestra tendencias a lo largo del tiempo",
+      "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado.",
+      "legendLabel": "Leyenda del gráfico",
+      "accessibleSummary": "Este gráfico muestra tendencias de {{metric}} a lo largo del tiempo. El valor más alto es {{highestValue}} el {{highestDate}}."
+    }
+  }
+}
