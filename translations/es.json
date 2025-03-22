@@ -1,4 +1,36 @@
 {
+  "common": {
+    "success": "Éxito",
+    "error": "Error",
+    "loading": "Cargando...",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "ok": "OK"
+  },
+  "weather": {
+    "loading": "Cargando información meteorológica...",
+    "unavailable": "Datos meteorológicos no disponibles",
+    "expand": "Expandir información meteorológica",
+    "collapse": "Contraer información meteorológica",
+    "feelsLike": "Sensación Térmica",
+    "humidity": "Humedad",
+    "wind": "Viento",
+    "impact": "Impacto del clima en {playerName}",
+    "noData": "No hay datos de impacto meteorológico disponibles",
+    "confidence": "Confianza:",
+    "impact": {
+      "strongNegative": "Muy Negativo",
+      "slightNegative": "Ligeramente Negativo",
+      "neutral": "Neutral",
+      "slightPositive": "Ligeramente Positivo",
+      "strongPositive": "Muy Positivo"
+    }
+  },
   "dashboard": {
     "title": "Panel de Análisis",
     "tabs": {
@@ -41,7 +73,33 @@
       "userEngagementStats": "Estadísticas de Participación de Usuarios",
       "revenueByType": "Ingresos por Tipo",
       "revenueTrend": "Tendencia de Ingresos",
-      "microtransactionPerformance": "Rendimiento de Microtransacciones"
+      "microtransactionPerformance": "Rendimiento de Microtransacciones",
+      "heatmap": {
+        "accessibilityLabel": "Mapa de calor de actividad. Use las teclas de flecha para navegar entre días.",
+        "accessibilityHint": "Un mapa de calor que muestra la frecuencia de actividad a lo largo del tiempo",
+        "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el día seleccionado.",
+        "legendLabel": "Leyenda de intensidad de color del mapa de calor",
+        "less": "Menos",
+        "more": "Más",
+        "intensity": "Nivel de intensidad",
+        "accessibleSummary": "Este mapa de calor muestra {{totalActivities}} actividades durante {{activeDays}} días activos de un total de {{totalDays}} días. El día más activo fue {{mostActiveDate}}."
+      },
+      "bubble": {
+        "accessibilityLabel": "Gráfico de burbujas. Use las teclas de flecha para navegar entre burbujas.",
+        "accessibilityHint": "Un gráfico de burbujas que muestra puntos de datos con tamaños variables",
+        "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre la burbuja seleccionada.",
+        "legendLabel": "Leyenda de tamaño de burbuja",
+        "smaller": "Más pequeño",
+        "larger": "Más grande",
+        "accessibleSummary": "Este gráfico de burbujas muestra {{totalItems}} elementos. El elemento más grande es {{largestItem}} con un valor de {{largestValue}}."
+      },
+      "historical": {
+        "accessibilityLabel": "Gráfico de tendencias históricas. Use las teclas de flecha para navegar entre puntos de datos.",
+        "accessibilityHint": "Un gráfico de líneas que muestra tendencias a lo largo del tiempo",
+        "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado.",
+        "legendLabel": "Leyenda del gráfico",
+        "accessibleSummary": "Este gráfico muestra tendencias de {{metric}} a lo largo del tiempo. El valor más alto es {{highestValue}} el {{highestDate}}."
+      }
     },
     "labels": {
       "profit": "Beneficio",
@@ -102,6 +160,215 @@
       "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado.",
       "legendLabel": "Leyenda del gráfico",
       "accessibleSummary": "Este gráfico muestra tendencias de {{metric}} a lo largo del tiempo. El valor más alto es {{highestValue}} el {{highestDate}}."
+    }
+  },
+  "login": {
+    "title": "AI SPORTS EDGE",
+    "subtitle": "IMPULSADO POR IA AVANZADA",
+    "signIn": "INICIAR SESIÓN",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "dontHaveAccount": "¿No tiene una cuenta?",
+    "signUp": "Registrarse",
+    "features": {
+      "aiPicks": "Selecciones de IA",
+      "trackBets": "Seguimiento de Apuestas",
+      "rewards": "Recompensas",
+      "proAnalysis": "Análisis Pro",
+      "helpFaq": "Ayuda y FAQ"
+    },
+    "errors": {
+      "emailRequired": "El correo electrónico es obligatorio",
+      "passwordRequired": "La contraseña es obligatoria",
+      "invalidEmail": "Por favor, introduzca un correo electrónico válido",
+      "invalidCredentials": "Correo electrónico o contraseña inválidos",
+      "loginFailed": "Error al iniciar sesión. Por favor, inténtelo de nuevo.",
+      "signUpFailed": "Error al crear la cuenta. Por favor, inténtelo de nuevo.",
+      "emailInUse": "Este correo electrónico ya está en uso. Por favor, utilice otro.",
+      "weakPassword": "La contraseña es demasiado débil. Utilice al menos 6 caracteres.",
+      "accountDisabled": "Esta cuenta ha sido deshabilitada. Contacte con soporte.",
+      "tooManyAttempts": "Demasiados intentos fallidos. Por favor, inténtelo más tarde."
+    },
+    "alerts": {
+      "accountCreated": "¡Cuenta creada!",
+      "loggedIn": "¡Sesión iniciada!"
+    }
+  },
+  "payment": {
+    "title": "Información de Pago",
+    "subtitle": "Ingrese los detalles de su tarjeta para suscribirse a {{planName}}",
+    "cardInformation": "Información de la Tarjeta",
+    "subscribeNow": "Suscribirse Ahora",
+    "secureInfo": "Su información de pago está segura y encriptada",
+    "planSummary": {
+      "title": "Resumen del Plan",
+      "plan": "Plan",
+      "price": "Precio"
+    },
+    "interval": {
+      "month": "mes",
+      "year": "año"
+    },
+    "success": {
+      "title": "Suscripción Exitosa",
+      "message": "¡Su suscripción ha sido activada exitosamente!"
+    },
+    "errors": {
+      "invalidPlan": "Plan de suscripción inválido",
+      "incompleteCard": "Por favor complete los detalles de la tarjeta",
+      "paymentMethodFailed": "Falló la creación del método de pago",
+      "notAuthenticated": "Usuario no autenticado",
+      "generic": "Ocurrió un error durante el procesamiento del pago"
+    }
+  },
+  "subscription": {
+    "loading": "Cargando opciones de suscripción...",
+    "title": "Elija un Plan de Suscripción",
+    "subtitle": "Obtenga acceso a análisis premium de apuestas con IA",
+    "alreadySubscribed": "Ya tiene una suscripción activa. Puede administrar su suscripción en la configuración.",
+    "manageSubscription": "Administrar Suscripción",
+    "features": "Características",
+    "selectPlan": "Seleccionar Plan",
+    "interval": {
+      "month": "mes",
+      "year": "año"
+    },
+    "group": {
+      "title": "¿Busca un Plan Grupal?",
+      "description": "Comparta funciones premium con amigos o familiares. Obtenga acceso Pro para hasta 3 usuarios por solo $149.99/mes.",
+      "createButton": "Crear Suscripción Grupal"
+    },
+    "gift": {
+      "redeemButton": "Canjear una Suscripción de Regalo"
+    },
+    "refundPolicy": "Ver nuestra Política de Cancelación y Reembolso"
+  },
+  "personalization": {
+    "title": "Personalización",
+    "loading": "Cargando preferencias...",
+    "tabs": {
+      "general": "General",
+      "sportsbooks": "Casas de Apuestas",
+      "notifications": "Notificaciones"
+    },
+    "general": {
+      "defaultSport": "Deporte Predeterminado",
+      "defaultSportDescription": "Elija su deporte predeterminado para comparación de cuotas"
+    },
+    "sportsbooks": {
+      "defaultSportsbook": "Casa de Apuestas Predeterminada",
+      "defaultSportsbookDescription": "Elija su casa de apuestas preferida para apostar",
+      "noPreference": "Sin Preferencia"
+    },
+    "notifications": {
+      "title": "Preferencias de Notificación",
+      "description": "Personalice qué notificaciones recibe",
+      "oddsMovements": "Movimientos de Cuotas",
+      "gameStart": "Inicio de Juego",
+      "gameEnd": "Fin de Juego",
+      "specialOffers": "Ofertas Especiales"
+    },
+    "alerts": {
+      "defaultSportUpdated": "Deporte Predeterminado Actualizado",
+      "defaultSportUpdatedMessage": "{sport} es ahora su deporte predeterminado.",
+      "defaultSportsbookUpdated": "Casa de Apuestas Predeterminada Actualizada",
+      "defaultSportsbookUpdatedMessage": "{sportsbook} es ahora su casa de apuestas predeterminada.",
+      "defaultSportsbookCleared": "Preferencia de casa de apuestas predeterminada eliminada.",
+      "resetPreferences": "Restablecer Preferencias",
+      "resetPreferencesMessage": "¿Está seguro de que desea restablecer todas las preferencias de personalización a los valores predeterminados?",
+      "preferencesReset": "Preferencias Restablecidas",
+      "preferencesResetMessage": "Todas las preferencias de personalización han sido restablecidas a los valores predeterminados.",
+      "cancel": "Cancelar",
+      "reset": "Restablecer",
+      "ok": "OK"
+    },
+    "resetButton": "Restablecer Todas las Preferencias"
+  },
+  "languageSelector": {
+    "switchToEnglish": "Cambiar a inglés",
+    "switchToSpanish": "Cambiar a español",
+    "hint": "Cambia el idioma de la aplicación"
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Aprenda más sobre nuestras predicciones de apuestas deportivas con IA",
+    "loading": "Cargando preguntas..."
+  },
+  "sports": {
+    "basketball_nba": "NBA Baloncesto",
+    "basketball_ncaab": "NCAA Baloncesto",
+    "football_nfl": "NFL Fútbol Americano",
+    "hockey_nhl": "NHL Hockey",
+    "baseball_mlb": "MLB Béisbol",
+    "soccer_epl": "Premier League",
+    "soccer_mls": "MLS Fútbol",
+    "soccer_womens_nwsl": "NWSL Fútbol Femenino",
+    "soccer_womens_intl": "Fútbol Internacional Femenino",
+    "soccer_mens_intl": "Fútbol Internacional Masculino",
+    "soccer_laliga": "LaLiga",
+    "soccer_bundesliga": "Bundesliga",
+    "soccer_seriea": "Serie A",
+    "soccer_ligue1": "Ligue 1",
+    "mma_ufc": "UFC MMA"
+  },
+  "oddsComparison": {
+    "title": "Comparación de Cuotas",
+    "subtitle": "Compare cuotas entre DraftKings y FanDuel para juegos de la NBA",
+    "selectSport": "Seleccionar Deporte:",
+    "gameMatchup": "Enfrentamiento",
+    "versus": "VS",
+    "gameDate": "{{date}} a las {{time}}",
+    "noGameSelected": "No hay juego seleccionado",
+    "lastUpdated": "Última actualización: {{time}}",
+    "refresh": "Actualizar",
+    "sortBy": "Ordenar por:",
+    "bestOdds": "Mejores Cuotas",
+    "filter": "Filtrar",
+    "showDraftKings": "DraftKings",
+    "showFanDuel": "FanDuel",
+    "notAvailable": "N/D",
+    "unlockOdds": "Desbloquear Cuotas",
+    "purchaseOdds": "Comprar Acceso a Cuotas",
+    "purchaseSuccess": "¡Compra Exitosa!",
+    "purchaseError": "Error de Compra",
+    "dataSource": {
+      "cached": "ALMACENADO",
+      "stale": "ANTIGUO",
+      "fallback": "ALTERNATIVO",
+      "error": "ERROR"
+    },
+    "errors": {
+      "apiFailure": "Error al cargar datos de cuotas. Por favor, inténtelo de nuevo más tarde.",
+      "networkError": "Error de red. Por favor, compruebe su conexión e inténtelo de nuevo.",
+      "rateLimit": "Límite de tasa excedido. Por favor, inténtelo de nuevo en unos minutos.",
+      "noData": "No se pudieron encontrar cuotas para DraftKings o FanDuel en este momento.",
+      "configuration": "Error de configuración. Por favor, contacte con soporte."
+    },
+    "loading": "Cargando comparación de cuotas...",
+    "retry": "Reintentar",
+    "alerts": {
+      "title": "Alertas de Movimiento de Cuotas",
+      "noAlerts": "No hay alertas de movimiento de cuotas todavía",
+      "noAlertsSubtext": "Se le notificará cuando las cuotas cambien significativamente",
+      "loading": "Cargando alertas..."
+    },
+    "accessibility": {
+      "refreshButton": "Botón de actualización",
+      "refreshButtonHint": "Actualiza los datos de cuotas",
+      "alertsButton": "Botón de alertas",
+      "alertsButtonHint": "Muestra alertas de movimiento de cuotas",
+      "settingsButton": "Botón de configuración",
+      "settingsButtonHint": "Abre la configuración de personalización",
+      "sortOption": "Opción de ordenación: {{option}}",
+      "sortOptionHint": "Cambia el orden de visualización de las cuotas",
+      "filterOption": "Opción de filtro: {{option}}",
+      "filterOptionHint": "Filtra los corredores de apuestas mostrados",
+      "bookmakerButton": "{{bookmaker}} cuotas: {{odds}}",
+      "bookmakerButtonHint": "Toca para visitar el sitio del corredor de apuestas",
+      "lockedOdds": "cuotas bloqueadas",
+      "selectSport": "Seleccionar {{sport}}",
+      "selectSportHint": "Cambia la comparación de cuotas para mostrar cuotas de {{sport}}"
     }
   }
 }

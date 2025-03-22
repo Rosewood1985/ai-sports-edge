@@ -8,6 +8,7 @@
 - Gift Subscription Flow
 - Group Subscription Management
 - Stripe Integration with Webhooks
+- Spanish Translations for Payment and Subscription Screens
 
 #### Geolocation Features
 - Enhanced Caching System with Memory and Persistent Storage

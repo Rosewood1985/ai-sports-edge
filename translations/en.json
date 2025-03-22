@@ -1,4 +1,36 @@
 {
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "ok": "OK"
+  },
+  "weather": {
+    "loading": "Loading weather insights...",
+    "unavailable": "Weather data unavailable",
+    "expand": "Expand weather insights",
+    "collapse": "Collapse weather insights",
+    "feelsLike": "Feels Like",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "impact": "Weather Impact on {playerName}",
+    "noData": "No weather impact data available",
+    "confidence": "Confidence:",
+    "impact": {
+      "strongNegative": "Strong Negative",
+      "slightNegative": "Slight Negative",
+      "neutral": "Neutral",
+      "slightPositive": "Slight Positive",
+      "strongPositive": "Strong Positive"
+    }
+  },
   "dashboard": {
     "title": "Analytics Dashboard",
     "tabs": {
@@ -102,6 +134,164 @@
         "legendLabel": "Chart legend",
         "accessibleSummary": "This chart shows {{metric}} trends over time. The highest value is {{highestValue}} on {{highestDate}}."
       }
+    }
+  },
+  "login": {
+    "title": "AI SPORTS EDGE",
+    "subtitle": "POWERED BY ADVANCED AI",
+    "signIn": "SIGN IN",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "dontHaveAccount": "Don't have an account?",
+    "signUp": "Sign Up",
+    "features": {
+      "aiPicks": "AI Picks",
+      "trackBets": "Track Bets",
+      "rewards": "Rewards",
+      "proAnalysis": "Pro Analysis",
+      "helpFaq": "Help & FAQ"
+    },
+    "errors": {
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidCredentials": "Invalid email or password",
+      "loginFailed": "Login failed. Please try again.",
+      "signUpFailed": "Sign up failed. Please try again.",
+      "emailInUse": "This email is already in use. Please use a different one.",
+      "weakPassword": "Password is too weak. Use at least 6 characters.",
+      "accountDisabled": "This account has been disabled. Please contact support.",
+      "tooManyAttempts": "Too many failed attempts. Please try again later."
+    },
+    "alerts": {
+      "accountCreated": "Account created!",
+      "loggedIn": "Logged in!"
+    }
+  },
+  "sports": {
+    "basketball_nba": "NBA Basketball",
+    "basketball_ncaab": "NCAA Basketball",
+    "football_nfl": "NFL Football",
+    "hockey_nhl": "NHL Hockey",
+    "baseball_mlb": "MLB Baseball",
+    "soccer_epl": "Premier League",
+    "soccer_mls": "MLS Soccer",
+    "soccer_womens_nwsl": "NWSL Women's Soccer",
+    "soccer_womens_intl": "Women's International Soccer",
+    "soccer_mens_intl": "Men's International Soccer",
+    "soccer_laliga": "LaLiga",
+    "soccer_bundesliga": "Bundesliga",
+    "soccer_seriea": "Serie A",
+    "soccer_ligue1": "Ligue 1",
+    "mma_ufc": "UFC MMA"
+  },
+  "payment": {
+    "title": "Payment Information",
+    "subtitle": "Enter your card details to subscribe to {{planName}}",
+    "cardInformation": "Card Information",
+    "subscribeNow": "Subscribe Now",
+    "secureInfo": "Your payment information is secure and encrypted",
+    "planSummary": {
+      "title": "Plan Summary",
+      "plan": "Plan",
+      "price": "Price"
+    },
+    "interval": {
+      "month": "month",
+      "year": "year"
+    },
+    "success": {
+      "title": "Subscription Successful",
+      "message": "Your subscription has been activated successfully!"
+    },
+    "errors": {
+      "invalidPlan": "Invalid subscription plan",
+      "incompleteCard": "Please complete the card details",
+      "paymentMethodFailed": "Payment method creation failed",
+      "notAuthenticated": "User not authenticated",
+      "generic": "An error occurred during payment processing"
+    }
+  },
+  "subscription": {
+    "loading": "Loading subscription options...",
+    "title": "Choose a Subscription Plan",
+    "subtitle": "Get access to premium AI-powered betting insights",
+    "alreadySubscribed": "You already have an active subscription. You can manage your subscription in the settings.",
+    "manageSubscription": "Manage Subscription",
+    "features": "Features",
+    "selectPlan": "Select Plan",
+    "interval": {
+      "month": "month",
+      "year": "year"
+    },
+    "group": {
+      "title": "Looking for a Group Plan?",
+      "description": "Share premium features with friends or family. Get Pro access for up to 3 users for just $149.99/month.",
+      "createButton": "Create Group Subscription"
+    },
+    "gift": {
+      "redeemButton": "Redeem a Gift Subscription"
+    },
+    "refundPolicy": "View our Cancellation & Refund Policy"
+  },
+  "oddsComparison": {
+    "title": "Odds Comparison",
+    "subtitle": "Compare odds between DraftKings and FanDuel for NBA games",
+    "selectSport": "Select Sport:",
+    "gameMatchup": "Game Matchup",
+    "versus": "VS",
+    "gameDate": "{{date}} at {{time}}",
+    "noGameSelected": "No game selected",
+    "lastUpdated": "Last updated: {{time}}",
+    "refresh": "Refresh",
+    "sortBy": "Sort by:",
+    "bestOdds": "Best Odds",
+    "filter": "Filter",
+    "showDraftKings": "DraftKings",
+    "showFanDuel": "FanDuel",
+    "notAvailable": "N/A",
+    "unlockOdds": "Unlock Odds",
+    "purchaseOdds": "Purchase Odds Access",
+    "purchaseSuccess": "Purchase Successful!",
+    "purchaseError": "Purchase Error",
+    "dataSource": {
+      "cached": "CACHED",
+      "stale": "STALE",
+      "fallback": "FALLBACK",
+      "error": "ERROR"
+    },
+    "errors": {
+      "apiFailure": "Failed to load odds data. Please try again later.",
+      "networkError": "Network error. Please check your connection and try again.",
+      "rateLimit": "Rate limit exceeded. Please try again in a few minutes.",
+      "noData": "Could not find odds for DraftKings or FanDuel at this time.",
+      "configuration": "Configuration error. Please contact support."
+    },
+    "loading": "Loading odds comparison...",
+    "retry": "Retry",
+    "alerts": {
+      "title": "Odds Movement Alerts",
+      "noAlerts": "No odds movement alerts yet",
+      "noAlertsSubtext": "You'll be notified when odds change significantly",
+      "loading": "Loading alerts..."
+    },
+    "accessibility": {
+      "refreshButton": "Refresh button",
+      "refreshButtonHint": "Refreshes the odds data",
+      "alertsButton": "Alerts button",
+      "alertsButtonHint": "Shows odds movement alerts",
+      "settingsButton": "Settings button",
+      "settingsButtonHint": "Opens personalization settings",
+      "sortOption": "Sort option: {{option}}",
+      "sortOptionHint": "Changes the display order of odds",
+      "filterOption": "Filter option: {{option}}",
+      "filterOptionHint": "Filters the displayed sportsbooks",
+      "bookmakerButton": "{{bookmaker}} odds: {{odds}}",
+      "bookmakerButtonHint": "Tap to visit sportsbook site",
+      "lockedOdds": "locked odds",
+      "selectSport": "Select {{sport}}",
+      "selectSportHint": "Changes odds comparison to show {{sport}} odds"
     }
   }
 }

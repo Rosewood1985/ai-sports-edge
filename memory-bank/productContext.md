@@ -169,6 +169,8 @@
 - Context-based translation keys
 - Parameter interpolation support
 - Translation management tools
+- Complete Spanish translations for payment and subscription screens
+- Comprehensive error message translations
 
 ### Language Detection and Selection
 - URL-based language selection for web
@@ -181,6 +183,7 @@
 - Currency formatting based on locale
 - Date formatting based on locale
 - Right-to-left language support
+- Localized subscription plan intervals (month/year)
 
 ### SEO Optimization
 - Language-specific URLs with proper structure
