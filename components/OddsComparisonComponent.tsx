@@ -7,6 +7,8 @@ import { Game, Bookmaker } from '../types/odds';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { auth } from '../config/firebase';
 import { oddsCacheService } from '../services/oddsCacheService';
+import API_KEYS, { API_BASE_URLS, isApiKeyConfigured } from '../config/apiKeys';
+import { microtransactionService, MICROTRANSACTION_TYPES } from '../services/microtransactionService';
 import { errorRecoveryService, ErrorType, RecoveryStrategy } from '../services/errorRecoveryService';
 import { oddsHistoryService } from '../services/oddsHistoryService';
 import { analyticsService, AnalyticsEventType, ConversionFunnelStep } from '../services/analyticsService';
@@ -99,7 +101,15 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
             variant_id: experimentVariant?.id || 'none'
         });
         
-        const apiKey = process.env.ODDS_API_KEY || 'fdf4ad2d50a6b6d2ca77e52734851aa4';
+        // Check if Odds API key is configured
+        if (!isApiKeyConfigured('ODDS_API_KEY')) {
+            console.error('ODDS_API_KEY is not configured');
+            setError('Configuration error. Please contact support.');
+            setLoading(false);
+            return;
+        }
+        
+        const apiKey = API_KEYS.ODDS_API_KEY as string;
         const cacheKey = `odds_${selectedSport}`;
         
         // Check cache first
@@ -141,7 +151,7 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
     
     // Helper function to fetch fresh data with error recovery
     const fetchFreshData = async (apiKey: string, cacheKey: string) => {
-        const endpoint = `https://api.the-odds-api.com/v4/sports/${selectedSport}/odds`;
+        const endpoint = `${API_BASE_URLS.ODDS_API}/sports/${selectedSport}/odds`;
         
         // Define the API call function
         const fetchFromApi = async () => {
@@ -185,17 +195,66 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
                 // Cache the data if it's from the API
                 if (result.source === 'api') {
                     await oddsCacheService.setCachedData(cacheKey, result.data);
+                    
+                    // Track successful API fetch
+                    analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+                        event_name: 'odds_fetch_success',
+                        sport: selectedSport,
+                        source: 'api'
+                    });
+                } else {
+                    // Track fallback data usage
+                    analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+                        event_name: 'odds_fetch_fallback',
+                        sport: selectedSport,
+                        source: result.source
+                    });
                 }
                 
                 await processOddsData(result.data);
                 setLastUpdated(new Date());
             } else if (result.error) {
-                setError(`${result.error.message}. Please try again later.`);
+                // Track error
+                analyticsService.trackEvent(AnalyticsEventType.ERROR_OCCURRED, {
+                    error_type: 'odds_fetch_error',
+                    error_message: result.error.message,
+                    sport: selectedSport,
+                    retry_count: retryCount
+                });
+                
+                // Provide more specific error message based on error type
+                if (result.error.message.includes('rate limit')) {
+                    setError('Rate limit exceeded. Please try again in a few minutes.');
+                } else if (result.error.message.includes('network')) {
+                    setError('Network error. Please check your connection and try again.');
+                } else {
+                    setError(`${result.error.message}. Please try again later.`);
+                }
                 setNoData(true);
             }
         } catch (error) {
             console.error('Error fetching odds:', error);
-            setError('Failed to fetch odds data. Please try again later.');
+            
+            // Track unexpected error
+            analyticsService.trackEvent(AnalyticsEventType.ERROR_OCCURRED, {
+                error_type: 'odds_fetch_unexpected_error',
+                error_message: error instanceof Error ? error.message : 'Unknown error',
+                sport: selectedSport,
+                retry_count: retryCount
+            });
+            
+            // Provide more user-friendly error message
+            if (error instanceof Error) {
+                if (error.message.includes('timeout')) {
+                    setError('Request timed out. Please try again.');
+                } else if (error.message.includes('network')) {
+                    setError('Network error. Please check your connection and try again.');
+                } else {
+                    setError('Failed to fetch odds data. Please try again later.');
+                }
+            } else {
+                setError('Failed to fetch odds data. Please try again later.');
+            }
             setNoData(true);
         } finally {
             setLoading(false);
@@ -274,8 +333,8 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
         if (!data || data.length === 0) return 'empty';
         return `${selectedSport}_${data[0]?.id || 'unknown'}`;
     },
-    // TTL of 2 minutes
-    2 * 60 * 1000);
+    // Use a longer TTL for iOS to reduce processing overhead
+    Platform.OS === 'ios' ? 5 * 60 * 1000 : 2 * 60 * 1000);
     
     // Generate mock data for fallback
     const generateMockData = (): Game[] => {
@@ -623,31 +682,112 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
     );
 
     // Handle purchase of odds
-    const handlePurchaseOdds = () => {
-        // In a real app, this would initiate a payment flow
-        // For now, we'll just simulate a successful purchase
-        Alert.alert(
-            "Purchase Odds",
-            "Would you like to purchase access to these odds for $0.99?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel"
-                },
-                {
-                    text: "Purchase",
-                    onPress: () => {
-                        // Simulate successful purchase
-                        setHasPurchasedOdds(true);
-                        
-                        // Track conversion
-                        if (userId) {
-                            bettingAffiliateService.trackConversion('odds_purchase', 0.99, userId);
+    const handlePurchaseOdds = async () => {
+        try {
+            // Get current user ID
+            const currentUserId = userId || auth.currentUser?.uid;
+            
+            if (!currentUserId) {
+                Alert.alert(
+                    "Sign In Required",
+                    "Please sign in to purchase odds access.",
+                    [
+                        { text: "OK" }
+                    ]
+                );
+                return;
+            }
+            
+            // Get pricing from microtransaction service
+            const price = microtransactionService.getPricing(MICROTRANSACTION_TYPES.ODDS_ACCESS);
+            const formattedPrice = `$${(price / 100).toFixed(2)}`;
+            
+            // Create opportunity data
+            const opportunityData = {
+                type: MICROTRANSACTION_TYPES.ODDS_ACCESS,
+                price,
+                title: 'Odds Access',
+                description: 'Unlock betting odds for this game',
+                buttonText: 'Get Odds',
+                priority: 1,
+                cookieEnabled: true,
+            };
+            
+            // Show purchase confirmation
+            Alert.alert(
+                "Purchase Odds",
+                `Would you like to purchase access to these odds for ${formattedPrice}?`,
+                [
+                    {
+                        text: "Cancel",
+                        style: "cancel",
+                        onPress: () => {
+                            // Track cancellation
+                            microtransactionService.trackInteraction('cancel', opportunityData, {
+                                id: currentUserId,
+                                isPremium: isPremium
+                            });
+                        }
+                    },
+                    {
+                        text: "Purchase",
+                        onPress: async () => {
+                            // Track purchase start
+                            await microtransactionService.trackInteraction('purchase_start', opportunityData, {
+                                id: currentUserId,
+                                isPremium: isPremium
+                            });
+                            
+                            // In a production app, this would integrate with Stripe or another payment processor
+                            // For now, we'll simulate a successful purchase
+                            
+                            // Simulate loading state
+                            setLoading(true);
+                            
+                            // Simulate API call delay
+                            setTimeout(async () => {
+                                // Set purchase state
+                                setHasPurchasedOdds(true);
+                                setLoading(false);
+                                
+                                // Track successful purchase
+                                await microtransactionService.trackInteraction('purchase', opportunityData, {
+                                    id: currentUserId,
+                                    isPremium: isPremium
+                                });
+                                
+                                // Track conversion with affiliate service
+                                if (currentUserId) {
+                                    bettingAffiliateService.trackConversion('odds_purchase', price / 100, currentUserId);
+                                }
+                                
+                                // Track analytics event
+                                await analyticsService.trackEvent(AnalyticsEventType.CONVERSION_COMPLETED, {
+                                    product_id: MICROTRANSACTION_TYPES.ODDS_ACCESS,
+                                    price: price / 100,
+                                    currency: 'USD',
+                                    success: true
+                                });
+                                
+                                // Show success message
+                                Alert.alert(
+                                    "Purchase Successful",
+                                    "You now have access to the odds for this game.",
+                                    [{ text: "OK" }]
+                                );
+                            }, 1500);
                         }
                     }
-                }
-            ]
-        );
+                ]
+            );
+        } catch (error) {
+            console.error('Error in handlePurchaseOdds:', error);
+            Alert.alert(
+                "Purchase Failed",
+                "There was an error processing your purchase. Please try again.",
+                [{ text: "OK" }]
+            );
+        }
     };
     // Handle click on sportsbook button
     const handleSportsbookClick = async (sportsbook: 'draftkings' | 'fanduel') => {
@@ -712,47 +852,83 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
                 
             // If user has purchased odds, open the sportsbook directly
             if (hasPurchasedOdds) {
-                const affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
-                    baseUrl,
-                    affiliateCode,
-                    undefined,
-                    userId || undefined
-                );
+                // Show loading indicator
+                setLoading(true);
                 
-                await Linking.openURL(affiliateUrl);
-                
-                // Track conversion with affiliate service
-                if (userId) {
-                    bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
-                }
-                
-                // Track A/B testing conversion
-                if (experimentVariant) {
-                    await abTestingService.trackConversion(experimentId, 1, {
-                        conversion_type: 'sportsbook_click',
-                        sportsbook,
-                        sport: selectedSport
-                    });
-                }
-                
-                // Start conversion funnel
-                await analyticsService.startFunnel(
-                    `bet_placement_${Date.now()}`,
-                    ConversionFunnelStep.SPORTSBOOK_CLICK,
-                    {
-                        sportsbook,
-                        sport: selectedSport,
-                        experiment_id: experimentId,
-                        variant_id: experimentVariant?.id || 'none'
+                try {
+                    // Generate affiliate link
+                    const affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
+                        baseUrl,
+                        affiliateCode,
+                        undefined,
+                        userId || undefined
+                    );
+                    
+                    // Track conversion with affiliate service
+                    if (userId) {
+                        bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
                     }
-                );
+                    
+                    // Track A/B testing conversion
+                    if (experimentVariant) {
+                        await abTestingService.trackConversion(experimentId, 1, {
+                            conversion_type: 'sportsbook_click',
+                            sportsbook,
+                            sport: selectedSport
+                        });
+                    }
+                    
+                    // Start conversion funnel
+                    await analyticsService.startFunnel(
+                        `bet_placement_${Date.now()}`,
+                        ConversionFunnelStep.SPORTSBOOK_CLICK,
+                        {
+                            sportsbook,
+                            sport: selectedSport,
+                            experiment_id: experimentId,
+                            variant_id: experimentVariant?.id || 'none'
+                        }
+                    );
+                    
+                    // Hide loading indicator
+                    setLoading(false);
+                    
+                    // Check if URL can be opened
+                    const canOpen = await Linking.canOpenURL(affiliateUrl);
+                    
+                    if (canOpen) {
+                        await Linking.openURL(affiliateUrl);
+                    } else {
+                        throw new Error(`Cannot open URL: ${affiliateUrl}`);
+                    }
+                } catch (linkError) {
+                    console.error('Error generating or opening affiliate link:', linkError);
+                    setLoading(false);
+                    
+                    // Fallback to direct URL if affiliate link fails
+                    try {
+                        await Linking.openURL(baseUrl);
+                    } catch (fallbackError) {
+                        console.error('Error opening fallback URL:', fallbackError);
+                        Alert.alert(
+                            "Cannot Open Sportsbook",
+                            "Unable to open the sportsbook website. Please check your internet connection and try again.",
+                            [{ text: "OK" }]
+                        );
+                    }
+                }
             } else {
                 // If not purchased, prompt to purchase
                 handlePurchaseOdds();
             }
         } catch (error) {
-            console.error('Error opening sportsbook:', error);
-            Alert.alert('Error', 'Could not open sportsbook. Please try again.');
+            console.error('Error in handleSportsbookClick:', error);
+            setLoading(false);
+            Alert.alert(
+                'Error',
+                'Could not open sportsbook. Please try again.',
+                [{ text: "OK" }]
+            );
         }
     };
 
