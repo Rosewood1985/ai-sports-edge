@@ -1,5 +1,49 @@
 # Decision Log
 
+## Weather Integration for Sports Odds Prediction
+
+### March 22, 2025
+
+#### Decision: Create a Centralized Weather Adjustment Service
+- **Decision**: Implement a centralized WeatherAdjustmentService to handle weather-based odds adjustments for all sports.
+- **Context**: Different sports are affected by weather conditions in different ways, and this needs to be reflected in odds predictions.
+- **Alternatives Considered**:
+  1. Implement weather adjustments directly in each sport-specific service
+  2. Create a centralized service for all weather adjustments
+  3. Use a third-party API for weather-adjusted odds
+- **Reasoning**: A centralized service provides consistent weather adjustment logic while still allowing for sport-specific implementations, reducing code duplication and ensuring consistent behavior.
+- **Implications**: This approach makes it easier to maintain and update weather adjustment logic, but requires careful design to handle the unique characteristics of each sport.
+
+#### Decision: Implement Sport-Specific Weather Adjustment Algorithms
+- **Decision**: Create separate adjustment algorithms for each sport based on their specific weather sensitivities.
+- **Context**: Different sports are affected by weather in fundamentally different ways (e.g., baseball is affected by wind, soccer by field conditions).
+- **Alternatives Considered**:
+  1. Use a generic algorithm for all sports
+  2. Implement sport-specific algorithms
+  3. Use machine learning to determine adjustments
+- **Reasoning**: Sport-specific algorithms provide the most accurate adjustments based on known weather impacts for each sport.
+- **Implications**: This approach requires more implementation work but results in more accurate odds adjustments and better user experience.
+
+#### Decision: Handle Indoor Sports Appropriately
+- **Decision**: Explicitly handle indoor sports (NBA, NHL, UFC) with minimal weather impact.
+- **Context**: Some sports are played indoors and are minimally affected by weather conditions.
+- **Alternatives Considered**:
+  1. Exclude indoor sports from weather adjustments entirely
+  2. Apply minimal adjustments to indoor sports
+  3. Consider venue-specific factors for indoor sports
+- **Reasoning**: Explicitly handling indoor sports with minimal adjustments provides a consistent API while acknowledging the reality that these sports are largely unaffected by weather.
+- **Implications**: This approach ensures that all sports are handled consistently in the codebase, even if some have minimal weather impact.
+
+#### Decision: Include Weather Impact Descriptions
+- **Decision**: Include human-readable descriptions of weather impacts in the adjustment results.
+- **Context**: Users need to understand how weather is affecting odds predictions.
+- **Alternatives Considered**:
+  1. Return only numerical adjustment factors
+  2. Include basic impact labels (positive/negative)
+  3. Include detailed descriptions of weather impacts
+- **Reasoning**: Detailed descriptions provide the most value to users, helping them understand why odds are adjusted in a particular way.
+- **Implications**: This approach enhances the user experience but requires maintaining accurate and informative descriptions for all weather conditions and sports.
+
 ## Stripe Integration Testing Implementation
 
 ### March 20, 2025

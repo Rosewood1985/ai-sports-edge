@@ -88,8 +88,114 @@ This pattern provides:
 - Consistent test execution environment
 - Coverage reporting for quality assurance
 - Clear output for test results
-
 ## Implementation Patterns
+
+### Weather Integration for Sports Odds
+```javascript
+/**
+ * Get weather adjustment factor for a specific sport and condition
+ * @param {string} sport - Sport key (e.g., 'NBA', 'MLB')
+ * @param {Object} weatherData - Weather data
+ * @returns {Object} Weather adjustment factors
+ */
+async getWeatherAdjustmentFactor(sport, weatherData) {
+  try {
+    if (!weatherData) {
+      return { factor: 1.0, impact: 'none', description: 'No weather data available' };
+    }
+
+    // Get the weather condition
+    const { condition, temperature, windSpeed, precipitation } = weatherData;
+    
+    // Default adjustment (no impact)
+    let factor = 1.0;
+    let impact = 'none';
+    let description = 'Weather has no significant impact on this sport';
+    
+    // Adjust based on sport and weather condition
+    switch (sport) {
+      case 'MLB':
+        return this.getBaseballWeatherAdjustment(weatherData);
+      
+      case 'NFL':
+        return this.getFootballWeatherAdjustment(weatherData);
+      
+      case 'NBA':
+      case 'WNBA':
+      case 'NCAA_MENS':
+      case 'NCAA_WOMENS':
+        // Basketball is mostly played indoors
+        return {
+          factor: 1.0,
+          impact: 'none',
+          description: 'Basketball is played indoors and not affected by weather'
+        };
+      
+      // ... more sports ...
+      
+      default:
+        return { factor: 1.0, impact: 'none', description: 'No specific weather adjustment for this sport' };
+    }
+  } catch (error) {
+    console.error('Error getting weather adjustment factor:', error);
+    return { factor: 1.0, impact: 'none', description: 'Error calculating weather adjustment' };
+  }
+}
+```
+
+This pattern provides:
+- Centralized weather adjustment logic
+- Sport-specific weather impact handling
+- Graceful error handling with sensible defaults
+- Clear documentation of weather impact on odds
+
+### Sport-Specific Weather Adjustments
+```javascript
+/**
+ * Get baseball weather adjustment
+ * @param {Object} weatherData - Weather data
+ * @returns {Object} Weather adjustment factors
+ */
+getBaseballWeatherAdjustment(weatherData) {
+  const { condition, temperature, windSpeed, precipitation } = weatherData;
+  let factor = 1.0;
+  let impact = 'none';
+  let description = 'Normal baseball conditions';
+
+  // Temperature impact
+  if (temperature < 40) {
+    factor *= 0.9; // Cold weather reduces scoring
+    impact = 'negative';
+    description = 'Cold temperatures typically reduce scoring in baseball';
+  } else if (temperature > 90) {
+    factor *= 1.1; // Hot weather increases scoring
+    impact = 'positive';
+    description = 'Hot temperatures typically increase scoring in baseball';
+  }
+
+  // Wind impact
+  if (windSpeed > 15) {
+    factor *= 1.15; // High winds can increase home runs in the right direction
+    impact = 'significant';
+    description = 'High winds can significantly affect ball flight and scoring';
+  }
+
+  // Rain impact
+  if (condition === 'Rain' || precipitation > 0.1) {
+    factor *= 0.85; // Rain reduces scoring
+    impact = 'negative';
+    description = 'Rain typically reduces scoring and increases pitching advantage';
+  }
+
+  return { factor, impact, description };
+}
+```
+
+This pattern provides:
+- Detailed sport-specific weather adjustments
+- Clear documentation of weather impact factors
+- Quantifiable adjustment factors for odds calculation
+- Descriptive impact information for user display
 
 ### Webhook Handling
 ```javascript
@@ -97,6 +203,7 @@ This pattern provides:
 const signature = req.headers['stripe-signature'];
 if (!signature) {
   return res.status(400).send('Missing Stripe signature');
+}
 }
 
 // Verify event
