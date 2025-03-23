@@ -11,6 +11,8 @@ type RootStackParamList = {
   ParlayOdds: undefined;
   AnalyticsDashboard: undefined;
   OddsComparison: undefined;
+  LocalTeamOdds: undefined;
+  NearbyVenues: undefined;
 };
 
 // Define the navigation prop type
@@ -32,6 +34,14 @@ const HomeScreen: React.FC = () => {
   
   const navigateToOddsComparison = () => {
     navigation.navigate('OddsComparison');
+  };
+  
+  const navigateToLocalTeamOdds = () => {
+    navigation.navigate('LocalTeamOdds');
+  };
+  
+  const navigateToNearbyVenues = () => {
+    navigation.navigate('NearbyVenues');
   };
   
   return (
@@ -104,6 +114,48 @@ const HomeScreen: React.FC = () => {
               </View>
               <View style={styles.cardIconContainer}>
                 <Ionicons name="git-compare-outline" size={48} color={Colors.neon.green} />
+              </View>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.parlayCard, { borderColor: Colors.neon.blue, borderWidth: 1 }]}
+            onPress={navigateToLocalTeamOdds}
+          >
+            <View style={styles.cardContent}>
+              <View style={styles.cardTextContent}>
+                <Text style={[styles.cardTitle, { color: Colors.neon.blue }]}>Local Team Odds</Text>
+                <Text style={styles.cardDescription}>
+                  Get personalized odds suggestions for teams in your area based on your location
+                </Text>
+                <View style={[styles.cardButton, { backgroundColor: Colors.neon.blue }]}>
+                  <Text style={styles.cardButtonText}>View Local Odds</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </View>
+              </View>
+              <View style={styles.cardIconContainer}>
+                <Ionicons name="location" size={48} color={Colors.neon.blue} />
+              </View>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.parlayCard, { borderColor: Colors.neon.orange, borderWidth: 1 }]}
+            onPress={navigateToNearbyVenues}
+          >
+            <View style={styles.cardContent}>
+              <View style={styles.cardTextContent}>
+                <Text style={[styles.cardTitle, { color: Colors.neon.orange }]}>Nearby Venues</Text>
+                <Text style={styles.cardDescription}>
+                  Discover sports venues near you with details on capacity, teams, and directions
+                </Text>
+                <View style={[styles.cardButton, { backgroundColor: Colors.neon.orange }]}>
+                  <Text style={styles.cardButtonText}>Find Venues</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </View>
+              </View>
+              <View style={styles.cardIconContainer}>
+                <Ionicons name="map" size={48} color={Colors.neon.orange} />
               </View>
             </View>
           </TouchableOpacity>

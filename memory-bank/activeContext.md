@@ -9,11 +9,12 @@
 - Group Subscription Management
 - Stripe Integration with Webhooks
 - Spanish Translations for Payment and Subscription Screens
-
-#### Geolocation Features
+#### Geolocation Features (COMPLETED)
 - Enhanced Caching System with Memory and Persistent Storage
 - Improved Error Handling with Retry Mechanisms
 - Local Team Odds Implementation
+- Nearby Venues with Filtering
+- Home Screen Integration
 - Nearby Venues with Filtering
 
 #### Betting Analytics
