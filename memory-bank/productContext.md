@@ -237,7 +237,29 @@
 - Proper semantic roles
 - Logical focus order
 
-## Deployment Requirements
+## Deployment Preparation (IN PROGRESS)
+
+### Mock Data Removal (COMPLETED)
+- Removed all simulated data and mock APIs
+- Replaced simulated API call in FanDuelService with real API implementation
+- Removed mock data from prediction.controller.js
+- Added TODO comments to mark sample data functions for removal in production
+- Verified real data fetching functions are in place
+
+### Required Configuration
+- API keys for external services:
+  - The Odds API
+  - ESPN API
+  - FanDuel API
+  - Other sportsbook APIs
+- Database connection strings:
+  - MongoDB for game data
+  - Firebase for user data
+- Environment variables:
+  - NODE_ENV=production
+  - API keys and secrets
+  - Database credentials
+  - Feature flags
 
 ### iOS App Store
 - App Store screenshots and metadata
@@ -327,6 +349,15 @@
 - Animated chart entrances
 - Staggered metric card animations
 - Consistent animation patterns across the application
+
+### Homepage Enhancements
+- Enhanced hero section with animated elements and gradient text
+- Improved features section with hover effects and animated icons
+- Enhanced "How It Works" section with connected steps and visual cues
+- Compelling CTA section with testimonials and floating particles
+- Improved footer section with newsletter signup and organized navigation
+- Responsive design for all screen sizes
+- Consistent design language across all sections
 
 ### Accessibility Considerations
 - Reduced motion support

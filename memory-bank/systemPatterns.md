@@ -476,6 +476,103 @@ This pattern provides:
 - Detailed error logging with context
 - Graceful degradation with appropriate fallbacks
 
+## Production-Ready API Integration Patterns
+
+### Real API Integration with Error Handling
+```typescript
+/**
+ * Track a conversion with the FanDuel API
+ * @param {Object} data - Conversion data
+ * @param {string} data.userId - User ID
+ * @param {string} data.eventType - Event type (e.g., 'click', 'signup', 'deposit')
+ * @param {string} data.source - Traffic source
+ * @param {number} data.value - Conversion value
+ * @returns {Promise<Object>} Tracking result
+ */
+async trackConversion(data = {}) {
+  try {
+    // Make an API call to FanDuel's conversion tracking API
+    console.log('Tracking conversion:', data);
+    
+    // Implement real API call to FanDuel's tracking endpoint
+    const response = await fetch('https://affiliates.fanduel.com/api/track', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.FANDUEL_API_KEY || 'api-key-required'}`
+      },
+      body: JSON.stringify({
+        userId: data.userId,
+        eventType: data.eventType,
+        source: data.source || 'ai_sports_edge',
+        value: data.value || 0,
+        timestamp: new Date().toISOString()
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`FanDuel API error: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error tracking conversion:', error);
+    throw error;
+  }
+}
+```
+
+This pattern provides:
+- Real API integration with proper error handling
+- Secure API key management through environment variables
+- Default values for optional parameters
+- Comprehensive error reporting
+- Proper HTTP status code handling
+- JSON parsing with await for proper error propagation
+
+### Database-Backed Data Fetching
+```typescript
+/**
+ * Fetch upcoming games from the database
+ * @param {string} sport - Sport key
+ * @param {string} date - Date string (optional)
+ * @returns {Promise<Array>} - Upcoming games
+ */
+async function fetchUpcomingGames(sport, date) {
+  try {
+    // In production, this would query a database or API
+    const Game = require('../../models/Game');
+    
+    const query = { sport: sport.toUpperCase() };
+    
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      
+      query.date = { $gte: startDate, $lte: endDate };
+    } else {
+      const now = new Date();
+      query.date = { $gte: now };
+    }
+    
+    return await Game.find(query).sort({ date: 1 }).limit(10);
+  } catch (error) {
+    console.error(`Error fetching upcoming games for ${sport}:`, error);
+    return [];
+  }
+}
+```
+
+This pattern provides:
+- Database-backed data fetching instead of mock data
+- Proper date range handling for queries
+- Error handling with appropriate fallbacks
+- Query optimization with sorting and limits
+- Clear error logging for debugging
+
 ## Analytics Dashboard Implementation Patterns
 
 ### Caching System with TTL
