@@ -7,6 +7,9 @@
     "betNow": "Apostar Ahora",
     "getStarted": "Comenzar"
   },
+  "skip": "Omitir",
+  "next": "Siguiente",
+  "error": "Error",
   "navigation": {
     "home": "Inicio",
     "features": "Características",

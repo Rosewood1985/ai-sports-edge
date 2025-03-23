@@ -88,6 +88,554 @@ This pattern provides:
 - Consistent test execution environment
 - Coverage reporting for quality assurance
 - Clear output for test results
+## Machine Learning Implementation Patterns
+
+### TensorFlow.js Model Integration
+```typescript
+/**
+ * Load TensorFlow.js model for a specific sport
+ * @param sport - Sport name
+ * @returns TensorFlow.js model
+ */
+export const loadModel = async (sport: string): Promise<tf.LayersModel | null> => {
+  try {
+    // Check if model is already loaded
+    if (modelCache[sport]) {
+      return modelCache[sport];
+    }
+    
+    // Determine model URL based on sport
+    const modelUrl = `${MODEL_BASE_URL}/${sport.toLowerCase()}/model.json`;
+    
+    // Load model from URL
+    const model = await loadLayersModel(modelUrl);
+    
+    // Cache the model
+    modelCache[sport] = model;
+    
+    return model;
+  } catch (error) {
+    console.error(`Error loading model for ${sport}:`, error);
+    
+    // Fall back to default model
+    try {
+      const defaultModel = await loadLayersModel(`${MODEL_BASE_URL}/default/model.json`);
+      modelCache[sport] = defaultModel;
+      return defaultModel;
+    } catch (fallbackError) {
+      console.error('Error loading default model:', fallbackError);
+      return null;
+    }
+  }
+};
+```
+
+This pattern provides:
+- Efficient model loading with caching
+- Sport-specific model selection
+- Fallback to default model when specific models are unavailable
+- Proper error handling with graceful degradation
+- Memory efficiency through shared model instances
+
+### Feature Generation for Machine Learning
+```typescript
+/**
+ * Generate features for prediction
+ * @param game - Game to predict
+ * @param sport - Sport type
+ * @returns Feature tensor
+ */
+const generateFeatures = (game: Game, sport: string): tf.Tensor => {
+  // Base features array
+  const features: number[] = [];
+  
+  // Extract common features
+  features.push(
+    game.home_team_win_percentage || 0.5,
+    game.away_team_win_percentage || 0.5,
+    game.home_team_recent_form || 0.5,
+    game.away_team_recent_form || 0.5
+  );
+  
+  // Add sport-specific features
+  switch (sport) {
+    case 'basketball':
+      features.push(
+        game.home_team_offensive_rating || 100,
+        game.away_team_offensive_rating || 100,
+        game.home_team_defensive_rating || 100,
+        game.away_team_defensive_rating || 100,
+        game.home_team_pace || 100,
+        game.away_team_pace || 100
+      );
+      break;
+    case 'baseball':
+      features.push(
+        game.home_team_batting_average || 0.250,
+        game.away_team_batting_average || 0.250,
+        game.home_team_era || 4.0,
+        game.away_team_era || 4.0,
+        game.home_pitcher_era || 4.0,
+        game.away_pitcher_era || 4.0
+      );
+      break;
+    // Add more sports as needed
+    default:
+      // Add generic features for unsupported sports
+      features.push(0.5, 0.5, 0.5, 0.5);
+  }
+  
+  // Normalize features to [0, 1] range
+  const normalizedFeatures = features.map(f => Math.max(0, Math.min(1, f / 100)));
+  
+  return tf.tensor2d([normalizedFeatures]);
+};
+```
+
+This pattern provides:
+- Sport-specific feature extraction
+- Safe defaults for missing data
+- Feature normalization for model compatibility
+- Extensibility for additional sports
+- Type safety and error prevention
+
+### Feedback Loop for Model Improvement
+```typescript
+/**
+ * Record prediction feedback
+ * @param gameId - Game ID
+ * @param actualWinner - Actual winner
+ * @returns Success status
+ */
+export const recordFeedback = async (
+  gameId: string,
+  actualWinner: string
+): Promise<boolean> => {
+  try {
+    // Get the prediction from cache or database
+    const prediction = await getPrediction(gameId);
+    if (!prediction) {
+      console.error('No prediction found for game:', gameId);
+      return false;
+    }
+    
+    const wasCorrect = prediction.predicted_winner === actualWinner;
+    
+    // Create feedback entry
+    const feedback = {
+      gameId,
+      predictedWinner: prediction.predicted_winner,
+      actualWinner,
+      wasCorrect,
+      confidenceScore: prediction.confidence_score,
+      timestamp: Date.now()
+    };
+    
+    // Store feedback in database
+    await firestore.collection('predictionFeedback').add(feedback);
+    
+    // Update model accuracy metrics
+    await updateModelAccuracy(prediction.sport, wasCorrect);
+    
+    // Check if retraining is needed
+    const feedbackCount = await getFeedbackCount(prediction.sport);
+    if (feedbackCount >= RETRAINING_THRESHOLD) {
+      // Trigger model retraining
+      await triggerModelRetraining(prediction.sport);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error recording prediction feedback:', error);
+    return false;
+  }
+};
+```
+
+This pattern provides:
+- Comprehensive feedback collection
+- Accuracy tracking for model performance
+- Automatic retraining triggers based on feedback volume
+- Error handling and logging
+- Database integration for persistent storage
+
+## Multilingual Onboarding Implementation Patterns
+
+### Secure LocalStorage with Validation
+```typescript
+/**
+ * Check if onboarding has been completed
+ * @returns {Promise<boolean>} True if onboarding has been completed
+ */
+export const isOnboardingCompleted = async () => {
+  try {
+    // Use a try-catch block to handle potential localStorage access issues
+    // This can happen in private browsing mode or when storage is full
+    const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
+    
+    // Validate the value to prevent unexpected behavior
+    if (completed !== 'true' && completed !== null) {
+      console.warn('Invalid onboarding status value:', completed);
+      // Reset to a valid state
+      localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
+      return false;
+    }
+    
+    return completed === 'true';
+  } catch (error) {
+    console.error('Error checking onboarding status:', error);
+    // Graceful degradation - if we can't access localStorage, assume onboarding is not completed
+    return false;
+  }
+};
+```
+
+This pattern provides:
+- Secure storage of onboarding state
+- Validation of stored values to prevent unexpected behavior
+- Graceful degradation when localStorage is unavailable
+- Clear error handling with appropriate fallbacks
+- Protection against corrupted or invalid data
+
+### Accessible Component Implementation
+```typescript
+return (
+  <div
+    className="onboarding-page"
+    style={{ backgroundColor: currentStepData.backgroundColor }}
+    role="main"
+    aria-label={t('onboarding:pageTitle')}
+  >
+    <div
+      className={`onboarding-content ${animating ? 'fade-out' : 'fade-in'}`}
+      aria-live="polite"
+    >
+      <div className="onboarding-image">
+        <img
+          src={currentStepData.image}
+          alt={currentStepData.title}
+          aria-hidden="true" // Decorative image, main content is in the text
+        />
+      </div>
+      
+      <div className="onboarding-text">
+        <h1 id={`onboarding-step-${currentStep + 1}`} tabIndex="-1">{currentStepData.title}</h1>
+        <p>{currentStepData.description}</p>
+      </div>
+      
+      <div className="onboarding-progress" role="navigation" aria-label={t('onboarding:progressNav')}>
+        {steps.map((step, index) => (
+          <div
+            key={step.id}
+            className={`progress-dot ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
+            role="button"
+            tabIndex={index === currentStep ? 0 : -1}
+            aria-label={`${t('onboarding:step')} ${index + 1} ${index === currentStep ? t('onboarding:current') : index < currentStep ? t('onboarding:completed') : ''}`}
+            aria-current={index === currentStep ? "step" : undefined}
+            onClick={() => setCurrentStep(index)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setCurrentStep(index);
+                e.preventDefault();
+              }
+            }}
+          />
+        ))}
+      </div>
+      
+      <div className="onboarding-buttons">
+        {currentStep < steps.length - 1 ? (
+          <>
+            <button
+              className="skip-button"
+              onClick={handleSkip}
+              aria-label={t('common:skip')}
+            >
+              {t('common:skip')}
+            </button>
+            <button
+              className="next-button"
+              onClick={handleNext}
+              aria-label={t('common:next')}
+            >
+              {t('common:next')}
+            </button>
+          </>
+        ) : (
+          <button
+            className="get-started-button"
+            onClick={handleComplete}
+            aria-label={t('common:getStarted')}
+          >
+            {t('common:getStarted')}
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+);
+```
+
+This pattern provides:
+- Proper ARIA roles and attributes for screen readers
+- Keyboard navigation support for interactive elements
+- Descriptive labels for all UI elements
+- Proper focus management for accessibility
+- Semantic HTML structure for better navigation
+
+### Robust Error Handling with Fallbacks
+```typescript
+/**
+ * Mark a feature tour step as completed
+ * @param {string} stepId - ID of the step to mark as completed
+ * @returns {Promise<boolean>} True if successful, false otherwise
+ */
+export const markFeatureTourStepCompleted = async (stepId) => {
+  try {
+    // Validate input to prevent security issues
+    if (!stepId || typeof stepId !== 'string') {
+      console.error('Invalid step ID:', stepId);
+      return false;
+    }
+    
+    // Sanitize the stepId to prevent XSS or injection attacks
+    const sanitizedStepId = stepId.replace(/[^\w-]/g, '');
+    if (sanitizedStepId !== stepId) {
+      console.error('Step ID contained potentially unsafe characters');
+      return false;
+    }
+    
+    // Check if localStorage is available
+    if (typeof localStorage === 'undefined') {
+      console.error('localStorage is not available');
+      return false;
+    }
+    
+    const steps = await getFeatureTourSteps();
+    
+    // Verify the step exists before updating
+    const stepExists = steps.some(step => step.id === stepId);
+    if (!stepExists) {
+      console.error('Step ID not found:', stepId);
+      return false;
+    }
+    
+    // Create a new array to avoid mutation
+    const updatedSteps = steps.map(step => {
+      if (step.id === stepId) {
+        return { ...step, completed: true };
+      }
+      return step;
+    });
+    
+    // Store with proper error handling
+    try {
+      localStorage.setItem(FEATURE_TOUR_STEPS_KEY, JSON.stringify(updatedSteps));
+      
+      // Verify the data was stored correctly
+      const storedData = localStorage.getItem(FEATURE_TOUR_STEPS_KEY);
+      const parsedData = JSON.parse(storedData);
+      const stepUpdated = parsedData.some(step => step.id === stepId && step.completed === true);
+      
+      if (!stepUpdated) {
+        console.error('Failed to verify step was marked as completed');
+        return false;
+      }
+    } catch (storageError) {
+      console.error('Error storing updated steps:', storageError);
+      return false;
+    }
+    
+    // Track step completion with analytics in a separate try/catch
+    try {
+      if (window.gtag) {
+        window.gtag('event', 'feature_tour_step_completed', {
+          'event_category': 'engagement',
+          'event_label': `step_${stepId}`,
+          'step_id': stepId,
+          'timestamp': new Date().toISOString(),
+        });
+      }
+    } catch (analyticsError) {
+      // Don't let analytics errors affect the main functionality
+      console.warn('Analytics error:', analyticsError);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error marking feature tour step as completed:', error);
+    return false;
+  }
+};
+```
+
+This pattern provides:
+- Comprehensive input validation and sanitization
+- Isolation of analytics errors from core functionality
+- Verification of data integrity after storage operations
+- Detailed error logging with context
+- Graceful degradation with appropriate fallbacks
+
+## Analytics Dashboard Implementation Patterns
+
+### Caching System with TTL
+```typescript
+/**
+ * Get analytics dashboard data with caching
+ * @param timePeriod Time period
+ * @param customDateRange Custom date range (if timePeriod is CUSTOM)
+ * @returns Analytics dashboard data
+ */
+public async getDashboardData(
+  timePeriod: AnalyticsTimePeriod = AnalyticsTimePeriod.LAST_30_DAYS,
+  customDateRange?: { startDate: number; endDate: number }
+): Promise<AnalyticsDashboardData> {
+  try {
+    // Generate cache key
+    const cacheKey = this.generateCacheKey(timePeriod, customDateRange);
+    
+    // Check cache first
+    const cachedData = this.dashboardCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp) < CACHE_TTL) {
+      console.log('Using cached dashboard data');
+      return cachedData.data;
+    }
+    
+    // Get date range
+    const { startDate, endDate } = this.getDateRangeForTimePeriod(timePeriod, customDateRange);
+    
+    // Try to fetch from API first
+    try {
+      const apiData = await this.fetchDashboardDataFromAPI(startDate, endDate);
+      
+      // Cache the data
+      this.dashboardCache.set(cacheKey, {
+        data: apiData,
+        timestamp: Date.now()
+      });
+      
+      // Also store in AsyncStorage for persistence
+      await this.saveDashboardCache();
+      
+      return apiData;
+    } catch (apiError) {
+      console.error('API fetch failed, falling back to Firestore:', apiError);
+      
+      // Fallback to Firestore
+      const firestoreData = await this.fetchFromFirestore(startDate, endDate);
+      
+      // Cache the data
+      this.dashboardCache.set(cacheKey, {
+        data: firestoreData,
+        timestamp: Date.now()
+      });
+      
+      // Also store in AsyncStorage for persistence
+      await this.saveDashboardCache();
+      
+      return firestoreData;
+    }
+  } catch (error) {
+    console.error('Error getting analytics dashboard data:', error);
+    
+    // If all else fails, return mock data
+    return this.generateMockDashboardData(timePeriod, customDateRange);
+  }
+}
+```
+
+This pattern provides:
+- Multi-level caching (memory and persistent storage)
+- Time-based cache invalidation
+- Fallback mechanisms for API failures
+- Error handling with mock data generation
+- Efficient cache key generation based on parameters
+
+### Granular Date Range Filtering
+```typescript
+/**
+ * Get the start and end dates for a time period
+ * @param timePeriod Time period
+ * @param customDateRange Custom date range (if timePeriod is CUSTOM)
+ * @returns Start and end dates in milliseconds
+ */
+private getDateRangeForTimePeriod(
+  timePeriod: AnalyticsTimePeriod,
+  customDateRange?: { startDate: number; endDate: number }
+): { startDate: number; endDate: number } {
+  const now = new Date();
+  const endDate = now.getTime();
+  let startDate: number;
+  
+  switch (timePeriod) {
+    case AnalyticsTimePeriod.TODAY:
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      break;
+    case AnalyticsTimePeriod.YESTERDAY:
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      startDate = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()).getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_7_DAYS:
+      const last7Days = new Date(now);
+      last7Days.setDate(last7Days.getDate() - 7);
+      startDate = last7Days.getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_30_DAYS:
+      const last30Days = new Date(now);
+      last30Days.setDate(last30Days.getDate() - 30);
+      startDate = last30Days.getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_90_DAYS:
+      const last90Days = new Date(now);
+      last90Days.setDate(last90Days.getDate() - 90);
+      startDate = last90Days.getTime();
+      break;
+    case AnalyticsTimePeriod.THIS_MONTH:
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_MONTH:
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      startDate = lastMonth.getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_3_MONTHS:
+      const last3Months = new Date(now);
+      last3Months.setMonth(last3Months.getMonth() - 3);
+      startDate = last3Months.getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_6_MONTHS:
+      const last6Months = new Date(now);
+      last6Months.setMonth(last6Months.getMonth() - 6);
+      startDate = last6Months.getTime();
+      break;
+    case AnalyticsTimePeriod.YEAR_TO_DATE:
+      startDate = new Date(now.getFullYear(), 0, 1).getTime();
+      break;
+    case AnalyticsTimePeriod.LAST_YEAR:
+      const lastYear = new Date(now);
+      lastYear.setFullYear(lastYear.getFullYear() - 1);
+      startDate = lastYear.getTime();
+      break;
+    case AnalyticsTimePeriod.CUSTOM:
+      if (!customDateRange) {
+        throw new Error('Custom date range is required for CUSTOM time period');
+      }
+      return customDateRange;
+    default:
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30).getTime();
+  }
+  
+  return { startDate, endDate };
+}
+```
+
+This pattern provides:
+- Comprehensive time period options
+- Precise date calculations
+- Support for custom date ranges
+- Error handling for invalid inputs
+- Consistent date range format
+
 ## Implementation Patterns
 
 ### Secure Weather Integration for Sports Odds

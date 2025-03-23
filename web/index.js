@@ -7,6 +7,7 @@ import App from './App';
 import './styles/global.css';
 import './styles/fix-overlay.css'; // Import the fix for overlay issues
 import './styles/notification-banner.css'; // Import notification banner styles
+import './styles/onboarding.css'; // Import onboarding and feature tour styles
 
 // Initialize required global services
 console.log('[Web] Initializing cross-platform services');

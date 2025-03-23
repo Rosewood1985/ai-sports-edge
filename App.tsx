@@ -1,5 +1,5 @@
 import { registerRootComponent } from "expo";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { ParamListBase } from "@react-navigation/native";
@@ -7,7 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { PersonalizationProvider } from "./contexts/PersonalizationContext";
 import { BettingAffiliateProvider } from "./contexts/BettingAffiliateContext";
 import { I18nProvider, useI18n } from "./contexts/I18nContext";
-import { StatusBar, useColorScheme, View } from "react-native";
+import { StatusBar, useColorScheme, View, Text } from "react-native";
 import StripeProvider from "./components/StripeProvider";
 import OneSignalProvider from "./components/OneSignalProvider";
 import { LanguageRedirect } from "./components/LanguageRedirect";
@@ -17,6 +17,10 @@ import { ToastContainer } from "./components/Toast";
 import NeonLoginScreen from "./screens/NeonLoginScreen";
 import NeonOddsScreen from "./screens/NeonOddsScreen";
 import RewardsScreen from "./screens/RewardsScreen";
+import OnboardingScreen from "./screens/OnboardingScreen";
+import FeatureTourScreen from "./screens/FeatureTourScreen";
+import { isOnboardingCompleted } from "./services/onboardingService";
+import featureTourService from "./services/featureTourService";
 import ReferralLeaderboardScreen from "./screens/ReferralLeaderboardScreen";
 import FAQScreen from "./screens/FAQScreen";
 import GiftRedemptionScreen from "./screens/GiftRedemptionScreen";
@@ -34,6 +38,9 @@ import { colors } from "./styles/theme";
 
 // Define the type for the navigation stack parameters
 type RootStackParamList = {
+  Onboarding: undefined;
+  FeatureTour: undefined;
+  Main: undefined;
   Login: undefined;
   Odds: undefined;
   Rewards: undefined;
@@ -82,6 +89,35 @@ const HeaderLanguageSelector = () => {
 // Main navigation component with i18n support
 const AppNavigator = () => {
   const { t, language, setLanguage } = useI18n();
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  // Check if onboarding has been completed
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        const completed = await isOnboardingCompleted();
+        setOnboardingComplete(completed);
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        // Default to showing onboarding if there's an error
+        setOnboardingComplete(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    checkOnboarding();
+  }, []);
+  
+  // Show loading screen while checking onboarding status
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background.primary }}>
+        <Text style={{ color: colors.text.primary }}>{t('common.loading')}</Text>
+      </View>
+    );
+  }
   
   return (
     <>
@@ -91,6 +127,7 @@ const AppNavigator = () => {
       <ToastContainer />
       <NavigationContainer theme={NeonTheme}>
         <Stack.Navigator
+          initialRouteName={onboardingComplete ? "Login" : "Onboarding"}
           screenOptions={({ navigation }) => ({
             headerStyle: {
               backgroundColor: colors.background.secondary,
@@ -108,6 +145,22 @@ const AppNavigator = () => {
             headerRight: () => <HeaderLanguageSelector />,
           })}
         >
+          <Stack.Screen
+            name="Onboarding"
+            component={OnboardingScreen}
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen
+            name="FeatureTour"
+            component={FeatureTourScreen}
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
           <Stack.Screen
             name="Login"
             component={NeonLoginScreen}

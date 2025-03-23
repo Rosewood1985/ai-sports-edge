@@ -446,6 +446,132 @@
 - **Reasoning**: User-configurable settings provide the most flexibility and allow users to optimize offline behavior for their specific needs.
 - **Implications**: This approach adds complexity to the UI but provides better user experience and control.
 
+### March 23, 2025 - Machine Learning Model Integration
+
+#### Decision: Use TensorFlow.js for Machine Learning Model Integration
+- **Decision**: Implement machine learning models using TensorFlow.js rather than a server-side solution.
+- **Context**: The application needs to provide AI predictions for sports outcomes, which requires machine learning capabilities.
+- **Alternatives Considered**:
+  1. Use a server-side ML solution with API calls
+  2. Use TensorFlow.js for client-side ML
+  3. Use a third-party prediction API
+- **Reasoning**: TensorFlow.js provides the ability to run models directly on the client, reducing latency and server costs while still providing powerful ML capabilities.
+- **Implications**: This approach improves user experience with faster predictions but requires careful optimization for mobile devices and may have limitations compared to server-side solutions.
+
+#### Decision: Implement Model Caching for Performance
+- **Decision**: Cache loaded models in memory to avoid repeated loading of the same model.
+- **Context**: Loading ML models can be time-consuming and resource-intensive.
+- **Alternatives Considered**:
+  1. Load models on demand without caching
+  2. Pre-load all models at startup
+  3. Implement a caching system with TTL
+- **Reasoning**: A caching system provides the best balance of performance and resource usage, loading models only when needed but avoiding repeated loading of the same model.
+- **Implications**: This approach improves performance but requires managing cache size and ensuring models are updated when new versions are available.
+
+#### Decision: Create Sport-Specific Feature Generators
+- **Decision**: Implement separate feature generation logic for different sports.
+- **Context**: Different sports have unique characteristics and statistics that affect prediction accuracy.
+- **Alternatives Considered**:
+  1. Use a generic feature generator for all sports
+  2. Create sport-specific feature generators
+  3. Use a hybrid approach with common and sport-specific features
+- **Reasoning**: Sport-specific feature generators provide the most accurate predictions by leveraging the unique characteristics of each sport.
+- **Implications**: This approach requires more implementation work but results in more accurate predictions and better user experience.
+
+#### Decision: Implement a Feedback Loop for Model Improvement
+- **Decision**: Create a system to collect prediction outcomes and use them to improve future predictions.
+- **Context**: ML models can improve over time with feedback on prediction accuracy.
+- **Alternatives Considered**:
+  1. Use static models without feedback
+  2. Manually update models periodically
+  3. Implement an automated feedback loop
+- **Reasoning**: An automated feedback loop provides continuous improvement of predictions without requiring manual intervention.
+- **Implications**: This approach improves prediction accuracy over time but requires implementing and maintaining a feedback collection and processing system.
+### March 23, 2025 - Multilingual Onboarding Experience Implementation
+
+#### Decision: Create Dedicated URL Structure for Language Versions
+- **Decision**: Implement separate URL paths for English (/onboarding, /feature-tour) and Spanish (/es/onboarding, /es/feature-tour).
+- **Context**: The app needs to support multiple languages with proper SEO optimization.
+- **Alternatives Considered**:
+  1. Use query parameters for language selection (e.g., ?lang=es)
+  2. Use browser language detection without URL changes
+  3. Implement dedicated URL paths for each language
+- **Reasoning**: Dedicated URL paths provide the best SEO optimization, allow for proper indexing by search engines, and follow best practices for multilingual websites.
+- **Implications**: This approach requires more routing configuration but provides better user experience and SEO benefits.
+
+#### Decision: Implement Secure LocalStorage with Validation
+- **Decision**: Add comprehensive validation and security measures to localStorage usage in onboarding services.
+- **Context**: Onboarding state needs to be persisted between sessions, but localStorage can be vulnerable to various issues.
+- **Alternatives Considered**:
+  1. Use basic localStorage without validation
+  2. Use server-side storage for onboarding state
+  3. Implement secure localStorage with validation and fallbacks
+- **Reasoning**: Secure localStorage with validation provides the best balance of convenience and security, ensuring data integrity while maintaining offline capabilities.
+- **Implications**: This approach adds complexity but significantly improves security and reliability.
+
+#### Decision: Separate Onboarding and Feature Tour Components
+- **Decision**: Create separate components for onboarding (initial setup) and feature tour (detailed feature exploration).
+- **Context**: Users need different types of guidance at different stages of their app usage.
+- **Alternatives Considered**:
+  1. Combine onboarding and feature tour into a single flow
+  2. Create separate components for each
+  3. Make feature tour part of the main app navigation
+- **Reasoning**: Separate components provide more flexibility, allow users to complete onboarding quickly while saving the more detailed feature tour for later, and better accommodate different user needs.
+- **Implications**: This approach requires implementing and maintaining two separate systems but provides a better user experience.
+
+#### Decision: Enhance Accessibility for Onboarding Components
+- **Decision**: Implement comprehensive accessibility features in onboarding and feature tour components.
+- **Context**: All users, including those with disabilities, need to be able to complete the onboarding process.
+- **Alternatives Considered**:
+  1. Basic accessibility compliance only
+  2. Comprehensive accessibility features
+  3. Separate accessible onboarding flow
+- **Reasoning**: Comprehensive accessibility features ensure that all users can successfully complete onboarding, regardless of their abilities.
+- **Implications**: This approach requires more implementation work but creates a more inclusive user experience and meets legal requirements for accessibility.
+
+#### Decision: Implement Robust Error Handling with Fallbacks
+- **Decision**: Add comprehensive error handling with fallback mechanisms to all onboarding services.
+- **Context**: Onboarding is a critical user flow that needs to be reliable even when errors occur.
+- **Alternatives Considered**:
+  1. Basic error handling with error messages
+  2. Error handling with retries
+  3. Comprehensive error handling with fallbacks
+- **Reasoning**: Comprehensive error handling with fallbacks ensures that users can complete onboarding even when unexpected errors occur, providing a more reliable user experience.
+- **Implications**: This approach adds complexity but significantly improves reliability and user experience.
+
+### March 23, 2025 - Enhanced Analytics Dashboard
+### March 23, 2025 - Enhanced Analytics Dashboard
+
+#### Decision: Implement More Granular Date Filtering
+- **Decision**: Add additional time period options for analytics data filtering.
+- **Context**: Users need more flexibility in analyzing data over different time periods.
+- **Alternatives Considered**:
+  1. Keep existing basic time periods (today, week, month, year)
+  2. Add a few additional options (last 90 days, year to date)
+  3. Implement comprehensive time period options with custom ranges
+- **Reasoning**: Comprehensive time period options provide the most flexibility for users to analyze data over exactly the time periods they need.
+- **Implications**: This approach enhances the user experience but requires implementing and testing additional date calculations and UI elements.
+
+#### Decision: Implement Dual-Layer Caching System
+- **Decision**: Create a caching system with both in-memory cache and persistent storage.
+- **Context**: Analytics data can be expensive to fetch and process, and users often view the same data multiple times.
+- **Alternatives Considered**:
+  1. Use in-memory caching only
+  2. Use persistent storage only
+  3. Implement a dual-layer system with both
+- **Reasoning**: A dual-layer system provides the best performance (in-memory cache) while also preserving data across app restarts (persistent storage).
+- **Implications**: This approach improves performance significantly but requires managing cache synchronization and invalidation across both layers.
+
+#### Decision: Implement Real API Integration with Fallbacks
+- **Decision**: Connect to real analytics APIs with fallbacks to Firestore and mock data.
+- **Context**: The analytics dashboard needs to display real data but must be resilient to API failures.
+- **Alternatives Considered**:
+  1. Use API data only
+  2. Use Firestore data only
+  3. Implement a fallback system with multiple data sources
+- **Reasoning**: A fallback system provides the best reliability by attempting to fetch the most current data (API) but falling back to alternative sources when needed.
+- **Implications**: This approach improves reliability but requires implementing and maintaining multiple data fetching paths.
+
 ### March 21, 2025 - Analytics Dashboard Enhancements
 
 #### Decision: Implement Memoization for Performance Optimization

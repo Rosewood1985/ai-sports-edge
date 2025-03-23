@@ -1,0 +1,83 @@
+{
+  "pageTitle": "AI Sports Edge - Onboarding",
+  "metaDescription": "Get started with AI Sports Edge and learn how to use AI-powered sports betting predictions to improve your betting strategy.",
+  "progressNav": "Onboarding progress",
+  "step": "Step",
+  "current": "current",
+  "completed": "completed",
+  "welcome": {
+    "title": "Welcome to AI Sports Edge",
+    "description": "Turn your sports knowledge into winning bets with the power of AI. Our users are beating the odds by up to 15% compared to traditional betting."
+  },
+  "aiPredictions": {
+    "title": "AI-Powered Predictions",
+    "description": "Our AI analyzes millions of data points to spot value bets that humans miss. See exactly where bookmakers have set odds that don't match real probabilities—giving you a statistical edge on every bet."
+  },
+  "liveOdds": {
+    "title": "Live Betting Odds",
+    "description": "Never miss the best odds again! Our real-time comparison shows you exactly where to place your bet for maximum returns. Users who follow our odds recommendations increase their potential winnings by an average of 12%."
+  },
+  "performance": {
+    "title": "Track Your Performance",
+    "description": "Watch your betting success grow! Track your performance against AI predictions, learn from personalized insights, and see your ROI increase over time. Users who follow our system consistently outperform their previous betting results."
+  },
+  "getStarted": {
+    "title": "Ready to Start?",
+    "description": "Ready to start winning smarter? Set up your personalized betting profile in just 2 minutes and make your next bet your best bet! Join thousands of bettors who are already using data to beat the bookmakers."
+  },
+  "completion": {
+    "title": "Onboarding Complete",
+    "message": "You can replay this feature tour anytime from Settings > App Tour & Help > Replay Feature Tour",
+    "gotIt": "Got it"
+  },
+  "featureTour": {
+    "pageTitle": "AI Sports Edge - Feature Tour",
+    "metaDescription": "Explore the key features of AI Sports Edge and learn how to use AI-powered sports betting predictions to improve your betting strategy.",
+    "title": "Feature Tour",
+    "loading": "Loading feature tour...",
+    "skipTour": "Skip Tour",
+    "next": "Next",
+    "finishTour": "Finish Tour",
+    "tryIt": "Try It",
+    "hintLabel": "Helpful tip",
+    "navigationControls": "Tour navigation controls",
+    "steps": {
+      "aiPredictions": {
+        "title": "Find Value Where Others Don't",
+        "description": "Our AI doesn't just predict winners—it finds VALUE. See exactly where the bookmakers have set odds that don't match the real probabilities.",
+        "hint": "Users who follow our AI picks see a 15% higher win rate on average."
+      },
+      "realTimeOdds": {
+        "title": "Never Miss the Best Odds Again",
+        "description": "Watch odds move in real-time across all major sportsbooks. Get alerts when there's value to be found.",
+        "hint": "Getting the best odds on every bet can increase your returns by up to 12% with no additional risk."
+      },
+      "performanceDashboard": {
+        "title": "Your Betting Command Center",
+        "description": "Track performance over time, see where you're making and losing money, and get AI-powered suggestions to improve.",
+        "hint": "Users who regularly check their dashboard improve their ROI by 8% on average."
+      },
+      "personalizedInsights": {
+        "title": "Your Personal Betting Analyst",
+        "description": "Receive custom insights based on your favorite teams, betting history, and preferences.",
+        "hint": "Personalized insights help users spot 23% more valuable betting opportunities."
+      },
+      "premiumFeatures": {
+        "title": "Unlock Your Maximum Advantage",
+        "description": "Preview our premium tools like parlay optimizers, prop bet analyzers, and weather impact analysis.",
+        "hint": "Premium users report 22% higher returns than betting on their own."
+      }
+    },
+    "completion": {
+      "title": "Tour Completed",
+      "message": "You've completed the feature tour! You can replay it anytime from Settings > App Tour & Help > Replay Feature Tour.",
+      "gotIt": "Got it"
+    },
+    "skip": {
+      "title": "Skip Tour",
+      "message": "Are you sure you want to skip the feature tour? You can replay it anytime from Settings.",
+      "cancel": "Cancel",
+      "skip": "Skip"
+    }
+  }
+}

@@ -14,11 +14,17 @@ import AboutPage from './pages/AboutPage';
 import DownloadPage from './pages/DownloadPage';
 import OddsPage from './pages/OddsPage';
 import PredictionsPage from './pages/PredictionsPage';
+import OnboardingPage from './pages/OnboardingPage';
+import FeatureTourPage from './pages/FeatureTourPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { isOnboardingCompleted } from './services/onboardingService';
 
 const App = () => {
   const location = useLocation();
   const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const [onboardingComplete, setOnboardingComplete] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   // Set language based on URL
   useEffect(() => {
@@ -29,6 +35,37 @@ const App = () => {
       i18n.changeLanguage('en');
     }
   }, [location.pathname, i18n]);
+  
+  // Check if onboarding has been completed
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        const completed = await isOnboardingCompleted();
+        setOnboardingComplete(completed);
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        // Default to showing onboarding if there's an error
+        setOnboardingComplete(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    checkOnboarding();
+  }, []);
+  
+  // Redirect to onboarding if not completed
+  useEffect(() => {
+    if (onboardingComplete === false && !loading) {
+      const currentPath = location.pathname;
+      const isOnboardingPath = currentPath.endsWith('/onboarding') || currentPath.endsWith('/feature-tour');
+      const languagePrefix = currentPath.startsWith('/es') ? '/es' : '';
+      
+      if (!isOnboardingPath && !currentPath.endsWith('/login') && !currentPath.includes('/login?')) {
+        navigate(`${languagePrefix}/onboarding`);
+      }
+    }
+  }, [onboardingComplete, loading, location.pathname, navigate]);
   
   // Add page-specific class to body based on current route
   useEffect(() => {
@@ -168,6 +205,8 @@ const App = () => {
           <Routes>
             {/* English routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/feature-tour" element={<FeatureTourPage />} />
             
             <Route path="/" element={
               <ProtectedRoute>
@@ -207,6 +246,8 @@ const App = () => {
             
             {/* Spanish routes */}
             <Route path="/es/login" element={<LoginPage />} />
+            <Route path="/es/onboarding" element={<OnboardingPage />} />
+            <Route path="/es/feature-tour" element={<FeatureTourPage />} />
             
             <Route path="/es/" element={
               <ProtectedRoute>

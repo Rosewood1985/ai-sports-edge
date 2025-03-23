@@ -20,7 +20,7 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
-    ns: ['common', 'home', 'features', 'pricing', 'login'],
+    ns: ['common', 'home', 'features', 'pricing', 'login', 'onboarding'],
     defaultNS: 'common',
   });
 

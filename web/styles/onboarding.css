@@ -1,0 +1,318 @@
+/* Onboarding and Feature Tour Styles */
+
+/* Common styles for both pages */
+.onboarding-page,
+.feature-tour-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  transition: background-color 0.5s ease;
+}
+
+.onboarding-content,
+.feature-tour-content {
+  max-width: 1200px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Onboarding specific styles */
+.onboarding-image {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.onboarding-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.onboarding-text {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.onboarding-text h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.onboarding-text p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #555;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.onboarding-progress {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ddd;
+  margin: 0 8px;
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  background-color: #3498db;
+  transform: scale(1.2);
+}
+
+.progress-dot.completed {
+  background-color: #2ecc71;
+}
+
+.onboarding-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 2rem;
+}
+
+.skip-button {
+  background: none;
+  border: none;
+  color: #777;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.8rem 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.skip-button:hover {
+  color: #333;
+}
+
+.next-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #2980b9;
+}
+
+.get-started-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.get-started-button:hover {
+  background-color: #27ae60;
+}
+
+/* Feature Tour specific styles */
+.feature-tour-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.feature-tour-title {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #333;
+  text-align: center;
+}
+
+.feature-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .feature-step {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.feature-step-image {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .feature-step-image {
+    margin-right: 2rem;
+    margin-bottom: 0;
+    width: 40%;
+  }
+}
+
+.feature-step-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-step-content {
+  flex: 1;
+}
+
+.feature-step-title {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.feature-step-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.feature-step-hint {
+  display: flex;
+  align-items: flex-start;
+  background-color: #f8f9fa;
+  border-left: 4px solid #3498db;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.feature-step-hint i {
+  color: #3498db;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.feature-step-hint p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  font-style: italic;
+}
+
+.feature-step-demo {
+  margin-top: 1.5rem;
+}
+
+.try-it-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.try-it-button:hover {
+  background-color: #2980b9;
+}
+
+.feature-tour-progress {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.feature-tour-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 2rem;
+}
+
+.finish-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.finish-button:hover {
+  background-color: #27ae60;
+}

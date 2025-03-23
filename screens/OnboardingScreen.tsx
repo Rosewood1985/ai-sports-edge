@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  FlatList, 
-  Animated, 
-  TouchableOpacity, 
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Animated,
+  TouchableOpacity,
   Text,
   SafeAreaView,
   Dimensions,
-  StatusBar
+  StatusBar,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useI18n } from '../contexts/I18nContext';
 import OnboardingSlide from '../components/OnboardingSlide';
 import { 
   isOnboardingCompleted, 
@@ -21,55 +23,6 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-// Define the onboarding slides
-const slides = [
-  {
-    id: '1',
-    title: 'Welcome to AI Sports Edge',
-    description: 'Your ultimate companion for AI-powered sports betting insights and predictions.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#3498db',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '2',
-    title: 'AI-Powered Predictions',
-    description: 'Get access to cutting-edge AI predictions with confidence scores to make informed betting decisions.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#2ecc71',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '3',
-    title: 'Live Betting Odds',
-    description: 'Stay updated with real-time odds from multiple bookmakers, all in one place.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#9b59b6',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '4',
-    title: 'Track Your Performance',
-    description: 'Compare AI predictions with actual results to see how well our system performs.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#e74c3c',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '5',
-    title: 'Ready to Start?',
-    description: 'Get started now and elevate your betting strategy with AI-powered insights!',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#f39c12',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  }
-];
-
 /**
  * Onboarding screen component
  * @returns {JSX.Element} - Rendered component
@@ -79,12 +32,62 @@ const OnboardingScreen = (): JSX.Element => {
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
+  const { t, language } = useI18n();
+  
+  // Define the onboarding slides with translations
+  const translatedSlides = [
+    {
+      id: '1',
+      title: t('onboarding.welcome.title'),
+      description: t('onboarding.welcome.description'),
+      image: require('../assets/images/icon.png'),
+      backgroundColor: '#3498db',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '2',
+      title: t('onboarding.aiPredictions.title'),
+      description: t('onboarding.aiPredictions.description'),
+      image: require('../assets/images/icon.png'),
+      backgroundColor: '#2ecc71',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '3',
+      title: t('onboarding.liveOdds.title'),
+      description: t('onboarding.liveOdds.description'),
+      image: require('../assets/images/icon.png'),
+      backgroundColor: '#9b59b6',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '4',
+      title: t('onboarding.performance.title'),
+      description: t('onboarding.performance.description'),
+      image: require('../assets/images/icon.png'),
+      backgroundColor: '#e74c3c',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '5',
+      title: t('onboarding.getStarted.title'),
+      description: t('onboarding.getStarted.description'),
+      image: require('../assets/images/icon.png'),
+      backgroundColor: '#f39c12',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    }
+  ];
 
   // Initialize analytics when component mounts
   useEffect(() => {
     const initAnalytics = async () => {
-      await initOnboardingAnalytics(slides.length);
-      await updateOnboardingProgress(1, slides.length);
+      await initOnboardingAnalytics(translatedSlides.length);
+      await updateOnboardingProgress(1, translatedSlides.length);
     };
     
     initAnalytics();
@@ -93,28 +96,39 @@ const OnboardingScreen = (): JSX.Element => {
   // Update analytics when slide changes
   useEffect(() => {
     const updateAnalytics = async () => {
-      await updateOnboardingProgress(currentIndex + 1, slides.length);
+      await updateOnboardingProgress(currentIndex + 1, translatedSlides.length);
     };
     
     updateAnalytics();
   }, [currentIndex]);
 
   const handleSkip = () => {
-    flatListRef.current?.scrollToIndex({ index: slides.length - 1 });
+    flatListRef.current?.scrollToIndex({ index: translatedSlides.length - 1 });
   };
 
   const handleNext = () => {
-    if (currentIndex < slides.length - 1) {
+    if (currentIndex < translatedSlides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     }
   };
 
   const handleComplete = async () => {
     await markOnboardingCompleted();
-    navigation.navigate('Main' as never);
+    
+    // Show notification about feature tour reset option
+    Alert.alert(
+      t('onboarding.completion.title'),
+      t('onboarding.completion.message'),
+      [
+        {
+          text: t('onboarding.completion.gotIt'),
+          onPress: () => navigation.navigate('Main' as never)
+        }
+      ]
+    );
   };
 
-  const renderItem = ({ item }: { item: typeof slides[0] }) => (
+  const renderItem = ({ item }: { item: typeof translatedSlides[0] }) => (
     <OnboardingSlide
       title={item.title}
       description={item.description}
@@ -130,7 +144,7 @@ const OnboardingScreen = (): JSX.Element => {
     
     return (
       <View style={styles.dotsContainer}>
-        {slides.map((_, index) => {
+        {translatedSlides.map((_, index) => {
           const opacity = dotPosition.interpolate({
             inputRange: [index - 1, index, index + 1],
             outputRange: [0.3, 1, 0.3],
@@ -163,7 +177,7 @@ const OnboardingScreen = (): JSX.Element => {
       
       <FlatList
         ref={flatListRef}
-        data={slides}
+        data={translatedSlides}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         horizontal
@@ -184,13 +198,13 @@ const OnboardingScreen = (): JSX.Element => {
       {renderDots()}
       
       <View style={styles.buttonsContainer}>
-        {currentIndex < slides.length - 1 ? (
+        {currentIndex < translatedSlides.length - 1 ? (
           <>
             <TouchableOpacity
               style={styles.button}
               onPress={handleSkip}
             >
-              <Text style={styles.buttonText}>Skip</Text>
+              <Text style={styles.buttonText}>{t('common.skip')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -198,7 +212,7 @@ const OnboardingScreen = (): JSX.Element => {
               onPress={handleNext}
             >
               <Text style={[styles.buttonText, styles.nextButtonText]}>
-                Next
+                {t('common.next')}
               </Text>
             </TouchableOpacity>
           </>
@@ -208,7 +222,7 @@ const OnboardingScreen = (): JSX.Element => {
             onPress={handleComplete}
           >
             <Text style={[styles.buttonText, styles.getStartedButtonText]}>
-              Get Started
+              {t('common.getStarted')}
             </Text>
           </TouchableOpacity>
         )}
