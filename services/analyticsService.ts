@@ -108,6 +108,59 @@ export interface AnalyticsSession {
   userId?: string;
 }
 
+// Dashboard data interface
+export interface DashboardData {
+  revenue: {
+    total_revenue: number;
+    active_users: number;
+    daily_data: Record<string, number>;
+  };
+  cookies: {
+    cookie_inits: number;
+    cookie_persists: number;
+    redirects: number;
+    conversions: number;
+    persist_rate: number;
+    redirect_success_rate: number;
+  };
+  microtransactions: {
+    total_revenue: number;
+    by_type: Record<string, {
+      impressions: number;
+      clicks: number;
+      purchases: number;
+      revenue: number;
+      click_rate: number;
+      conversion_rate: number;
+    }>;
+  };
+  user_journey: {
+    stages: Record<string, number>;
+    dropoff_rates: Record<string, number>;
+    completion_rate: number;
+  };
+  betting_performance?: {
+    win_rate: number;
+    roi: number;
+    by_sport: Record<string, any>;
+    heat_map_data: any[];
+  };
+  user_engagement?: {
+    daily_active_users: number;
+    sessions_per_user: number;
+    retention_rate: number;
+    engagement_metrics: Record<string, number>;
+  };
+}
+
+// Cache interface
+interface DashboardDataCache {
+  data: DashboardData;
+  timestamp: number;
+  timePeriod: string;
+  customDateRange?: { start: Date, end: Date };
+}
+
 // Analytics conversion funnel step
 export enum ConversionFunnelStep {
   ODDS_VIEW = 'odds_view',
@@ -145,12 +198,16 @@ class AnalyticsService {
   private isInitialized: boolean = false;
   private eventQueue: AnalyticsEvent[] = [];
   private flushInterval: ReturnType<typeof setInterval> | null = null;
+  private dashboardDataCache: Map<string, DashboardDataCache> = new Map();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private readonly API_BASE_URL = 'https://api.ai-sports-edge.com/analytics';
   private readonly STORAGE_KEYS = {
     DEVICE_ID: 'analytics_device_id',
     USER_PROPERTIES: 'analytics_user_properties',
     EVENTS: 'analytics_events',
     FUNNELS: 'analytics_funnels',
-    SESSION: 'analytics_current_session'
+    SESSION: 'analytics_current_session',
+    DASHBOARD_CACHE: 'analytics_dashboard_cache'
   };
   
   // Get singleton instance
@@ -790,6 +847,699 @@ class AnalyticsService {
       console.error('Error clearing analytics data:', error);
     }
   }
+
+  /**
+   * Get dashboard data for analytics
+   * @param timePeriod - Time period for the data
+   * @param customDateRange - Custom date range (if timePeriod is 'custom')
+   * @returns Dashboard data
+   */
+  public async getDashboardData(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): Promise<DashboardData> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    
+    try {
+      // Generate cache key
+      const cacheKey = this.generateCacheKey(timePeriod, customDateRange);
+      
+      // Check if we have cached data
+      const cachedData = this.dashboardDataCache.get(cacheKey);
+      if (cachedData && Date.now() - cachedData.timestamp < this.CACHE_TTL) {
+        console.log('Using cached dashboard data');
+        return cachedData.data;
+      }
+      
+      // Try to fetch from API
+      try {
+        const data = await this.fetchDashboardDataFromAPI(timePeriod, customDateRange);
+        
+        // Cache the data
+        this.dashboardDataCache.set(cacheKey, {
+          data,
+          timestamp: Date.now(),
+          timePeriod,
+          customDateRange
+        });
+        
+        // Save cache to storage
+        await this.saveDashboardCache();
+        
+        return data;
+      } catch (apiError) {
+        console.error('Error fetching dashboard data from API:', apiError);
+        
+        // If API fails and we have cached data (even if expired), use it
+        if (cachedData) {
+          console.log('Using expired cached dashboard data as fallback');
+          return cachedData.data;
+        }
+        
+        // If no cached data, use mock data
+        return this.generateMockDashboardData(timePeriod, customDateRange);
+      }
+    } catch (error) {
+      console.error('Error getting dashboard data:', error);
+      return this.generateMockDashboardData(timePeriod, customDateRange);
+    }
+  }
+  
+  /**
+   * Fetch dashboard data from API
+   */
+  private async fetchDashboardDataFromAPI(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): Promise<DashboardData> {
+    // In a real implementation, this would make an API call
+    // For now, we'll throw an error to simulate API failure
+    throw new Error('API not implemented yet');
+  }
+  
+  /**
+   * Generate mock dashboard data
+   */
+  private generateMockDashboardData(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): DashboardData {
+    // Generate daily data based on time period
+    const dailyData: Record<string, number> = {};
+    const startDate = new Date();
+    let days = 7;
+    
+    switch (timePeriod) {
+      case 'today':
+        days = 1;
+        break;
+      case 'yesterday':
+        days = 1;
+        startDate.setDate(startDate.getDate() - 1);
+        break;
+      case 'last_7_days':
+        days = 7;
+        break;
+      case 'last_30_days':
+        days = 30;
+        break;
+      case 'this_month':
+        days = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+        startDate.setDate(1);
+        break;
+      case 'last_month':
+        const lastMonth = new Date(startDate.getFullYear(), startDate.getMonth() - 1, 1);
+        days = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0).getDate();
+        startDate.setMonth(startDate.getMonth() - 1);
+        startDate.setDate(1);
+        break;
+      case 'custom':
+        if (customDateRange) {
+          const diffTime = Math.abs(customDateRange.end.getTime() - customDateRange.start.getTime());
+          days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          startDate.setTime(customDateRange.start.getTime());
+        }
+        break;
+    }
+    
+    // Generate daily data
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      const dateString = date.toISOString().split('T')[0];
+      dailyData[dateString] = 100 + Math.floor(Math.random() * 150);
+    }
+    
+    return {
+      revenue: {
+        total_revenue: 1250.75,
+        active_users: 450,
+        daily_data: dailyData
+      },
+      cookies: {
+        cookie_inits: 850,
+        cookie_persists: 720,
+        redirects: 380,
+        conversions: 210,
+        persist_rate: 84.7,
+        redirect_success_rate: 55.3,
+      },
+      microtransactions: {
+        total_revenue: 1250.75,
+        by_type: {
+          'Live Parlay Odds': {
+            impressions: 2500,
+            clicks: 450,
+            purchases: 180,
+            revenue: 540.00,
+            click_rate: 18.0,
+            conversion_rate: 40.0,
+          },
+          'Premium Stats': {
+            impressions: 3200,
+            clicks: 580,
+            purchases: 210,
+            revenue: 420.00,
+            click_rate: 18.1,
+            conversion_rate: 36.2,
+          },
+          'Expert Picks': {
+            impressions: 1800,
+            clicks: 320,
+            purchases: 95,
+            revenue: 190.75,
+            click_rate: 17.8,
+            conversion_rate: 29.7,
+          },
+          'Player Insights': {
+            impressions: 1200,
+            clicks: 180,
+            purchases: 50,
+            revenue: 100.00,
+            click_rate: 15.0,
+            conversion_rate: 27.8,
+          },
+        }
+      },
+      user_journey: {
+        stages: {
+          impressions: 8700,
+          clicks: 1530,
+          purchases: 535,
+          redirects: 380,
+          conversions: 210,
+        },
+        dropoff_rates: {
+          impression_to_click: 82.4,
+          click_to_purchase: 65.0,
+          purchase_to_redirect: 29.0,
+          redirect_to_conversion: 44.7,
+        },
+        completion_rate: 2.4,
+      },
+      betting_performance: {
+        win_rate: 58.3,
+        roi: 12.7,
+        by_sport: {
+          'NBA': { win_rate: 62.5, roi: 15.2 },
+          'NFL': { win_rate: 55.8, roi: 10.3 },
+          'MLB': { win_rate: 53.2, roi: 8.7 },
+          'NHL': { win_rate: 59.1, roi: 13.5 }
+        },
+        heat_map_data: this.generateHeatMapData()
+      },
+      user_engagement: {
+        daily_active_users: 1250,
+        sessions_per_user: 3.7,
+        retention_rate: 68.5,
+        engagement_metrics: {
+          avg_session_duration: 8.5,
+          screens_per_session: 4.2,
+          actions_per_session: 12.8
+        }
+      }
+    };
+  }
+  
+  /**
+   * Generate heat map data for dashboard
+   */
+  private generateHeatMapData() {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const times = ['Morning', 'Afternoon', 'Evening', 'Night'];
+    
+    return days.flatMap(day =>
+      times.map(time => ({
+        day,
+        time,
+        value: Math.floor(Math.random() * 100)
+      }))
+    );
+  }
+  
+  /**
+   * Generate cache key for dashboard data
+   */
+  private generateCacheKey(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): string {
+    if (timePeriod === 'custom' && customDateRange) {
+      const startDate = customDateRange.start.toISOString().split('T')[0];
+      const endDate = customDateRange.end.toISOString().split('T')[0];
+      return `${timePeriod}_${startDate}_${endDate}`;
+    }
+    return timePeriod;
+  }
+  
+  /**
+   * Load dashboard cache from storage
+   */
+  private async loadDashboardCache(): Promise<void> {
+    try {
+      const cacheString = await AsyncStorage.getItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
+      
+      if (cacheString) {
+        const cacheEntries: [string, DashboardDataCache][] = JSON.parse(cacheString);
+        this.dashboardDataCache = new Map(cacheEntries);
+      }
+    } catch (error) {
+      console.error('Error loading dashboard cache:', error);
+    }
+  }
+  
+  /**
+   * Save dashboard cache to storage
+   */
+  private async saveDashboardCache(): Promise<void> {
+    try {
+      const cacheEntries = Array.from(this.dashboardDataCache.entries());
+      await AsyncStorage.setItem(
+        this.STORAGE_KEYS.DASHBOARD_CACHE,
+        JSON.stringify(cacheEntries)
+      );
+    } catch (error) {
+      console.error('Error saving dashboard cache:', error);
+    }
+  }
+  
+  /**
+   * Clear dashboard cache
+   */
+  public async clearDashboardCache(): Promise<void> {
+    try {
+      this.dashboardDataCache.clear();
+      await AsyncStorage.removeItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
+      console.log('Dashboard cache cleared');
+    } catch (error) {
+      console.error('Error clearing dashboard cache:', error);
+    }
+  }
+}
+
+// Dashboard data interface
+export interface DashboardData {
+  revenue: {
+    total_revenue: number;
+    active_users: number;
+    daily_data: Record<string, number>;
+  };
+  cookies: {
+    cookie_inits: number;
+    cookie_persists: number;
+    redirects: number;
+    conversions: number;
+    persist_rate: number;
+    redirect_success_rate: number;
+  };
+  microtransactions: {
+    total_revenue: number;
+    by_type: Record<string, {
+      impressions: number;
+      clicks: number;
+      purchases: number;
+      revenue: number;
+      click_rate: number;
+      conversion_rate: number;
+    }>;
+  };
+  user_journey: {
+    stages: Record<string, number>;
+    dropoff_rates: Record<string, number>;
+    completion_rate: number;
+  };
+  betting_performance?: {
+    win_rate: number;
+    roi: number;
+    by_sport: Record<string, any>;
+    heat_map_data: any[];
+  };
+  user_engagement?: {
+    daily_active_users: number;
+    sessions_per_user: number;
+    retention_rate: number;
+    engagement_metrics: Record<string, number>;
+  };
+}
+
+// Cache interface
+interface DashboardDataCache {
+  data: DashboardData;
+  timestamp: number;
+  timePeriod: string;
+  customDateRange?: { start: Date, end: Date };
+}
+
+class AnalyticsService {
+  private static instance: AnalyticsService;
+  private currentSession: AnalyticsSession | null = null;
+  private deviceId: string = '';
+  private userProperties: AnalyticsUserProperties = {};
+  private activeFunnels: Map<string, ConversionFunnel> = new Map();
+  private isInitialized: boolean = false;
+  private eventQueue: AnalyticsEvent[] = [];
+  private flushInterval: ReturnType<typeof setInterval> | null = null;
+  private dashboardDataCache: Map<string, DashboardDataCache> = new Map();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private readonly API_BASE_URL = 'https://api.ai-sports-edge.com/analytics';
+  private readonly STORAGE_KEYS = {
+    DEVICE_ID: 'analytics_device_id',
+    USER_PROPERTIES: 'analytics_user_properties',
+    EVENTS: 'analytics_events',
+    FUNNELS: 'analytics_funnels',
+    SESSION: 'analytics_current_session',
+    DASHBOARD_CACHE: 'analytics_dashboard_cache'
+  };
+  
+  // Get singleton instance
+  public static getInstance(): AnalyticsService {
+    if (!AnalyticsService.instance) {
+      AnalyticsService.instance = new AnalyticsService();
+    }
+    return AnalyticsService.instance;
+  }
+  
+  // Initialize analytics service
+  public async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+    
+    try {
+      // Load device ID or generate a new one
+      await this.loadDeviceId();
+      
+      // Load user properties
+      await this.loadUserProperties();
+      
+      // Start a new session
+      await this.startNewSession();
+      
+      // Load dashboard data cache
+      await this.loadDashboardCache();
+      
+      // Set up event flushing interval (every 60 seconds)
+      this.flushInterval = setInterval(() => {
+        this.flushEvents();
+      }, 60000);
+      
+      this.isInitialized = true;
+      
+      console.log('Analytics service initialized');
+    } catch (error) {
+      console.error('Error initializing analytics service:', error);
+    }
+  }
+
+  /**
+   * Get dashboard data for analytics
+   * @param timePeriod - Time period for the data
+   * @param customDateRange - Custom date range (if timePeriod is 'custom')
+   * @returns Dashboard data
+   */
+  public async getDashboardData(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): Promise<DashboardData> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    
+    try {
+      // Generate cache key
+      const cacheKey = this.generateCacheKey(timePeriod, customDateRange);
+      
+      // Check if we have cached data
+      const cachedData = this.dashboardDataCache.get(cacheKey);
+      if (cachedData && Date.now() - cachedData.timestamp < this.CACHE_TTL) {
+        console.log('Using cached dashboard data');
+        return cachedData.data;
+      }
+      
+      // Try to fetch from API
+      try {
+        const data = await this.fetchDashboardDataFromAPI(timePeriod, customDateRange);
+        
+        // Cache the data
+        this.dashboardDataCache.set(cacheKey, {
+          data,
+          timestamp: Date.now(),
+          timePeriod,
+          customDateRange
+        });
+        
+        // Save cache to storage
+        await this.saveDashboardCache();
+        
+        return data;
+      } catch (apiError) {
+        console.error('Error fetching dashboard data from API:', apiError);
+        
+        // If API fails and we have cached data (even if expired), use it
+        if (cachedData) {
+          console.log('Using expired cached dashboard data as fallback');
+          return cachedData.data;
+        }
+        
+        // If no cached data, use mock data
+        return this.generateMockDashboardData(timePeriod, customDateRange);
+      }
+    } catch (error) {
+      console.error('Error getting dashboard data:', error);
+      return this.generateMockDashboardData(timePeriod, customDateRange);
+    }
+  }
+  
+  /**
+   * Fetch dashboard data from API
+   */
+  private async fetchDashboardDataFromAPI(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): Promise<DashboardData> {
+    // In a real implementation, this would make an API call
+    // For now, we'll throw an error to simulate API failure
+    throw new Error('API not implemented yet');
+  }
+  
+  /**
+   * Generate mock dashboard data
+   */
+  private generateMockDashboardData(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): DashboardData {
+    // Generate daily data based on time period
+    const dailyData: Record<string, number> = {};
+    const today = new Date();
+    let days = 7;
+    
+    switch (timePeriod) {
+      case 'today':
+        days = 1;
+        break;
+      case 'yesterday':
+        days = 1;
+        today.setDate(today.getDate() - 1);
+        break;
+      case 'last_7_days':
+        days = 7;
+        break;
+      case 'last_30_days':
+        days = 30;
+        break;
+      case 'this_month':
+        days = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        today.setDate(1);
+        break;
+      case 'last_month':
+        const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        days = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0).getDate();
+        today = lastMonth;
+        break;
+      case 'custom':
+        if (customDateRange) {
+          const diffTime = Math.abs(customDateRange.end.getTime() - customDateRange.start.getTime());
+          days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          today = new Date(customDateRange.start);
+        }
+        break;
+    }
+    
+    // Generate daily data
+    for (let i = 0; i < days; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + i);
+      const dateString = date.toISOString().split('T')[0];
+      dailyData[dateString] = 100 + Math.floor(Math.random() * 150);
+    }
+    
+    return {
+      revenue: {
+        total_revenue: 1250.75,
+        active_users: 450,
+        daily_data: dailyData
+      },
+      cookies: {
+        cookie_inits: 850,
+        cookie_persists: 720,
+        redirects: 380,
+        conversions: 210,
+        persist_rate: 84.7,
+        redirect_success_rate: 55.3,
+      },
+      microtransactions: {
+        total_revenue: 1250.75,
+        by_type: {
+          'Live Parlay Odds': {
+            impressions: 2500,
+            clicks: 450,
+            purchases: 180,
+            revenue: 540.00,
+            click_rate: 18.0,
+            conversion_rate: 40.0,
+          },
+          'Premium Stats': {
+            impressions: 3200,
+            clicks: 580,
+            purchases: 210,
+            revenue: 420.00,
+            click_rate: 18.1,
+            conversion_rate: 36.2,
+          },
+          'Expert Picks': {
+            impressions: 1800,
+            clicks: 320,
+            purchases: 95,
+            revenue: 190.75,
+            click_rate: 17.8,
+            conversion_rate: 29.7,
+          },
+          'Player Insights': {
+            impressions: 1200,
+            clicks: 180,
+            purchases: 50,
+            revenue: 100.00,
+            click_rate: 15.0,
+            conversion_rate: 27.8,
+          },
+        }
+      },
+      user_journey: {
+        stages: {
+          impressions: 8700,
+          clicks: 1530,
+          purchases: 535,
+          redirects: 380,
+          conversions: 210,
+        },
+        dropoff_rates: {
+          impression_to_click: 82.4,
+          click_to_purchase: 65.0,
+          purchase_to_redirect: 29.0,
+          redirect_to_conversion: 44.7,
+        },
+        completion_rate: 2.4,
+      },
+      betting_performance: {
+        win_rate: 58.3,
+        roi: 12.7,
+        by_sport: {
+          'NBA': { win_rate: 62.5, roi: 15.2 },
+          'NFL': { win_rate: 55.8, roi: 10.3 },
+          'MLB': { win_rate: 53.2, roi: 8.7 },
+          'NHL': { win_rate: 59.1, roi: 13.5 }
+        },
+        heat_map_data: this.generateHeatMapData()
+      },
+      user_engagement: {
+        daily_active_users: 1250,
+        sessions_per_user: 3.7,
+        retention_rate: 68.5,
+        engagement_metrics: {
+          avg_session_duration: 8.5,
+          screens_per_session: 4.2,
+          actions_per_session: 12.8
+        }
+      }
+    };
+  }
+  
+  /**
+   * Generate heat map data for dashboard
+   */
+  private generateHeatMapData() {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const times = ['Morning', 'Afternoon', 'Evening', 'Night'];
+    
+    return days.flatMap(day =>
+      times.map(time => ({
+        day,
+        time,
+        value: Math.floor(Math.random() * 100)
+      }))
+    );
+  }
+  
+  /**
+   * Generate cache key for dashboard data
+   */
+  private generateCacheKey(
+    timePeriod: string,
+    customDateRange?: { start: Date, end: Date }
+  ): string {
+    if (timePeriod === 'custom' && customDateRange) {
+      const startDate = customDateRange.start.toISOString().split('T')[0];
+      const endDate = customDateRange.end.toISOString().split('T')[0];
+      return `${timePeriod}_${startDate}_${endDate}`;
+    }
+    return timePeriod;
+  }
+  
+  /**
+   * Load dashboard cache from storage
+   */
+  private async loadDashboardCache(): Promise<void> {
+    try {
+      const cacheString = await AsyncStorage.getItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
+      
+      if (cacheString) {
+        const cacheEntries: [string, DashboardDataCache][] = JSON.parse(cacheString);
+        this.dashboardDataCache = new Map(cacheEntries);
+      }
+    } catch (error) {
+      console.error('Error loading dashboard cache:', error);
+    }
+  }
+  
+  /**
+   * Save dashboard cache to storage
+   */
+  private async saveDashboardCache(): Promise<void> {
+    try {
+      const cacheEntries = Array.from(this.dashboardDataCache.entries());
+      await AsyncStorage.setItem(
+        this.STORAGE_KEYS.DASHBOARD_CACHE,
+        JSON.stringify(cacheEntries)
+      );
+    } catch (error) {
+      console.error('Error saving dashboard cache:', error);
+    }
+  }
+  
+  /**
+   * Clear dashboard cache
+   */
+  public async clearDashboardCache(): Promise<void> {
+    try {
+      this.dashboardDataCache.clear();
+      await AsyncStorage.removeItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
+      console.log('Dashboard cache cleared');
+    } catch (error) {
+      console.error('Error clearing dashboard cache:', error);
+    }
+  }
+
 }
 
 // Export singleton instance

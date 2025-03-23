@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { personalizationService, UserPreferences } from '../services/personalizationService';
+import { personalizationService, UserPreferences, Player } from '../services/personalizationService';
 import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
 
 // Context interface
@@ -12,6 +12,10 @@ interface PersonalizationContextType {
   removeFavoriteTeam: (team: string) => Promise<void>;
   addFavoriteLeague: (league: string) => Promise<void>;
   removeFavoriteLeague: (league: string) => Promise<void>;
+  addFavoritePlayer: (player: Player) => Promise<void>;
+  removeFavoritePlayer: (playerId: string) => Promise<void>;
+  updateFavoritePlayers: (players: Player[]) => Promise<void>;
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   hideSportsbook: (sportsbook: 'draftkings' | 'fanduel') => Promise<void>;
   showSportsbook: (sportsbook: 'draftkings' | 'fanduel') => Promise<void>;
   setNotificationPreferences: (preferences: Partial<UserPreferences['notificationPreferences']>) => Promise<void>;
@@ -29,6 +33,10 @@ const PersonalizationContext = createContext<PersonalizationContextType>({
   removeFavoriteTeam: async () => {},
   addFavoriteLeague: async () => {},
   removeFavoriteLeague: async () => {},
+  addFavoritePlayer: async () => {},
+  removeFavoritePlayer: async () => {},
+  updateFavoritePlayers: async () => {},
+  updatePreferences: async () => {},
   hideSportsbook: async () => {},
   showSportsbook: async () => {},
   setNotificationPreferences: async () => {},
@@ -65,7 +73,8 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
           has_default_sport: !!userPreferences.defaultSport,
           has_default_sportsbook: !!userPreferences.defaultSportsbook,
           favorite_teams_count: userPreferences.favoriteTeams?.length || 0,
-          favorite_leagues_count: userPreferences.favoriteLeagues?.length || 0
+          favorite_leagues_count: userPreferences.favoriteLeagues?.length || 0,
+          favorite_players_count: userPreferences.favoritePlayers?.length || 0
         });
       } catch (error) {
         console.error('Error initializing personalization:', error);
@@ -255,6 +264,66 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
     }
   };
   
+  // Add favorite player
+  const addFavoritePlayer = async (player: Player) => {
+    try {
+      await personalizationService.addFavoritePlayer(player);
+      
+      // Update local state
+      setPreferences(prev => ({
+        ...prev,
+        favoritePlayers: [...(prev.favoritePlayers || []), player]
+      }));
+    } catch (error) {
+      console.error('Error adding favorite player:', error);
+    }
+  };
+  
+  // Remove favorite player
+  const removeFavoritePlayer = async (playerId: string) => {
+    try {
+      await personalizationService.removeFavoritePlayer(playerId);
+      
+      // Update local state
+      setPreferences(prev => ({
+        ...prev,
+        favoritePlayers: (prev.favoritePlayers || []).filter(p => p.id !== playerId)
+      }));
+    } catch (error) {
+      console.error('Error removing favorite player:', error);
+    }
+  };
+  
+  // Update favorite players
+  const updateFavoritePlayers = async (players: Player[]) => {
+    try {
+      await personalizationService.updateFavoritePlayers(players);
+      
+      // Update local state
+      setPreferences(prev => ({
+        ...prev,
+        favoritePlayers: players
+      }));
+    } catch (error) {
+      console.error('Error updating favorite players:', error);
+    }
+  };
+  
+  // Update preferences directly
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
+    try {
+      await personalizationService.setUserPreferences(newPreferences);
+      
+      // Update local state
+      setPreferences(prev => ({
+        ...prev,
+        ...newPreferences
+      }));
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+    }
+  };
+
   // Context value
   const contextValue: PersonalizationContextType = {
     preferences,
@@ -265,6 +334,10 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
     removeFavoriteTeam,
     addFavoriteLeague,
     removeFavoriteLeague,
+    addFavoritePlayer,
+    removeFavoritePlayer,
+    updateFavoritePlayers,
+    updatePreferences,
     hideSportsbook,
     showSportsbook,
     setNotificationPreferences,

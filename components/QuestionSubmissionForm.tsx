@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  TextInput, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Text, 
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { submitQuestion } from '../services/faqService';
 import { auth } from '../config/firebase';
+import { useI18n } from '../contexts/I18nContext';
 
 interface QuestionSubmissionFormProps {
   onQuestionSubmitted?: () => void;
@@ -22,15 +23,16 @@ interface QuestionSubmissionFormProps {
  * @param {QuestionSubmissionFormProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const QuestionSubmissionForm = ({ 
-  onQuestionSubmitted 
+const QuestionSubmissionForm = ({
+  onQuestionSubmitted
 }: QuestionSubmissionFormProps): JSX.Element => {
+  const { t } = useI18n();
   const [question, setQuestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!question.trim()) {
-      Alert.alert('Error', 'Please enter a question');
+      Alert.alert(t('faq.form.errorTitle'), t('faq.form.errorEmpty'));
       return;
     }
 
@@ -43,9 +45,9 @@ const QuestionSubmissionForm = ({
       
       // Show success alert
       Alert.alert(
-        'Question Submitted',
-        'Your question has been submitted for review. Once approved, it will appear in the FAQ.',
-        [{ text: 'OK' }]
+        t('faq.form.successTitle'),
+        t('faq.form.successMessage'),
+        [{ text: t('personalization.alerts.ok') }]
       );
       
       // Clear form
@@ -57,7 +59,7 @@ const QuestionSubmissionForm = ({
       }
     } catch (error) {
       console.error('Error submitting question:', error);
-      Alert.alert('Error', 'Failed to submit your question. Please try again later.');
+      Alert.alert(t('faq.form.errorTitle'), t('faq.form.errorSubmit'));
     } finally {
       setIsSubmitting(false);
     }
@@ -68,42 +70,50 @@ const QuestionSubmissionForm = ({
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <Text style={styles.title}>Ask a Question</Text>
+      <Text style={styles.title}>{t('faq.form.title')}</Text>
       <Text style={styles.subtitle}>
-        Have a question about sports betting or our AI predictions? Submit it here and our team will answer it.
+        {t('faq.form.subtitle')}
       </Text>
       
       <TextInput
         style={styles.input}
-        placeholder="Type your question here..."
+        placeholder={t('faq.form.placeholder')}
         value={question}
         onChangeText={setQuestion}
         multiline
         numberOfLines={3}
         maxLength={300}
+        accessible={true}
+        accessibilityLabel={t('faq.accessibility.questionInput')}
+        accessibilityHint={t('faq.accessibility.questionInputHint')}
       />
       
       <Text style={styles.charCount}>
-        {question.length}/300 characters
+        {question.length}/300 {t('faq.form.charCount')}
       </Text>
       
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[
-          styles.submitButton, 
+          styles.submitButton,
           (!question.trim() || isSubmitting) && styles.disabledButton
         ]}
         onPress={handleSubmit}
         disabled={!question.trim() || isSubmitting}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={t('faq.accessibility.submitButton')}
+        accessibilityHint={t('faq.accessibility.submitButtonHint')}
+        accessibilityState={{ disabled: !question.trim() || isSubmitting }}
       >
         {isSubmitting ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text style={styles.submitButtonText}>Submit Question</Text>
+          <Text style={styles.submitButtonText}>{t('faq.form.submit')}</Text>
         )}
       </TouchableOpacity>
       
       <Text style={styles.disclaimer}>
-        Questions are reviewed by our team before being added to the FAQ.
+        {t('faq.form.disclaimer')}
       </Text>
     </KeyboardAvoidingView>
   );

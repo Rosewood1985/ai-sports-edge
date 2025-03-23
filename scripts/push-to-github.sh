@@ -1,145 +1,76 @@
 #!/bin/bash
-# Script to push AI Sports Edge changes to GitHub
 
-# Set variables
-GITHUB_REPO="https://github.com/ai-sports-edge/ai-sports-edge.git"
-BRANCH_NAME="main"
+# Push changes to GitHub
+# This script commits and pushes changes to the GitHub repository
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Exit on error
+set -e
 
-echo -e "${YELLOW}Pushing changes to GitHub repository...${NC}"
+# Display script header
+echo "=========================================="
+echo "AI Sports Edge GitHub Push Script"
+echo "=========================================="
+echo ""
 
 # Check if git is installed
 if ! command -v git &> /dev/null; then
-  echo -e "${RED}Git is not installed. Please install git and try again.${NC}"
-  exit 1
-fi
-
-# Check if the directory is a git repository
-if [ ! -d ".git" ]; then
-  echo -e "${YELLOW}Initializing git repository...${NC}"
-  git init
-  
-  # Add the remote repository
-  echo -e "${YELLOW}Adding remote repository...${NC}"
-  git remote add origin $GITHUB_REPO
-  
-  if [ $? -ne 0 ]; then
-    echo -e "${RED}Failed to add remote repository. Aborting.${NC}"
+    echo "Git is not installed. Please install git."
     exit 1
-  fi
-else
-  # Check if the remote repository is already set
-  REMOTE_URL=$(git remote get-url origin 2>/dev/null)
-  
-  if [ $? -ne 0 ] || [ "$REMOTE_URL" != "$GITHUB_REPO" ]; then
-    echo -e "${YELLOW}Setting remote repository...${NC}"
-    git remote remove origin 2>/dev/null
-    git remote add origin $GITHUB_REPO
-    
-    if [ $? -ne 0 ]; then
-      echo -e "${RED}Failed to set remote repository. Aborting.${NC}"
-      exit 1
-    fi
-  fi
 fi
 
-# Create .gitignore file if it doesn't exist
-if [ ! -f ".gitignore" ]; then
-  echo -e "${YELLOW}Creating .gitignore file...${NC}"
-  cat > .gitignore << EOF
-# Node.js
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-.pnpm-debug.log
-.npm
-
-# Build files
-/build
-/dist
-/.next
-/out
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE files
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
-
-# Logs
-logs
-*.log
-
-# Testing
-/coverage
-
-# Dependency directories
-/.pnp
-.pnp.js
-
-# Misc
-.DS_Store
-Thumbs.db
-EOF
+# Check if we're in a git repository
+if [ ! -d ".git" ]; then
+    echo "Error: .git directory not found. Please run this script from the project root directory."
+    exit 1
 fi
 
-# Stage all changes
-echo -e "${YELLOW}Staging changes...${NC}"
+# Check git status
+git_status=$(git status --porcelain)
+if [ -z "$git_status" ]; then
+    echo "No changes to commit."
+    exit 0
+fi
+
+# Show changes
+echo "Changes to be committed:"
+git status --short
+
+# Prompt for commit message
+echo ""
+read -p "Enter commit message: " commit_message
+
+if [ -z "$commit_message" ]; then
+    echo "Error: Commit message cannot be empty."
+    exit 1
+fi
+
+# Add all changes
+echo ""
+echo "Adding changes..."
 git add .
 
-if [ $? -ne 0 ]; then
-  echo -e "${RED}Failed to stage changes. Aborting.${NC}"
-  exit 1
-fi
-
 # Commit changes
-echo -e "${YELLOW}Committing changes...${NC}"
-TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-git commit -m "Deploy update: $TIMESTAMP"
+echo "Committing changes..."
+git commit -m "$commit_message"
 
-if [ $? -ne 0 ]; then
-  echo -e "${RED}Failed to commit changes. Aborting.${NC}"
-  exit 1
+# Check if there's a remote repository
+remote_exists=$(git remote -v)
+if [ -z "$remote_exists" ]; then
+    echo "No remote repository configured."
+    exit 0
 fi
 
-# Check if the branch exists
-BRANCH_EXISTS=$(git branch --list $BRANCH_NAME)
+# Get current branch
+current_branch=$(git symbolic-ref --short HEAD)
+echo "Current branch: $current_branch"
 
-if [ -z "$BRANCH_EXISTS" ]; then
-  echo -e "${YELLOW}Creating branch $BRANCH_NAME...${NC}"
-  git branch $BRANCH_NAME
-fi
+# Push changes
+echo "Pushing changes to remote repository..."
+git push origin $current_branch
 
-# Switch to the branch
-echo -e "${YELLOW}Switching to branch $BRANCH_NAME...${NC}"
-git checkout $BRANCH_NAME
-
-if [ $? -ne 0 ]; then
-  echo -e "${RED}Failed to switch to branch $BRANCH_NAME. Aborting.${NC}"
-  exit 1
-fi
-
-# Push changes to GitHub
-echo -e "${YELLOW}Pushing changes to GitHub...${NC}"
-git push -u origin $BRANCH_NAME
-
-if [ $? -ne 0 ]; then
-  echo -e "${RED}Failed to push changes to GitHub. Aborting.${NC}"
-  exit 1
-fi
-
-echo -e "${GREEN}Changes successfully pushed to GitHub repository!${NC}"
+echo ""
+echo "=========================================="
+echo "Changes pushed successfully!"
+echo "Branch: $current_branch"
+echo "Commit message: $commit_message"
+echo "=========================================="

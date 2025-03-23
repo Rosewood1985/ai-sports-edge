@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { I18nManager } from 'react-native';
+import { I18nManager, Platform, NativeModules } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Storage key for language preference
+const LANGUAGE_STORAGE_KEY = 'app_language';
 
 // Import translations
 import en from '../translations/en.json';
@@ -12,6 +16,51 @@ export type Language = 'en' | 'es';
 const translations = {
   en,
   es,
+};
+
+/**
+ * Get the device language
+ * @returns The device language code
+ */
+const getDeviceLanguage = (): string => {
+  // iOS
+  if (Platform.OS === 'ios') {
+    return (
+      NativeModules.SettingsManager.settings.AppleLocale ||
+      NativeModules.SettingsManager.settings.AppleLanguages[0] ||
+      'en'
+    );
+  }
+  
+  // Android
+  if (Platform.OS === 'android') {
+    return NativeModules.I18nManager.localeIdentifier || 'en';
+  }
+  
+  // Web
+  if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
+    return navigator.language || 'en';
+  }
+  
+  return 'en';
+};
+
+/**
+ * Get language from locale
+ * @param locale The locale string (e.g., 'en-US', 'es-ES')
+ * @returns The language code ('en' or 'es')
+ */
+const getLanguageFromLocale = (locale: string): Language => {
+  const langCode = locale.split('-')[0].toLowerCase();
+  
+  // Fix: Add better language detection for Spanish variants
+  if (langCode === 'es' || locale.startsWith('es-') ||
+      locale === 'spa' || locale.includes('spanish')) {
+    return 'es';
+  }
+  
+  // Default to English for all other languages
+  return 'en';
 };
 
 // Default language
@@ -45,15 +94,57 @@ const I18nContext = createContext<I18nContextType>({
  * This component provides internationalization functionality to the app.
  * It manages the current language and provides translation and formatting functions.
  */
-export const I18nProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const I18nProvider: React.FC<{
+  children: React.ReactNode;
+  initialLanguage?: Language;
+}> = ({ children, initialLanguage }) => {
   // State for current language
-  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [language, setLanguageState] = useState<Language>(initialLanguage || DEFAULT_LANGUAGE);
   const [isRTL, setIsRTL] = useState<boolean>(I18nManager.isRTL);
   
+  // Load saved language on startup
+  useEffect(() => {
+    const loadSavedLanguage = async () => {
+      try {
+        // Try to load saved language
+        const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+        
+        if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+          setLanguageState(savedLanguage as Language);
+          
+          // Update RTL status
+          const isRTLLanguage = ['ar', 'he', 'ur'].includes(savedLanguage);
+          setIsRTL(isRTLLanguage);
+        } else if (!initialLanguage) {
+          // If no saved language and no initial language provided, try to detect device language
+          const deviceLocale = getDeviceLanguage();
+          const detectedLanguage = getLanguageFromLocale(deviceLocale);
+          
+          setLanguageState(detectedLanguage);
+          
+          // Save detected language
+          await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, detectedLanguage);
+        }
+      } catch (error) {
+        console.error('Error loading saved language:', error);
+      }
+    };
+    
+    loadSavedLanguage();
+  }, [initialLanguage]);
+  
   // Set language and update RTL status
-  const setLanguage = (lang: Language) => {
+  const setLanguage = async (lang: Language) => {
     if (Object.keys(translations).includes(lang)) {
       setLanguageState(lang);
+      
+      // Save language preference
+      try {
+        await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      } catch (error) {
+        console.error('Error saving language preference:', error);
+      }
+      
       // Update RTL status (not needed for English/Spanish, but included for future languages)
       const isRTLLanguage = ['ar', 'he', 'ur'].includes(lang);
       setIsRTL(isRTLLanguage);
@@ -70,21 +161,41 @@ export const I18nProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let translation: any = translations[language];
+    let foundTranslation = true;
     
     // Navigate through the nested keys
     for (const k of keys) {
       if (!translation || !translation[k]) {
-        // Fallback to English if translation not found
-        translation = translations[DEFAULT_LANGUAGE];
-        for (const fallbackKey of keys) {
-          if (!translation || !translation[fallbackKey]) {
-            return key; // Return the key if translation not found
-          }
-          translation = translation[fallbackKey];
-        }
+        foundTranslation = false;
         break;
       }
       translation = translation[k];
+    }
+    
+    // If translation not found in current language, try fallback
+    if (!foundTranslation) {
+      console.warn(`Translation missing for key: ${key} in language: ${language}`);
+      
+      // Try English as fallback
+      let fallbackTranslation: any = translations[DEFAULT_LANGUAGE];
+      let foundInFallback = true;
+      
+      // Navigate through the nested keys in fallback
+      for (const fallbackKey of keys) {
+        if (!fallbackTranslation || !fallbackTranslation[fallbackKey]) {
+          foundInFallback = false;
+          break;
+        }
+        fallbackTranslation = fallbackTranslation[fallbackKey];
+      }
+      
+      // Use fallback if found
+      if (foundInFallback) {
+        translation = fallbackTranslation;
+      } else {
+        // Return the key if translation not found in any language
+        return key;
+      }
     }
     
     // Return the key if translation not found
@@ -93,7 +204,7 @@ export const I18nProvider: React.FC<{children: React.ReactNode}> = ({ children }
     // Replace parameters if provided
     if (params) {
       return Object.entries(params).reduce(
-        (str, [paramKey, paramValue]) => 
+        (str, [paramKey, paramValue]) =>
           str.replace(new RegExp(`{{${paramKey}}}`, 'g'), String(paramValue)),
         translation
       );

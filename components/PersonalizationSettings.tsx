@@ -14,6 +14,7 @@ import { usePersonalization } from '../contexts/PersonalizationContext';
 import { AVAILABLE_SPORTS } from './SportSelector';
 import { useTheme } from '../contexts/ThemeContext';
 import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
+import { useI18n } from '../contexts/I18nContext';
 
 interface PersonalizationSettingsProps {
   onClose?: () => void;
@@ -22,6 +23,7 @@ interface PersonalizationSettingsProps {
 const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClose }) => {
   const { preferences, isLoading, setDefaultSport, setDefaultSportsbook, resetPreferences } = usePersonalization();
   const { colors, isDark } = useTheme();
+  const { t } = useI18n();
   
   // Local state for UI
   const [activeTab, setActiveTab] = useState<'general' | 'sportsbooks' | 'notifications'>('general');
@@ -39,9 +41,9 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
     
     // Show confirmation
     Alert.alert(
-      'Default Sport Updated',
-      `${AVAILABLE_SPORTS.find(s => s.key === sport)?.name || sport} is now your default sport.`,
-      [{ text: 'OK' }]
+      t('personalization.alerts.defaultSportUpdated'),
+      t('personalization.alerts.defaultSportUpdatedMessage', { sport: AVAILABLE_SPORTS.find(s => s.key === sport)?.name || sport }),
+      [{ text: t('personalization.alerts.ok') }]
     );
   };
   
@@ -51,33 +53,37 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
     
     // Show confirmation
     Alert.alert(
-      'Default Sportsbook Updated',
-      sportsbook ? `${sportsbook === 'draftkings' ? 'DraftKings' : 'FanDuel'} is now your default sportsbook.` : 'Default sportsbook preference cleared.',
-      [{ text: 'OK' }]
+      t('personalization.alerts.defaultSportsbookUpdated'),
+      sportsbook
+        ? t('personalization.alerts.defaultSportsbookUpdatedMessage', {
+            sportsbook: sportsbook === 'draftkings' ? 'DraftKings' : 'FanDuel'
+          })
+        : t('personalization.alerts.defaultSportsbookCleared'),
+      [{ text: t('personalization.alerts.ok') }]
     );
   };
   
   // Handle reset preferences
   const handleResetPreferences = () => {
     Alert.alert(
-      'Reset Preferences',
-      'Are you sure you want to reset all personalization preferences to default?',
+      t('personalization.alerts.resetPreferences'),
+      t('personalization.alerts.resetPreferencesMessage'),
       [
         {
-          text: 'Cancel',
+          text: t('personalization.alerts.cancel'),
           style: 'cancel'
         },
         {
-          text: 'Reset',
+          text: t('personalization.alerts.reset'),
           style: 'destructive',
           onPress: async () => {
             await resetPreferences();
             
             // Show confirmation
             Alert.alert(
-              'Preferences Reset',
-              'All personalization preferences have been reset to default.',
-              [{ text: 'OK' }]
+              t('personalization.alerts.preferencesReset'),
+              t('personalization.alerts.preferencesResetMessage'),
+              [{ text: t('personalization.alerts.ok') }]
             );
           }
         }
@@ -89,7 +95,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
   if (isLoading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Loading preferences...</Text>
+        <Text style={[styles.title, { color: colors.text }]}>{t('personalization.loading')}</Text>
       </View>
     );
   }
@@ -97,9 +103,9 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
   // Render general settings tab
   const renderGeneralTab = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Default Sport</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('personalization.general.defaultSport')}</Text>
       <Text style={[styles.sectionDescription, { color: colors.text }]}>
-        Choose your default sport for odds comparison
+        {t('personalization.general.defaultSportDescription')}
       </Text>
       
       <ScrollView style={styles.optionsList}>
@@ -135,9 +141,9 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
   // Render sportsbooks tab
   const renderSportsbooksTab = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Default Sportsbook</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('personalization.sportsbooks.defaultSportsbook')}</Text>
       <Text style={[styles.sectionDescription, { color: colors.text }]}>
-        Choose your preferred sportsbook for betting
+        {t('personalization.sportsbooks.defaultSportsbookDescription')}
       </Text>
       
       <View style={styles.optionsList}>
@@ -189,7 +195,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
           ]}
           onPress={() => handleSportsbookSelection(null)}
         >
-          <Text style={[styles.optionText, { color: colors.text }]}>No Preference</Text>
+          <Text style={[styles.optionText, { color: colors.text }]}>{t('personalization.sportsbooks.noPreference')}</Text>
           {preferences.defaultSportsbook === null && (
             <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
           )}
@@ -201,14 +207,14 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
   // Render notifications tab
   const renderNotificationsTab = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Notification Preferences</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('personalization.notifications.title')}</Text>
       <Text style={[styles.sectionDescription, { color: colors.text }]}>
-        Customize which notifications you receive
+        {t('personalization.notifications.description')}
       </Text>
       
       <View style={styles.optionsList}>
         <View style={styles.switchOption}>
-          <Text style={[styles.optionText, { color: colors.text }]}>Odds Movements</Text>
+          <Text style={[styles.optionText, { color: colors.text }]}>{t('personalization.notifications.oddsMovements')}</Text>
           <Switch
             value={preferences.notificationPreferences?.oddsMovements ?? true}
             onValueChange={value => {
@@ -226,7 +232,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
         </View>
         
         <View style={styles.switchOption}>
-          <Text style={[styles.optionText, { color: colors.text }]}>Game Start</Text>
+          <Text style={[styles.optionText, { color: colors.text }]}>{t('personalization.notifications.gameStart')}</Text>
           <Switch
             value={preferences.notificationPreferences?.gameStart ?? true}
             onValueChange={value => {
@@ -244,7 +250,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
         </View>
         
         <View style={styles.switchOption}>
-          <Text style={[styles.optionText, { color: colors.text }]}>Game End</Text>
+          <Text style={[styles.optionText, { color: colors.text }]}>{t('personalization.notifications.gameEnd')}</Text>
           <Switch
             value={preferences.notificationPreferences?.gameEnd ?? true}
             onValueChange={value => {
@@ -262,7 +268,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
         </View>
         
         <View style={styles.switchOption}>
-          <Text style={[styles.optionText, { color: colors.text }]}>Special Offers</Text>
+          <Text style={[styles.optionText, { color: colors.text }]}>{t('personalization.notifications.specialOffers')}</Text>
           <Switch
             value={preferences.notificationPreferences?.specialOffers ?? true}
             onValueChange={value => {
@@ -285,7 +291,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Personalization</Text>
+        <Text style={[styles.title, { color: colors.text }]}>{t('personalization.title')}</Text>
         {onClose && (
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Ionicons name="close" size={24} color={colors.text} />
@@ -312,7 +318,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
               }
             ]}
           >
-            General
+            {t('personalization.tabs.general')}
           </Text>
         </TouchableOpacity>
         
@@ -334,7 +340,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
               }
             ]}
           >
-            Sportsbooks
+            {t('personalization.tabs.sportsbooks')}
           </Text>
         </TouchableOpacity>
         
@@ -356,7 +362,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
               }
             ]}
           >
-            Notifications
+            {t('personalization.tabs.notifications')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -369,7 +375,7 @@ const PersonalizationSettings: React.FC<PersonalizationSettingsProps> = ({ onClo
         style={[styles.resetButton, { backgroundColor: '#ff6b6b' }]}
         onPress={handleResetPreferences}
       >
-        <Text style={styles.resetButtonText}>Reset All Preferences</Text>
+        <Text style={styles.resetButtonText}>{t('personalization.resetButton')}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -2,7 +2,7 @@ module.exports = {
   preset: 'react-native',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|react-navigation|@react-navigation|@expo|expo|@unimodules|react-native-vector-icons|react-native-gesture-handler)/)'
+    'node_modules/(?!(react-native|@react-native|react-navigation|@react-navigation|@expo|expo|@unimodules|react-native-vector-icons|react-native-gesture-handler|@react-native-async-storage|@react-native-community)/)'
   ],
   setupFiles: [
     '<rootDir>/jest.setup.js'
@@ -21,6 +21,8 @@ module.exports = {
   collectCoverageFrom: [
     'components/**/*.{js,jsx,ts,tsx}',
     'screens/**/*.{js,jsx,ts,tsx}',
+    'contexts/**/*.{js,jsx,ts,tsx}',
+    'translations/**/*.{js,jsx,ts,json}',
     '!**/node_modules/**',
     '!**/vendor/**'
   ],
@@ -29,7 +31,17 @@ module.exports = {
   globals: {
     'ts-jest': {
       babelConfig: true,
-      tsconfig: 'tsconfig.jest.json'
+      tsconfig: 'tsconfig.jest.json',
+      isolatedModules: false
     }
-  }
+  },
+  // Add transform configuration for JSX syntax
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['@babel/preset-react'] }]
+  },
+  // Add reporters for test results
+  reporters: [
+    'default',
+    ['jest-junit', { outputDirectory: 'test-results', outputName: 'jest-junit.xml' }]
+  ]
 };

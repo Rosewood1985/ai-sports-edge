@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform, AppState } from 'react-native';
 import { useI18n } from '../contexts/I18nContext';
 
 /**
@@ -63,16 +63,36 @@ const LanguageChangeListener: React.FC = () => {
     } catch (error) {
       console.warn('Could not set up locale change listener:', error);
       
-      // Fallback: Check for locale changes periodically
+      // Improved fallback strategy:
+      // 1. Check less frequently (30 seconds instead of 5)
+      // 2. Add AppState listener to check when app comes to foreground
+      
+      // Set up AppState listener for iOS
+      const handleAppStateChange = (nextAppState: string) => {
+        if (nextAppState === 'active') {
+          // Check language when app comes to foreground
+          const deviceLanguage = getLanguageFromLocale(getDeviceLocale());
+          if (deviceLanguage !== language) {
+            setLanguage(deviceLanguage);
+          }
+        }
+      };
+      
+      // Add AppState listener using the newer API
+      const subscription = AppState.addEventListener('change', handleAppStateChange);
+      
+      // Still keep a less frequent interval check as a backup
       const intervalId = setInterval(() => {
         const deviceLanguage = getLanguageFromLocale(getDeviceLocale());
         if (deviceLanguage !== language) {
           setLanguage(deviceLanguage);
         }
-      }, 5000); // Check every 5 seconds
+      }, 30000); // Check every 30 seconds instead of 5
       
       return () => {
+        // Clean up both listeners
         clearInterval(intervalId);
+        subscription.remove(); // Use the subscription object to remove the listener
       };
     }
   }, [language, setLanguage]);

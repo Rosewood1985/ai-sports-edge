@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
+import ResponsiveSportIcon from './ResponsiveSportIcon';
+import { useI18n } from '../contexts/I18nContext';
 
 // Define available sports
 export const AVAILABLE_SPORTS = [
@@ -22,50 +23,58 @@ interface SportSelectorProps {
 
 /**
  * SportSelector component allows users to select from available sports
+ * with responsive icons and internationalization support
  */
 const SportSelector: React.FC<SportSelectorProps> = ({ selectedSport, onSelectSport }) => {
   const { colors, isDark } = useTheme();
+  const { t } = useI18n();
   
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.text }]}>Select Sport:</Text>
-      <ScrollView 
-        horizontal 
+      <Text style={[styles.label, { color: colors.text }]}>
+        {t('oddsComparison.selectSport')}
+      </Text>
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {AVAILABLE_SPORTS.map((sport) => (
-          <TouchableOpacity
-            key={sport.key}
-            style={[
-              styles.sportButton,
-              selectedSport === sport.key && [styles.selectedSport, { backgroundColor: colors.primary }],
-              { backgroundColor: isDark ? '#333333' : '#f0f0f0' }
-            ]}
-            onPress={() => onSelectSport(sport.key)}
-            accessible={true}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: selectedSport === sport.key }}
-            accessibilityLabel={`Select ${sport.name}`}
-            accessibilityHint={`Changes odds comparison to show ${sport.name} odds`}
-          >
-            <Ionicons 
-              name={sport.icon as any} 
-              size={20} 
-              color={selectedSport === sport.key ? '#fff' : (isDark ? '#e0e0e0' : '#333')} 
-            />
-            <Text 
+        {AVAILABLE_SPORTS.map((sport) => {
+          const isSelected = selectedSport === sport.key;
+          return (
+            <TouchableOpacity
+              key={sport.key}
               style={[
-                styles.sportText, 
-                selectedSport === sport.key && styles.selectedSportText,
-                { color: selectedSport === sport.key ? '#fff' : (isDark ? '#e0e0e0' : '#333') }
+                styles.sportButton,
+                isSelected && [styles.selectedSport, { backgroundColor: colors.primary }],
+                { backgroundColor: isDark ? '#333333' : '#f0f0f0' }
               ]}
-              numberOfLines={1}
+              onPress={() => onSelectSport(sport.key)}
+              accessible={true}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: isSelected }}
+              accessibilityLabel={t('oddsComparison.accessibility.selectSport', { sport: t(`sports.${sport.key}`) })}
+              accessibilityHint={t('oddsComparison.accessibility.selectSportHint')}
             >
-              {sport.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <ResponsiveSportIcon
+                sportKey={sport.key}
+                iconName={sport.icon}
+                size={20}
+                selected={isSelected}
+              />
+              <Text
+                style={[
+                  styles.sportText,
+                  isSelected && styles.selectedSportText,
+                  { color: isSelected ? '#fff' : (isDark ? '#e0e0e0' : '#333') }
+                ]}
+                numberOfLines={1}
+              >
+                {t(`sports.${sport.key}`) || sport.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );

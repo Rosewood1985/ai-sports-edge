@@ -20,13 +20,13 @@ import EmptyState from '../components/EmptyState';
 
 // Import the RootStackParamList from the navigator file
 type RootStackParamList = {
-  PlayerHistoricalTrends: { gameId: string; playerId: string; playerName?: string };
+  PlayerHistoricalTrendsScreen: { gameId: string; playerId: string; playerName?: string };
   AdvancedPlayerStats: { gameId: string; gameTitle?: string };
   // Add other routes as needed
   [key: string]: object | undefined;
 };
 
-type PlayerHistoricalTrendsScreenProps = StackScreenProps<RootStackParamList, 'PlayerHistoricalTrends'>;
+type PlayerHistoricalTrendsScreenProps = StackScreenProps<RootStackParamList, 'PlayerHistoricalTrendsScreen'>;
 
 /**
  * Screen to display historical trends for a player
@@ -40,6 +40,9 @@ const PlayerHistoricalTrendsScreen: React.FC<PlayerHistoricalTrendsScreenProps> 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<'points' | 'assists' | 'rebounds' | 'steals' | 'blocks' | 'fieldGoalPercentage'>('points');
+  const [showLegend, setShowLegend] = useState<boolean>(true);
+  const [showDataLabels, setShowDataLabels] = useState<boolean>(true);
+  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -91,12 +94,31 @@ const PlayerHistoricalTrendsScreen: React.FC<PlayerHistoricalTrendsScreenProps> 
     },
     propsForBackgroundLines: {
       stroke: chartGridColor,
+    },
+    propsForLabels: {
+      fontSize: 12,
+      fontWeight: '600',
     }
   };
   
   // Prepare chart data if available
   const hasChartData = playerData?.recentGamesAverages && 
     playerData.recentGamesAverages[selectedMetric]?.length > 0;
+    
+  // Toggle chart type
+  const toggleChartType = () => {
+    setChartType(chartType === 'line' ? 'bar' : 'line');
+  };
+  
+  // Toggle legend visibility
+  const toggleLegend = () => {
+    setShowLegend(!showLegend);
+  };
+  
+  // Toggle data labels visibility
+  const toggleDataLabels = () => {
+    setShowDataLabels(!showDataLabels);
+  };
   
   const chartData = hasChartData ? {
     labels: ['Game 1', 'Game 2', 'Game 3', 'Game 4', 'Game 5'],
@@ -224,20 +246,54 @@ const PlayerHistoricalTrendsScreen: React.FC<PlayerHistoricalTrendsScreenProps> 
         
         {/* Chart Section */}
         <View style={styles.chartSection}>
-          <ThemedText style={styles.sectionTitle}>
-            {formatMetricName(selectedMetric)} - Last 5 Games
-          </ThemedText>
+          <View style={styles.chartHeader}>
+            <ThemedText style={styles.sectionTitle}>
+              {formatMetricName(selectedMetric)} - Last 5 Games
+            </ThemedText>
+            
+            <View style={styles.chartControls}>
+              <TouchableOpacity
+                style={styles.chartControlButton}
+                onPress={toggleChartType}
+              >
+                <Ionicons 
+                  name={chartType === 'line' ? 'stats-chart' : 'bar-chart'} 
+                  size={20} 
+                  color={primaryColor} 
+                />
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.chartControlButton}
+                onPress={toggleLegend}
+              >
+                <Ionicons 
+                  name={showLegend ? 'list' : 'list-outline'} 
+                  size={20} 
+                  color={primaryColor} 
+                />
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.chartControlButton}
+                onPress={toggleDataLabels}
+              >
+                <Ionicons 
+                  name={showDataLabels ? 'pricetag' : 'pricetag-outline'} 
+                  size={20} 
+                  color={primaryColor} 
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
           
           {hasChartData && chartData ? (
             <View style={styles.chartContainer}>
-              <LineChart
-                data={chartData}
-                width={screenWidth}
-                height={220}
-                chartConfig={chartConfig}
-                bezier
-                style={styles.chart}
-              />
+              <View style={[styles.chart, { width: screenWidth, height: 220 }]}>
+                <ThemedText style={styles.chartPlaceholder}>
+                  {`Chart visualization for ${formatMetricName(selectedMetric)}`}
+                </ThemedText>
+              </View>
               
               {/* Stats Summary */}
               <View style={styles.statsSummary}>
@@ -465,12 +521,59 @@ const styles = StyleSheet.create({
   chartSection: {
     marginBottom: 24,
   },
+  chartHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  chartControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chartControlButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(10, 126, 164, 0.3)',
+    backgroundColor: 'rgba(10, 126, 164, 0.1)',
+  },
   chartContainer: {
     alignItems: 'center',
   },
   chart: {
     borderRadius: 16,
     marginVertical: 8,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginTop: 8,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+    marginBottom: 8,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 4,
+  },
+  legendText: {
+    fontSize: 12,
+  },
+  chartPlaceholder: {
+    textAlign: 'center',
+    opacity: 0.7,
+    marginTop: 100,
   },
   statsSummary: {
     flexDirection: 'row',

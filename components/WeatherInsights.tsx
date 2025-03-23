@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { Ionicons } from '@expo/vector-icons';
-import { 
-  getGameWeather, 
-  getWeatherPerformanceInsights, 
-  WeatherData, 
-  WeatherPerformanceCorrelation 
+import {
+  getGameWeather,
+  getWeatherPerformanceInsights,
+  WeatherData,
+  WeatherPerformanceCorrelation
 } from '../services/weatherService';
 import { useTheme } from '../contexts/ThemeContext';
+import { useI18n } from '../contexts/I18nContext';
 
 interface WeatherInsightsProps {
   gameId: string;
@@ -30,6 +31,7 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<boolean>(false);
   const { colors, isDark } = useTheme();
+  const { t } = useI18n();
   
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -61,7 +63,7 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
       <View style={[styles.container, { borderColor: colors.border }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color={colors.primary} />
-          <ThemedText style={styles.loadingText}>Loading weather insights...</ThemedText>
+          <ThemedText style={styles.loadingText}>{t('weather.loading')}</ThemedText>
         </View>
       </View>
     );
@@ -74,7 +76,7 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
         <View style={styles.errorContainer}>
           <Ionicons name="cloud-offline" size={24} color={colors.error} />
           <ThemedText style={[styles.errorText, { color: colors.error }]}>
-            {error || 'Weather data unavailable'}
+            {error || t('weather.unavailable')}
           </ThemedText>
         </View>
       </View>
@@ -92,11 +94,11 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
   
   // Get impact text based on correlation value
   const getImpactText = (correlation: number) => {
-    if (correlation <= -0.2) return 'Strong Negative';
-    if (correlation < 0) return 'Slight Negative';
-    if (correlation === 0) return 'Neutral';
-    if (correlation < 0.2) return 'Slight Positive';
-    return 'Strong Positive';
+    if (correlation <= -0.2) return t('weather.impact.strongNegative');
+    if (correlation < 0) return t('weather.impact.slightNegative');
+    if (correlation === 0) return t('weather.impact.neutral');
+    if (correlation < 0.2) return t('weather.impact.slightPositive');
+    return t('weather.impact.strongPositive');
   };
   
   // Get impact icon based on correlation value
@@ -116,10 +118,10 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
         backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
       }
     ]}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.header}
         onPress={() => setExpanded(!expanded)}
-        accessibilityLabel={expanded ? "Collapse weather insights" : "Expand weather insights"}
+        accessibilityLabel={expanded ? t('weather.collapse') : t('weather.expand')}
         accessibilityRole="button"
       >
         <View style={styles.weatherSummary}>
@@ -153,21 +155,21 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
         <View style={styles.detailsContainer}>
           <View style={styles.weatherDetails}>
             <View style={styles.weatherDetailItem}>
-              <ThemedText style={styles.detailLabel}>Feels Like</ThemedText>
+              <ThemedText style={styles.detailLabel}>{t('weather.feelsLike')}</ThemedText>
               <ThemedText style={styles.detailValue}>
                 {Math.round(weatherData.feelsLike)}°F
               </ThemedText>
             </View>
             
             <View style={styles.weatherDetailItem}>
-              <ThemedText style={styles.detailLabel}>Humidity</ThemedText>
+              <ThemedText style={styles.detailLabel}>{t('weather.humidity')}</ThemedText>
               <ThemedText style={styles.detailValue}>
                 {weatherData.humidity}%
               </ThemedText>
             </View>
             
             <View style={styles.weatherDetailItem}>
-              <ThemedText style={styles.detailLabel}>Wind</ThemedText>
+              <ThemedText style={styles.detailLabel}>{t('weather.wind')}</ThemedText>
               <ThemedText style={styles.detailValue}>
                 {Math.round(weatherData.windSpeed)} mph
               </ThemedText>
@@ -178,12 +180,12 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
           
           <View style={styles.insightsContainer}>
             <ThemedText style={styles.insightsTitle}>
-              Weather Impact on {playerName}
+              {t('weather.impact', { playerName })}
             </ThemedText>
             
             {correlations.length === 0 ? (
               <ThemedText style={styles.noInsightsText}>
-                No weather impact data available
+                {t('weather.noData')}
               </ThemedText>
             ) : (
               correlations.map((correlation, index) => (
@@ -211,7 +213,7 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
                   
                   <View style={styles.confidenceContainer}>
                     <ThemedText style={styles.confidenceLabel}>
-                      Confidence:
+                      {t('weather.confidence')}
                     </ThemedText>
                     <View style={styles.confidenceMeter}>
                       <View 
@@ -283,7 +285,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   weatherLocation: {
-    fontSize: 12,
+    fontSize: 14,
     opacity: 0.7,
   },
   temperatureContainer: {
@@ -306,6 +308,7 @@ const styles = StyleSheet.create({
   },
   weatherDetailItem: {
     alignItems: 'center',
+    flex: 1,
   },
   detailLabel: {
     fontSize: 12,
@@ -313,16 +316,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(128, 128, 128, 0.2)',
-    marginVertical: 12,
+    opacity: 0.2,
+    backgroundColor: '#ccc',
+    marginBottom: 16,
   },
   insightsContainer: {
-    marginTop: 8,
+    marginBottom: 8,
   },
   insightsTitle: {
     fontSize: 16,
@@ -331,19 +335,22 @@ const styles = StyleSheet.create({
   },
   noInsightsText: {
     fontSize: 14,
-    fontStyle: 'italic',
     opacity: 0.7,
+    fontStyle: 'italic',
     textAlign: 'center',
-    marginVertical: 12,
+    marginVertical: 16,
   },
   insightItem: {
     marginBottom: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
   },
   insightMetric: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   metricName: {
     fontSize: 14,
@@ -358,14 +365,14 @@ const styles = StyleSheet.create({
   },
   impactText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 'bold',
     marginLeft: 4,
   },
   insightText: {
     fontSize: 14,
+    marginBottom: 12,
     lineHeight: 20,
-    marginBottom: 8,
   },
   confidenceContainer: {
     flexDirection: 'row',
@@ -378,19 +385,20 @@ const styles = StyleSheet.create({
   },
   confidenceMeter: {
     flex: 1,
-    height: 4,
-    backgroundColor: 'rgba(128, 128, 128, 0.2)',
-    borderRadius: 2,
+    height: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 3,
     overflow: 'hidden',
   },
   confidenceFill: {
     height: '100%',
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#007AFF',
+    borderRadius: 3,
   },
   confidenceValue: {
     fontSize: 12,
-    marginLeft: 8,
     opacity: 0.7,
+    marginLeft: 8,
   },
 });
 

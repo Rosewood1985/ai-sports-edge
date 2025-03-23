@@ -1,7 +1,12 @@
-import { auth, firestore, functions } from '../config/firebase';
+import { auth } from '../config/firebase';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { isFirebaseInitialized } from '../utils/environmentUtils';
 import { CardFieldInput } from '@stripe/stripe-react-native';
-import firebase from 'firebase/app';
+
+// Initialize Firestore and Functions
+const firestore = getFirestore();
+const functions = getFunctions();
 
 // Mock implementation of trackEvent for compatibility
 // This should be replaced with a proper import once analyticsService is implemented
@@ -1110,6 +1115,72 @@ export const redeemGiftSubscription = async (
   }
 };
 
+/**
+ * Check if user has used their free daily pick
+ * @param userId User ID
+ * @returns Boolean indicating if the user has used their free daily pick
+ */
+export const hasUsedFreeDailyPick = async (userId: string): Promise<boolean> => {
+  try {
+    // Get user document
+    const userDocRef = doc(firestore, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      return false;
+    }
+    
+    const userData = userDoc.data();
+    
+    // Check if user has used their free daily pick today
+    if (userData.lastFreeDailyPick) {
+      const lastPickDate = userData.lastFreeDailyPick.toDate();
+      const today = new Date();
+      
+      // Check if the last pick was today
+      return (
+        lastPickDate.getDate() === today.getDate() &&
+        lastPickDate.getMonth() === today.getMonth() &&
+        lastPickDate.getFullYear() === today.getFullYear()
+      );
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking if user has used free daily pick:', error);
+    return false;
+  }
+};
+
+/**
+ * Mark free daily pick as used
+ * @param userId User ID
+ * @param gameId Game ID
+ * @returns Boolean indicating success
+ */
+export const markFreeDailyPickAsUsed = async (userId: string, gameId: string): Promise<boolean> => {
+  try {
+    // Get user document
+    const userDocRef = doc(firestore, 'users', userId);
+    
+    // Update user document
+    await updateDoc(userDocRef, {
+      lastFreeDailyPick: serverTimestamp(),
+      lastFreeDailyPickGameId: gameId
+    });
+    
+    // Track the event
+    await trackEvent('free_daily_pick_used', {
+      gameId
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error marking free daily pick as used:', error);
+    return false;
+  }
+};
+
 export default {
   hasPremiumAccess,
   getSubscriptionStatus,
@@ -1118,6 +1189,8 @@ export default {
   getPlanById,
   startFreeTrial,
   getUserSubscription,
+  hasUsedFreeDailyPick,
+  markFreeDailyPickAsUsed,
   getUserPaymentMethods,
   createPaymentMethod,
   createSubscription,

@@ -16,6 +16,16 @@ jest.mock('react-native/Libraries/Animated/Animated', () => {
         interpolate: jest.fn(),
       })),
     })),
+    View: jest.fn(({ children }) => children),
+    createAnimatedComponent: jest.fn(component => component),
+    event: jest.fn(() => jest.fn()),
+    decay: jest.fn(() => ({ start: jest.fn() })),
+    spring: jest.fn(() => ({ start: jest.fn() })),
+    add: jest.fn(),
+    subtract: jest.fn(),
+    divide: jest.fn(),
+    multiply: jest.fn(),
+    modulo: jest.fn(),
   };
 });
 
@@ -35,6 +45,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   multiSet: jest.fn(() => Promise.resolve()),
   multiRemove: jest.fn(() => Promise.resolve()),
   getAllKeys: jest.fn(() => Promise.resolve([])),
+  clear: jest.fn(() => Promise.resolve()),
+  flushGetRequests: jest.fn(),
+  useAsyncStorage: jest.fn(() => ({
+    getItem: jest.fn(() => Promise.resolve(null)),
+    setItem: jest.fn(() => Promise.resolve()),
+    removeItem: jest.fn(() => Promise.resolve()),
+  })),
 }));
 
 // Mock Dimensions
@@ -100,6 +117,88 @@ global.console = {
   info: jest.fn(),
   debug: jest.fn(),
 };
+
+// Mock expo-linear-gradient
+jest.mock('expo-linear-gradient', () => ({
+  LinearGradient: 'LinearGradient',
+}));
+
+// Mock expo-status-bar
+jest.mock('expo-status-bar', () => ({
+  StatusBar: 'StatusBar',
+  setStatusBarStyle: jest.fn(),
+  setStatusBarHidden: jest.fn(),
+  setStatusBarTranslucent: jest.fn(),
+  setStatusBarBackgroundColor: jest.fn(),
+}));
+
+// Mock @testing-library/react-native
+jest.mock('@testing-library/react-native', () => {
+  const actual = jest.requireActual('@testing-library/react-native');
+  return {
+    ...actual,
+    render: jest.fn(actual.render),
+    fireEvent: {
+      ...actual.fireEvent,
+      press: jest.fn(actual.fireEvent.press),
+      changeText: jest.fn(actual.fireEvent.changeText),
+    },
+    waitFor: jest.fn(actual.waitFor),
+  };
+});
+// Mock React and ReactDOM for JSX support in tests
+jest.mock('react', () => {
+  const originalReact = jest.requireActual('react');
+  return {
+    ...originalReact,
+    // Add any specific React mocks here
+  };
+});
+
+jest.mock('react-dom', () => {
+  const originalReactDOM = jest.requireActual('react-dom');
+  return {
+    ...originalReactDOM,
+    // Add any specific ReactDOM mocks here
+  };
+});
+
+// Mock navigation
+// Mock navigation
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    setOptions: jest.fn(),
+    addListener: jest.fn(() => jest.fn()),
+    removeListener: jest.fn(),
+  }),
+  useRoute: () => ({
+    params: {},
+  }),
+  useIsFocused: () => true,
+  NavigationContainer: ({ children }) => children,
+  DefaultTheme: {
+    colors: {
+      primary: '#000',
+      background: '#fff',
+      card: '#fff',
+      text: '#000',
+      border: '#000',
+      notification: '#f00',
+    },
+  },
+  DarkTheme: {
+    colors: {
+      primary: '#fff',
+      background: '#000',
+      card: '#000',
+      text: '#fff',
+      border: '#fff',
+      notification: '#f00',
+    },
+  },
+}));
 
 // Mock timers
 jest.useFakeTimers();

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Animated, Linking, StyleSheet, ActivityIn
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useTheme } from '../contexts/ThemeContext';
+import { useI18n } from '../contexts/I18nContext';
 import { Game, Bookmaker } from '../types/odds';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { auth } from '../config/firebase';
@@ -18,6 +19,11 @@ import { AVAILABLE_SPORTS } from './SportSelector';
 import { LazySportSelector, LazyOddsMovementAlerts, LazyParlayIntegration } from './LazyComponents';
 import PersonalizationSettings from './PersonalizationSettings';
 import { memoizeWithTTL, registerCleanup, unregisterCleanup, clearExpiredCache } from '../utils/memoryManagement';
+import ResponsiveBookmakerLogo from './ResponsiveBookmakerLogo';
+import ResponsiveTeamLogo from './ResponsiveTeamLogo';
+import ResponsiveGameInfo from './ResponsiveGameInfo';
+import ResponsiveBookmakerCard from './ResponsiveBookmakerCard';
+import { createOptimizedGlowStyle } from './OptimizedOddsAnimations';
 
 interface OddsComparisonComponentProps {
     isPremium?: boolean;
@@ -85,6 +91,7 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
     const [showFilters, setShowFilters] = useState<boolean>(false);
     
     const { colors, isDark } = useTheme();
+    const { t } = useI18n();
 
     // Fetch odds data with caching and error recovery
     const fetchOdds = useCallback(async () => {
@@ -567,18 +574,22 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
         let dkAnimation: any = null;
         let fdAnimation: any = null;
 
-        // Start animation for the better odds
-        const startGlow = (animation: Animated.Value) => {
+        // Create optimized glow animation
+        const startOptimizedGlow = (animation: Animated.Value, isBetter: boolean) => {
+            // Use optimized animation parameters based on device capabilities
+            const duration = isBetter ? 1000 : 800;
+            const intensity = isBetter ? 1 : 0.7;
+            
             const loopAnimation = Animated.loop(
                 Animated.sequence([
                     Animated.timing(animation, {
-                        toValue: 1,
-                        duration: 1000,
+                        toValue: intensity,
+                        duration: duration,
                         useNativeDriver: true
                     }),
                     Animated.timing(animation, {
                         toValue: 0,
-                        duration: 1000,
+                        duration: duration,
                         useNativeDriver: true
                     })
                 ])
@@ -589,9 +600,13 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
         };
 
         if (betterOdds === 'DK') {
-            dkAnimation = startGlow(glowAnimationDK);
+            dkAnimation = startOptimizedGlow(glowAnimationDK, true);
+            // Add subtle animation to non-best odds
+            fdAnimation = startOptimizedGlow(glowAnimationFD, false);
         } else {
-            fdAnimation = startGlow(glowAnimationFD);
+            fdAnimation = startOptimizedGlow(glowAnimationFD, true);
+            // Add subtle animation to non-best odds
+            dkAnimation = startOptimizedGlow(glowAnimationDK, false);
         }
 
         // Register cleanup function
@@ -609,36 +624,18 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
         };
     }, [draftKingsOdds, fanDuelOdds, glowAnimationDK, glowAnimationFD, componentId]);
 
-    // Define the glowing style for the better odds
-    const glowingStyle = (animation: Animated.Value) => ({
-        transform: [{ 
-            scale: animation.interpolate({ 
-                inputRange: [0, 1], 
-                outputRange: [1, 1.1] 
-            }) 
-        }],
-        shadowColor: '#FFD700',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: animation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.2, 0.8]
-        }),
-        shadowRadius: animation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [5, 10]
-        }),
-        elevation: animation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [2, 8]
-        })
-    });
+    // Define the glowing style for the better odds using optimized animations
+    const glowingStyle = (animation: Animated.Value) => {
+        // Use the optimized glow style from our animation utilities
+        return createOptimizedGlowStyle(animation, '#FFD700');
+    };
 
     // Render loading state
     const renderLoadingState = () => (
         <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.text }]}>
-                Loading odds comparison...
+                {t('oddsComparison.loading')}
             </Text>
         </View>
     );
@@ -667,16 +664,20 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
         <View style={styles.noDataContainer}>
             <Ionicons name="information-circle" size={48} color="#FFA500" />
             <Text style={[styles.noDataTitle, { color: colors.text }]}>
-                No Odds Available
+                {t('oddsComparison.errors.noData')}
             </Text>
             <Text style={[styles.noDataMessage, { color: colors.text }]}>
-                We couldn't find odds for DraftKings or FanDuel at this time.
+                {t('oddsComparison.errors.noData')}
             </Text>
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={[styles.retryButton, { backgroundColor: colors.primary }]}
                 onPress={fetchOdds}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={t('oddsComparison.accessibility.refreshButton')}
+                accessibilityHint={t('oddsComparison.accessibility.refreshButtonHint')}
             >
-                <Text style={styles.retryButtonText}>Refresh</Text>
+                <Text style={styles.retryButtonText}>{t('oddsComparison.refresh')}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -1263,38 +1264,30 @@ const OddsComparisonComponent = forwardRef<OddsComparisonComponentRef, OddsCompa
                             
                             // Render sportsbooks
                             return sportsbooks.map(sportsbook => (
-                                <Animated.View key={sportsbook.key} style={glowingStyle(sportsbook.animation)}>
-                                    <TouchableOpacity
-                                        onPress={() => handleSportsbookClick(sportsbook.key as 'draftkings' | 'fanduel')}
-                                        style={[
-                                            styles.bookmakerButton,
-                                            { backgroundColor: sportsbook.color }
-                                        ]}
-                                    >
-                                        <Text style={styles.bookmakerName}>{sportsbook.name}</Text>
-                                        <Text style={styles.oddsValue}>
-                                            {hasPurchasedOdds ?
-                                                (sportsbook.odds !== null ?
-                                                    (sportsbook.odds > 0 ? `+${sportsbook.odds}` : sportsbook.odds) :
-                                                    'N/A') :
-                                                'Unlock Odds'
-                                            }
-                                        </Text>
-                                    </TouchableOpacity>
-                                    
-                                    {/* Parlay Integration */}
-                                    {hasPurchasedOdds && selectedGame && (
-                                        <LazyParlayIntegration
-                                            sportKey={selectedSport}
-                                            gameId={selectedGame.id}
-                                            homeTeam={selectedGame.home_team}
-                                            awayTeam={selectedGame.away_team}
-                                            bookmaker={sportsbook.key}
-                                            odds={sportsbook.odds || 0}
-                                            selection={selectedGame.home_team}
-                                        />
-                                    )}
-                                </Animated.View>
+                                <ResponsiveBookmakerCard
+                                    key={sportsbook.key}
+                                    bookmaker={sportsbook.key}
+                                    displayName={sportsbook.name}
+                                    odds={sportsbook.odds}
+                                    color={sportsbook.color}
+                                    animation={sportsbook.animation}
+                                    onPress={() => handleSportsbookClick(sportsbook.key as 'draftkings' | 'fanduel')}
+                                    isPremium={hasPurchasedOdds}
+                                    showParlay={hasPurchasedOdds && selectedGame !== null}
+                                    parlayComponent={
+                                        hasPurchasedOdds && selectedGame && (
+                                            <LazyParlayIntegration
+                                                sportKey={selectedSport}
+                                                gameId={selectedGame.id}
+                                                homeTeam={selectedGame.home_team}
+                                                awayTeam={selectedGame.away_team}
+                                                bookmaker={sportsbook.key}
+                                                odds={sportsbook.odds || 0}
+                                                selection={selectedGame.home_team}
+                                            />
+                                        )
+                                    }
+                                />
                             ));
                         })()}
                     </View>

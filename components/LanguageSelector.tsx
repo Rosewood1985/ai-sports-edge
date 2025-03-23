@@ -4,6 +4,7 @@ import { useI18n } from '../contexts/I18nContext';
 import { ThemedText } from './ThemedText';
 import { Language } from '../contexts/I18nContext';
 import Colors from '../constants/Colors';
+import { Toast } from './Toast';
 
 interface LanguageSelectorProps {
   style?: any;
@@ -16,7 +17,7 @@ interface LanguageSelectorProps {
  * This component allows users to switch between supported languages.
  * It displays language options as buttons and highlights the currently selected language.
  */
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ 
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   style,
   compact = false
 }) => {
@@ -28,6 +29,23 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     { code: 'es', label: 'Spanish', nativeName: 'Español' },
   ];
   
+  // Handle language change with toast notification
+  const handleLanguageChange = (lang: Language) => {
+    // Only show toast if language is actually changing
+    if (lang !== language) {
+      setLanguage(lang);
+      
+      // Show toast notification
+      Toast.show({
+        message: lang === 'en'
+          ? 'Language changed to English'
+          : 'Idioma cambiado a Español',
+        duration: 2000,
+        position: 'bottom'
+      });
+    }
+  };
+  
   return (
     <View style={[styles.container, style]}>
       {languages.map((lang) => (
@@ -38,9 +56,10 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             compact && styles.compactButton,
             language === lang.code && styles.activeLanguage,
           ]}
-          onPress={() => setLanguage(lang.code)}
-          accessibilityLabel={`Switch to ${lang.label} language`}
+          onPress={() => handleLanguageChange(lang.code)}
+          accessibilityLabel={t(`languageSelector.switchTo${lang.label}`)}
           accessibilityRole="button"
+          accessibilityHint={t('languageSelector.hint')}
         >
           <ThemedText
             style={[

@@ -13,6 +13,9 @@ type RootStackParamList = {
   OddsComparison: undefined;
   LocalTeamOdds: undefined;
   NearbyVenues: undefined;
+  FraudDetectionDashboard: undefined;
+  EnhancedAnalyticsDashboard: undefined;
+  BettingSlipImport: undefined;
 };
 
 // Define the navigation prop type
@@ -42,6 +45,18 @@ const HomeScreen: React.FC = () => {
   
   const navigateToNearbyVenues = () => {
     navigation.navigate('NearbyVenues');
+  };
+  
+  const navigateToFraudDetection = () => {
+    navigation.navigate('FraudDetectionDashboard');
+  };
+  
+  const navigateToEnhancedAnalytics = () => {
+    navigation.navigate('EnhancedAnalyticsDashboard');
+  };
+  
+  const navigateToBettingSlipImport = () => {
+    navigation.navigate('BettingSlipImport');
   };
   
   return (
@@ -156,6 +171,69 @@ const HomeScreen: React.FC = () => {
               </View>
               <View style={styles.cardIconContainer}>
                 <Ionicons name="map" size={48} color={Colors.neon.orange} />
+              </View>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.parlayCard, { borderColor: Colors.neon.purple, borderWidth: 1 }]}
+            onPress={navigateToFraudDetection}
+          >
+            <View style={styles.cardContent}>
+              <View style={styles.cardTextContent}>
+                <Text style={[styles.cardTitle, { color: Colors.neon.purple }]}>Fraud Detection</Text>
+                <Text style={styles.cardDescription}>
+                  Monitor and manage suspicious betting activities with our advanced fraud detection system
+                </Text>
+                <View style={[styles.cardButton, { backgroundColor: Colors.neon.purple }]}>
+                  <Text style={styles.cardButtonText}>View Dashboard</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </View>
+              </View>
+              <View style={styles.cardIconContainer}>
+                <Ionicons name="shield-checkmark" size={48} color={Colors.neon.purple} />
+              </View>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.parlayCard, { borderColor: Colors.neon.blue, borderWidth: 1 }]}
+            onPress={navigateToEnhancedAnalytics}
+          >
+            <View style={styles.cardContent}>
+              <View style={styles.cardTextContent}>
+                <Text style={[styles.cardTitle, { color: Colors.neon.blue }]}>Enhanced Analytics</Text>
+                <Text style={styles.cardDescription}>
+                  Track app usage, popular bets, and user engagement metrics with our advanced analytics dashboard
+                </Text>
+                <View style={[styles.cardButton, { backgroundColor: Colors.neon.blue }]}>
+                  <Text style={styles.cardButtonText}>View Analytics</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </View>
+              </View>
+              <View style={styles.cardIconContainer}>
+                <Ionicons name="bar-chart" size={48} color={Colors.neon.blue} />
+              </View>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.parlayCard, { borderColor: Colors.neon.green, borderWidth: 1 }]}
+            onPress={navigateToBettingSlipImport}
+          >
+            <View style={styles.cardContent}>
+              <View style={styles.cardTextContent}>
+                <Text style={[styles.cardTitle, { color: Colors.neon.green }]}>Betting Slip Import</Text>
+                <Text style={styles.cardDescription}>
+                  Import your betting slips from popular sportsbooks and get AI-powered suggestions
+                </Text>
+                <View style={[styles.cardButton, { backgroundColor: Colors.neon.green }]}>
+                  <Text style={styles.cardButtonText}>Import Slips</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </View>
+              </View>
+              <View style={styles.cardIconContainer}>
+                <Ionicons name="document-text" size={48} color={Colors.neon.green} />
               </View>
             </View>
           </TouchableOpacity>

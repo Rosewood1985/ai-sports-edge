@@ -13,6 +13,7 @@ import OneSignalProvider from "./components/OneSignalProvider";
 import { LanguageRedirect } from "./components/LanguageRedirect";
 import LanguageSelector from "./components/LanguageSelector";
 import LanguageChangeListener from "./components/LanguageChangeListener";
+import { ToastContainer } from "./components/Toast";
 import NeonLoginScreen from "./screens/NeonLoginScreen";
 import NeonOddsScreen from "./screens/NeonOddsScreen";
 import RewardsScreen from "./screens/RewardsScreen";
@@ -87,6 +88,7 @@ const AppNavigator = () => {
       <LanguageRedirect currentLanguage={language} setLanguage={setLanguage} />
       <LanguageChangeListener />
       <StatusBar barStyle="light-content" backgroundColor={colors.background.primary} />
+      <ToastContainer />
       <NavigationContainer theme={NeonTheme}>
         <Stack.Navigator
           screenOptions={({ navigation }) => ({

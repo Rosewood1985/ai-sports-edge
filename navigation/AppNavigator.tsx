@@ -11,6 +11,10 @@ import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
 import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
 import BettingAnalyticsScreen from '../screens/BettingAnalyticsScreen';
 import OddsComparisonScreen from '../screens/OddsComparisonScreen';
+import FraudDetectionDashboardScreen from '../screens/FraudDetectionDashboardScreen';
+import FraudAlertDetailsScreen from '../screens/FraudAlertDetailsScreen';
+import EnhancedAnalyticsDashboardScreen from '../screens/EnhancedAnalyticsDashboardScreen';
+import BettingSlipImportScreen from '../screens/BettingSlipImportScreen';
 
 // Create navigators
 const Tab = createBottomTabNavigator();
@@ -88,6 +92,38 @@ const HomeStack = () => (
       component={OddsComparisonScreen}
       options={{
         title: 'Odds Comparison',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="FraudDetectionDashboard"
+      component={FraudDetectionDashboardScreen}
+      options={{
+        title: 'Fraud Detection',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="FraudAlertDetails"
+      component={FraudAlertDetailsScreen}
+      options={{
+        title: 'Alert Details',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="EnhancedAnalyticsDashboard"
+      component={EnhancedAnalyticsDashboardScreen}
+      options={{
+        title: 'Enhanced Analytics',
+        headerTintColor: '#007bff',
+      }}
+    />
+    <Stack.Screen
+      name="BettingSlipImport"
+      component={BettingSlipImportScreen}
+      options={{
+        title: 'Betting Slip Import',
         headerTintColor: '#007bff',
       }}
     />

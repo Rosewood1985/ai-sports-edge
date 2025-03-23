@@ -29,6 +29,7 @@ import EnhancedPlayerComparison from '../components/EnhancedPlayerComparison';
 import EmptyState from '../components/EmptyState';
 import ErrorMessage from '../components/ErrorMessage';
 import UpgradePrompt from '../components/UpgradePrompt';
+import ViewLimitIndicator from '../components/ViewLimitIndicator';
 
 // Import the RootStackParamList from the navigator file
 type RootStackParamList = {
@@ -351,6 +352,14 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           <ThemedText style={styles.subtitle}>Advanced Player Metrics</ThemedText>
         </View>
         
+        {/* Compact View Limit Indicator for locked state */}
+        {viewsRemaining !== null && viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && (
+          <ViewLimitIndicator
+            onUpgradePress={showUpgradeModal}
+            compact={true}
+          />
+        )}
+        
         <View style={styles.lockedContainer}>
           <Ionicons 
             name="analytics" 
@@ -458,6 +467,14 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
         <ThemedText style={styles.title}>{gameTitle}</ThemedText>
         <ThemedText style={styles.subtitle}>Advanced Player Metrics</ThemedText>
       </View>
+      
+      {/* View Limit Indicator for free users */}
+      {!hasReachedViewLimit && viewsRemaining !== null && viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && (
+        <ViewLimitIndicator
+          onUpgradePress={() => setShowUpgradePrompt(true)}
+          compact={false}
+        />
+      )}
       
       <View style={styles.actionsContainer}>
         {hasComparisonAccess ? (
