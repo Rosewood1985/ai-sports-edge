@@ -48,10 +48,16 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   // Time period options
   const periods = [
     { key: 'today', label: 'Today' },
-    { key: 'week', label: 'This Week' },
-    { key: 'month', label: 'This Month' },
-    { key: 'year', label: 'This Year' },
-    { key: 'all', label: 'All Time' },
+    { key: 'yesterday', label: 'Yesterday' },
+    { key: 'week', label: 'Last 7 Days' },
+    { key: 'month', label: 'Last 30 Days' },
+    { key: 'quarter', label: 'Last 90 Days' },
+    { key: 'this_month', label: 'This Month' },
+    { key: 'last_month', label: 'Last Month' },
+    { key: 'last_quarter', label: 'Last 3 Months' },
+    { key: 'half_year', label: 'Last 6 Months' },
+    { key: 'ytd', label: 'Year to Date' },
+    { key: 'year', label: 'Last Year' },
   ];
   
   // Show calendar modal

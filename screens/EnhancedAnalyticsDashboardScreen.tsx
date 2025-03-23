@@ -8,7 +8,9 @@ import {
   RefreshControl,
   Alert,
   Platform,
-  Dimensions
+  Dimensions,
+  Modal,
+  TextInput
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -27,6 +29,7 @@ import {
   AnalyticsDashboardData
 } from '../types/enhancedAnalytics';
 import { useTheme } from '../contexts/ThemeContext';
+import DateRangeSelector from '../components/DateRangeSelector';
 
 /**
  * Enhanced Analytics Dashboard Screen
@@ -41,6 +44,7 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [dashboardData, setDashboardData] = useState<AnalyticsDashboardData | null>(null);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState<AnalyticsTimePeriod>(AnalyticsTimePeriod.LAST_30_DAYS);
+  const [customDateRange, setCustomDateRange] = useState<{ startDate: number; endDate: number } | undefined>(undefined);
 
   // Screen dimensions
   const screenWidth = Dimensions.get('window').width;
@@ -62,7 +66,7 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
     try {
       setLoading(true);
       
-      const data = await enhancedAnalyticsService.getDashboardData(selectedTimePeriod);
+      const data = await enhancedAnalyticsService.getDashboardData(selectedTimePeriod, customDateRange);
       setDashboardData(data);
     } catch (error) {
       console.error('Error loading analytics dashboard data:', error);
@@ -71,7 +75,7 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [selectedTimePeriod]);
+  }, [selectedTimePeriod, customDateRange]);
 
   // Load data when screen is focused
   useFocusEffect(
@@ -123,55 +127,103 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
     }
   };
 
-  // Render time period selector
-  const renderTimePeriodSelector = () => {
-    const timePeriods = [
-      AnalyticsTimePeriod.TODAY,
-      AnalyticsTimePeriod.YESTERDAY,
-      AnalyticsTimePeriod.LAST_7_DAYS,
-      AnalyticsTimePeriod.LAST_30_DAYS,
-      AnalyticsTimePeriod.THIS_MONTH,
-      AnalyticsTimePeriod.LAST_MONTH
-    ];
+  // Handle time period selection
+  const handleTimePeriodSelect = (period: string) => {
+    // Map DateRangeSelector TimePeriod to AnalyticsTimePeriod
+    switch (period) {
+      case 'today':
+        setSelectedTimePeriod(AnalyticsTimePeriod.TODAY);
+        setCustomDateRange(undefined);
+        break;
+      case 'yesterday':
+        setSelectedTimePeriod(AnalyticsTimePeriod.YESTERDAY);
+        setCustomDateRange(undefined);
+        break;
+      case 'week':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_7_DAYS);
+        setCustomDateRange(undefined);
+        break;
+      case 'month':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_30_DAYS);
+        setCustomDateRange(undefined);
+        break;
+      case 'quarter':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_90_DAYS);
+        setCustomDateRange(undefined);
+        break;
+      case 'this_month':
+        setSelectedTimePeriod(AnalyticsTimePeriod.THIS_MONTH);
+        setCustomDateRange(undefined);
+        break;
+      case 'last_month':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_MONTH);
+        setCustomDateRange(undefined);
+        break;
+      case 'last_quarter':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_3_MONTHS);
+        setCustomDateRange(undefined);
+        break;
+      case 'half_year':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_6_MONTHS);
+        setCustomDateRange(undefined);
+        break;
+      case 'ytd':
+        setSelectedTimePeriod(AnalyticsTimePeriod.YEAR_TO_DATE);
+        setCustomDateRange(undefined);
+        break;
+      case 'year':
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_YEAR);
+        setCustomDateRange(undefined);
+        break;
+      case 'custom':
+        setSelectedTimePeriod(AnalyticsTimePeriod.CUSTOM);
+        // Custom date range will be set by handleCustomRangeSelect
+        break;
+      default:
+        setSelectedTimePeriod(AnalyticsTimePeriod.LAST_30_DAYS);
+        setCustomDateRange(undefined);
+    }
+  };
 
-    return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.timePeriodContainer}
-      >
-        {timePeriods.map((period) => (
-          <TouchableOpacity
-            key={period}
-            style={[
-              styles.timePeriodButton,
-              {
-                backgroundColor:
-                  selectedTimePeriod === period
-                    ? primaryColor
-                    : 'transparent',
-                borderColor: primaryColor
-              }
-            ]}
-            onPress={() => setSelectedTimePeriod(period)}
-          >
-            <ThemedText
-              style={[
-                styles.timePeriodButtonText,
-                {
-                  color:
-                    selectedTimePeriod === period
-                      ? '#FFFFFF'
-                      : primaryColor
-                }
-              ]}
-            >
-              {getTimePeriodLabel(period)}
-            </ThemedText>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    );
+  // Handle custom date range selection
+  const handleCustomRangeSelect = (start: Date, end: Date) => {
+    setSelectedTimePeriod(AnalyticsTimePeriod.CUSTOM);
+    setCustomDateRange({
+      startDate: start.getTime(),
+      endDate: end.getTime()
+    });
+  };
+
+  // Map AnalyticsTimePeriod to DateRangeSelector TimePeriod
+  const mapTimePeriod = (): string => {
+    switch (selectedTimePeriod) {
+      case AnalyticsTimePeriod.TODAY:
+        return 'today';
+      case AnalyticsTimePeriod.YESTERDAY:
+        return 'yesterday';
+      case AnalyticsTimePeriod.LAST_7_DAYS:
+        return 'week';
+      case AnalyticsTimePeriod.LAST_30_DAYS:
+        return 'month';
+      case AnalyticsTimePeriod.LAST_90_DAYS:
+        return 'quarter';
+      case AnalyticsTimePeriod.THIS_MONTH:
+        return 'this_month';
+      case AnalyticsTimePeriod.LAST_MONTH:
+        return 'last_month';
+      case AnalyticsTimePeriod.LAST_3_MONTHS:
+        return 'last_quarter';
+      case AnalyticsTimePeriod.LAST_6_MONTHS:
+        return 'half_year';
+      case AnalyticsTimePeriod.YEAR_TO_DATE:
+        return 'ytd';
+      case AnalyticsTimePeriod.LAST_YEAR:
+        return 'year';
+      case AnalyticsTimePeriod.CUSTOM:
+        return 'custom';
+      default:
+        return 'month';
+    }
   };
 
   // Render user engagement metrics
@@ -270,7 +322,15 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Time period selector */}
-        {renderTimePeriodSelector()}
+        <DateRangeSelector
+          selectedPeriod={mapTimePeriod()}
+          onSelectPeriod={handleTimePeriodSelect}
+          onSelectCustomRange={handleCustomRangeSelect}
+          customDateRange={customDateRange ? {
+            start: new Date(customDateRange.startDate),
+            end: new Date(customDateRange.endDate)
+          } : undefined}
+        />
         
         {/* User engagement metrics */}
         {renderUserEngagementMetrics()}
@@ -311,22 +371,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 32,
-  },
-  timePeriodContainer: {
-    flexDirection: 'row',
-    paddingVertical: 8,
-    marginBottom: 16,
-  },
-  timePeriodButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    borderWidth: 1,
-  },
-  timePeriodButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
   },
   metricsSection: {
     marginBottom: 24,
