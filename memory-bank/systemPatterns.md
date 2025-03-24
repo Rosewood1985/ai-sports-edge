@@ -477,6 +477,332 @@ This pattern provides:
 - Graceful degradation with appropriate fallbacks
 
 ## Production-Ready API Integration Patterns
+## Performance Optimization Patterns
+
+### Bundle Size Optimization with Webpack
+```javascript
+// webpack.prod.js
+module.exports = {
+  mode: 'production',
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].chunk.js',
+    publicPath: '/',
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+      new CssMinimizerPlugin(),
+    ],
+    splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: Infinity,
+      minSize: 20000,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `vendor.${packageName.replace('@', '')}`;
+          },
+        },
+      },
+    },
+    runtimeChunk: 'single',
+  },
+  plugins: [
+    new CompressionPlugin({
+      algorithm: 'gzip',
+      test: /\.(js|css|html|svg)$/,
+      threshold: 10240,
+      minRatio: 0.8,
+    }),
+  ],
+}
+```
+
+This pattern provides:
+- Reduced bundle size through code splitting and minification
+- Efficient caching with content hashing
+- Vendor chunk separation for better caching
+- Compression for faster downloads
+- Dead code elimination for smaller bundles
+
+### Code Splitting with React.lazy
+```javascript
+// src/utils/lazyLoad.js
+import React, { lazy, Suspense } from 'react';
+
+export const lazyLoad = (importFunc, fallback = null) => {
+  const LazyComponent = lazy(importFunc);
+  
+  return props => (
+    <Suspense fallback={fallback || <DefaultLoadingFallback />}>
+      <LazyComponent {...props} />
+    </Suspense>
+  );
+};
+
+// Usage in routes
+const routes = {
+  '/home': lazyLoad(() => import('../screens/HomeScreen')),
+  '/profile': lazyLoad(() => import('../screens/ProfileScreen')),
+};
+```
+
+This pattern provides:
+- On-demand loading of components
+- Reduced initial bundle size
+- Improved initial load time
+- Fallback UI during loading
+- Simplified lazy loading implementation
+
+### Server-Side Rendering for Web Components
+```javascript
+// server/ssr.js
+app.get('*', (req, res) => {
+  try {
+    // Create a stats file path
+    const statsFile = path.resolve(__dirname, '../build/client/loadable-stats.json');
+    
+    // Create a new ChunkExtractor instance
+    const extractor = new ChunkExtractor({ statsFile });
+    
+    // Create a context for the StaticRouter
+    const context = {};
+    
+    // Wrap the app in the ChunkExtractor and StaticRouter
+    const jsx = extractor.collectChunks(
+      React.createElement(
+        StaticRouter,
+        { location: req.url, context },
+        React.createElement(App)
+      )
+    );
+    
+    // Render the app to string
+    const html = ReactDOMServer.renderToString(jsx);
+    
+    // Get the script tags for the chunks
+    const scriptTags = extractor.getScriptTags();
+    
+    // Get the style tags for the chunks
+    const styleTags = extractor.getStyleTags();
+    
+    // Replace the root div with the rendered app
+    const renderedHtml = template
+      .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+      .replace('</head>', `${styleTags}</head>`)
+      .replace('</body>', `${scriptTags}</body>`);
+    
+    // Send the rendered HTML
+    return res.send(renderedHtml);
+  } catch (error) {
+    console.error('SSR Error:', error);
+    return res.send(template);
+  }
+});
+```
+
+This pattern provides:
+- Improved initial load performance
+- Better SEO with complete HTML
+- Progressive enhancement
+- Code splitting support
+- Graceful fallback to client-side rendering
+
+### API Response Compression
+```javascript
+// server/api.js
+// Enable gzip compression for all responses
+app.use(compression({
+  // Compression filter function
+  filter: (req, res) => {
+    // Don't compress responses with this request header
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    
+    // Use compression filter function from the middleware
+    return compression.filter(req, res);
+  },
+  // Compression level (0-9, where 9 is maximum compression)
+  level: 6,
+  // Minimum size threshold in bytes. Only responses larger than this will be compressed
+  threshold: 1024, // 1KB
+}));
+```
+
+This pattern provides:
+- Reduced bandwidth usage
+- Faster response times
+- Configurable compression level
+- Threshold control for small responses
+- Client capability detection
+
+## User Support Patterns
+
+### Help Center Service
+```typescript
+// services/helpCenterService.ts
+export const getHelpArticlesByCategory = (category: HelpCategory): HelpArticle[] => {
+  return helpArticles.filter(article => article.category === category);
+};
+
+export const searchHelpArticles = (query: string): HelpArticle[] => {
+  const normalizedQuery = query.toLowerCase().trim();
+  
+  return helpArticles.filter(article => {
+    // Search in title
+    if (article.title.toLowerCase().includes(normalizedQuery)) {
+      return true;
+    }
+    
+    // Search in content
+    if (article.content.toLowerCase().includes(normalizedQuery)) {
+      return true;
+    }
+    
+    // Search in tags
+    if (article.tags.some(tag => tag.toLowerCase().includes(normalizedQuery))) {
+      return true;
+    }
+    
+    return false;
+  });
+};
+```
+
+This pattern provides:
+- Categorized help content
+- Efficient search functionality
+- Tag-based organization
+- Related article suggestions
+- Contact information management
+
+### Feedback Collection
+```typescript
+// services/feedbackService.ts
+export const submitFeedback = async (feedback: Feedback): Promise<Feedback> => {
+  try {
+    // Add device information
+    const deviceInfo = {
+      platform: Platform.OS,
+      version: Platform.Version.toString(),
+      model: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
+      appVersion: '1.0.0',
+    };
+    
+    // Add timestamps
+    const now = new Date().toISOString();
+    
+    // Prepare feedback for submission
+    const feedbackToSubmit: Feedback = {
+      ...feedback,
+      deviceInfo,
+      status: FeedbackStatus.SUBMITTED,
+      createdAt: now,
+      updatedAt: now,
+    };
+    
+    // Log the feedback submission event
+    logEvent(AnalyticsEvent.CUSTOM, {
+      event_name: 'feedback_submitted',
+      feedback_type: feedback.type,
+      feedback_priority: feedback.priority,
+    });
+    
+    // Generate a mock ID
+    const mockId = `feedback-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    
+    // Return the submitted feedback with the mock ID
+    return {
+      ...feedbackToSubmit,
+      id: mockId,
+    };
+  } catch (err) {
+    logError(LogCategory.APP, 'Failed to submit feedback', err as Error);
+    captureException(err as Error);
+    throw err;
+  }
+};
+```
+
+This pattern provides:
+- Structured feedback collection
+- Device information capture
+- Status tracking
+- Analytics integration
+- Error handling with logging
+
+### Bug Reporting
+```typescript
+// services/bugReportingService.ts
+export const reportBug = async (
+  userId: string,
+  title: string,
+  description: string,
+  severity: BugSeverity,
+  category: BugCategory,
+  options: BugReportOptions = defaultBugReportOptions
+): Promise<DetailedBugReport> => {
+  try {
+    // Map severity to priority
+    const priorityMap: Record<BugSeverity, FeedbackPriority> = {
+      [BugSeverity.LOW]: FeedbackPriority.LOW,
+      [BugSeverity.MEDIUM]: FeedbackPriority.MEDIUM,
+      [BugSeverity.HIGH]: FeedbackPriority.HIGH,
+      [BugSeverity.CRITICAL]: FeedbackPriority.CRITICAL,
+    };
+    
+    // Collect device information
+    const deviceInfo = await collectDeviceInfo(options);
+    
+    // Collect logs
+    const logs = await collectLogs(options);
+    
+    // Collect screenshots
+    const screenshots = options.includeScreenshot ? await captureScreenshot() : [];
+    
+    // Prepare bug report
+    const bugReport: DetailedBugReport = {
+      userId,
+      type: FeedbackType.BUG_REPORT,
+      title,
+      description,
+      priority: priorityMap[severity],
+      severity,
+      category,
+      // ... additional fields
+    };
+    
+    // Submit bug report
+    const submittedBugReport = await submitBugReport(bugReport);
+    
+    return submittedBugReport as DetailedBugReport;
+  } catch (err) {
+    logError(LogCategory.APP, 'Failed to report bug', err as Error);
+    captureException(err as Error);
+    throw err;
+  }
+};
+```
+
+This pattern provides:
+- Comprehensive bug reporting
+- Automatic data collection
+- Severity and category classification
+- Screenshot capture
+- Integration with error tracking
 
 ### Real API Integration with Error Handling
 ```typescript
