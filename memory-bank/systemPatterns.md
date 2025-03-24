@@ -649,6 +649,193 @@ This pattern provides:
 - Threshold control for small responses
 - Client capability detection
 
+## Security Patterns
+
+### DDoS Protection
+```javascript
+// server/ddosProtection.js
+const configureDdosProtection = (options = {}) => {
+  const {
+    rateWindow = 15 * 60 * 1000, // 15 minutes
+    rateMax = 100, // 100 requests per window
+    speedWindow = 15 * 60 * 1000, // 15 minutes
+    speedDelay = 500, // 500ms delay after threshold
+    speedDelayAfter = 50, // Start delaying after 50 requests
+    trustProxy = true, // Trust X-Forwarded-For header
+    blacklist = [], // IP blacklist
+    whitelist = [], // IP whitelist
+  } = options;
+
+  // Array to hold middleware
+  const middleware = [];
+
+  // Rate limiting middleware
+  const limiter = rateLimit({
+    windowMs: rateWindow,
+    max: rateMax,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+      securityLogger.warn('Rate Limit Exceeded', {
+        ip: req.ip,
+        path: req.path,
+        method: req.method,
+      });
+      
+      res.status(429).json({
+        error: 'Too Many Requests',
+        message: 'You have exceeded the rate limit. Please try again later.',
+      });
+    },
+  });
+  
+  middleware.push(limiter);
+
+  return middleware;
+};
+```
+
+This pattern provides:
+- Protection against DDoS attacks
+- Rate limiting to prevent abuse
+- Configurable thresholds and windows
+- Detailed logging of rate limit events
+- Custom response handling
+
+### Security Headers Configuration
+```javascript
+// server/securityHeaders.js
+const configureSecurityHeaders = (options = {}) => {
+  const {
+    // Content Security Policy options
+    enableCSP = true,
+    reportOnly = false,
+    defaultSrc = ["'self'"],
+    scriptSrc = ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+    // Other options...
+  } = options;
+
+  // Configure Helmet options
+  const helmetOptions = {};
+
+  // Content Security Policy
+  if (enableCSP) {
+    helmetOptions.contentSecurityPolicy = {
+      useDefaults: false,
+      directives: {
+        defaultSrc,
+        scriptSrc,
+        // Other directives...
+      },
+      reportOnly,
+    };
+  } else {
+    helmetOptions.contentSecurityPolicy = false;
+  }
+
+  // Create and return the configured middleware
+  const middleware = helmet(helmetOptions);
+
+  return middleware;
+};
+```
+
+This pattern provides:
+- Comprehensive security headers
+- Configurable Content Security Policy
+- Protection against XSS, clickjacking, and other attacks
+- Flexible configuration options
+- Integration with Helmet middleware
+
+### Secure Audit Logging
+```javascript
+// server/auditLogging.js
+// Create a secure hash for log integrity
+const createLogHash = (logEntry) => {
+  return crypto.createHash('sha256').update(JSON.stringify(logEntry)).digest('hex');
+};
+
+// Create a Winston logger for security events
+const createSecurityLogger = (options = {}) => {
+  // Create the logger
+  const logger = winston.createLogger({
+    level: logLevel,
+    format: logFormat,
+    defaultMeta: { service: 'security-audit' },
+    transports,
+  });
+
+  // Add tamper protection
+  if (enableTamperProtection) {
+    // Override the log method to add a hash
+    const originalLog = logger.log.bind(logger);
+    logger.log = function (level, message, meta) {
+      const logEntry = {
+        level,
+        message,
+        ...meta,
+        timestamp: new Date().toISOString(),
+      };
+      
+      // Add a hash for tamper detection
+      logEntry.hash = createLogHash(logEntry);
+      
+      return originalLog(level, message, meta);
+    };
+  }
+
+  return logger;
+};
+```
+
+This pattern provides:
+- Tamper-resistant logging
+- Cryptographic verification of log integrity
+- Structured logging with metadata
+- Multiple transport options
+- Configurable log levels and formats
+
+### Vulnerability Scanning
+```javascript
+// scripts/vulnerability-scan.js
+const runNpmAudit = async () => {
+  console.log(chalk.blue('Running npm audit...'));
+  
+  try {
+    const output = runCommand('npm audit --json', true);
+    const auditResults = JSON.parse(output);
+    
+    // Extract vulnerability counts
+    const vulns = {
+      critical: auditResults.metadata?.vulnerabilities?.critical || 0,
+      high: auditResults.metadata?.vulnerabilities?.high || 0,
+      medium: auditResults.metadata?.vulnerabilities?.moderate || 0,
+      low: auditResults.metadata?.vulnerabilities?.low || 0,
+      info: 0,
+    };
+    
+    // Update summary
+    updateSummary(vulns);
+    
+    // Display results
+    if (vulns.critical > 0 || vulns.high > 0) {
+      console.log(chalk.red(`npm audit found ${vulns.critical} critical and ${vulns.high} high severity vulnerabilities`));
+    } else {
+      console.log(chalk.green('npm audit completed with no high or critical vulnerabilities'));
+    }
+  } catch (error) {
+    console.log(chalk.red(`Error running npm audit: ${error.message}`));
+  }
+};
+```
+
+This pattern provides:
+- Comprehensive vulnerability scanning
+- Multiple scanning techniques
+- Detailed reporting of findings
+- Severity-based categorization
+- Integration with CI/CD pipelines
+
 ## User Support Patterns
 
 ### Help Center Service
