@@ -1,5 +1,34 @@
 # Product Context
 
+## Security Features
+
+### Web Application Security (COMPLETED)
+- Content Security Policy (CSP) implementation
+  - Restricts the sources from which various resource types can be loaded
+  - Mitigates XSS attacks by controlling which scripts can execute
+  - Prevents data exfiltration by limiting connection destinations
+- Subresource Integrity (SRI) for external resources
+  - Ensures the integrity of third-party resources
+  - Prevents attackers from injecting malicious content via compromised CDNs
+- CSRF protection for API requests
+  - Prevents Cross-Site Request Forgery attacks
+  - Ensures that only requests from the legitimate application are processed
+- Enhanced XSS protection
+  - Comprehensive sanitization of user inputs and API responses
+  - Multiple layers of protection against various XSS attack vectors
+- Environment variable security
+  - Secure management of sensitive configuration
+  - Prevents exposure of API keys and other sensitive information
+- HTTP Strict Transport Security (HSTS)
+  - Forces all connections to use HTTPS
+  - Protects against protocol downgrade attacks
+- Additional security headers
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY/SAMEORIGIN
+  - X-XSS-Protection: 1; mode=block
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - Permissions-Policy: restricts browser features
+
 ## Subscription Features
 
 ### Gift Subscription (COMPLETED)
@@ -237,6 +266,33 @@
 - Proper semantic roles
 - Logical focus order
 
+## Payment Processing (COMPLETED)
+
+### Production API Keys
+- Script for switching from test to production payment API keys
+- Backup and restore functionality for configuration files
+- Verification steps to ensure proper configuration
+- Support for multiple payment providers (Stripe, PayPal)
+- Comprehensive documentation for the process
+
+### Payment Webhooks
+- Script for configuring production webhooks for payment events
+- Support for both Stripe and PayPal webhooks
+- Secure storage of webhook secrets
+- Event-specific configuration for different payment events
+- Manual and automated configuration options
+
+### Refund Process
+- Comprehensive refund policies and procedures
+- Technical implementation for processing refunds
+- Support for different refund scenarios:
+  - Full refunds
+  - Partial refunds
+  - Subscription refunds
+  - Batch refunds
+- Error handling and validation
+- Testing framework for refund procedures
+
 ## Deployment Preparation (IN PROGRESS)
 
 ### Mock Data Removal (COMPLETED)
@@ -321,6 +377,8 @@
 - Personalized onboarding based on user preferences
 - Progress tracking with visual indicators
 - Skip and navigation options for flexibility
+- Enhanced accessibility with ARIA attributes and keyboard navigation
+- Unified analytics tracking across platforms
 
 ### Feature Tour
 - Interactive tour of key app features
@@ -328,6 +386,7 @@
 - Visual demonstrations of feature usage
 - Contextual hints and tips for better understanding
 - Analytics tracking for tour completion and engagement
+- Comprehensive error handling with fallbacks
 
 ### Technical Implementation
 - Secure storage of onboarding state with validation
@@ -335,6 +394,8 @@
 - Accessibility features for all users
 - Performance optimizations with caching
 - Cross-platform compatibility for web and mobile
+- Development mode bypass configuration for testing
+- Unified analytics service for consistent tracking
 
 ## UI/UX Polishing (COMPLETED)
 

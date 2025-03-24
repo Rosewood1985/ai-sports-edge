@@ -1,2497 +1,479 @@
 # System Patterns
 
-## Testing Patterns
-
-### Mocking External Services
-```typescript
-// Mock Firebase auth
-jest.mock('../../config/firebase', () => ({
-  auth: {
-    currentUser: {
-      uid: 'test-user-id'
-    }
-  },
-  firestore: jest.fn()
-}));
-
-// Mock firebaseSubscriptionService
-jest.mock('../../services/firebaseSubscriptionService', () => ({
-  subscribeToPlan: jest.fn(),
-  cancelSubscription: jest.fn(),
-  getUserSubscription: jest.fn()
-}));
-```
-
-This pattern allows testing payment flows without making real API calls, providing:
-- Isolation from external dependencies
-- Consistent test behavior
-- Fast test execution
-- No side effects in production systems
-
-### Test Organization by Functional Domain
-```
-__tests__/stripe/
-  ├── config.test.ts           # Configuration tests
-  ├── subscription.test.ts     # Individual subscription tests
-  ├── group-subscription.test.ts # Group subscription tests
-  ├── one-time-purchases.test.ts # One-time purchase tests
-  ├── webhooks.test.ts         # Webhook tests
-  ├── security.test.ts         # Security tests
-  ├── run-stripe-tests.sh      # Test runner script
-  └── README.md                # Documentation
-```
-
-This organization provides:
-- Clear separation of concerns
-- Easy navigation of test files
-- Focused test files for specific functionality
-- Comprehensive coverage of all aspects of the system
-
-### Security-Focused Testing
-```typescript
-describe('API Key Protection', () => {
-  test('should only expose publishable key to client', () => {
-    // Verify that the publishable key starts with 'pk_'
-    expect(STRIPE_PUBLISHABLE_KEY).toBeDefined();
-    expect(STRIPE_PUBLISHABLE_KEY.startsWith('pk_')).toBe(true);
-    
-    // Verify that no secret key is exposed
-    // @ts-ignore - Intentionally checking for undefined variable
-    expect(typeof STRIPE_SECRET_KEY).toBe('undefined');
-  });
-});
-```
-
-This pattern ensures:
-- API keys are properly protected
-- Only publishable keys are exposed to clients
-- Secret keys are kept secure
-- Security vulnerabilities are caught early
-
-### Test Runner Script
-```bash
-#!/bin/bash
-
-# Run the tests
-echo -e "\n${YELLOW}1. Testing Stripe Configuration${NC}"
-npx jest --testMatch="**/__tests__/stripe/config.test.ts" --verbose
-
-# ... more test commands ...
-
-# Run all tests together and generate a coverage report
-echo -e "\n${YELLOW}Running all tests with coverage report${NC}"
-npx jest --testMatch="**/__tests__/stripe/*.test.ts" --coverage --coverageDirectory=test-results/stripe/coverage
-```
-
-This pattern provides:
-- Easy execution of all tests
-- Consistent test execution environment
-- Coverage reporting for quality assurance
-- Clear output for test results
-## Machine Learning Implementation Patterns
-
-### TensorFlow.js Model Integration
-```typescript
-/**
- * Load TensorFlow.js model for a specific sport
- * @param sport - Sport name
- * @returns TensorFlow.js model
- */
-export const loadModel = async (sport: string): Promise<tf.LayersModel | null> => {
-  try {
-    // Check if model is already loaded
-    if (modelCache[sport]) {
-      return modelCache[sport];
-    }
-    
-    // Determine model URL based on sport
-    const modelUrl = `${MODEL_BASE_URL}/${sport.toLowerCase()}/model.json`;
-    
-    // Load model from URL
-    const model = await loadLayersModel(modelUrl);
-    
-    // Cache the model
-    modelCache[sport] = model;
-    
-    return model;
-  } catch (error) {
-    console.error(`Error loading model for ${sport}:`, error);
-    
-    // Fall back to default model
-    try {
-      const defaultModel = await loadLayersModel(`${MODEL_BASE_URL}/default/model.json`);
-      modelCache[sport] = defaultModel;
-      return defaultModel;
-    } catch (fallbackError) {
-      console.error('Error loading default model:', fallbackError);
-      return null;
-    }
-  }
-};
-```
-
-This pattern provides:
-- Efficient model loading with caching
-- Sport-specific model selection
-- Fallback to default model when specific models are unavailable
-- Proper error handling with graceful degradation
-- Memory efficiency through shared model instances
-
-### Feature Generation for Machine Learning
-```typescript
-/**
- * Generate features for prediction
- * @param game - Game to predict
- * @param sport - Sport type
- * @returns Feature tensor
- */
-const generateFeatures = (game: Game, sport: string): tf.Tensor => {
-  // Base features array
-  const features: number[] = [];
-  
-  // Extract common features
-  features.push(
-    game.home_team_win_percentage || 0.5,
-    game.away_team_win_percentage || 0.5,
-    game.home_team_recent_form || 0.5,
-    game.away_team_recent_form || 0.5
-  );
-  
-  // Add sport-specific features
-  switch (sport) {
-    case 'basketball':
-      features.push(
-        game.home_team_offensive_rating || 100,
-        game.away_team_offensive_rating || 100,
-        game.home_team_defensive_rating || 100,
-        game.away_team_defensive_rating || 100,
-        game.home_team_pace || 100,
-        game.away_team_pace || 100
-      );
-      break;
-    case 'baseball':
-      features.push(
-        game.home_team_batting_average || 0.250,
-        game.away_team_batting_average || 0.250,
-        game.home_team_era || 4.0,
-        game.away_team_era || 4.0,
-        game.home_pitcher_era || 4.0,
-        game.away_pitcher_era || 4.0
-      );
-      break;
-    // Add more sports as needed
-    default:
-      // Add generic features for unsupported sports
-      features.push(0.5, 0.5, 0.5, 0.5);
-  }
-  
-  // Normalize features to [0, 1] range
-  const normalizedFeatures = features.map(f => Math.max(0, Math.min(1, f / 100)));
-  
-  return tf.tensor2d([normalizedFeatures]);
-};
-```
-
-This pattern provides:
-- Sport-specific feature extraction
-- Safe defaults for missing data
-- Feature normalization for model compatibility
-- Extensibility for additional sports
-- Type safety and error prevention
-
-### Feedback Loop for Model Improvement
-```typescript
-/**
- * Record prediction feedback
- * @param gameId - Game ID
- * @param actualWinner - Actual winner
- * @returns Success status
- */
-export const recordFeedback = async (
-  gameId: string,
-  actualWinner: string
-): Promise<boolean> => {
-  try {
-    // Get the prediction from cache or database
-    const prediction = await getPrediction(gameId);
-    if (!prediction) {
-      console.error('No prediction found for game:', gameId);
-      return false;
-    }
-    
-    const wasCorrect = prediction.predicted_winner === actualWinner;
-    
-    // Create feedback entry
-    const feedback = {
-      gameId,
-      predictedWinner: prediction.predicted_winner,
-      actualWinner,
-      wasCorrect,
-      confidenceScore: prediction.confidence_score,
-      timestamp: Date.now()
-    };
-    
-    // Store feedback in database
-    await firestore.collection('predictionFeedback').add(feedback);
-    
-    // Update model accuracy metrics
-    await updateModelAccuracy(prediction.sport, wasCorrect);
-    
-    // Check if retraining is needed
-    const feedbackCount = await getFeedbackCount(prediction.sport);
-    if (feedbackCount >= RETRAINING_THRESHOLD) {
-      // Trigger model retraining
-      await triggerModelRetraining(prediction.sport);
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error recording prediction feedback:', error);
-    return false;
-  }
-};
-```
-
-This pattern provides:
-- Comprehensive feedback collection
-- Accuracy tracking for model performance
-- Automatic retraining triggers based on feedback volume
-- Error handling and logging
-- Database integration for persistent storage
-
-## Multilingual Onboarding Implementation Patterns
-
-### Secure LocalStorage with Validation
-```typescript
-/**
- * Check if onboarding has been completed
- * @returns {Promise<boolean>} True if onboarding has been completed
- */
-export const isOnboardingCompleted = async () => {
-  try {
-    // Use a try-catch block to handle potential localStorage access issues
-    // This can happen in private browsing mode or when storage is full
-    const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
-    
-    // Validate the value to prevent unexpected behavior
-    if (completed !== 'true' && completed !== null) {
-      console.warn('Invalid onboarding status value:', completed);
-      // Reset to a valid state
-      localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
-      return false;
-    }
-    
-    return completed === 'true';
-  } catch (error) {
-    console.error('Error checking onboarding status:', error);
-    // Graceful degradation - if we can't access localStorage, assume onboarding is not completed
-    return false;
-  }
-};
-```
-
-This pattern provides:
-- Secure storage of onboarding state
-- Validation of stored values to prevent unexpected behavior
-- Graceful degradation when localStorage is unavailable
-- Clear error handling with appropriate fallbacks
-- Protection against corrupted or invalid data
-
-### Accessible Component Implementation
-```typescript
-return (
-  <div
-    className="onboarding-page"
-    style={{ backgroundColor: currentStepData.backgroundColor }}
-    role="main"
-    aria-label={t('onboarding:pageTitle')}
-  >
-    <div
-      className={`onboarding-content ${animating ? 'fade-out' : 'fade-in'}`}
-      aria-live="polite"
-    >
-      <div className="onboarding-image">
-        <img
-          src={currentStepData.image}
-          alt={currentStepData.title}
-          aria-hidden="true" // Decorative image, main content is in the text
-        />
-      </div>
-      
-      <div className="onboarding-text">
-        <h1 id={`onboarding-step-${currentStep + 1}`} tabIndex="-1">{currentStepData.title}</h1>
-        <p>{currentStepData.description}</p>
-      </div>
-      
-      <div className="onboarding-progress" role="navigation" aria-label={t('onboarding:progressNav')}>
-        {steps.map((step, index) => (
-          <div
-            key={step.id}
-            className={`progress-dot ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
-            role="button"
-            tabIndex={index === currentStep ? 0 : -1}
-            aria-label={`${t('onboarding:step')} ${index + 1} ${index === currentStep ? t('onboarding:current') : index < currentStep ? t('onboarding:completed') : ''}`}
-            aria-current={index === currentStep ? "step" : undefined}
-            onClick={() => setCurrentStep(index)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                setCurrentStep(index);
-                e.preventDefault();
-              }
-            }}
-          />
-        ))}
-      </div>
-      
-      <div className="onboarding-buttons">
-        {currentStep < steps.length - 1 ? (
-          <>
-            <button
-              className="skip-button"
-              onClick={handleSkip}
-              aria-label={t('common:skip')}
-            >
-              {t('common:skip')}
-            </button>
-            <button
-              className="next-button"
-              onClick={handleNext}
-              aria-label={t('common:next')}
-            >
-              {t('common:next')}
-            </button>
-          </>
-        ) : (
-          <button
-            className="get-started-button"
-            onClick={handleComplete}
-            aria-label={t('common:getStarted')}
-          >
-            {t('common:getStarted')}
-          </button>
-        )}
-      </div>
-    </div>
-  </div>
-);
-```
-
-This pattern provides:
-- Proper ARIA roles and attributes for screen readers
-- Keyboard navigation support for interactive elements
-- Descriptive labels for all UI elements
-- Proper focus management for accessibility
-- Semantic HTML structure for better navigation
-
-### Robust Error Handling with Fallbacks
-```typescript
-/**
- * Mark a feature tour step as completed
- * @param {string} stepId - ID of the step to mark as completed
- * @returns {Promise<boolean>} True if successful, false otherwise
- */
-export const markFeatureTourStepCompleted = async (stepId) => {
-  try {
-    // Validate input to prevent security issues
-    if (!stepId || typeof stepId !== 'string') {
-      console.error('Invalid step ID:', stepId);
-      return false;
-    }
-    
-    // Sanitize the stepId to prevent XSS or injection attacks
-    const sanitizedStepId = stepId.replace(/[^\w-]/g, '');
-    if (sanitizedStepId !== stepId) {
-      console.error('Step ID contained potentially unsafe characters');
-      return false;
-    }
-    
-    // Check if localStorage is available
-    if (typeof localStorage === 'undefined') {
-      console.error('localStorage is not available');
-      return false;
-    }
-    
-    const steps = await getFeatureTourSteps();
-    
-    // Verify the step exists before updating
-    const stepExists = steps.some(step => step.id === stepId);
-    if (!stepExists) {
-      console.error('Step ID not found:', stepId);
-      return false;
-    }
-    
-    // Create a new array to avoid mutation
-    const updatedSteps = steps.map(step => {
-      if (step.id === stepId) {
-        return { ...step, completed: true };
-      }
-      return step;
-    });
-    
-    // Store with proper error handling
-    try {
-      localStorage.setItem(FEATURE_TOUR_STEPS_KEY, JSON.stringify(updatedSteps));
-      
-      // Verify the data was stored correctly
-      const storedData = localStorage.getItem(FEATURE_TOUR_STEPS_KEY);
-      const parsedData = JSON.parse(storedData);
-      const stepUpdated = parsedData.some(step => step.id === stepId && step.completed === true);
-      
-      if (!stepUpdated) {
-        console.error('Failed to verify step was marked as completed');
-        return false;
-      }
-    } catch (storageError) {
-      console.error('Error storing updated steps:', storageError);
-      return false;
-    }
-    
-    // Track step completion with analytics in a separate try/catch
-    try {
-      if (window.gtag) {
-        window.gtag('event', 'feature_tour_step_completed', {
-          'event_category': 'engagement',
-          'event_label': `step_${stepId}`,
-          'step_id': stepId,
-          'timestamp': new Date().toISOString(),
-        });
-      }
-    } catch (analyticsError) {
-      // Don't let analytics errors affect the main functionality
-      console.warn('Analytics error:', analyticsError);
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error marking feature tour step as completed:', error);
-    return false;
-  }
-};
-```
-
-This pattern provides:
-- Comprehensive input validation and sanitization
-- Isolation of analytics errors from core functionality
-- Verification of data integrity after storage operations
-- Detailed error logging with context
-- Graceful degradation with appropriate fallbacks
-
-## Production-Ready API Integration Patterns
-## Performance Optimization Patterns
-
-### Bundle Size Optimization with Webpack
-```javascript
-// webpack.prod.js
-module.exports = {
-  mode: 'production',
-  entry: './src/index.js',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[contenthash].js',
-    chunkFilename: '[name].[contenthash].chunk.js',
-    publicPath: '/',
-  },
-  optimization: {
-    minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          compress: {
-            drop_console: true,
-          },
-        },
-      }),
-      new CssMinimizerPlugin(),
-    ],
-    splitChunks: {
-      chunks: 'all',
-      maxInitialRequests: Infinity,
-      minSize: 20000,
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-            return `vendor.${packageName.replace('@', '')}`;
-          },
-        },
-      },
-    },
-    runtimeChunk: 'single',
-  },
-  plugins: [
-    new CompressionPlugin({
-      algorithm: 'gzip',
-      test: /\.(js|css|html|svg)$/,
-      threshold: 10240,
-      minRatio: 0.8,
-    }),
-  ],
-}
-```
-
-This pattern provides:
-- Reduced bundle size through code splitting and minification
-- Efficient caching with content hashing
-- Vendor chunk separation for better caching
-- Compression for faster downloads
-- Dead code elimination for smaller bundles
-
-### Code Splitting with React.lazy
-```javascript
-// src/utils/lazyLoad.js
-import React, { lazy, Suspense } from 'react';
-
-export const lazyLoad = (importFunc, fallback = null) => {
-  const LazyComponent = lazy(importFunc);
-  
-  return props => (
-    <Suspense fallback={fallback || <DefaultLoadingFallback />}>
-      <LazyComponent {...props} />
-    </Suspense>
-  );
-};
-
-// Usage in routes
-const routes = {
-  '/home': lazyLoad(() => import('../screens/HomeScreen')),
-  '/profile': lazyLoad(() => import('../screens/ProfileScreen')),
-};
-```
-
-This pattern provides:
-- On-demand loading of components
-- Reduced initial bundle size
-- Improved initial load time
-- Fallback UI during loading
-- Simplified lazy loading implementation
-
-### Server-Side Rendering for Web Components
-```javascript
-// server/ssr.js
-app.get('*', (req, res) => {
-  try {
-    // Create a stats file path
-    const statsFile = path.resolve(__dirname, '../build/client/loadable-stats.json');
-    
-    // Create a new ChunkExtractor instance
-    const extractor = new ChunkExtractor({ statsFile });
-    
-    // Create a context for the StaticRouter
-    const context = {};
-    
-    // Wrap the app in the ChunkExtractor and StaticRouter
-    const jsx = extractor.collectChunks(
-      React.createElement(
-        StaticRouter,
-        { location: req.url, context },
-        React.createElement(App)
-      )
-    );
-    
-    // Render the app to string
-    const html = ReactDOMServer.renderToString(jsx);
-    
-    // Get the script tags for the chunks
-    const scriptTags = extractor.getScriptTags();
-    
-    // Get the style tags for the chunks
-    const styleTags = extractor.getStyleTags();
-    
-    // Replace the root div with the rendered app
-    const renderedHtml = template
-      .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
-      .replace('</head>', `${styleTags}</head>`)
-      .replace('</body>', `${scriptTags}</body>`);
-    
-    // Send the rendered HTML
-    return res.send(renderedHtml);
-  } catch (error) {
-    console.error('SSR Error:', error);
-    return res.send(template);
-  }
-});
-```
-
-This pattern provides:
-- Improved initial load performance
-- Better SEO with complete HTML
-- Progressive enhancement
-- Code splitting support
-- Graceful fallback to client-side rendering
-
-### API Response Compression
-```javascript
-// server/api.js
-// Enable gzip compression for all responses
-app.use(compression({
-  // Compression filter function
-  filter: (req, res) => {
-    // Don't compress responses with this request header
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    
-    // Use compression filter function from the middleware
-    return compression.filter(req, res);
-  },
-  // Compression level (0-9, where 9 is maximum compression)
-  level: 6,
-  // Minimum size threshold in bytes. Only responses larger than this will be compressed
-  threshold: 1024, // 1KB
-}));
-```
-
-This pattern provides:
-- Reduced bandwidth usage
-- Faster response times
-- Configurable compression level
-- Threshold control for small responses
-- Client capability detection
-
-## Security Patterns
-
-### DDoS Protection
-```javascript
-// server/ddosProtection.js
-const configureDdosProtection = (options = {}) => {
-  const {
-    rateWindow = 15 * 60 * 1000, // 15 minutes
-    rateMax = 100, // 100 requests per window
-    speedWindow = 15 * 60 * 1000, // 15 minutes
-    speedDelay = 500, // 500ms delay after threshold
-    speedDelayAfter = 50, // Start delaying after 50 requests
-    trustProxy = true, // Trust X-Forwarded-For header
-    blacklist = [], // IP blacklist
-    whitelist = [], // IP whitelist
-  } = options;
-
-  // Array to hold middleware
-  const middleware = [];
-
-  // Rate limiting middleware
-  const limiter = rateLimit({
-    windowMs: rateWindow,
-    max: rateMax,
-    standardHeaders: true,
-    legacyHeaders: false,
-    handler: (req, res) => {
-      securityLogger.warn('Rate Limit Exceeded', {
-        ip: req.ip,
-        path: req.path,
-        method: req.method,
-      });
-      
-      res.status(429).json({
-        error: 'Too Many Requests',
-        message: 'You have exceeded the rate limit. Please try again later.',
-      });
-    },
-  });
-  
-  middleware.push(limiter);
-
-  return middleware;
-};
-```
-
-This pattern provides:
-- Protection against DDoS attacks
-- Rate limiting to prevent abuse
-- Configurable thresholds and windows
-- Detailed logging of rate limit events
-- Custom response handling
-
-### Security Headers Configuration
-```javascript
-// server/securityHeaders.js
-const configureSecurityHeaders = (options = {}) => {
-  const {
-    // Content Security Policy options
-    enableCSP = true,
-    reportOnly = false,
-    defaultSrc = ["'self'"],
-    scriptSrc = ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-    // Other options...
-  } = options;
-
-  // Configure Helmet options
-  const helmetOptions = {};
-
-  // Content Security Policy
-  if (enableCSP) {
-    helmetOptions.contentSecurityPolicy = {
-      useDefaults: false,
-      directives: {
-        defaultSrc,
-        scriptSrc,
-        // Other directives...
-      },
-      reportOnly,
-    };
-  } else {
-    helmetOptions.contentSecurityPolicy = false;
-  }
-
-  // Create and return the configured middleware
-  const middleware = helmet(helmetOptions);
-
-  return middleware;
-};
-```
-
-This pattern provides:
-- Comprehensive security headers
-- Configurable Content Security Policy
-- Protection against XSS, clickjacking, and other attacks
-- Flexible configuration options
-- Integration with Helmet middleware
-
-### Secure Audit Logging
-```javascript
-// server/auditLogging.js
-// Create a secure hash for log integrity
-const createLogHash = (logEntry) => {
-  return crypto.createHash('sha256').update(JSON.stringify(logEntry)).digest('hex');
-};
-
-// Create a Winston logger for security events
-const createSecurityLogger = (options = {}) => {
-  // Create the logger
-  const logger = winston.createLogger({
-    level: logLevel,
-    format: logFormat,
-    defaultMeta: { service: 'security-audit' },
-    transports,
-  });
-
-  // Add tamper protection
-  if (enableTamperProtection) {
-    // Override the log method to add a hash
-    const originalLog = logger.log.bind(logger);
-    logger.log = function (level, message, meta) {
-      const logEntry = {
-        level,
-        message,
-        ...meta,
-        timestamp: new Date().toISOString(),
-      };
-      
-      // Add a hash for tamper detection
-      logEntry.hash = createLogHash(logEntry);
-      
-      return originalLog(level, message, meta);
-    };
-  }
-
-  return logger;
-};
-```
-
-This pattern provides:
-- Tamper-resistant logging
-- Cryptographic verification of log integrity
-- Structured logging with metadata
-- Multiple transport options
-- Configurable log levels and formats
-
-### Vulnerability Scanning
-```javascript
-// scripts/vulnerability-scan.js
-const runNpmAudit = async () => {
-  console.log(chalk.blue('Running npm audit...'));
-  
-  try {
-    const output = runCommand('npm audit --json', true);
-    const auditResults = JSON.parse(output);
-    
-    // Extract vulnerability counts
-    const vulns = {
-      critical: auditResults.metadata?.vulnerabilities?.critical || 0,
-      high: auditResults.metadata?.vulnerabilities?.high || 0,
-      medium: auditResults.metadata?.vulnerabilities?.moderate || 0,
-      low: auditResults.metadata?.vulnerabilities?.low || 0,
-      info: 0,
-    };
-    
-    // Update summary
-    updateSummary(vulns);
-    
-    // Display results
-    if (vulns.critical > 0 || vulns.high > 0) {
-      console.log(chalk.red(`npm audit found ${vulns.critical} critical and ${vulns.high} high severity vulnerabilities`));
-    } else {
-      console.log(chalk.green('npm audit completed with no high or critical vulnerabilities'));
-    }
-  } catch (error) {
-    console.log(chalk.red(`Error running npm audit: ${error.message}`));
-  }
-};
-```
-
-This pattern provides:
-- Comprehensive vulnerability scanning
-- Multiple scanning techniques
-- Detailed reporting of findings
-- Severity-based categorization
-- Integration with CI/CD pipelines
-
-## User Support Patterns
-
-### Help Center Service
-```typescript
-// services/helpCenterService.ts
-export const getHelpArticlesByCategory = (category: HelpCategory): HelpArticle[] => {
-  return helpArticles.filter(article => article.category === category);
-};
-
-export const searchHelpArticles = (query: string): HelpArticle[] => {
-  const normalizedQuery = query.toLowerCase().trim();
-  
-  return helpArticles.filter(article => {
-    // Search in title
-    if (article.title.toLowerCase().includes(normalizedQuery)) {
-      return true;
-    }
-    
-    // Search in content
-    if (article.content.toLowerCase().includes(normalizedQuery)) {
-      return true;
-    }
-    
-    // Search in tags
-    if (article.tags.some(tag => tag.toLowerCase().includes(normalizedQuery))) {
-      return true;
-    }
-    
-    return false;
-  });
-};
-```
-
-This pattern provides:
-- Categorized help content
-- Efficient search functionality
-- Tag-based organization
-- Related article suggestions
-- Contact information management
-
-### Feedback Collection
-```typescript
-// services/feedbackService.ts
-export const submitFeedback = async (feedback: Feedback): Promise<Feedback> => {
-  try {
-    // Add device information
-    const deviceInfo = {
-      platform: Platform.OS,
-      version: Platform.Version.toString(),
-      model: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
-      appVersion: '1.0.0',
-    };
-    
-    // Add timestamps
-    const now = new Date().toISOString();
-    
-    // Prepare feedback for submission
-    const feedbackToSubmit: Feedback = {
-      ...feedback,
-      deviceInfo,
-      status: FeedbackStatus.SUBMITTED,
-      createdAt: now,
-      updatedAt: now,
-    };
-    
-    // Log the feedback submission event
-    logEvent(AnalyticsEvent.CUSTOM, {
-      event_name: 'feedback_submitted',
-      feedback_type: feedback.type,
-      feedback_priority: feedback.priority,
-    });
-    
-    // Generate a mock ID
-    const mockId = `feedback-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    
-    // Return the submitted feedback with the mock ID
-    return {
-      ...feedbackToSubmit,
-      id: mockId,
-    };
-  } catch (err) {
-    logError(LogCategory.APP, 'Failed to submit feedback', err as Error);
-    captureException(err as Error);
-    throw err;
-  }
-};
-```
-
-This pattern provides:
-- Structured feedback collection
-- Device information capture
-- Status tracking
-- Analytics integration
-- Error handling with logging
-
-### Bug Reporting
-```typescript
-// services/bugReportingService.ts
-export const reportBug = async (
-  userId: string,
-  title: string,
-  description: string,
-  severity: BugSeverity,
-  category: BugCategory,
-  options: BugReportOptions = defaultBugReportOptions
-): Promise<DetailedBugReport> => {
-  try {
-    // Map severity to priority
-    const priorityMap: Record<BugSeverity, FeedbackPriority> = {
-      [BugSeverity.LOW]: FeedbackPriority.LOW,
-      [BugSeverity.MEDIUM]: FeedbackPriority.MEDIUM,
-      [BugSeverity.HIGH]: FeedbackPriority.HIGH,
-      [BugSeverity.CRITICAL]: FeedbackPriority.CRITICAL,
-    };
-    
-    // Collect device information
-    const deviceInfo = await collectDeviceInfo(options);
-    
-    // Collect logs
-    const logs = await collectLogs(options);
-    
-    // Collect screenshots
-    const screenshots = options.includeScreenshot ? await captureScreenshot() : [];
-    
-    // Prepare bug report
-    const bugReport: DetailedBugReport = {
-      userId,
-      type: FeedbackType.BUG_REPORT,
-      title,
-      description,
-      priority: priorityMap[severity],
-      severity,
-      category,
-      // ... additional fields
-    };
-    
-    // Submit bug report
-    const submittedBugReport = await submitBugReport(bugReport);
-    
-    return submittedBugReport as DetailedBugReport;
-  } catch (err) {
-    logError(LogCategory.APP, 'Failed to report bug', err as Error);
-    captureException(err as Error);
-    throw err;
-  }
-};
-```
-
-This pattern provides:
-- Comprehensive bug reporting
-- Automatic data collection
-- Severity and category classification
-- Screenshot capture
-- Integration with error tracking
-
-### Real API Integration with Error Handling
-```typescript
-/**
- * Track a conversion with the FanDuel API
- * @param {Object} data - Conversion data
- * @param {string} data.userId - User ID
- * @param {string} data.eventType - Event type (e.g., 'click', 'signup', 'deposit')
- * @param {string} data.source - Traffic source
- * @param {number} data.value - Conversion value
- * @returns {Promise<Object>} Tracking result
- */
-async trackConversion(data = {}) {
-  try {
-    // Make an API call to FanDuel's conversion tracking API
-    console.log('Tracking conversion:', data);
-    
-    // Implement real API call to FanDuel's tracking endpoint
-    const response = await fetch('https://affiliates.fanduel.com/api/track', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.FANDUEL_API_KEY || 'api-key-required'}`
-      },
-      body: JSON.stringify({
-        userId: data.userId,
-        eventType: data.eventType,
-        source: data.source || 'ai_sports_edge',
-        value: data.value || 0,
-        timestamp: new Date().toISOString()
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`FanDuel API error: ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error tracking conversion:', error);
-    throw error;
-  }
-}
-```
-
-This pattern provides:
-- Real API integration with proper error handling
-- Secure API key management through environment variables
-- Default values for optional parameters
-- Comprehensive error reporting
-- Proper HTTP status code handling
-- JSON parsing with await for proper error propagation
-
-### Database-Backed Data Fetching
-```typescript
-/**
- * Fetch upcoming games from the database
- * @param {string} sport - Sport key
- * @param {string} date - Date string (optional)
- * @returns {Promise<Array>} - Upcoming games
- */
-async function fetchUpcomingGames(sport, date) {
-  try {
-    // In production, this would query a database or API
-    const Game = require('../../models/Game');
-    
-    const query = { sport: sport.toUpperCase() };
-    
-    if (date) {
-      const startDate = new Date(date);
-      startDate.setHours(0, 0, 0, 0);
-      
-      const endDate = new Date(date);
-      endDate.setHours(23, 59, 59, 999);
-      
-      query.date = { $gte: startDate, $lte: endDate };
-    } else {
-      const now = new Date();
-      query.date = { $gte: now };
-    }
-    
-    return await Game.find(query).sort({ date: 1 }).limit(10);
-  } catch (error) {
-    console.error(`Error fetching upcoming games for ${sport}:`, error);
-    return [];
-  }
-}
-```
-
-This pattern provides:
-- Database-backed data fetching instead of mock data
-- Proper date range handling for queries
-- Error handling with appropriate fallbacks
-- Query optimization with sorting and limits
-- Clear error logging for debugging
-
-## Analytics Dashboard Implementation Patterns
-
-### Caching System with TTL
-```typescript
-/**
- * Get analytics dashboard data with caching
- * @param timePeriod Time period
- * @param customDateRange Custom date range (if timePeriod is CUSTOM)
- * @returns Analytics dashboard data
- */
-public async getDashboardData(
-  timePeriod: AnalyticsTimePeriod = AnalyticsTimePeriod.LAST_30_DAYS,
-  customDateRange?: { startDate: number; endDate: number }
-): Promise<AnalyticsDashboardData> {
-  try {
-    // Generate cache key
-    const cacheKey = this.generateCacheKey(timePeriod, customDateRange);
-    
-    // Check cache first
-    const cachedData = this.dashboardCache.get(cacheKey);
-    if (cachedData && (Date.now() - cachedData.timestamp) < CACHE_TTL) {
-      console.log('Using cached dashboard data');
-      return cachedData.data;
-    }
-    
-    // Get date range
-    const { startDate, endDate } = this.getDateRangeForTimePeriod(timePeriod, customDateRange);
-    
-    // Try to fetch from API first
-    try {
-      const apiData = await this.fetchDashboardDataFromAPI(startDate, endDate);
-      
-      // Cache the data
-      this.dashboardCache.set(cacheKey, {
-        data: apiData,
-        timestamp: Date.now()
-      });
-      
-      // Also store in AsyncStorage for persistence
-      await this.saveDashboardCache();
-      
-      return apiData;
-    } catch (apiError) {
-      console.error('API fetch failed, falling back to Firestore:', apiError);
-      
-      // Fallback to Firestore
-      const firestoreData = await this.fetchFromFirestore(startDate, endDate);
-      
-      // Cache the data
-      this.dashboardCache.set(cacheKey, {
-        data: firestoreData,
-        timestamp: Date.now()
-      });
-      
-      // Also store in AsyncStorage for persistence
-      await this.saveDashboardCache();
-      
-      return firestoreData;
-    }
-  } catch (error) {
-    console.error('Error getting analytics dashboard data:', error);
-    
-    // If all else fails, return mock data
-    return this.generateMockDashboardData(timePeriod, customDateRange);
-  }
-}
-```
-
-This pattern provides:
-- Multi-level caching (memory and persistent storage)
-- Time-based cache invalidation
-- Fallback mechanisms for API failures
-- Error handling with mock data generation
-- Efficient cache key generation based on parameters
-
-### Granular Date Range Filtering
-```typescript
-/**
- * Get the start and end dates for a time period
- * @param timePeriod Time period
- * @param customDateRange Custom date range (if timePeriod is CUSTOM)
- * @returns Start and end dates in milliseconds
- */
-private getDateRangeForTimePeriod(
-  timePeriod: AnalyticsTimePeriod,
-  customDateRange?: { startDate: number; endDate: number }
-): { startDate: number; endDate: number } {
-  const now = new Date();
-  const endDate = now.getTime();
-  let startDate: number;
-  
-  switch (timePeriod) {
-    case AnalyticsTimePeriod.TODAY:
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      break;
-    case AnalyticsTimePeriod.YESTERDAY:
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      startDate = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()).getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_7_DAYS:
-      const last7Days = new Date(now);
-      last7Days.setDate(last7Days.getDate() - 7);
-      startDate = last7Days.getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_30_DAYS:
-      const last30Days = new Date(now);
-      last30Days.setDate(last30Days.getDate() - 30);
-      startDate = last30Days.getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_90_DAYS:
-      const last90Days = new Date(now);
-      last90Days.setDate(last90Days.getDate() - 90);
-      startDate = last90Days.getTime();
-      break;
-    case AnalyticsTimePeriod.THIS_MONTH:
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_MONTH:
-      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      startDate = lastMonth.getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_3_MONTHS:
-      const last3Months = new Date(now);
-      last3Months.setMonth(last3Months.getMonth() - 3);
-      startDate = last3Months.getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_6_MONTHS:
-      const last6Months = new Date(now);
-      last6Months.setMonth(last6Months.getMonth() - 6);
-      startDate = last6Months.getTime();
-      break;
-    case AnalyticsTimePeriod.YEAR_TO_DATE:
-      startDate = new Date(now.getFullYear(), 0, 1).getTime();
-      break;
-    case AnalyticsTimePeriod.LAST_YEAR:
-      const lastYear = new Date(now);
-      lastYear.setFullYear(lastYear.getFullYear() - 1);
-      startDate = lastYear.getTime();
-      break;
-    case AnalyticsTimePeriod.CUSTOM:
-      if (!customDateRange) {
-        throw new Error('Custom date range is required for CUSTOM time period');
-      }
-      return customDateRange;
-    default:
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30).getTime();
-  }
-  
-  return { startDate, endDate };
-}
-```
-
-This pattern provides:
-- Comprehensive time period options
-- Precise date calculations
-- Support for custom date ranges
-- Error handling for invalid inputs
-- Consistent date range format
-
-## Implementation Patterns
-
-### Secure Weather Integration for Sports Odds
-```javascript
-/**
- * Get weather adjustment factor for a specific sport and condition
- * @param {string} sport - Sport key (e.g., 'NBA', 'MLB')
- * @param {Object} weatherData - Weather data
- * @returns {Object} Weather adjustment factors
- */
-async getWeatherAdjustmentFactor(sport, weatherData) {
-  try {
-    // Validate sport parameter
-    if (!sport || typeof sport !== 'string') {
-      console.error('Invalid sport parameter:', sport);
-      return { factor: 1.0, impact: 'none', description: 'Invalid sport parameter' };
-    }
-
-    // Validate supported sports
-    const supportedSports = ['MLB', 'NFL', 'NBA', 'WNBA', 'NCAA_MENS', 'NCAA_WOMENS',
-                            'NHL', 'FORMULA_1', 'SOCCER_EPL', 'SOCCER_MLS',
-                            'HORSE_RACING', 'UFC'];
-    
-    if (!supportedSports.includes(sport)) {
-      console.error('Unsupported sport:', sport);
-      return { factor: 1.0, impact: 'none', description: 'Unsupported sport' };
-    }
-
-    if (!weatherData) {
-      return { factor: 1.0, impact: 'none', description: 'No weather data available' };
-    }
-
-    // Validate weatherData object
-    if (typeof weatherData !== 'object') {
-      console.error('Invalid weatherData parameter:', typeof weatherData);
-      return { factor: 1.0, impact: 'none', description: 'Invalid weather data' };
-    }
-
-    // Get the weather condition with safe defaults
-    const condition = weatherData.condition || 'Unknown';
-    const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
-    const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
-    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-    
-    // Default adjustment (no impact)
-    let factor = 1.0;
-    let impact = 'none';
-    let description = 'Weather has no significant impact on this sport';
-    
-    // Adjust based on sport and weather condition
-    switch (sport) {
-      case 'MLB':
-        return this.getBaseballWeatherAdjustment(weatherData);
-      
-      case 'NFL':
-        return this.getFootballWeatherAdjustment(weatherData);
-      
-      case 'NBA':
-      case 'WNBA':
-      case 'NCAA_MENS':
-      case 'NCAA_WOMENS':
-        // Basketball is mostly played indoors
-        return {
-          factor: 1.0,
-          impact: 'none',
-          description: 'Basketball is played indoors and not affected by weather'
-        };
-      
-      // ... more sports ...
-      
-      default:
-        return { factor: 1.0, impact: 'none', description: 'No specific weather adjustment for this sport' };
-    }
-  } catch (error) {
-    // Log error without exposing sensitive details
-    console.error('Error getting weather adjustment factor:', error.message || 'Unknown error');
-    return { factor: 1.0, impact: 'none', description: 'Error calculating weather adjustment' };
-  }
-}
-```
-
-This pattern provides:
-- Comprehensive input validation for all parameters
-- Type checking and safe defaults for all weather properties
-- Explicit validation of supported sports
-- Secure error handling that prevents information leakage
-- Centralized weather adjustment logic with proper security controls
-### Secure Sport-Specific Weather Adjustments
-```javascript
-/**
- * Get baseball weather adjustment
- * @param {Object} weatherData - Weather data
- * @returns {Object} Weather adjustment factors
- */
-getBaseballWeatherAdjustment(weatherData) {
-  // Validate input
-  if (!weatherData || typeof weatherData !== 'object') {
-    return {
-      factor: 1.0,
-      impact: 'none',
-      description: 'Invalid weather data for baseball adjustment'
-    };
-  }
-
-  // Extract weather properties with safe defaults
-  const condition = weatherData.condition || 'Unknown';
-  const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
-  const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
-  const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-  
-  let factor = 1.0;
-  let impact = 'none';
-  let description = 'Normal baseball conditions';
-
-  // Temperature impact
-  if (temperature < 40) {
-    factor *= 0.9; // Cold weather reduces scoring
-    impact = 'negative';
-    description = 'Cold temperatures typically reduce scoring in baseball';
-  } else if (temperature > 90) {
-    factor *= 1.1; // Hot weather increases scoring
-    impact = 'positive';
-    description = 'Hot temperatures typically increase scoring in baseball';
-  }
-
-  // Wind impact
-  if (windSpeed > 15) {
-    factor *= 1.15; // High winds can increase home runs in the right direction
-    impact = 'significant';
-    description = 'High winds can significantly affect ball flight and scoring';
-  }
-
-  // Rain impact
-  if (condition === 'Rain' || precipitation > 0.1) {
-    factor *= 0.85; // Rain reduces scoring
-    impact = 'negative';
-    description = 'Rain typically reduces scoring and increases pitching advantage';
-  }
-
-  // Ensure factor is within reasonable bounds
-  factor = Math.max(0.5, Math.min(factor, 2.0));
-
-  return { factor, impact, description };
-}
-```
-```
-
-This pattern provides:
-- Input validation with proper error handling
-- Safe defaults for all weather properties
-- Bounds checking to prevent extreme adjustment values
-- Detailed sport-specific weather adjustments with security controls
-- Descriptive impact information for user display
-
-### Secure Weather API Response Handling
-```javascript
-/**
- * Sanitize weather data before returning to client
- * @param {Object} weatherData - Raw weather data from API
- * @returns {Object} Sanitized weather data
- */
-function sanitizeWeatherData(weatherData) {
-  // Validate input
-  if (!weatherData || typeof weatherData !== 'object') {
-    return {
-      temperature: 0,
-      condition: 'Unknown',
-      timestamp: new Date().toISOString()
-    };
-  }
-  
-  // Extract only the properties we need with safe defaults
-  return {
-    temperature: typeof weatherData.temperature === 'number' ? weatherData.temperature : 0,
-    feelsLike: typeof weatherData.feelsLike === 'number' ? weatherData.feelsLike : 0,
-    humidity: typeof weatherData.humidity === 'number' ? weatherData.humidity : 0,
-    windSpeed: typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0,
-    windDirection: weatherData.windDirection || 'Unknown',
-    precipitation: typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0,
-    condition: weatherData.condition || 'Unknown',
-    conditionIcon: weatherData.conditionIcon || 'default-icon',
-    location: weatherData.location || 'Unknown',
-    timestamp: weatherData.timestamp || new Date().toISOString()
-  };
-}
-```
-
-This pattern provides:
-- Data sanitization to prevent injection attacks
-- Type checking for all weather properties
-- Safe defaults for missing or invalid data
-- Removal of potentially sensitive or unnecessary data
-- Consistent data structure for client-side processing
-
-### Webhook Handling
-```javascript
-// Check signature
-const signature = req.headers['stripe-signature'];
-if (!signature) {
-  return res.status(400).send('Missing Stripe signature');
-}
-}
-
-// Verify event
-try {
-  event = stripe.webhooks.constructEvent(
-    req.rawBody,
-    signature,
-    process.env.STRIPE_WEBHOOK_SECRET
-  );
-} catch (err) {
-  return res.status(400).send(`Webhook Error: ${err.message}`);
-}
-```
-
-This pattern ensures:
-- Webhook signatures are verified
-- Invalid requests are rejected
-- Error handling is robust
-- Security is maintained
-
-### User Authorization
-```javascript
-// Auth check
-if (!context.auth) {
-  throw new Error('unauthenticated');
-}
-
-// Owner check
-if (groupData.ownerId !== userId) {
-  throw new Error('permission-denied');
-}
-```
-
-This pattern ensures:
-- Only authenticated users can access resources
-- Only authorized users can modify resources
-- Security is maintained throughout the application
-- Clear error messages for unauthorized access
-
-## Usage-Based Billing Patterns
-
-### Usage Tracking
-```typescript
-// services/usageTrackingService.ts
-export const trackUsage = async (
-  userId: string,
-  featureId: string,
-  quantity: number = 1
-): Promise<void> => {
-  try {
-    await firestore.collection('usageRecords').add({
-      userId,
-      featureId,
-      quantity,
-      timestamp: serverTimestamp()
-    });
-    
-    // Track analytics event
-    await analyticsService.trackEvent(`used_metered_feature`, {
-      featureId,
-      quantity
-    });
-  } catch (error) {
-    console.error('Error tracking feature usage:', error);
-  }
-};
-```
-
-This pattern provides:
-- Consistent tracking of feature usage
-- Integration with analytics for business insights
-- Error handling to prevent tracking failures
-- Flexibility for different feature types
-
-### Usage Reporting to Stripe
-```javascript
-// functions/src/reportUsage.js
-exports.reportUsageToStripe = functions.pubsub.schedule('0 0 * * *').onRun(async (context) => {
-  try {
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    // Get all active metered subscriptions
-    const subscriptionsSnapshot = await db.collectionGroup('subscriptions')
-      .where('status', '==', 'active')
-      .where('usageType', '==', 'metered')
-      .get();
-    
-    for (const doc of subscriptionsSnapshot.docs) {
-      const subscription = doc.data();
-      const userId = doc.ref.parent.parent.id;
-      
-      // Get usage records for yesterday
-      const usageSnapshot = await db.collection('usageRecords')
-        .where('userId', '==', userId)
-        .where('featureId', '==', subscription.featureId)
-        .where('timestamp', '>=', admin.firestore.Timestamp.fromDate(yesterday))
-        .where('timestamp', '<', admin.firestore.Timestamp.fromDate(now))
-        .get();
-      
-      // Sum up the quantities
-      let totalUsage = 0;
-      usageSnapshot.forEach(doc => {
-        totalUsage += doc.data().quantity || 1;
-      });
-      
-      if (totalUsage > 0) {
-        // Report usage to Stripe
-        await stripe.subscriptionItems.createUsageRecord(
-          subscription.stripeSubscriptionItemId,
-          {
-            quantity: totalUsage,
-            timestamp: Math.floor(now.getTime() / 1000),
-            action: 'increment'
-          }
-        );
-      }
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error reporting usage to Stripe:', error);
-    return null;
-  }
-});
-```
-
-This pattern ensures:
-- Usage is reported to Stripe on a regular schedule
-- Only active subscriptions are processed
-- Usage is aggregated correctly
-- Errors are handled gracefully
-
-### Metered Subscription Creation
-```javascript
-// Create subscription with metered pricing
-const subscription = await stripe.subscriptions.create({
-  customer: customerId,
-  items: [{
-    price_data: {
-      currency: 'usd',
-      product: METERED_PRODUCTS[featureId],
-      recurring: {
-        interval: 'month',
-        usage_type: 'metered'
-      },
-      unit_amount: METERED_PRICES[featureId]
-    }
-  }],
-  payment_behavior: 'default_incomplete',
-  expand: ['latest_invoice.payment_intent']
-});
-
-// Store subscription in Firestore
-await db.collection('users').doc(userId)
-  .collection('subscriptions').doc(subscription.id).set({
-    status: subscription.status,
-    featureId: featureId,
-    usageType: 'metered',
-    stripeSubscriptionId: subscription.id,
-    stripeSubscriptionItemId: subscription.items.data[0].id,
-    currentPeriodStart: admin.firestore.Timestamp.fromMillis(subscription.current_period_start * 1000),
-    currentPeriodEnd: admin.firestore.Timestamp.fromMillis(subscription.current_period_end * 1000),
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
-  });
-```
-
-This pattern provides:
-- Proper configuration of metered subscriptions in Stripe
-- Storage of subscription details in Firestore
-- Tracking of subscription item IDs for usage reporting
-- Proper timestamp handling between Stripe and Firestore
-
-### Usage Display Component
-```tsx
-// components/UsageTracker.tsx
-const UsageTracker: React.FC<UsageTrackerProps> = ({ featureId }) => {
-  const [currentUsage, setCurrentUsage] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const { colors } = useTheme();
-  
-  const feature = METERED_FEATURES[featureId];
-  
-  useEffect(() => {
-    const fetchUsage = async () => {
-      try {
-        const userId = auth.currentUser?.uid;
-        if (!userId) return;
-        
-        const usage = await getCurrentUsage(userId, featureId);
-        setCurrentUsage(usage);
-      } catch (error) {
-        console.error('Error fetching usage:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchUsage();
-  }, [featureId]);
-  
-  // Render usage information
-  return (
-    <View style={[styles.container, { borderColor: colors.border }]}>
-      <Text style={[styles.title, { color: colors.text }]}>
-        {feature.name} Usage
-      </Text>
-      <Text style={[styles.usage, { color: colors.primary }]}>
-        {currentUsage} units used this month
-      </Text>
-      <Text style={[styles.info, { color: colors.textSecondary }]}>
-        Base price: ${(feature.basePrice / 100).toFixed(2)}/month
-        + ${(feature.unitPrice / 100).toFixed(2)} per unit
-      </Text>
-    </View>
-  );
-};
-```
-
-This pattern provides:
-- Real-time display of usage information
-- Clear presentation of pricing structure
-- Integration with the app's theme system
-- Loading state handling
-
-## Internationalization Patterns
-
-### Translation Context
-```typescript
-// contexts/I18nContext.tsx
-export const I18nProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(i18n.getLanguage());
-  const [isRTL, setIsRTL] = useState<boolean>(i18n.isRTLLanguage());
-  
-  const setLanguage = (lang: Language) => {
-    i18n.setLanguage(lang);
-    setLanguageState(lang);
-    setIsRTL(i18n.isRTLLanguage());
-  };
-  
-  return (
-    <I18nContext.Provider
-      value={{
-        language,
-        setLanguage,
-        t: (key, params) => i18n.translate(key, params),
-        formatNumber: (value, options) => i18n.formatNumber(value, options),
-        formatCurrency: (value, currencyCode) => i18n.formatCurrency(value, currencyCode),
-        formatDate: (date, options) => i18n.formatDate(date, options),
-        isRTL,
-      }}
-    >
-      {children}
-    </I18nContext.Provider>
-  );
-};
-```
-
-This pattern provides:
-- Centralized language management
-- Consistent translation across the app
-- Localized formatting for numbers, dates, and currencies
-- Support for right-to-left languages
-- Clean component code with the useI18n hook
-
-### Language Detection
-```typescript
-// components/LanguageRedirect.tsx
-export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
-  currentLanguage,
-  setLanguage
-}) => {
-  // Get device locale
-  const getDeviceLocale = (): string => {
-    // iOS
-    if (Platform.OS === 'ios') {
-      return (
-        NativeModules.SettingsManager.settings.AppleLocale ||
-        NativeModules.SettingsManager.settings.AppleLanguages[0] ||
-        'en'
-      );
-    }
-    // Android
-    if (Platform.OS === 'android') {
-      return NativeModules.I18nManager.localeIdentifier || 'en';
-    }
-    // Web - use navigator.language if available
-    if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
-      return navigator.language || 'en';
-    }
-    
-    return 'en'; // Default to English
-  };
-
-  useEffect(() => {
-    // Only run on web platform
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      // Extract language from URL path
-      const path = window.location.pathname;
-      const pathSegments = path.split('/').filter((segment: string) => segment.length > 0);
-      const pathLang = pathSegments.length > 0 ? pathSegments[0] : '';
-      
-      if (pathLang === 'en' || pathLang === 'es') {
-        // Set language based on URL
-        if (pathLang !== currentLanguage) {
-          setLanguage(pathLang as Language);
-        }
-      } else {
-        // Determine language based on device locale
-        const deviceLocale = getDeviceLocale().split('-')[0];
-        const redirectLang = deviceLocale === 'es' ? 'es' : 'en';
-        
-        if (redirectLang !== currentLanguage) {
-          setLanguage(redirectLang as Language);
-        }
-        
-        // Redirect to language-specific URL
-        const newPath = `/${redirectLang}${path === '/' ? '' : path}`;
-        window.history.replaceState(null, '', newPath);
-      }
-    }
-  }, [currentLanguage, setLanguage]);
-  
-  return null;
-};
-```
-
-This pattern ensures:
-- Automatic language detection based on URL or device settings
-- Consistent language experience across platforms
-- SEO-friendly URL structure for web
-- Proper handling of language changes
-
-## Accessibility Patterns
-
-### Accessibility Service
-```typescript
-// services/accessibilityService.ts
-export const getAccessibilityProps = (
-  label: string,
-  hint?: string,
-  role?: AccessibilityRole,
-  state?: Record<string, boolean>
-): Record<string, any> => {
-  const props: Record<string, any> = {
-    accessible: true,
-    accessibilityLabel: label
-  };
-  
-  if (hint && preferences.screenReaderHints) {
-    props.accessibilityHint = hint;
-  }
-  
-  if (role) {
-    props.accessibilityRole = role;
-  }
-  
-  if (state) {
-    props.accessibilityState = state;
-  }
-  
-  return props;
-};
-```
-
-This pattern ensures:
-- Consistent accessibility properties across components
-- Proper screen reader support
-- Respect for user preferences
-- Clean component code without repetitive accessibility logic
-
-## Performance Optimization Patterns
-
-### Code Splitting with Lazy Loading
-```typescript
-// utils/codeSplitting.tsx
-export function createLazyComponent<T extends ComponentType<any>>(
-  factory: () => Promise<{ default: T }>,
-  fallback: { text?: string; component?: ReactNode } = {}
-): React.FC<ComponentProps<T>> {
-  const LazyComponent = lazy(factory);
-  
-  return (props) => {
-    const fallbackComponent = fallback.component || (
-      <View style={styles.fallbackContainer}>
-        <ActivityIndicator size="small" color="#007AFF" />
-        {fallback.text && <Text style={styles.fallbackText}>{fallback.text}</Text>}
-      </View>
-    );
-    
-    return (
-      <Suspense fallback={fallbackComponent}>
-        <LazyComponent {...props} />
-      </Suspense>
-    );
-  };
-}
-```
-
-This pattern provides:
-- Reduced initial bundle size
-- Faster initial load times
-- On-demand loading of components
-- Consistent loading experience
-
-### Memory Management with TTL
-```typescript
-// utils/memoryManagement.ts
-export function memoizeWithTTL<T extends (...args: any[]) => any>(
-  fn: T,
-  keyFn: (...args: Parameters<T>) => string,
-  ttl: number = 5 * 60 * 1000 // 5 minutes default
-): T {
-  const cache: Record<string, { value: ReturnType<T>; timestamp: number }> = {};
-  
-  return ((...args: Parameters<T>): ReturnType<T> => {
-    const key = keyFn(...args);
-    const now = Date.now();
-    
-    // Check if cached value exists and is still valid
-    if (cache[key] && now - cache[key].timestamp < ttl) {
-      return cache[key].value;
-    }
-    
-    // Calculate new value
-    const result = fn(...args);
-    
-    // Cache the result
-    cache[key] = {
-      value: result,
-      timestamp: now
-    };
-    
-    // Clean up old cache entries
-    Object.keys(cache).forEach(cacheKey => {
-      if (now - cache[cacheKey].timestamp > ttl) {
-        delete cache[cacheKey];
-      }
-    });
-    
-    return result;
-  }) as T;
-}
-```
-
-This pattern ensures:
-- Efficient caching of expensive operations
-- Automatic cache invalidation
-- Memory leak prevention
-- Improved performance for repeated operations
-
-## Analytics and A/B Testing Patterns
-
-### Event Tracking
-```typescript
-// services/analyticsService.ts
-export const trackEvent = async (
-  eventType: AnalyticsEventType,
-  properties: Record<string, any> = {}
-): Promise<void> => {
-  try {
-    // Add common properties
-    const enhancedProperties = {
-      ...properties,
-      platform: Platform.OS,
-      app_version: Constants.manifest.version,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Log event for debugging in development
-    if (__DEV__) {
-      console.log(`[Analytics] ${eventType}:`, enhancedProperties);
-    }
-    
-    // Store event in local queue
-    await storeEventInQueue(eventType, enhancedProperties);
-    
-    // Process queue if conditions are met
-    await processEventQueue();
-    
-  } catch (error) {
-    console.error('Error tracking analytics event:', error);
-  }
-};
-```
-
-This pattern provides:
-- Consistent event tracking across the app
-- Offline support with queuing
-- Debug information in development
-- Error handling to prevent app crashes
-
-### A/B Testing Experiment Management
-```typescript
-// services/abTestingService.ts
-export const getVariantForUser = async (
-  experimentId: string
-): Promise<ExperimentVariant | null> => {
-  try {
-    // Check if user already has an assigned variant
-    const storedVariant = await AsyncStorage.getItem(`experiment_${experimentId}`);
-    if (storedVariant) {
-      return JSON.parse(storedVariant);
-    }
-    
-    // Get experiment configuration
-    const experiment = await getExperiment(experimentId);
-    if (!experiment || !experiment.isActive) {
-      return null;
-    }
-    
-    // Check if user is in target audience
-    if (!isUserInTargetAudience(experiment.targetAudience)) {
-      return null;
-    }
-    
-    // Assign variant based on weights
-    const variant = assignVariantByWeight(experiment.variants);
-    if (!variant) {
-      return null;
-    }
-    
-    // Store assigned variant
-    await AsyncStorage.setItem(`experiment_${experimentId}`, JSON.stringify(variant));
-    
-    // Track impression
-    await trackImpression(experimentId, variant.id);
-    
-    return variant;
-  } catch (error) {
-    console.error('Error getting variant for user:', error);
-    return null;
-  }
-};
-```
-
-This pattern ensures:
-- Consistent variant assignment
-- Persistent user experience
-- Proper targeting based on audience criteria
-- Accurate tracking of impressions
-
-## Personalization Patterns
-
-### User Preferences Management
-```typescript
-// services/personalizationService.ts
-export const setUserPreferences = async (
-  preferences: Partial<UserPreferences>
-): Promise<void> => {
-  try {
-    // Get current preferences
-    const currentPreferences = await getUserPreferences();
-    
-    // Merge with new preferences
-    const updatedPreferences = {
-      ...currentPreferences,
-      ...preferences,
-      lastUpdated: Date.now()
-    };
-    
-    // Save to storage
-    const userId = auth.currentUser?.uid;
-    const storageKey = userId ? `user_preferences_${userId}` : 'user_preferences';
-    await AsyncStorage.setItem(storageKey, JSON.stringify(updatedPreferences));
-    
-    // Track preference changes
-    await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
-      event_name: 'preferences_updated',
-      ...Object.keys(preferences).reduce((obj, key) => {
-        obj[`preference_${key}`] = preferences[key as keyof UserPreferences];
-        return obj;
-      }, {} as Record<string, any>)
-    });
-  } catch (error) {
-    console.error('Error setting user preferences:', error);
-  }
-};
-```
-
-This pattern provides:
-- Consistent preference management
-- User-specific preferences when logged in
-- Device-specific preferences when not logged in
-- Analytics tracking for preference changes
-
-### Chart Accessibility
-```typescript
-// components/HeatMapChart.tsx
-// Create an accessible summary of the data for screen readers
-const accessibleSummary = useMemo(() => {
-  const totalActivities = Object.values(data).reduce((sum, count) => sum + count, 0);
-  const activeDays = Object.values(data).filter(count => count > 0).length;
-  const mostActiveDate = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
-  
-  return t('charts.heatmap.accessibleSummary', {
-    totalActivities,
-    activeDays,
-    totalDays: numDays,
-    mostActiveDate: mostActiveDate ? `${mostActiveDate[0]} with ${mostActiveDate[1]} activities` : 'None'
-  });
-}, [data, numDays, t]);
-
-// Handle keyboard navigation
-const handleKeyDown = (e: React.KeyboardEvent) => {
-  if (!focusedDay && focusedDay !== 0) {
-    setFocusedDay(0);
-    return;
-  }
-  
-  switch (e.key) {
-    case 'ArrowRight':
-      setFocusedDay(prev => (prev !== null && prev < numDays - 1) ? prev + 1 : prev);
-      break;
-    case 'ArrowLeft':
-      setFocusedDay(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
-      break;
-    // ... more key handlers
-  }
-};
-
-// Component JSX
-return (
-  <View
-    accessible={true}
-    accessibilityLabel={title}
-    accessibilityHint={t('charts.heatmap.accessibilityHint')}
-  >
-    {/* Screen reader summary */}
-    {isScreenReaderEnabled && (
-      <View accessibilityRole="summary" accessibilityLabel={accessibleSummary} />
-    )}
-    
-    {/* Keyboard navigable chart wrapper */}
-    <View
-      ref={chartRef}
-      accessible={!isScreenReaderEnabled}
-      accessibilityLabel={t('charts.heatmap.accessibilityLabel')}
-      accessibilityHint={t('charts.heatmap.keyboardHint')}
-      onAccessibilityTap={() => setFocusedDay(0)}
-      {...(Platform.OS === 'web' ? {
-        tabIndex: 0,
-        onKeyDown: handleKeyDown
-      } : {})}
-    >
-      {/* Chart content */}
-    </View>
-  </View>
-);
-```
-
-This pattern provides:
-- Comprehensive accessibility for data visualizations
-- Keyboard navigation for interactive charts
-- Screen reader support with detailed data summaries
-- Platform-specific accessibility optimizations
-- Integration with internationalization for translated accessibility text
-
-## UI/UX Animation Patterns
-
-### Chart Transition Pattern
-```tsx
-// components/ChartTransition.tsx
-const ChartTransition: React.FC<ChartTransitionProps> = ({
-  children,
-  delay = 0,
-  index = 0,
-  style,
-  visible = true,
-}) => {
-  // Animation values
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const translateYAnim = useRef(new Animated.Value(50)).current;
-  const scaleAnim = useRef(new Animated.Value(0.95)).current;
-  
-  // Get accessibility preferences
-  const { isReducedMotionEnabled } = useAccessibilityService();
-  
-  // Calculate total delay including index
-  const totalDelay = delay + (index * 100);
-  
-  // Run animation when component mounts or when visibility changes
-  useEffect(() => {
-    if (visible) {
-      // Create animations
-      const animations = [];
-      
-      // Fade animation (always used)
-      animations.push(
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: isReducedMotionEnabled ? 0 : 400,
-          delay: isReducedMotionEnabled ? 0 : totalDelay,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
-        })
-      );
-      
-      // Only add motion animations if reduced motion is not enabled
-      if (!isReducedMotionEnabled) {
-        // Slide up animation
-        animations.push(
-          Animated.timing(translateYAnim, {
-            toValue: 0,
-            duration: 500,
-            delay: totalDelay,
-            useNativeDriver: true,
-            easing: Easing.out(Easing.cubic),
-          })
-        );
-        
-        // Scale animation
-        animations.push(
-          Animated.timing(scaleAnim, {
-            toValue: 1,
-            duration: 500,
-            delay: totalDelay,
-            useNativeDriver: true,
-            easing: Easing.out(Easing.cubic),
-          })
-        );
-      } else {
-        // Immediately set final values for reduced motion
-        translateYAnim.setValue(0);
-        scaleAnim.setValue(1);
-      }
-      
-      // Run all animations in parallel
-      Animated.parallel(animations).start();
-    }
-  }, [visible, totalDelay, isReducedMotionEnabled]);
-  
-  return (
-    <Animated.View
-      style={[
-        style,
-        {
-          opacity: opacityAnim,
-          transform: [
-            { translateY: translateYAnim },
-            { scale: scaleAnim },
-          ],
-        },
-      ]}
-    >
-      {children}
-    </Animated.View>
-  );
-};
-```
-
-This pattern provides:
-- Smooth entrance animations for chart components
-- Staggered animations based on index
-- Accessibility considerations with reduced motion support
-- Performance optimization with native driver
-- Consistent animation style across the application
-
-### Tab Transition Pattern
-```tsx
-// components/TabTransition.tsx
-const TabTransition: React.FC<TabTransitionProps> = ({
-  children,
-  active,
-  style,
-}) => {
-  // Animation values
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const translateXAnim = useRef(new Animated.Value(20)).current;
-  
-  // Get accessibility preferences
-  const { isReducedMotionEnabled } = useAccessibilityService();
-  
-  // Run animation when active state changes
-  useEffect(() => {
-    if (active) {
-      // Create animations
-      const animations = [];
-      
-      // Fade animation (always used)
-      animations.push(
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: isReducedMotionEnabled ? 0 : 300,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
-        })
-      );
-      
-      // Only add motion animations if reduced motion is not enabled
-      if (!isReducedMotionEnabled) {
-        // Slide animation
-        animations.push(
-          Animated.timing(translateXAnim, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-            easing: Easing.out(Easing.cubic),
-          })
-        );
-      } else {
-        // Immediately set final values for reduced motion
-        translateXAnim.setValue(0);
-      }
-      
-      // Run all animations in parallel
-      Animated.parallel(animations).start();
-    } else {
-      // Reset animations if not active
-      opacityAnim.setValue(0);
-      translateXAnim.setValue(20);
-    }
-  }, [active, isReducedMotionEnabled]);
-  
-  // Don't render anything if not active
-  if (!active) {
-    return null;
-  }
-  
-  return (
-    <Animated.View
-      style={[
-        style,
-        {
-          opacity: opacityAnim,
-          transform: [
-            { translateX: translateXAnim },
-          ],
-        },
-      ]}
-    >
-      {children}
-    </Animated.View>
-  );
-};
-```
-
-This pattern provides:
-- Smooth transitions between tabs
-- Conditional rendering based on active state
-- Accessibility considerations with reduced motion support
-- Performance optimization with native driver
-- Clean component API for tab content
-
-### Staggered Animation Pattern
-```tsx
-// Implementation in EnhancedAnalyticsDashboardScreen.tsx
-<View style={styles.metricsRow}>
-  <ChartTransition index={0} delay={100} style={styles.metricCardWrapper}>
-    <ThemedView style={styles.metricCard}>
-      <View style={styles.metricHeader}>
-        <Ionicons name="cash" size={24} color={Colors.neon.green} />
-        <ThemedText style={styles.metricTitle}>Total Revenue</ThemedText>
-      </View>
-      <ThemedText style={[styles.metricValue, { color: Colors.neon.green }]}>
-        ${dashboardData.revenue.total_revenue.toFixed(2)}
-      </ThemedText>
-    </ThemedView>
-  </ChartTransition>
-  
-  <ChartTransition index={1} delay={100} style={styles.metricCardWrapper}>
-    <ThemedView style={styles.metricCard}>
-      <View style={styles.metricHeader}>
-        <Ionicons name="trending-up" size={24} color={Colors.neon.blue} />
-        <ThemedText style={styles.metricTitle}>Win Rate</ThemedText>
-      </View>
-      <ThemedText style={[styles.metricValue, { color: Colors.neon.blue }]}>
-        {dashboardData.betting_performance.win_rate.toFixed(1)}%
-      </ThemedText>
-    </ThemedView>
-  </ChartTransition>
-</View>
-```
-
-This pattern provides:
-- Visually appealing staggered entrance for related elements
-- Consistent timing and easing for a cohesive feel
-- Improved user experience with progressive content reveal
-- Accessibility considerations with reduced motion support
-- Performance optimization with native driver
-
-### Accessible Component Wrappers
-```tsx
-// components/AccessibleText.tsx
-const AccessibleText: React.FC<AccessibleTextProps> = ({
-  accessibilityLabel,
-  accessibilityHint,
-  accessibilityRole,
-  accessibilityState,
-  applyHighContrast = true,
-  applyLargeText = true,
-  applyBoldText = true,
-  highContrastStyle,
-  largeTextStyle,
-  boldTextStyle,
-  style,
-  children,
-  ...props
-}) => {
-  const [preferences, setPreferences] = useState<AccessibilityPreferences>(
-    accessibilityService.getPreferences()
-  );
-  
-  // Subscribe to accessibility service changes
-  useEffect(() => {
-    const unsubscribe = accessibilityService.addListener((newPreferences) => {
-      setPreferences(newPreferences);
-    });
-    
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-  
-  // Apply styles based on preferences
-  const appliedStyle = [
-    style,
-    preferences.highContrast && applyHighContrast && [styles.highContrast, highContrastStyle],
-    preferences.largeText && applyLargeText && [styles.largeText, largeTextStyle],
-    (preferences.boldText || accessibilityService.isBoldTextActive()) && 
-      applyBoldText && [styles.boldText, boldTextStyle]
-  ];
-  
-  // Get accessibility props
-  const accessibilityProps = accessibilityLabel
-    ? accessibilityService.getAccessibilityProps(
-        accessibilityLabel,
-        accessibilityHint,
-        accessibilityRole,
-        accessibilityState
-      )
-    : {};
-  
-  return (
-    <Text
-      style={appliedStyle}
-      {...accessibilityProps}
-      {...props}
-    >
-      {children}
-    </Text>
-  );
-};
-```
-
-This pattern provides:
-- Automatic adaptation to user preferences
-- Consistent styling for accessibility features
-- Clean component API
-- Reusable accessibility logic
-
-### Reduced Motion Animation
-```typescript
-// hooks/useAccessibleAnimation.ts
-export const useAccessibleAnimation = (
-  defaultConfig: Animated.TimingAnimationConfig
-): Animated.TimingAnimationConfig => {
-  const [reduceMotion, setReduceMotion] = useState<boolean>(
-    accessibilityService.isReduceMotionActive()
-  );
-  
-  // Subscribe to accessibility service changes
-  useEffect(() => {
-    const unsubscribe = accessibilityService.addListener((preferences) => {
-      setReduceMotion(
-        preferences.reduceMotion || accessibilityService.isReduceMotionActive()
-      );
-    });
-    
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-  
-  // Return modified animation config based on reduce motion preference
-  return reduceMotion
-    ? {
-        ...defaultConfig,
-        duration: 0, // Disable animation
-      }
-    : defaultConfig;
-};
-```
-
-This pattern ensures:
-- Animations respect the reduce motion preference
-- Consistent animation behavior across the app
-- Clean component code without repetitive motion checks
-- Proper handling of system and user preferences
-
-### Accessibility Testing
-```typescript
-// scripts/accessibility-audit.js
-function scanFile(filePath) {
-  const issues = [];
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  
-  // Check for missing accessibility props
-  if (!fileContent.includes('accessibilityLabel') && 
-      (fileContent.includes('<TouchableOpacity') || 
-       fileContent.includes('<Button') || 
-       fileContent.includes('<Pressable'))) {
-    issues.push({
-      file: filePath,
-      line: findLineNumber(fileContent, '<TouchableOpacity') || 
-            findLineNumber(fileContent, '<Button') || 
-            findLineNumber(fileContent, '<Pressable'),
-      criterion: '4.1.2',
-      severity: 'error',
-      message: 'Interactive element missing accessibilityLabel',
-      code: 'missing-accessibility-label',
-      suggestion: 'Add accessibilityLabel prop to describe the purpose of this control'
-    });
-  }
-  
-  // Check for small touch targets
-  if (fileContent.includes('width:') && fileContent.includes('height:')) {
-    const smallTouchTargetRegex = /width:\s*(\d+)(px|pt)?.+?height:\s*(\d+)(px|pt)?/gs;
-    let match;
-    while ((match = smallTouchTargetRegex.exec(fileContent)) !== null) {
-      const width = parseInt(match[1], 10);
-      const height = parseInt(match[3], 10);
-      
-      if ((width < 44 || height < 44) && 
-          fileContent.substring(match.index - 200, match.index).includes('<TouchableOpacity')) {
-        issues.push({
-          file: filePath,
-          line: findLineNumber(fileContent, match[0]),
-          criterion: 'M1',
-          severity: 'warning',
-          message: 'Touch target may be too small',
-          code: 'small-touch-target',
-          suggestion: 'Ensure touch targets are at least 44x44 points'
-        });
-      }
-    }
-  }
-  
-  return issues;
-}
-```
-
-This pattern provides:
-- Automated accessibility testing
-- Identification of common accessibility issues
-- Specific suggestions for fixing issues
-- Integration with development workflow
+## Code Patterns
+
+### Shell Scripting Patterns
+
+1. **Command-Line Interface Pattern**
+   - All scripts follow a consistent CLI pattern with --init, --help, and other standardized options
+   - Help text is displayed when no arguments are provided
+   - Each script can be run independently or as part of a larger orchestration
+
+2. **Configuration Management Pattern**
+   - JSON configuration files for all components
+   - Configuration files are created during initialization
+   - Configuration files can be modified manually or through scripts
+
+3. **Reporting Pattern**
+   - HTML reports generated for all test results
+   - Consistent styling across all reports
+   - Reports include summary and detailed information
+   - Screenshots included where applicable
+
+4. **Logging Pattern**
+   - All operations are logged to dedicated log files
+   - Logs include timestamps and severity levels
+   - Color-coded output for better readability
+
+### Testing Patterns
+
+1. **Edge Cases Testing Pattern**
+   - Identify boundary conditions
+   - Test with invalid inputs
+   - Test error handling
+   - Verify appropriate error messages
+
+2. **Accessibility Testing Pattern**
+   - Automated testing with Pa11y and Axe
+   - WCAG 2.1 AA compliance checks
+   - Screenshot capture for visual verification
+
+3. **Internationalization Testing Pattern**
+   - Translation file verification
+   - RTL language support testing
+   - Date and number formatting tests
+   - Screenshot comparison across languages
+
+4. **Regression Testing Pattern**
+   - Smoke tests run first
+   - Critical path tests run next
+   - Full regression tests run if smoke and critical path tests pass
+### Security Patterns
+
+1. **Penetration Testing Pattern**
+   - Network scanning
+   - Web application testing
+   - API testing
+   - Database testing
+
+2. **Vulnerability Scanning Pattern**
+   - Code scanning
+   - Dependency scanning
+   - Docker image scanning
+   - Infrastructure scanning
+
+3. **API Rate Limiting Pattern**
+   - Global rate limits
+   - Endpoint-specific rate limits
+   - User tier-based rate limits
+   - IP whitelisting
+
+4. **Content Security Policy Pattern**
+   - Default-src restriction to 'self'
+   - Specific allowances for trusted external sources
+   - Inline script and style restrictions
+   - Frame and object restrictions
+
+5. **Subresource Integrity Pattern**
+   - SHA-384 hash generation for external resources
+   - Integrity attribute on script and link tags
+   - Crossorigin attribute for CORS resources
+   - Fallback mechanisms for failed integrity checks
+
+6. **CSRF Protection Pattern**
+   - Token generation and storage
+   - Token inclusion in non-GET requests
+   - Token validation on server-side
+   - Token refresh mechanisms
+
+7. **XSS Prevention Pattern**
+   - HTML entity encoding
+   - JavaScript protocol blocking
+   - Event handler sanitization
+   - Data URI filtering
+   - Recursive object sanitization
+   - IP whitelisting
+
+### Release Management Patterns
+
+1. **CI/CD Pipeline Pattern**
+   - Automated build, test, and deployment
+   - Integration with AWS services
+   - Artifact storage and management
+
+2. **Versioning Pattern**
+   - Semantic versioning
+   - Changelog management
+   - Git tagging
+
+3. **Rollback Pattern**
+   - Code rollback
+   - Database rollback
+   - Deployment rollback
+
+4. **Feature Flags Pattern**
+   - Gradual rollout
+   - A/B testing
+   - Environment-specific configuration
+
+5. **Canary Deployment Pattern**
+   - Traffic splitting
+   - Metrics monitoring
+   - Automated promotion/rollback
+
+### Onboarding Experience Patterns
+
+1. **Secure Storage Pattern**
+   ```javascript
+   // Configuration options
+   const BYPASS_ONBOARDING_IN_DEV = false; // Set to true only when needed for testing
+
+   // Local storage key with a unique prefix to avoid conflicts
+   const ONBOARDING_COMPLETED_KEY = 'ai_sports_edge_onboarding_completed';
+
+   /**
+    * Check if onboarding has been completed
+    * @returns {Promise<boolean>} True if onboarding has been completed
+    */
+   export const isOnboardingCompleted = async () => {
+     try {
+       // For development purposes, optionally bypass onboarding
+       const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname === '127.0.0.1';
+       
+       if (isDevelopment && BYPASS_ONBOARDING_IN_DEV) {
+         console.log('Development mode: Onboarding bypassed');
+         return true;
+       }
+       
+       // Use a try-catch block to handle potential localStorage access issues
+       const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
+       
+       // Validate the value to prevent unexpected behavior
+       if (completed !== 'true' && completed !== null) {
+         // Check for potential XSS attempts in the stored value
+         if (completed && (completed.includes('<') || completed.includes('>'))) {
+           console.warn('Potentially malicious value detected:', sanitizeValue(completed));
+           localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
+           localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
+           return false;
+         }
+         
+         console.warn('Invalid onboarding status value:', sanitizeValue(completed));
+         localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
+         return false;
+       }
+       
+       return completed === 'true';
+     } catch (error) {
+       console.error('Error checking onboarding status:', error);
+       return false;
+     }
+   };
+   ```
+
+2. **Enhanced Accessibility Pattern**
+   ```jsx
+   <div
+     className={`onboarding-content ${animating ? 'fade-out' : 'fade-in'}`}
+     aria-live="polite"
+     role="region"
+     aria-label={`${t('onboarding:step', { defaultValue: 'Step' })} ${currentStep + 1} ${t('onboarding:of', { defaultValue: 'of' })} ${steps.length}`}
+   >
+     {/* Content */}
+   </div>
+
+   <button
+     className="next-button"
+     onClick={handleNext}
+     aria-label={t('common:next')}
+     aria-describedby={`onboarding-step-${currentStep + 1}`}
+   >
+     {t('common:next')}
+   </button>
+   ```
+
+3. **Unified Analytics Pattern**
+   ```javascript
+   /**
+    * Track an analytics event
+    * @param {string} eventName - Name of the event to track
+    * @param {Object} eventData - Data associated with the event
+    * @returns {Promise<boolean>} - True if successful, false otherwise
+    */
+   export const trackEvent = async (eventName, eventData) => {
+     try {
+       // Sanitize inputs
+       const sanitizedEventName = sanitizeValue(eventName);
+       const sanitizedEventData = sanitizeValue(eventData);
+       
+       // Add common properties
+       const commonData = {
+         timestamp: new Date().toISOString(),
+         platform: 'web',
+         browser: navigator.userAgent ? sanitizeValue(navigator.userAgent) : 'unknown',
+         language: navigator.language || 'en',
+         url: window.location.href,
+         referrer: document.referrer || 'direct'
+       };
+       
+       // Merge with event data
+       const fullEventData = {
+         ...sanitizedEventData,
+         ...commonData
+       };
+       
+       // Web implementation (gtag)
+       if (typeof window !== 'undefined' && window.gtag) {
+         window.gtag('event', sanitizedEventName, fullEventData);
+       }
+       
+       return true;
+     } catch (error) {
+       console.error('Analytics error:', error);
+       return false;
+     }
+   };
+   ```
+
+4. **Multilingual Support Pattern**
+   ```javascript
+   // Translation files structure
+   // translations/en.json
+   {
+     "onboarding": {
+       "welcome": {
+         "title": "Welcome to AI Sports Edge",
+         "description": "Get an edge in sports betting with AI-powered predictions and analysis."
+       },
+       // More translations...
+     }
+   }
+
+   // translations/es.json
+   {
+     "onboarding": {
+       "welcome": {
+         "title": "Bienvenido a AI Sports Edge",
+         "description": "Obtenga ventaja en las apuestas deportivas con predicciones y análisis impulsados por IA."
+       },
+       // More translations...
+     }
+   }
+
+   // Usage in components
+   const { t, i18n } = useTranslation(['common', 'onboarding']);
+   
+   <h1>{t('onboarding:welcome.title')}</h1>
+   <p>{t('onboarding:welcome.description')}</p>
+   ```
+
+## Implementation Approaches
+
+### Modular Design
+
+Each script is designed to be modular and focused on a specific concern:
+- `ci-cd-pipeline.sh` - CI/CD pipeline setup
+- `versioning-strategy.sh` - Version management
+- `rollback-procedure.sh` - Rollback procedures
+- `feature-flags.sh` - Feature flag management
+- `canary-deployments.sh` - Canary deployment management
+- `release-management.sh` - Orchestration of release management
+- `penetration-testing.sh` - Penetration testing
+- `vulnerability-scanning.sh` - Vulnerability scanning
+- `api-rate-limiting.sh` - API rate limiting
+- `security-management.sh` - Orchestration of security components
+- `edge-cases-testing.sh` - Edge cases testing
+- `accessibility-audit.sh` - Accessibility testing
+- `internationalization-testing.sh` - Internationalization testing
+- `regression-testing.sh` - Regression testing
+- `testing-management.sh` - Orchestration of testing components
+
+### Orchestration Pattern
+
+Higher-level scripts orchestrate lower-level scripts:
+- `deploy-production.sh` orchestrates all components
+- `release-management.sh` orchestrates release management scripts
+- `security-management.sh` orchestrates security scripts
+- `testing-management.sh` orchestrates testing scripts
+
+### Documentation Pattern
+
+Comprehensive documentation for all components:
+- `docs/production-infrastructure.md` - Infrastructure documentation
+- `docs/release-management-plan.md` - Release management documentation
+- `docs/security-plan.md` - Security documentation
+- `docs/testing-plan.md` - Testing documentation
+- `docs/onboarding-process.md` - Onboarding process documentation
+
+### Payment Processing Patterns
+
+1. **API Key Management Pattern**
+   ```bash
+   # Configuration options
+   ENV_FILE=".env"
+   CONFIG_FILE="config/payment.json"
+   BACKUP_SUFFIX=".test-backup"
+
+   # Create backups
+   cp "$ENV_FILE" "$ENV_FILE$BACKUP_SUFFIX"
+   cp "$CONFIG_FILE" "$CONFIG_FILE$BACKUP_SUFFIX"
+
+   # Update configuration
+   sed -i.bak 's/STRIPE_TEST_PUBLISHABLE_KEY/STRIPE_PUBLISHABLE_KEY/g' "$ENV_FILE"
+   sed -i.bak 's/PAYMENT_MODE=test/PAYMENT_MODE=production/g' "$ENV_FILE"
+
+   # Verify changes
+   if grep -q "PAYMENT_MODE=production" "$ENV_FILE"; then
+     echo "Configuration successfully updated to production mode!"
+   else
+     echo "Verification failed. Restoring backups..."
+     mv "$ENV_FILE$BACKUP_SUFFIX" "$ENV_FILE"
+     mv "$CONFIG_FILE$BACKUP_SUFFIX" "$CONFIG_FILE"
+   fi
+   ```
+
+   This pattern provides:
+   - Safe switching between test and production environments
+   - Automatic backup of configuration files
+   - Verification of changes before committing
+   - Easy rollback to previous configuration
+   - Consistent environment configuration
+
+2. **Webhook Configuration Pattern**
+   ```javascript
+   // Define events to listen for
+   const STRIPE_EVENTS = [
+     "payment_intent.succeeded",
+     "payment_intent.payment_failed",
+     "checkout.session.completed",
+     "customer.subscription.created",
+     "customer.subscription.updated",
+     "customer.subscription.deleted",
+     "invoice.payment_succeeded",
+     "invoice.payment_failed",
+     "charge.refunded"
+   ];
+
+   // Create webhook
+   const webhook = await stripe.webhookEndpoints.create({
+     url: WEBHOOK_ENDPOINT,
+     enabled_events: STRIPE_EVENTS,
+     description: "Production webhook for payment events"
+   });
+
+   // Store webhook secret securely
+   await storeWebhookSecret(webhook.secret);
+   ```
+
+   This pattern provides:
+   - Consistent webhook configuration across environments
+   - Event-specific configuration for different payment scenarios
+   - Secure storage of webhook secrets
+   - Proper error handling and validation
+   - Support for multiple payment providers
+
+3. **Refund Processing Pattern**
+   ```javascript
+   // Process a refund
+   async function processRefund(paymentId, amount, reason) {
+     try {
+       // Validate inputs
+       if (!paymentId) throw new Error("Payment ID is required");
+       if (amount <= 0) throw new Error("Amount must be greater than 0");
+       
+       // Get payment details
+       const payment = await getPaymentDetails(paymentId);
+       
+       // Validate payment status
+       if (payment.status !== "succeeded") {
+         throw new Error(`Cannot refund payment with status: ${payment.status}`);
+       }
+       
+       // Check if already refunded
+       if (payment.refunded) {
+         throw new Error("Payment has already been refunded");
+       }
+       
+       // Check refund amount
+       if (amount > payment.amount) {
+         throw new Error("Refund amount cannot exceed payment amount");
+       }
+       
+       // Process refund with payment provider
+       const refund = await paymentProvider.refunds.create({
+         payment: paymentId,
+         amount: amount,
+         reason: reason
+       });
+       
+       // Record refund in database
+       await saveRefundRecord(refund.id, paymentId, amount, reason);
+       
+       // Notify customer
+       await notifyCustomerOfRefund(payment.customerId, refund.id, amount);
+       
+       return refund;
+     } catch (error) {
+       // Log error
+       console.error("Refund processing error:", error);
+       
+       // Rethrow with appropriate message
+       throw new Error(`Failed to process refund: ${error.message}`);
+     }
+   }
+   ```
+
+   This pattern provides:
+   - Comprehensive input validation
+   - Payment status verification
+   - Amount validation to prevent over-refunding
+   - Proper error handling with detailed messages
+   - Database recording of refund details
+   - Customer notification of refund status
+
+## Best Practices
+
+1. **Error Handling**
+   - All scripts include proper error handling
+   - Errors are reported with clear messages
+   - Non-zero exit codes for failures
+
+2. **Idempotency**
+   - Scripts can be run multiple times without side effects
+   - Configuration files are created only if they don't exist
+   - Existing configurations are preserved
+
+3. **Automation**
+   - All processes are automated
+   - Scheduled tasks for regular operations
+   - Minimal manual intervention required
+
+4. **Monitoring**
+   - All operations are logged
+   - Reports are generated for all tests
+   - Alerts for critical issues
+
+5. **Security**
+   - Secure coding practices
+   - Regular security testing
+   - Proper authentication and authorization
+
+6. **Accessibility**
+   - ARIA attributes for screen readers
+   - Keyboard navigation support
+   - High contrast support
+   - Reduced motion options
+
+7. **Internationalization**
+   - Translation files for all supported languages
+   - Context-based translation keys
+   - Proper handling of RTL languages
+   - Localized formatting for dates, numbers, and currencies
+
+8. **Payment Processing**
+   - Test mode for development and testing
+   - Production mode for live transactions
+   - Comprehensive webhook handling
+   - Robust refund procedures
+   - Detailed transaction logging

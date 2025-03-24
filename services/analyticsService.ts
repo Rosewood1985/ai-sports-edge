@@ -1,1546 +1,187 @@
 /**
  * Analytics Service
  * 
- * This service provides analytics tracking functionality for the app.
- * It supports tracking events, user properties, and conversion metrics.
+ * A unified analytics interface that works across platforms (web and mobile)
+ * This service abstracts away the platform-specific implementation details
+ * and provides a consistent API for tracking events.
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-// Import Device from expo-device if available, otherwise use a mock
-let Device: any;
-try {
-  Device = require('expo-device');
-} catch (error) {
-  // Mock Device if not available
-  Device = {
-    getDeviceTypeAsync: async () => 'unknown',
-  };
-}
-import Constants from 'expo-constants';
+import { firestore } from '../config/firebase';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { auth } from '../config/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Analytics event types
-export enum AnalyticsEventType {
-  // Screen views
-  SCREEN_VIEW = 'screen_view',
-  
-  // Feature usage
-  FEATURE_USED = 'feature_used',
-  
-  // Odds comparison events
-  ODDS_VIEWED = 'odds_viewed',
-  ODDS_REFRESHED = 'odds_refreshed',
-  SPORT_SELECTED = 'sport_selected',
-  
-  // Betting events
-  SPORTSBOOK_CLICKED = 'sportsbook_clicked',
-  BET_PLACED = 'bet_placed',
-  PARLAY_CREATED = 'parlay_created',
-  PARLAY_ITEM_ADDED = 'parlay_item_added',
-  PARLAY_ITEM_REMOVED = 'parlay_item_removed',
-  
-  // Conversion events
-  CONVERSION_STARTED = 'conversion_started',
-  CONVERSION_COMPLETED = 'conversion_completed',
-  CONVERSION_ABANDONED = 'conversion_abandoned',
-  
-  // Subscription events
-  SUBSCRIPTION_VIEWED = 'subscription_viewed',
-  SUBSCRIPTION_STARTED = 'subscription_started',
-  SUBSCRIPTION_COMPLETED = 'subscription_completed',
-  SUBSCRIPTION_CANCELLED = 'subscription_cancelled',
-  
-  // Error events
-  ERROR_OCCURRED = 'error_occurred',
-  
-  // Performance events
-  PERFORMANCE_METRIC = 'performance_metric',
-  
-  // A/B testing events
-  EXPERIMENT_VIEWED = 'experiment_viewed',
-  EXPERIMENT_INTERACTED = 'experiment_interacted',
-  
-  // Custom events
-  CUSTOM = 'custom'
-}
-
-// Analytics properties interface
-export interface AnalyticsProperties {
-  [key: string]: string | number | boolean | null | undefined;
-}
-
-// Analytics event interface
-export interface AnalyticsEvent {
-  eventType: AnalyticsEventType;
-  properties: AnalyticsProperties;
-  timestamp: number;
-  sessionId: string;
-  userId?: string;
-  deviceId: string;
-}
-
-// Analytics user properties interface
-export interface AnalyticsUserProperties {
-  userId?: string;
-  email?: string;
-  isPremium?: boolean;
-  hasCompletedOnboarding?: boolean;
-  preferredSport?: string;
-  installDate?: number;
-  lastLoginDate?: number;
-  deviceType?: string;
-  osVersion?: string;
-  appVersion?: string;
-  [key: string]: any;
-}
-
-// Analytics session interface
-export interface AnalyticsSession {
-  sessionId: string;
-  startTime: number;
-  endTime?: number;
-  events: AnalyticsEvent[];
-  deviceId: string;
-  platform: string;
-  osVersion: string;
-  appVersion: string;
-  userId?: string;
-}
-
-// Dashboard data interface
-export interface DashboardData {
-  revenue: {
-    total_revenue: number;
-    active_users: number;
-    daily_data: Record<string, number>;
-  };
-  cookies: {
-    cookie_inits: number;
-    cookie_persists: number;
-    redirects: number;
-    conversions: number;
-    persist_rate: number;
-    redirect_success_rate: number;
-  };
-  microtransactions: {
-    total_revenue: number;
-    by_type: Record<string, {
-      impressions: number;
-      clicks: number;
-      purchases: number;
-      revenue: number;
-      click_rate: number;
-      conversion_rate: number;
-    }>;
-  };
-  user_journey: {
-    stages: Record<string, number>;
-    dropoff_rates: Record<string, number>;
-    completion_rate: number;
-  };
-  betting_performance?: {
-    win_rate: number;
-    roi: number;
-    by_sport: Record<string, any>;
-    heat_map_data: any[];
-  };
-  user_engagement?: {
-    daily_active_users: number;
-    sessions_per_user: number;
-    retention_rate: number;
-    engagement_metrics: Record<string, number>;
-  };
-}
-
-// Cache interface
-interface DashboardDataCache {
-  data: DashboardData;
-  timestamp: number;
-  timePeriod: string;
-  customDateRange?: { start: Date, end: Date };
-}
-
-// Analytics conversion funnel step
-export enum ConversionFunnelStep {
-  ODDS_VIEW = 'odds_view',
-  SPORTSBOOK_CLICK = 'sportsbook_click',
-  REGISTRATION = 'registration',
-  SUBSCRIPTION = 'subscription',
-  FIRST_BET = 'first_bet',
-  PARLAY_CREATION = 'parlay_creation'
-}
-
-// Analytics conversion funnel
-export interface ConversionFunnel {
-  funnelId: string;
-  steps: {
-    step: ConversionFunnelStep;
-    timestamp: number;
-    completed: boolean;
-    properties?: AnalyticsProperties;
-  }[];
-  startTime: number;
-  endTime?: number;
-  completed: boolean;
-  userId?: string;
-  sessionId: string;
-  experimentId?: string;
-  experimentVariant?: string;
-}
-
-class AnalyticsService {
-  private static instance: AnalyticsService;
-  private currentSession: AnalyticsSession | null = null;
-  private deviceId: string = '';
-  private userProperties: AnalyticsUserProperties = {};
-  private activeFunnels: Map<string, ConversionFunnel> = new Map();
-  private isInitialized: boolean = false;
-  private eventQueue: AnalyticsEvent[] = [];
-  private flushInterval: ReturnType<typeof setInterval> | null = null;
-  private dashboardDataCache: Map<string, DashboardDataCache> = new Map();
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
-  private readonly API_BASE_URL = 'https://api.ai-sports-edge.com/analytics';
-  private readonly STORAGE_KEYS = {
-    DEVICE_ID: 'analytics_device_id',
-    USER_PROPERTIES: 'analytics_user_properties',
-    EVENTS: 'analytics_events',
-    FUNNELS: 'analytics_funnels',
-    SESSION: 'analytics_current_session',
-    DASHBOARD_CACHE: 'analytics_dashboard_cache'
-  };
-  
-  // Get singleton instance
-  public static getInstance(): AnalyticsService {
-    if (!AnalyticsService.instance) {
-      AnalyticsService.instance = new AnalyticsService();
-    }
-    return AnalyticsService.instance;
-  }
-  
-  // Initialize analytics service
-  public async initialize(): Promise<void> {
-    if (this.isInitialized) return;
-    
-    try {
-      // Load device ID or generate a new one
-      await this.loadDeviceId();
-      
-      // Load user properties
-      await this.loadUserProperties();
-      
-      // Start a new session
-      await this.startNewSession();
-      
-      // Set up event flushing interval (every 60 seconds)
-      this.flushInterval = setInterval(() => {
-        this.flushEvents();
-      }, 60000);
-      
-      this.isInitialized = true;
-      
-      console.log('Analytics service initialized');
-    } catch (error) {
-      console.error('Error initializing analytics service:', error);
-    }
-  }
-  
-  // Track an analytics event
-  public async trackEvent(
-    eventType: AnalyticsEventType,
-    properties: AnalyticsProperties = {}
-  ): Promise<void> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    if (!this.currentSession) {
-      await this.startNewSession();
-    }
-    
-    const event: AnalyticsEvent = {
-      eventType,
-      properties,
-      timestamp: Date.now(),
-      sessionId: this.currentSession!.sessionId,
-      userId: auth.currentUser?.uid,
-      deviceId: this.deviceId
-    };
-    
-    // Add event to current session
-    this.currentSession!.events.push(event);
-    
-    // Add event to queue for flushing
-    this.eventQueue.push(event);
-    
-    // Save session
-    await this.saveCurrentSession();
-    
-    // If queue is getting large, flush immediately
-    if (this.eventQueue.length >= 20) {
-      this.flushEvents();
-    }
-    
-    // Process funnel steps if applicable
-    if (this.isFunnelEvent(eventType)) {
-      this.processFunnelStep(eventType, properties);
-    }
-  }
-  
-  // Set user properties
-  public async setUserProperties(properties: AnalyticsUserProperties): Promise<void> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    // Merge new properties with existing ones
-    this.userProperties = {
-      ...this.userProperties,
-      ...properties
-    };
-    
-    // Save user properties
-    await this.saveUserProperties();
-  }
-  
-  // Start tracking a conversion funnel
-  public async startFunnel(
-    funnelId: string,
-    firstStep: ConversionFunnelStep,
-    properties: AnalyticsProperties = {}
-  ): Promise<string> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    if (!this.currentSession) {
-      await this.startNewSession();
-    }
-    
-    // Create a new funnel
-    const funnel: ConversionFunnel = {
-      funnelId,
-      steps: [
-        {
-          step: firstStep,
-          timestamp: Date.now(),
-          completed: true,
-          properties
-        }
-      ],
-      startTime: Date.now(),
-      completed: false,
-      userId: auth.currentUser?.uid,
-      sessionId: this.currentSession!.sessionId,
-      experimentId: properties.experimentId as string,
-      experimentVariant: properties.experimentVariant as string
-    };
-    
-    // Add funnel to active funnels
-    this.activeFunnels.set(funnelId, funnel);
-    
-    // Save active funnels
-    await this.saveActiveFunnels();
-    
-    // Track funnel start event
-    await this.trackEvent(AnalyticsEventType.CONVERSION_STARTED, {
-      funnel_id: funnelId,
-      first_step: firstStep,
-      ...properties
-    });
-    
-    return funnelId;
-  }
-  
-  // Add a step to a conversion funnel
-  public async addFunnelStep(
-    funnelId: string,
-    step: ConversionFunnelStep,
-    properties: AnalyticsProperties = {}
-  ): Promise<boolean> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    // Get funnel
-    const funnel = this.activeFunnels.get(funnelId);
-    
-    if (!funnel) {
-      console.warn(`Funnel with ID ${funnelId} not found`);
-      return false;
-    }
-    
-    // Add step to funnel
-    funnel.steps.push({
-      step,
-      timestamp: Date.now(),
-      completed: true,
-      properties
-    });
-    
-    // Save active funnels
-    await this.saveActiveFunnels();
-    
-    // Track funnel step event
-    await this.trackEvent(AnalyticsEventType.CUSTOM, {
-      event_name: `funnel_step_${step}`,
-      funnel_id: funnelId,
-      step,
-      ...properties
-    });
-    
-    return true;
-  }
-  
-  // Complete a conversion funnel
-  public async completeFunnel(
-    funnelId: string,
-    properties: AnalyticsProperties = {}
-  ): Promise<boolean> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    // Get funnel
-    const funnel = this.activeFunnels.get(funnelId);
-    
-    if (!funnel) {
-      console.warn(`Funnel with ID ${funnelId} not found`);
-      return false;
-    }
-    
-    // Mark funnel as completed
-    funnel.completed = true;
-    funnel.endTime = Date.now();
-    
-    // Remove from active funnels
-    this.activeFunnels.delete(funnelId);
-    
-    // Save active funnels
-    await this.saveActiveFunnels();
-    
-    // Track funnel completion event
-    await this.trackEvent(AnalyticsEventType.CONVERSION_COMPLETED, {
-      funnel_id: funnelId,
-      duration_ms: funnel.endTime - funnel.startTime,
-      steps_count: funnel.steps.length,
-      ...properties
-    });
-    
-    return true;
-  }
-  
-  // Abandon a conversion funnel
-  public async abandonFunnel(
-    funnelId: string,
-    reason: string,
-    properties: AnalyticsProperties = {}
-  ): Promise<boolean> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    // Get funnel
-    const funnel = this.activeFunnels.get(funnelId);
-    
-    if (!funnel) {
-      console.warn(`Funnel with ID ${funnelId} not found`);
-      return false;
-    }
-    
-    // Mark funnel as abandoned
-    funnel.completed = false;
-    funnel.endTime = Date.now();
-    
-    // Remove from active funnels
-    this.activeFunnels.delete(funnelId);
-    
-    // Save active funnels
-    await this.saveActiveFunnels();
-    
-    // Track funnel abandonment event
-    await this.trackEvent(AnalyticsEventType.CONVERSION_ABANDONED, {
-      funnel_id: funnelId,
-      reason,
-      duration_ms: funnel.endTime - funnel.startTime,
-      steps_completed: funnel.steps.length,
-      last_step: funnel.steps[funnel.steps.length - 1].step,
-      ...properties
-    });
-    
-    return true;
-  }
-  
-  // Track screen view
-  public async trackScreenView(
-    screenName: string,
-    properties: AnalyticsProperties = {}
-  ): Promise<void> {
-    await this.trackEvent(AnalyticsEventType.SCREEN_VIEW, {
-      screen_name: screenName,
-      ...properties
-    });
-  }
-  
-  // Track feature usage
-  public async trackFeatureUsage(
-    featureName: string,
-    properties: AnalyticsProperties = {}
-  ): Promise<void> {
-    await this.trackEvent(AnalyticsEventType.FEATURE_USED, {
-      feature_name: featureName,
-      ...properties
-    });
-  }
-  
-  // Track error
-  public async trackError(
-    errorType: string,
-    errorMessage: string,
-    properties: AnalyticsProperties = {}
-  ): Promise<void> {
-    await this.trackEvent(AnalyticsEventType.ERROR_OCCURRED, {
-      error_type: errorType,
-      error_message: errorMessage,
-      ...properties
-    });
-  }
-  
-  // Track performance metric
-  public async trackPerformanceMetric(
-    metricName: string,
-    value: number,
-    properties: AnalyticsProperties = {}
-  ): Promise<void> {
-    await this.trackEvent(AnalyticsEventType.PERFORMANCE_METRIC, {
-      metric_name: metricName,
-      value,
-      ...properties
-    });
-  }
-  
-  // End current session
-  public async endSession(): Promise<void> {
-    if (!this.currentSession) return;
-    
-    // Set end time
-    this.currentSession.endTime = Date.now();
-    
-    // Save session
-    await this.saveCurrentSession();
-    
-    // Track session end event
-    await this.trackEvent(AnalyticsEventType.CUSTOM, {
-      event_name: 'session_end',
-      duration_ms: this.currentSession.endTime - this.currentSession.startTime,
-      events_count: this.currentSession.events.length
-    });
-    
-    // Clear current session
-    this.currentSession = null;
-  }
-  
-  // Flush events to storage and/or server
-  private async flushEvents(): Promise<void> {
-    if (this.eventQueue.length === 0) return;
-    
-    try {
-      // In a real app, we would send events to a server here
-      // For now, we'll just save them to AsyncStorage
-      
-      // Get existing events
-      const eventsString = await AsyncStorage.getItem(this.STORAGE_KEYS.EVENTS);
-      let events: AnalyticsEvent[] = [];
-      
-      if (eventsString) {
-        events = JSON.parse(eventsString);
-      }
-      
-      // Add new events
-      events = [...events, ...this.eventQueue];
-      
-      // Save events
-      await AsyncStorage.setItem(this.STORAGE_KEYS.EVENTS, JSON.stringify(events));
-      
-      // Clear event queue
-      this.eventQueue = [];
-      
-      console.log(`Flushed ${events.length} analytics events`);
-    } catch (error) {
-      console.error('Error flushing analytics events:', error);
-    }
-  }
-  
-  // Start a new session
-  private async startNewSession(): Promise<void> {
-    // Generate session ID
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    
-    // Create new session
-    this.currentSession = {
-      sessionId,
-      startTime: Date.now(),
-      events: [],
-      deviceId: this.deviceId,
-      platform: Platform.OS,
-      osVersion: Platform.Version.toString(),
-      appVersion: Constants.expoConfig?.version || '1.0.0',
-      userId: auth.currentUser?.uid
-    };
-    
-    // Save session
-    await this.saveCurrentSession();
-    
-    // Track session start event
-    await this.trackEvent(AnalyticsEventType.CUSTOM, {
-      event_name: 'session_start',
-      platform: Platform.OS,
-      os_version: Platform.Version.toString(),
-      app_version: Constants.expoConfig?.version || '1.0.0',
-      device_type: await Device.getDeviceTypeAsync()
-    });
-  }
-  
-  // Load device ID from storage or generate a new one
-  private async loadDeviceId(): Promise<void> {
-    try {
-      const deviceId = await AsyncStorage.getItem(this.STORAGE_KEYS.DEVICE_ID);
-      
-      if (deviceId) {
-        this.deviceId = deviceId;
-      } else {
-        // Generate a new device ID
-        this.deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        
-        // Save device ID
-        await AsyncStorage.setItem(this.STORAGE_KEYS.DEVICE_ID, this.deviceId);
-      }
-    } catch (error) {
-      console.error('Error loading device ID:', error);
-      
-      // Generate a fallback device ID
-      this.deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    }
-  }
-  
-  // Load user properties from storage
-  private async loadUserProperties(): Promise<void> {
-    try {
-      const userPropertiesString = await AsyncStorage.getItem(this.STORAGE_KEYS.USER_PROPERTIES);
-      
-      if (userPropertiesString) {
-        this.userProperties = JSON.parse(userPropertiesString);
-      } else {
-        // Initialize with default properties
-        this.userProperties = {
-          installDate: Date.now(),
-          lastLoginDate: Date.now(),
-          deviceType: await Device.getDeviceTypeAsync(),
-          osVersion: Platform.Version.toString(),
-          appVersion: Constants.expoConfig?.version || '1.0.0'
+// Sanitize values for XSS prevention
+const sanitizeValue = (value: any): any => {
+  if (typeof value === 'string') {
+    // More comprehensive XSS prevention
+    // Escape HTML special chars, script tags, event handlers, and data URIs
+    return value
+      .replace(/[&<>"']/g, (char) => {
+        const entities: Record<string, string> = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
         };
-        
-        // Save user properties
-        await this.saveUserProperties();
-      }
-    } catch (error) {
-      console.error('Error loading user properties:', error);
-    }
+        return entities[char];
+      })
+      .replace(/javascript:/gi, 'blocked:')
+      .replace(/on\w+=/gi, 'data-blocked=')
+      .replace(/data:(?!image\/(jpeg|png|gif|webp))/gi, 'blocked:');
   }
-  
-  // Save user properties to storage
-  private async saveUserProperties(): Promise<void> {
-    try {
-      await AsyncStorage.setItem(
-        this.STORAGE_KEYS.USER_PROPERTIES,
-        JSON.stringify(this.userProperties)
-      );
-    } catch (error) {
-      console.error('Error saving user properties:', error);
+  if (typeof value === 'object' && value !== null) {
+    // Handle arrays
+    if (Array.isArray(value)) {
+      return value.map(item => sanitizeValue(item));
     }
+    // Handle objects
+    return Object.keys(value).reduce((acc: Record<string, any>, key) => {
+      acc[key] = sanitizeValue(value[key]);
+      return acc;
+    }, {});
   }
-  
-  // Save current session to storage
-  private async saveCurrentSession(): Promise<void> {
-    if (!this.currentSession) return;
+  return value;
+};
+
+/**
+ * Track an analytics event
+ * @param {string} eventName - Name of the event to track
+ * @param {Object} eventData - Data associated with the event
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackEvent = async (eventName: string, eventData: Record<string, any>): Promise<boolean> => {
+  try {
+    // Sanitize inputs
+    const sanitizedEventName = sanitizeValue(eventName);
+    const sanitizedEventData = sanitizeValue(eventData);
     
-    try {
-      await AsyncStorage.setItem(
-        this.STORAGE_KEYS.SESSION,
-        JSON.stringify(this.currentSession)
-      );
-    } catch (error) {
-      console.error('Error saving current session:', error);
+    // Add common properties
+    const commonData = {
+      timestamp: new Date().toISOString(),
+      platform: Platform.OS,
+    };
+    
+    // Merge with event data
+    const fullEventData = {
+      ...sanitizedEventData,
+      ...commonData
+    };
+    
+    // Web implementation (gtag)
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', sanitizedEventName, fullEventData);
     }
-  }
-  
-  // Save active funnels to storage
-  private async saveActiveFunnels(): Promise<void> {
-    try {
-      const funnels = Array.from(this.activeFunnels.values());
-      await AsyncStorage.setItem(
-        this.STORAGE_KEYS.FUNNELS,
-        JSON.stringify(funnels)
-      );
-    } catch (error) {
-      console.error('Error saving active funnels:', error);
-    }
-  }
-  
-  // Load active funnels from storage
-  private async loadActiveFunnels(): Promise<void> {
-    try {
-      const funnelsString = await AsyncStorage.getItem(this.STORAGE_KEYS.FUNNELS);
-      
-      if (funnelsString) {
-        const funnels: ConversionFunnel[] = JSON.parse(funnelsString);
+    
+    // React Native implementation (Firebase)
+    if (Platform.OS !== 'web') {
+      // Store in Firestore if user is logged in
+      if (auth.currentUser) {
+        const userId = auth.currentUser.uid;
+        const deviceId = await getDeviceId();
         
-        // Clear existing funnels
-        this.activeFunnels.clear();
+        const analyticsRef = doc(
+          firestore,
+          'analytics_events',
+          `${userId || deviceId}_${sanitizedEventName}_${Date.now()}`
+        );
         
-        // Add funnels to map
-        funnels.forEach(funnel => {
-          this.activeFunnels.set(funnel.funnelId, funnel);
+        await setDoc(analyticsRef, {
+          eventName: sanitizedEventName,
+          userId: userId || null,
+          deviceId: deviceId,
+          ...fullEventData,
+          serverTimestamp: Timestamp.now()
         });
       }
-    } catch (error) {
-      console.error('Error loading active funnels:', error);
-    }
-  }
-  
-  // Check if an event is related to a funnel
-  private isFunnelEvent(eventType: AnalyticsEventType): boolean {
-    return [
-      AnalyticsEventType.ODDS_VIEWED,
-      AnalyticsEventType.SPORTSBOOK_CLICKED,
-      AnalyticsEventType.BET_PLACED,
-      AnalyticsEventType.PARLAY_CREATED,
-      AnalyticsEventType.SUBSCRIPTION_COMPLETED
-    ].includes(eventType);
-  }
-  
-  // Process funnel step based on event type
-  private async processFunnelStep(
-    eventType: AnalyticsEventType,
-    properties: AnalyticsProperties
-  ): Promise<void> {
-    // Map event types to funnel steps
-    const eventToStepMap: Partial<Record<AnalyticsEventType, ConversionFunnelStep>> = {
-      [AnalyticsEventType.ODDS_VIEWED]: ConversionFunnelStep.ODDS_VIEW,
-      [AnalyticsEventType.SPORTSBOOK_CLICKED]: ConversionFunnelStep.SPORTSBOOK_CLICK,
-      [AnalyticsEventType.BET_PLACED]: ConversionFunnelStep.FIRST_BET,
-      [AnalyticsEventType.PARLAY_CREATED]: ConversionFunnelStep.PARLAY_CREATION,
-      [AnalyticsEventType.SUBSCRIPTION_COMPLETED]: ConversionFunnelStep.SUBSCRIPTION
-    };
-    
-    const step = eventToStepMap[eventType];
-    
-    if (!step) return;
-    
-    // Check if this step belongs to an active funnel
-    for (const [funnelId, funnel] of this.activeFunnels.entries()) {
-      // Check if this step is the next logical step in the funnel
-      const lastStep = funnel.steps[funnel.steps.length - 1].step;
-      
-      // Simple sequential funnel logic - can be made more sophisticated
-      if (this.isNextLogicalStep(lastStep, step)) {
-        await this.addFunnelStep(funnelId, step, properties);
-        
-        // Check if this completes the funnel
-        if (this.isFunnelComplete(funnel, step)) {
-          await this.completeFunnel(funnelId, properties);
-        }
-      }
-    }
-  }
-  
-  // Check if a step is the next logical step in a funnel
-  private isNextLogicalStep(
-    currentStep: ConversionFunnelStep,
-    nextStep: ConversionFunnelStep
-  ): boolean {
-    // Define the funnel flow
-    const funnelFlow: Record<ConversionFunnelStep, ConversionFunnelStep[]> = {
-      [ConversionFunnelStep.ODDS_VIEW]: [
-        ConversionFunnelStep.SPORTSBOOK_CLICK,
-        ConversionFunnelStep.REGISTRATION
-      ],
-      [ConversionFunnelStep.SPORTSBOOK_CLICK]: [
-        ConversionFunnelStep.REGISTRATION,
-        ConversionFunnelStep.FIRST_BET
-      ],
-      [ConversionFunnelStep.REGISTRATION]: [
-        ConversionFunnelStep.SUBSCRIPTION,
-        ConversionFunnelStep.FIRST_BET
-      ],
-      [ConversionFunnelStep.SUBSCRIPTION]: [
-        ConversionFunnelStep.FIRST_BET,
-        ConversionFunnelStep.PARLAY_CREATION
-      ],
-      [ConversionFunnelStep.FIRST_BET]: [
-        ConversionFunnelStep.PARLAY_CREATION
-      ],
-      [ConversionFunnelStep.PARLAY_CREATION]: []
-    };
-    
-    return funnelFlow[currentStep]?.includes(nextStep) || false;
-  }
-  
-  // Check if a funnel is complete
-  private isFunnelComplete(
-    funnel: ConversionFunnel,
-    lastStep: ConversionFunnelStep
-  ): boolean {
-    // A funnel is complete if it reaches certain end steps
-    const completionSteps = [
-      ConversionFunnelStep.SUBSCRIPTION,
-      ConversionFunnelStep.PARLAY_CREATION
-    ];
-    
-    return completionSteps.includes(lastStep);
-  }
-  
-  // Get analytics data for reporting
-  public async getAnalyticsData(): Promise<{
-    events: AnalyticsEvent[];
-    funnels: ConversionFunnel[];
-    userProperties: AnalyticsUserProperties;
-  }> {
-    // Get events from storage
-    const eventsString = await AsyncStorage.getItem(this.STORAGE_KEYS.EVENTS);
-    let events: AnalyticsEvent[] = [];
-    
-    if (eventsString) {
-      events = JSON.parse(eventsString);
     }
     
-    // Get funnels
-    await this.loadActiveFunnels();
-    const funnels = Array.from(this.activeFunnels.values());
-    
-    return {
-      events,
-      funnels,
-      userProperties: this.userProperties
-    };
+    return true;
+  } catch (error) {
+    console.error('Analytics error:', error);
+    // Don't let analytics errors affect the main functionality
+    return false;
   }
-  
-  // Clear analytics data (for testing or user privacy)
-  public async clearAnalyticsData(): Promise<void> {
-    try {
-      // Clear events
-      await AsyncStorage.removeItem(this.STORAGE_KEYS.EVENTS);
-      
-      // Clear funnels
-      await AsyncStorage.removeItem(this.STORAGE_KEYS.FUNNELS);
-      
-      // Clear session
-      await AsyncStorage.removeItem(this.STORAGE_KEYS.SESSION);
-      
-      // Reset in-memory data
-      this.eventQueue = [];
-      this.activeFunnels.clear();
-      this.currentSession = null;
-      
-      console.log('Analytics data cleared');
-    } catch (error) {
-      console.error('Error clearing analytics data:', error);
-    }
-  }
+};
 
-  /**
-   * Get dashboard data for analytics
-   * @param timePeriod - Time period for the data
-   * @param customDateRange - Custom date range (if timePeriod is 'custom')
-   * @returns Dashboard data
-   */
-  public async getDashboardData(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): Promise<DashboardData> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    try {
-      // Generate cache key
-      const cacheKey = this.generateCacheKey(timePeriod, customDateRange);
+/**
+ * Get a unique device ID
+ * @returns {Promise<string>} - Device ID
+ */
+const getDeviceId = async (): Promise<string> => {
+  try {
+    // For React Native
+    if (Platform.OS !== 'web') {
+      let deviceId = await AsyncStorage.getItem('@AISportsEdge:deviceId');
       
-      // Check if we have cached data
-      const cachedData = this.dashboardDataCache.get(cacheKey);
-      if (cachedData && Date.now() - cachedData.timestamp < this.CACHE_TTL) {
-        console.log('Using cached dashboard data');
-        return cachedData.data;
+      if (!deviceId) {
+        deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        await AsyncStorage.setItem('@AISportsEdge:deviceId', deviceId);
       }
       
-      // Try to fetch from API
-      try {
-        const data = await this.fetchDashboardDataFromAPI(timePeriod, customDateRange);
-        
-        // Cache the data
-        this.dashboardDataCache.set(cacheKey, {
-          data,
-          timestamp: Date.now(),
-          timePeriod,
-          customDateRange
-        });
-        
-        // Save cache to storage
-        await this.saveDashboardCache();
-        
-        return data;
-      } catch (apiError) {
-        console.error('Error fetching dashboard data from API:', apiError);
-        
-        // If API fails and we have cached data (even if expired), use it
-        if (cachedData) {
-          console.log('Using expired cached dashboard data as fallback');
-          return cachedData.data;
-        }
-        
-        // If no cached data, use mock data
-        return this.generateMockDashboardData(timePeriod, customDateRange);
-      }
-    } catch (error) {
-      console.error('Error getting dashboard data:', error);
-      return this.generateMockDashboardData(timePeriod, customDateRange);
-    }
-  }
-  
-  /**
-   * Fetch dashboard data from API
-   */
-  private async fetchDashboardDataFromAPI(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): Promise<DashboardData> {
-    // In a real implementation, this would make an API call
-    // For now, we'll throw an error to simulate API failure
-    throw new Error('API not implemented yet');
-  }
-  
-  /**
-   * Generate mock dashboard data
-   */
-  private generateMockDashboardData(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): DashboardData {
-    // Generate daily data based on time period
-    const dailyData: Record<string, number> = {};
-    const startDate = new Date();
-    let days = 7;
-    
-    switch (timePeriod) {
-      case 'today':
-        days = 1;
-        break;
-      case 'yesterday':
-        days = 1;
-        startDate.setDate(startDate.getDate() - 1);
-        break;
-      case 'last_7_days':
-        days = 7;
-        break;
-      case 'last_30_days':
-        days = 30;
-        break;
-      case 'this_month':
-        days = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
-        startDate.setDate(1);
-        break;
-      case 'last_month':
-        const lastMonth = new Date(startDate.getFullYear(), startDate.getMonth() - 1, 1);
-        days = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0).getDate();
-        startDate.setMonth(startDate.getMonth() - 1);
-        startDate.setDate(1);
-        break;
-      case 'custom':
-        if (customDateRange) {
-          const diffTime = Math.abs(customDateRange.end.getTime() - customDateRange.start.getTime());
-          days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          startDate.setTime(customDateRange.start.getTime());
-        }
-        break;
+      return deviceId;
     }
     
-    // Generate daily data
-    for (let i = 0; i < days; i++) {
-      const date = new Date(startDate);
-      date.setDate(date.getDate() + i);
-      const dateString = date.toISOString().split('T')[0];
-      dailyData[dateString] = 100 + Math.floor(Math.random() * 150);
-    }
-    
-    return {
-      revenue: {
-        total_revenue: 1250.75,
-        active_users: 450,
-        daily_data: dailyData
-      },
-      cookies: {
-        cookie_inits: 850,
-        cookie_persists: 720,
-        redirects: 380,
-        conversions: 210,
-        persist_rate: 84.7,
-        redirect_success_rate: 55.3,
-      },
-      microtransactions: {
-        total_revenue: 1250.75,
-        by_type: {
-          'Live Parlay Odds': {
-            impressions: 2500,
-            clicks: 450,
-            purchases: 180,
-            revenue: 540.00,
-            click_rate: 18.0,
-            conversion_rate: 40.0,
-          },
-          'Premium Stats': {
-            impressions: 3200,
-            clicks: 580,
-            purchases: 210,
-            revenue: 420.00,
-            click_rate: 18.1,
-            conversion_rate: 36.2,
-          },
-          'Expert Picks': {
-            impressions: 1800,
-            clicks: 320,
-            purchases: 95,
-            revenue: 190.75,
-            click_rate: 17.8,
-            conversion_rate: 29.7,
-          },
-          'Player Insights': {
-            impressions: 1200,
-            clicks: 180,
-            purchases: 50,
-            revenue: 100.00,
-            click_rate: 15.0,
-            conversion_rate: 27.8,
-          },
-        }
-      },
-      user_journey: {
-        stages: {
-          impressions: 8700,
-          clicks: 1530,
-          purchases: 535,
-          redirects: 380,
-          conversions: 210,
-        },
-        dropoff_rates: {
-          impression_to_click: 82.4,
-          click_to_purchase: 65.0,
-          purchase_to_redirect: 29.0,
-          redirect_to_conversion: 44.7,
-        },
-        completion_rate: 2.4,
-      },
-      betting_performance: {
-        win_rate: 58.3,
-        roi: 12.7,
-        by_sport: {
-          'NBA': { win_rate: 62.5, roi: 15.2 },
-          'NFL': { win_rate: 55.8, roi: 10.3 },
-          'MLB': { win_rate: 53.2, roi: 8.7 },
-          'NHL': { win_rate: 59.1, roi: 13.5 }
-        },
-        heat_map_data: this.generateHeatMapData()
-      },
-      user_engagement: {
-        daily_active_users: 1250,
-        sessions_per_user: 3.7,
-        retention_rate: 68.5,
-        engagement_metrics: {
-          avg_session_duration: 8.5,
-          screens_per_session: 4.2,
-          actions_per_session: 12.8
-        }
-      }
-    };
-  }
-  
-  /**
-   * Generate heat map data for dashboard
-   */
-  private generateHeatMapData() {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const times = ['Morning', 'Afternoon', 'Evening', 'Night'];
-    
-    return days.flatMap(day =>
-      times.map(time => ({
-        day,
-        time,
-        value: Math.floor(Math.random() * 100)
-      }))
-    );
-  }
-  
-  /**
-   * Generate cache key for dashboard data
-   */
-  private generateCacheKey(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): string {
-    if (timePeriod === 'custom' && customDateRange) {
-      const startDate = customDateRange.start.toISOString().split('T')[0];
-      const endDate = customDateRange.end.toISOString().split('T')[0];
-      return `${timePeriod}_${startDate}_${endDate}`;
-    }
-    return timePeriod;
-  }
-  
-  /**
-   * Load dashboard cache from storage
-   */
-  private async loadDashboardCache(): Promise<void> {
-    try {
-      const cacheString = await AsyncStorage.getItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
+    // For Web
+    if (typeof localStorage !== 'undefined') {
+      let deviceId = localStorage.getItem('ai_sports_edge_device_id');
       
-      if (cacheString) {
-        const cacheEntries: [string, DashboardDataCache][] = JSON.parse(cacheString);
-        this.dashboardDataCache = new Map(cacheEntries);
+      if (!deviceId) {
+        deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('ai_sports_edge_device_id', deviceId);
       }
-    } catch (error) {
-      console.error('Error loading dashboard cache:', error);
+      
+      return deviceId;
     }
+    
+    // Fallback
+    return `anonymous_${Date.now()}`;
+  } catch (error) {
+    console.error('Error getting device ID:', error);
+    return `anonymous_${Date.now()}`;
   }
-  
-  /**
-   * Save dashboard cache to storage
-   */
-  private async saveDashboardCache(): Promise<void> {
-    try {
-      const cacheEntries = Array.from(this.dashboardDataCache.entries());
-      await AsyncStorage.setItem(
-        this.STORAGE_KEYS.DASHBOARD_CACHE,
-        JSON.stringify(cacheEntries)
-      );
-    } catch (error) {
-      console.error('Error saving dashboard cache:', error);
-    }
-  }
-  
-  /**
-   * Clear dashboard cache
-   */
-  public async clearDashboardCache(): Promise<void> {
-    try {
-      this.dashboardDataCache.clear();
-      await AsyncStorage.removeItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
-      console.log('Dashboard cache cleared');
-    } catch (error) {
-      console.error('Error clearing dashboard cache:', error);
-    }
-  }
-}
+};
 
-// Dashboard data interface
-export interface DashboardData {
-  revenue: {
-    total_revenue: number;
-    active_users: number;
-    daily_data: Record<string, number>;
-  };
-  cookies: {
-    cookie_inits: number;
-    cookie_persists: number;
-    redirects: number;
-    conversions: number;
-    persist_rate: number;
-    redirect_success_rate: number;
-  };
-  microtransactions: {
-    total_revenue: number;
-    by_type: Record<string, {
-      impressions: number;
-      clicks: number;
-      purchases: number;
-      revenue: number;
-      click_rate: number;
-      conversion_rate: number;
-    }>;
-  };
-  user_journey: {
-    stages: Record<string, number>;
-    dropoff_rates: Record<string, number>;
-    completion_rate: number;
-  };
-  betting_performance?: {
-    win_rate: number;
-    roi: number;
-    by_sport: Record<string, any>;
-    heat_map_data: any[];
-  };
-  user_engagement?: {
-    daily_active_users: number;
-    sessions_per_user: number;
-    retention_rate: number;
-    engagement_metrics: Record<string, number>;
-  };
-}
+/**
+ * Track onboarding started event
+ * @param {number} totalSteps - Total number of onboarding steps
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackOnboardingStarted = async (totalSteps: number): Promise<boolean> => {
+  return trackEvent('onboarding_started', {
+    event_category: 'engagement',
+    event_label: 'onboarding',
+    total_steps: totalSteps
+  });
+};
 
-// Cache interface
-interface DashboardDataCache {
-  data: DashboardData;
-  timestamp: number;
-  timePeriod: string;
-  customDateRange?: { start: Date, end: Date };
-}
+/**
+ * Track onboarding step viewed event
+ * @param {number} currentStep - Current step index (1-based)
+ * @param {number} totalSteps - Total number of steps
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackOnboardingStep = async (currentStep: number, totalSteps: number): Promise<boolean> => {
+  const progressPercentage = Math.round((currentStep / totalSteps) * 100);
+  
+  return trackEvent('onboarding_step', {
+    event_category: 'engagement',
+    event_label: `step_${currentStep}`,
+    current_step: currentStep,
+    total_steps: totalSteps,
+    progress_percentage: progressPercentage
+  });
+};
 
-class AnalyticsService {
-  private static instance: AnalyticsService;
-  private currentSession: AnalyticsSession | null = null;
-  private deviceId: string = '';
-  private userProperties: AnalyticsUserProperties = {};
-  private activeFunnels: Map<string, ConversionFunnel> = new Map();
-  private isInitialized: boolean = false;
-  private eventQueue: AnalyticsEvent[] = [];
-  private flushInterval: ReturnType<typeof setInterval> | null = null;
-  private dashboardDataCache: Map<string, DashboardDataCache> = new Map();
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
-  private readonly API_BASE_URL = 'https://api.ai-sports-edge.com/analytics';
-  private readonly STORAGE_KEYS = {
-    DEVICE_ID: 'analytics_device_id',
-    USER_PROPERTIES: 'analytics_user_properties',
-    EVENTS: 'analytics_events',
-    FUNNELS: 'analytics_funnels',
-    SESSION: 'analytics_current_session',
-    DASHBOARD_CACHE: 'analytics_dashboard_cache'
-  };
-  
-  // Get singleton instance
-  public static getInstance(): AnalyticsService {
-    if (!AnalyticsService.instance) {
-      AnalyticsService.instance = new AnalyticsService();
-    }
-    return AnalyticsService.instance;
-  }
-  
-  // Initialize analytics service
-  public async initialize(): Promise<void> {
-    if (this.isInitialized) return;
-    
-    try {
-      // Load device ID or generate a new one
-      await this.loadDeviceId();
-      
-      // Load user properties
-      await this.loadUserProperties();
-      
-      // Start a new session
-      await this.startNewSession();
-      
-      // Load dashboard data cache
-      await this.loadDashboardCache();
-      
-      // Set up event flushing interval (every 60 seconds)
-      this.flushInterval = setInterval(() => {
-        this.flushEvents();
-      }, 60000);
-      
-      this.isInitialized = true;
-      
-      console.log('Analytics service initialized');
-    } catch (error) {
-      console.error('Error initializing analytics service:', error);
-    }
-  }
-
-  /**
-   * Get dashboard data for analytics
-   * @param timePeriod - Time period for the data
-   * @param customDateRange - Custom date range (if timePeriod is 'custom')
-   * @returns Dashboard data
-   */
-  public async getDashboardData(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): Promise<DashboardData> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-    
-    try {
-      // Generate cache key
-      const cacheKey = this.generateCacheKey(timePeriod, customDateRange);
-      
-      // Check if we have cached data
-      const cachedData = this.dashboardDataCache.get(cacheKey);
-      if (cachedData && Date.now() - cachedData.timestamp < this.CACHE_TTL) {
-        console.log('Using cached dashboard data');
-        return cachedData.data;
-      }
-      
-      // Try to fetch from API
-      try {
-        const data = await this.fetchDashboardDataFromAPI(timePeriod, customDateRange);
-        
-        // Cache the data
-        this.dashboardDataCache.set(cacheKey, {
-          data,
-          timestamp: Date.now(),
-          timePeriod,
-          customDateRange
-        });
-        
-        // Save cache to storage
-        await this.saveDashboardCache();
-        
-        return data;
-      } catch (apiError) {
-        console.error('Error fetching dashboard data from API:', apiError);
-        
-        // If API fails and we have cached data (even if expired), use it
-        if (cachedData) {
-          console.log('Using expired cached dashboard data as fallback');
-          return cachedData.data;
-        }
-        
-        // If no cached data, use mock data
-        return this.generateMockDashboardData(timePeriod, customDateRange);
-      }
-    } catch (error) {
-      console.error('Error getting dashboard data:', error);
-      return this.generateMockDashboardData(timePeriod, customDateRange);
-    }
-  }
-  
-  /**
-   * Fetch dashboard data from API
-   */
-  private async fetchDashboardDataFromAPI(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): Promise<DashboardData> {
-    // In a real implementation, this would make an API call
-    // For now, we'll throw an error to simulate API failure
-    throw new Error('API not implemented yet');
-  }
-  
-  /**
-   * Generate mock dashboard data
-   */
-  private generateMockDashboardData(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): DashboardData {
-    // Generate daily data based on time period
-    const dailyData: Record<string, number> = {};
-    const today = new Date();
-    let days = 7;
-    
-    switch (timePeriod) {
-      case 'today':
-        days = 1;
-        break;
-      case 'yesterday':
-        days = 1;
-        today.setDate(today.getDate() - 1);
-        break;
-      case 'last_7_days':
-        days = 7;
-        break;
-      case 'last_30_days':
-        days = 30;
-        break;
-      case 'this_month':
-        days = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-        today.setDate(1);
-        break;
-      case 'last_month':
-        const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        days = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0).getDate();
-        today = lastMonth;
-        break;
-      case 'custom':
-        if (customDateRange) {
-          const diffTime = Math.abs(customDateRange.end.getTime() - customDateRange.start.getTime());
-          days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          today = new Date(customDateRange.start);
-        }
-        break;
-    }
-    
-    // Generate daily data
-    for (let i = 0; i < days; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + i);
-      const dateString = date.toISOString().split('T')[0];
-      dailyData[dateString] = 100 + Math.floor(Math.random() * 150);
-    }
-    
-    return {
-      revenue: {
-        total_revenue: 1250.75,
-        active_users: 450,
-        daily_data: dailyData
-      },
-      cookies: {
-        cookie_inits: 850,
-        cookie_persists: 720,
-        redirects: 380,
-        conversions: 210,
-        persist_rate: 84.7,
-        redirect_success_rate: 55.3,
-      },
-      microtransactions: {
-        total_revenue: 1250.75,
-        by_type: {
-          'Live Parlay Odds': {
-            impressions: 2500,
-            clicks: 450,
-            purchases: 180,
-            revenue: 540.00,
-            click_rate: 18.0,
-            conversion_rate: 40.0,
-          },
-          'Premium Stats': {
-            impressions: 3200,
-            clicks: 580,
-            purchases: 210,
-            revenue: 420.00,
-            click_rate: 18.1,
-            conversion_rate: 36.2,
-          },
-          'Expert Picks': {
-            impressions: 1800,
-            clicks: 320,
-            purchases: 95,
-            revenue: 190.75,
-            click_rate: 17.8,
-            conversion_rate: 29.7,
-          },
-          'Player Insights': {
-            impressions: 1200,
-            clicks: 180,
-            purchases: 50,
-            revenue: 100.00,
-            click_rate: 15.0,
-            conversion_rate: 27.8,
-          },
-        }
-      },
-      user_journey: {
-        stages: {
-          impressions: 8700,
-          clicks: 1530,
-          purchases: 535,
-          redirects: 380,
-          conversions: 210,
-        },
-        dropoff_rates: {
-          impression_to_click: 82.4,
-          click_to_purchase: 65.0,
-          purchase_to_redirect: 29.0,
-          redirect_to_conversion: 44.7,
-        },
-        completion_rate: 2.4,
-      },
-      betting_performance: {
-        win_rate: 58.3,
-        roi: 12.7,
-        by_sport: {
-          'NBA': { win_rate: 62.5, roi: 15.2 },
-          'NFL': { win_rate: 55.8, roi: 10.3 },
-          'MLB': { win_rate: 53.2, roi: 8.7 },
-          'NHL': { win_rate: 59.1, roi: 13.5 }
-        },
-        heat_map_data: this.generateHeatMapData()
-      },
-      user_engagement: {
-        daily_active_users: 1250,
-        sessions_per_user: 3.7,
-        retention_rate: 68.5,
-        engagement_metrics: {
-          avg_session_duration: 8.5,
-          screens_per_session: 4.2,
-          actions_per_session: 12.8
-        }
-      }
-    };
-  }
-  
-  /**
-   * Generate heat map data for dashboard
-   */
-  private generateHeatMapData() {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const times = ['Morning', 'Afternoon', 'Evening', 'Night'];
-    
-    return days.flatMap(day =>
-      times.map(time => ({
-        day,
-        time,
-        value: Math.floor(Math.random() * 100)
-      }))
-    );
-  }
-  
-  /**
-   * Generate cache key for dashboard data
-   */
-  private generateCacheKey(
-    timePeriod: string,
-    customDateRange?: { start: Date, end: Date }
-  ): string {
-    if (timePeriod === 'custom' && customDateRange) {
-      const startDate = customDateRange.start.toISOString().split('T')[0];
-      const endDate = customDateRange.end.toISOString().split('T')[0];
-      return `${timePeriod}_${startDate}_${endDate}`;
-    }
-    return timePeriod;
-  }
-  
-  /**
-   * Load dashboard cache from storage
-   */
-  private async loadDashboardCache(): Promise<void> {
-    try {
-      const cacheString = await AsyncStorage.getItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
-      
-      if (cacheString) {
-        const cacheEntries: [string, DashboardDataCache][] = JSON.parse(cacheString);
-        this.dashboardDataCache = new Map(cacheEntries);
-      }
-    } catch (error) {
-      console.error('Error loading dashboard cache:', error);
-    }
-  }
-  
-  /**
-   * Save dashboard cache to storage
-   */
-  private async saveDashboardCache(): Promise<void> {
-    try {
-      const cacheEntries = Array.from(this.dashboardDataCache.entries());
-      await AsyncStorage.setItem(
-        this.STORAGE_KEYS.DASHBOARD_CACHE,
-        JSON.stringify(cacheEntries)
-      );
-    } catch (error) {
-      console.error('Error saving dashboard cache:', error);
-    }
-  }
-  
-  /**
-   * Clear dashboard cache
-   */
-  public async clearDashboardCache(): Promise<void> {
-    try {
-      this.dashboardDataCache.clear();
-      await AsyncStorage.removeItem(this.STORAGE_KEYS.DASHBOARD_CACHE);
-      console.log('Dashboard cache cleared');
-    } catch (error) {
-      console.error('Error clearing dashboard cache:', error);
-    }
-  }
-
-}
-
-// Export singleton instance
-export const analyticsService = AnalyticsService.getInstance();
+/**
+ * Track onboarding completed event
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackOnboardingCompleted = async (): Promise<boolean> => {
+  return trackEvent('onboarding_completed', {
+    event_category: 'engagement',
+    event_label: 'onboarding'
+  });
+};

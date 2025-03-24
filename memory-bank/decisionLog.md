@@ -1,6 +1,59 @@
 # Decision Log
 
-## Security Enhancements for Weather Integration
+## Security Enhancements for Web Application
+
+### March 24, 2025
+
+#### Decision: Implement Content Security Policy (CSP)
+- **Decision**: Add a comprehensive Content Security Policy to the web application.
+- **Context**: The web application was vulnerable to XSS attacks and other content injection vulnerabilities.
+- **Alternatives Considered**:
+  1. No CSP implementation
+  2. Basic CSP with default-src 'self' only
+  3. Comprehensive CSP with specific directives for different resource types
+- **Reasoning**: A comprehensive CSP provides the best protection against XSS attacks by restricting the sources from which various resource types can be loaded.
+- **Implications**: This approach requires careful configuration to ensure legitimate resources are allowed while blocking malicious ones.
+
+#### Decision: Implement Subresource Integrity (SRI)
+- **Decision**: Add integrity hashes to external scripts and stylesheets.
+- **Context**: External resources could be compromised or modified in transit, leading to security vulnerabilities.
+- **Alternatives Considered**:
+  1. No SRI implementation
+  2. SRI for scripts only
+  3. SRI for all external resources
+- **Reasoning**: SRI ensures that resources loaded from external sources haven't been tampered with, providing an additional layer of security.
+- **Implications**: This approach requires generating and maintaining integrity hashes for external resources, which adds some overhead to the development process.
+
+#### Decision: Enhance CSRF Protection
+- **Decision**: Implement token-based CSRF protection for all state-changing operations.
+- **Context**: The application was vulnerable to CSRF attacks, which could lead to unauthorized actions being performed on behalf of authenticated users.
+- **Alternatives Considered**:
+  1. No CSRF protection
+  2. Same-site cookies only
+  3. Token-based protection
+  4. Double-submit cookie pattern
+- **Reasoning**: Token-based CSRF protection provides the most robust security against CSRF attacks, as it ensures that requests come from the legitimate application.
+- **Implications**: This approach requires generating, storing, and validating tokens for all non-GET requests, which adds some complexity to the API service.
+
+#### Decision: Improve XSS Protection
+- **Decision**: Enhance the sanitization function to provide comprehensive protection against XSS attacks.
+- **Context**: The existing sanitization function only removed < and > characters, which was insufficient to prevent sophisticated XSS attacks.
+- **Alternatives Considered**:
+  1. Basic character escaping
+  2. HTML entity encoding
+  3. Comprehensive sanitization with multiple layers of protection
+- **Reasoning**: Comprehensive sanitization provides the best protection against XSS attacks by addressing multiple attack vectors.
+- **Implications**: This approach adds some processing overhead but significantly improves security.
+
+#### Decision: Use Environment Variables for Sensitive Configuration
+- **Decision**: Update the Firebase configuration to use environment variables instead of hardcoded values.
+- **Context**: Sensitive information like API keys was hardcoded in the source code, which could lead to security breaches if the code was exposed.
+- **Alternatives Considered**:
+  1. Hardcoded values
+  2. Separate configuration files
+  3. Environment variables
+- **Reasoning**: Environment variables provide a secure way to manage sensitive configuration without exposing it in the source code.
+- **Implications**: This approach requires proper environment variable management in different deployment environments.
 
 ### March 22, 2025
 
@@ -445,6 +498,80 @@
   3. Provide user-configurable settings
 - **Reasoning**: User-configurable settings provide the most flexibility and allow users to optimize offline behavior for their specific needs.
 - **Implications**: This approach adds complexity to the UI but provides better user experience and control.
+
+### March 24, 2025 - Payment Processing Enhancement
+
+#### Decision: Create Script for Switching Between Test and Production API Keys
+- **Decision**: Implement a script to automate the process of switching between test and production payment API keys.
+- **Context**: Moving from development to production requires changing API keys in multiple places, which is error-prone if done manually.
+- **Alternatives Considered**:
+  1. Manual update of API keys in configuration files
+  2. Environment-based configuration without explicit switching
+  3. Automated script with backup and verification
+- **Reasoning**: An automated script with backup and verification provides the safest and most reliable way to switch between environments.
+- **Implications**: This approach reduces the risk of errors and provides a way to quickly revert to test mode if needed.
+
+#### Decision: Support Both Stripe CLI and Direct API Calls for Webhook Configuration
+- **Decision**: Implement webhook configuration to work with both Stripe CLI (if available) and direct API calls.
+- **Context**: Webhook configuration is a critical part of payment processing, and different developers may have different tools available.
+- **Alternatives Considered**:
+  1. Require Stripe CLI for webhook configuration
+  2. Use only direct API calls
+  3. Support both methods with appropriate fallbacks
+- **Reasoning**: Supporting both methods provides maximum flexibility and ensures the script works in all environments.
+- **Implications**: This approach requires more implementation work but provides better usability and reliability.
+
+#### Decision: Implement Comprehensive Refund Testing Framework
+- **Decision**: Create a comprehensive testing framework for refund procedures covering multiple scenarios.
+- **Context**: Refund processing is a critical business function that needs thorough testing to ensure reliability.
+- **Alternatives Considered**:
+  1. Manual testing of refund procedures
+  2. Basic automated tests for simple cases
+  3. Comprehensive automated tests for multiple scenarios
+- **Reasoning**: Comprehensive automated tests provide the most thorough validation of refund functionality and can be run consistently.
+- **Implications**: This approach requires more implementation work but provides better confidence in the refund system's reliability.
+
+### March 23, 2025 - Onboarding Experience Enhancement
+
+#### Decision: Create a Unified Analytics Service for Cross-Platform Consistency
+- **Decision**: Implement a unified analytics service that works consistently across web and mobile platforms.
+- **Context**: The onboarding process needs consistent analytics tracking across platforms to measure user engagement and conversion.
+- **Alternatives Considered**:
+  1. Use platform-specific analytics implementations
+  2. Use a third-party analytics service directly
+  3. Create a unified analytics service as an abstraction layer
+- **Reasoning**: A unified service provides consistent tracking across platforms, simplifies implementation, and makes it easier to change analytics providers in the future.
+- **Implications**: This approach requires additional implementation work but provides better data consistency and maintainability.
+
+#### Decision: Implement Development Mode Bypass Configuration
+- **Decision**: Add a configuration option to control onboarding bypass in development mode rather than always bypassing.
+- **Context**: The web app was always bypassing onboarding in development mode, which made it difficult to test the onboarding flow.
+- **Alternatives Considered**:
+  1. Always bypass onboarding in development mode
+  2. Never bypass onboarding in development mode
+  3. Add a configuration option to control the behavior
+- **Reasoning**: A configuration option provides flexibility for different testing scenarios while still allowing for efficient development.
+- **Implications**: This approach requires a small code change but significantly improves the ability to test the onboarding flow in development.
+
+#### Decision: Enhance Accessibility with ARIA Attributes and Keyboard Navigation
+- **Decision**: Add comprehensive accessibility features to the onboarding process, including ARIA attributes and keyboard navigation.
+- **Context**: The onboarding process needs to be accessible to all users, including those with disabilities.
+- **Alternatives Considered**:
+  1. Basic accessibility implementation
+  2. Third-party accessibility library
+  3. Comprehensive custom implementation
+- **Reasoning**: A comprehensive custom implementation provides the best user experience and allows for tailoring to the specific needs of the onboarding flow.
+- **Implications**: This approach requires more development effort but results in a more accessible and inclusive user experience.
+
+#### Decision: Implement Robust Error Handling with Fallbacks
+- **Decision**: Enhance error handling in the onboarding process with fallback mechanisms and graceful degradation.
+- **Context**: The onboarding process needs to be resilient to errors to ensure users can complete it successfully.
+- **Alternatives Considered**:
+  1. Basic error handling with alerts
+  2. Error logging without user feedback
+  3. Comprehensive error handling with fallbacks
+- **Reasoning**: Comprehensive error handling with fallbacks provides the best user experience by allowing the onboarding process to continue even when errors occur.
+- **Implications**: This approach requires more implementation work but significantly improves reliability and user experience.
 
 ### March 23, 2025 - Machine Learning Model Integration
 
