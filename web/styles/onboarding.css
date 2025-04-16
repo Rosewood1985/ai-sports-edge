@@ -77,6 +77,28 @@
   color: #555;
   max-width: 800px;
   margin: 0 auto;
+  margin-bottom: 1.5rem;
+}
+
+.action-button {
+  background-color: #ffffff;
+  color: #16a085;
+  border: 2px solid #16a085;
+  border-radius: 2rem;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+  background-color: #16a085;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .onboarding-progress {

@@ -1,14 +1,14 @@
 /**
  * BetNowButton Component for React Native
- * Displays a neon-styled "Bet Now" button for affiliate links
+ * Displays a neon-styled "Bet Now" button for affiliate links, aligned with the theme.
  */
 
 import React, { useState, useEffect } from 'react';
-import { 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet, 
-  Animated, 
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Animated,
   Easing,
   Linking,
   Platform,
@@ -16,7 +16,8 @@ import {
   TextStyle
 } from 'react-native';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
-import { useThemeColor } from '../hooks/useThemeColor';
+import { useUITheme } from './UIThemeProvider'; // Use the hook inside the component
+import themeObject from '../styles/theme'; // Import the theme object directly for StyleSheet
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { fanduelCookieService } from '../services/fanduelCookieService';
 import { microtransactionService } from '../services/microtransactionService';
@@ -42,11 +43,10 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
   style,
   textStyle
 }) => {
-  // Animation values
+  const { theme } = useUITheme(); // Use the hook to get theme for dynamic styles
   const pulseAnim = new Animated.Value(1);
   const [isSurging, setIsSurging] = useState(false);
-  
-  // Get context values
+
   const {
     affiliateCode,
     buttonSettings,
@@ -55,25 +55,18 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     getButtonColors,
     primaryTeam,
   } = useBettingAffiliate();
-  
-  // Get theme colors
-  const primaryColor = useThemeColor({ light: '#FF0055', dark: '#FF3300' }, 'text');
-  const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A1A' }, 'background');
-  
-  // Determine if button should use team colors
+
   const useTeamColors = buttonSettings.style === 'team-colored';
   const effectiveTeamId = teamId || primaryTeam;
   const teamColors = useTeamColors ? getButtonColors(effectiveTeamId) : null;
-  
-  // Track impression when button is mounted
+
   useEffect(() => {
     trackButtonImpression(position, teamId, userId, gameId);
   }, [position, teamId, userId, gameId, trackButtonImpression]);
-  
-  // Set up pulse animation
+
   useEffect(() => {
     if (buttonSettings.animation === 'none') return;
-    
+
     const pulseAnimation = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
@@ -90,11 +83,10 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
         })
       ])
     );
-    
+
     pulseAnimation.start();
-    
-    // Set up surge animation (occasional)
-    let surgeInterval: NodeJS.Timeout;
+
+    let surgeInterval: NodeJS.Timeout | null = null;
     if (buttonSettings.animation === 'surge') {
       surgeInterval = setInterval(() => {
         if (Math.random() > 0.8) {
@@ -103,28 +95,18 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
         }
       }, 10000);
     }
-    
+
     return () => {
       pulseAnimation.stop();
       if (surgeInterval) clearInterval(surgeInterval);
     };
   }, [buttonSettings.animation, pulseAnim]);
-  
-  // Handle button click
+
+
   const handlePress = async () => {
-    // Track the click
     trackButtonClick(position, teamId, userId, gameId);
-    
-    // Track microtransaction interaction
-    microtransactionService.trackInteraction('click', {
-      type: 'bet_now',
-      contentType,
-      teamId,
-      gameId,
-      cookieEnabled: true,
-    }, { id: userId });
-    
-    // Check if this is after a purchase using cross-platform sync
+    microtransactionService.trackInteraction('click', { type: 'bet_now', contentType, teamId, gameId, cookieEnabled: true }, { id: userId });
+
     let isPurchased = false;
     if (gameId) {
       try {
@@ -134,144 +116,119 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
         console.warn('Could not check purchase status:', error);
       }
     }
-    
-    // Track FanDuel interaction
-    await fanduelCookieService.trackInteraction('bet_button_click', {
-      teamId,
-      gameId,
-      position,
-      isPurchased,
-    });
-    
-    // Generate URL with cookies
+
+    await fanduelCookieService.trackInteraction('bet_button_click', { teamId, gameId, position, isPurchased });
+
     let affiliateUrl;
     const baseUrl = 'https://fanduel.com/';
-    
-    // Check if we have cookie data
     const cookieData = await fanduelCookieService.getCookieData();
+
     if (cookieData) {
-      // Generate URL with cookies
       affiliateUrl = await fanduelCookieService.generateUrlWithCookies(baseUrl);
     } else {
-      // Initialize cookies first
-      await fanduelCookieService.initializeCookies(
-        userId || 'anonymous',
-        gameId || 'unknown',
-        teamId || 'unknown'
-      );
-      
-      // Then generate affiliate link
-      affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
-        baseUrl,
-        affiliateCode,
-        teamId,
-        userId,
-        gameId
-      );
+      await fanduelCookieService.initializeCookies(userId || 'anonymous', gameId || 'unknown', teamId || 'unknown');
+      affiliateUrl = await bettingAffiliateService.generateAffiliateLink(baseUrl, affiliateCode, teamId, userId, gameId);
     }
-    
-    // Track conversion if this is after a purchase
+
     if (isPurchased) {
       bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
-      
-      // Track microtransaction conversion
-      microtransactionService.trackInteraction('conversion', {
-        type: 'bet_now',
-        contentType,
-        teamId,
-        gameId,
-        cookieEnabled: true,
-      }, { id: userId });
+      microtransactionService.trackInteraction('conversion', { type: 'bet_now', contentType, teamId, gameId, cookieEnabled: true }, { id: userId });
     }
-    
+
     try {
-      // Open URL
-      await Linking.openURL(affiliateUrl);
-      
-      // Track successful redirect
-      await fanduelCookieService.trackInteraction('redirect_success', {
-        teamId,
-        gameId,
-        url: affiliateUrl,
-      });
+      // Ensure affiliateUrl is defined before opening
+      if (affiliateUrl) {
+        await Linking.openURL(affiliateUrl);
+        await fanduelCookieService.trackInteraction('redirect_success', { teamId, gameId, url: affiliateUrl });
+      } else {
+         throw new Error("Affiliate URL could not be generated.");
+      }
     } catch (error) {
       console.error('Error opening URL:', error);
-      
-      // Track failed redirect
-      await fanduelCookieService.trackInteraction('redirect_failed', {
-        teamId,
-        gameId,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      await fanduelCookieService.trackInteraction('redirect_failed', { teamId, gameId, error: error instanceof Error ? error.message : 'Unknown error' });
     }
   };
-  
-  // Determine button styles based on props
-  const getButtonStyles = () => {
-    // Base styles
+
+  // Determine button styles based on props and theme
+  const getButtonStyles = (): ViewStyle => {
+    let sizeStyles: ViewStyle;
+    switch (size) {
+      case 'small':
+        sizeStyles = { paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs, minWidth: 100 };
+        break;
+      case 'large':
+        sizeStyles = { paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm, minWidth: 150 };
+        break;
+      default: // medium
+        sizeStyles = { paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm, minWidth: 120 };
+        break;
+    }
+
+    let positionStyles: ViewStyle;
+    switch (position) {
+      case 'floating':
+        positionStyles = styles.floatingButton;
+        break;
+      case 'fixed':
+        positionStyles = styles.fixedButton;
+        break;
+      default: // inline
+        positionStyles = styles.inlineButton;
+        break;
+    }
+
+    // Base styles using theme
     const baseStyles: ViewStyle = {
-      ...styles.button,
-      ...getSizeStyles(),
-      ...getPositionStyles(),
+      borderRadius: theme.borderRadius.sm,
+      shadowOffset: { width: 0, height: 0 },
+      elevation: 5,
+      overflow: 'hidden',
+      ...sizeStyles,
+      ...positionStyles,
     };
-    
-    // Add team colors if applicable
+
+    // Apply colors and glow
     if (useTeamColors && teamColors) {
       baseStyles.backgroundColor = teamColors.backgroundColor;
       baseStyles.shadowColor = teamColors.glowColor;
       baseStyles.shadowOpacity = isSurging ? 0.8 : 0.6;
       baseStyles.shadowRadius = isSurging ? 15 : 10;
     } else {
-      baseStyles.backgroundColor = primaryColor;
-      baseStyles.shadowColor = primaryColor;
+      baseStyles.backgroundColor = theme.colors.primaryAction;
+      baseStyles.shadowColor = theme.colors.primaryAction;
       baseStyles.shadowOpacity = isSurging ? 0.8 : 0.6;
       baseStyles.shadowRadius = isSurging ? 15 : 10;
     }
-    
+
     return baseStyles;
   };
-  
-  // Get size-specific styles
-  const getSizeStyles = (): ViewStyle => {
-    switch (size) {
-      case 'small':
-        return styles.smallButton;
-      case 'large':
-        return styles.largeButton;
-      default:
-        return styles.mediumButton;
-    }
-  };
-  
-  // Get position-specific styles
-  const getPositionStyles = (): ViewStyle => {
-    switch (position) {
-      case 'floating':
-        return styles.floatingButton;
-      case 'fixed':
-        return styles.fixedButton;
-      default:
-        return styles.inlineButton;
-    }
-  };
-  
-  // Get text styles
+
+  // Get text styles using theme
   const getTextStyles = (): TextStyle => {
-    const baseTextStyles: TextStyle = {
-      ...styles.buttonText,
-      color: useTeamColors && teamColors ? teamColors.textColor : backgroundColor,
-    };
-    
+    let sizeTextStyle: TextStyle;
     switch (size) {
       case 'small':
-        return { ...baseTextStyles, ...styles.smallText };
+        sizeTextStyle = { fontSize: theme.typography.fontSize.small };
+        break;
       case 'large':
-        return { ...baseTextStyles, ...styles.largeText };
-      default:
-        return { ...baseTextStyles, ...styles.mediumText };
+        sizeTextStyle = { fontSize: theme.typography.fontSize.button };
+        break;
+      default: // medium
+        sizeTextStyle = { fontSize: theme.typography.fontSize.label };
+        break;
     }
+
+    const baseTextStyles: TextStyle = {
+      fontFamily: theme.typography.fontFamily.body,
+      fontWeight: theme.typography.fontWeight.medium as TextStyle['fontWeight'],
+      textAlign: 'center',
+      color: useTeamColors && teamColors ? teamColors.textColor : '#000000', // Use black for contrast on neon blue
+      ...sizeTextStyle,
+    };
+
+    return baseTextStyles;
   };
-  
+
   return (
     <Animated.View
       style={[
@@ -293,63 +250,28 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
   );
 };
 
+// Use the imported themeObject for static styles like zIndex
 const styles = StyleSheet.create({
-  button: {
-    borderRadius: 8,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 5,
-    overflow: 'hidden',
-  },
   touchable: {
     width: '100%',
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonText: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  // Size variations
-  smallButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minWidth: 100,
-  },
-  mediumButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    minWidth: 120,
-  },
-  largeButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    minWidth: 150,
-  },
-  smallText: {
-    fontSize: 12,
-  },
-  mediumText: {
-    fontSize: 14,
-  },
-  largeText: {
-    fontSize: 16,
-  },
-  // Position variations
   inlineButton: {
     alignSelf: 'center',
-    margin: 5,
+    margin: themeObject.spacing.xs, // Use theme spacing
   },
   floatingButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    zIndex: 100,
+    bottom: themeObject.spacing.lg, // Use theme spacing
+    right: themeObject.spacing.lg, // Use theme spacing
+    zIndex: themeObject.zIndex.above, // Use theme zIndex from imported object
   },
   fixedButton: {
     width: '100%',
     alignSelf: 'center',
-    marginVertical: 10,
+    marginVertical: themeObject.spacing.sm, // Use theme spacing
   },
 });
 

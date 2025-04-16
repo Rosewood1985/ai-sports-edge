@@ -358,20 +358,8 @@ router.post('/local', asyncHandler(async (req, res) => {
           // Add real odds data
           localOdds.push(...teamOdds);
         } else {
-          // If no real odds are available, create a simulated entry
-          const opponent = generateOpponent(team);
-          const baseOdds = 2.0;
-          const popularityFactor = team.includes('Yankees') || team.includes('Lakers') ? 0.8 : 1.2;
-          const odds = baseOdds * popularityFactor * (0.9 + Math.random() * 0.4);
-          const suggestion = odds < 2.0 ? 'bet' : 'avoid';
-          
-          localOdds.push({
-            team,
-            game: `${team} vs. ${opponent}`,
-            odds: odds,
-            suggestion: suggestion,
-            timestamp: new Date().toISOString()
-          });
+          // No real odds available for this team
+          console.log(`No real odds available for team: ${team}`);
         }
       } catch (error) {
         console.error(`Error getting odds for team ${team}:`, error);
@@ -390,54 +378,6 @@ router.post('/local', asyncHandler(async (req, res) => {
   }
 }));
 
-/**
- * Generate a realistic opponent for a team
- * @param {string} team - Team name
- * @returns {string} Opponent name
- */
-function generateOpponent(team) {
-  // Simple mapping of teams to common opponents
-  const rivalries = {
-    'New York Yankees': ['Boston Red Sox', 'Tampa Bay Rays'],
-    'Boston Red Sox': ['New York Yankees', 'Toronto Blue Jays'],
-    'Los Angeles Lakers': ['Los Angeles Clippers', 'Golden State Warriors'],
-    'Golden State Warriors': ['Los Angeles Lakers', 'Phoenix Suns'],
-    'Dallas Cowboys': ['Philadelphia Eagles', 'New York Giants'],
-    'New England Patriots': ['Buffalo Bills', 'Miami Dolphins']
-  };
-  
-  // Check if we have a known rivalry
-  for (const [teamName, opponents] of Object.entries(rivalries)) {
-    if (team.includes(teamName)) {
-      return opponents[Math.floor(Math.random() * opponents.length)];
-    }
-  }
-  
-  // Default opponents by sport
-  const sportOpponents = {
-    'Yankees': 'Red Sox',
-    'Mets': 'Phillies',
-    'Giants': 'Eagles',
-    'Jets': 'Patriots',
-    'Knicks': 'Celtics',
-    'Nets': 'Raptors',
-    'Dodgers': 'Giants',
-    'Angels': 'Athletics',
-    'Rams': 'Seahawks',
-    'Chargers': 'Raiders',
-    'Lakers': 'Celtics',
-    'Clippers': 'Warriors'
-  };
-  
-  // Try to find a matching opponent
-  for (const [teamKey, opponent] of Object.entries(sportOpponents)) {
-    if (team.includes(teamKey)) {
-      return opponent;
-    }
-  }
-  
-  // Generic opponent as fallback
-  return 'Rival Team';
-}
+// Function removed: generateOpponent - No longer needed for production
 
 export default router;

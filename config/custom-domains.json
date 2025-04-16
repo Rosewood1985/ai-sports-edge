@@ -1,0 +1,79 @@
+{
+  "domains": [
+    {
+      "site": "ai-sports-edge-prod",
+      "domainName": "ai-sports-edge.com",
+      "type": "primary",
+      "status": "active",
+      "dnsRecords": [
+        {
+          "type": "A",
+          "name": "@",
+          "value": "151.101.1.195",
+          "ttl": 3600
+        },
+        {
+          "type": "A",
+          "name": "@",
+          "value": "151.101.65.195",
+          "ttl": 3600
+        },
+        {
+          "type": "TXT",
+          "name": "@",
+          "value": "google-site-verification=abcdefghijklmnopqrstuvwxyz123456",
+          "ttl": 3600
+        }
+      ]
+    },
+    {
+      "site": "ai-sports-edge-prod",
+      "domainName": "www.ai-sports-edge.com",
+      "type": "redirect",
+      "redirectTo": "ai-sports-edge.com",
+      "status": "active",
+      "dnsRecords": [
+        {
+          "type": "CNAME",
+          "name": "www",
+          "value": "ai-sports-edge-prod.web.app",
+          "ttl": 3600
+        }
+      ]
+    },
+    {
+      "site": "ai-sports-edge-prod",
+      "domainName": "api.ai-sports-edge.com",
+      "type": "api",
+      "status": "active",
+      "dnsRecords": [
+        {
+          "type": "CNAME",
+          "name": "api",
+          "value": "ai-sports-edge-prod.web.app",
+          "ttl": 3600
+        }
+      ]
+    },
+    {
+      "site": "ai-sports-edge-prod",
+      "domainName": "admin.ai-sports-edge.com",
+      "type": "admin",
+      "status": "active",
+      "dnsRecords": [
+        {
+          "type": "CNAME",
+          "name": "admin",
+          "value": "ai-sports-edge-prod.web.app",
+          "ttl": 3600
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "defaultDomain": "ai-sports-edge.com",
+    "enforceHttps": true,
+    "cleanUrls": true,
+    "trailingSlashBehavior": "remove"
+  }
+}

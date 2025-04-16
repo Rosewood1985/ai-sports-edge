@@ -1,77 +1,145 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { useI18n } from '../contexts/I18nContext';
-import { ThemedText } from './ThemedText';
-import { Language } from '../contexts/I18nContext';
-import Colors from '../constants/Colors';
-import { Toast } from './Toast';
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  Alert,
+  ActivityIndicator
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../contexts/LanguageContext';
+import { ThemedText, ThemedView } from './ThemedComponents';
+import { useTheme } from '@react-navigation/native';
 
-interface LanguageSelectorProps {
-  style?: any;
-  compact?: boolean;
+interface LanguageOption {
+  code: string;
+  name: string;
+  direction: string;
 }
 
-/**
- * LanguageSelector component
- * 
- * This component allows users to switch between supported languages.
- * It displays language options as buttons and highlights the currently selected language.
- */
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  style,
-  compact = false
-}) => {
-  const { language, setLanguage, t } = useI18n();
-  
-  // Available languages with their display names
-  const languages: { code: Language; label: string; nativeName: string }[] = [
-    { code: 'en', label: 'English', nativeName: 'English' },
-    { code: 'es', label: 'Spanish', nativeName: 'Español' },
-  ];
-  
-  // Handle language change with toast notification
-  const handleLanguageChange = (lang: Language) => {
-    // Only show toast if language is actually changing
-    if (lang !== language) {
-      setLanguage(lang);
+interface LanguageSelectorProps {
+  showLabel?: boolean;
+  style?: any;
+}
+
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, style }) => {
+  const { colors } = useTheme();
+  const { language, setLanguage, t, availableLanguages } = useLanguage();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+
+  // Convert languages object to array for FlatList
+  const languageOptions = Object.values(availableLanguages);
+
+  // Get current language name
+  const currentLanguageName = availableLanguages[language as keyof typeof availableLanguages]?.name || 'English';
+
+  // Handle language change
+  const handleLanguageChange = async (languageCode: string) => {
+    try {
+      setLoading(languageCode);
+      await setLanguage(languageCode);
+      setModalVisible(false);
       
-      // Show toast notification
-      Toast.show({
-        message: lang === 'en'
-          ? 'Language changed to English'
-          : 'Idioma cambiado a Español',
-        duration: 2000,
-        position: 'bottom'
-      });
+      // Show success message
+      Alert.alert(
+        t('language.language_changed'),
+        t('language.restart_required'),
+        [{ text: t('common.ok') }]
+      );
+    } catch (error) {
+      console.error('Error changing language:', error);
+      Alert.alert(
+        t('common.error'),
+        'Failed to change language. Please try again.',
+        [{ text: t('common.ok') }]
+      );
+    } finally {
+      setLoading(null);
     }
   };
-  
+
+  // Render language option
+  const renderLanguageOption = ({ item }: { item: LanguageOption }) => {
+    const isSelected = item.code === language;
+    
+    return (
+      <TouchableOpacity
+        style={[
+          styles.languageOption,
+          isSelected && { backgroundColor: colors.primary + '20' },
+          { borderBottomColor: colors.border }
+        ]}
+        onPress={() => handleLanguageChange(item.code)}
+        disabled={loading !== null}
+      >
+        <ThemedText style={[
+          styles.languageName,
+          isSelected ? { fontWeight: 'bold', color: colors.primary } : {}
+        ]}>
+          {item.name}
+        </ThemedText>
+        
+        {isSelected && (
+          <Ionicons name="checkmark" size={24} color={colors.primary} />
+        )}
+        
+        {loading === item.code && (
+          <ActivityIndicator size="small" color={colors.primary} />
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={[styles.container, style]}>
-      {languages.map((lang) => (
-        <TouchableOpacity
-          key={lang.code}
-          style={[
-            styles.languageButton,
-            compact && styles.compactButton,
-            language === lang.code && styles.activeLanguage,
-          ]}
-          onPress={() => handleLanguageChange(lang.code)}
-          accessibilityLabel={t(`languageSelector.switchTo${lang.label}`)}
-          accessibilityRole="button"
-          accessibilityHint={t('languageSelector.hint')}
-        >
-          <ThemedText
-            style={[
-              styles.languageText,
-              compact && styles.compactText,
-              language === lang.code && styles.activeLanguageText,
-            ]}
-          >
-            {compact ? lang.code.toUpperCase() : lang.nativeName}
+      <TouchableOpacity
+        style={styles.selectorButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <Ionicons name="language" size={24} color={colors.text} />
+        
+        {showLabel && (
+          <ThemedText style={styles.currentLanguage}>
+            {currentLanguageName}
           </ThemedText>
-        </TouchableOpacity>
-      ))}
+        )}
+        
+        <Ionicons name="chevron-down" size={16} color={colors.text} />
+      </TouchableOpacity>
+      
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView style={[styles.modalContent, { borderColor: colors.border }]}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>
+                {t('language.select_language')}
+              </ThemedText>
+              
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              data={languageOptions}
+              renderItem={renderLanguageOption}
+              keyExtractor={(item) => item.code}
+              style={styles.languageList}
+            />
+          </ThemedView>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -81,33 +149,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  languageButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginHorizontal: 4,
-    borderRadius: 16,
+  selectorButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
+  },
+  currentLanguage: {
+    marginHorizontal: 8,
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    maxHeight: '70%',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ccc',
+    overflow: 'hidden',
   },
-  compactButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginHorizontal: 2,
-    borderRadius: 4,
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  activeLanguage: {
-    backgroundColor: Colors.neon.blue,
-    borderColor: Colors.neon.blue,
-  },
-  languageText: {
-    fontSize: 14,
-  },
-  compactText: {
-    fontSize: 12,
-  },
-  activeLanguageText: {
-    color: '#fff',
+  modalTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  languageList: {
+    flexGrow: 0,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  languageName: {
+    fontSize: 16,
   },
 });
 

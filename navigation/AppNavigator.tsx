@@ -1,218 +1,133 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@react-navigation/native';
+import { View, Text, ActivityIndicator, Button } from 'react-native';
+import { useNavigationState } from '../contexts/NavigationStateContext';
 
 // Import screens
-import { HomeScreen, SearchScreen, ProfileScreen, SettingsScreen } from '../screens';
-import ParlayOddsScreen from '../screens/ParlayOddsScreen';
-import AnalyticsDashboardScreen from '../screens/AnalyticsDashboardScreen';
-import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
-import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
-import BettingAnalyticsScreen from '../screens/BettingAnalyticsScreen';
-import OddsComparisonScreen from '../screens/OddsComparisonScreen';
-import FraudDetectionDashboardScreen from '../screens/FraudDetectionDashboardScreen';
-import FraudAlertDetailsScreen from '../screens/FraudAlertDetailsScreen';
-import EnhancedAnalyticsDashboardScreen from '../screens/EnhancedAnalyticsDashboardScreen';
-import BettingSlipImportScreen from '../screens/BettingSlipImportScreen';
+import HomeScreen from '../screens/HomeScreen';
+import GamesScreen from '../screens/GamesScreen';
+import GameDetailsScreen from '../screens/GameDetailsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import SubscriptionScreen from '../screens/SubscriptionScreen';
+import PurchaseHistoryScreen from '../screens/PurchaseHistoryScreen';
+import LanguageSettingsScreen from '../screens/LanguageSettingsScreen';
+import AuthScreen from '../screens/AuthScreen';
+import LegalScreen from '../screens/LegalScreen';
 
-// Create navigators
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+// Import navigators
+import OnboardingNavigator from './OnboardingNavigator';
 
-// Location stack navigator
-const LocationStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="LocationHome"
-      component={LocalTeamOddsScreen}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="NearbyVenues"
-      component={NearbyVenuesScreen}
-      options={{
-        title: 'Nearby Venues',
-        headerTintColor: '#007bff',
-      }}
-    />
-  </Stack.Navigator>
-);
+// Define navigation types
+export type RootStackParamList = {
+  Main: undefined;
+  Auth: undefined;
+  Onboarding: undefined;
+  GameDetails: { gameId: string };
+  Subscription: undefined;
+  PurchaseHistory: undefined;
+  Settings: undefined;
+  LanguageSettings: undefined;
+  Legal: { type: 'privacy-policy' | 'terms-of-service' };
+};
 
-// Stack navigators for each tab
-const HomeStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="Home"
-      component={HomeScreen}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="ParlayOdds"
-      component={ParlayOddsScreen}
-      options={{
-        title: 'Parlay Builder',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="AnalyticsDashboard"
-      component={AnalyticsDashboardScreen}
-      options={{
-        title: 'Analytics Dashboard',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="LocalTeamOdds"
-      component={LocalTeamOddsScreen}
-      options={{
-        title: 'Local Team Odds',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="NearbyVenues"
-      component={NearbyVenuesScreen}
-      options={{
-        title: 'Nearby Venues',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="BettingAnalytics"
-      component={BettingAnalyticsScreen}
-      options={{
-        title: 'Betting Analytics',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="OddsComparison"
-      component={OddsComparisonScreen}
-      options={{
-        title: 'Odds Comparison',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="FraudDetectionDashboard"
-      component={FraudDetectionDashboardScreen}
-      options={{
-        title: 'Fraud Detection',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="FraudAlertDetails"
-      component={FraudAlertDetailsScreen}
-      options={{
-        title: 'Alert Details',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="EnhancedAnalyticsDashboard"
-      component={EnhancedAnalyticsDashboardScreen}
-      options={{
-        title: 'Enhanced Analytics',
-        headerTintColor: '#007bff',
-      }}
-    />
-    <Stack.Screen
-      name="BettingSlipImport"
-      component={BettingSlipImportScreen}
-      options={{
-        title: 'Betting Slip Import',
-        headerTintColor: '#007bff',
-      }}
-    />
-  </Stack.Navigator>
-);
+export type MainTabParamList = {
+  Home: undefined;
+  Games: undefined;
+  Profile: undefined;
+};
 
-const SearchStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="Search" 
-      component={SearchScreen} 
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
-
-const ProfileStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="Profile" 
-      component={ProfileScreen} 
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
-
-const SettingsStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="Settings" 
-      component={SettingsScreen} 
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
+const Stack = createStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Main tab navigator
-const AppNavigator = () => {
+const MainTabNavigator = () => {
+  const { colors } = useTheme();
+  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'help-circle';
-
-          if (route.name === 'HomeTab') {
+          let iconName: string;
+          
+          if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'SearchTab') {
-            iconName = focused ? 'search' : 'search-outline';
-          } else if (route.name === 'LocationTab') {
-            iconName = focused ? 'location' : 'location-outline';
-          } else if (route.name === 'ProfileTab') {
+          } else if (route.name === 'Games') {
+            iconName = focused ? 'football' : 'football-outline';
+          } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === 'SettingsTab') {
-            iconName = focused ? 'settings' : 'settings-outline';
+          } else {
+            iconName = 'help-circle';
           }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
+          
+          return <Ionicons name={iconName as any} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007bff',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.text,
+        tabBarStyle: {
+          borderTopColor: colors.border,
+        },
         headerShown: false,
       })}
     >
-      <Tab.Screen 
-        name="HomeTab" 
-        component={HomeStack} 
-        options={{ tabBarLabel: 'Home' }}
-      />
-      <Tab.Screen
-        name="SearchTab"
-        component={SearchStack}
-        options={{ tabBarLabel: 'Search' }}
-      />
-      <Tab.Screen
-        name="LocationTab"
-        component={LocationStack}
-        options={{ tabBarLabel: 'Nearby' }}
-      />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileStack}
-        options={{ tabBarLabel: 'Profile' }}
-      />
-      <Tab.Screen 
-        name="SettingsTab" 
-        component={SettingsStack} 
-        options={{ tabBarLabel: 'Settings' }}
-      />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Games" component={GamesScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
+  );
+};
+
+// Root stack navigator
+const AppNavigator = () => {
+  // Use the navigation state context to determine the initial route
+  const { initialRoute, isLoading, error } = useNavigationState();
+  
+  // Add logging for navigation initialization
+  console.log(`AppNavigator: Initializing navigation with route "${initialRoute}"`);
+  
+  // Show loading indicator while determining the initial route
+  if (isLoading) {
+    console.log('AppNavigator: Still loading navigation state');
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0066FF" />
+        <Text style={{ marginTop: 20 }}>Loading...</Text>
+      </View>
+    );
+  }
+  
+  // Show error message if there was an error determining the initial route
+  if (error) {
+    console.error('AppNavigator: Error in navigation state:', error);
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <Text style={{ fontSize: 18, color: 'red', marginBottom: 10 }}>Navigation Error</Text>
+        <Text style={{ textAlign: 'center', marginBottom: 20 }}>{error.message}</Text>
+        <Button title="Retry" onPress={() => window.location.reload()} />
+      </View>
+    );
+  }
+  
+  return (
+    <Stack.Navigator
+      initialRouteName={initialRoute}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Main" component={MainTabNavigator} />
+      <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
+      <Stack.Screen name="GameDetails" component={GameDetailsScreen} />
+      <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+      <Stack.Screen name="PurchaseHistory" component={PurchaseHistoryScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="LanguageSettings" component={LanguageSettingsScreen} />
+      <Stack.Screen name="Legal" component={LegalScreen} />
+    </Stack.Navigator>
   );
 };
 

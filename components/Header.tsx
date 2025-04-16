@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
+import { View, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext'; // Keep for backward compatibility
 import { useI18n } from '../contexts/I18nContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useUITheme } from './UIThemeProvider'; // Import the new theme hook
+import { ThemedText } from './ThemedText'; // Import ThemedText
+import { ThemedView } from './ThemedView'; // Import ThemedView
 
 export interface HeaderProps {
   title: string;
@@ -12,7 +15,7 @@ export interface HeaderProps {
 }
 
 /**
- * Header component with title and refresh button
+ * Header component with title and refresh button, using the centralized theme system
  * @param {HeaderProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
@@ -22,31 +25,42 @@ const Header = ({
   isLoading,
   accessibilityHint
 }: HeaderProps): JSX.Element => {
-  const { colors, isDark } = useTheme();
+  const { colors, isDark } = useTheme(); // Keep for backward compatibility
+  const { theme } = useUITheme(); // Use the new theme
   const { t } = useI18n();
   
   return (
-    <View
+    <ThemedView
+      background="surface" // Use surface background from theme
       style={[
         styles.header,
-        { backgroundColor: isDark ? '#1a1a1a' : '#f8f8f8' }
+        {
+          marginBottom: theme.spacing.md,
+          padding: theme.spacing.md,
+          borderRadius: theme.borderRadius.sm,
+          marginHorizontal: Platform.OS === 'web' ? 0 : theme.spacing.sm,
+          marginTop: theme.spacing.sm,
+        }
       ]}
       accessible={true}
       accessibilityRole="header"
     >
-      <Text
-        style={[
-          styles.title,
-          { color: colors.text }
-        ]}
+      <ThemedText
+        type="h2" // Use h2 type from theme
+        style={styles.title}
         accessibilityRole="header"
       >
         {title}
-      </Text>
+      </ThemedText>
       <TouchableOpacity
         style={[
           styles.refreshButton,
-          { backgroundColor: colors.primary },
+          {
+            backgroundColor: theme.colors.primaryAction, // Use primary action color
+            borderRadius: theme.borderRadius.sm,
+            paddingVertical: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.md,
+          },
           isLoading && styles.refreshButtonDisabled
         ]}
         onPress={onRefresh}
@@ -58,49 +72,52 @@ const Header = ({
         accessibilityState={{ disabled: isLoading }}
       >
         {isLoading ? (
-          <ActivityIndicator size="small" color="#fff" />
+          <ActivityIndicator size="small" color={theme.colors.primaryText} />
         ) : (
           <>
-            <Ionicons name="refresh" size={16} color="#fff" style={styles.refreshIcon} />
-            <Text style={styles.refreshButtonText}>{t('oddsComparison.refresh')}</Text>
+            <Ionicons 
+              name="refresh" 
+              size={16} 
+              color={theme.colors.primaryText} 
+              style={[styles.refreshIcon, { marginRight: theme.spacing.xs }]} 
+            />
+            <ThemedText 
+              type="button" 
+              color="primary" // Use primary text color
+              style={styles.refreshButtonText}
+            >
+              {t('oddsComparison.refresh')}
+            </ThemedText>
           </>
         )}
       </TouchableOpacity>
-    </View>
+    </ThemedView>
   );
 };
 
+// Keep minimal StyleSheet for layout and non-theme styles
 const styles = StyleSheet.create({
   header: {
-    marginBottom: 20,
-    padding: 12,
-    borderRadius: 8,
-    marginHorizontal: Platform.OS === 'web' ? 0 : 8,
-    marginTop: 8,
+    // Margin, padding, and border radius now applied dynamically
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10
+    marginBottom: 10, // Could use theme.spacing.sm
+    // Font size, weight, and color now handled by ThemedText
   },
   refreshButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
+    // Background color, padding, and border radius now applied dynamically
   },
   refreshButtonDisabled: {
     opacity: 0.7,
   },
   refreshIcon: {
-    marginRight: 6,
+    // Margin now applied dynamically
   },
   refreshButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
+    // Color, font weight, and font size now handled by ThemedText
   }
 });
 

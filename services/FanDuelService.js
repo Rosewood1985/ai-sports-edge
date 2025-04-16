@@ -160,15 +160,30 @@ class FanDuelService {
    */
   async trackConversion(data = {}) {
     try {
-      // In a real implementation, this would make an API call to FanDuel's conversion tracking API
+      // Make an API call to FanDuel's conversion tracking API
       console.log('Tracking conversion:', data);
       
-      // Simulate API call
-      return {
-        success: true,
-        trackingId: `track-${Date.now()}`,
-        ...data,
-      };
+      // Implement real API call to FanDuel's tracking endpoint
+      const response = await fetch('https://affiliates.fanduel.com/api/track', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.FANDUEL_API_KEY || 'api-key-required'}`
+        },
+        body: JSON.stringify({
+          userId: data.userId,
+          eventType: data.eventType,
+          source: data.source || 'ai_sports_edge',
+          value: data.value || 0,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`FanDuel API error: ${response.status}`);
+      }
+      
+      return await response.json();
     } catch (error) {
       console.error('Error tracking conversion:', error);
       throw error;

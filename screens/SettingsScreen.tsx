@@ -1,281 +1,287 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  SafeAreaView,
-  ScrollView,
   TouchableOpacity,
-  Alert,
-  Switch
+  ScrollView,
+  Switch,
+  Alert
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { useI18n } from '../contexts/I18nContext';
-import featureTourService from '../services/featureTourService';
-import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
-import Header from '../components/Header';
-import { ThemedText } from '../components/ThemedText';
-import { ThemedView } from '../components/ThemedView';
+import { ThemedText, ThemedView } from '../components/ThemedComponents';
+import { useTheme } from '@react-navigation/native';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from '../components/LanguageSelector';
 
-/**
- * SettingsScreen component
- * Displays various app settings and preferences
- */
-const SettingsScreen: React.FC = () => {
+const SettingsScreen = () => {
   const navigation = useNavigation();
-  const [isResetting, setIsResetting] = useState<boolean>(false);
-  const { t, language } = useI18n();
-
-  /**
-   * Handle resetting the onboarding/feature tour
-   * Resets the onboarding status and navigates to the onboarding screen
-   */
-  const handleResetTour = async () => {
-    try {
-      setIsResetting(true);
-      
-      // Confirm with the user
-      Alert.alert(
-        t('featureTour.title'),
-        t('featureTour.skip.message'),
-        [
-          {
-            text: t('featureTour.skip.cancel'),
-            style: "cancel",
-            onPress: () => setIsResetting(false)
-          },
-          {
-            text: t('settings.items.replayFeatureTour'),
-            onPress: async () => {
-              // Reset feature tour and onboarding status
-              await featureTourService.resetFeatureTour('settings_screen');
-              
-              // Navigate to onboarding
-              navigation.navigate('Onboarding' as never);
-              
-              setIsResetting(false);
-            }
+  const { colors } = useTheme();
+  const { t } = useLanguage();
+  
+  // Mock settings state
+  const [darkMode, setDarkMode] = React.useState(false);
+  const [pushNotifications, setPushNotifications] = React.useState(true);
+  const [emailNotifications, setEmailNotifications] = React.useState(false);
+  const [autoPlayVideos, setAutoPlayVideos] = React.useState(true);
+  const [downloadOverWifi, setDownloadOverWifi] = React.useState(true);
+  
+  // Handle clear cache
+  const handleClearCache = () => {
+    Alert.alert(
+      t('common.confirm'),
+      t('settings.clear_cache'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel'
+        },
+        {
+          text: t('common.ok'),
+          onPress: () => {
+            // Mock cache clearing
+            Alert.alert(
+              t('common.success'),
+              'Cache cleared successfully',
+              [{ text: t('common.ok') }]
+            );
           }
-        ]
-      );
-    } catch (error) {
-      console.error('Error resetting feature tour:', error);
-      Alert.alert('Error', 'Failed to reset feature tour. Please try again.');
-      setIsResetting(false);
-    }
+        }
+      ]
+    );
   };
-
-  /**
-   * Navigate to notification settings
-   */
-  const goToNotificationSettings = () => {
-    navigation.navigate('NotificationSettings' as never);
-  };
-
-  /**
-   * Navigate to accessibility settings
-   */
-  const goToAccessibilitySettings = () => {
-    navigation.navigate('AccessibilitySettings' as never);
-  };
-
-  /**
-   * Navigate to personalization settings
-   */
-  const goToPersonalizationSettings = () => {
-    navigation.navigate('Personalization' as never);
-  };
-
-  /**
-   * Navigate to offline settings
-   */
-  const goToOfflineSettings = () => {
-    navigation.navigate('OfflineSettings' as never);
-  };
-
+  
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        title={t('settings.title')}
-        onRefresh={() => {}}
-        isLoading={false}
-      />
+    <ThemedView style={styles.container}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <ThemedText style={styles.headerTitle}>
+          {t('settings.app_settings')}
+        </ThemedText>
+      </View>
       
       <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.sections.account')}</ThemedText>
+        {/* Appearance Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
+            {t('settings.theme_settings')}
+          </ThemedText>
           
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.profile')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.subscription')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.paymentMethods')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-        
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.sections.preferences')}</ThemedText>
-          
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={goToNotificationSettings}
-          >
-            <ThemedText style={styles.settingLabel}>{t('settings.items.notifications')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={goToPersonalizationSettings}
-          >
-            <ThemedText style={styles.settingLabel}>{t('settings.items.personalization')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={goToAccessibilitySettings}
-          >
-            <ThemedText style={styles.settingLabel}>{t('settings.items.accessibility')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={goToOfflineSettings}
-          >
-            <ThemedText style={styles.settingLabel}>{t('settings.items.offlineMode')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-        
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.sections.appTourHelp')}</ThemedText>
-          
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={handleResetTour}
-            disabled={isResetting}
-          >
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingLabel}>{t('settings.items.replayFeatureTour')}</ThemedText>
-              <ThemedText style={styles.settingDescription}>
-                {t('settings.items.replayFeatureTourDesc')}
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="moon-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.dark_mode')}
               </ThemedText>
             </View>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
+            <Switch
+              value={darkMode}
+              onValueChange={setDarkMode}
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor="#f4f3f4"
+            />
+          </View>
+        </View>
+        
+        {/* Language Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
+            {t('settings.language_settings')}
+          </ThemedText>
           
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingLabel}>{t('settings.items.helpCenter')}</ThemedText>
-              <ThemedText style={styles.settingDescription}>
-                {t('settings.items.helpCenterDesc')}
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => navigation.navigate('LanguageSettings' as never)}
+          >
+            <View style={styles.settingInfo}>
+              <Ionicons name="language" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.language')}
               </ThemedText>
             </View>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
+            <View style={styles.settingAction}>
+              <LanguageSelector showLabel={false} />
+              <Ionicons name="chevron-forward" size={24} color={colors.text} />
+            </View>
           </TouchableOpacity>
-        </ThemedView>
+        </View>
         
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.sections.about')}</ThemedText>
+        {/* Notifications Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
+            {t('settings.notification_settings')}
+          </ThemedText>
           
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.version')}</ThemedText>
-            <ThemedText style={styles.settingValue}>1.0.0</ThemedText>
-          </TouchableOpacity>
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="notifications-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.push_notifications')}
+              </ThemedText>
+            </View>
+            <Switch
+              value={pushNotifications}
+              onValueChange={setPushNotifications}
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor="#f4f3f4"
+            />
+          </View>
           
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.termsOfService')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.privacyPolicy')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingLabel}>{t('settings.items.licenses')}</ThemedText>
-            <ThemedText style={styles.settingArrow}>›</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="mail-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.email_notifications')}
+              </ThemedText>
+            </View>
+            <Switch
+              value={emailNotifications}
+              onValueChange={setEmailNotifications}
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor="#f4f3f4"
+            />
+          </View>
+        </View>
         
-        <TouchableOpacity style={styles.logoutButton}>
-          <ThemedText style={styles.logoutButtonText}>{t('settings.items.logOut')}</ThemedText>
-        </TouchableOpacity>
+        {/* Data Usage Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
+            {t('settings.data_settings')}
+          </ThemedText>
+          
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="wifi-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.download_over_wifi')}
+              </ThemedText>
+            </View>
+            <Switch
+              value={downloadOverWifi}
+              onValueChange={setDownloadOverWifi}
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor="#f4f3f4"
+            />
+          </View>
+          
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="play-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.auto_play_videos')}
+              </ThemedText>
+            </View>
+            <Switch
+              value={autoPlayVideos}
+              onValueChange={setAutoPlayVideos}
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor="#f4f3f4"
+            />
+          </View>
+          
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={handleClearCache}
+          >
+            <View style={styles.settingInfo}>
+              <Ionicons name="trash-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.clear_cache')}
+              </ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+        
+        {/* About Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
+            {t('settings.about')}
+          </ThemedText>
+          
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+          >
+            <View style={styles.settingInfo}>
+              <Ionicons name="information-circle-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.version', { version: '1.0.0' })}
+              </ThemedText>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+          >
+            <View style={styles.settingInfo}>
+              <Ionicons name="document-text-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.terms')}
+              </ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color={colors.text} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+          >
+            <View style={styles.settingInfo}>
+              <Ionicons name="shield-outline" size={24} color={colors.text} />
+              <ThemedText style={styles.settingLabel}>
+                {t('settings.privacy')}
+              </ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   scrollView: {
     flex: 1,
   },
   section: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-    padding: 16,
-    borderRadius: 8,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    marginTop: 16,
   },
   settingItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
-  settingContent: {
-    flex: 1,
+  settingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   settingLabel: {
     fontSize: 16,
+    marginLeft: 12,
   },
-  settingDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  settingValue: {
-    fontSize: 16,
-    color: '#666',
-  },
-  settingArrow: {
-    fontSize: 20,
-    color: '#666',
-    marginLeft: 8,
-  },
-  logoutButton: {
-    marginHorizontal: 16,
-    marginVertical: 24,
-    padding: 16,
-    backgroundColor: '#f44336',
-    borderRadius: 8,
+  settingAction: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  logoutButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
   },
 });
 

@@ -1,0 +1,28 @@
+{
+  "files_in_context": [
+    {
+      "path": "app.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744767288772,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "app.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744767295618,
+      "roo_edit_date": 1744767295618,
+      "user_edit_date": null
+    },
+    {
+      "path": "app.json",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744767295618,
+      "roo_edit_date": 1744767295618,
+      "user_edit_date": 1744767295625
+    }
+  ]
+}

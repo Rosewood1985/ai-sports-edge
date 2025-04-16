@@ -1,14 +1,17 @@
+/**
+ * GeoIP service for Node.js environments
+ * This uses the MaxMind GeoIP2 database for IP geolocation
+ */
+
 const fs = require('fs');
 const path = require('path');
 const requestIp = require('request-ip');
-
-// Import the Reader class from @maxmind/geoip2-node
 const geoip2 = require('@maxmind/geoip2-node');
 
 /**
  * GeoIP service for getting location data based on IP address
  */
-class GeoIPService {
+class NodeGeoIPService {
   constructor() {
     // Set the path to the GeoLite2-City.mmdb database
     this.dbPath = path.resolve(__dirname, 'GeoLite2-City.mmdb');
@@ -128,6 +131,5 @@ class GeoIPService {
   }
 }
 
-const geoipService = new GeoIPService();
-exports.geoipService = geoipService;
-module.exports = geoipService;
+const nodeGeoipService = new NodeGeoIPService();
+module.exports = nodeGeoipService;

@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const { exec } = require('child_process');
@@ -56,6 +59,46 @@ if (rssRoutes) {
   console.log('RSS feed routes registered at /api/rss-feeds');
 }
 
+// Import authentication middleware
+let authMiddleware;
+try {
+  authMiddleware = require('./middleware/authMiddleware');
+  console.log('Authentication middleware loaded successfully');
+} catch (error) {
+  console.warn('Authentication middleware not loaded:', error.message);
+  authMiddleware = {
+    authenticate: (req, res, next) => next(),
+    requireAdmin: (req, res, next) => next()
+  };
+}
+
+// Import tax API routes
+let taxApi;
+try {
+  taxApi = require('./api/tax-api');
+  console.log('Tax API routes loaded successfully');
+} catch (error) {
+  console.warn('Tax API routes not loaded:', error.message);
+  taxApi = null;
+}
+
+// Use tax API routes if available
+if (taxApi) {
+  // Secure tax calculation endpoint with authentication
+  app.post('/api/tax/calculate', authMiddleware.authenticate, taxApi.calculateTax);
+  
+  // Tax rates endpoint is less sensitive, but still authenticated
+  app.get('/api/tax/rates', authMiddleware.authenticate, taxApi.getTaxRates);
+  
+  // Admin-only endpoint for tax reporting
+  app.get('/api/tax/reports', authMiddleware.requireAdmin, (req, res) => {
+    // This would be implemented with the tax report generator
+    res.json({ message: 'Tax reports endpoint (admin only)' });
+  });
+  
+  console.log('Tax API routes registered with authentication');
+}
+
 // Import and start RSS feed cron job
 try {
   const { startRssFeedCronJob } = require('./jobs/rssFeedCronJob.js');
@@ -65,25 +108,70 @@ try {
   console.warn('RSS feed cron job not started:', error.message);
 }
 
+// Import payment service
+let paymentService;
+try {
+  paymentService = require('./services/paymentService');
+  console.log('Payment service loaded successfully');
+} catch (error) {
+  console.warn('Payment service not loaded:', error.message);
+  paymentService = null;
+}
+
 // API endpoints
 app.post('/api/create-payment', async (req, res) => {
   try {
-    const { userId, productId, price, productName } = req.body;
+    const { userId, productId, price, productName, customerDetails, currency = 'usd', metadata = {} } = req.body;
     
     if (!userId || !productId || !price) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
-    // In a real app, this would create a payment intent with Stripe
-    // For now, we'll just simulate a successful payment
+    // Get client IP address
+    const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     
-    // Generate a fake client secret
-    const clientSecret = `pi_${Math.random().toString(36).substring(2)}_secret_${Math.random().toString(36).substring(2)}`;
-    
-    // Log the payment attempt
-    console.log(`Payment intent created for ${productName} (${productId}) by user ${userId} for $${price}`);
-    
-    res.json({ clientSecret });
+    // If payment service is available, use it to create a payment intent with US-only restrictions
+    if (paymentService) {
+      try {
+        // Validate customer is in the US
+        if (!customerDetails || !paymentService.isCustomerInUS(customerDetails, ipAddress)) {
+          return res.status(403).json({ error: 'Payments are only accepted from the United States' });
+        }
+        
+        // Create payment intent
+        const paymentIntent = await paymentService.createPaymentIntent({
+          amount: Math.round(price * 100), // Convert to cents
+          currency,
+          customerDetails,
+          ipAddress,
+          customerId: userId,
+          metadata: {
+            ...metadata,
+            productId,
+            productName
+          }
+        });
+        
+        // Log the payment attempt
+        console.log(`Payment intent created for ${productName} (${productId}) by user ${userId} for $${price}`);
+        
+        res.json({ clientSecret: paymentIntent.client_secret });
+      } catch (paymentError) {
+        console.error('Payment service error:', paymentError);
+        res.status(400).json({ error: paymentError.message });
+      }
+    } else {
+      // Fallback to simulated payment for development
+      console.log('Using simulated payment (payment service not available)');
+      
+      // Generate a fake client secret
+      const clientSecret = `pi_${Math.random().toString(36).substring(2)}_secret_${Math.random().toString(36).substring(2)}`;
+      
+      // Log the payment attempt
+      console.log(`Payment intent created for ${productName} (${productId}) by user ${userId} for $${price}`);
+      
+      res.json({ clientSecret });
+    }
   } catch (error) {
     console.error('Error creating payment:', error);
     res.status(500).json({ error: 'Failed to create payment' });
@@ -249,9 +337,65 @@ app.get('/test-payment', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'test-payment.html'));
 });
 
+// Special route for US-only payment test page
+app.get('/test-us-payment', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test-us-payment.html'));
+});
+
 // Special route for fixed about page
 app.get('/fixed-about', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'fixed-about.html'));
+});
+
+// Admin dashboard routes
+app.get('/admin/tax-dashboard', authMiddleware.requireAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tax-dashboard.html'));
+});
+
+// Admin API endpoints
+app.get('/api/admin/monitoring', authMiddleware.requireAdmin, (req, res) => {
+  try {
+    const monitoringService = require('./services/monitoringService');
+    const data = monitoringService.getMonitoringSummary();
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to get monitoring data' });
+  }
+});
+
+app.get('/api/admin/tax-settings', authMiddleware.requireAdmin, (req, res) => {
+  try {
+    const stripeTaxConfig = require('./utils/stripeTaxConfig');
+    const data = stripeTaxConfig.getConfig();
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to get tax settings' });
+  }
+});
+
+app.post('/api/admin/generate-report', authMiddleware.requireAdmin, (req, res) => {
+  try {
+    const { type, startDate, endDate, format } = req.body;
+    
+    if (!type || !startDate || !endDate) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+    
+    // This would be handled asynchronously in a real implementation
+    res.json({
+      success: true,
+      message: 'Report generation started',
+      reportId: `report_${Date.now()}`,
+      status: 'pending'
+    });
+    
+    // In a real implementation, this would be a background job
+    setTimeout(() => {
+      console.log(`Generated ${type} report from ${startDate} to ${endDate} in ${format} format`);
+    }, 100);
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to generate report' });
+  }
 });
 
 // Serve the index.html file for all other routes

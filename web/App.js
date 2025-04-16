@@ -243,6 +243,11 @@ const App = () => {
                 <PredictionsPage />
               </ProtectedRoute>
             } />
+            <Route path="/group-subscription" element={
+              <ProtectedRoute>
+                <PricingPage groupSubscription={true} />
+              </ProtectedRoute>
+            } />
             
             {/* Spanish routes */}
             <Route path="/es/login" element={<LoginPage />} />
@@ -282,6 +287,11 @@ const App = () => {
             <Route path="/es/predictions" element={
               <ProtectedRoute>
                 <PredictionsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/es/group-subscription" element={
+              <ProtectedRoute>
+                <PricingPage groupSubscription={true} />
               </ProtectedRoute>
             } />
             

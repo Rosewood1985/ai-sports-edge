@@ -11,12 +11,16 @@ import { Platform } from 'react-native';
 import { analyticsService } from './analyticsService';
 import { FEATURE_FLAGS, STRIPE_CONFIG } from '../config/affiliateConfig';
 import { fanduelCookieService } from './fanduelCookieService';
+import apiService from './apiService';
+import { auth } from '../config/firebase';
 
 // Storage keys
 const STORAGE_KEYS = {
   MICROTRANSACTION_HISTORY: 'microtransaction_history',
   USER_PREFERENCES: 'user_microtransaction_preferences',
   CONVERSION_TRACKING: 'microtransaction_conversion_tracking',
+  LAST_SHOWN_TIMESTAMPS: 'microtransaction_last_shown_timestamps',
+  RECENT_OPPORTUNITIES: 'microtransaction_recent_opportunities',
 };
 
 // Microtransaction types
@@ -49,6 +53,55 @@ export const OPPORTUNITY_TYPES = {
 };
 
 class MicrotransactionService {
+  constructor() {
+    // Initialize frequency control storage
+    this.lastShownTimestamps = {};
+    this.recentOpportunities = [];
+    
+    // Load from AsyncStorage if available
+    this.loadFrequencyControlData();
+  }
+  
+  /**
+   * Load frequency control data from AsyncStorage
+   * @private
+   */
+  async loadFrequencyControlData() {
+    try {
+      const lastShownData = await AsyncStorage.getItem(STORAGE_KEYS.LAST_SHOWN_TIMESTAMPS);
+      if (lastShownData) {
+        this.lastShownTimestamps = JSON.parse(lastShownData);
+      }
+      
+      const recentOppsData = await AsyncStorage.getItem(STORAGE_KEYS.RECENT_OPPORTUNITIES);
+      if (recentOppsData) {
+        this.recentOpportunities = JSON.parse(recentOppsData);
+      }
+    } catch (error) {
+      console.error('Error loading frequency control data:', error);
+    }
+  }
+  
+  /**
+   * Save frequency control data to AsyncStorage
+   * @private
+   */
+  async saveFrequencyControlData() {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.LAST_SHOWN_TIMESTAMPS,
+        JSON.stringify(this.lastShownTimestamps)
+      );
+      
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.RECENT_OPPORTUNITIES,
+        JSON.stringify(this.recentOpportunities)
+      );
+    } catch (error) {
+      console.error('Error saving frequency control data:', error);
+    }
+  }
+  
   /**
    * Check if microtransactions are enabled
    * @returns {boolean} Whether microtransactions are enabled
@@ -58,43 +111,128 @@ class MicrotransactionService {
   }
   
   /**
+   * Check if a microtransaction opportunity should be shown based on frequency rules
+   * @param {string} userId User ID
+   * @param {string} contextType Context type (e.g., 'game_card')
+   * @param {string} opportunityId Opportunity ID
+   * @returns {boolean} Whether the opportunity should be shown
+   */
+  async shouldShowOpportunity(userId, contextType, opportunityId) {
+    if (!userId) return true; // Always show for non-authenticated users
+    
+    const now = Date.now();
+    const key = `${userId}_${contextType}_${opportunityId}`;
+    
+    // Check if this specific opportunity was shown recently (24-hour cooldown)
+    if (this.lastShownTimestamps[key] &&
+        (now - this.lastShownTimestamps[key]) < 24 * 60 * 60 * 1000) {
+      return false;
+    }
+    
+    // Check if we've shown too many opportunities recently (max 3 per hour)
+    const oneHourAgo = now - 60 * 60 * 1000;
+    const recentCount = this.recentOpportunities.filter(
+      opp => opp.userId === userId && opp.timestamp > oneHourAgo
+    ).length;
+    
+    if (recentCount >= 3) {
+      return false;
+    }
+    
+    // Get user preferences
+    const prefs = await this.getUserPreferences(userId);
+    if (!prefs.enableMicrotransactions) {
+      return false;
+    }
+    
+    // Update frequency control data
+    this.lastShownTimestamps[key] = now;
+    this.recentOpportunities.push({
+      userId,
+      contextType,
+      opportunityId,
+      timestamp: now
+    });
+    
+    // Clean up old data (older than 7 days)
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+    this.recentOpportunities = this.recentOpportunities.filter(
+      opp => opp.timestamp > sevenDaysAgo
+    );
+    
+    // Save updated data
+    this.saveFrequencyControlData();
+    
+    return true;
+  }
+  
+  /**
    * Get microtransaction opportunities for a specific context
    * @param {string} contextType Type of context (e.g., 'game_card', 'player_profile')
    * @param {Object} contextData Data about the context
    * @param {Object} userData User data
-   * @returns {Array} Array of microtransaction opportunities
+   * @returns {Promise<Array>} Array of microtransaction opportunities
    */
-  getOpportunities(contextType, contextData, userData) {
+  async getOpportunities(contextType, contextData, userData) {
     // If microtransactions are disabled, return empty array
     if (!this.isMicrotransactionsEnabled()) {
       return [];
     }
     
-    // Get opportunities based on context type
+    // Get all potential opportunities based on context type
+    let opportunities = [];
     switch (contextType) {
       case OPPORTUNITY_TYPES.GAME_CARD:
-        return this.getGameCardOpportunities(contextData, userData);
+        opportunities = this.getGameCardOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.PLAYER_PROFILE:
-        return this.getPlayerProfileOpportunities(contextData, userData);
+        opportunities = this.getPlayerProfileOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.TEAM_PAGE:
-        return this.getTeamPageOpportunities(contextData, userData);
+        opportunities = this.getTeamPageOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.ODDS_PAGE:
-        return this.getOddsPageOpportunities(contextData, userData);
+        opportunities = this.getOddsPageOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.STATS_PAGE:
-        return this.getStatsPageOpportunities(contextData, userData);
+        opportunities = this.getStatsPageOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.PREDICTION_PAGE:
-        return this.getPredictionPageOpportunities(contextData, userData);
+        opportunities = this.getPredictionPageOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.LIVE_FEED:
-        return this.getLiveFeedOpportunities(contextData, userData);
+        opportunities = this.getLiveFeedOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.SEARCH_RESULTS:
-        return this.getSearchResultsOpportunities(contextData, userData);
+        opportunities = this.getSearchResultsOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.HOME_SCREEN:
-        return this.getHomeScreenOpportunities(contextData, userData);
+        opportunities = this.getHomeScreenOpportunities(contextData, userData);
+        break;
       case OPPORTUNITY_TYPES.NOTIFICATION:
-        return this.getNotificationOpportunities(contextData, userData);
+        opportunities = this.getNotificationOpportunities(contextData, userData);
+        break;
       default:
-        return [];
+        opportunities = [];
     }
+    
+    // Filter opportunities based on frequency rules
+    if (userData && userData.id) {
+      const filteredOpportunities = [];
+      
+      for (const opportunity of opportunities) {
+        const opportunityId = opportunity.type + (opportunity.gameId || opportunity.playerId || opportunity.teamId || '');
+        const shouldShow = await this.shouldShowOpportunity(userData.id, contextType, opportunityId);
+        
+        if (shouldShow) {
+          filteredOpportunities.push(opportunity);
+        }
+      }
+      
+      return filteredOpportunities;
+    }
+    
+    return opportunities;
   }
   
   /**
@@ -407,7 +545,7 @@ class MicrotransactionService {
    * @param {string} interactionType Type of interaction (e.g., 'impression', 'click', 'purchase')
    * @param {Object} opportunityData Opportunity data
    * @param {Object} userData User data
-   * @returns {Promise<boolean>} Success status
+   * @returns {Promise<boolean|Object>} Success status or purchase result
    */
   async trackInteraction(interactionType, opportunityData, userData) {
     try {
@@ -426,13 +564,38 @@ class MicrotransactionService {
       // Track interaction
       analyticsService.trackEvent('microtransaction_interaction', interactionData);
       
-      // If this is a purchase, initialize cookies for FanDuel
-      if (interactionType === 'purchase' && opportunityData.cookieEnabled) {
-        await fanduelCookieService.initializeCookies(
-          userData.id,
-          opportunityData.gameId || opportunityData.entityId,
-          opportunityData.teamId
-        );
+      // If this is a purchase, use the API service for server-side validation
+      if (interactionType === 'purchase') {
+        // Only authenticated users can make purchases
+        if (!auth.currentUser) {
+          throw new Error('User must be authenticated to make purchases');
+        }
+        
+        try {
+          // Get payment method (in a real app, this would be selected by the user)
+          const paymentMethodId = 'pm_card_visa'; // Example payment method ID
+          
+          // Use the API service to make the purchase with server-side validation
+          const result = await apiService.purchaseMicrotransaction(
+            opportunityData.type,
+            paymentMethodId
+          );
+          
+          // If purchase is successful and cookies are enabled, initialize cookies
+          if (result && opportunityData.cookieEnabled) {
+            await fanduelCookieService.initializeCookies(
+              userData.id,
+              opportunityData.gameId || opportunityData.entityId,
+              opportunityData.teamId
+            );
+          }
+          
+          // Return the purchase result
+          return result;
+        } catch (error) {
+          console.error('Error purchasing microtransaction:', error);
+          throw error;
+        }
       }
       
       return true;

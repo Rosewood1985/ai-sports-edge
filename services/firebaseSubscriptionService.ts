@@ -200,7 +200,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'group-pro-monthly',
     name: 'Group Pro',
-    description: 'Share premium features with friends or family',
+    description: 'Share premium features with friends or family. All members must register within 24 hours for the deal to activate.',
     price: 149.99,
     amount: 14999, // For backward compatibility (in cents)
     interval: 'month',
@@ -209,7 +209,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     features: [
       'All Premium features for up to 3 users',
       'Each user gets full access to premium features',
-      'Save $49.98/month compared to individual subscriptions',
+      'Split the cost between up to 3 people',
+      'All members must register within 24 hours',
       'Manage members from your account',
       'Perfect for friends, family, or small groups'
     ]
@@ -779,19 +780,45 @@ export const purchaseOneTimeProduct = async (
  * @param userId User ID
  * @param productId Product ID
  * @param paymentMethodId Payment method ID
- * @returns Success status
+ * @param retryCount Optional retry count for handling network errors
+ * @returns Object with success status and error details if applicable
  */
 export const purchaseMicrotransaction = async (
   userId: string,
   productId: string,
-  paymentMethodId: string
-): Promise<boolean> => {
+  paymentMethodId: string,
+  retryCount: number = 0
+): Promise<{success: boolean, error?: string, errorCode?: string, transactionId?: string}> => {
   try {
+    // Validate inputs
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User ID is required',
+        errorCode: 'missing_user_id'
+      };
+    }
+
+    if (!paymentMethodId) {
+      return {
+        success: false,
+        error: 'Payment method ID is required',
+        errorCode: 'missing_payment_method'
+      };
+    }
+
     // Find the product
     const product = MICROTRANSACTIONS.find(p => p.id === productId);
     if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
+      return {
+        success: false,
+        error: `Product with ID ${productId} not found`,
+        errorCode: 'product_not_found'
+      };
     }
+    
+    // Generate idempotency key to prevent duplicate charges
+    const idempotencyKey = `${userId}_${productId}_${Date.now()}`;
     
     // Call the Firebase function to create a one-time payment
     const createOneTimePayment = functions.httpsCallable('createOneTimePayment');
@@ -799,13 +826,48 @@ export const purchaseMicrotransaction = async (
       userId,
       paymentMethodId,
       productId,
-      amount: product.amount
+      amount: product.amount,
+      idempotencyKey
     });
     
-    return result.data.status === 'succeeded';
-  } catch (error) {
-    console.error('Error purchasing microtransaction:', error);
-    return false;
+    // Track successful transaction
+    if (result.data.status === 'succeeded') {
+      // Log successful purchase
+      safeLog('log', `Successful microtransaction purchase: ${productId} for user ${userId}`);
+      
+      return {
+        success: true,
+        transactionId: result.data.transactionId
+      };
+    } else {
+      return {
+        success: false,
+        error: 'Payment processing failed',
+        errorCode: 'payment_failed'
+      };
+    }
+  } catch (error: any) {
+    // Log detailed error
+    safeLog('error', `Error purchasing microtransaction: ${error.message || 'Unknown error'}`, error);
+    
+    // Handle network errors with retry
+    if (error.code === 'network-error' && retryCount < 3) {
+      // Exponential backoff: wait longer for each retry
+      const waitTime = 1000 * Math.pow(2, retryCount);
+      await new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), waitTime);
+      });
+      
+      // Retry the purchase
+      return purchaseMicrotransaction(userId, productId, paymentMethodId, retryCount + 1);
+    }
+    
+    // Return detailed error information
+    return {
+      success: false,
+      error: error.message || 'Unknown error occurred',
+      errorCode: error.code || 'unknown_error'
+    };
   }
 };
 

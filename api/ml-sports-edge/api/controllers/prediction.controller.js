@@ -145,11 +145,20 @@ async function getGamePredictions(req, res) {
     // 2. Extract features for each game
     // 3. Make predictions using the trained models
     
-    // For demonstration, we'll use sample data
-    const games = getSampleGames(sport, date);
+    // Fetch upcoming games from the database
+    const games = await fetchUpcomingGames(sport, date);
     
     // Apply limit if provided
     const limitedGames = limit ? games.slice(0, parseInt(limit)) : games;
+    
+    if (limitedGames.length === 0) {
+      return res.status(404).json({
+        error: {
+          message: `No upcoming games found for sport: ${sport}`,
+          status: 404
+        }
+      });
+    }
     
     // Cache predictions
     predictionCache.set(cacheKey, limitedGames);
@@ -197,8 +206,8 @@ async function getGamePredictionById(req, res) {
     // 3. Make predictions using the trained models
     // 4. Add detailed analysis
     
-    // For demonstration, we'll use sample data
-    const game = getSampleGameById(gameId);
+    // Fetch the game from the database
+    const game = await fetchGameById(gameId);
     
     if (!game) {
       return res.status(404).json({
@@ -208,6 +217,12 @@ async function getGamePredictionById(req, res) {
         }
       });
     }
+    
+    // Extract features for the game
+    const features = extractGameFeatures(game);
+    
+    // Make predictions using the trained models
+    const predictions = await makePredictions(features);
     
     // Add additional analysis for the detailed view
     const enhancedPrediction = {
@@ -282,60 +297,53 @@ async function getPlayerPrediction(req, res) {
     // 2. Extract features for the player
     // 3. Make predictions using the trained models
     
-    // For demonstration, we'll use sample data
+    // Fetch player data from the database
+    const player = await fetchPlayerById(playerId);
+    
+    if (!player) {
+      return res.status(404).json({
+        error: {
+          message: `Player with ID ${playerId} not found`,
+          status: 404
+        }
+      });
+    }
+    
+    // Get player's upcoming game
+    const upcomingGame = await fetchPlayerUpcomingGame(playerId);
+    
+    if (!upcomingGame) {
+      return res.status(404).json({
+        error: {
+          message: `No upcoming games found for player ${playerId}`,
+          status: 404
+        }
+      });
+    }
+    
+    // Extract features for the player
+    const features = extractPlayerFeatures(player, upcomingGame);
+    
+    // Make predictions using the trained models
+    const statPredictions = await predictPlayerStats(features);
+    const propBets = await predictPlayerProps(features, statPredictions);
+    
+    // Analyze recent performance
+    const recentPerformance = await analyzeRecentPerformance(playerId);
+    
+    // Compile the player prediction
     const playerPrediction = {
-      id: playerId,
-      name: 'LeBron James',
-      team: 'Lakers',
+      id: player.id,
+      name: player.name,
+      team: player.team,
       game: {
-        id: 'game123',
-        opponent: 'Celtics',
-        date: '2025-03-18T19:30:00Z'
+        id: upcomingGame.id,
+        opponent: upcomingGame.opponent,
+        date: upcomingGame.date
       },
-      predictions: {
-        points: {
-          prediction: 26.5,
-          confidence: 0.75,
-          range: [22, 31]
-        },
-        rebounds: {
-          prediction: 8.2,
-          confidence: 0.68,
-          range: [6, 11]
-        },
-        assists: {
-          prediction: 7.5,
-          confidence: 0.72,
-          range: [5, 10]
-        }
-      },
-      propBets: [
-        {
-          type: 'Points',
-          line: 25.5,
-          recommendation: 'Over',
-          confidence: 0.65
-        },
-        {
-          type: 'Pts+Reb+Ast',
-          line: 40.5,
-          recommendation: 'Over',
-          confidence: 0.70
-        }
-      ],
-      analysis: {
-        keyFactors: [
-          'Recent performance trend',
-          'Matchup against defender',
-          'Minutes projection',
-          'Team injuries'
-        ],
-        trends: [
-          'Averaging 28.3 points in last 5 games',
-          'Scored 30+ in 3 of last 4 games against Celtics',
-          'Playing 38+ minutes in competitive games'
-        ]
-      }
+      predictions: statPredictions,
+      propBets: propBets,
+      analysis: recentPerformance
     };
     
     // Store in cache
@@ -388,16 +396,8 @@ async function getPredictionsBySport(req, res) {
       });
     }
     
-    // Get predictions for the sport
-    let predictions;
-    
-    if (sportType.toUpperCase() === 'FORMULA1') {
-      predictions = getSampleF1Predictions();
-    } else if (sportType.toUpperCase() === 'UFC') {
-      predictions = getSampleUFCPredictions();
-    } else {
-      predictions = getSampleGames(sportType.toUpperCase());
-    }
+    // Fetch predictions for the sport from the database
+    const predictions = await fetchPredictionsBySport(sportType);
     
     if (predictions.length === 0) {
       return res.status(404).json({
@@ -449,19 +449,11 @@ async function getTrendingPredictions(req, res) {
     // In a real implementation, this would query the database
     // for predictions with high confidence scores
     
-    // For demonstration, we'll combine sample predictions from different sports
-    const nbaGames = getSampleGames('NBA').slice(0, 2);
-    const mlbGames = getSampleGames('MLB').slice(0, 2);
-    const f1Races = getSampleF1Predictions().slice(0, 1);
-    const ufcFights = getSampleUFCPredictions().slice(0, 1);
+    // Fetch trending predictions from the database
+    const trendingPredictions = await fetchTrendingPredictions();
     
-    // Combine and sort by confidence
-    const trendingPredictions = [
-      ...nbaGames,
-      ...mlbGames,
-      ...f1Races,
-      ...ufcFights
-    ].sort((a, b) => {
+    // Sort by confidence
+    trendingPredictions.sort((a, b) => {
       const aConfidence = a.predictions?.spread?.confidence || 
                          a.predictions?.winner?.confidence || 
                          a.predictions?.moneyline?.confidence || 0;
@@ -543,6 +535,10 @@ async function submitPredictionFeedback(req, res) {
  * @param {string} sport - Sport key
  * @param {string} date - Date string
  * @returns {Array} - Sample games
+ *
+ * TODO: REMOVE FOR PRODUCTION
+ * This function provides mock data for development and testing.
+ * Replace with real data fetching from database or API in production.
  */
 function getSampleGames(sport, date) {
   const today = date ? new Date(date) : new Date();
@@ -719,6 +715,10 @@ function getSampleGames(sport, date) {
  * Get sample game by ID
  * @param {string} gameId - Game ID
  * @returns {Object} - Sample game
+ *
+ * TODO: REMOVE FOR PRODUCTION
+ * This function provides mock data for development and testing.
+ * Replace with real data fetching from database or API in production.
  */
 function getSampleGameById(gameId) {
   const allGames = [
@@ -732,6 +732,10 @@ function getSampleGameById(gameId) {
 /**
  * Get sample Formula 1 predictions
  * @returns {Array} - Sample F1 predictions
+ *
+ * TODO: REMOVE FOR PRODUCTION
+ * This function provides mock data for development and testing.
+ * Replace with real data fetching from database or API in production.
  */
 function getSampleF1Predictions() {
   const today = new Date();
@@ -785,6 +789,10 @@ function getSampleF1Predictions() {
 /**
  * Get sample UFC predictions
  * @returns {Array} - Sample UFC predictions
+ *
+ * TODO: REMOVE FOR PRODUCTION
+ * This function provides mock data for development and testing.
+ * Replace with real data fetching from database or API in production.
  */
 function getSampleUFCPredictions() {
   const today = new Date();

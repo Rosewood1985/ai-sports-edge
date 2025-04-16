@@ -1,0 +1,201 @@
+{
+  "projectId": "ai-sports-edge-prod",
+  "appId": "1:123456789012:web:abcdef1234567890",
+  "databaseURL": "https://ai-sports-edge-prod.firebaseio.com",
+  "storageBucket": "ai-sports-edge-prod.appspot.com",
+  "locationId": "us-central",
+  "apiKey": "YOUR_API_KEY",
+  "authDomain": "ai-sports-edge-prod.firebaseapp.com",
+  "messagingSenderId": "123456789012",
+  "measurementId": "G-ABCDEF1234",
+  "production": true,
+  "scaling": {
+    "database": {
+      "instances": 3,
+      "shardCount": 5,
+      "maxConnections": 2000,
+      "maxConcurrentRequests": 5000
+    },
+    "functions": {
+      "minInstances": 5,
+      "maxInstances": 50,
+      "timeoutSeconds": 300,
+      "memory": "2GB",
+      "cpu": 2
+    },
+    "hosting": {
+      "cacheControl": "max-age=3600",
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
+        },
+        {
+          "source": "**/*.@(jpg|jpeg|png|gif|webp|svg|ico)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=604800"
+            }
+          ]
+        }
+      ]
+    },
+    "storage": {
+      "cors": [
+        {
+          "origin": ["https://ai-sports-edge.com"],
+          "method": ["GET", "POST", "PUT", "DELETE"],
+          "maxAgeSeconds": 3600
+        }
+      ],
+      "lifecycle": {
+        "rules": [
+          {
+            "action": {
+              "type": "delete"
+            },
+            "condition": {
+              "age": 365,
+              "matchesStorageClass": ["STANDARD"]
+            }
+          },
+          {
+            "action": {
+              "type": "setStorageClass",
+              "storageClass": "NEARLINE"
+            },
+            "condition": {
+              "age": 30,
+              "matchesStorageClass": ["STANDARD"]
+            }
+          }
+        ]
+      }
+    },
+    "firestore": {
+      "indexes": {
+        "collections": [
+          {
+            "collectionGroup": "users",
+            "queryScope": "COLLECTION",
+            "fields": [
+              {
+                "fieldPath": "lastUpdated",
+                "order": "DESCENDING"
+              }
+            ]
+          },
+          {
+            "collectionGroup": "purchasedOdds",
+            "queryScope": "COLLECTION",
+            "fields": [
+              {
+                "fieldPath": "timestamp",
+                "order": "DESCENDING"
+              }
+            ]
+          }
+        ]
+      },
+      "backupSchedule": {
+        "frequency": "daily",
+        "time": "03:00",
+        "retentionDays": 30
+      }
+    }
+  },
+  "security": {
+    "authentication": {
+      "providers": ["email", "google", "apple", "facebook"],
+      "mfa": {
+        "enabled": true,
+        "providerConfigs": [
+          {
+            "phoneNumber": {
+              "enabled": true
+            }
+          }
+        ]
+      },
+      "emailLinkSignIn": {
+        "enabled": true,
+        "actionCodeSettings": {
+          "url": "https://ai-sports-edge.com/finishSignIn",
+          "handleCodeInApp": true,
+          "iOS": {
+            "bundleId": "com.aisportsedge.app"
+          },
+          "android": {
+            "packageName": "com.aisportsedge.app",
+            "installApp": true,
+            "minimumVersion": "12"
+          },
+          "dynamicLinkDomain": "aisportsedge.page.link"
+        }
+      }
+    },
+    "firestore": {
+      "rules": {
+        "users": {
+          "read": "auth.uid == userId",
+          "write": "auth.uid == userId"
+        },
+        "purchasedOdds": {
+          "read": "auth.uid == userId",
+          "write": "auth.uid == userId"
+        },
+        "publicData": {
+          "read": "true",
+          "write": "false"
+        }
+      }
+    },
+    "storage": {
+      "rules": {
+        "userFiles": {
+          "read": "auth.uid == userId",
+          "write": "auth.uid == userId"
+        },
+        "publicFiles": {
+          "read": "true",
+          "write": "false"
+        }
+      }
+    }
+  },
+  "monitoring": {
+    "alerts": [
+      {
+        "name": "high-error-rate",
+        "description": "Alert when error rate exceeds 1%",
+        "threshold": 0.01,
+        "duration": "5m",
+        "notificationChannels": ["email", "slack"]
+      },
+      {
+        "name": "high-latency",
+        "description": "Alert when p95 latency exceeds 500ms",
+        "threshold": 500,
+        "duration": "5m",
+        "notificationChannels": ["email", "slack"]
+      },
+      {
+        "name": "high-billing",
+        "description": "Alert when daily billing exceeds $100",
+        "threshold": 100,
+        "duration": "1d",
+        "notificationChannels": ["email", "slack"]
+      }
+    ],
+    "logging": {
+      "retention": "30d",
+      "exportToBigQuery": true
+    }
+  }
+}

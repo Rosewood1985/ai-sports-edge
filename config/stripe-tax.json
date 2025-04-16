@@ -1,0 +1,55 @@
+{
+  "enabled": true,
+  "mode": "automatic",
+  "defaultTaxCodes": {
+    "subscription": "txcd_10103001",
+    "oneTimePurchase": "txcd_10103001",
+    "inAppPurchase": "txcd_10103001",
+    "premiumFeature": "txcd_10103001",
+    "groupSubscription": "txcd_10103001"
+  },
+  "taxCalculation": {
+    "cacheEnabled": true,
+    "cacheTTL": 300000,
+    "defaultTaxBehavior": "exclusive"
+  },
+  "taxReporting": {
+    "enabled": true,
+    "automaticReporting": true,
+    "reportingFrequency": "monthly",
+    "reportingDay": 5,
+    "recipients": []
+  },
+  "taxExemptions": {
+    "enabled": true,
+    "requireCertificate": true,
+    "certificateStorage": "firebase"
+  },
+  "registrations": [
+    {
+      "country": "US",
+      "state": "CA",
+      "type": "state_tax",
+      "registrationId": "CA-12345"
+    },
+    {
+      "country": "US",
+      "type": "federal_tax",
+      "registrationId": "US-12345"
+    }
+  ],
+  "thresholds": [
+    {
+      "country": "US",
+      "threshold": 100000,
+      "currency": "USD",
+      "period": "annual"
+    },
+    {
+      "country": "CA",
+      "threshold": 30000,
+      "currency": "CAD",
+      "period": "annual"
+    }
+  ]
+}

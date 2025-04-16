@@ -1,0 +1,58 @@
+--- Service Initialization Debug Log ---
+
+[18:13:57] [DEBUG] Debug script started - Testing service initialization
+[18:13:57] [DEBUG] Attempting to import errorUtils.ts
+[18:13:57] [ERROR] Failed to import errorUtils: Cannot find module './services/errorUtils'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js
+[18:13:57] [DEBUG] Attempting to import loggingService.ts
+[18:13:57] [ERROR] Failed to import or initialize loggingService: Cannot find module './services/loggingService'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js Error: Cannot find module './services/loggingService'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+    at Module.require (node:internal/modules/cjs/loader:1311:12)
+    at require (node:internal/modules/helpers:136:16)
+    at Object.<anonymous> (/Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js:79:26)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Object..js (node:internal/modules/cjs/loader:1706:10)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)
+[18:13:57] [DEBUG] Attempting to import errorTrackingService.ts
+[18:13:57] [ERROR] Failed to import or initialize errorTrackingService: Cannot find module './services/errorTrackingService'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js Error: Cannot find module './services/errorTrackingService'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+    at Module.require (node:internal/modules/cjs/loader:1311:12)
+    at require (node:internal/modules/helpers:136:16)
+    at Object.<anonymous> (/Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js:99:32)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Object..js (node:internal/modules/cjs/loader:1706:10)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)
+[18:13:57] [DEBUG] Simulating App.tsx initialization
+[18:13:57] [DEBUG] Initializing services in order
+[18:13:57] [DEBUG] About to initialize logging service
+[18:13:57] [ERROR] Error in App.tsx simulation: Cannot find module './services/loggingService'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js Error: Cannot find module './services/loggingService'
+Require stack:
+- /Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function._load (node:internal/modules/cjs/loader:1055:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+    at Module.require (node:internal/modules/cjs/loader:1311:12)
+    at require (node:internal/modules/helpers:136:16)
+    at Object.<anonymous> (/Users/lisadario/Desktop/ai-sports-edge/debug-service-init.js:119:26)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Object..js (node:internal/modules/cjs/loader:1706:10)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)
+[18:13:59] [DEBUG] Debug script completed

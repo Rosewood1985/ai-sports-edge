@@ -1,0 +1,135 @@
+{
+  "database": {
+    "enabled": true,
+    "type": "RDS",
+    "instanceId": "ai-sports-edge-production",
+    "backupRetentionPeriod": 7,
+    "pointInTimeRecovery": true,
+    "snapshotSchedule": {
+      "daily": {
+        "enabled": true,
+        "time": "03:00",
+        "retentionDays": 7
+      },
+      "weekly": {
+        "enabled": true,
+        "dayOfWeek": "Sunday",
+        "time": "02:00",
+        "retentionDays": 30
+      },
+      "monthly": {
+        "enabled": true,
+        "dayOfMonth": 1,
+        "time": "01:00",
+        "retentionDays": 90
+      }
+    },
+    "transactionLogs": {
+      "enabled": true,
+      "retentionHours": 24
+    }
+  },
+  "fileSystem": {
+    "enabled": true,
+    "s3Buckets": [
+      {
+        "name": "ai-sports-edge-static",
+        "versioning": true,
+        "replication": {
+          "enabled": true,
+          "destinationBucket": "ai-sports-edge-static-backup",
+          "destinationRegion": "us-west-2"
+        },
+        "lifecycle": {
+          "transitionToIA": 30,
+          "transitionToGlacier": 90,
+          "expiration": 365
+        }
+      },
+      {
+        "name": "ai-sports-edge-user-uploads",
+        "versioning": true,
+        "replication": {
+          "enabled": true,
+          "destinationBucket": "ai-sports-edge-user-uploads-backup",
+          "destinationRegion": "us-west-2"
+        },
+        "lifecycle": {
+          "transitionToIA": 30,
+          "transitionToGlacier": 90,
+          "expiration": 365
+        }
+      }
+    ],
+    "efsFileSystems": [
+      {
+        "id": "fs-XXXXXXXXXXXXXXXXX",
+        "backupVault": "ai-sports-edge-backup-vault",
+        "schedule": {
+          "daily": {
+            "enabled": true,
+            "time": "04:00",
+            "retentionDays": 7
+          },
+          "weekly": {
+            "enabled": true,
+            "dayOfWeek": "Sunday",
+            "time": "03:00",
+            "retentionDays": 30
+          }
+        }
+      }
+    ]
+  },
+  "applicationState": {
+    "enabled": true,
+    "dynamoDBTables": [
+      {
+        "name": "ai-sports-edge-sessions",
+        "pointInTimeRecovery": true,
+        "backupSchedule": {
+          "daily": {
+            "enabled": true,
+            "time": "05:00",
+            "retentionDays": 7
+          }
+        }
+      },
+      {
+        "name": "ai-sports-edge-user-preferences",
+        "pointInTimeRecovery": true,
+        "backupSchedule": {
+          "daily": {
+            "enabled": true,
+            "time": "05:30",
+            "retentionDays": 7
+          }
+        }
+      }
+    ]
+  },
+  "verification": {
+    "enabled": true,
+    "schedule": {
+      "weekly": {
+        "enabled": true,
+        "dayOfWeek": "Saturday",
+        "time": "06:00"
+      }
+    },
+    "restoreTest": {
+      "database": true,
+      "fileSystem": true,
+      "applicationState": true
+    },
+    "notificationEmail": "devops@aisportsedge.com"
+  },
+  "monitoring": {
+    "enabled": true,
+    "failedBackupAlerts": true,
+    "successfulBackupNotifications": true,
+    "backupSizeThreshold": 10737418240,
+    "backupDurationThreshold": 3600,
+    "snsTopicArn": "arn:aws:sns:us-east-1:XXXXXXXXXXXX:ai-sports-edge-backup-alerts"
+  }
+}

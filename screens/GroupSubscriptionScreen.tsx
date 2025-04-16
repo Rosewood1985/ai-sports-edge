@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,9 @@ import { ThemedText } from '../components/ThemedText';
 import { useTheme } from '../contexts/ThemeContext';
 // Import analytics service
 import { analyticsService } from '../services/analyticsService';
+import { AnalyticsEventType } from '../services/analyticsService';
+// Import error styles
+import { errorStyles } from '../styles/groupSubscriptionStyles';
 
 /**
  * GroupSubscriptionScreen component
@@ -40,6 +43,12 @@ const GroupSubscriptionScreen: React.FC = () => {
   const [newMemberEmail, setNewMemberEmail] = useState<string>('');
   const [transferringOwnership, setTransferringOwnership] = useState<boolean>(false);
   const [step, setStep] = useState<'info' | 'payment' | 'manage'>('info');
+  const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  
+  // Refs for accessibility focus management
+  const emailInputRefs = useRef<Array<TextInput | null>>([null, null]);
+  const newMemberInputRef = useRef<TextInput | null>(null);
   
   // Load existing group subscription if any
   useEffect(() => {
@@ -78,29 +87,66 @@ const GroupSubscriptionScreen: React.FC = () => {
     setMemberEmails(newEmails);
   };
   
+  // Validate email function
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return email.trim() === '' || emailRegex.test(email);
+  };
+
   // Handle continue to payment
   const handleContinueToPayment = () => {
+    // Reset errors
+    setError(null);
+    setValidationErrors({});
+    
     // Filter out empty emails
     const validEmails = memberEmails.filter(email => email.trim() !== '');
     
     // Validate emails
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const invalidEmails = validEmails.filter(email => !emailRegex.test(email));
+    const newValidationErrors: {[key: string]: string} = {};
+    let hasErrors = false;
     
-    if (invalidEmails.length > 0) {
-      Alert.alert('Invalid Email', 'Please enter valid email addresses for all members.');
+    validEmails.forEach((email, index) => {
+      if (!emailRegex.test(email)) {
+        newValidationErrors[`email_${index}`] = `Email ${index + 1} is invalid`;
+        hasErrors = true;
+      }
+    });
+    
+    if (hasErrors) {
+      setValidationErrors(newValidationErrors);
+      setError('Please correct the invalid email addresses.');
+      
+      // Focus the first invalid input
+      const firstInvalidIndex = memberEmails.findIndex((email, index) =>
+        email.trim() !== '' && !emailRegex.test(email)
+      );
+      
+      if (firstInvalidIndex >= 0 && emailInputRefs.current[firstInvalidIndex]) {
+        emailInputRefs.current[firstInvalidIndex]?.focus();
+      }
+      
       return;
     }
     
     // Set valid emails and continue to payment
     setMemberEmails(validEmails);
     setStep('payment');
+    
+    // Track analytics
+    analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_STARTED, {
+      subscription_type: 'group_pro',
+      member_count: validEmails.length + 1, // +1 for owner
+      is_group: true
+    });
   };
   
   // Handle create group subscription
   const handleCreateGroupSubscription = async () => {
     try {
       setLoading(true);
+      setError(null);
       
       const userId = auth.currentUser?.uid;
       
@@ -109,6 +155,33 @@ const GroupSubscriptionScreen: React.FC = () => {
         return;
       }
       
+      // Inform user about the 24-hour registration requirement
+      Alert.alert(
+        'Registration Time Limit',
+        'Please note that all members must register within 24 hours for the group subscription to activate. Do you want to continue?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+            onPress: () => setLoading(false)
+          },
+          {
+            text: 'Continue',
+            style: 'default',
+            onPress: () => processGroupSubscription(userId)
+          }
+        ]
+      );
+    } catch (error: any) {
+      console.error('Error creating group subscription:', error);
+      Alert.alert('Error', error.message || 'Failed to create group subscription. Please try again.');
+      setLoading(false);
+    }
+  };
+  
+  // Process the group subscription after confirmation
+  const processGroupSubscription = async (userId: string) => {
+    try {
       // Call backend to prepare payment
       try {
         // Call the Firebase function to prepare the payment
@@ -178,9 +251,10 @@ const GroupSubscriptionScreen: React.FC = () => {
       );
       
       // Track event
-      analyticsService.trackEvent('group_subscription_created', {
+      analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_COMPLETED, {
         member_count: memberEmails.length + 1, // +1 for the owner
-        subscription_type: 'group_pro'
+        subscription_type: 'group_pro',
+        is_group: true
       });
       
       // Set group ID and data
@@ -190,7 +264,7 @@ const GroupSubscriptionScreen: React.FC = () => {
       // Show success message
       Alert.alert(
         'Group Subscription Created',
-        'Your group subscription has been created successfully!',
+        'Your group subscription has been created successfully! Remember that all members must register within 24 hours for the group subscription to activate.',
         [
           {
             text: 'OK',
@@ -391,7 +465,14 @@ const GroupSubscriptionScreen: React.FC = () => {
           <View style={styles.infoRow}>
             <Ionicons name="cash" size={24} color={colors.primary} />
             <ThemedText style={styles.infoText}>
-              Save $49.98/month compared to individual subscriptions
+              Split the cost and save compared to individual subscriptions
+            </ThemedText>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Ionicons name="time" size={24} color={colors.primary} />
+            <ThemedText style={styles.infoText}>
+              All members must register within 24 hours for the deal to activate
             </ThemedText>
           </View>
           
@@ -412,16 +493,40 @@ const GroupSubscriptionScreen: React.FC = () => {
         {memberEmails.map((email, index) => (
           <View key={index} style={styles.inputContainer}>
             <TextInput
-              style={[styles.input, { color: colors.text }]}
+              ref={ref => emailInputRefs.current[index] = ref}
+              style={[
+                styles.input,
+                { color: colors.text },
+                validationErrors[`email_${index}`] ? errorStyles.inputError : {}
+              ]}
               placeholder={`Member ${index + 1} email`}
               placeholderTextColor={colors.secondary}
               value={email}
               onChangeText={(text) => handleMemberEmailChange(text, index)}
               keyboardType="email-address"
               autoCapitalize="none"
+              accessibilityLabel={`Member ${index + 1} email input`}
+              accessibilityHint="Enter the email address of a group member"
+              returnKeyType={index < memberEmails.length - 1 ? "next" : "done"}
+              onSubmitEditing={() => {
+                if (index < memberEmails.length - 1 && emailInputRefs.current[index + 1]) {
+                  emailInputRefs.current[index + 1]?.focus();
+                }
+              }}
             />
+            {validationErrors[`email_${index}`] && (
+              <Text style={errorStyles.errorText}>
+                {validationErrors[`email_${index}`]}
+              </Text>
+            )}
           </View>
         ))}
+        
+        {error && (
+          <View style={errorStyles.errorContainer}>
+            <Text style={errorStyles.errorText}>{error}</Text>
+          </View>
+        )}
         
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}

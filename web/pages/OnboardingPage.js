@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { markOnboardingCompleted } from '../services/onboardingService';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 /**
  * OnboardingPage component for web
@@ -12,6 +13,12 @@ const OnboardingPage = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmationData, setConfirmationData] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
   const languagePrefix = i18n.language === 'es' ? '/es' : '';
 
   // Define the onboarding steps
@@ -43,6 +50,25 @@ const OnboardingPage = () => {
       description: t('onboarding:performance.description'),
       image: '/images/onboarding/performance.svg',
       backgroundColor: '#e74c3c',
+    },
+    {
+      id: 'groupSubscription',
+      title: t('onboarding:groupSubscription.title'),
+      description: t('onboarding:groupSubscription.description'),
+      image: '/images/onboarding/group-subscription.svg',
+      backgroundColor: '#16a085',
+      actionButton: {
+        text: t('onboarding:groupSubscription.actionButton'),
+        onClick: () => {
+          // Show 24-hour registration requirement modal before navigating
+          setConfirmationData({
+            title: t('onboarding:groupSubscription.title'),
+            message: t('onboarding:groupSubscription.timeRequirement'),
+            onConfirm: () => navigate(`${languagePrefix}/group-subscription`)
+          });
+          setShowConfirmModal(true);
+        }
+      }
     },
     {
       id: 'getStarted',
@@ -78,14 +104,39 @@ const OnboardingPage = () => {
       if (!success) {
         // Show an error message but still allow navigation
         console.error('Failed to save onboarding status');
-        // Use a more user-friendly approach like a toast notification here
-        alert(t('common:error'));
+        
+        // Set confirmation data for the error modal
+        setConfirmationData({
+          title: t('common:error'),
+          message: t('onboarding:errors.saveFailed', {
+            defaultValue: 'We couldn\'t save your onboarding progress. Some features may ask you to complete onboarding again.'
+          }),
+          onConfirm: () => navigate(`${languagePrefix}/`)
+        });
+        setShowConfirmModal(true);
+        return; // Don't navigate yet, let the modal handle it
       }
+      
+      // Success case - navigate to home
       navigate(`${languagePrefix}/`);
     } catch (error) {
-      console.error('Error completing onboarding:', error);
-      // Navigate anyway, but log the error for debugging
-      navigate(`${languagePrefix}/`);
+      // Sanitize error message to prevent XSS
+      const sanitizedError = error?.message ?
+        error.message.replace(/[<>]/g, '') :
+        'Unknown error';
+      
+      console.error('Error completing onboarding:', sanitizedError);
+      
+      // Show error modal with sanitized message
+      setConfirmationData({
+        title: t('common:error'),
+        message: t('onboarding:errors.generalError', {
+          defaultValue: 'There was a problem completing the onboarding process. You can try again later.',
+          error: sanitizedError
+        }),
+        onConfirm: () => navigate(`${languagePrefix}/`)
+      });
+      setShowConfirmModal(true);
     }
   };
 
@@ -146,9 +197,21 @@ const OnboardingPage = () => {
       role="main"
       aria-label={t('onboarding:pageTitle')}
     >
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        title={confirmationData.title}
+        message={confirmationData.message}
+        onConfirm={confirmationData.onConfirm}
+        confirmText={t('common:confirm')}
+        cancelText={t('common:cancel')}
+      />
       <div
         className={`onboarding-content ${animating ? 'fade-out' : 'fade-in'}`}
         aria-live="polite"
+        role="region"
+        aria-label={`${t('onboarding:step', { defaultValue: 'Step' })} ${currentStep + 1} ${t('onboarding:of', { defaultValue: 'of' })} ${steps.length}`}
       >
         <div className="onboarding-image">
           <img
@@ -161,6 +224,15 @@ const OnboardingPage = () => {
         <div className="onboarding-text">
           <h1 id={`onboarding-step-${currentStep + 1}`} tabIndex="-1">{currentStepData.title}</h1>
           <p>{currentStepData.description}</p>
+          {currentStepData.actionButton && (
+            <button
+              className="action-button"
+              onClick={currentStepData.actionButton.onClick}
+              aria-label={currentStepData.actionButton.text}
+            >
+              {currentStepData.actionButton.text}
+            </button>
+          )}
         </div>
         
         <div className="onboarding-progress" role="navigation" aria-label={t('onboarding:progressNav')}>
@@ -190,6 +262,8 @@ const OnboardingPage = () => {
                 className="skip-button"
                 onClick={handleSkip}
                 aria-label={t('common:skip')}
+                aria-haspopup="dialog"
+                aria-describedby={`onboarding-step-${currentStep + 1}`}
               >
                 {t('common:skip')}
               </button>
@@ -197,6 +271,7 @@ const OnboardingPage = () => {
                 className="next-button"
                 onClick={handleNext}
                 aria-label={t('common:next')}
+                aria-describedby={`onboarding-step-${currentStep + 1}`}
               >
                 {t('common:next')}
               </button>
@@ -206,6 +281,8 @@ const OnboardingPage = () => {
               className="get-started-button"
               onClick={handleComplete}
               aria-label={t('common:getStarted')}
+              aria-haspopup="dialog"
+              aria-describedby={`onboarding-step-${currentStep + 1}`}
             >
               {t('common:getStarted')}
             </button>

@@ -1,323 +1,195 @@
-import { registerRootComponent } from "expo";
-import React, { useEffect, useState } from "react";
-import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { ParamListBase } from "@react-navigation/native";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { PersonalizationProvider } from "./contexts/PersonalizationContext";
-import { BettingAffiliateProvider } from "./contexts/BettingAffiliateContext";
-import { I18nProvider, useI18n } from "./contexts/I18nContext";
-import { StatusBar, useColorScheme, View, Text } from "react-native";
-import StripeProvider from "./components/StripeProvider";
-import OneSignalProvider from "./components/OneSignalProvider";
-import { LanguageRedirect } from "./components/LanguageRedirect";
-import LanguageSelector from "./components/LanguageSelector";
-import LanguageChangeListener from "./components/LanguageChangeListener";
-import { ToastContainer } from "./components/Toast";
-import NeonLoginScreen from "./screens/NeonLoginScreen";
-import NeonOddsScreen from "./screens/NeonOddsScreen";
-import RewardsScreen from "./screens/RewardsScreen";
-import OnboardingScreen from "./screens/OnboardingScreen";
-import FeatureTourScreen from "./screens/FeatureTourScreen";
-import { isOnboardingCompleted } from "./services/onboardingService";
-import featureTourService from "./services/featureTourService";
-import ReferralLeaderboardScreen from "./screens/ReferralLeaderboardScreen";
-import FAQScreen from "./screens/FAQScreen";
-import GiftRedemptionScreen from "./screens/GiftRedemptionScreen";
-import SubscriptionAnalyticsScreen from "./screens/SubscriptionAnalyticsScreen";
-import SportsNewsScreen from "./screens/SportsNewsScreen";
-import Formula1Screen from "./screens/Formula1Screen";
-import PlayerStatsScreen from "./screens/PlayerStatsScreen";
-import AdvancedPlayerStatsScreen from "./screens/AdvancedPlayerStatsScreen";
-import PlayerHistoricalTrendsScreen from "./screens/PlayerHistoricalTrendsScreen";
-import NcaaBasketballScreen from "./screens/NcaaBasketballScreen";
-import PersonalizationScreen from "./screens/PersonalizationScreen";
-import PersonalizedHomeScreen from "./screens/PersonalizedHomeScreen";
-import NotificationSettingsScreen from "./screens/NotificationSettingsScreen";
-import { colors } from "./styles/theme";
+import React, { useEffect } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { useColorScheme, Text, View, StyleSheet } from 'react-native';
+import AppNavigator from './navigation/AppNavigator';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { NavigationStateProvider } from './contexts/NavigationStateContext';
+import { initErrorTracking } from './services/errorTrackingService';
+import { initPerformanceMonitoring } from './services/performanceMonitoringService';
+// import { initAnalytics } from './services/analyticsService'; // Removed - function doesn't exist
+import { initAlerting } from './services/alertingService';
+import { initLogging, info, LogCategory } from './services/loggingService';
+import { debugServiceInitialization, debugServiceDependencies } from './debug-services';
+import ErrorBoundary from './components/ErrorBoundary';
+import { Colors } from './constants/Colors'; // Import Colors
 
-// Define the type for the navigation stack parameters
-type RootStackParamList = {
-  Onboarding: undefined;
-  FeatureTour: undefined;
-  Main: undefined;
-  Login: undefined;
-  Odds: undefined;
-  Rewards: undefined;
-  ReferralLeaderboard: undefined;
-  FAQ: undefined;
-  GiftRedemption: undefined;
-  SubscriptionAnalytics: undefined;
-  SportsNews: undefined;
-  Formula1: undefined;
-  PlayerStats: { gameId: string; gameTitle?: string };
-  AdvancedPlayerStats: { gameId: string; gameTitle?: string };
-  PlayerHistoricalTrends: { gameId: string; playerId: string; playerName?: string };
-  NcaaBasketball: { gender?: 'mens' | 'womens' };
-  Personalization: undefined;
-  FavoriteSports: undefined;
-  FavoriteTeams: undefined;
-  RiskToleranceSettings: undefined;
-  OddsFormatSettings: undefined;
-  PersonalizedHome: undefined;
-  NotificationSettings: undefined;
-};
+export default function App() {
+  const colorScheme = useColorScheme();
 
-const Stack = createStackNavigator<RootStackParamList>();
-
-// Custom navigation theme
-const NeonTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: colors.neon.blue,
-    background: colors.background.primary,
-    card: colors.background.secondary,
-    text: colors.text.primary,
-    border: colors.border.default,
-    notification: colors.status.error,
-  },
-};
-
-// Language selector component for the header
-const HeaderLanguageSelector = () => {
-  return (
-    <LanguageSelector compact={true} style={{ marginRight: 10 }} />
-  );
-};
-
-// Main navigation component with i18n support
-const AppNavigator = () => {
-  const { t, language, setLanguage } = useI18n();
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  
-  // Check if onboarding has been completed
+  // Initialize monitoring services
   useEffect(() => {
-    const checkOnboarding = async () => {
-      try {
-        const completed = await isOnboardingCompleted();
-        setOnboardingComplete(completed);
-      } catch (error) {
-        console.error('Error checking onboarding status:', error);
-        // Default to showing onboarding if there's an error
-        setOnboardingComplete(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkOnboarding();
-  }, []);
-  
-  // Show loading screen while checking onboarding status
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background.primary }}>
-        <Text style={{ color: colors.text.primary }}>{t('common.loading')}</Text>
-      </View>
-    );
-  }
-  
-  return (
-    <>
-      <LanguageRedirect currentLanguage={language} setLanguage={setLanguage} />
-      <LanguageChangeListener />
-      <StatusBar barStyle="light-content" backgroundColor={colors.background.primary} />
-      <ToastContainer />
-      <NavigationContainer theme={NeonTheme}>
-        <Stack.Navigator
-          initialRouteName={onboardingComplete ? "Login" : "Onboarding"}
-          screenOptions={({ navigation }) => ({
-            headerStyle: {
-              backgroundColor: colors.background.secondary,
-              elevation: 0, // Remove shadow on Android
-              shadowOpacity: 0, // Remove shadow on iOS
-              borderBottomWidth: 1,
-              borderBottomColor: colors.neon.blue,
-            },
-            headerTintColor: colors.neon.blue,
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-            cardStyle: { backgroundColor: colors.background.primary },
-            // Add language selector to header right
-            headerRight: () => <HeaderLanguageSelector />,
-          })}
-        >
-          <Stack.Screen
-            name="Onboarding"
-            component={OnboardingScreen}
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="FeatureTour"
-            component={FeatureTourScreen}
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={NeonLoginScreen}
-            options={{
-              title: t("screens.login.title"),
-              headerShown: false, // Hide header for login screen
-            }}
-          />
-          <Stack.Screen
-            name="PersonalizedHome"
-            component={PersonalizedHomeScreen}
-            options={{
-              title: t("screens.home.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="Odds"
-            component={NeonOddsScreen}
-            options={{
-              title: t("screens.odds.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="Rewards"
-            component={RewardsScreen}
-            options={{
-              title: t("screens.rewards.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="ReferralLeaderboard"
-            component={ReferralLeaderboardScreen}
-            options={{
-              title: t("screens.referralLeaderboard.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="FAQ"
-            component={FAQScreen}
-            options={{
-              title: t("screens.faq.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="GiftRedemption"
-            component={GiftRedemptionScreen}
-            options={{
-              title: t("screens.giftRedemption.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="SubscriptionAnalytics"
-            component={SubscriptionAnalyticsScreen}
-            options={{
-              title: t("screens.subscriptionAnalytics.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="SportsNews"
-            component={SportsNewsScreen}
-            options={{
-              title: t("screens.sportsNews.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="Formula1"
-            component={Formula1Screen}
-            options={{
-              title: t("screens.formula1.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="PlayerStats"
-            component={PlayerStatsScreen}
-            options={{
-              title: t("screens.playerStats.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="AdvancedPlayerStats"
-            component={AdvancedPlayerStatsScreen}
-            options={{
-              title: t("screens.advancedPlayerStats.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="PlayerHistoricalTrends"
-            component={PlayerHistoricalTrendsScreen}
-            options={{
-              title: t("screens.playerHistoricalTrends.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="NcaaBasketball"
-            component={NcaaBasketballScreen}
-            options={{
-              title: t("screens.ncaaBasketball.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="Personalization"
-            component={PersonalizationScreen}
-            options={{
-              title: t("screens.personalization.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-          <Stack.Screen
-            name="NotificationSettings"
-            component={NotificationSettingsScreen}
-            options={{
-              title: t("screens.notificationSettings.title"),
-              headerBackTitle: t("common.back")
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </>
-  );
-};
+    console.log('Initializing services...');
 
-/**
- * Main App component with neon UI design and internationalization support
- * @returns {JSX.Element} - Rendered component
- */
-function App(): JSX.Element {
+    // Run debug functions to check module resolution
+    console.log('Running debug functions to check module resolution');
+    try {
+      debugServiceDependencies();
+      debugServiceInitialization();
+    } catch (debugError) {
+      console.error('Error running debug functions:', debugError);
+    }
+
+    try {
+      // Initialize logging first
+      console.log('About to initialize logging service');
+      const loggingInitialized = initLogging();
+      console.log('Logging initialization result:', loggingInitialized);
+
+      if (loggingInitialized) {
+        info(LogCategory.APP, 'Logging service initialized');
+
+        // Try to initialize error tracking with improved error handling
+        console.log('About to initialize error tracking service');
+        try {
+          const errorTrackingInitialized = initErrorTracking();
+          if (errorTrackingInitialized) {
+            console.log('Error tracking service initialized successfully');
+            info(LogCategory.APP, 'Error tracking service initialized');
+          } else {
+            console.warn('Error tracking service initialization returned false');
+            info(LogCategory.APP, 'Error tracking service initialization failed');
+          }
+        } catch (errorTrackingError) {
+          console.error('Exception caught while initializing error tracking:', errorTrackingError);
+          info(LogCategory.APP, 'Error tracking service initialization failed with exception');
+        }
+
+        // Initialize other services with improved error handling
+        console.log('About to initialize performance monitoring');
+        try {
+          const performanceMonitoringInitialized = initPerformanceMonitoring();
+          if (performanceMonitoringInitialized) {
+            console.log('Performance monitoring service initialized successfully');
+            info(LogCategory.APP, 'Performance monitoring service initialized');
+          } else {
+            console.warn('Performance monitoring service initialization returned false');
+            info(LogCategory.APP, 'Performance monitoring service initialization failed');
+          }
+        } catch (performanceMonitoringError) {
+          console.error('Exception caught while initializing performance monitoring:', performanceMonitoringError);
+          info(LogCategory.APP, 'Performance monitoring service initialization failed with exception');
+        }
+
+        console.log('About to initialize alerting service');
+        try {
+          const alertingInitialized = initAlerting();
+          if (alertingInitialized) {
+            console.log('Alerting service initialized successfully');
+            info(LogCategory.APP, 'Alerting service initialized');
+          } else {
+            console.warn('Alerting service initialization returned false');
+            info(LogCategory.APP, 'Alerting service initialization failed');
+          }
+        } catch (alertingError) {
+          console.error('Exception caught while initializing alerting service:', alertingError);
+          info(LogCategory.APP, 'Alerting service initialization failed with exception');
+        }
+      } else {
+        console.error('Logging service failed to initialize');
+      }
+
+      // Log app start
+      console.log('Logging application start');
+      info(LogCategory.APP, 'Application started');
+    } catch (error) {
+      console.error('Error initializing services:', error);
+    }
+  }, []);
+
+  // Customize themes based on Colors.ts and guidelines
+  const lightTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: Colors.light.tint, // Accent color
+      background: Colors.light.background, // Dominant color
+      card: '#f0f2f5', // Secondary background (light gray)
+      text: Colors.light.text, // Secondary color
+      border: '#d1d5db', // Secondary color (slightly lighter gray for borders)
+      notification: '#FF3B30', // Accent color (keep red for notifications)
+      icon: Colors.light.icon, // Add icon color from constants
+    },
+  };
+
+  const darkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      primary: Colors.neon.blue, // Use a neon accent for dark mode actions
+      background: Colors.dark.background, // Dominant color
+      card: '#2a2c2d', // Secondary background (lighter dark gray)
+      text: Colors.dark.text, // Secondary color
+      border: Colors.dark.icon, // Secondary color (use icon color for borders)
+      notification: '#FF453A', // Accent color (keep red for notifications)
+      icon: Colors.dark.icon, // Add icon color from constants
+    },
+  };
+
+  // Create a custom fallback UI for critical errors
+  const fallbackUI = (
+    <View style={styles.fallbackContainer}>
+      <Text style={styles.fallbackTitle}>App Error</Text>
+      <Text style={styles.fallbackText}>
+        We encountered a problem with the app. Please restart the application.
+      </Text>
+    </View>
+  );
+
   return (
-    <ThemeProvider>
-      <I18nProvider>
-        <PersonalizationProvider>
-          <BettingAffiliateProvider>
-            <StripeProvider>
-              <OneSignalProvider>
-                <AppNavigator />
-              </OneSignalProvider>
-            </StripeProvider>
-          </BettingAffiliateProvider>
-        </PersonalizationProvider>
-      </I18nProvider>
-    </ThemeProvider>
+    <ErrorBoundary fallback={fallbackUI}>
+      <SafeAreaProvider>
+        <ErrorBoundary>
+          <LanguageProvider>
+            <NavigationStateProvider>
+              <NavigationContainer
+                theme={colorScheme === 'dark' ? darkTheme : lightTheme}
+                onReady={() => {
+                  console.log('App: Navigation container ready');
+                  info(LogCategory.NAVIGATION, 'Navigation container ready');
+                }}
+                onStateChange={(state) => {
+                  const currentRoute = state?.routes[state.index]?.name;
+                  if (currentRoute) {
+                    console.log(`App: Navigated to ${currentRoute}`);
+                    info(LogCategory.NAVIGATION, `Navigated to ${currentRoute}`);
+                  }
+                }}
+              >
+                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                <ErrorBoundary>
+                  <AppNavigator />
+                </ErrorBoundary>
+              </NavigationContainer>
+            </NavigationStateProvider>
+          </LanguageProvider>
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
 
-// Register App
-registerRootComponent(App);
-
-export default App;
+// Styles for the fallback UI - updated with light theme colors and spacing
+const styles = StyleSheet.create({
+  fallbackContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24, // Increased padding
+    backgroundColor: Colors.light.background, // Use light background
+  },
+  fallbackTitle: {
+    fontSize: 24, // Slightly larger
+    fontWeight: 'bold',
+    marginBottom: 16, // Increased spacing
+    color: '#dc3545', // Keep error color distinct
+    textAlign: 'center', // Center align header
+  },
+  fallbackText: {
+    fontSize: 16,
+    textAlign: 'center', // Center align description text
+    color: Colors.light.text, // Use standard text color
+    lineHeight: 24, // Improve readability
+  },
+});

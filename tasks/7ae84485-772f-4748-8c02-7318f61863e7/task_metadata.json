@@ -1,0 +1,28 @@
+{
+  "files_in_context": [
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775019083,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744775019083,
+      "roo_edit_date": null,
+      "user_edit_date": 1744775037420
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744775037708,
+      "roo_edit_date": 1744775037708,
+      "user_edit_date": 1744775037420
+    }
+  ]
+}

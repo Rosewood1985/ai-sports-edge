@@ -293,6 +293,21 @@
   position: absolute;
   left: 0;
   color: #8e44ad; /* Purple checkmark */
+}
+
+.time-requirement {
+  background-color: #f8f4ff;
+  border-left: 3px solid #8e44ad;
+  padding: var(--spacing-3);
+  margin-top: var(--spacing-3);
+  font-size: var(--font-size-md);
+  color: var(--gray-800);
+  text-align: left;
+}
+
+.highlight-feature {
+  font-weight: bold;
+  color: #8e44ad;
   font-weight: bold;
 }
 

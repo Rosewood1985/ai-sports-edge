@@ -1,0 +1,125 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is accessing their own data
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Function to check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Function to validate file size (max 10MB for user uploads)
+    function isValidFileSize() {
+      return request.resource.size <= 10 * 1024 * 1024;
+    }
+    
+    // Function to validate image file type
+    function isImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // Function to validate document file type
+    function isDocumentFile() {
+      return request.resource.contentType.matches('application/pdf') ||
+             request.resource.contentType.matches('application/msword') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
+             request.resource.contentType.matches('text/plain');
+    }
+    
+    // Function to validate video file type
+    function isVideoFile() {
+      return request.resource.contentType.matches('video/.*');
+    }
+    
+    // Function to check if the file is being uploaded by its owner
+    function isUploadedByOwner(userId) {
+      return request.resource.metadata.ownerId == userId;
+    }
+    
+    // Function to check if metadata contains required fields
+    function hasRequiredMetadata() {
+      return request.resource.metadata.keys().hasAll(['ownerId', 'uploadedAt']);
+    }
+    
+    // Rate limiting function (basic implementation)
+    function isNotRateLimited() {
+      return true; // Implement rate limiting logic here
+    }
+    
+    // Default deny all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+    
+    // User files
+    match /userFiles/{userId}/{allPaths=**} {
+      // Allow users to read and write their own files
+      allow read: if isUser(userId) || isAdmin();
+      allow create: if isUser(userId) && 
+                     isValidFileSize() && 
+                     hasRequiredMetadata() && 
+                     isUploadedByOwner(userId) &&
+                     isNotRateLimited();
+      allow update: if isUser(userId) && 
+                     isValidFileSize() && 
+                     hasRequiredMetadata() && 
+                     isUploadedByOwner(userId);
+      allow delete: if isUser(userId) || isAdmin();
+    }
+    
+    // User profile images (public readable)
+    match /profileImages/{userId} {
+      allow read: if true; // Public readable
+      allow create, update: if isUser(userId) && 
+                             isImageFile() && 
+                             isValidFileSize() && 
+                             hasRequiredMetadata() && 
+                             isUploadedByOwner(userId);
+      allow delete: if isUser(userId) || isAdmin();
+    }
+    
+    // Public files that anyone can read
+    match /publicFiles/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Sports data images (team logos, player photos, etc.)
+    match /sportsImages/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Temporary uploads (expire after 24 hours)
+    match /tempUploads/{userId}/{fileName} {
+      allow read: if isUser(userId) || isAdmin();
+      allow create: if isUser(userId) && 
+                     isValidFileSize() && 
+                     hasRequiredMetadata() && 
+                     isUploadedByOwner(userId);
+      allow delete: if isUser(userId) || isAdmin();
+    }
+    
+    // Backup files (admin only)
+    match /backups/{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Shared files (specific access control)
+    match /sharedFiles/{fileId} {
+      // Allow read if the user is in the allowedUsers metadata array
+      allow read: if isAuthenticated() && 
+                   (resource.metadata.allowedUsers.hasAny([request.auth.uid]) || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,11 +1,15 @@
 import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native'; // Keep View for specific layout needs if ThemedView isn't sufficient
 import { Game, ConfidenceLevel } from '../types/odds';
 import PremiumFeature from './PremiumFeature';
 import PropBetList from './PropBetList';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useUITheme } from './UIThemeProvider'; // Import theme hook
+import { ThemedText } from './ThemedText'; // Import ThemedText
+import { ThemedView } from './ThemedView'; // Import ThemedView
+import { Colors } from '../constants/Colors'; // Import Colors for status
 
 // Define navigation type
 type RootStackParamList = {
@@ -22,33 +26,37 @@ interface GameCardProps {
 }
 
 /**
- * GameCard component displays information about a game and its odds
+ * GameCard component displays information about a game and its odds, using the theme system.
  * @param {GameCardProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
 const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Element => {
   const navigation = useNavigation<GameCardNavigationProp>();
-  
+  const { theme } = useUITheme(); // Get theme object
+
   // Check if game object has required properties
   if (!game || !game.home_team || !game.away_team) {
     return (
-      <View style={styles.card}>
-        <Text style={styles.error}>Invalid game data</Text>
-      </View>
+      // Use ThemedView for the card background
+      <ThemedView style={styles.card} background="surface">
+        <ThemedText color="statusLow">Invalid game data</ThemedText>
+      </ThemedView>
     );
   }
 
-  // Get confidence color based on level
-  const getConfidenceColor = (level: ConfidenceLevel): string => {
+  // Get confidence color based on level using theme status colors
+  // Updated to handle 'unknown' explicitly
+  const getConfidenceColor = (level: ConfidenceLevel | 'unknown'): string => {
     switch (level) {
       case 'high':
-        return '#4CAF50'; // Green
+        return Colors.status.highConfidence;
       case 'medium':
-        return '#FFC107'; // Yellow
+        return Colors.status.mediumConfidence;
       case 'low':
-        return '#F44336'; // Red
+        return Colors.status.lowConfidence;
+      case 'unknown': // Handle unknown case
       default:
-        return '#757575'; // Gray
+        return theme.colors.tertiaryText; // Use tertiary text color for unknown/default
     }
   };
 
@@ -57,12 +65,18 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       onPress(game);
     }
   };
-  
+
   // Check if the game is live or has started
   const isGameActive = () => {
-    return game.live_updates || new Date(game.commence_time) <= new Date();
+    // Ensure commence_time is valid before comparing
+    try {
+      return game.live_updates || (game.commence_time && new Date(game.commence_time) <= new Date());
+    } catch (e) {
+      console.error("Invalid date format for commence_time:", game.commence_time);
+      return !!game.live_updates; // Fallback based on live_updates only
+    }
   };
-  
+
   // Navigate to player stats screen
   const navigateToPlayerStats = () => {
     navigation.navigate('PlayerStats', {
@@ -71,206 +85,261 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
     });
   };
 
+  // Dynamic styles using theme
+  const cardStyle = [
+    styles.card,
+    {
+      padding: theme.spacing.md,
+      margin: theme.spacing.sm,
+      borderRadius: theme.borderRadius.sm,
+      // Background color handled by ThemedView
+      // Border can be added if needed:
+      // borderWidth: 1,
+      // borderColor: theme.colors.borderSubtle,
+    }
+  ];
+
+  const localIndicatorStyle = [
+    styles.localIndicator,
+    {
+      backgroundColor: Colors.status.highConfidence, // Example: Use status color
+      paddingHorizontal: theme.spacing.xs,
+      paddingVertical: 2, // Keep small vertical padding
+      borderRadius: theme.borderRadius.xs,
+      marginLeft: theme.spacing.sm,
+    }
+  ];
+
+  const liveScoreContainerStyle = [
+    styles.liveScoreContainer,
+    {
+      backgroundColor: Colors.status.lowConfidence, // Example: Use status color
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: 2,
+      borderRadius: theme.borderRadius.xs,
+    }
+  ];
+
+  const predictionContainerStyle = [
+    styles.predictionContainer,
+    {
+      marginTop: theme.spacing.md,
+      padding: theme.spacing.sm,
+      backgroundColor: theme.colors.surfaceBackground, // Use surface bg, slightly different shade?
+      borderRadius: theme.borderRadius.sm,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.primaryAction, // Use theme action color
+    }
+  ];
+
+  const confidenceIndicatorStyle = [
+    styles.confidenceIndicator,
+    {
+      // Pass the potentially 'unknown' value here, getConfidenceColor now handles it
+      backgroundColor: getConfidenceColor(game.ai_prediction?.confidence ?? 'unknown'),
+      paddingHorizontal: theme.spacing.xs,
+      paddingVertical: 2,
+      borderRadius: theme.borderRadius.xs,
+    }
+  ];
+
+  const statsButtonStyle = [
+    styles.statsButton,
+    {
+      backgroundColor: theme.colors.primaryAction,
+      borderRadius: theme.borderRadius.sm,
+      padding: theme.spacing.sm,
+      marginTop: theme.spacing.md,
+    }
+  ];
+
+
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={cardStyle} // Apply dynamic style here
       onPress={handlePress}
       activeOpacity={onPress ? 0.7 : 1}
+      // Wrap content in ThemedView for background
     >
-      {/* Game header with teams and time */}
-      <View style={styles.header}>
-        <View style={styles.matchupContainer}>
-          <Text style={styles.matchup}>{game.home_team} vs {game.away_team}</Text>
-          
-          {isLocalGame && (
-            <View style={styles.localIndicator}>
-              <Text style={styles.localIndicatorText}>LOCAL</Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Live score indicator */}
-        {game.live_updates?.score && (
-          <View style={styles.liveScoreContainer}>
-            <Text style={styles.liveScoreText}>
-              {game.live_updates.score.home} - {game.live_updates.score.away}
-            </Text>
-            <View style={styles.liveIndicator} />
-          </View>
-        )}
-      </View>
-      
-      <View style={styles.timeContainer}>
-        <Text style={styles.time}>
-          {new Date(game.commence_time).toLocaleString()}
-        </Text>
-        
-        {/* Live game status */}
-        {game.live_updates && (
-          <Text style={styles.liveStatus}>
-            {game.live_updates.period} • {game.live_updates.time_remaining} remaining
-          </Text>
-        )}
-      </View>
-      
-      {/* Bookmaker odds */}
-      {game.bookmakers && game.bookmakers.length > 0 ? (
-        <View style={styles.bookmakerContainer}>
-          <Text style={styles.bookmakerTitle}>
-            {game.bookmakers[0].title}
-          </Text>
-          
-          {game.bookmakers[0]?.markets[0]?.outcomes ? (
-            <View style={styles.oddsContainer}>
-              {game.bookmakers[0].markets[0].outcomes.map((outcome, idx) => (
-                <View key={idx} style={styles.outcomeRow}>
-                  <Text style={styles.teamName}>{outcome.name}</Text>
-                  <Text style={styles.odds}>{outcome.price}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <Text style={styles.noOdds}>No odds available</Text>
-          )}
-        </View>
-      ) : (
-        <Text style={styles.noOdds}>No bookmaker data available</Text>
-      )}
-      
-      {/* AI Prediction (Premium Feature) */}
-      {game.ai_prediction && (
-        <PremiumFeature>
-          <View style={styles.predictionContainer}>
-            <View style={styles.predictionHeader}>
-              <Text style={styles.predictionTitle}>AI Prediction</Text>
-              <View
-                style={[
-                  styles.confidenceIndicator,
-                  { backgroundColor: getConfidenceColor(game.ai_prediction.confidence) }
-                ]}
-              >
-                <Text style={styles.confidenceText}>
-                  {game.ai_prediction.confidence.toUpperCase()} CONFIDENCE
-                </Text>
+      <ThemedView background="surface">
+        {/* Game header with teams and time */}
+        <View style={styles.header}>
+          <View style={styles.matchupContainer}>
+            {/* Use ThemedText with appropriate types */}
+            <ThemedText type="h3" style={styles.matchupText}>
+              {game.home_team} vs {game.away_team}
+            </ThemedText>
+
+            {isLocalGame && (
+              <View style={localIndicatorStyle}>
+                <ThemedText type="small" color="primary" style={styles.localIndicatorText}>LOCAL</ThemedText>
               </View>
-            </View>
-            
-            <Text style={styles.predictionText}>
-              <Text style={styles.bold}>Pick: </Text>
-              {game.ai_prediction.predicted_winner}
-            </Text>
-            
-            <Text style={styles.predictionText}>
-              <Text style={styles.bold}>Reasoning: </Text>
-              {game.ai_prediction.reasoning}
-            </Text>
-            
-            <Text style={styles.predictionText}>
-              <Text style={styles.bold}>Historical Accuracy: </Text>
-              {game.ai_prediction.historical_accuracy}%
-            </Text>
+            )}
           </View>
-        </PremiumFeature>
-      )}
-      
-      {/* Player Prop Predictions */}
-      <PropBetList game={game} />
-      
-      {/* Player Stats Button - Only show for active games */}
-      {isGameActive() && (
-        <TouchableOpacity
-          style={styles.statsButton}
-          onPress={navigateToPlayerStats}
-        >
-          <Ionicons name="stats-chart" size={16} color="#fff" style={styles.statsIcon} />
-          <Text style={styles.statsButtonText}>View Player Stats</Text>
-        </TouchableOpacity>
-      )}
+
+          {/* Live score indicator */}
+          {game.live_updates?.score && (
+            <View style={liveScoreContainerStyle}>
+              <ThemedText type="label" color="primary" style={styles.liveScoreText}>
+                {game.live_updates.score.home} - {game.live_updates.score.away}
+              </ThemedText>
+              <View style={[styles.liveIndicator, { backgroundColor: theme.colors.primaryText }]} />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.timeContainer}>
+          <ThemedText type="small" color="secondary">
+            {/* Ensure date is valid before formatting */}
+            {game.commence_time ? new Date(game.commence_time).toLocaleString() : 'Time TBD'}
+          </ThemedText>
+
+          {/* Live game status */}
+          {game.live_updates && (
+            <ThemedText type="small" color="statusLow" style={styles.liveStatus}>
+              {game.live_updates.period} • {game.live_updates.time_remaining} remaining
+            </ThemedText>
+          )}
+        </View>
+
+        {/* Bookmaker odds */}
+        {game.bookmakers && game.bookmakers.length > 0 ? (
+          <View style={styles.bookmakerContainer}>
+            <ThemedText type="label" color="secondary" style={styles.bookmakerTitle}>
+              {game.bookmakers[0].title}
+            </ThemedText>
+
+            {game.bookmakers[0]?.markets[0]?.outcomes ? (
+              <View style={styles.oddsContainer}>
+                {game.bookmakers[0].markets[0].outcomes.map((outcome, idx) => (
+                  <View key={idx} style={styles.outcomeRow}>
+                    <ThemedText type="bodyStd" style={styles.teamName}>{outcome.name}</ThemedText>
+                    <ThemedText type="bodyStd" style={styles.odds}>{outcome.price}</ThemedText>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <ThemedText type="small" color="tertiary" style={styles.noOdds}>No odds available</ThemedText>
+            )}
+          </View>
+        ) : (
+          <ThemedText type="small" color="tertiary" style={styles.noOdds}>No bookmaker data available</ThemedText>
+        )}
+
+        {/* AI Prediction (Premium Feature) */}
+        {game.ai_prediction && (
+          <PremiumFeature>
+            <View style={predictionContainerStyle}>
+              <View style={styles.predictionHeader}>
+                <ThemedText type="label" color="action" style={styles.predictionTitle}>AI Prediction</ThemedText>
+                {/* Confidence indicator rendering logic remains the same */}
+                <View style={confidenceIndicatorStyle}>
+                  <ThemedText type="small" color="primary" style={styles.confidenceText}>
+                    {(game.ai_prediction.confidence ?? 'UNKNOWN').toUpperCase()} CONFIDENCE
+                  </ThemedText>
+                </View>
+              </View>
+
+              <ThemedText type="bodyStd" color="secondary" style={styles.predictionText}>
+                <ThemedText type="bodyStd" style={styles.bold}>Pick: </ThemedText>
+                {game.ai_prediction.predicted_winner}
+              </ThemedText>
+
+              <ThemedText type="bodyStd" color="secondary" style={styles.predictionText}>
+                <ThemedText type="bodyStd" style={styles.bold}>Reasoning: </ThemedText>
+                {game.ai_prediction.reasoning}
+              </ThemedText>
+
+              <ThemedText type="bodyStd" color="secondary" style={styles.predictionText}>
+                <ThemedText type="bodyStd" style={styles.bold}>Historical Accuracy: </ThemedText>
+                {game.ai_prediction.historical_accuracy}%
+              </ThemedText>
+            </View>
+          </PremiumFeature>
+        )}
+
+        {/* Player Prop Predictions */}
+        <PropBetList game={game} />
+
+        {/* Player Stats Button - Only show for active games */}
+        {isGameActive() && (
+          <TouchableOpacity
+            style={statsButtonStyle}
+            onPress={navigateToPlayerStats}
+          >
+            <Ionicons name="stats-chart" size={16} color={theme.colors.primaryText} style={styles.statsIcon} />
+            <ThemedText type="button" color="primary" style={styles.statsButtonText}>View Player Stats</ThemedText>
+          </TouchableOpacity>
+        )}
+      </ThemedView>
     </TouchableOpacity>
   );
 });
 
+// Keep StyleSheet for layout and styles not directly covered by theme props
 const styles = StyleSheet.create({
   card: {
-    padding: 15,
-    margin: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
+    // Base card structure - background/padding/radius applied dynamically
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 4, // Use theme.spacing?
   },
   matchupContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
+    marginRight: 8, // Use theme.spacing?
   },
-  matchup: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-    flex: 1,
+  matchupText: {
+     // Font size/weight handled by ThemedText type='h3'
+     flexShrink: 1, // Allow text to shrink
   },
   localIndicator: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 8,
+    // Background/padding/radius applied dynamically
   },
   localIndicatorText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
+    // Color/size handled by ThemedText
+    fontWeight: 'bold', // Keep specific weight if needed
   },
   timeContainer: {
-    marginBottom: 8,
+    marginBottom: 8, // Use theme.spacing?
   },
-  time: {
-    fontSize: 12,
-    color: '#666',
-  },
+  // Time text style handled by ThemedText
   liveStatus: {
-    fontSize: 12,
-    color: '#e53935',
+    // Color/size handled by ThemedText
     fontWeight: '500',
     marginTop: 2,
   },
   liveScoreContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e53935',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    // Background/padding/radius applied dynamically
   },
   liveScoreText: {
-    color: 'white',
+     // Color/size handled by ThemedText
     fontWeight: 'bold',
-    fontSize: 14,
-    marginRight: 4,
+    marginRight: 4, // Use theme.spacing?
   },
   liveIndicator: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'white',
+    // Background applied dynamically
   },
   bookmakerContainer: {
-    marginTop: 8,
+    marginTop: 8, // Use theme.spacing?
   },
   bookmakerTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
+    // Color/size handled by ThemedText
+    fontWeight: '500', // Keep specific weight
+    marginBottom: 4, // Use theme.spacing?
   },
   oddsContainer: {
-    marginTop: 5,
+    marginTop: 5, // Use theme.spacing?
   },
   outcomeRow: {
     flexDirection: 'row',
@@ -278,75 +347,58 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   teamName: {
-    fontSize: 14,
-    flex: 1,
+    // Font size handled by ThemedText
+    flex: 1, // Keep flex
+    marginRight: 8, // Add spacing
   },
   odds: {
-    fontSize: 14,
-    fontWeight: '500',
+    // Font size handled by ThemedText
+    fontWeight: '500', // Keep specific weight
   },
   noOdds: {
-    fontStyle: 'italic',
-    color: '#666',
-  },
-  error: {
-    color: 'red',
-    fontSize: 14,
+    // Color/size handled by ThemedText
+    fontStyle: 'italic', // Keep italic
   },
   predictionContainer: {
-    marginTop: 12,
-    padding: 10,
-    backgroundColor: '#f0f8ff',
-    borderRadius: 6,
-    borderLeftWidth: 3,
-    borderLeftColor: '#3498db',
+    // Background/padding/radius/border applied dynamically
   },
   predictionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 8, // Use theme.spacing?
   },
   predictionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#3498db',
+    // Color/size handled by ThemedText
+    fontWeight: 'bold', // Keep specific weight
   },
   confidenceIndicator: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    // Background/padding/radius applied dynamically
   },
   confidenceText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
+     // Color/size handled by ThemedText
+    fontWeight: 'bold', // Keep specific weight
   },
   predictionText: {
-    fontSize: 13,
-    color: '#333',
-    marginBottom: 4,
-    lineHeight: 18,
+    // Color/size handled by ThemedText
+    marginBottom: 4, // Use theme.spacing?
+    // Line height handled by ThemedText
   },
   bold: {
-    fontWeight: 'bold',
+    fontWeight: 'bold', // Keep bold style helper
   },
   statsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3498db',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 12,
+    // Background/padding/radius/marginTop applied dynamically
   },
   statsIcon: {
-    marginRight: 6,
+    marginRight: 6, // Use theme.spacing?
   },
   statsButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
+     // Color/size handled by ThemedText
+    fontWeight: 'bold', // Keep specific weight
   }
 });
 

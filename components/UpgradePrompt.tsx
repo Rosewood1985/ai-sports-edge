@@ -13,6 +13,7 @@ import {
 import { ThemedText } from './ThemedText';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SUBSCRIPTION_PLANS, MICROTRANSACTIONS } from '../services/firebaseSubscriptionService';
 import advancedPlayerStatsService from '../services/advancedPlayerStatsService';
 import { auth } from '../config/firebase';
@@ -201,16 +202,46 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
 
       // Hide loading indicator
       setLoading(null);
-
-      if (success) {
-        // Track successful purchase
-        await analyticsService.trackEvent('microtransaction_purchase_success', {
-          productId,
-          gameId,
-          featureType
-        });
-        
-        // Show success animation
+if (success) {
+  // Track successful purchase
+  await analyticsService.trackEvent('microtransaction_purchase_success', {
+    productId,
+    gameId,
+    featureType
+  });
+  
+  // Store purchase in history
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      // Get current purchase history
+      const purchaseHistoryKey = `user_purchases_${user.uid}`;
+      const purchaseHistoryJson = await AsyncStorage.getItem(purchaseHistoryKey);
+      let purchaseHistory = purchaseHistoryJson ? JSON.parse(purchaseHistoryJson) : [];
+      
+      // Add new purchase
+      const product = relevantMicrotransactions.find(m => m.id === productId);
+      const purchaseRecord = {
+        id: `purchase_${Date.now()}`,
+        name: product?.name || productId,
+        date: new Date().toISOString(),
+        price: product?.price ? product.price * 100 : undefined, // Convert to cents
+        gameId,
+        productType: featureType,
+        status: 'active'
+      };
+      
+      purchaseHistory.push(purchaseRecord);
+      
+      // Save updated history
+      await AsyncStorage.setItem(purchaseHistoryKey, JSON.stringify(purchaseHistory));
+    } catch (error) {
+      console.error('Error saving purchase history:', error);
+    }
+  }
+  
+  // Show success animation
+  setPurchaseSuccess(true);
         setPurchaseSuccess(true);
       } else {
         // Track failed purchase

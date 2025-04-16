@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>US-Only Payment Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+    .card {
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+      background-color: #f1f8ff;
+      font-weight: 600;
+    }
+    .form-label {
+      font-weight: 500;
+    }
+    .payment-status {
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    .status-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .status-error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .notice-box {
+      background-color: #e9ecef;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .notice-text {
+      font-size: 14px;
+      color: #495057;
+    }
+    #card-element {
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      background-color: white;
+    }
+    .StripeElement--focus {
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .StripeElement--invalid {
+      border-color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">US-Only Payment Test</h1>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            Payment Form
+          </div>
+          <div class="card-body">
+            <form id="payment-form">
+              <div class="mb-3">
+                <label for="amount" class="form-label">Amount (USD)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="amount" value="49.99" min="1" step="0.01" required>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <select class="form-select" id="country" required>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="AU">Australia</option>
+                  <option value="DE">Germany</option>
+                  <option value="FR">France</option>
+                </select>
+              </div>
+              
+              <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input type="text" class="form-control" id="address" required>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="city" class="form-label">City</label>
+                  <input type="text" class="form-control" id="city" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="state" class="form-label">State</label>
+                  <input type="text" class="form-control" id="state" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="zip" class="form-label">ZIP Code</label>
+                  <input type="text" class="form-control" id="zip" required>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="card-element" class="form-label">Credit Card</label>
+                <div id="card-element">
+                  <!-- Stripe Card Element will be inserted here -->
+                </div>
+                <div id="card-errors" class="text-danger mt-2"></div>
+              </div>
+              
+              <div class="notice-box">
+                <p class="notice-text">
+                  <strong>Note:</strong> Payments are only accepted from the United States. If you select a different country or enter a non-US postal code, your payment will be rejected.
+                </p>
+              </div>
+              
+              <button type="submit" class="btn btn-primary" id="submit-button">
+                Pay Now
+              </button>
+            </form>
+            
+            <div id="payment-status" class="payment-status d-none"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            Test Cards
+          </div>
+          <div class="card-body">
+            <p>Use these test card numbers with any future expiration date and any 3-digit CVC:</p>
+            
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Card Number</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>4242 4242 4242 4242</td>
+                  <td>Successful payment (US)</td>
+                </tr>
+                <tr>
+                  <td>4000 0000 0000 0069</td>
+                  <td>Declined payment (insufficient funds)</td>
+                </tr>
+                <tr>
+                  <td>4000 0000 0000 0127</td>
+                  <td>Declined payment (incorrect CVC)</td>
+                </tr>
+                <tr>
+                  <td>4000 0000 0000 0101</td>
+                  <td>Declined payment (expired card)</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <p>For testing non-US payments, use these postal codes:</p>
+            
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>Postal Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>United States</td>
+                  <td>90210</td>
+                </tr>
+                <tr>
+                  <td>Canada</td>
+                  <td>V6B 2E7</td>
+                </tr>
+                <tr>
+                  <td>United Kingdom</td>
+                  <td>SW1A 1AA</td>
+                </tr>
+                <tr>
+                  <td>Australia</td>
+                  <td>2000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Stripe
+      const stripe = Stripe('pk_test_your_publishable_key');
+      const elements = stripe.elements();
+      
+      // Create card element
+      const cardElement = elements.create('card', {
+        style: {
+          base: {
+            fontSize: '16px',
+            color: '#32325d',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            '::placeholder': {
+              color: '#aab7c4'
+            }
+          },
+          invalid: {
+            color: '#dc3545',
+            iconColor: '#dc3545'
+          }
+        },
+        hidePostalCode: false
+      });
+      
+      // Mount card element
+      cardElement.mount('#card-element');
+      
+      // Handle validation errors
+      cardElement.addEventListener('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+          displayError.textContent = event.error.message;
+        } else {
+          displayError.textContent = '';
+        }
+      });
+      
+      // Handle form submission
+      const form = document.getElementById('payment-form');
+      const submitButton = document.getElementById('submit-button');
+      const paymentStatus = document.getElementById('payment-status');
+      
+      form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // Disable form submission while processing
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        
+        // Get form values
+        const amount = document.getElementById('amount').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const country = document.getElementById('country').value;
+        const address = document.getElementById('address').value;
+        const city = document.getElementById('city').value;
+        const state = document.getElementById('state').value;
+        const zip = document.getElementById('zip').value;
+        
+        // Check if country is US
+        if (country !== 'US') {
+          showError('Payments are only accepted from the United States');
+          return;
+        }
+        
+        try {
+          // Create payment intent on the server
+          const response = await fetch('/api/create-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              userId: 'test_user_' + Math.random().toString(36).substring(2),
+              productId: 'test_product_' + Math.random().toString(36).substring(2),
+              productName: 'Test Product',
+              price: parseFloat(amount),
+              currency: 'usd',
+              customerDetails: {
+                name,
+                email,
+                address: {
+                  line1: address,
+                  city,
+                  state,
+                  postal_code: zip,
+                  country
+                }
+              }
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.error) {
+            showError(data.error);
+            return;
+          }
+          
+          // Confirm card payment
+          const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+            payment_method: {
+              card: cardElement,
+              billing_details: {
+                name,
+                email,
+                address: {
+                  line1: address,
+                  city,
+                  state,
+                  postal_code: zip,
+                  country
+                }
+              }
+            }
+          });
+          
+          if (error) {
+            showError(error.message);
+          } else if (paymentIntent.status === 'succeeded') {
+            showSuccess('Payment successful! Payment ID: ' + paymentIntent.id);
+            form.reset();
+            cardElement.clear();
+          } else {
+            showError('Payment status: ' + paymentIntent.status);
+          }
+        } catch (error) {
+          showError('An unexpected error occurred: ' + error.message);
+        }
+      });
+      
+      // Helper functions
+      function showError(message) {
+        paymentStatus.textContent = message;
+        paymentStatus.className = 'payment-status status-error';
+        paymentStatus.classList.remove('d-none');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Pay Now';
+      }
+      
+      function showSuccess(message) {
+        paymentStatus.textContent = message;
+        paymentStatus.className = 'payment-status status-success';
+        paymentStatus.classList.remove('d-none');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Pay Now';
+      }
+      
+      // Update form based on country selection
+      document.getElementById('country').addEventListener('change', function(event) {
+        const country = event.target.value;
+        const stateLabel = document.querySelector('label[for="state"]');
+        const zipLabel = document.querySelector('label[for="zip"]');
+        
+        if (country === 'US') {
+          stateLabel.textContent = 'State';
+          zipLabel.textContent = 'ZIP Code';
+        } else if (country === 'CA') {
+          stateLabel.textContent = 'Province';
+          zipLabel.textContent = 'Postal Code';
+        } else if (country === 'GB') {
+          stateLabel.textContent = 'County';
+          zipLabel.textContent = 'Postcode';
+        } else if (country === 'AU') {
+          stateLabel.textContent = 'State/Territory';
+          zipLabel.textContent = 'Postcode';
+        } else {
+          stateLabel.textContent = 'State/Province';
+          zipLabel.textContent = 'Postal Code';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,626 +1,262 @@
 {
   "common": {
-    "success": "Éxito",
-    "error": "Error",
+    "app_name": "AI Sports Edge",
     "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
     "cancel": "Cancelar",
-    "confirm": "Confirmar",
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
+    "close": "Cerrar",
     "back": "Atrás",
     "next": "Siguiente",
+    "done": "Hecho",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
     "ok": "OK",
-    "skip": "Omitir",
-    "getStarted": "Comenzar"
+    "continue": "Continuar",
+    "not_authenticated": "Debe iniciar sesión para realizar esta acción."
   },
-  "onboarding": {
-    "welcome": {
-      "title": "Bienvenido a AI Sports Edge",
-      "description": "Convierte tu conocimiento deportivo en apuestas ganadoras con el poder de la IA. Nuestros usuarios están superando las probabilidades hasta en un 15% en comparación con las apuestas tradicionales."
-    },
-    "aiPredictions": {
-      "title": "Predicciones Impulsadas por IA",
-      "description": "Nuestra IA analiza millones de datos para detectar apuestas de valor que los humanos pasan por alto. Observa exactamente dónde las casas de apuestas han establecido cuotas que no coinciden con las probabilidades reales, dándote una ventaja estadística en cada apuesta."
-    },
-    "liveOdds": {
-      "title": "Cuotas de Apuestas en Vivo",
-      "description": "¡Nunca más te pierdas las mejores cuotas! Nuestra comparación en tiempo real te muestra exactamente dónde colocar tu apuesta para obtener el máximo rendimiento. Los usuarios que siguen nuestras recomendaciones de cuotas aumentan sus ganancias potenciales en un promedio del 12%."
-    },
-    "performance": {
-      "title": "Seguimiento de tu Rendimiento",
-      "description": "¡Observa cómo crece tu éxito en las apuestas! Haz un seguimiento de tu rendimiento frente a las predicciones de IA, aprende de los conocimientos personalizados y observa cómo aumenta tu ROI con el tiempo. Los usuarios que siguen nuestro sistema superan constantemente sus resultados anteriores de apuestas."
-    },
-    "getStarted": {
-      "title": "¿Listo para Comenzar?",
-      "description": "¿Listo para empezar a ganar de manera más inteligente? Configura tu perfil de apuestas personalizado en solo 2 minutos y ¡haz que tu próxima apuesta sea tu mejor apuesta! Únete a miles de apostadores que ya están utilizando datos para vencer a las casas de apuestas."
-    },
-    "completion": {
-      "title": "Introducción Completada",
-      "message": "Puedes volver a ver este recorrido de funciones en cualquier momento desde Configuración > Recorrido de la App y Ayuda > Repetir Recorrido de Funciones",
-      "gotIt": "Entendido"
-    }
-  },
-  "featureTour": {
-    "title": "Recorrido de Funciones",
-    "loading": "Cargando recorrido de funciones...",
-    "skipTour": "Omitir Recorrido",
-    "next": "Siguiente",
-    "finishTour": "Finalizar Recorrido",
-    "tryIt": "Pruébalo",
-    "steps": {
-      "aiPredictions": {
-        "title": "Encuentra Valor Donde Otros No",
-        "description": "Nuestra IA no solo predice ganadores, encuentra VALOR. Observa exactamente dónde las casas de apuestas han establecido cuotas que no coinciden con las probabilidades reales.",
-        "hint": "Los usuarios que siguen nuestras selecciones de IA ven una tasa de victorias un 15% más alta en promedio."
-      },
-      "realTimeOdds": {
-        "title": "Nunca Más Te Pierdas las Mejores Cuotas",
-        "description": "Observa cómo se mueven las cuotas en tiempo real en todas las principales casas de apuestas. Recibe alertas cuando hay valor para encontrar.",
-        "hint": "Obtener las mejores cuotas en cada apuesta puede aumentar tus rendimientos hasta un 12% sin riesgo adicional."
-      },
-      "performanceDashboard": {
-        "title": "Tu Centro de Control de Apuestas",
-        "description": "Haz un seguimiento del rendimiento a lo largo del tiempo, observa dónde estás ganando y perdiendo dinero, y obtén sugerencias impulsadas por IA para mejorar.",
-        "hint": "Los usuarios que revisan regularmente su panel de control mejoran su ROI en un 8% en promedio."
-      },
-      "personalizedInsights": {
-        "title": "Tu Analista de Apuestas Personal",
-        "description": "Recibe información personalizada basada en tus equipos favoritos, historial de apuestas y preferencias.",
-        "hint": "Los conocimientos personalizados ayudan a los usuarios a detectar un 23% más de oportunidades de apuestas valiosas."
-      },
-      "premiumFeatures": {
-        "title": "Desbloquea Tu Máxima Ventaja",
-        "description": "Vista previa de nuestras herramientas premium como optimizadores de parlay, analizadores de apuestas de proposición y análisis de impacto climático.",
-        "hint": "Los usuarios premium reportan rendimientos un 22% más altos que apostar por su cuenta."
-      }
-    },
-    "completion": {
-      "title": "Recorrido Completado",
-      "message": "¡Has completado el recorrido de funciones! Puedes volver a verlo en cualquier momento desde Configuración > Recorrido de la App y Ayuda > Repetir Recorrido de Funciones.",
-      "gotIt": "Entendido"
-    },
-    "skip": {
-      "title": "Omitir Recorrido",
-      "message": "¿Estás seguro de que deseas omitir el recorrido de funciones? Puedes volver a verlo en cualquier momento desde Configuración.",
-      "cancel": "Cancelar",
-      "skip": "Omitir"
-    }
-  },
-  "settings": {
-    "title": "Configuración",
-    "subtitle": "Configuración y preferencias de la aplicación",
-    "sections": {
-      "account": "Cuenta",
-      "preferences": "Preferencias",
-      "appTourHelp": "Recorrido de la App y Ayuda",
-      "about": "Acerca de"
-    },
-    "items": {
-      "profile": "Perfil",
-      "subscription": "Suscripción",
-      "paymentMethods": "Métodos de Pago",
-      "notifications": "Notificaciones",
-      "personalization": "Personalización",
-      "accessibility": "Accesibilidad",
-      "offlineMode": "Modo Sin Conexión",
-      "replayFeatureTour": "Repetir Recorrido de Funciones",
-      "replayFeatureTourDesc": "Realiza un recorrido guiado por las funciones de la aplicación",
-      "helpCenter": "Centro de Ayuda",
-      "helpCenterDesc": "Preguntas frecuentes, tutoriales y soporte",
-      "version": "Versión",
-      "termsOfService": "Términos de Servicio",
-      "privacyPolicy": "Política de Privacidad",
-      "licenses": "Licencias",
-      "logOut": "Cerrar Sesión"
-    }
-  },
-  "weather": {
-    "loading": "Cargando información meteorológica...",
-    "unavailable": "Datos meteorológicos no disponibles",
-    "expand": "Expandir información meteorológica",
-    "collapse": "Contraer información meteorológica",
-    "feelsLike": "Sensación Térmica",
-    "humidity": "Humedad",
-    "wind": "Viento",
-    "impact": "Impacto del clima en {playerName}",
-    "noData": "No hay datos de impacto meteorológico disponibles",
-    "confidence": "Confianza:",
-    "impact": {
-      "strongNegative": "Muy Negativo",
-      "slightNegative": "Ligeramente Negativo",
-      "neutral": "Neutral",
-      "slightPositive": "Ligeramente Positivo",
-      "strongPositive": "Muy Positivo"
-    }
-  },
-  "dashboard": {
-    "title": "Panel de Análisis",
-    "tabs": {
-      "overview": "Resumen",
-      "betting": "Apuestas",
-      "engagement": "Participación",
-      "revenue": "Ingresos"
-    },
-    "timePeriods": {
-      "today": "Hoy",
-      "yesterday": "Ayer",
-      "last7Days": "Últimos 7 Días",
-      "last30Days": "Últimos 30 Días",
-      "thisMonth": "Este Mes",
-      "lastMonth": "Mes Pasado",
-      "custom": "Personalizado"
-    },
-    "metrics": {
-      "totalRevenue": "Ingresos Totales",
-      "totalBets": "Apuestas Totales",
-      "winRate": "Tasa de Victorias",
-      "averageOdds": "Cuotas Promedio",
-      "profitMargin": "Margen de Beneficio",
-      "roi": "ROI",
-      "dailyActiveUsers": "Usuarios Activos Diarios",
-      "avgSession": "Sesión Promedio",
-      "totalUsers": "Usuarios Totales",
-      "conversionRate": "Tasa de Conversión"
-    },
-    "charts": {
-      "revenueOverTime": "Ingresos a lo Largo del Tiempo",
-      "betsByType": "Apuestas por Tipo",
-      "winRateBySport": "Tasa de Victorias por Deporte",
-      "profitByBetType": "Beneficio por Tipo de Apuesta",
-      "bettingActivityHeatmap": "Mapa de Calor de Actividad de Apuestas",
-      "monthlyPerformance": "Rendimiento Mensual",
-      "userEngagementOverTime": "Participación de Usuarios a lo Largo del Tiempo",
-      "platformDistribution": "Distribución por Plataforma",
-      "featureUsage": "Uso de Funciones",
-      "userEngagementStats": "Estadísticas de Participación de Usuarios",
-      "revenueByType": "Ingresos por Tipo",
-      "revenueTrend": "Tendencia de Ingresos",
-      "microtransactionPerformance": "Rendimiento de Microtransacciones",
-      "heatmap": {
-        "accessibilityLabel": "Mapa de calor de actividad. Use las teclas de flecha para navegar entre días.",
-        "accessibilityHint": "Un mapa de calor que muestra la frecuencia de actividad a lo largo del tiempo",
-        "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el día seleccionado.",
-        "legendLabel": "Leyenda de intensidad de color del mapa de calor",
-        "less": "Menos",
-        "more": "Más",
-        "intensity": "Nivel de intensidad",
-        "accessibleSummary": "Este mapa de calor muestra {{totalActivities}} actividades durante {{activeDays}} días activos de un total de {{totalDays}} días. El día más activo fue {{mostActiveDate}}."
-      },
-      "bubble": {
-        "accessibilityLabel": "Gráfico de burbujas. Use las teclas de flecha para navegar entre burbujas.",
-        "accessibilityHint": "Un gráfico de burbujas que muestra puntos de datos con tamaños variables",
-        "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre la burbuja seleccionada.",
-        "legendLabel": "Leyenda de tamaño de burbuja",
-        "smaller": "Más pequeño",
-        "larger": "Más grande",
-        "accessibleSummary": "Este gráfico de burbujas muestra {{totalItems}} elementos. El elemento más grande es {{largestItem}} con un valor de {{largestValue}}."
-      },
-      "historical": {
-        "accessibilityLabel": "Gráfico de tendencias históricas. Use las teclas de flecha para navegar entre puntos de datos.",
-        "accessibilityHint": "Un gráfico de líneas que muestra tendencias a lo largo del tiempo",
-        "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado.",
-        "legendLabel": "Leyenda del gráfico",
-        "accessibleSummary": "Este gráfico muestra tendencias de {{metric}} a lo largo del tiempo. El valor más alto es {{highestValue}} el {{highestDate}}."
-      }
-    },
-    "labels": {
-      "profit": "Beneficio",
-      "winRate": "Tasa de Victorias",
-      "loading": "Cargando gráfico...",
-      "loadingDashboard": "Cargando datos del panel...",
-      "realTimeUpdates": "Actualizaciones en Tiempo Real",
-      "refresh": "Actualizar",
-      "selectDateRange": "Seleccionar Rango de Fechas",
-      "apply": "Aplicar",
-      "cancel": "Cancelar",
-      "from": "Desde",
-      "to": "Hasta",
-      "monthlyActiveUsers": "Usuarios Activos Mensuales",
-      "sessionsPerUser": "Sesiones por Usuario",
-      "churnRate": "Tasa de Abandono",
-      "returningUsers": "Usuarios Recurrentes",
-      "impressions": "Impresiones",
-      "clicks": "Clics",
-      "purchases": "Compras",
-      "revenue": "Ingresos",
-      "clickRate": "Tasa de Clics",
-      "conversionRate": "Tasa de Conversión"
-    },
-    "accessibility": {
-      "chartNavigation": "Use las teclas de flecha para navegar entre puntos de datos",
-      "chartDetails": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado",
-      "heatmapSummary": "Este mapa de calor muestra la frecuencia de actividad a lo largo del tiempo",
-      "bubbleChartSummary": "Este gráfico de burbujas muestra puntos de datos con tamaños variables",
-      "lineChartSummary": "Este gráfico de líneas muestra tendencias a lo largo del tiempo",
-      "barChartSummary": "Este gráfico de barras compara valores entre categorías",
-      "pieChartSummary": "Este gráfico circular muestra la proporción de cada categoría"
-    }
-  },
-  "charts": {
-    "heatmap": {
-      "accessibilityLabel": "Mapa de calor de actividad. Use las teclas de flecha para navegar entre días.",
-      "accessibilityHint": "Un mapa de calor que muestra la frecuencia de actividad a lo largo del tiempo",
-      "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el día seleccionado.",
-      "legendLabel": "Leyenda de intensidad de color del mapa de calor",
-      "less": "Menos",
-      "more": "Más",
-      "intensity": "Nivel de intensidad",
-      "accessibleSummary": "Este mapa de calor muestra {{totalActivities}} actividades durante {{activeDays}} días activos de un total de {{totalDays}} días. El día más activo fue {{mostActiveDate}}."
-    },
-    "bubble": {
-      "accessibilityLabel": "Gráfico de burbujas. Use las teclas de flecha para navegar entre burbujas.",
-      "accessibilityHint": "Un gráfico de burbujas que muestra puntos de datos con tamaños variables",
-      "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre la burbuja seleccionada.",
-      "legendLabel": "Leyenda de tamaño de burbuja",
-      "smaller": "Más pequeño",
-      "larger": "Más grande",
-      "accessibleSummary": "Este gráfico de burbujas muestra {{totalItems}} elementos. El elemento más grande es {{largestItem}} con un valor de {{largestValue}}."
-    },
-    "historical": {
-      "accessibilityLabel": "Gráfico de tendencias históricas. Use las teclas de flecha para navegar entre puntos de datos.",
-      "accessibilityHint": "Un gráfico de líneas que muestra tendencias a lo largo del tiempo",
-      "keyboardHint": "Presione Enter o Espacio para escuchar detalles sobre el punto de datos seleccionado.",
-      "legendLabel": "Leyenda del gráfico",
-      "accessibleSummary": "Este gráfico muestra tendencias de {{metric}} a lo largo del tiempo. El valor más alto es {{highestValue}} el {{highestDate}}."
-    }
-  },
-  "login": {
-    "title": "AI SPORTS EDGE",
-    "subtitle": "IMPULSADO POR IA AVANZADA",
-    "signIn": "INICIAR SESIÓN",
+  "auth": {
+    "sign_in": "Iniciar sesión",
+    "sign_up": "Registrarse",
+    "sign_out": "Cerrar sesión",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "forgotPassword": "¿Olvidó su contraseña?",
-    "dontHaveAccount": "¿No tiene una cuenta?",
-    "signUp": "Registrarse",
-    "features": {
-      "aiPicks": "Selecciones de IA",
-      "trackBets": "Seguimiento de Apuestas",
-      "rewards": "Recompensas",
-      "proAnalysis": "Análisis Pro",
-      "helpFaq": "Ayuda y FAQ"
-    },
-    "errors": {
-      "emailRequired": "El correo electrónico es obligatorio",
-      "passwordRequired": "La contraseña es obligatoria",
-      "invalidEmail": "Por favor, introduzca un correo electrónico válido",
-      "invalidCredentials": "Correo electrónico o contraseña inválidos",
-      "loginFailed": "Error al iniciar sesión. Por favor, inténtelo de nuevo.",
-      "signUpFailed": "Error al crear la cuenta. Por favor, inténtelo de nuevo.",
-      "emailInUse": "Este correo electrónico ya está en uso. Por favor, utilice otro.",
-      "weakPassword": "La contraseña es demasiado débil. Utilice al menos 6 caracteres.",
-      "accountDisabled": "Esta cuenta ha sido deshabilitada. Contacte con soporte.",
-      "tooManyAttempts": "Demasiados intentos fallidos. Por favor, inténtelo más tarde."
-    },
-    "alerts": {
-      "accountCreated": "¡Cuenta creada!",
-      "loggedIn": "¡Sesión iniciada!"
-    }
+    "forgot_password": "¿Olvidó su contraseña?",
+    "reset_password": "Restablecer contraseña",
+    "create_account": "Crear cuenta",
+    "already_have_account": "¿Ya tiene una cuenta?",
+    "dont_have_account": "¿No tiene una cuenta?",
+    "sign_in_with": "Iniciar sesión con",
+    "or": "o",
+    "terms_and_conditions": "Términos y condiciones",
+    "privacy_policy": "Política de privacidad",
+    "agree_to_terms": "Al registrarse, acepta nuestros {{terms}} y nuestra {{privacy}}."
   },
-  "payment": {
-    "title": "Información de Pago",
-    "subtitle": "Ingrese los detalles de su tarjeta para suscribirse a {{planName}}",
-    "cardInformation": "Información de la Tarjeta",
-    "subscribeNow": "Suscribirse Ahora",
-    "secureInfo": "Su información de pago está segura y encriptada",
-    "planSummary": {
-      "title": "Resumen del Plan",
-      "plan": "Plan",
-      "price": "Precio"
-    },
-    "interval": {
-      "month": "mes",
-      "year": "año"
-    },
-    "success": {
-      "title": "Suscripción Exitosa",
-      "message": "¡Su suscripción ha sido activada exitosamente!"
-    },
-    "errors": {
-      "invalidPlan": "Plan de suscripción inválido",
-      "incompleteCard": "Por favor complete los detalles de la tarjeta",
-      "paymentMethodFailed": "Falló la creación del método de pago",
-      "notAuthenticated": "Usuario no autenticado",
-      "generic": "Ocurrió un error durante el procesamiento del pago"
-    }
+  "onboarding": {
+    "welcome_title": "Bienvenido a AI Sports Edge",
+    "welcome_description": "Obtenga ventaja en las apuestas deportivas con predicciones y análisis impulsados por IA.",
+    "feature_analytics": "Análisis deportivos avanzados",
+    "feature_predictions": "Predicciones impulsadas por IA",
+    "feature_alerts": "Alertas y notificaciones en tiempo real",
+    "get_started": "Comenzar",
+    "disclaimer": "Las apuestas deportivas implican riesgo. Juegue siempre de manera responsable.",
+    "complete_title": "Incorporación completa",
+    "complete_message": "Ha completado con éxito el proceso de incorporación y ahora puede usar AI Sports Edge."
+  },
+  "gdpr": {
+    "title": "Preferencias de privacidad de datos",
+    "description": "Valoramos su privacidad. Por favor, seleccione cómo desea que usemos sus datos.",
+    "essential_title": "Datos esenciales",
+    "essential_description": "Necesarios para el funcionamiento de la aplicación. Esto incluye autenticación, seguridad y funcionalidad básica de la aplicación.",
+    "analytics_title": "Datos analíticos",
+    "analytics_description": "Nos ayuda a entender cómo usa la aplicación para que podamos mejorarla. Esto incluye estadísticas de uso y datos de rendimiento.",
+    "marketing_title": "Datos de marketing",
+    "marketing_description": "Nos permite enviarle ofertas y promociones personalizadas. Esto incluye marketing por correo electrónico y notificaciones en la aplicación.",
+    "third_party_title": "Compartir con terceros",
+    "third_party_description": "Nos permite compartir sus datos con socios de confianza para mejorar su experiencia. Esto incluye integración con redes sociales y servicios de terceros.",
+    "privacy_note": "Puede cambiar esta configuración en cualquier momento en la configuración de su perfil.",
+    "continue": "Continuar con la selección",
+    "view_privacy_policy": "Ver política de privacidad",
+    "save_error": "Hubo un error al guardar sus preferencias de privacidad. Por favor, inténtelo de nuevo."
+  },
+  "cookie": {
+    "title": "Preferencias de cookies",
+    "description": "Utilizamos cookies para mejorar su experiencia. Por favor, seleccione qué cookies desea permitir.",
+    "essential_title": "Cookies esenciales",
+    "essential_description": "Necesarias para el funcionamiento de la aplicación. Estas cookies permiten funciones básicas como la navegación por páginas y el acceso a áreas seguras.",
+    "analytics_title": "Cookies analíticas",
+    "analytics_description": "Nos ayudan a entender cómo los visitantes interactúan con nuestra aplicación recopilando y reportando información de forma anónima.",
+    "marketing_title": "Cookies de marketing",
+    "marketing_description": "Se utilizan para rastrear a los visitantes a través de aplicaciones. La intención es mostrar anuncios que sean relevantes y atractivos para el usuario individual.",
+    "preference_title": "Cookies de preferencia",
+    "preference_description": "Permiten que la aplicación recuerde información que cambia la forma en que la aplicación se comporta o se ve, como su idioma o región preferida.",
+    "note": "Puede cambiar sus preferencias de cookies en cualquier momento en la configuración de su perfil.",
+    "accept_selected": "Aceptar seleccionadas",
+    "accept_all": "Aceptar todas",
+    "view_policy": "Ver política de cookies",
+    "save_error": "Hubo un error al guardar sus preferencias de cookies. Por favor, inténtelo de nuevo."
+  },
+  "age_verification": {
+    "title": "Verificación de edad",
+    "description": "Para usar AI Sports Edge, debe tener al menos 18 años (21+ en algunas jurisdicciones).",
+    "confirmation": "Confirmo que tengo al menos 18 años (o la edad legal mínima para apuestas deportivas en mi jurisdicción).",
+    "legal_text": "Las apuestas deportivas solo son legales para adultos. Estamos obligados por ley a verificar su edad antes de que pueda usar nuestros servicios.",
+    "disclaimer": "Al continuar, también acepta que podamos solicitar verificación adicional de edad si es necesario.",
+    "alert_title": "Confirmación de edad requerida",
+    "alert_message": "Debe confirmar que tiene la edad legal para usar AI Sports Edge.",
+    "save_error": "Hubo un error al guardar su verificación de edad. Por favor, inténtelo de nuevo."
+  },
+  "self_exclusion": {
+    "title": "Verificación de autoexclusión",
+    "description": "Antes de continuar, necesitamos confirmar su elegibilidad para usar nuestra aplicación.",
+    "question": "¿Está actualmente en alguna lista de autoexclusión estatal o nacional que le prohíba participar en apuestas deportivas?",
+    "disclaimer": "Al seleccionar \"No\", confirma que no está en ninguna lista de autoexclusión.",
+    "alert_title": "No se puede continuar",
+    "alert_message": "Si está en una lista de autoexclusión, no puede usar AI Sports Edge en este momento. Por favor, respete el programa de autoexclusión y busque ayuda si es necesario.",
+    "save_error": "Hubo un error al guardar su respuesta. Por favor, inténtelo de nuevo."
+  },
+  "responsible_gambling": {
+    "title": "Compromiso de juego responsable",
+    "description": "En AI Sports Edge, promovemos el juego responsable. Por favor, lea y reconozca la siguiente declaración:",
+    "acknowledgment": "Reconozco que las apuestas deportivas deben realizarse de manera responsable y que soy consciente de los riesgos asociados con el juego.",
+    "tips_title": "El juego responsable significa:",
+    "tip_1": "Establecer límites de tiempo y dinero",
+    "tip_2": "Nunca perseguir pérdidas",
+    "tip_3": "No jugar cuando esté molesto o estresado",
+    "tip_4": "Equilibrar el juego con otras actividades",
+    "helpline": "¿Necesita ayuda? Llame al 900 200 225",
+    "alert_title": "Reconocimiento requerido",
+    "alert_message": "Por favor, reconozca la declaración de juego responsable para continuar.",
+    "save_error": "Hubo un error al guardar su reconocimiento. Por favor, inténtelo de nuevo."
+  },
+  "liability": {
+    "title": "Exención de responsabilidad",
+    "content": "Al usar AI Sports Edge, reconoce y acepta lo siguiente:\n\n## Descargo de responsabilidad sobre consejos de apuestas\n\nLas predicciones, cuotas y recomendaciones de apuestas proporcionadas por AI Sports Edge son solo para fines informativos y de entretenimiento. Aunque utilizamos algoritmos avanzados y análisis de datos para generar estas recomendaciones, no podemos garantizar su precisión o éxito.\n\n## Sin garantía de ganancias\n\nLas apuestas deportivas implican riesgo, y no hay garantía de ganancias. AI Sports Edge no garantiza que ganará dinero siguiendo nuestras recomendaciones. Nunca debe apostar más de lo que puede permitirse perder.\n\n## Responsabilidad del usuario\n\nUsted es el único responsable de sus decisiones de apuestas y de cualquier pérdida financiera resultante. AI Sports Edge, sus propietarios, empleados y afiliados no serán responsables de ninguna pérdida incurrida como resultado de seguir nuestras recomendaciones o usar nuestros servicios.\n\n## Cumplimiento legal\n\nUsted es responsable de asegurarse de que su uso de AI Sports Edge cumple con todas las leyes y regulaciones aplicables en su jurisdicción. Las apuestas deportivas pueden ser ilegales en algunas jurisdicciones, y no fomentamos el juego ilegal.\n\n## Juego responsable\n\nAI Sports Edge promueve el juego responsable. Si cree que puede tener un problema con el juego, le animamos a buscar ayuda de una organización profesional.\n\n## Reconocimiento\n\nAl hacer clic en \"Acepto\" a continuación, reconoce que ha leído, entendido y aceptado esta exención de responsabilidad. Si no está de acuerdo, no debe usar AI Sports Edge.",
+    "scroll_to_continue": "Por favor, desplácese hasta el final para continuar",
+    "acknowledgment": "He leído y acepto los términos de la exención de responsabilidad",
+    "accept": "Acepto",
+    "decline": "Rechazar",
+    "alert_title": "Exención requerida",
+    "alert_message": "Debe leer y aceptar la exención de responsabilidad para continuar.",
+    "decline_title": "Exención rechazada",
+    "decline_message": "Debe aceptar la exención de responsabilidad para usar AI Sports Edge.",
+    "review_again": "Revisar de nuevo",
+    "exit": "Salir",
+    "save_error": "Hubo un error al guardar su aceptación de la exención. Por favor, inténtelo de nuevo."
+  },
+  "legal": {
+    "legal_information": "Información legal",
+    "privacy_policy": "Política de privacidad",
+    "terms_of_service": "Términos de servicio",
+    "by_using_app": "Al usar esta aplicación, acepta nuestros Términos de servicio y Política de privacidad."
+  },
+  "home": {
+    "welcome": "Bienvenido a AI Sports Edge",
+    "featured_games": "Partidos destacados",
+    "trending": "Tendencias",
+    "upcoming_games": "Próximos partidos",
+    "view_all": "Ver todo",
+    "predictions": "Predicciones",
+    "stats": "Estadísticas",
+    "news": "Noticias"
+  },
+  "games": {
+    "all_games": "Todos los partidos",
+    "live_games": "Partidos en vivo",
+    "upcoming_games": "Próximos partidos",
+    "completed_games": "Partidos completados",
+    "game_details": "Detalles del partido",
+    "odds": "Cuotas",
+    "predictions": "Predicciones",
+    "stats": "Estadísticas",
+    "team_stats": "Estadísticas del equipo",
+    "player_stats": "Estadísticas del jugador",
+    "head_to_head": "Cara a cara",
+    "betting_trends": "Tendencias de apuestas",
+    "injury_report": "Informe de lesiones",
+    "venue": "Lugar",
+    "weather": "Clima"
+  },
+  "profile": {
+    "profile": "Perfil",
+    "account": "Cuenta",
+    "settings": "Configuración",
+    "subscription": "Suscripción",
+    "purchase_history": "Historial de compras",
+    "preferences": "Preferencias",
+    "notifications": "Notificaciones",
+    "language": "Idioma",
+    "theme": "Tema",
+    "help": "Ayuda",
+    "about": "Acerca de",
+    "contact_us": "Contáctenos",
+    "feedback": "Comentarios",
+    "rate_app": "Calificar aplicación",
+    "share_app": "Compartir aplicación",
+    "sign_out": "Cerrar sesión",
+    "delete_account": "Eliminar cuenta"
   },
   "subscription": {
-    "loading": "Cargando opciones de suscripción...",
-    "title": "Elija un Plan de Suscripción",
-    "subtitle": "Obtenga acceso a análisis premium de apuestas con IA",
-    "alreadySubscribed": "Ya tiene una suscripción activa. Puede administrar su suscripción en la configuración.",
-    "manageSubscription": "Administrar Suscripción",
+    "plans": "Planes de suscripción",
+    "current_plan": "Plan actual",
+    "upgrade": "Mejorar",
+    "downgrade": "Degradar",
+    "cancel": "Cancelar suscripción",
+    "renews_on": "Se renueva el",
+    "payment_method": "Método de pago",
+    "update_payment": "Actualizar pago",
+    "billing_history": "Historial de facturación",
+    "restore_purchases": "Restaurar compras",
+    "free_trial": "Prueba gratuita",
+    "premium": "Premium",
+    "pro": "Pro",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "save_percent": "Ahorre {{percent}}%",
     "features": "Características",
-    "selectPlan": "Seleccionar Plan",
-    "interval": {
-      "month": "mes",
-      "year": "año"
-    },
-    "group": {
-      "title": "¿Busca un Plan Grupal?",
-      "description": "Comparta funciones premium con amigos o familiares. Obtenga acceso Pro para hasta 3 usuarios por solo $149.99/mes.",
-      "createButton": "Crear Suscripción Grupal"
-    },
-    "gift": {
-      "redeemButton": "Canjear una Suscripción de Regalo"
-    },
-    "refundPolicy": "Ver nuestra Política de Cancelación y Reembolso"
+    "feature_included": "Incluido",
+    "feature_not_included": "No incluido",
+    "subscribe_now": "Suscribirse ahora",
+    "subscription_terms": "Al suscribirse, acepta nuestros términos de suscripción y política de privacidad. Su suscripción se renovará automáticamente a menos que se cancele al menos 24 horas antes del final del período actual."
   },
-  "personalization": {
-    "title": "Personalización",
-    "loading": "Cargando preferencias...",
-    "tabs": {
-      "general": "General",
-      "sportsbooks": "Casas de Apuestas",
-      "notifications": "Notificaciones"
-    },
-    "general": {
-      "defaultSport": "Deporte Predeterminado",
-      "defaultSportDescription": "Elija su deporte predeterminado para comparación de cuotas"
-    },
-    "sportsbooks": {
-      "defaultSportsbook": "Casa de Apuestas Predeterminada",
-      "defaultSportsbookDescription": "Elija su casa de apuestas preferida para apostar",
-      "noPreference": "Sin Preferencia"
-    },
-    "notifications": {
-      "title": "Preferencias de Notificación",
-      "description": "Personalice qué notificaciones recibe",
-      "oddsMovements": "Movimientos de Cuotas",
-      "gameStart": "Inicio de Juego",
-      "gameEnd": "Fin de Juego",
-      "specialOffers": "Ofertas Especiales"
-    },
-    "alerts": {
-      "defaultSportUpdated": "Deporte Predeterminado Actualizado",
-      "defaultSportUpdatedMessage": "{sport} es ahora su deporte predeterminado.",
-      "defaultSportsbookUpdated": "Casa de Apuestas Predeterminada Actualizada",
-      "defaultSportsbookUpdatedMessage": "{sportsbook} es ahora su casa de apuestas predeterminada.",
-      "defaultSportsbookCleared": "Preferencia de casa de apuestas predeterminada eliminada.",
-      "resetPreferences": "Restablecer Preferencias",
-      "resetPreferencesMessage": "¿Está seguro de que desea restablecer todas las preferencias de personalización a los valores predeterminados?",
-      "preferencesReset": "Preferencias Restablecidas",
-      "preferencesResetMessage": "Todas las preferencias de personalización han sido restablecidas a los valores predeterminados.",
-      "cancel": "Cancelar",
-      "reset": "Restablecer",
-      "ok": "OK"
-    },
-    "resetButton": "Restablecer Todas las Preferencias"
-  },
-  "languageSelector": {
-    "switchToEnglish": "Cambiar a inglés",
-    "switchToSpanish": "Cambiar a español",
-    "hint": "Cambia el idioma de la aplicación"
-  },
-  "faq": {
-    "title": "Preguntas Frecuentes",
-    "subtitle": "Aprenda más sobre nuestras predicciones de apuestas deportivas con IA",
-    "loading": "Cargando preguntas..."
-  },
-  "sports": {
-    "basketball_nba": "NBA Baloncesto",
-    "basketball_ncaab": "NCAA Baloncesto",
-    "football_nfl": "NFL Fútbol Americano",
-    "hockey_nhl": "NHL Hockey",
-    "baseball_mlb": "MLB Béisbol",
-    "soccer_epl": "Premier League",
-    "soccer_mls": "MLS Fútbol",
-    "soccer_womens_nwsl": "NWSL Fútbol Femenino",
-    "soccer_womens_intl": "Fútbol Internacional Femenino",
-    "soccer_mens_intl": "Fútbol Internacional Masculino",
-    "soccer_laliga": "LaLiga",
-    "soccer_bundesliga": "Bundesliga",
-    "soccer_seriea": "Serie A",
-    "soccer_ligue1": "Ligue 1",
-    "mma_ufc": "UFC MMA"
-  },
-  "oddsComparison": {
-    "title": "Comparación de Cuotas",
-    "subtitle": "Compare cuotas entre DraftKings y FanDuel para juegos de la NBA",
-    "selectSport": "Seleccionar Deporte:",
-    "gameMatchup": "Enfrentamiento",
-    "versus": "VS",
-    "gameDate": "{{date}} a las {{time}}",
-    "noGameSelected": "No hay juego seleccionado",
-    "lastUpdated": "Última actualización: {{time}}",
-    "refresh": "Actualizar",
-    "sortBy": "Ordenar por:",
-    "bestOdds": "Mejores Cuotas",
-    "filter": "Filtrar",
-    "showDraftKings": "DraftKings",
-    "showFanDuel": "FanDuel",
-    "notAvailable": "N/D",
-    "unlockOdds": "Desbloquear Cuotas",
-    "purchaseOdds": "Comprar Acceso a Cuotas",
-    "purchaseSuccess": "¡Compra Exitosa!",
-    "purchaseError": "Error de Compra",
-    "dataSource": {
-      "cached": "ALMACENADO",
-      "stale": "ANTIGUO",
-      "fallback": "ALTERNATIVO",
-      "error": "ERROR"
-    },
-    "errors": {
-      "apiFailure": "Error al cargar datos de cuotas. Por favor, inténtelo de nuevo más tarde.",
-      "networkError": "Error de red. Por favor, compruebe su conexión e inténtelo de nuevo.",
-      "rateLimit": "Límite de tasa excedido. Por favor, inténtelo de nuevo en unos minutos.",
-      "noData": "No se pudieron encontrar cuotas para DraftKings o FanDuel en este momento.",
-      "configuration": "Error de configuración. Por favor, contacte con soporte."
-    },
-    "loading": "Cargando comparación de cuotas...",
-    "retry": "Reintentar",
-    "alerts": {
-      "title": "Alertas de Movimiento de Cuotas",
-      "noAlerts": "No hay alertas de movimiento de cuotas todavía",
-      "noAlertsSubtext": "Se le notificará cuando las cuotas cambien significativamente",
-      "loading": "Cargando alertas..."
-    },
-    "accessibility": {
-      "refreshButton": "Botón de actualización",
-      "refreshButtonHint": "Actualiza los datos de cuotas",
-      "alertsButton": "Botón de alertas",
-      "alertsButtonHint": "Muestra alertas de movimiento de cuotas",
-      "settingsButton": "Botón de configuración",
-      "settingsButtonHint": "Abre la configuración de personalización",
-      "sortOption": "Opción de ordenación: {{option}}",
-      "sortOptionHint": "Cambia el orden de visualización de las cuotas",
-      "filterOption": "Opción de filtro: {{option}}",
-      "filterOptionHint": "Filtra los corredores de apuestas mostrados",
-      "bookmakerButton": "{{bookmaker}} cuotas: {{odds}}",
-      "bookmakerButtonHint": "Toca para visitar el sitio del corredor de apuestas",
-      "lockedOdds": "cuotas bloqueadas",
-      "selectSport": "Seleccionar {{sport}}",
-      "selectSportHint": "Cambia la comparación de cuotas para mostrar cuotas de {{sport}}"
-    }
-  },
-  "playerStats": {
-    "title": "Estadísticas de Jugadores",
-    "subtitle": "Plus/Minus de Jugadores",
-    "loading": "Cargando estadísticas de jugadores...",
-    "premiumFeature": "Función Premium",
-    "plusMinusDescription": "El seguimiento de plus-minus de jugadores está disponible para suscriptores Premium o como compra única.",
-    "unlockPlayerStats": "Desbloquear Estadísticas de Jugadores",
-    "playerImpact": "Impacto del Jugador",
-    "team": "Equipo:",
-    "plusMinus": "Plus/Minus:",
-    "lastUpdated": "Última actualización:",
-    "advancedMetrics": "Métricas Avanzadas",
-    "unlockAdvancedMetrics": "Desbloquear Métricas Avanzadas",
-    "purchaseSuccess": "Compra Exitosa",
-    "purchaseSuccessMessage": "Ahora tiene acceso a las estadísticas de jugadores plus-minus para este juego.",
-    "viewPlans": "Ver Planes",
+  "microtransactions": {
     "purchase": "Comprar",
-    "close": "Cerrar"
+    "unlock": "Desbloquear",
+    "get_access": "Obtener Acceso",
+    "purchase_success": "Compra Exitosa",
+    "purchase_failed": "Compra Fallida",
+    "try_again": "Por favor, inténtelo de nuevo",
+    "purchase_history": "Historial de Compras",
+    "no_purchases": "Aún no ha realizado ninguna compra",
+    "active": "Activo",
+    "expired": "Expirado",
+    "pending": "Pendiente",
+    "purchased_on": "Comprado el {{date}}",
+    "expires_on": "Expira el {{date}}",
+    "browse_features": "Explorar Funciones"
   },
-  "advancedPlayerStats": {
-    "title": "Métricas Avanzadas de Jugadores",
-    "subtitle": "Métricas Avanzadas de Jugadores",
-    "loading": "Cargando estadísticas avanzadas...",
-    "premiumFeature": "Función Premium",
-    "advancedMetricsDescription": "Las métricas avanzadas de jugadores están disponibles para suscriptores Premium o como compra única.",
-    "unlockAdvancedMetrics": "Desbloquear Métricas Avanzadas",
-    "comparePlayersButton": "Comparar Jugadores",
-    "cancelComparisonButton": "Cancelar Comparación",
-    "unlockComparisonTool": "Desbloquear Herramienta de Comparación",
-    "selectTwoPlayers": "Seleccione dos jugadores para comparar",
-    "selectOneMorePlayer": "Seleccione un jugador más",
-    "readyToCompare": "Listo para comparar",
-    "compareNow": "Comparar Ahora",
-    "playerComparison": "Comparación de Jugadores",
-    "purchaseSuccess": "Compra Exitosa",
-    "purchaseSuccessMessage": "Ahora tiene acceso a las métricas avanzadas de jugadores para este juego.",
-    "viewPlans": "Ver Planes",
-    "purchase": "Comprar",
-    "close": "Cerrar",
-    "viewsRemaining": "{{count}} visualizaciones restantes",
-    "freeViewsUsed": "Visualizaciones gratuitas agotadas"
+  "settings": {
+    "app_settings": "Configuración de la Aplicación",
+    "account_settings": "Configuración de la Cuenta",
+    "notification_settings": "Configuración de Notificaciones",
+    "language_settings": "Configuración de Idioma",
+    "theme_settings": "Configuración de Tema",
+    "privacy_settings": "Configuración de Privacidad",
+    "data_settings": "Configuración de Datos",
+    "advanced_settings": "Configuración Avanzada",
+    "about": "Acerca de",
+    "help": "Ayuda",
+    "feedback": "Comentarios",
+    "terms": "Términos de Servicio",
+    "privacy": "Política de Privacidad",
+    "version": "Versión {{version}}",
+    "language": "Idioma",
+    "select_language": "Seleccionar Idioma",
+    "theme": "Tema",
+    "dark_mode": "Modo Oscuro",
+    "light_mode": "Modo Claro",
+    "system_default": "Predeterminado del Sistema",
+    "push_notifications": "Notificaciones Push",
+    "email_notifications": "Notificaciones por Correo Electrónico",
+    "in_app_notifications": "Notificaciones en la Aplicación",
+    "data_usage": "Uso de Datos",
+    "clear_cache": "Limpiar Caché",
+    "download_over_wifi": "Descargar Solo con Wi-Fi",
+    "auto_play_videos": "Reproducción Automática de Videos"
   },
-  "playerHistoricalTrends": {
-    "title": "Tendencias Históricas",
-    "subtitle": "Análisis de Tendencias Históricas",
-    "loading": "Cargando datos históricos...",
-    "noData": "No hay datos históricos disponibles para este jugador.",
-    "selectMetric": "Seleccionar Métrica",
-    "points": "Puntos",
-    "assists": "Asistencias",
-    "rebounds": "Rebotes",
-    "steals": "Robos",
-    "blocks": "Bloqueos",
-    "fieldGoalPercentage": "% Tiros de Campo",
-    "lastGames": "Últimos 5 Partidos",
-    "average": "Promedio",
-    "high": "Máximo",
-    "low": "Mínimo",
-    "trendAnalysis": "Análisis de Tendencias",
-    "noDataForTrend": "Datos insuficientes para análisis de tendencias",
-    "performanceInsights": "Información de Rendimiento",
-    "trendTypes": {
-      "strongUpward": "Tendencia fuerte al alza",
-      "slightUpward": "Tendencia ligera al alza",
-      "stable": "Rendimiento estable",
-      "slightDownward": "Tendencia ligera a la baja",
-      "strongDownward": "Tendencia fuerte a la baja"
-    },
-    "consistencyLevels": {
-      "high": "Producción de {{metric}} altamente consistente",
-      "moderate": "Producción de {{metric}} moderadamente consistente",
-      "variable": "Producción de {{metric}} variable de partido a partido"
-    },
-    "lastGamePerformance": {
-      "aboveAverage": "El último partido {{metric}} fue significativamente superior al promedio",
-      "belowAverage": "El último partido {{metric}} fue significativamente inferior al promedio",
-      "average": "El último partido {{metric}} fue cercano al promedio del jugador"
-    }
-  },
-  "viewLimitIndicator": {
-    "freeViewsUsed": "Visualizaciones Gratuitas Agotadas",
-    "freeViewsLeft": "{{count}} Visualizaciones Gratuitas Restantes",
-    "viewsUsedMessage": "Ha utilizado todas sus visualizaciones gratuitas para este mes.",
-    "viewsLeftMessage": "Ha utilizado {{used}} de sus {{total}} visualizaciones gratuitas{{resetInfo}}.",
-    "resetsOn": "Se restablece el {{date}}",
-    "upgradeNow": "Actualizar Ahora",
-    "getUnlimitedAccess": "Obtener Acceso Ilimitado"
-  },
-  "enhancedAnalytics": {
-    "title": "Análisis Mejorado",
-    "subtitle": "Panel de Administración",
-    "loading": "Cargando panel de análisis...",
-    "userEngagement": "Participación de Usuarios",
-    "totalUsers": "Usuarios Totales",
-    "dailyActiveUsers": "Usuarios Activos Diarios",
-    "monthlyActiveUsers": "Usuarios Activos Mensuales",
-    "newUsers": "Usuarios Nuevos",
-    "retentionRate": "Tasa de Retención",
-    "churnRate": "Tasa de Abandono",
-    "userGrowth": "Crecimiento de Usuarios",
-    "revenueMetrics": "Métricas de Ingresos",
-    "totalRevenue": "Ingresos Totales",
-    "subscriptionRevenue": "Ingresos por Suscripción",
-    "microtransactionRevenue": "Ingresos por Microtransacciones",
-    "arpu": "ARPU",
-    "arppu": "ARPPU",
-    "conversionRate": "Tasa de Conversión",
-    "revenueGrowth": "Crecimiento de Ingresos",
-    "bettingMetrics": "Métricas de Apuestas",
-    "totalBets": "Apuestas Totales",
-    "totalBetAmount": "Cantidad Total Apostada",
-    "averageBetAmount": "Cantidad Media Apostada",
-    "uniqueBettors": "Apostadores Únicos",
-    "betsPerUser": "Apuestas por Usuario",
-    "aiPredictionAccuracy": "Precisión de Predicción IA",
-    "betsByType": "Apuestas por Tipo",
-    "betsBySport": "Apuestas por Deporte",
-    "popularBets": "Apuestas Populares",
-    "topFeatures": "Características Principales",
-    "viewAnalytics": "Ver Análisis"
-  },
-  "bettingSlipImport": {
-    "title": "Importación de Boletos de Apuestas",
-    "subtitle": "Importe sus boletos de apuestas desde casas de apuestas",
-    "loading": "Cargando...",
-    "selectSportsbook": "Seleccionar Casa de Apuestas",
-    "selectImportMethod": "Seleccionar Método de Importación",
-    "screenshot": "Captura de Pantalla",
-    "copyPaste": "Copiar y Pegar",
-    "takePhoto": "Tomar Foto",
-    "pickImage": "Seleccionar Imagen",
-    "pasteText": "Pegar Texto",
-    "importButton": "Importar Boleto de Apuestas",
-    "importResult": "Resultado de Importación",
-    "importSuccess": "Importación Exitosa",
-    "importFailed": "Importación Fallida",
-    "subscriptionRequired": "Se requiere suscripción",
-    "upgradeMessage": "Actualice a Premium para importar boletos de apuestas",
-    "betType": "Tipo de Apuesta",
-    "betAmount": "Cantidad Apostada",
-    "betDescription": "Descripción",
-    "odds": "Cuotas",
-    "potentialWin": "Ganancia Potencial",
-    "aiSuggestion": "Sugerencia de IA",
-    "betterOdds": "Mejores Cuotas",
-    "goodValue": "Buen Valor",
-    "avoid": "Evitar",
-    "importSlips": "Importar Boletos"
+  "language": {
+    "language": "Idioma",
+    "select_language": "Seleccionar Idioma",
+    "english": "Inglés",
+    "spanish": "Español",
+    "french": "Francés",
+    "current_language": "Idioma Actual: {{language}}",
+    "change_language": "Cambiar Idioma",
+    "language_changed": "Idioma Cambiado",
+    "restart_required": "Por favor, reinicie la aplicación para que los cambios surtan efecto"
   }
 }

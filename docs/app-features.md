@@ -46,7 +46,7 @@ This document provides a comprehensive list of features available in the AI Spor
 
 18. **Offline Mode** - Access to key features without internet connection.
 
-19. **Multi-Language Support** - Interface available in English, Spanish, and French.
+19. **Multi-Language Support** - Interface available in English, and Spanish.
 
 ## Social Features
 

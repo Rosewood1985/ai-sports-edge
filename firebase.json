@@ -1,100 +1,267 @@
 {
-  "functions": {
-    "source": "functions"
+  "hosting": {
+    "site": "ai-sports-edge-com",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/v1/**",
+        "destination": "https://api.ai-sports-edge.com/v1/:splat"
+      },
+      {
+        "source": "/api/v2/**",
+        "destination": "https://api.ai-sports-edge.com/v2/:splat"
+      },
+      {
+        "source": "/admin/**",
+        "destination": "https://admin.ai-sports-edge.com/:splat"
+      },
+      {
+        "source": "/app/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/sports/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/predictions/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/account/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/auth/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/checkout/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "redirects": [
+      {
+        "source": "http://ai-sports-edge.com/*",
+        "destination": "https://ai-sports-edge.com/:splat",
+        "type": 301
+      },
+      {
+        "source": "http://www.ai-sports-edge.com/*",
+        "destination": "https://ai-sports-edge.com/:splat",
+        "type": 301
+      },
+      {
+        "source": "https://www.ai-sports-edge.com/*",
+        "destination": "https://ai-sports-edge.com/:splat",
+        "type": 301
+      },
+      {
+        "source": "/home",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/about-us",
+        "destination": "/about",
+        "type": 301
+      },
+      {
+        "source": "/contact-us",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/blog/posts/*",
+        "destination": "/blog/:splat",
+        "type": 301
+      },
+      {
+        "source": "/old-app/*",
+        "destination": "/app/:splat",
+        "type": 301
+      },
+      {
+        "source": "/sports/nfl",
+        "destination": "/sports/football",
+        "type": 301
+      },
+      {
+        "source": "/sports/mlb",
+        "destination": "/sports/baseball",
+        "type": 301
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|png|gif|webp|svg|ico)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=604800"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(html)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=0, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(json)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          }
+        ]
+      },
+      {
+        "source": "/api/**",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "https://ai-sports-edge.com"
+          },
+          {
+            "key": "Access-Control-Allow-Methods",
+            "value": "GET, POST, OPTIONS, PUT, DELETE"
+          },
+          {
+            "key": "Access-Control-Allow-Headers",
+            "value": "Content-Type, Authorization"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=31536000; includeSubDomains; preload"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=(self), interest-cohort=()"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' https://apis.google.com https://*.firebaseio.com https://www.googletagmanager.com https://www.google-analytics.com https://*.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://*.firebaseio.com https://www.google-analytics.com https://api.qrserver.com data:; connect-src 'self' https://*.firebaseio.com https://www.googleapis.com https://*.cloudfunctions.net https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://www.google-analytics.com; frame-src 'self' https://*.firebaseio.com https://apis.google.com; object-src 'none'"
+          }
+        ]
+      }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "i18n": {
+      "root": "/locales"
+    },
+    "appAssociation": "AUTO",
+    "customDomains": [
+      {
+        "domain": "ai-sports-edge.com",
+        "ssl": true
+      },
+      {
+        "domain": "www.ai-sports-edge.com",
+        "ssl": true
+      },
+      {
+        "domain": "api.ai-sports-edge.com",
+        "ssl": true
+      },
+      {
+        "domain": "admin.ai-sports-edge.com",
+        "ssl": true
+      }
+    ]
   },
-  "hosting": [
-    {
-      "target": "default",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**",
-        "README.md"
-      ],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ],
-      "headers": [
-        {
-          "source": "**/*.@(jpg|jpeg|gif|png|svg|webp)",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "max-age=86400"
-            }
-          ]
-        },
-        {
-          "source": "**/*.@(js|css)",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "max-age=3600"
-            }
-          ]
-        },
-        {
-          "source": "/es/**",
-          "headers": [
-            {
-              "key": "Content-Language",
-              "value": "es"
-            }
-          ]
-        }
-      ]
+  "firestore": {
+    "rules": "./firestore.rules",
+    "indexes": "./firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "./storage.rules"
+  },
+  "functions": {
+    "source": "functions",
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run lint",
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ],
+    "runtime": "nodejs16",
+    "minInstances": 5,
+    "maxInstances": 50,
+    "memory": "2GB",
+    "timeoutSeconds": 300,
+    "vpc": {
+      "connector": "projects/ai-sports-edge-prod/locations/us-central1/connectors/serverless-vpc-connector"
     },
-    {
-      "target": "custom-domain",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**",
-        "README.md"
-      ],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ],
-      "headers": [
-        {
-          "source": "**/*.@(jpg|jpeg|gif|png|svg|webp)",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "max-age=86400"
-            }
-          ]
-        },
-        {
-          "source": "**/*.@(js|css)",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "max-age=3600"
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "targets": {
-    "default": {
-      "hosting": {
-        "site": "ai-sports-edge"
-      }
+    "cpu": 2
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
     },
-    "custom-domain": {
-      "hosting": {
-        "site": "aisportsedge-app"
-      }
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "database": {
+      "port": 9000
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "storage": {
+      "port": 9199
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
     }
+  },
+  "remoteconfig": {
+    "template": "remoteconfig.template.json"
   }
 }

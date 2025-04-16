@@ -1,38 +1,36 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firestore } from '../config/firebase';
-import { doc, setDoc, getDoc, Timestamp } from 'firebase/firestore';
-import { auth } from '../config/firebase';
+import { info, error as logError, LogCategory } from './loggingService';
+import { safeErrorCapture } from './errorUtils';
 
-// Keys for AsyncStorage
-const ONBOARDING_COMPLETED_KEY = '@AISportsEdge:onboardingCompleted';
-const ONBOARDING_ANALYTICS_KEY = '@AISportsEdge:onboardingAnalytics';
-
-// Firestore collection for analytics
-const ANALYTICS_COLLECTION = 'onboarding_analytics';
+// Storage keys
+const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
+const ONBOARDING_STEPS_KEY = 'onboarding_steps_completed';
 
 /**
- * Interface for onboarding analytics data
+ * Onboarding Service
+ * 
+ * Manages the onboarding state of the application, including tracking which
+ * onboarding steps have been completed and whether the entire onboarding
+ * process has been completed.
  */
-interface OnboardingAnalytics {
-  userId?: string;
-  deviceId: string;
-  started: Timestamp;
-  completed?: Timestamp;
-  slidesViewed: number;
-  totalSlides: number;
-  completionRate: number;
-}
 
 /**
  * Check if onboarding has been completed
- * @returns Promise<boolean> - Whether onboarding has been completed
+ * @returns Promise<boolean> True if onboarding has been completed, false otherwise
  */
 export const isOnboardingCompleted = async (): Promise<boolean> => {
+  console.log('onboardingService: Checking if onboarding is completed');
   try {
     const value = await AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY);
-    return value === 'true';
+    const completed = value === 'true';
+    console.log(`onboardingService: Onboarding completed: ${completed}`);
+    info(LogCategory.APP, `Onboarding completed: ${completed}`);
+    return completed;
   } catch (error) {
-    console.error('Error checking onboarding status:', error);
+    console.error('onboardingService: Error checking onboarding status:', error);
+    logError(LogCategory.APP, 'Error checking onboarding status', error as Error);
+    safeErrorCapture(error as Error);
+    // Default to showing onboarding if there's an error
     return false;
   }
 };
@@ -42,124 +40,98 @@ export const isOnboardingCompleted = async (): Promise<boolean> => {
  * @returns Promise<void>
  */
 export const markOnboardingCompleted = async (): Promise<void> => {
+  console.log('onboardingService: Marking onboarding as completed');
   try {
     await AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
-    
-    // Update analytics
-    const analytics = await getOnboardingAnalytics();
-    if (analytics) {
-      analytics.completed = Timestamp.now();
-      analytics.completionRate = 100;
-      await saveOnboardingAnalytics(analytics);
-    }
+    console.log('onboardingService: Onboarding marked as completed');
+    info(LogCategory.APP, 'Onboarding marked as completed');
   } catch (error) {
-    console.error('Error marking onboarding as completed:', error);
+    console.error('onboardingService: Error marking onboarding as completed:', error);
+    logError(LogCategory.APP, 'Error marking onboarding as completed', error as Error);
+    safeErrorCapture(error as Error);
+    throw error;
   }
 };
 
 /**
- * Reset onboarding completion status
+ * Reset onboarding status (for testing or user reset)
  * @returns Promise<void>
  */
 export const resetOnboardingStatus = async (): Promise<void> => {
+  console.log('onboardingService: Resetting onboarding status');
   try {
     await AsyncStorage.removeItem(ONBOARDING_COMPLETED_KEY);
+    await AsyncStorage.removeItem(ONBOARDING_STEPS_KEY);
+    console.log('onboardingService: Onboarding status reset');
+    info(LogCategory.APP, 'Onboarding status reset');
   } catch (error) {
-    console.error('Error resetting onboarding status:', error);
+    console.error('onboardingService: Error resetting onboarding status:', error);
+    logError(LogCategory.APP, 'Error resetting onboarding status', error as Error);
+    safeErrorCapture(error as Error);
+    throw error;
   }
 };
 
 /**
- * Initialize onboarding analytics
- * @param totalSlides - Total number of onboarding slides
- * @returns Promise<string> - Device ID for analytics tracking
+ * Get completed onboarding steps
+ * @returns Promise<string[]> Array of completed step IDs
  */
-export const initOnboardingAnalytics = async (totalSlides: number): Promise<string> => {
+export const getCompletedOnboardingSteps = async (): Promise<string[]> => {
+  console.log('onboardingService: Getting completed onboarding steps');
   try {
-    // Generate a unique device ID if not already stored
-    let deviceId = await AsyncStorage.getItem('@AISportsEdge:deviceId');
-    if (!deviceId) {
-      deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      await AsyncStorage.setItem('@AISportsEdge:deviceId', deviceId);
-    }
-    
-    const analytics: OnboardingAnalytics = {
-      userId: auth.currentUser?.uid,
-      deviceId,
-      started: Timestamp.now(),
-      slidesViewed: 0,
-      totalSlides,
-      completionRate: 0
-    };
-    
-    await saveOnboardingAnalytics(analytics);
-    return deviceId;
+    const value = await AsyncStorage.getItem(ONBOARDING_STEPS_KEY);
+    const steps = value ? JSON.parse(value) : [];
+    console.log(`onboardingService: Completed steps: ${steps.join(', ') || 'none'}`);
+    return steps;
   } catch (error) {
-    console.error('Error initializing onboarding analytics:', error);
-    return '';
+    console.error('onboardingService: Error getting completed onboarding steps:', error);
+    logError(LogCategory.APP, 'Error getting completed onboarding steps', error as Error);
+    safeErrorCapture(error as Error);
+    // Return empty array if there's an error
+    return [];
   }
 };
 
 /**
- * Update onboarding progress
- * @param slidesViewed - Number of slides viewed
- * @param totalSlides - Total number of slides
+ * Mark an onboarding step as completed
+ * @param stepId ID of the step to mark as completed
  * @returns Promise<void>
  */
-export const updateOnboardingProgress = async (
-  slidesViewed: number, 
-  totalSlides: number
-): Promise<void> => {
+export const markOnboardingStepCompleted = async (stepId: string): Promise<void> => {
+  console.log(`onboardingService: Marking onboarding step ${stepId} as completed`);
   try {
-    const analytics = await getOnboardingAnalytics();
-    if (analytics) {
-      analytics.slidesViewed = slidesViewed;
-      analytics.totalSlides = totalSlides;
-      analytics.completionRate = Math.round((slidesViewed / totalSlides) * 100);
-      await saveOnboardingAnalytics(analytics);
+    const steps = await getCompletedOnboardingSteps();
+    if (!steps.includes(stepId)) {
+      steps.push(stepId);
+      await AsyncStorage.setItem(ONBOARDING_STEPS_KEY, JSON.stringify(steps));
+      console.log(`onboardingService: Step ${stepId} marked as completed`);
+      info(LogCategory.APP, `Onboarding step ${stepId} marked as completed`);
     }
   } catch (error) {
-    console.error('Error updating onboarding progress:', error);
+    console.error(`onboardingService: Error marking step ${stepId} as completed:`, error);
+    logError(LogCategory.APP, `Error marking onboarding step ${stepId} as completed`, error as Error);
+    safeErrorCapture(error as Error);
+    throw error;
   }
 };
 
 /**
- * Get onboarding analytics from AsyncStorage
- * @returns Promise<OnboardingAnalytics | null>
+ * Check if a specific onboarding step has been completed
+ * @param stepId ID of the step to check
+ * @returns Promise<boolean> True if the step has been completed, false otherwise
  */
-const getOnboardingAnalytics = async (): Promise<OnboardingAnalytics | null> => {
+export const isOnboardingStepCompleted = async (stepId: string): Promise<boolean> => {
+  console.log(`onboardingService: Checking if onboarding step ${stepId} is completed`);
   try {
-    const value = await AsyncStorage.getItem(ONBOARDING_ANALYTICS_KEY);
-    return value ? JSON.parse(value) : null;
+    const steps = await getCompletedOnboardingSteps();
+    const completed = steps.includes(stepId);
+    console.log(`onboardingService: Step ${stepId} completed: ${completed}`);
+    return completed;
   } catch (error) {
-    console.error('Error getting onboarding analytics:', error);
-    return null;
-  }
-};
-
-/**
- * Save onboarding analytics to AsyncStorage and Firestore
- * @param analytics - Onboarding analytics data
- * @returns Promise<void>
- */
-const saveOnboardingAnalytics = async (analytics: OnboardingAnalytics): Promise<void> => {
-  try {
-    // Save to AsyncStorage
-    await AsyncStorage.setItem(ONBOARDING_ANALYTICS_KEY, JSON.stringify(analytics));
-    
-    // Save to Firestore if user is logged in
-    if (auth.currentUser) {
-      const analyticsRef = doc(
-        firestore, 
-        ANALYTICS_COLLECTION, 
-        analytics.userId || analytics.deviceId
-      );
-      await setDoc(analyticsRef, {
-        ...analytics,
-        updatedAt: Timestamp.now()
-      }, { merge: true });
-    }
-  } catch (error) {
-    console.error('Error saving onboarding analytics:', error);
+    console.error(`onboardingService: Error checking if step ${stepId} is completed:`, error);
+    logError(LogCategory.APP, `Error checking if onboarding step ${stepId} is completed`, error as Error);
+    safeErrorCapture(error as Error);
+    // Default to not completed if there's an error
+    return false;
   }
 };

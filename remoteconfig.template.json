@@ -1,0 +1,254 @@
+{
+  "conditions": [
+    {
+      "name": "ios",
+      "expression": "device.os == 'ios'"
+    },
+    {
+      "name": "android",
+      "expression": "device.os == 'android'"
+    },
+    {
+      "name": "web",
+      "expression": "device.os == 'web'"
+    },
+    {
+      "name": "ios_new_version",
+      "expression": "device.os == 'ios' && version.ios >= '2.0.0'"
+    },
+    {
+      "name": "android_new_version",
+      "expression": "device.os == 'android' && version.android >= '2.0.0'"
+    },
+    {
+      "name": "premium_users",
+      "expression": "user.data.isPremium == true"
+    },
+    {
+      "name": "beta_testers",
+      "expression": "user.data.isBetaTester == true"
+    },
+    {
+      "name": "us_users",
+      "expression": "user.data.country == 'US'"
+    }
+  ],
+  "parameters": {
+    "feature_enhanced_predictions": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "conditionalValues": {
+        "premium_users": {
+          "value": "true"
+        },
+        "beta_testers": {
+          "value": "true"
+        }
+      },
+      "description": "Enable enhanced predictions feature",
+      "valueType": "BOOLEAN"
+    },
+    "feature_live_odds": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Enable live odds updates",
+      "valueType": "BOOLEAN"
+    },
+    "feature_social_sharing": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Enable social sharing features",
+      "valueType": "BOOLEAN"
+    },
+    "feature_dark_mode": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Enable dark mode option",
+      "valueType": "BOOLEAN"
+    },
+    "feature_push_notifications": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "conditionalValues": {
+        "ios": {
+          "value": "true"
+        },
+        "android": {
+          "value": "true"
+        },
+        "web": {
+          "value": "false"
+        }
+      },
+      "description": "Enable push notifications",
+      "valueType": "BOOLEAN"
+    },
+    "feature_ai_insights": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "conditionalValues": {
+        "premium_users": {
+          "value": "true"
+        }
+      },
+      "description": "Enable AI insights feature",
+      "valueType": "BOOLEAN"
+    },
+    "feature_us_only_payments": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Restrict payments to US users only",
+      "valueType": "BOOLEAN"
+    },
+    "api_request_timeout": {
+      "defaultValue": {
+        "value": "30000"
+      },
+      "conditionalValues": {
+        "ios": {
+          "value": "30000"
+        },
+        "android": {
+          "value": "30000"
+        },
+        "web": {
+          "value": "60000"
+        }
+      },
+      "description": "API request timeout in milliseconds",
+      "valueType": "NUMBER"
+    },
+    "cache_ttl": {
+      "defaultValue": {
+        "value": "3600"
+      },
+      "description": "Cache time-to-live in seconds",
+      "valueType": "NUMBER"
+    },
+    "max_predictions_per_day": {
+      "defaultValue": {
+        "value": "10"
+      },
+      "conditionalValues": {
+        "premium_users": {
+          "value": "50"
+        }
+      },
+      "description": "Maximum number of predictions per day",
+      "valueType": "NUMBER"
+    },
+    "maintenance_mode": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "Enable maintenance mode",
+      "valueType": "BOOLEAN"
+    },
+    "maintenance_message": {
+      "defaultValue": {
+        "value": "We're currently performing maintenance. Please check back soon."
+      },
+      "description": "Message to display during maintenance",
+      "valueType": "STRING"
+    },
+    "app_theme": {
+      "defaultValue": {
+        "value": "{\"primaryColor\":\"#007bff\",\"secondaryColor\":\"#6c757d\",\"accentColor\":\"#28a745\",\"backgroundColor\":\"#f8f9fa\",\"textColor\":\"#212529\"}"
+      },
+      "description": "Application theme configuration",
+      "valueType": "JSON"
+    },
+    "sports_config": {
+      "defaultValue": {
+        "value": "{\"featured\":[\"nfl\",\"nba\",\"mlb\"],\"enabled\":[\"nfl\",\"nba\",\"mlb\",\"nhl\",\"soccer\",\"tennis\",\"golf\"],\"disabled\":[]}"
+      },
+      "description": "Sports configuration",
+      "valueType": "JSON"
+    },
+    "odds_refresh_interval": {
+      "defaultValue": {
+        "value": "60"
+      },
+      "conditionalValues": {
+        "premium_users": {
+          "value": "30"
+        }
+      },
+      "description": "Odds refresh interval in seconds",
+      "valueType": "NUMBER"
+    },
+    "analytics_sample_rate": {
+      "defaultValue": {
+        "value": "0.1"
+      },
+      "conditionalValues": {
+        "beta_testers": {
+          "value": "1.0"
+        }
+      },
+      "description": "Analytics sampling rate (0.0-1.0)",
+      "valueType": "NUMBER"
+    },
+    "min_required_app_version_ios": {
+      "defaultValue": {
+        "value": "1.0.0"
+      },
+      "description": "Minimum required iOS app version",
+      "valueType": "STRING"
+    },
+    "min_required_app_version_android": {
+      "defaultValue": {
+        "value": "1.0.0"
+      },
+      "description": "Minimum required Android app version",
+      "valueType": "STRING"
+    },
+    "payment_providers": {
+      "defaultValue": {
+        "value": "{\"stripe\":true,\"apple\":true,\"google\":true}"
+      },
+      "conditionalValues": {
+        "ios": {
+          "value": "{\"stripe\":true,\"apple\":true,\"google\":false}"
+        },
+        "android": {
+          "value": "{\"stripe\":true,\"apple\":false,\"google\":true}"
+        },
+        "web": {
+          "value": "{\"stripe\":true,\"apple\":false,\"google\":false}"
+        }
+      },
+      "description": "Enabled payment providers",
+      "valueType": "JSON"
+    },
+    "subscription_tiers": {
+      "defaultValue": {
+        "value": "{\"basic\":{\"price\":9.99,\"features\":[\"basic_predictions\",\"odds_comparison\"]},\"premium\":{\"price\":19.99,\"features\":[\"enhanced_predictions\",\"ai_insights\",\"unlimited_odds\"]},\"pro\":{\"price\":29.99,\"features\":[\"enhanced_predictions\",\"ai_insights\",\"unlimited_odds\",\"expert_picks\",\"priority_support\"]}}"
+      },
+      "description": "Subscription tier configuration",
+      "valueType": "JSON"
+    },
+    "api_endpoints": {
+      "defaultValue": {
+        "value": "{\"odds\":\"https://api.ai-sports-edge.com/v1/odds\",\"predictions\":\"https://api.ai-sports-edge.com/v1/predictions\",\"user\":\"https://api.ai-sports-edge.com/v1/user\"}"
+      },
+      "description": "API endpoint configuration",
+      "valueType": "JSON"
+    }
+  },
+  "version": {
+    "versionNumber": "1",
+    "updateTime": "2025-03-24T12:00:00Z",
+    "updateUser": {
+      "email": "admin@ai-sports-edge.com"
+    },
+    "description": "Initial production configuration"
+  }
+}

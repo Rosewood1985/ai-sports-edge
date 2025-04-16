@@ -3,8 +3,21 @@
  * Handles onboarding state and analytics
  */
 
-// Local storage key for onboarding status
-const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
+import { trackEvent, trackOnboardingStarted, trackOnboardingStep, trackOnboardingCompleted } from './analyticsService';
+
+// Configuration options
+const BYPASS_ONBOARDING_IN_DEV = false; // Set to true only when needed for testing
+
+// Local storage key for onboarding status with a unique prefix to avoid conflicts
+const ONBOARDING_COMPLETED_KEY = 'ai_sports_edge_onboarding_completed';
+
+// Helper function to sanitize values for XSS prevention
+const sanitizeValue = (value) => {
+  if (typeof value === 'string') {
+    return value.replace(/[<>]/g, '');
+  }
+  return value;
+};
 
 /**
  * Check if onboarding has been completed
@@ -12,13 +25,32 @@ const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
  */
 export const isOnboardingCompleted = async () => {
   try {
+    // For development purposes, optionally bypass onboarding
+    // This makes it easier to test the app without going through onboarding
+    const isDevelopment = window.location.hostname === 'localhost' ||
+                          window.location.hostname === '127.0.0.1';
+    
+    if (isDevelopment && BYPASS_ONBOARDING_IN_DEV) {
+      console.log('Development mode: Onboarding bypassed');
+      return true;
+    }
+    
     // Use a try-catch block to handle potential localStorage access issues
     // This can happen in private browsing mode or when storage is full
     const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
     
     // Validate the value to prevent unexpected behavior
     if (completed !== 'true' && completed !== null) {
-      console.warn('Invalid onboarding status value:', completed);
+      // Check for potential XSS attempts in the stored value
+      if (completed && (completed.includes('<') || completed.includes('>'))) {
+        console.warn('Potentially malicious onboarding status value detected:', sanitizeValue(completed));
+        // Reset to a valid state and clear the suspicious value
+        localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
+        localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
+        return false;
+      }
+      
+      console.warn('Invalid onboarding status value:', sanitizeValue(completed));
       // Reset to a valid state
       localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
       return false;
@@ -44,6 +76,16 @@ export const markOnboardingCompleted = async () => {
       return false;
     }
     
+    // Try to use more secure storage if available
+    if (window.sessionStorage) {
+      try {
+        // Store a backup in sessionStorage in case localStorage fails
+        sessionStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+      } catch (sessionError) {
+        console.warn('Failed to use sessionStorage as backup:', sessionError);
+      }
+    }
+    
     // Set the value with proper error handling
     localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
     
@@ -56,13 +98,7 @@ export const markOnboardingCompleted = async () => {
     
     // Track onboarding completion with analytics
     try {
-      if (window.gtag) {
-        window.gtag('event', 'onboarding_completed', {
-          'event_category': 'engagement',
-          'event_label': 'onboarding',
-          'timestamp': new Date().toISOString(),
-        });
-      }
+      await trackOnboardingCompleted();
     } catch (analyticsError) {
       // Don't let analytics errors affect the main functionality
       console.warn('Analytics error:', analyticsError);
@@ -71,6 +107,20 @@ export const markOnboardingCompleted = async () => {
     return true;
   } catch (error) {
     console.error('Error marking onboarding as completed:', error);
+    
+    // Try to use the backup from sessionStorage if localStorage failed
+    if (window.sessionStorage) {
+      try {
+        const backupValue = sessionStorage.getItem(ONBOARDING_COMPLETED_KEY);
+        if (backupValue === 'true') {
+          console.log('Using sessionStorage backup for onboarding status');
+          return true;
+        }
+      } catch (sessionError) {
+        console.warn('Failed to read from sessionStorage backup:', sessionError);
+      }
+    }
+    
     // Return false instead of throwing to prevent app crashes
     return false;
   }
@@ -78,33 +128,56 @@ export const markOnboardingCompleted = async () => {
 
 /**
  * Reset onboarding status (for testing)
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} True if successful, false otherwise
  */
 export const resetOnboardingStatus = async () => {
   try {
+    // Remove from localStorage
     localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
+    
+    // Also remove from sessionStorage if it exists
+    if (window.sessionStorage) {
+      try {
+        sessionStorage.removeItem(ONBOARDING_COMPLETED_KEY);
+      } catch (sessionError) {
+        console.warn('Failed to remove from sessionStorage:', sessionError);
+      }
+    }
+    
+    // Verify removal
+    const verifyValue = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
+    if (verifyValue !== null) {
+      console.error('Failed to reset onboarding status');
+      return false;
+    }
+    
+    return true;
   } catch (error) {
     console.error('Error resetting onboarding status:', error);
-    throw error;
+    return false;
   }
 };
 
 /**
  * Initialize onboarding analytics
  * @param {number} totalSteps - Total number of onboarding steps
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} - True if successful, false otherwise
  */
 export const initOnboardingAnalytics = async (totalSteps) => {
   try {
-    if (window.gtag) {
-      window.gtag('event', 'onboarding_started', {
-        'event_category': 'engagement',
-        'event_label': 'onboarding',
-        'total_steps': totalSteps,
-      });
+    // Input validation
+    if (!Number.isInteger(totalSteps) || totalSteps <= 0 || totalSteps > 100) {
+      console.error('Invalid totalSteps value:', totalSteps);
+      return false;
     }
+    
+    // Track onboarding started event using the new analytics service
+    await trackOnboardingStarted(totalSteps);
+    
+    return true;
   } catch (error) {
     console.error('Error initializing onboarding analytics:', error);
+    return false;
   }
 };
 
@@ -112,20 +185,31 @@ export const initOnboardingAnalytics = async (totalSteps) => {
  * Update onboarding progress
  * @param {number} currentStep - Current step index (1-based)
  * @param {number} totalSteps - Total number of steps
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} - True if successful, false otherwise
  */
 export const updateOnboardingProgress = async (currentStep, totalSteps) => {
   try {
-    if (window.gtag) {
-      window.gtag('event', 'onboarding_step', {
-        'event_category': 'engagement',
-        'event_label': `step_${currentStep}`,
-        'current_step': currentStep,
-        'total_steps': totalSteps,
-        'progress_percentage': Math.round((currentStep / totalSteps) * 100),
-      });
+    // Input validation
+    if (!Number.isInteger(currentStep) || currentStep <= 0 || currentStep > 100) {
+      console.error('Invalid currentStep value:', currentStep);
+      return false;
     }
+    
+    if (!Number.isInteger(totalSteps) || totalSteps <= 0 || totalSteps > 100) {
+      console.error('Invalid totalSteps value:', totalSteps);
+      return false;
+    }
+    
+    if (currentStep > totalSteps) {
+      console.error('currentStep cannot be greater than totalSteps');
+      return false;
+    }
+    
+    // Track onboarding step event using the new analytics service
+    await trackOnboardingStep(currentStep, totalSteps);
+    return true;
   } catch (error) {
     console.error('Error updating onboarding progress:', error);
+    return false;
   }
 };

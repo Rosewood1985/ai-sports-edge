@@ -413,11 +413,10 @@ class OddsService {
         }
       }
       
-      // If we couldn't determine the sport, try all sports
+      // If we couldn't determine the sport, return empty array
       if (!sportKey) {
-        // For teams like Yankees, Giants, etc. that aren't in our supported sports
-        // Return simulated data since we don't have real odds for these teams
-        return this.generateSimulatedTeamOdds(teamName);
+        console.log(`Could not determine sport for team: ${teamName}`);
+        return [];
       }
       
       // Get odds for the determined sport
@@ -479,66 +478,13 @@ class OddsService {
       });
     } catch (error) {
       console.error(`Error getting odds for team ${teamName}:`, error);
-      // Fall back to simulated data
-      return this.generateSimulatedTeamOdds(teamName);
+      // Return empty array instead of simulated data
+      console.error(`Error getting odds for team ${teamName}, returning empty array`);
+      return [];
     }
   }
   
-  /**
-   * Generate simulated odds data for a team
-   * @param {string} teamName - Team name
-   * @returns {Array} Simulated odds data
-   */
-  generateSimulatedTeamOdds(teamName) {
-    // Generate a realistic opponent
-    const rivalries = {
-      'Yankees': ['Red Sox', 'Rays'],
-      'Mets': ['Phillies', 'Braves'],
-      'Giants': ['Eagles', 'Cowboys'],
-      'Jets': ['Patriots', 'Dolphins'],
-      'Knicks': ['Celtics', 'Heat'],
-      'Nets': ['76ers', 'Raptors'],
-      'Rangers': ['Islanders', 'Devils'],
-      'Lakers': ['Clippers', 'Warriors'],
-      'Dodgers': ['Giants', 'Padres'],
-      'Celtics': ['Lakers', 'Heat'],
-      'Cowboys': ['Eagles', 'Giants'],
-      'Warriors': ['Lakers', 'Suns']
-    };
-    
-    let opponent = 'Opponent';
-    for (const [team, rivals] of Object.entries(rivalries)) {
-      if (teamName.includes(team)) {
-        opponent = rivals[Math.floor(Math.random() * rivals.length)];
-        break;
-      }
-    }
-    
-    // Generate realistic odds
-    const isPopular = teamName.includes('Yankees') ||
-                      teamName.includes('Lakers') ||
-                      teamName.includes('Cowboys');
-    
-    const baseOdds = isPopular ? 1.8 : 2.2;
-    const randomFactor = 0.9 + (Math.random() * 0.4);
-    const odds = baseOdds * randomFactor;
-    
-    // Generate suggestion based on odds
-    const suggestion = odds < 2.0 ? 'bet' : 'avoid';
-    
-    // Generate a future date for the game
-    const gameDate = new Date();
-    gameDate.setDate(gameDate.getDate() + Math.floor(Math.random() * 7) + 1);
-    
-    return [{
-      team: teamName,
-      game: `${teamName} vs. ${opponent}`,
-      odds: odds,
-      suggestion: suggestion,
-      timestamp: new Date().toISOString(),
-      startTime: gameDate
-    }];
-  }
+  // Method removed: generateSimulatedTeamOdds - No longer needed for production
 }
 
 // Export singleton instance

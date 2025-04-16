@@ -1,316 +1,69 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { StyleSheet, View, StatusBar, Platform } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import Colors from '../constants/Colors';
+import theme from '../styles/theme'; // Import the centralized theme object
+import { useTheme as useAppTheme } from '../contexts/ThemeContext'; // Alias to avoid naming conflict
 
-// Define UI theme types
-export type UIThemeType = 'default' | 'neon' | 'minimal' | 'classic';
-
-// Define UI theme context
+// Define the structure of the theme context
+// It will now provide the whole theme object
 interface UIThemeContextType {
-  uiTheme: UIThemeType;
-  setUITheme: (theme: UIThemeType) => void;
-  cardStyle: any;
-  buttonStyle: any;
-  textStyle: any;
-  headerStyle: any;
-  shadowStyle: any;
-  spacing: {
-    xs: number;
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-  };
-  borderRadius: {
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    round: number;
-  };
+  theme: typeof theme;
+  isDark: boolean; // Keep providing light/dark status if needed elsewhere
 }
 
-// Create UI theme context
+// Create UI theme context with default values matching the theme structure
 const UIThemeContext = createContext<UIThemeContextType>({
-  uiTheme: 'default',
-  setUITheme: () => {},
-  cardStyle: {},
-  buttonStyle: {},
-  textStyle: {},
-  headerStyle: {},
-  shadowStyle: {},
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-  },
-  borderRadius: {
-    sm: 4,
-    md: 8,
-    lg: 12,
-    xl: 16,
-    round: 9999,
-  },
+  theme: theme, // Provide the imported theme as default
+  isDark: true, // Assume dark mode default for context structure
 });
 
 // UI Theme Provider props
 interface UIThemeProviderProps {
   children: React.ReactNode;
-  initialTheme?: UIThemeType;
 }
 
 /**
- * UIThemeProvider component for consistent UI styling
+ * UIThemeProvider component - Simplified to provide a single, centralized theme.
  */
-export const UIThemeProvider: React.FC<UIThemeProviderProps> = ({
-  children,
-  initialTheme = 'neon',
-}) => {
-  // State for UI theme
-  const [uiTheme, setUITheme] = useState<UIThemeType>(initialTheme);
-  
-  // Get app theme (light/dark)
-  const { isDark } = useTheme();
-  
-  // Define spacing and border radius (consistent across themes)
-  const spacing = {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-  };
-  
-  const borderRadius = {
-    sm: 4,
-    md: 8,
-    lg: 12,
-    xl: 16,
-    round: 9999,
-  };
-  
-  // Get theme-specific styles
-  const getThemeStyles = () => {
-    switch (uiTheme) {
-      case 'neon':
-        return {
-          cardStyle: {
-            backgroundColor: isDark ? '#1A1A1A' : '#FFFFFF',
-            borderRadius: borderRadius.lg,
-            padding: spacing.md,
-            marginBottom: spacing.md,
-            borderWidth: 1,
-            borderColor: isDark ? '#333333' : '#E0E0E0',
-            ...styles.neonShadow,
-          },
-          buttonStyle: {
-            backgroundColor: Colors.neon.blue,
-            borderRadius: borderRadius.md,
-            paddingVertical: spacing.sm,
-            paddingHorizontal: spacing.md,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-          },
-          textStyle: {
-            color: isDark ? '#FFFFFF' : '#333333',
-            fontSize: 16,
-          },
-          headerStyle: {
-            backgroundColor: isDark ? '#121212' : '#F8F8F8',
-            borderBottomWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          shadowStyle: styles.neonShadow,
-        };
-      case 'minimal':
-        return {
-          cardStyle: {
-            backgroundColor: isDark ? '#121212' : '#FFFFFF',
-            borderRadius: borderRadius.sm,
-            padding: spacing.md,
-            marginBottom: spacing.md,
-            ...styles.minimalShadow,
-          },
-          buttonStyle: {
-            backgroundColor: isDark ? '#333333' : '#F0F0F0',
-            borderRadius: borderRadius.sm,
-            paddingVertical: spacing.sm,
-            paddingHorizontal: spacing.md,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-          },
-          textStyle: {
-            color: isDark ? '#FFFFFF' : '#333333',
-            fontSize: 16,
-          },
-          headerStyle: {
-            backgroundColor: isDark ? '#121212' : '#FFFFFF',
-            borderBottomWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          shadowStyle: styles.minimalShadow,
-        };
-      case 'classic':
-        return {
-          cardStyle: {
-            backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
-            borderRadius: borderRadius.md,
-            padding: spacing.md,
-            marginBottom: spacing.md,
-            borderWidth: 1,
-            borderColor: isDark ? '#333333' : '#E0E0E0',
-            ...styles.classicShadow,
-          },
-          buttonStyle: {
-            backgroundColor: isDark ? '#3498db' : '#3498db',
-            borderRadius: borderRadius.md,
-            paddingVertical: spacing.sm,
-            paddingHorizontal: spacing.md,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-          },
-          textStyle: {
-            color: isDark ? '#FFFFFF' : '#333333',
-            fontSize: 16,
-          },
-          headerStyle: {
-            backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
-            borderBottomWidth: 1,
-            borderBottomColor: isDark ? '#333333' : '#E0E0E0',
-          },
-          shadowStyle: styles.classicShadow,
-        };
-      default: // default theme
-        return {
-          cardStyle: {
-            backgroundColor: isDark ? '#1A1A1A' : '#FFFFFF',
-            borderRadius: borderRadius.md,
-            padding: spacing.md,
-            marginBottom: spacing.md,
-            ...styles.defaultShadow,
-          },
-          buttonStyle: {
-            backgroundColor: '#3498db',
-            borderRadius: borderRadius.md,
-            paddingVertical: spacing.sm,
-            paddingHorizontal: spacing.md,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-          },
-          textStyle: {
-            color: isDark ? '#FFFFFF' : '#333333',
-            fontSize: 16,
-          },
-          headerStyle: {
-            backgroundColor: isDark ? '#1A1A1A' : '#FFFFFF',
-            borderBottomWidth: 1,
-            borderBottomColor: isDark ? '#333333' : '#E0E0E0',
-          },
-          shadowStyle: styles.defaultShadow,
-        };
-    }
-  };
-  
-  // Get current theme styles
-  const themeStyles = getThemeStyles();
-  
-  // Update StatusBar based on theme
+export const UIThemeProvider: React.FC<UIThemeProviderProps> = ({ children }) => {
+  // Get app theme (light/dark) status if needed for conditional logic elsewhere
+  // Note: Our theme object itself is currently hardcoded to dark mode values
+  const { isDark } = useAppTheme();
+
+  // Update StatusBar based on the centralized theme
   useEffect(() => {
-    let statusBarBgColor;
-    
-    // Set status bar background color based on theme
-    switch (uiTheme) {
-      case 'neon':
-        statusBarBgColor = isDark ? '#121212' : '#F8F8F8';
-        break;
-      case 'minimal':
-        statusBarBgColor = isDark ? '#121212' : '#FFFFFF';
-        break;
-      case 'classic':
-        statusBarBgColor = isDark ? '#1E1E1E' : '#FFFFFF';
-        break;
-      default: // default theme
-        statusBarBgColor = isDark ? '#1A1A1A' : '#FFFFFF';
-        break;
-    }
-    
+    // Use colors directly from the imported theme object
+    const statusBarBgColor = theme.colors.primaryBackground; // Or surfaceBackground depending on header style
+    const barStyle = isDark ? 'light-content' : 'dark-content'; // Keep this dynamic if light mode is ever added
+
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(statusBarBgColor);
     }
-    StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
-  }, [isDark, uiTheme]);
-  
+    StatusBar.setBarStyle(barStyle);
+  }, [isDark]); // Dependency on isDark remains if barStyle needs to change
+
   return (
     <UIThemeContext.Provider
       value={{
-        uiTheme,
-        setUITheme,
-        ...themeStyles,
-        spacing,
-        borderRadius,
+        theme: theme, // Provide the full theme object
+        isDark: isDark,
       }}
     >
-      <View style={{ flex: 1 }}>
+      {/* Apply base background color if desired, or handle in screen components */}
+      <View style={{ flex: 1, backgroundColor: theme.colors.primaryBackground }}>
         {children}
       </View>
     </UIThemeContext.Provider>
   );
 };
 
-// Custom hook to use UI theme
+// Custom hook to use the simplified UI theme context
 export const useUITheme = () => useContext(UIThemeContext);
 
-// Styles
+// Local styles can be kept if needed for platform-specific overrides or non-theme styles
+// Removed theme-specific shadow styles as shadows are now in theme.ts
 const styles = StyleSheet.create({
-  defaultShadow: Platform.OS === 'ios'
-    ? {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      }
-    : {
-        elevation: 3,
-      },
-  neonShadow: Platform.OS === 'ios'
-    ? {
-        shadowColor: Colors.neon.blue,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      }
-    : {
-        elevation: 4,
-      },
-  minimalShadow: Platform.OS === 'ios'
-    ? {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-      }
-    : {
-        elevation: 1,
-      },
-  classicShadow: Platform.OS === 'ios'
-    ? {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.15,
-        shadowRadius: 5,
-      }
-    : {
-        elevation: 4,
-      },
+  // Add any necessary non-theme related styles here
 });
 
+// Export the context itself if needed for direct consumption without the hook
 export default UIThemeContext;

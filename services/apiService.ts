@@ -1,12 +1,15 @@
 /**
  * API Service
- * 
+ *
  * This service handles all API requests to the backend.
  * It includes error handling, caching, and retry logic.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from '../config/firebase';
+import { getAuth, Auth } from 'firebase/auth';
+import { info, error as logError, LogCategory } from './loggingService';
+import { safeErrorCapture } from './errorUtils';
+import { Platform } from 'react-native';
 
 // API base URL
 const API_BASE_URL = 'https://api.aisportsedge.com/v1';
@@ -85,6 +88,10 @@ const getCsrfToken = async (): Promise<string> => {
  * @returns Headers object with authentication token and CSRF token for non-GET requests
  */
 const getAuthHeaders = async (method: string = 'GET'): Promise<Record<string, string>> => {
+  console.log(`apiService: Getting auth headers for ${method} request`);
+  info(LogCategory.API, 'Getting authentication headers', { method });
+  
+  const auth = getAuth();
   const user = auth.currentUser;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -92,14 +99,37 @@ const getAuthHeaders = async (method: string = 'GET'): Promise<Record<string, st
   
   // Add authentication token if user is logged in
   if (user) {
-    const token = await user.getIdToken();
-    headers['Authorization'] = `Bearer ${token}`;
+    try {
+      console.log(`apiService: Getting ID token for user ${user.uid}`);
+      const token = await user.getIdToken();
+      headers['Authorization'] = `Bearer ${token}`;
+      console.log('apiService: Successfully added auth token to headers');
+      info(LogCategory.API, 'Added authentication token to headers', { userId: user.uid });
+    } catch (error) {
+      console.error('apiService: Error getting ID token:', error);
+      logError(LogCategory.API, 'Failed to get authentication token', error as Error);
+      safeErrorCapture(error as Error);
+      // Continue without auth token
+    }
+  } else {
+    console.log('apiService: No authenticated user found');
+    info(LogCategory.API, 'No authenticated user for request');
   }
   
   // Add CSRF token for non-GET requests
   if (method !== 'GET') {
-    const csrfToken = await getCsrfToken();
-    headers['X-CSRF-Token'] = csrfToken;
+    try {
+      console.log('apiService: Getting CSRF token for non-GET request');
+      const csrfToken = await getCsrfToken();
+      headers['X-CSRF-Token'] = csrfToken;
+      console.log('apiService: Successfully added CSRF token to headers');
+      info(LogCategory.API, 'Added CSRF token to headers');
+    } catch (error) {
+      console.error('apiService: Error getting CSRF token:', error);
+      logError(LogCategory.API, 'Failed to get CSRF token', error as Error);
+      safeErrorCapture(error as Error);
+      // Continue without CSRF token
+    }
   }
   
   return headers;
@@ -201,17 +231,34 @@ const makeRequest = async <T>(
   options: RequestInit = {},
   retries = 3
 ): Promise<T> => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const method = options.method || 'GET';
+  
+  console.log(`apiService: Making ${method} request to ${endpoint}`);
+  info(LogCategory.API, `Making ${method} request`, { endpoint, method });
+  
+  const startTime = Date.now();
+  
   try {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const method = options.method || 'GET';
+    // Get authentication headers
     const headers = await getAuthHeaders(method);
     
+    // Make the request
+    console.log(`apiService: Fetching ${url}`);
     const response = await fetch(url, {
       ...options,
       headers: {
         ...headers,
         ...options.headers,
       },
+    });
+    
+    const responseTime = Date.now() - startTime;
+    console.log(`apiService: Response received in ${responseTime}ms with status ${response.status}`);
+    info(LogCategory.API, 'Response received', {
+      endpoint,
+      status: response.status,
+      responseTime
     });
     
     // Handle HTTP errors
@@ -244,53 +291,93 @@ const makeRequest = async <T>(
           break;
       }
       
+      console.error(`apiService: HTTP error ${response.status} (${errorType}): ${errorMessage}`);
+      
       // Try to get error message from response
       try {
         const errorData = await response.json();
         if (errorData.message) {
           errorMessage = errorData.message;
+          console.error(`apiService: Error message from server: ${errorMessage}`);
         }
       } catch (e) {
+        console.error('apiService: Could not parse error response as JSON');
         // Ignore JSON parsing errors
       }
       
-      throw new ApiError(errorMessage, errorType, response.status);
+      const apiError = new ApiError(errorMessage, errorType, response.status);
+      logError(LogCategory.API, `HTTP error ${response.status} (${errorType})`, apiError);
+      safeErrorCapture(apiError);
+      throw apiError;
     }
     
     // Parse JSON response
-    const data = await response.json();
-    return data as T;
+    console.log('apiService: Parsing JSON response');
+    try {
+      const data = await response.json();
+      console.log(`apiService: Successfully parsed response for ${endpoint}`);
+      return data as T;
+    } catch (parseError) {
+      console.error(`apiService: Error parsing JSON response: ${parseError}`);
+      logError(LogCategory.API, 'Error parsing JSON response', parseError as Error);
+      safeErrorCapture(parseError as Error);
+      throw new ApiError(
+        'Invalid JSON response from server',
+        ApiErrorType.SERVER
+      );
+    }
   } catch (error) {
+    const responseTime = Date.now() - startTime;
+    
     // Handle network errors with retry
     if (
       (error instanceof TypeError && error.message.includes('Network request failed')) ||
       (error instanceof ApiError && error.type === ApiErrorType.SERVER)
     ) {
+      console.error(`apiService: Network or server error: ${error.message}`);
+      logError(LogCategory.API, 'Network or server error', error as Error);
+      
       if (retries > 0) {
         // Exponential backoff
         const delay = 1000 * Math.pow(2, 3 - retries);
+        console.log(`apiService: Retrying request in ${delay}ms (${retries} retries left)`);
+        info(LogCategory.API, 'Retrying request after error', {
+          endpoint,
+          retriesLeft: retries,
+          delay
+        });
+        
         await new Promise<void>(resolve => setTimeout(resolve, delay));
         
         // Retry the request
         return makeRequest<T>(endpoint, options, retries - 1);
       }
       
-      throw new ApiError(
+      console.error(`apiService: Request failed after multiple retries: ${endpoint}`);
+      const maxRetriesError = new ApiError(
         'Network request failed after multiple retries',
         ApiErrorType.NETWORK
       );
+      logError(LogCategory.API, 'Request failed after maximum retries', maxRetriesError);
+      safeErrorCapture(maxRetriesError);
+      throw maxRetriesError;
     }
     
     // Re-throw API errors
     if (error instanceof ApiError) {
+      console.error(`apiService: API error (${error.type}): ${error.message}`);
       throw error;
     }
     
     // Handle other errors
-    throw new ApiError(
+    console.error(`apiService: Unexpected error: ${error}`);
+    const unexpectedError = new ApiError(
       error instanceof Error ? error.message : 'Unknown error',
       ApiErrorType.UNKNOWN
     );
+    logError(LogCategory.API, 'Unexpected error during API request', error as Error);
+    safeErrorCapture(error as Error);
+    throw unexpectedError;
   }
 };
 
@@ -430,29 +517,75 @@ export const purchaseMicrotransaction = async (
   productId: string,
   paymentMethodId: string
 ): Promise<any> => {
-  const user = auth.currentUser;
+  console.log(`apiService: Initiating purchase for product ${productId}`);
+  info(LogCategory.API, 'Initiating microtransaction purchase', { productId });
   
-  if (!user) {
-    throw new ApiError('User not authenticated', ApiErrorType.AUTH);
-  }
-  
-  // Generate idempotency key to prevent duplicate charges
-  const idempotencyKey = `${user.uid}_${productId}_${Date.now()}`;
-  
-  // Make API request
-  const data = await makeRequest<{ purchase: any }>(
-    '/purchases',
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        productId,
-        paymentMethodId,
-        idempotencyKey,
-      }),
+  try {
+    // Check network connectivity first
+    const networkState = await Platform.select({
+      web: Promise.resolve({ isConnected: true }),
+      default: Promise.resolve({ isConnected: true }) // In a real app, use NetInfo.fetch()
+    });
+    
+    if (!networkState.isConnected) {
+      console.error('apiService: Network unavailable for purchase');
+      const error = new ApiError('Network unavailable', ApiErrorType.NETWORK);
+      logError(LogCategory.API, 'Network unavailable for purchase', error);
+      safeErrorCapture(error);
+      throw error;
     }
-  );
-  
-  return data.purchase;
+    
+    const auth = getAuth();
+    const user = auth.currentUser;
+    
+    if (!user) {
+      console.error('apiService: User not authenticated for purchase');
+      const error = new ApiError('User not authenticated', ApiErrorType.AUTH);
+      logError(LogCategory.API, 'User not authenticated for purchase', error);
+      safeErrorCapture(error);
+      throw error;
+    }
+    
+    console.log(`apiService: User ${user.uid} authenticated for purchase`);
+    info(LogCategory.API, 'User authenticated for purchase', { userId: user.uid });
+    
+    // Generate idempotency key to prevent duplicate charges
+    const idempotencyKey = `${user.uid}_${productId}_${Date.now()}`;
+    console.log(`apiService: Generated idempotency key: ${idempotencyKey}`);
+    
+    // Make API request
+    console.log('apiService: Sending purchase request to API');
+    const data = await makeRequest<{ purchase: any }>(
+      '/purchases',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          productId,
+          paymentMethodId,
+          idempotencyKey,
+        }),
+      }
+    );
+    
+    console.log(`apiService: Purchase successful for product ${productId}`);
+    info(LogCategory.API, 'Microtransaction purchase successful', {
+      productId,
+      purchaseId: data.purchase.id
+    });
+    
+    return data.purchase;
+  } catch (error) {
+    console.error(`apiService: Purchase failed for product ${productId}:`, error);
+    
+    if (error instanceof ApiError) {
+      logError(LogCategory.API, `Purchase failed with API error (${error.type})`, error);
+    } else {
+      logError(LogCategory.API, 'Purchase failed with unknown error', error as Error);
+    }
+    
+    safeErrorCapture(error as Error);
+    throw error;
+  }
 };
 
 export default {

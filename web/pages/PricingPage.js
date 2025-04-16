@@ -6,28 +6,38 @@ import BetNowButton from '../components/BetNowButton';
 import { useBettingAffiliate } from '../../contexts/BettingAffiliateContext';
 import { SUBSCRIPTION_PLANS, getMonthlyPlans, getYearlyPlans, getGroupPlan } from '../services/subscriptionService';
 
-const PricingPage = () => {
+const PricingPage = ({ groupSubscription = false }) => {
   const { showBetButton } = useBettingAffiliate();
   const location = useLocation();
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [annualPlan, setAnnualPlan] = useState(null);
   const [groupPlan, setGroupPlan] = useState(null);
+  const [showGroupPlanOnly, setShowGroupPlanOnly] = useState(groupSubscription);
   
   useEffect(() => {
-    // Get monthly plans (excluding group plan)
-    const monthlyPlans = getMonthlyPlans().filter(plan => plan.id !== 'group-pro-monthly');
-    setSubscriptionPlans(monthlyPlans);
-    
-    // Get annual plan
-    const yearlyPlans = getYearlyPlans();
-    if (yearlyPlans.length > 0) {
-      setAnnualPlan(yearlyPlans[0]);
-    }
-    
-    // Get group plan
-    const group = getGroupPlan();
-    if (group) {
-      setGroupPlan(group);
+    if (groupSubscription) {
+      // If groupSubscription prop is true, only show the group plan
+      const group = getGroupPlan();
+      if (group) {
+        setGroupPlan(group);
+        setShowGroupPlanOnly(true);
+      }
+    } else {
+      // Get monthly plans (excluding group plan)
+      const monthlyPlans = getMonthlyPlans().filter(plan => plan.id !== 'group-pro-monthly');
+      setSubscriptionPlans(monthlyPlans);
+      
+      // Get annual plan
+      const yearlyPlans = getYearlyPlans();
+      if (yearlyPlans.length > 0) {
+        setAnnualPlan(yearlyPlans[0]);
+      }
+      
+      // Get group plan
+      const group = getGroupPlan();
+      if (group) {
+        setGroupPlan(group);
+      }
     }
     
     // Return a cleanup function that runs when the component unmounts
@@ -62,86 +72,92 @@ const PricingPage = () => {
       <section className="pricing-hero">
         <div className="container">
           <div className="pricing-hero-content">
-            <h1>Simple, Transparent Pricing</h1>
-            <p>Choose the plan that fits your betting strategy and budget.</p>
+            <h1>{showGroupPlanOnly ? "Group Subscription" : "Simple, Transparent Pricing"}</h1>
+            <p>{showGroupPlanOnly ?
+              "Share the winning edge with friends! All members must register within 24 hours for the deal to activate." :
+              "Choose the plan that fits your betting strategy and budget."}</p>
           </div>
         </div>
       </section>
       
-      <section className="pricing-plans">
-        <div className="container">
-          <div className="plans-grid">
-            {subscriptionPlans.map((plan, index) => (
-              <div 
-                key={plan.id} 
-                className={`plan-card ${plan.popular ? 'popular' : ''}`}
-              >
-                {plan.popular && <div className="popular-badge">Most Popular</div>}
-                <div className="plan-header">
-                  <h2 className="plan-name">{plan.name}</h2>
-                  <p className="plan-price">
-                    ${plan.price}<span>/{plan.interval}</span>
-                  </p>
-                </div>
-                <div className="plan-description">
-                  <p>{plan.description}</p>
-                </div>
-                <div className="plan-features">
-                  <ul>
-                    {plan.features.map((feature, i) => (
-                      <li key={i}>{feature}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="plan-cta">
-                  <Link 
-                    to="/download" 
-                    className={`button ${plan.popular ? 'primary-button' : 'secondary-button'}`}
+      {!showGroupPlanOnly && (
+        <>
+          <section className="pricing-plans">
+            <div className="container">
+              <div className="plans-grid">
+                {subscriptionPlans.map((plan, index) => (
+                  <div
+                    key={plan.id}
+                    className={`plan-card ${plan.popular ? 'popular' : ''}`}
                   >
-                    Get Started
-                  </Link>
-                  {showBetButton('pricing') && (
-                    <div className="plan-bet-button">
+                    {plan.popular && <div className="popular-badge">Most Popular</div>}
+                    <div className="plan-header">
+                      <h2 className="plan-name">{plan.name}</h2>
+                      <p className="plan-price">
+                        ${plan.price}<span>/{plan.interval}</span>
+                      </p>
+                    </div>
+                    <div className="plan-description">
+                      <p>{plan.description}</p>
+                    </div>
+                    <div className="plan-features">
+                      <ul>
+                        {plan.features.map((feature, i) => (
+                          <li key={i}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="plan-cta">
+                      <Link
+                        to="/download"
+                        className={`button ${plan.popular ? 'primary-button' : 'secondary-button'}`}
+                      >
+                        Get Started
+                      </Link>
+                      {showBetButton('pricing') && (
+                        <div className="plan-bet-button">
+                          <BetNowButton
+                            size="medium"
+                            position="inline"
+                            contentType="pricing"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+          
+          {annualPlan && (
+            <section className="annual-discount" id="annual-discount-section">
+              <div className="container">
+                <div className="discount-content">
+                  <h2>Save with our Annual Plan</h2>
+                  <p>Get {annualPlan.name} for ${annualPlan.price}/year and save compared to monthly billing.</p>
+                  <div className="discount-buttons">
+                    <Link to="/download" className="button primary-button">View Annual Plan</Link>
+                    {showBetButton('pricing') && (
                       <BetNowButton
-                        size="medium"
+                        size="large"
                         position="inline"
                         contentType="pricing"
                       />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {annualPlan && (
-        <section className="annual-discount" id="annual-discount-section">
-          <div className="container">
-            <div className="discount-content">
-              <h2>Save with our Annual Plan</h2>
-              <p>Get {annualPlan.name} for ${annualPlan.price}/year and save compared to monthly billing.</p>
-              <div className="discount-buttons">
-                <Link to="/download" className="button primary-button">View Annual Plan</Link>
-                {showBetButton('pricing') && (
-                  <BetNowButton
-                    size="large"
-                    position="inline"
-                    contentType="pricing"
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
+            </section>
+          )}
+        </>
       )}
       
       {groupPlan && (
         <section className="group-subscription" id="group-subscription-section">
           <div className="container">
             <div className="group-content">
-              <h2>Group Subscription</h2>
+              <h2>{showGroupPlanOnly ? "Group Subscription Details" : "Group Subscription"}</h2>
               <div className="group-plan-card">
                 <div className="group-plan-header">
                   <h3 className="group-plan-name">{groupPlan.name}</h3>
@@ -151,12 +167,15 @@ const PricingPage = () => {
                 </div>
                 <div className="group-plan-description">
                   <p>{groupPlan.description}</p>
+                  <p className="time-requirement"><strong>Important:</strong> All members must register within 24 hours for the group subscription to activate.</p>
                 </div>
                 <div className="group-plan-features">
                   <ul>
                     {groupPlan.features.map((feature, i) => (
                       <li key={i}>{feature}</li>
                     ))}
+                    <li className="highlight-feature">Split the cost between up to 3 people</li>
+                    <li className="highlight-feature">24-hour registration window for all members</li>
                   </ul>
                 </div>
                 <div className="group-plan-cta">

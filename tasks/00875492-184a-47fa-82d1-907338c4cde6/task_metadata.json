@@ -1,0 +1,76 @@
+{
+  "files_in_context": [
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775519495,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775525434,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775530543,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "aisportsedge-deploy/README.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775535841,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775541105,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "tasks/e9537057-9cc1-432a-afdc-a2b54ca12b53/ui_messages.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775558418,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/deployment-checklist.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775566565,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/deployment-process.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744775571770,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/ftp-deployment-checklist.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744775780422,
+      "roo_edit_date": 1744775780422,
+      "user_edit_date": null
+    }
+  ]
+}

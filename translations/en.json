@@ -1,400 +1,260 @@
 {
   "common": {
-    "success": "Success",
-    "error": "Error",
+    "app_name": "AI Sports Edge",
     "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
     "cancel": "Cancel",
-    "confirm": "Confirm",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
+    "close": "Close",
     "back": "Back",
     "next": "Next",
+    "done": "Done",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
     "ok": "OK",
-    "skip": "Skip",
-    "getStarted": "Get Started"
+    "continue": "Continue",
+    "not_authenticated": "You must be logged in to perform this action."
   },
-  "onboarding": {
-    "welcome": {
-      "title": "Welcome to AI Sports Edge",
-      "description": "Turn your sports knowledge into winning bets with the power of AI. Our users are beating the odds by up to 15% compared to traditional betting."
-    },
-    "aiPredictions": {
-      "title": "AI-Powered Predictions",
-      "description": "Our AI analyzes millions of data points to spot value bets that humans miss. See exactly where bookmakers have set odds that don't match real probabilities—giving you a statistical edge on every bet."
-    },
-    "liveOdds": {
-      "title": "Live Betting Odds",
-      "description": "Never miss the best odds again! Our real-time comparison shows you exactly where to place your bet for maximum returns. Users who follow our odds recommendations increase their potential winnings by an average of 12%."
-    },
-    "performance": {
-      "title": "Track Your Performance",
-      "description": "Watch your betting success grow! Track your performance against AI predictions, learn from personalized insights, and see your ROI increase over time. Users who follow our system consistently outperform their previous betting results."
-    },
-    "getStarted": {
-      "title": "Ready to Start?",
-      "description": "Ready to start winning smarter? Set up your personalized betting profile in just 2 minutes and make your next bet your best bet! Join thousands of bettors who are already using data to beat the bookmakers."
-    },
-    "completion": {
-      "title": "Onboarding Complete",
-      "message": "You can replay this feature tour anytime from Settings > App Tour & Help > Replay Feature Tour",
-      "gotIt": "Got it"
-    }
-  },
-  "featureTour": {
-    "title": "Feature Tour",
-    "loading": "Loading feature tour...",
-    "skipTour": "Skip Tour",
-    "next": "Next",
-    "finishTour": "Finish Tour",
-    "tryIt": "Try It",
-    "steps": {
-      "aiPredictions": {
-        "title": "Find Value Where Others Don't",
-        "description": "Our AI doesn't just predict winners—it finds VALUE. See exactly where the bookmakers have set odds that don't match the real probabilities.",
-        "hint": "Users who follow our AI picks see a 15% higher win rate on average."
-      },
-      "realTimeOdds": {
-        "title": "Never Miss the Best Odds Again",
-        "description": "Watch odds move in real-time across all major sportsbooks. Get alerts when there's value to be found.",
-        "hint": "Getting the best odds on every bet can increase your returns by up to 12% with no additional risk."
-      },
-      "performanceDashboard": {
-        "title": "Your Betting Command Center",
-        "description": "Track performance over time, see where you're making and losing money, and get AI-powered suggestions to improve.",
-        "hint": "Users who regularly check their dashboard improve their ROI by 8% on average."
-      },
-      "personalizedInsights": {
-        "title": "Your Personal Betting Analyst",
-        "description": "Receive custom insights based on your favorite teams, betting history, and preferences.",
-        "hint": "Personalized insights help users spot 23% more valuable betting opportunities."
-      },
-      "premiumFeatures": {
-        "title": "Unlock Your Maximum Advantage",
-        "description": "Preview our premium tools like parlay optimizers, prop bet analyzers, and weather impact analysis.",
-        "hint": "Premium users report 22% higher returns than betting on their own."
-      }
-    },
-    "completion": {
-      "title": "Tour Completed",
-      "message": "You've completed the feature tour! You can replay it anytime from Settings > App Tour & Help > Replay Feature Tour.",
-      "gotIt": "Got it"
-    },
-    "skip": {
-      "title": "Skip Tour",
-      "message": "Are you sure you want to skip the feature tour? You can replay it anytime from Settings.",
-      "cancel": "Cancel",
-      "skip": "Skip"
-    }
-  },
-  "settings": {
-    "title": "Settings",
-    "subtitle": "App settings and preferences",
-    "sections": {
-      "account": "Account",
-      "preferences": "Preferences",
-      "appTourHelp": "App Tour & Help",
-      "about": "About"
-    },
-    "items": {
-      "profile": "Profile",
-      "subscription": "Subscription",
-      "paymentMethods": "Payment Methods",
-      "notifications": "Notifications",
-      "personalization": "Personalization",
-      "accessibility": "Accessibility",
-      "offlineMode": "Offline Mode",
-      "replayFeatureTour": "Replay Feature Tour",
-      "replayFeatureTourDesc": "Take a guided tour of the app's features",
-      "helpCenter": "Help Center",
-      "helpCenterDesc": "FAQs, tutorials, and support",
-      "version": "Version",
-      "termsOfService": "Terms of Service",
-      "privacyPolicy": "Privacy Policy",
-      "licenses": "Licenses",
-      "logOut": "Log Out"
-    }
-  },
-  "weather": {
-    "loading": "Loading weather insights...",
-    "unavailable": "Weather data unavailable",
-    "expand": "Expand weather insights",
-    "collapse": "Collapse weather insights",
-    "feelsLike": "Feels Like",
-    "humidity": "Humidity",
-    "wind": "Wind",
-    "impact": "Weather Impact on {playerName}",
-    "noData": "No weather impact data available",
-    "confidence": "Confidence:",
-    "impact": {
-      "strongNegative": "Strong Negative",
-      "slightNegative": "Slight Negative",
-      "neutral": "Neutral",
-      "slightPositive": "Slight Positive",
-      "strongPositive": "Strong Positive"
-    }
-  },
-  "dashboard": {
-    "title": "Analytics Dashboard",
-    "tabs": {
-      "overview": "Overview",
-      "betting": "Betting",
-      "engagement": "Engagement",
-      "revenue": "Revenue"
-    },
-    "timePeriods": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "last7Days": "Last 7 Days",
-      "last30Days": "Last 30 Days",
-      "thisMonth": "This Month",
-      "lastMonth": "Last Month",
-      "custom": "Custom"
-    },
-    "metrics": {
-      "totalRevenue": "Total Revenue",
-      "totalBets": "Total Bets",
-      "winRate": "Win Rate",
-      "averageOdds": "Average Odds",
-      "profitMargin": "Profit Margin",
-      "roi": "ROI",
-      "dailyActiveUsers": "Daily Active Users",
-      "avgSession": "Avg. Session",
-      "totalUsers": "Total Users",
-      "conversionRate": "Conversion Rate"
-    },
-    "charts": {
-      "revenueOverTime": "Revenue Over Time",
-      "betsByType": "Bets by Type",
-      "winRateBySport": "Win Rate by Sport",
-      "profitByBetType": "Profit by Bet Type",
-      "bettingActivityHeatmap": "Betting Activity Heatmap",
-      "monthlyPerformance": "Monthly Performance",
-      "userEngagementOverTime": "User Engagement Over Time",
-      "platformDistribution": "Platform Distribution",
-      "featureUsage": "Feature Usage",
-      "userEngagementStats": "User Engagement Stats",
-      "revenueByType": "Revenue by Type",
-      "revenueTrend": "Revenue Trend",
-      "microtransactionPerformance": "Microtransaction Performance"
-    },
-    "labels": {
-      "profit": "Profit",
-      "winRate": "Win Rate",
-      "loading": "Loading chart...",
-      "loadingDashboard": "Loading dashboard data...",
-      "realTimeUpdates": "Real-time Updates",
-      "refresh": "Refresh",
-      "selectDateRange": "Select Date Range",
-      "apply": "Apply",
-      "cancel": "Cancel",
-      "from": "From",
-      "to": "To",
-      "monthlyActiveUsers": "Monthly Active Users",
-      "sessionsPerUser": "Sessions per User",
-      "churnRate": "Churn Rate",
-      "returningUsers": "Returning Users",
-      "impressions": "Impressions",
-      "clicks": "Clicks",
-      "purchases": "Purchases",
-      "revenue": "Revenue",
-      "clickRate": "Click Rate",
-      "conversionRate": "Conversion Rate"
-    },
-    "accessibility": {
-      "chartNavigation": "Use arrow keys to navigate between data points",
-      "chartDetails": "Press Enter or Space to hear details about the selected data point",
-      "heatmapSummary": "This heatmap shows activity frequency over time",
-      "bubbleChartSummary": "This bubble chart shows data points with varying sizes",
-      "lineChartSummary": "This line chart shows trends over time",
-      "barChartSummary": "This bar chart compares values across categories",
-      "pieChartSummary": "This pie chart shows the proportion of each category"
-    },
-    "charts": {
-      "heatmap": {
-        "accessibilityLabel": "Activity heatmap. Use arrow keys to navigate between days.",
-        "accessibilityHint": "A heatmap showing activity frequency over time",
-        "keyboardHint": "Press Enter or Space to hear details about the selected day.",
-        "legendLabel": "Heatmap color intensity legend",
-        "less": "Less",
-        "more": "More",
-        "intensity": "Intensity level",
-        "accessibleSummary": "This heatmap shows {{totalActivities}} activities over {{activeDays}} active days out of {{totalDays}} total days. The most active day was {{mostActiveDate}}."
-      },
-      "bubble": {
-        "accessibilityLabel": "Bubble chart. Use arrow keys to navigate between bubbles.",
-        "accessibilityHint": "A bubble chart showing data points with varying sizes",
-        "keyboardHint": "Press Enter or Space to hear details about the selected bubble.",
-        "legendLabel": "Bubble size legend",
-        "smaller": "Smaller",
-        "larger": "Larger",
-        "accessibleSummary": "This bubble chart shows {{totalItems}} items. The largest item is {{largestItem}} with a value of {{largestValue}}."
-      },
-      "historical": {
-        "accessibilityLabel": "Historical trends chart. Use arrow keys to navigate between data points.",
-        "accessibilityHint": "A line chart showing trends over time",
-        "keyboardHint": "Press Enter or Space to hear details about the selected data point.",
-        "legendLabel": "Chart legend",
-        "accessibleSummary": "This chart shows {{metric}} trends over time. The highest value is {{highestValue}} on {{highestDate}}."
-      }
-    }
-  },
-  "login": {
-    "title": "AI SPORTS EDGE",
-    "subtitle": "POWERED BY ADVANCED AI",
-    "signIn": "SIGN IN",
+  "auth": {
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "sign_out": "Sign Out",
     "email": "Email",
     "password": "Password",
-    "forgotPassword": "Forgot your password?",
-    "dontHaveAccount": "Don't have an account?",
-    "signUp": "Sign Up",
-    "features": {
-      "aiPicks": "AI Picks",
-      "trackBets": "Track Bets",
-      "rewards": "Rewards",
-      "proAnalysis": "Pro Analysis",
-      "helpFaq": "Help & FAQ"
-    },
-    "errors": {
-      "emailRequired": "Email is required",
-      "passwordRequired": "Password is required",
-      "invalidEmail": "Please enter a valid email address",
-      "invalidCredentials": "Invalid email or password",
-      "loginFailed": "Login failed. Please try again.",
-      "signUpFailed": "Sign up failed. Please try again.",
-      "emailInUse": "This email is already in use. Please use a different one.",
-      "weakPassword": "Password is too weak. Use at least 6 characters.",
-      "accountDisabled": "This account has been disabled. Please contact support.",
-      "tooManyAttempts": "Too many failed attempts. Please try again later."
-    },
-    "alerts": {
-      "accountCreated": "Account created!",
-      "loggedIn": "Logged in!"
-    }
+    "forgot_password": "Forgot Password?",
+    "reset_password": "Reset Password",
+    "create_account": "Create Account",
+    "already_have_account": "Already have an account?",
+    "dont_have_account": "Don't have an account?",
+    "sign_in_with": "Sign in with",
+    "or": "or",
+    "terms_and_conditions": "Terms and Conditions",
+    "privacy_policy": "Privacy Policy",
+    "agree_to_terms": "By signing up, you agree to our {{terms}} and {{privacy}}."
   },
-  "sports": {
-    "basketball_nba": "NBA Basketball",
-    "basketball_ncaab": "NCAA Basketball",
-    "football_nfl": "NFL Football",
-    "hockey_nhl": "NHL Hockey",
-    "baseball_mlb": "MLB Baseball",
-    "soccer_epl": "Premier League",
-    "soccer_mls": "MLS Soccer",
-    "soccer_womens_nwsl": "NWSL Women's Soccer",
-    "soccer_womens_intl": "Women's International Soccer",
-    "soccer_mens_intl": "Men's International Soccer",
-    "soccer_laliga": "LaLiga",
-    "soccer_bundesliga": "Bundesliga",
-    "soccer_seriea": "Serie A",
-    "soccer_ligue1": "Ligue 1",
-    "mma_ufc": "UFC MMA"
+  "onboarding": {
+    "welcome_title": "Welcome to AI Sports Edge",
+    "welcome_description": "Get the edge in sports betting with AI-powered predictions and analytics.",
+    "feature_analytics": "Advanced sports analytics",
+    "feature_predictions": "AI-powered predictions",
+    "feature_alerts": "Real-time alerts and notifications",
+    "get_started": "Get Started",
+    "disclaimer": "Sports betting involves risk. Always gamble responsibly.",
+    "complete_title": "Onboarding Complete",
+    "complete_message": "You have successfully completed the onboarding process and can now use AI Sports Edge."
   },
-  "payment": {
-    "title": "Payment Information",
-    "subtitle": "Enter your card details to subscribe to {{planName}}",
-    "cardInformation": "Card Information",
-    "subscribeNow": "Subscribe Now",
-    "secureInfo": "Your payment information is secure and encrypted",
-    "planSummary": {
-      "title": "Plan Summary",
-      "plan": "Plan",
-      "price": "Price"
-    },
-    "interval": {
-      "month": "month",
-      "year": "year"
-    },
-    "success": {
-      "title": "Subscription Successful",
-      "message": "Your subscription has been activated successfully!"
-    },
-    "errors": {
-      "invalidPlan": "Invalid subscription plan",
-      "incompleteCard": "Please complete the card details",
-      "paymentMethodFailed": "Payment method creation failed",
-      "notAuthenticated": "User not authenticated",
-      "generic": "An error occurred during payment processing"
-    }
+  "age_verification": {
+    "title": "Age Verification",
+    "description": "To use AI Sports Edge, you must be at least 18 years of age (21+ in some jurisdictions).",
+    "confirmation": "I confirm that I am at least 18 years of age (or the minimum legal age for sports betting in my jurisdiction).",
+    "legal_text": "Sports betting is only legal for adults. We are required by law to verify your age before you can use our services.",
+    "disclaimer": "By continuing, you also agree that we may request additional age verification if needed.",
+    "alert_title": "Age Confirmation Required",
+    "alert_message": "You must confirm that you are of legal age to use AI Sports Edge.",
+    "save_error": "There was an error saving your age verification. Please try again."
+  },
+  "self_exclusion": {
+    "title": "Self-Exclusion Check",
+    "description": "Before you continue, we need to confirm your eligibility to use our app.",
+    "question": "Are you currently on any state or national self-exclusion lists that prohibit you from participating in sports betting?",
+    "disclaimer": "By selecting \"No\", you confirm that you are not on any self-exclusion lists.",
+    "alert_title": "Unable to Proceed",
+    "alert_message": "If you are on a self-exclusion list, you cannot use AI Sports Edge at this time. Please respect the self-exclusion program and seek help if needed.",
+    "save_error": "There was an error saving your response. Please try again."
+  },
+  "responsible_gambling": {
+    "title": "Responsible Gambling Commitment",
+    "description": "At AI Sports Edge, we promote responsible gambling. Please read and acknowledge the following statement:",
+    "acknowledgment": "I acknowledge that sports betting should be conducted responsibly and that I am aware of the risks associated with gambling.",
+    "tips_title": "Responsible gambling means:",
+    "tip_1": "Setting time and money limits",
+    "tip_2": "Never chasing losses",
+    "tip_3": "Not gambling when upset or stressed",
+    "tip_4": "Balancing gambling with other activities",
+    "helpline": "Need help? Call 1-800-GAMBLER",
+    "alert_title": "Acknowledgment Required",
+    "alert_message": "Please acknowledge the responsible gambling statement to continue.",
+    "save_error": "There was an error saving your acknowledgment. Please try again."
+  },
+  "liability": {
+    "title": "Liability Waiver",
+    "content": "By using AI Sports Edge, you acknowledge and agree to the following:\n\n## Betting Advice Disclaimer\n\nThe predictions, odds, and betting recommendations provided by AI Sports Edge are for informational and entertainment purposes only. While we use advanced algorithms and data analysis to generate these recommendations, we cannot guarantee their accuracy or success.\n\n## No Guarantee of Winnings\n\nSports betting involves risk, and there is no guarantee of winnings. AI Sports Edge does not guarantee that you will make money from following our recommendations. You should never bet more than you can afford to lose.\n\n## User Responsibility\n\nYou are solely responsible for your betting decisions and any resulting financial losses. AI Sports Edge, its owners, employees, and affiliates will not be liable for any losses incurred as a result of following our recommendations or using our services.\n\n## Legal Compliance\n\nYou are responsible for ensuring that your use of AI Sports Edge complies with all applicable laws and regulations in your jurisdiction. Sports betting may be illegal in some jurisdictions, and we do not encourage illegal gambling.\n\n## Responsible Gambling\n\nAI Sports Edge promotes responsible gambling. If you believe you may have a gambling problem, we encourage you to seek help from a professional organization such as the National Council on Problem Gambling.\n\n## Acknowledgment\n\nBy clicking \"I Agree\" below, you acknowledge that you have read, understood, and agree to this liability waiver. If you do not agree, you should not use AI Sports Edge.",
+    "scroll_to_continue": "Please scroll to the bottom to continue",
+    "acknowledgment": "I have read and agree to the terms of the liability waiver",
+    "accept": "I Agree",
+    "decline": "Decline",
+    "alert_title": "Waiver Required",
+    "alert_message": "You must read and accept the liability waiver to continue.",
+    "decline_title": "Waiver Declined",
+    "decline_message": "You must accept the liability waiver to use AI Sports Edge.",
+    "review_again": "Review Again",
+    "exit": "Exit",
+    "save_error": "There was an error saving your waiver acceptance. Please try again."
+  },
+  "gdpr": {
+    "title": "Data Privacy Preferences",
+    "description": "We value your privacy. Please select how you would like us to use your data.",
+    "essential_title": "Essential Data",
+    "essential_description": "Required for the app to function. This includes authentication, security, and basic app functionality.",
+    "analytics_title": "Analytics Data",
+    "analytics_description": "Helps us understand how you use the app so we can improve it. This includes usage statistics and performance data.",
+    "marketing_title": "Marketing Data",
+    "marketing_description": "Allows us to send you personalized offers and promotions. This includes email marketing and in-app notifications.",
+    "third_party_title": "Third-Party Sharing",
+    "third_party_description": "Allows us to share your data with trusted partners to enhance your experience. This includes social media integration and third-party services.",
+    "privacy_note": "You can change these settings at any time in your profile settings.",
+    "continue": "Continue with Selected",
+    "view_privacy_policy": "View Privacy Policy",
+    "save_error": "There was an error saving your privacy preferences. Please try again."
+  },
+  "cookie": {
+    "title": "Cookie Preferences",
+    "description": "We use cookies to enhance your experience. Please select which cookies you would like to allow.",
+    "essential_title": "Essential Cookies",
+    "essential_description": "Required for the app to function. These cookies enable basic functions like page navigation and access to secure areas.",
+    "analytics_title": "Analytics Cookies",
+    "analytics_description": "Help us understand how visitors interact with our app by collecting and reporting information anonymously.",
+    "marketing_title": "Marketing Cookies",
+    "marketing_description": "Used to track visitors across apps. The intention is to display ads that are relevant and engaging for the individual user.",
+    "preference_title": "Preference Cookies",
+    "preference_description": "Enable the app to remember information that changes the way the app behaves or looks, like your preferred language or region.",
+    "note": "You can change your cookie preferences at any time in your profile settings.",
+    "accept_selected": "Accept Selected",
+    "accept_all": "Accept All",
+    "view_policy": "View Cookie Policy",
+    "save_error": "There was an error saving your cookie preferences. Please try again."
+  },
+  "legal": {
+    "legal_information": "Legal Information",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "by_using_app": "By using this app, you agree to our Terms of Service and Privacy Policy."
+  },
+  "home": {
+    "welcome": "Welcome to AI Sports Edge",
+    "featured_games": "Featured Games",
+    "trending": "Trending",
+    "upcoming_games": "Upcoming Games",
+    "view_all": "View All",
+    "predictions": "Predictions",
+    "stats": "Stats",
+    "news": "News"
+  },
+  "games": {
+    "all_games": "All Games",
+    "live_games": "Live Games",
+    "upcoming_games": "Upcoming Games",
+    "completed_games": "Completed Games",
+    "game_details": "Game Details",
+    "odds": "Odds",
+    "predictions": "Predictions",
+    "stats": "Stats",
+    "team_stats": "Team Stats",
+    "player_stats": "Player Stats",
+    "head_to_head": "Head to Head",
+    "betting_trends": "Betting Trends",
+    "injury_report": "Injury Report",
+    "venue": "Venue",
+    "weather": "Weather"
+  },
+  "profile": {
+    "profile": "Profile",
+    "account": "Account",
+    "settings": "Settings",
+    "subscription": "Subscription",
+    "purchase_history": "Purchase History",
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "language": "Language",
+    "theme": "Theme",
+    "help": "Help",
+    "about": "About",
+    "contact_us": "Contact Us",
+    "feedback": "Feedback",
+    "rate_app": "Rate App",
+    "share_app": "Share App",
+    "sign_out": "Sign Out",
+    "delete_account": "Delete Account"
   },
   "subscription": {
-    "loading": "Loading subscription options...",
-    "title": "Choose a Subscription Plan",
-    "subtitle": "Get access to premium AI-powered betting insights",
-    "alreadySubscribed": "You already have an active subscription. You can manage your subscription in the settings.",
-    "manageSubscription": "Manage Subscription",
+    "plans": "Subscription Plans",
     "features": "Features",
-    "selectPlan": "Select Plan",
-    "interval": {
-      "month": "month",
-      "year": "year"
-    },
-    "group": {
-      "title": "Looking for a Group Plan?",
-      "description": "Share premium features with friends or family. Get Pro access for up to 3 users for just $149.99/month.",
-      "createButton": "Create Group Subscription"
-    },
-    "gift": {
-      "redeemButton": "Redeem a Gift Subscription"
-    },
-    "refundPolicy": "View our Cancellation & Refund Policy"
+    "current_plan": "Current Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "cancel": "Cancel Subscription",
+    "renews_on": "Renews on {{date}}",
+    "expires_on": "Expires on {{date}}",
+    "payment_method": "Payment Method",
+    "billing_history": "Billing History",
+    "manage_subscription": "Manage Subscription",
+    "subscribe_now": "Subscribe Now",
+    "trial_period": "{{days}}-Day Free Trial",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save_percent": "Save {{percent}}%",
+    "billed_monthly": "Billed monthly",
+    "billed_yearly": "Billed yearly",
+    "cancel_anytime": "Cancel anytime"
   },
-  "oddsComparison": {
-    "title": "Odds Comparison",
-    "subtitle": "Compare odds between DraftKings and FanDuel for NBA games",
-    "selectSport": "Select Sport:",
-    "gameMatchup": "Game Matchup",
-    "versus": "VS",
-    "gameDate": "{{date}} at {{time}}",
-    "noGameSelected": "No game selected",
-    "lastUpdated": "Last updated: {{time}}",
-    "refresh": "Refresh",
-    "sortBy": "Sort by:",
-    "bestOdds": "Best Odds",
-    "filter": "Filter",
-    "showDraftKings": "DraftKings",
-    "showFanDuel": "FanDuel",
-    "notAvailable": "N/A",
-    "unlockOdds": "Unlock Odds",
-    "purchaseOdds": "Purchase Odds Access",
-    "purchaseSuccess": "Purchase Successful!",
-    "purchaseError": "Purchase Error",
-    "dataSource": {
-      "cached": "CACHED",
-      "stale": "STALE",
-      "fallback": "FALLBACK",
-      "error": "ERROR"
-    },
-    "errors": {
-      "apiFailure": "Failed to load odds data. Please try again later.",
-      "networkError": "Network error. Please check your connection and try again.",
-      "rateLimit": "Rate limit exceeded. Please try again in a few minutes.",
-      "noData": "Could not find odds for DraftKings or FanDuel at this time.",
-      "configuration": "Configuration error. Please contact support."
-    },
-    "loading": "Loading odds comparison...",
-    "retry": "Retry",
-    "alerts": {
-      "title": "Odds Movement Alerts",
-      "noAlerts": "No odds movement alerts yet",
-      "noAlertsSubtext": "You'll be notified when odds change significantly",
-      "loading": "Loading alerts..."
-    },
-    "accessibility": {
-      "refreshButton": "Refresh button",
-      "refreshButtonHint": "Refreshes the odds data",
-      "alertsButton": "Alerts button",
-      "alertsButtonHint": "Shows odds movement alerts",
-      "settingsButton": "Settings button",
-      "settingsButtonHint": "Opens personalization settings",
-      "sortOption": "Sort option: {{option}}",
-      "sortOptionHint": "Changes the display order of odds",
-      "filterOption": "Filter option: {{option}}",
-      "filterOptionHint": "Filters the displayed sportsbooks",
-      "bookmakerButton": "{{bookmaker}} odds: {{odds}}",
-      "bookmakerButtonHint": "Tap to visit sportsbook site",
-      "lockedOdds": "locked odds",
-      "selectSport": "Select {{sport}}",
-      "selectSportHint": "Changes odds comparison to show {{sport}} odds"
-    }
+  "microtransactions": {
+    "purchase": "Purchase",
+    "unlock": "Unlock",
+    "get_access": "Get Access",
+    "purchase_success": "Purchase Successful",
+    "purchase_failed": "Purchase Failed",
+    "try_again": "Please try again",
+    "purchase_history": "Purchase History",
+    "no_purchases": "You haven't made any purchases yet",
+    "active": "Active",
+    "expired": "Expired",
+    "pending": "Pending",
+    "purchased_on": "Purchased on {{date}}",
+    "expires_on": "Expires on {{date}}",
+    "browse_features": "Browse Features"
+  },
+  "settings": {
+    "app_settings": "App Settings",
+    "account_settings": "Account Settings",
+    "notification_settings": "Notification Settings",
+    "language_settings": "Language Settings",
+    "theme_settings": "Theme Settings",
+    "privacy_settings": "Privacy Settings",
+    "data_settings": "Data Settings",
+    "advanced_settings": "Advanced Settings",
+    "about": "About",
+    "help": "Help",
+    "feedback": "Feedback",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "version": "Version {{version}}",
+    "language": "Language",
+    "select_language": "Select Language",
+    "theme": "Theme",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode",
+    "system_default": "System Default",
+    "push_notifications": "Push Notifications",
+    "email_notifications": "Email Notifications",
+    "in_app_notifications": "In-App Notifications",
+    "data_usage": "Data Usage",
+    "clear_cache": "Clear Cache",
+    "download_over_wifi": "Download Over Wi-Fi Only",
+    "auto_play_videos": "Auto-Play Videos"
+  },
+  "language": {
+    "language": "Language",
+    "select_language": "Select Language",
+    "english": "English",
+    "spanish": "Spanish",
+    "french": "French",
+    "current_language": "Current Language: {{language}}",
+    "change_language": "Change Language",
+    "language_changed": "Language Changed",
+    "restart_required": "Please restart the app for changes to take effect"
   }
 }

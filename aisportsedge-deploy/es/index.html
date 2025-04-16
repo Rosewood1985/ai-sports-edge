@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#00F0FF" /> <!-- Color primario de acción neón -->
+    <meta
+      name="description"
+      content="AI Sports Edge - Predicciones de apuestas deportivas impulsadas por IA con análisis avanzados, información en tiempo real e interfaz de estilo neón para una experiencia premium."
+    />
+    <meta name="keywords" content="apuestas deportivas, predicciones IA, análisis de apuestas, cuotas deportivas, aprendizaje automático, datos deportivos, interfaz neón" />
+    <meta name="author" content="AI Sports Edge" />
+
+    <!-- Security Headers -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.aisportsedge.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://firebaseremoteconfig.googleapis.com https://firestore.googleapis.com; frame-src 'self' https://accounts.google.com https://aisportsedge.firebaseapp.com; object-src 'none';"
+    />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta
+      http-equiv="Referrer-Policy"
+      content="strict-origin-when-cross-origin"
+    />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="camera=(), microphone=(), geolocation=(self), interest-cohort=()"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aisportsedge.app/es/" />
+    <meta
+      property="og:title"
+      content="AI Sports Edge - Predicciones de apuestas deportivas impulsadas por IA"
+    />
+    <meta
+      property="og:description"
+      content="Obtén predicciones precisas de apuestas deportivas impulsadas por IA. Mejora tu estrategia de apuestas con análisis avanzados, información en tiempo real y nuestra elegante interfaz de estilo neón."
+    />
+    <meta property="og:image" content="https://aisportsedge.app/og-image.jpg" />
+    <meta property="og:site_name" content="AI Sports Edge" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://aisportsedge.app/es/" />
+    <meta
+      property="twitter:title"
+      content="AI Sports Edge - Predicciones de apuestas deportivas impulsadas por IA"
+    />
+    <meta
+      property="twitter:description"
+      content="Obtén predicciones precisas de apuestas deportivas impulsadas por IA. Mejora tu estrategia de apuestas con análisis avanzados, información en tiempo real y nuestra elegante interfaz de estilo neón."
+    />
+    <meta
+      property="twitter:image"
+      content="https://aisportsedge.app/og-image.jpg"
+    />
+    <meta name="twitter:creator" content="@AISportsEdge" />
+
+    <title>AI Sports Edge - Predicciones de apuestas deportivas impulsadas por IA</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/images/ai_logo.webp" />
+    <link rel="apple-touch-icon" href="/images/ai_logo.webp" />
+    <link rel="canonical" href="https://aisportsedge.app/es/" />
+    <link rel="alternate" href="https://aisportsedge.app/" hreflang="en" />
+    <link rel="alternate" href="https://aisportsedge.app/es/" hreflang="es" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+      integrity="sha384-T5i/RU1J7+Wkp+fVBXg+V5VjvHwZ5dJu/nCFZ1QIQCIUkNOHRHnpVzwZmnbc9Ey5"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../neon-ui.css" />
+
+    <!-- Structured Data - Enhanced with more details -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "AI Sports Edge",
+        "applicationCategory": "SportsApplication",
+        "operatingSystem": "iOS, Android, Web",
+        "offers": {
+          "@type": "Offer",
+          "price": "19.99",
+          "priceCurrency": "USD",
+          "priceValidUntil": "2025-12-31",
+          "availability": "https://schema.org/InStock"
+        },
+        "description": "Predicciones y análisis de apuestas deportivas impulsadas por IA con una elegante interfaz de estilo neón",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": "1250",
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "applicationSubCategory": "Apuestas Deportivas",
+        "releaseNotes": "La última versión incluye interfaz mejorada, algoritmos de predicción mejorados y soporte multilingüe",
+        "screenshot": "https://aisportsedge.app/images/app-screenshot.webp",
+        "softwareVersion": "2.5.0",
+        "author": {
+          "@type": "Organization",
+          "name": "AI Sports Edge, Inc.",
+          "url": "https://aisportsedge.app"
+        }
+      }
+    </script>
+
+    <!-- Additional structured data for Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "AI Sports Edge",
+        "url": "https://aisportsedge.app",
+        "logo": "https://aisportsedge.app/images/ai_logo.webp",
+        "sameAs": [
+          "https://twitter.com/AISportsEdge",
+          "https://www.facebook.com/AISportsEdge",
+          "https://www.instagram.com/aisportsedge"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+1-800-555-0123",
+          "contactType": "customer service",
+          "availableLanguage": ["English", "Spanish"]
+        }
+      }
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" integrity="sha384-Mh8z9e3yCJ0aNEYt4GwJ1FqUQdUDNAUOnBw6C/+7Xzqm0qRatuRYYZ+QQQ/hKY3" crossorigin="anonymous"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <!-- Fix for handleOddsButtonClick function -->
+    <script>
+      // Initialize cross-platform services for the static HTML page
+      window.crossPlatformSyncService = {
+        hasPurchasedOdds: function(gameId) {
+          try {
+            const purchases = JSON.parse(localStorage.getItem('purchasedOdds') || '[]');
+            console.log('[CrossPlatformSync] Checking if game is purchased:', gameId, purchases.includes(gameId));
+            return purchases.includes(gameId);
+          } catch (error) {
+            console.error('[CrossPlatformSync] Error checking purchased odds:', error);
+            return false;
+          }
+        },
+        recordOddsPurchase: function(gameId) {
+          try {
+            const purchases = JSON.parse(localStorage.getItem('purchasedOdds') || '[]');
+            if (!purchases.includes(gameId)) {
+              purchases.push(gameId);
+              localStorage.setItem('purchasedOdds', JSON.stringify(purchases));
+              console.log('[CrossPlatformSync] Recorded purchase for game:', gameId);
+              
+              // Dispatch event to notify other components
+              window.dispatchEvent(new CustomEvent('purchasedOddsUpdated', {
+                detail: { purchasedOdds: purchases.map(id => ({ gameId: id })) }
+              }));
+            }
+          } catch (error) {
+            console.error('[CrossPlatformSync] Error recording purchase:', error);
+          }
+        }
+      };
+
+      // Analytics service for tracking events
+      window.analyticsService = {
+        trackEvent: function(eventName, data) {
+          console.log(`[Analytics] ${eventName}:`, data);
+          // In a real implementation, this would send data to an analytics service
+        },
+        trackUserAction: function(action, data) {
+          console.log(`[Analytics] User Action - ${action}:`, data);
+          // In a real implementation, this would send data to an analytics service
+        }
+      };
+
+      // Betting affiliate service for tracking affiliate links
+      window.bettingAffiliateService = {
+        trackButtonClick: function(location, affiliateId, gameId, userId, eventId) {
+          console.log(`[Affiliate] Button click:`, { location, affiliateId, gameId, userId, eventId });
+          // In a real implementation, this would send data to an affiliate tracking service
+        },
+        trackConversion: function(type, value, userId) {
+          console.log(`[Affiliate] Conversion:`, { type, value, userId });
+          // In a real implementation, this would send data to an affiliate tracking service
+        }
+      };
+
+      // Handle odds button clicks
+      window.handleOddsButtonClick = function(button, gameId, homeTeam, awayTeam) {
+        console.log('[OddsButton] Button clicked for game:', { gameId, homeTeam, awayTeam });
+        
+        // Check if already purchased
+        const isPurchased = window.crossPlatformSyncService.hasPurchasedOdds(gameId);
+        
+        if (isPurchased) {
+          console.log('[OddsButton] Game already purchased, redirecting to FanDuel');
+          // Open FanDuel in a new tab
+          const affiliateUrl = `https://sportsbook.fanduel.com/?aff_id=PLACEHOLDER_AFFILIATE_ID&subId=user123-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton&utm_content=web`;
+          window.open(affiliateUrl, '_blank');
+          
+          // Track affiliate click
+          if (window.bettingAffiliateService) {
+            window.bettingAffiliateService.trackButtonClick('odds_button', 'PLACEHOLDER_AFFILIATE_ID', gameId, 'user123', gameId);
+          }
+        } else {
+          console.log('[OddsButton] Game not purchased, simulating payment');
+          
+          // Track analytics event
+          if (window.analyticsService) {
+            window.analyticsService.trackEvent('odds_purchase_initiated', {
+              gameId: gameId,
+              userId: 'user123',
+              timestamp: Date.now(),
+            });
+          }
+          
+          // Change button text to show loading
+          const originalText = button.textContent.trim();
+          button.innerHTML = '<div class="odds-button__spinner"></div>';
+          button.disabled = true;
+          
+          // Simulate payment processing
+          setTimeout(function() {
+            // Record purchase
+            window.crossPlatformSyncService.recordOddsPurchase(gameId);
+            
+            // Update button
+            button.innerHTML = 'APOSTAR AHORA';
+            button.disabled = false;
+            button.classList.add('bet-now-button');
+            
+            // Track successful purchase
+            if (window.analyticsService) {
+              window.analyticsService.trackEvent('odds_purchase_completed', {
+                gameId: gameId,
+                userId: 'user123',
+                price: 199, // $1.99
+                timestamp: Date.now(),
+              });
+            }
+            
+            // Show popup
+            alert(`¡Tus cuotas están listas! Haz tu apuesta ahora para la mejor experiencia.\n\nPartido: ${homeTeam} vs ${awayTeam}`);
+          }, 1500);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <div id="app-content" style="display: none;">
+      <header class="header">
+        <div class="container">
+          <div class="header-content">
+            <a href="/es/" class="logo">
+              <img src="/images/ai_logo.webp" alt="Logo de AI Sports Edge" style="width: 40px; height: 40px;">
+              <span>AI Sports Edge</span>
+            </a>
+            <nav class="nav">
+              <ul class="nav-list">
+                <li class="nav-item"><a href="/es/" class="active">Inicio</a></li>
+                <li class="nav-item"><a href="#features">Características</a></li>
+                <li class="nav-item"><a href="#pricing">Precios</a></li>
+                <li class="nav-item"><a href="#about">Acerca de</a></li>
+                <li class="nav-item"><a href="#live-odds">Cuotas en vivo</a></li>
+                <li class="nav-item"><a href="#download" class="download-button">Descargar</a></li>
+                <li class="nav-item"><a href="/" hreflang="en">EN</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>Predicciones de apuestas deportivas impulsadas por IA</h1>
+              <p class="hero-subtitle">
+                Obtén predicciones precisas, análisis e información para tomar decisiones de apuestas más inteligentes.
+              </p>
+              <div class="hero-buttons">
+                <a href="#download" class="button primary-button">Descargar App</a>
+                <a href="#features" class="button secondary-button">Más información</a>
+              </div>
+            </div>
+            <div class="hero-right">
+              <div class="hero-image">
+                <img src="/images/ai_logo.webp" alt="AI Sports Edge" style="width: 150px; height: 150px;">
+              </div>
+              <div class="news-feed">
+                <h3 class="news-feed-title">Últimas noticias deportivas</h3>
+                <div class="news-item">
+                  <span class="news-date">MAR 17</span>
+                  <p class="news-headline">Lakers aseguran puesto en playoffs con victoria sobre Nuggets</p>
+                </div>
+                <div class="news-item">
+                  <span class="news-date">MAR 16</span>
+                  <p class="news-headline">Draft de la NFL: Los mejores prospectos de QB muestran sus habilidades en el Pro Day</p>
+                </div>
+                <div class="news-item">
+                  <span class="news-date">MAR 15</span>
+                  <p class="news-headline">Fórmula 1: Hamilton domina en la clasificación del GP de Australia</p>
+                </div>
+                <a href="#" class="news-more">Más noticias →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="features" class="features-overview">
+        <div class="container">
+          <h2 class="section-title">¿Por qué elegir AI Sports Edge?</h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">AI</div>
+              <h3>Predicciones de IA</h3>
+              <p>Algoritmos avanzados de aprendizaje automático analizan grandes cantidades de datos para proporcionar predicciones precisas de apuestas.</p>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon">RT</div>
+              <h3>Análisis en tiempo real</h3>
+              <p>Obtén estadísticas, cuotas y análisis actualizados al minuto para tomar decisiones informadas de apuestas.</p>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon">MS</div>
+              <h3>Cobertura multideportiva</h3>
+              <p>Desde la NFL hasta la Fórmula 1, cubrimos todos los deportes principales con modelos de predicción especializados para cada uno.</p>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon">CI</div>
+              <h3>Información comunitaria</h3>
+              <p>Conéctate con otros apostadores, comparte estrategias y aprende de la sabiduría colectiva de la comunidad.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="pricing" class="pricing-section">
+        <div class="container">
+          <h2 class="section-title">Precios simples y transparentes</h2>
+          <p class="section-subtitle">Elige el plan que se adapte a tu estrategia de apuestas y presupuesto.</p>
+          
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3>Gratis</h3>
+                <p class="pricing-price">$0<span>/mes</span></p>
+              </div>
+              <div class="pricing-features">
+                <ul>
+                  <li>Predicciones básicas de IA</li>
+                  <li>Cobertura deportiva limitada</li>
+                  <li>Selección gratuita diaria</li>
+                  <li>Acceso a la comunidad</li>
+                  <li>Estadísticas y cuotas básicas</li>
+                </ul>
+              </div>
+              <div class="pricing-cta">
+                <a href="#download" class="button secondary-button">Comenzar</a>
+              </div>
+            </div>
+            
+            <div class="pricing-card popular">
+              <div class="popular-badge">Más popular</div>
+              <div class="pricing-header">
+                <h3>Pro</h3>
+                <p class="pricing-price">$19.99<span>/mes</span></p>
+              </div>
+              <div class="pricing-features">
+                <ul>
+                  <li>Predicciones avanzadas de IA</li>
+                  <li>Cobertura de todos los deportes principales</li>
+                  <li>Selecciones diarias ilimitadas</li>
+                  <li>Acceso a la comunidad</li>
+                  <li>Análisis en tiempo real</li>
+                  <li>Herramientas de gestión de bankroll</li>
+                  <li>Seguimiento del historial de apuestas</li>
+                </ul>
+              </div>
+              <div class="pricing-cta">
+                <a href="#download" class="button primary-button">Comenzar</a>
+              </div>
+            </div>
+            
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3>Elite</h3>
+                <p class="pricing-price">$39.99<span>/mes</span></p>
+              </div>
+              <div class="pricing-features">
+                <ul>
+                  <li>Predicciones premium de IA</li>
+                  <li>Cobertura de todos los deportes (incluyendo nichos)</li>
+                  <li>Selecciones diarias ilimitadas</li>
+                  <li>Acceso VIP a la comunidad</li>
+                  <li>Análisis avanzado en tiempo real</li>
+                  <li>Gestión avanzada de bankroll</li>
+                  <li>Seguimiento del historial de apuestas</li>
+                  <li>Estrategia de apuestas personalizada</li>
+                  <li>Soporte prioritario al cliente</li>
+                </ul>
+              </div>
+              <div class="pricing-cta">
+                <a href="#download" class="button secondary-button">Comenzar</a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="annual-discount">
+            <h3>Ahorra un 20% con planes anuales</h3>
+            <p>Obtén dos meses gratis cuando te suscribas a un plan anual.</p>
+            <a href="#download" class="button primary-button">Ver planes anuales</a>
+          </div>
+        </div>
+      </section>
+      
+      <section id="live-odds" class="app-section">
+        <div class="container">
+          <h2 class="section-title">Cuotas y predicciones en vivo</h2>
+          <p class="section-subtitle">Obtén información impulsada por IA para los próximos partidos. Compra cuotas para ver nuestras predicciones y análisis detallados.</p>
+          
+          <div class="games-grid">
+            <!-- Game Card 1 -->
+            <div class="game-card">
+              <div class="game-header">
+                <span class="game-sport">NFL</span>
+                <span class="game-time">Mañana, 3:30 PM</span>
+              </div>
+              
+              <div class="game-teams">
+                <div class="team home">
+                  <span class="team-name">Kansas City Chiefs</span>
+                  <span class="team-score">24</span>
+                </div>
+                <div class="vs">VS</div>
+                <div class="team away">
+                  <span class="team-name">San Francisco 49ers</span>
+                  <span class="team-score">17</span>
+                </div>
+              </div>
+              
+              <div class="game-odds">
+                <div class="odds-item">
+                  <span class="odds-label">Spread:</span>
+                  <span class="odds-value">Chiefs -3.5</span>
+                </div>
+                <div class="odds-item">
+                  <span class="odds-label">Total:</span>
+                  <span class="odds-value">O/U 49.5</span>
+                </div>
+              </div>
+              
+              <div class="game-actions">
+                <button class="odds-button odds-button--medium" onclick="handleOddsButtonClick(this, 'game1', 'Kansas City Chiefs', 'San Francisco 49ers')">
+                  OBTENER PREDICCIÓN
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="download" class="download-section">
+        <div class="container">
+          <h2 class="section-title">Descarga AI Sports Edge</h2>
+          <p class="section-subtitle">Disponible en iOS y Android. Comienza a hacer apuestas más inteligentes hoy.</p>
+          
+          <div class="download-grid">
+            <div class="download-item">
+              <h3>App para iOS</h3>
+              <a href="#" class="button primary-button">Descargar en App Store</a>
+            </div>
+            
+            <div class="download-item">
+              <h3>App para Android</h3>
+              <a href="#" class="button primary-button">Descargar en Google Play</a>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-logo">
+              <img src="/images/ai_logo.webp" alt="Logo de AI Sports Edge" style="width: 40px; height: 40px;">
+              <h3 class="footer-title">AI Sports Edge</h3>
+              <p class="footer-description">Predicciones y análisis de apuestas deportivas impulsadas por IA</p>
+            </div>
+            
+            <div class="footer-contact">
+              <h4>Contáctanos</h4>
+              <a href="mailto:support@aisportsedge.app">support@aisportsedge.app</a>
+              <a href="tel:+18005550123">+1 (800) 555-0123</a>
+            </div>
+            
+            <div class="footer-social">
+              <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+              <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          
+          <div class="footer-links">
+            <a href="#">Términos de servicio</a>
+            <a href="#">Política de privacidad</a>
+            <a href="#">Juego responsable</a>
+            <a href="#">Programa de afiliados</a>
+            <a href="#">Centro de ayuda</a>
+            <a href="/" hreflang="en">English</a>
+          </div>
+          
+          <div class="footer-copyright">
+            <p>&copy; 2025 AI Sports Edge. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script>
+      // Show content after everything is loaded
+      window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('app-content').style.display = 'block';
+      });
+    </script>
+  </body>
+</html>
