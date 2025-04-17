@@ -1,4 +1,6 @@
 const path = require('path');
+const Dotenv = require("dotenv-webpack");
+
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
@@ -7,6 +9,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   mode: 'production',
@@ -146,9 +149,25 @@ module.exports = {
       filename: 'styles/[name].[contenthash].css',
       chunkFilename: 'styles/[name].[contenthash].chunk.css',
     }),
+    // Load environment variables from .env.production first
+    new Dotenv({
+      path: './.env.production',
+      safe: true,
+      systemvars: true,
+    }),
+    // Then define them for the application
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
       'process.env.REACT_APP_API_URL': JSON.stringify(process.env.REACT_APP_API_URL || 'https://api.aisportsedge.com'),
+      'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
+      'process.env.FIREBASE_AUTH_DOMAIN': JSON.stringify(process.env.FIREBASE_AUTH_DOMAIN),
+      'process.env.FIREBASE_DATABASE_URL': JSON.stringify(process.env.FIREBASE_DATABASE_URL),
+      'process.env.FIREBASE_PROJECT_ID': JSON.stringify(process.env.FIREBASE_PROJECT_ID),
+      'process.env.FIREBASE_STORAGE_BUCKET': JSON.stringify(process.env.FIREBASE_STORAGE_BUCKET),
+      'process.env.FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(process.env.FIREBASE_MESSAGING_SENDER_ID),
+      'process.env.FIREBASE_APP_ID': JSON.stringify(process.env.FIREBASE_APP_ID),
+      'process.env.FIREBASE_MEASUREMENT_ID': JSON.stringify(process.env.FIREBASE_MEASUREMENT_ID),
+      'process.env.FIREBASE_RECAPTCHA_SITE_KEY': JSON.stringify(process.env.FIREBASE_RECAPTCHA_SITE_KEY),
     }),
     new CompressionPlugin({
       algorithm: 'gzip',

@@ -1,0 +1,172 @@
+{
+  "files_in_context": [
+    {
+      "path": "memory-bank/activeContext.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857759230,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/productContext.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857771827,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/systemPatterns.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857780026,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857785514,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/decisionLog.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857793479,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/firebase-security-assessment.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857804361,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/firebase-security-implementation.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857810071,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-godaddy-solution-plan.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857815035,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/README-DEPLOYMENT.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857820232,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase-fixed.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857824609,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.fixed.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857831358,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/activeContext.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744857855509,
+      "roo_edit_date": 1744857855509,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/activeContext.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744857855509,
+      "roo_edit_date": 1744857855509,
+      "user_edit_date": 1744857855530
+    },
+    {
+      "path": "memory-bank/productContext.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744857873422,
+      "roo_edit_date": 1744857873422,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/productContext.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744857873422,
+      "roo_edit_date": 1744857873422,
+      "user_edit_date": 1744857873446
+    },
+    {
+      "path": "memory-bank/systemPatterns.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744857915659,
+      "roo_edit_date": 1744857915659,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/systemPatterns.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744857915659,
+      "roo_edit_date": 1744857915659,
+      "user_edit_date": 1744857915696
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744857940926,
+      "roo_edit_date": 1744857940926,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744857940926,
+      "roo_edit_date": 1744857940926,
+      "user_edit_date": 1744857940963
+    },
+    {
+      "path": "memory-bank/decisionLog.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744857979524,
+      "roo_edit_date": 1744857979524,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/decisionLog.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744857979524,
+      "roo_edit_date": 1744857979524,
+      "user_edit_date": 1744857979541
+    }
+  ]
+}

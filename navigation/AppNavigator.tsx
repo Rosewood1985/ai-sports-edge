@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { View, Text, ActivityIndicator, Button } from 'react-native';
 import { useNavigationState } from '../contexts/NavigationStateContext';
+import ThemeToggle from '../components/ThemeToggle';
 
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
@@ -70,7 +71,12 @@ const MainTabNavigator = () => {
         tabBarStyle: {
           borderTopColor: colors.border,
         },
-        headerShown: false,
+        headerShown: true,
+        headerRight: () => (
+          <View style={{ marginRight: 15 }}>
+            <ThemeToggle />
+          </View>
+        ),
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />

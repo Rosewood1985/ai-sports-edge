@@ -7,7 +7,7 @@ module.exports = {
   setupFiles: [
     '<rootDir>/jest.setup.js'
   ],
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   testPathIgnorePatterns: [
     '/node_modules/',
     '/android/',
@@ -27,7 +27,8 @@ module.exports = {
     '!**/vendor/**'
   ],
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
+  // Temporarily commenting out testRegex to avoid conflict with testMatch
+  // testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   globals: {
     'ts-jest': {
       babelConfig: true,
@@ -35,13 +36,13 @@ module.exports = {
       isolatedModules: false
     }
   },
-  // Add transform configuration for JSX syntax
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['@babel/preset-react'] }]
-  },
-  // Add reporters for test results
-  reporters: [
-    'default',
-    ['jest-junit', { outputDirectory: 'test-results', outputName: 'jest-junit.xml' }]
-  ]
+  // Temporarily commenting out transform configuration due to babel-jest issues
+  // transform: {
+  //   '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['@babel/preset-react'] }]
+  // },
+  // Temporarily commenting out reporters due to jest-junit issues
+  // reporters: [
+  //   'default',
+  //   ['jest-junit', { outputDirectory: 'test-results', outputName: 'jest-junit.xml' }]
+  // ]
 };

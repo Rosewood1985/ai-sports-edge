@@ -1,0 +1,284 @@
+{
+  "files_in_context": [
+    {
+      "path": ".env.template",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744853892370,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.config.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744853931171,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744853936307,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "web/index.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744853941788,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/firebase-security-assessment.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744854538352,
+      "roo_edit_date": 1744854538352,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/firebase-security-assessment.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855013329,
+      "roo_edit_date": 1744854538352,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.development",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855025373,
+      "roo_edit_date": 1744855025373,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.production",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855035034,
+      "roo_edit_date": 1744855035034,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.example",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855046105,
+      "roo_edit_date": 1744855046105,
+      "user_edit_date": null
+    },
+    {
+      "path": ".gitignore",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855051150,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.config.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855071177,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855075474,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.config.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855071177,
+      "roo_edit_date": null,
+      "user_edit_date": 1744855085810
+    },
+    {
+      "path": "webpack.config.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855085823,
+      "roo_edit_date": 1744855085823,
+      "user_edit_date": 1744855085810
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855102588,
+      "roo_edit_date": 1744855102588,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855102588,
+      "roo_edit_date": 1744855102588,
+      "user_edit_date": 1744855102624
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855107473,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855124722,
+      "roo_edit_date": 1744855124722,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855124722,
+      "roo_edit_date": 1744855124722,
+      "user_edit_date": 1744855124812
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855128484,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855138831,
+      "roo_edit_date": 1744855138831,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855138831,
+      "roo_edit_date": 1744855138831,
+      "user_edit_date": 1744855138864
+    },
+    {
+      "path": "firestore.rules",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855143739,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855138831,
+      "roo_edit_date": 1744855138831,
+      "user_edit_date": 1744855160073
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855173456,
+      "roo_edit_date": 1744855173456,
+      "user_edit_date": 1744855124812
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855173456,
+      "roo_edit_date": 1744855173456,
+      "user_edit_date": 1744855173485
+    },
+    {
+      "path": ".env.development",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855189839,
+      "roo_edit_date": 1744855189839,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.development",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855189839,
+      "roo_edit_date": 1744855189839,
+      "user_edit_date": 1744855189869
+    },
+    {
+      "path": ".env.production",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855200657,
+      "roo_edit_date": 1744855200657,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.production",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855200657,
+      "roo_edit_date": 1744855200657,
+      "user_edit_date": 1744855200680
+    },
+    {
+      "path": ".env.example",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855210436,
+      "roo_edit_date": 1744855210436,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.example",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855210436,
+      "roo_edit_date": 1744855210436,
+      "user_edit_date": 1744855210468
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855227071,
+      "roo_edit_date": 1744855227071,
+      "user_edit_date": 1744855102624
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855227071,
+      "roo_edit_date": 1744855227071,
+      "user_edit_date": 1744855227099
+    },
+    {
+      "path": "docs/firebase-security-implementation.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855260926,
+      "roo_edit_date": 1744855260926,
+      "user_edit_date": null
+    }
+  ]
+}

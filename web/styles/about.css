@@ -283,3 +283,41 @@
     height: 120px;
   }
 }
+
+/* Theme Toggle Styles */
+.simple-header .nav-list .nav-item:last-child {
+  margin-left: auto;
+}
+
+.simple-header .theme-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simple-header .theme-toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  color: var(--white);
+}
+
+.simple-header .theme-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark theme styles */
+body.dark-theme .simple-header .theme-toggle-button {
+  color: var(--white);
+}
+
+body.dark-theme .simple-header .theme-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import '../styles/about.css';
 import '../styles/overlay-fix.css'; // Import emergency fix for overlay issues
+import ThemeToggle from '../components/ThemeToggle';
 
 // Custom header component to avoid using the shared header that might have issues
 const SimpleHeader = () => (
@@ -33,6 +34,9 @@ const SimpleHeader = () => (
             </li>
             <li className="nav-item">
               <Link to="/download" className="download-button">Download</Link>
+            </li>
+            <li className="nav-item">
+              <ThemeToggle />
             </li>
           </ul>
         </nav>

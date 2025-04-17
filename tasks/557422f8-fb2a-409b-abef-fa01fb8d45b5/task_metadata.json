@@ -1,0 +1,100 @@
+{
+  "files_in_context": [
+    {
+      "path": "aisportsedge-deploy/es/index.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843741348,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "translations/es.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843756231,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "components/LanguageChangeListener.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843765784,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "components/LanguageRedirect.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843771414,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "components/LanguageSelector.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843778316,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "__tests__/run-spanish-tests.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843784159,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "__tests__/spanish-testing-summary.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843791436,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "__tests__/spanish-tests-documentation.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843795636,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "__tests__/i18n/spanish-language-test.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843803460,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "contexts/I18nContext.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843824148,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "translations/es-error-updates.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843830773,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "translations/odds-comparison-es.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744843836877,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

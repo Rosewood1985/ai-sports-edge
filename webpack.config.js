@@ -1,5 +1,6 @@
 const path = require('path');
 const createExpoWebpackConfigAsync = require('@expo/webpack-config');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = async function (env, argv) {
   // Get the default Expo webpack config
@@ -46,6 +47,15 @@ module.exports = async function (env, argv) {
     config.performance.maxAssetSize = 1000000;
     config.performance.maxEntrypointSize = 1000000;
   }
+  
+  // Add Dotenv plugin to load environment variables
+  config.plugins.push(
+    new Dotenv({
+      path: `./.env.${process.env.NODE_ENV || 'development'}`, // Load based on environment
+      safe: true, // Load .env.example as a fallback
+      systemvars: true, // Load system environment variables as well
+    })
+  );
   
   return config;
 };

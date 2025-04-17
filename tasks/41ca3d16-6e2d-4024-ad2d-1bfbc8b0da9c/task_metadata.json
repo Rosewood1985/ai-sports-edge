@@ -1,0 +1,156 @@
+{
+  "files_in_context": [
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855708643,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase-fixed.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855712983,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.fixed.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855716555,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855720225,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/env-debug.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855723966,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/env-test.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855728846,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855770476,
+      "roo_edit_date": 1744855770476,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855770476,
+      "roo_edit_date": 1744855770476,
+      "user_edit_date": 1744855770499
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855813357,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.production",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855819804,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855912560,
+      "roo_edit_date": 1744855912560,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855917887,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855917887,
+      "roo_edit_date": null,
+      "user_edit_date": 1744855929668
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855929741,
+      "roo_edit_date": 1744855929741,
+      "user_edit_date": 1744855929668
+    },
+    {
+      "path": "dist/env-verification.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855947193,
+      "roo_edit_date": 1744855947193,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855959364,
+      "roo_edit_date": 1744855959364,
+      "user_edit_date": 1744855929668
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855959364,
+      "roo_edit_date": 1744855959364,
+      "user_edit_date": 1744855959394
+    },
+    {
+      "path": "dist/firebase-verification.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855984420,
+      "roo_edit_date": 1744855984420,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/README-DEPLOYMENT.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856010923,
+      "roo_edit_date": 1744856010923,
+      "user_edit_date": null
+    }
+  ]
+}

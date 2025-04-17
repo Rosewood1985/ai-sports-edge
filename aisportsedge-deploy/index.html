@@ -14,7 +14,7 @@
     <!-- Security Headers -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.aisportsedge.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://firebaseremoteconfig.googleapis.com https://firestore.googleapis.com; frame-src 'self' https://accounts.google.com https://aisportsedge.firebaseapp.com; object-src 'none';"
+      content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.aisportsedge.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://firebaseremoteconfig.googleapis.com https://firestore.googleapis.com; frame-src 'self' https://accounts.google.com https://aisportsedge.firebaseapp.com; object-src 'none';"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
@@ -905,16 +905,27 @@
     <script>
       // Initialize Firebase
       const firebaseConfig = {
-        apiKey: "AIzaSyA1234567890abcdefghijklmnopqrstuvwxyz",
+        apiKey: "AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw",
         authDomain: "ai-sports-edge.firebaseapp.com",
         projectId: "ai-sports-edge",
         storageBucket: "ai-sports-edge.appspot.com",
-        messagingSenderId: "123456789012",
-        appId: "1:123456789012:web:abcdef1234567890",
+        messagingSenderId: "63216708515",
+        appId: "1:63216708515:web:209e6baf130386edb00816",
       };
 
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+      // Add logging
+      console.log("Firebase config:", JSON.stringify(firebaseConfig));
+      console.log("Firebase SDK loaded:", typeof firebase !== 'undefined');
+      
+      try {
+        // Initialize Firebase
+        console.log("Attempting to initialize Firebase...");
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase initialized successfully!");
+        console.log("Firebase auth available:", typeof firebase.auth === 'function');
+      } catch (error) {
+        console.error("Error initializing Firebase:", error);
+      }
 
       // Check authentication state
       firebase.auth().onAuthStateChanged((user) => {

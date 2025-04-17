@@ -13,6 +13,7 @@ import { ThemedText, ThemedView } from '../components/ThemedComponents';
 import { useTheme } from '@react-navigation/native';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
+import ThemeToggle from '../components/ThemeToggle';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
@@ -73,12 +74,7 @@ const SettingsScreen = () => {
                 {t('settings.dark_mode')}
               </ThemedText>
             </View>
-            <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
-              trackColor={{ false: '#767577', true: colors.primary }}
-              thumbColor="#f4f3f4"
-            />
+            <ThemeToggle />
           </View>
         </View>
         

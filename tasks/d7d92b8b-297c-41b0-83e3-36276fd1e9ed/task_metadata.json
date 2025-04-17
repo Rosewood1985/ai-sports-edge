@@ -1,0 +1,76 @@
+{
+  "files_in_context": [
+    {
+      "path": "jest.config.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744845090163
+    },
+    {
+      "path": "jest.config.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744845102448,
+      "roo_edit_date": null,
+      "user_edit_date": 1744845090163
+    },
+    {
+      "path": "jest.config.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744845102448,
+      "roo_edit_date": null,
+      "user_edit_date": 1744845109659
+    },
+    {
+      "path": "jest.config.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744845109749,
+      "roo_edit_date": 1744845109749,
+      "user_edit_date": 1744845109659
+    },
+    {
+      "path": "jest.config.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744845133023,
+      "roo_edit_date": 1744845109749,
+      "user_edit_date": 1744845109659
+    },
+    {
+      "path": "jest.config.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744845141061,
+      "roo_edit_date": 1744845141061,
+      "user_edit_date": 1744845109659
+    },
+    {
+      "path": "jest.config.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744845141061,
+      "roo_edit_date": 1744845141061,
+      "user_edit_date": 1744845141091
+    },
+    {
+      "path": "jest.setup.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744845158256,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "test-results/spanish-test-results.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744845166235,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

@@ -1,138 +1,107 @@
-import React, { useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
-import { useColorScheme, Text, View, StyleSheet } from 'react-native';
-import AppNavigator from './navigation/AppNavigator';
-import { LanguageProvider } from './contexts/LanguageContext';
-import { NavigationStateProvider } from './contexts/NavigationStateContext';
-import { initErrorTracking } from './services/errorTrackingService';
-import { initPerformanceMonitoring } from './services/performanceMonitoringService';
-// import { initAnalytics } from './services/analyticsService'; // Removed - function doesn't exist
-import { initAlerting } from './services/alertingService';
-import { initLogging, info, LogCategory } from './services/loggingService';
-import { debugServiceInitialization, debugServiceDependencies } from './debug-services';
-import ErrorBoundary from './components/ErrorBoundary';
-import { Colors } from './constants/Colors'; // Import Colors
+import React, { useEffect } from "react";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from "@react-navigation/native";
+import { Text, View, StyleSheet } from "react-native";
+import AppNavigator from "./navigation/AppNavigator";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import { NavigationStateProvider } from "./contexts/NavigationStateContext";
+import { initErrorTracking } from "./services/errorTrackingService";
+import { initPerformanceMonitoring } from "./services/performanceMonitoringService";
+import { initAlerting } from "./services/alertingService";
+import { initLogging, info, LogCategory } from "./services/loggingService";
+import {
+  debugServiceInitialization,
+  debugServiceDependencies,
+} from "./debug-services";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { Colors } from "./constants/Colors";
+import { ThemeProvider, useTheme } from "./screens/Onboarding/Context/ThemeContext"; // 🌓 ThemeContext
 
-export default function App() {
-  const colorScheme = useColorScheme();
+// Custom light/dark theme objects based on your Colors.ts
+const lightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Colors.light.tint,
+    background: Colors.light.background,
+    card: "#f0f2f5",
+    text: Colors.light.text,
+    border: "#d1d5db",
+    notification: "#FF3B30",
+    icon: Colors.light.icon,
+  },
+};
 
-  // Initialize monitoring services
+const darkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Colors.dark.primaryAction,
+    background: Colors.dark.primaryBackground,
+    card: "#2a2c2d",
+    text: Colors.dark.primaryText,
+    border: Colors.dark.borderSubtle,
+    notification: "#FF453A",
+    icon: Colors.dark.iconPrimary,
+  },
+};
+
+// ⛑️ App body wrapped inside custom ThemeConsumer
+const AppInner = () => {
+  const { theme } = useTheme(); // Get current theme from context
+
+  // Monitoring setup
   useEffect(() => {
-    console.log('Initializing services...');
-
-    // Run debug functions to check module resolution
-    console.log('Running debug functions to check module resolution');
     try {
       debugServiceDependencies();
       debugServiceInitialization();
-    } catch (debugError) {
-      console.error('Error running debug functions:', debugError);
-    }
 
-    try {
-      // Initialize logging first
-      console.log('About to initialize logging service');
       const loggingInitialized = initLogging();
-      console.log('Logging initialization result:', loggingInitialized);
-
       if (loggingInitialized) {
-        info(LogCategory.APP, 'Logging service initialized');
+        info(LogCategory.APP, "Logging service initialized");
 
-        // Try to initialize error tracking with improved error handling
-        console.log('About to initialize error tracking service');
         try {
           const errorTrackingInitialized = initErrorTracking();
           if (errorTrackingInitialized) {
-            console.log('Error tracking service initialized successfully');
-            info(LogCategory.APP, 'Error tracking service initialized');
-          } else {
-            console.warn('Error tracking service initialization returned false');
-            info(LogCategory.APP, 'Error tracking service initialization failed');
+            info(LogCategory.APP, "Error tracking service initialized");
           }
-        } catch (errorTrackingError) {
-          console.error('Exception caught while initializing error tracking:', errorTrackingError);
-          info(LogCategory.APP, 'Error tracking service initialization failed with exception');
+        } catch (err) {
+          console.error("Error tracking failed:", err);
         }
 
-        // Initialize other services with improved error handling
-        console.log('About to initialize performance monitoring');
         try {
-          const performanceMonitoringInitialized = initPerformanceMonitoring();
-          if (performanceMonitoringInitialized) {
-            console.log('Performance monitoring service initialized successfully');
-            info(LogCategory.APP, 'Performance monitoring service initialized');
-          } else {
-            console.warn('Performance monitoring service initialization returned false');
-            info(LogCategory.APP, 'Performance monitoring service initialization failed');
+          const perfInit = initPerformanceMonitoring();
+          if (perfInit) {
+            info(LogCategory.APP, "Performance monitoring service initialized");
           }
-        } catch (performanceMonitoringError) {
-          console.error('Exception caught while initializing performance monitoring:', performanceMonitoringError);
-          info(LogCategory.APP, 'Performance monitoring service initialization failed with exception');
+        } catch (err) {
+          console.error("Perf monitoring failed:", err);
         }
 
-        console.log('About to initialize alerting service');
         try {
-          const alertingInitialized = initAlerting();
-          if (alertingInitialized) {
-            console.log('Alerting service initialized successfully');
-            info(LogCategory.APP, 'Alerting service initialized');
-          } else {
-            console.warn('Alerting service initialization returned false');
-            info(LogCategory.APP, 'Alerting service initialization failed');
+          const alertingInit = initAlerting();
+          if (alertingInit) {
+            info(LogCategory.APP, "Alerting service initialized");
           }
-        } catch (alertingError) {
-          console.error('Exception caught while initializing alerting service:', alertingError);
-          info(LogCategory.APP, 'Alerting service initialization failed with exception');
+        } catch (err) {
+          console.error("Alerting failed:", err);
         }
-      } else {
-        console.error('Logging service failed to initialize');
       }
-
-      // Log app start
-      console.log('Logging application start');
-      info(LogCategory.APP, 'Application started');
-    } catch (error) {
-      console.error('Error initializing services:', error);
+    } catch (err) {
+      console.error("Init failed:", err);
     }
   }, []);
 
-  // Customize themes based on Colors.ts and guidelines
-  const lightTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      primary: Colors.light.tint, // Accent color
-      background: Colors.light.background, // Dominant color
-      card: '#f0f2f5', // Secondary background (light gray)
-      text: Colors.light.text, // Secondary color
-      border: '#d1d5db', // Secondary color (slightly lighter gray for borders)
-      notification: '#FF3B30', // Accent color (keep red for notifications)
-      icon: Colors.light.icon, // Add icon color from constants
-    },
-  };
-
-  const darkTheme = {
-    ...DarkTheme,
-    colors: {
-      ...DarkTheme.colors,
-      primary: Colors.neon.blue, // Use a neon accent for dark mode actions
-      background: Colors.dark.background, // Dominant color
-      card: '#2a2c2d', // Secondary background (lighter dark gray)
-      text: Colors.dark.text, // Secondary color
-      border: Colors.dark.icon, // Secondary color (use icon color for borders)
-      notification: '#FF453A', // Accent color (keep red for notifications)
-      icon: Colors.dark.icon, // Add icon color from constants
-    },
-  };
-
-  // Create a custom fallback UI for critical errors
   const fallbackUI = (
     <View style={styles.fallbackContainer}>
       <Text style={styles.fallbackTitle}>App Error</Text>
       <Text style={styles.fallbackText}>
-        We encountered a problem with the app. Please restart the application.
+        We encountered a problem. Please restart the app.
       </Text>
     </View>
   );
@@ -144,20 +113,21 @@ export default function App() {
           <LanguageProvider>
             <NavigationStateProvider>
               <NavigationContainer
-                theme={colorScheme === 'dark' ? darkTheme : lightTheme}
+                theme={theme === "dark" ? darkTheme : lightTheme}
                 onReady={() => {
-                  console.log('App: Navigation container ready');
-                  info(LogCategory.NAVIGATION, 'Navigation container ready');
+                  info(LogCategory.NAVIGATION, "Navigation container ready");
                 }}
                 onStateChange={(state) => {
                   const currentRoute = state?.routes[state.index]?.name;
                   if (currentRoute) {
-                    console.log(`App: Navigated to ${currentRoute}`);
-                    info(LogCategory.NAVIGATION, `Navigated to ${currentRoute}`);
+                    info(
+                      LogCategory.NAVIGATION,
+                      `Navigated to ${currentRoute}`
+                    );
                   }
                 }}
               >
-                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                <StatusBar style={theme === "dark" ? "light" : "dark"} />
                 <ErrorBoundary>
                   <AppNavigator />
                 </ErrorBoundary>
@@ -168,28 +138,37 @@ export default function App() {
       </SafeAreaProvider>
     </ErrorBoundary>
   );
+};
+
+// Final wrapped export
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
+  );
 }
 
-// Styles for the fallback UI - updated with light theme colors and spacing
+// Fallback UI styles
 const styles = StyleSheet.create({
   fallbackContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24, // Increased padding
-    backgroundColor: Colors.light.background, // Use light background
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+    backgroundColor: Colors.light.background,
   },
   fallbackTitle: {
-    fontSize: 24, // Slightly larger
-    fontWeight: 'bold',
-    marginBottom: 16, // Increased spacing
-    color: '#dc3545', // Keep error color distinct
-    textAlign: 'center', // Center align header
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+    color: "#dc3545",
+    textAlign: "center",
   },
   fallbackText: {
     fontSize: 16,
-    textAlign: 'center', // Center align description text
-    color: Colors.light.text, // Use standard text color
-    lineHeight: 24, // Improve readability
+    textAlign: "center",
+    color: Colors.light.text,
+    lineHeight: 24,
   },
 });

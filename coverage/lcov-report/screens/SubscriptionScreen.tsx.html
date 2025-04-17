@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/30</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/30</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
@@ -414,7 +414,10 @@
 <a name='L349'></a><a href='#L349'>349</a>
 <a name='L350'></a><a href='#L350'>350</a>
 <a name='L351'></a><a href='#L351'>351</a>
-<a name='L352'></a><a href='#L352'>352</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -445,6 +448,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -778,8 +784,10 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
-import { ReferralProgramCard } from '../components/ReferralProgramCard';
-import { trackEvent } from '../services/analyticsService';
+import ReferralProgramCard from '../components/ReferralProgramCard';
+import { analyticsService } from '../services';
+import { useI18n } from '../contexts/I18nContext';
+import { AnalyticsEventType } from '../services/analyticsService';
 &nbsp;
 type RootStackParamList = {
   Payment: { planId: string };
@@ -800,6 +808,7 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
   const [loading, setLoading] = <span class="cstat-no" title="statement not covered" >useState&lt;boolean&gt;(true);</span>
   const [hasSubscription, setHasSubscription] = <span class="cstat-no" title="statement not covered" >useState&lt;boolean&gt;(false);</span>
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation&lt;SubscriptionScreenNavigationProp&gt;();</span>
+  const { t } = <span class="cstat-no" title="statement not covered" >useI18n();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const checkSubscription = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
@@ -821,7 +830,7 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
 &nbsp;
   const handleSelectPlan = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>lanId: string) =&gt; {</span>
     // Track subscription started event
-<span class="cstat-no" title="statement not covered" >    trackEvent('subscription_started', {</span>
+<span class="cstat-no" title="statement not covered" >    analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_STARTED, {</span>
       plan_id: planId,
       plan_name: SUBSCRIPTION_PLANS.find(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.id === planId)</span>?.name || 'Unknown'
     });
@@ -833,28 +842,28 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
 <span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;View style={styles.loadingContainer}&gt;
         &lt;ActivityIndicator size="large" color="#3498db" /&gt;
-        &lt;Text style={styles.loadingText}&gt;Loading subscription options...&lt;/Text&gt;
+        &lt;Text style={styles.loadingText}&gt;{t('subscription.loading')}&lt;/Text&gt;
       &lt;/View&gt;
     );
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;ScrollView style={styles.container}&gt;
-      &lt;Text style={styles.title}&gt;Choose a Subscription Plan&lt;/Text&gt;
+      &lt;Text style={styles.title}&gt;{t('subscription.title')}&lt;/Text&gt;
       &lt;Text style={styles.subtitle}&gt;
-        Get access to premium AI-powered betting insights
+        {t('subscription.subtitle')}
       &lt;/Text&gt;
 &nbsp;
       {hasSubscription &amp;&amp; (
         &lt;View style={styles.infoBox}&gt;
           &lt;Text style={styles.infoText}&gt;
-            You already have an active subscription. You can manage your subscription in the settings.
+            {t('subscription.alreadySubscribed')}
           &lt;/Text&gt;
           &lt;TouchableOpacity
             style={styles.manageButton}
             onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('SubscriptionManagement')}</span>
           &gt;
-            &lt;Text style={styles.manageButtonText}&gt;Manage Subscription&lt;/Text&gt;
+            &lt;Text style={styles.manageButtonText}&gt;{t('subscription.manageSubscription')}&lt;/Text&gt;
           &lt;/TouchableOpacity&gt;
         &lt;/View&gt;
       )}
@@ -870,7 +879,7 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
             &lt;Text style={styles.planPrice}&gt;
               ${(plan.amount || plan.price * 100) / 100}
               &lt;Text style={styles.planInterval}&gt;
-                /{plan.interval}
+                /{t(`subscription.interval.${plan.interval}`)}
               &lt;/Text&gt;
             &lt;/Text&gt;
           &lt;/View&gt;
@@ -878,7 +887,7 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
           &lt;Text style={styles.planDescription}&gt;{plan.description}&lt;/Text&gt;
           
           &lt;View style={styles.featuresContainer}&gt;
-            &lt;Text style={styles.featuresTitle}&gt;Features:&lt;/Text&gt;
+            &lt;Text style={styles.featuresTitle}&gt;{t('subscription.features')}:&lt;/Text&gt;
             {plan.features.map(<span class="fstat-no" title="function not covered" >(f</span>eature, index) =&gt; (
 <span class="cstat-no" title="statement not covered" >              &lt;View key={index} style={styles.featureItem}&gt;</span>
                 &lt;Text style={styles.featureText}&gt;• {feature}&lt;/Text&gt;
@@ -890,26 +899,26 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
             style={styles.selectButton}
             onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleSelectPlan(plan.id)}</span>
           &gt;
-            &lt;Text style={styles.selectButtonText}&gt;Select Plan&lt;/Text&gt;
+            &lt;Text style={styles.selectButtonText}&gt;{t('subscription.selectPlan')}&lt;/Text&gt;
           &lt;/TouchableOpacity&gt;
         &lt;/TouchableOpacity&gt;
       ))}
 &nbsp;
       {!hasSubscription &amp;&amp; (
-        &lt;ReferralProgramCard isSubscribed={false} /&gt;
+        &lt;ReferralProgramCard /&gt;
       )}
 &nbsp;
       &lt;View style={styles.groupSubscriptionCard}&gt;
-        &lt;Text style={styles.groupTitle}&gt;Looking for a Group Plan?&lt;/Text&gt;
+        &lt;Text style={styles.groupTitle}&gt;{t('subscription.group.title')}&lt;/Text&gt;
         &lt;Text style={styles.groupDescription}&gt;
-          Share premium features with friends or family. Get Pro access for up to 3 users for just $149.99/month.
+          {t('subscription.group.description')}
         &lt;/Text&gt;
         &lt;TouchableOpacity
           style={styles.groupButton}
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('GroupSubscription')}</span>
         &gt;
           &lt;Text style={styles.groupButtonText}&gt;
-            Create Group Subscription
+            {t('subscription.group.createButton')}
           &lt;/Text&gt;
         &lt;/TouchableOpacity&gt;
       &lt;/View&gt;
@@ -920,7 +929,7 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('GiftRedemption')}</span>
         &gt;
           &lt;Text style={styles.giftButtonText}&gt;
-            Redeem a Gift Subscription
+            {t('subscription.gift.redeemButton')}
           &lt;/Text&gt;
         &lt;/TouchableOpacity&gt;
 &nbsp;
@@ -929,7 +938,7 @@ const SubscriptionScreen = <span class="cstat-no" title="statement not covered" 
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('RefundPolicy')}</span>
         &gt;
           &lt;Text style={styles.policyLinkText}&gt;
-            View our Cancellation &amp; Refund Policy
+            {t('subscription.refundPolicy')}
           &lt;/Text&gt;
         &lt;/TouchableOpacity&gt;
       &lt;/View&gt;
@@ -1123,7 +1132,7 @@ export default SubscriptionScreen;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-22T18:47:12.636Z
+                at 2025-04-16T23:12:34.886Z
             </div>
         <script src="../prettify.js"></script>
         <script>

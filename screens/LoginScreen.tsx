@@ -6,6 +6,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import MobileAppDownload from "../components/MobileAppDownload";
 import { appDownloadService } from "../services/appDownloadService";
 import { useI18n } from "../contexts/I18nContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 // Define the navigation prop type
 type RootStackParamList = {
@@ -187,6 +188,9 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
       <Button title={t("login.signUp")} onPress={handleSignUp} />
       <Text style={styles.forgotPassword}>{t("login.forgotPassword")}</Text>
       <Text style={styles.dontHaveAccount}>{t("login.dontHaveAccount")} <Text style={styles.signUpLink}>{t("login.signUp")}</Text></Text>
+      
+      {/* Theme Toggle */}
+      <ThemeToggle />
     </View>
   );
 }

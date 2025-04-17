@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import NewsTicker from '../components/NewsTicker';
+import ThemeToggle from '../components/ThemeToggle';
 import '../styles/login.css';
 import '../components/NewsTicker.css';
 
@@ -121,6 +122,11 @@ const LoginPage = () => {
               <Link to="/signup">Create Account</Link>
             </div>
           </form>
+          
+          {/* Theme Toggle */}
+          <div className="login-theme-toggle">
+            <ThemeToggle />
+          </div>
           
           <div className="login-footer">
             <p>Get the latest sports predictions powered by AI</p>

@@ -1,479 +1,220 @@
-# System Patterns
+# System Patterns - 2025-04-17
 
-## Code Patterns
+## Error Patterns
 
-### Shell Scripting Patterns
+### 500 Internal Server Error
 
-1. **Command-Line Interface Pattern**
-   - All scripts follow a consistent CLI pattern with --init, --help, and other standardized options
-   - Help text is displayed when no arguments are provided
-   - Each script can be run independently or as part of a larger orchestration
+**Symptoms:**
+- Server responds with 500 Internal Server Error
+- No specific error message in browser
+- Resources fail to load
+- Browser console shows "Failed to load resource: the server responded with a status of 500 ()"
 
-2. **Configuration Management Pattern**
-   - JSON configuration files for all components
-   - Configuration files are created during initialization
-   - Configuration files can be modified manually or through scripts
+**Possible Causes:**
+1. Malformed `.htaccess` file with syntax errors
+2. Incompatible Apache directives for the hosting environment
+3. Server-side script errors (PHP, Node.js, etc.)
+4. File permission issues preventing execution
+5. Memory limits or timeout issues
+6. Missing required modules or dependencies
+7. Server configuration conflicts
 
-3. **Reporting Pattern**
-   - HTML reports generated for all test results
-   - Consistent styling across all reports
-   - Reports include summary and detailed information
-   - Screenshots included where applicable
+**Diagnosis Approach:**
+1. Check server error logs for specific error messages
+2. Examine `.htaccess` file for syntax errors
+3. Temporarily rename `.htaccess` to disable it and see if error resolves
+4. Create a minimal test file to isolate the issue
+5. Check file permissions
+6. Contact hosting provider for server-specific information
 
-4. **Logging Pattern**
-   - All operations are logged to dedicated log files
-   - Logs include timestamps and severity levels
-   - Color-coded output for better readability
+**Solutions:**
+1. Fix syntax errors in `.htaccess` file
+2. Use only compatible directives for the hosting environment
+3. Simplify `.htaccess` file to essential directives
+4. Set correct file permissions
+5. Increase memory limits or timeout settings if needed
+6. Install missing modules or dependencies
+7. Resolve server configuration conflicts
 
-### Testing Patterns
+### Content Security Policy Blocking Scripts
 
-1. **Edge Cases Testing Pattern**
-   - Identify boundary conditions
-   - Test with invalid inputs
-   - Test error handling
-   - Verify appropriate error messages
+**Symptoms:**
+- Console errors about CSP violations
+- Scripts fail to load or execute
+- "X is not defined" errors
+- Specific error messages like "Refused to load the script X because it violates the following Content Security Policy directive: script-src 'self'"
 
-2. **Accessibility Testing Pattern**
-   - Automated testing with Pa11y and Axe
-   - WCAG 2.1 AA compliance checks
-   - Screenshot capture for visual verification
+**Possible Causes:**
+1. Restrictive Content Security Policy
+2. Missing domains in CSP directives
+3. Missing 'unsafe-inline' or 'unsafe-eval' for scripts that require them
+4. Incorrect CSP syntax
+5. Multiple conflicting CSP definitions
+6. Server-level CSP overriding page-level CSP
+7. Third-party scripts requiring additional domains
 
-3. **Internationalization Testing Pattern**
-   - Translation file verification
-   - RTL language support testing
-   - Date and number formatting tests
-   - Screenshot comparison across languages
+**Diagnosis Approach:**
+1. Examine browser console for specific CSP violation messages
+2. Check the CSP meta tag in HTML files
+3. Check for CSP headers in server response
+4. Identify which domains are being blocked
+5. Test with a more permissive CSP to isolate the issue
+6. Use browser developer tools to monitor network requests
 
-4. **Regression Testing Pattern**
-   - Smoke tests run first
-   - Critical path tests run next
-   - Full regression tests run if smoke and critical path tests pass
-### Security Patterns
+**Solutions:**
+1. Update CSP to include all required domains
+2. Add 'unsafe-inline' and 'unsafe-eval' if required by scripts
+3. Expand connect-src directive to allow API connections
+4. Add frame-src entries for authentication services
+5. Ensure CSP syntax is correct
+6. Resolve conflicts between server-level and page-level CSP
+7. Consider using CSP reporting to identify blocked resources
 
-1. **Penetration Testing Pattern**
-   - Network scanning
-   - Web application testing
-   - API testing
-   - Database testing
+### Firebase Authentication API Key Error
 
-2. **Vulnerability Scanning Pattern**
-   - Code scanning
-   - Dependency scanning
-   - Docker image scanning
-   - Infrastructure scanning
+**Symptoms:**
+- Error message: "Firebase: Error (auth/api-key-not-valid.-please-pass-a-valid-api-key.)"
+- Authentication methods fail (sign in, sign up, etc.)
+- Firebase initializes successfully but auth operations fail
+- No CSP violation errors in console
 
-3. **API Rate Limiting Pattern**
-   - Global rate limits
-   - Endpoint-specific rate limits
-   - User tier-based rate limits
-   - IP whitelisting
+**Possible Causes:**
+1. Invalid or incorrect API key in Firebase configuration
+2. Missing API key in Firebase configuration
+3. API key restrictions in Firebase console
+4. Domain not authorized in Firebase console
+5. CSP missing 'unsafe-eval' in script-src directive
+6. CSP missing required authentication domains (especially gstatic.com)
+7. Firebase SDK version incompatibility
+8. Project configuration mismatch between different environment files
+9. Incorrect project ID or auth domain in configuration
 
-4. **Content Security Policy Pattern**
-   - Default-src restriction to 'self'
-   - Specific allowances for trusted external sources
-   - Inline script and style restrictions
-   - Frame and object restrictions
+**Diagnosis Approach:**
+1. Verify API key in Firebase configuration
+2. Check API key in Firebase console
+3. Check authorized domains in Firebase console
+4. Examine CSP for 'unsafe-eval' in script-src directive
+5. Check CSP for authentication domains
+6. Test with a minimal Firebase configuration
+7. Add diagnostic logging to Firebase initialization
 
-5. **Subresource Integrity Pattern**
-   - SHA-384 hash generation for external resources
-   - Integrity attribute on script and link tags
-   - Crossorigin attribute for CORS resources
-   - Fallback mechanisms for failed integrity checks
+**Solutions:**
+1. Update API key if incorrect
+2. Add API key if missing
+3. Update API key restrictions in Firebase console
+4. Add domain to authorized domains in Firebase console
+5. Add 'unsafe-eval' to script-src directive in CSP
+6. Add authentication domains to CSP, especially gstatic.com
+7. Update Firebase SDK version if needed
+8. Ensure consistent project configuration across all environment files
+9. Verify project ID and auth domain match in all configuration files
 
-6. **CSRF Protection Pattern**
-   - Token generation and storage
-   - Token inclusion in non-GET requests
-   - Token validation on server-side
-   - Token refresh mechanisms
+## Debugging Approaches
 
-7. **XSS Prevention Pattern**
-   - HTML entity encoding
-   - JavaScript protocol blocking
-   - Event handler sanitization
-   - Data URI filtering
-   - Recursive object sanitization
-   - IP whitelisting
+### Systematic Debugging Process
 
-### Release Management Patterns
+1. **Observe and Reproduce**
+   - Document exact error messages and symptoms
+   - Create a reliable reproduction case
+   - Identify patterns in when the error occurs
 
-1. **CI/CD Pipeline Pattern**
-   - Automated build, test, and deployment
-   - Integration with AWS services
-   - Artifact storage and management
+2. **Isolate the Problem**
+   - Create minimal test cases
+   - Disable components one by one to identify the culprit
+   - Use binary search approach for complex systems
 
-2. **Versioning Pattern**
-   - Semantic versioning
-   - Changelog management
-   - Git tagging
+3. **Formulate Hypotheses**
+   - List 5-7 possible causes based on symptoms
+   - Rank hypotheses by likelihood
+   - Focus on the most likely 1-2 causes first
 
-3. **Rollback Pattern**
-   - Code rollback
-   - Database rollback
-   - Deployment rollback
+4. **Test Hypotheses**
+   - Add strategic logging to validate assumptions
+   - Make minimal changes to test each hypothesis
+   - Document results of each test
 
-4. **Feature Flags Pattern**
-   - Gradual rollout
-   - A/B testing
-   - Environment-specific configuration
+5. **Implement Solution**
+   - Create a comprehensive fix
+   - Ensure the fix addresses the root cause, not just symptoms
+   - Create automated tests to prevent regression
 
-5. **Canary Deployment Pattern**
-   - Traffic splitting
-   - Metrics monitoring
-   - Automated promotion/rollback
+6. **Verify Solution**
+   - Test in multiple environments
+   - Verify all related functionality
+   - Monitor for any side effects
 
-### Onboarding Experience Patterns
+7. **Document Findings**
+   - Record the root cause and solution
+   - Update system documentation
+   - Share knowledge with the team
 
-1. **Secure Storage Pattern**
-   ```javascript
-   // Configuration options
-   const BYPASS_ONBOARDING_IN_DEV = false; // Set to true only when needed for testing
+### Web Hosting Debugging Patterns
 
-   // Local storage key with a unique prefix to avoid conflicts
-   const ONBOARDING_COMPLETED_KEY = 'ai_sports_edge_onboarding_completed';
+1. **Server Configuration Issues**
+   - Check for `.htaccess` syntax errors
+   - Verify server module availability
+   - Test with minimal configuration
+   - Isolate custom directives
 
-   /**
-    * Check if onboarding has been completed
-    * @returns {Promise<boolean>} True if onboarding has been completed
-    */
-   export const isOnboardingCompleted = async () => {
-     try {
-       // For development purposes, optionally bypass onboarding
-       const isDevelopment = window.location.hostname === 'localhost' || 
-                             window.location.hostname === '127.0.0.1';
-       
-       if (isDevelopment && BYPASS_ONBOARDING_IN_DEV) {
-         console.log('Development mode: Onboarding bypassed');
-         return true;
-       }
-       
-       // Use a try-catch block to handle potential localStorage access issues
-       const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
-       
-       // Validate the value to prevent unexpected behavior
-       if (completed !== 'true' && completed !== null) {
-         // Check for potential XSS attempts in the stored value
-         if (completed && (completed.includes('<') || completed.includes('>'))) {
-           console.warn('Potentially malicious value detected:', sanitizeValue(completed));
-           localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
-           localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
-           return false;
-         }
-         
-         console.warn('Invalid onboarding status value:', sanitizeValue(completed));
-         localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'false');
-         return false;
-       }
-       
-       return completed === 'true';
-     } catch (error) {
-       console.error('Error checking onboarding status:', error);
-       return false;
-     }
-   };
-   ```
+2. **Content Security Policy Debugging**
+   - Start with permissive CSP and gradually restrict
+   - Use CSP reporting to identify blocked resources
+   - Test each domain and directive individually
+   - Document required domains for third-party scripts
 
-2. **Enhanced Accessibility Pattern**
-   ```jsx
-   <div
-     className={`onboarding-content ${animating ? 'fade-out' : 'fade-in'}`}
-     aria-live="polite"
-     role="region"
-     aria-label={`${t('onboarding:step', { defaultValue: 'Step' })} ${currentStep + 1} ${t('onboarding:of', { defaultValue: 'of' })} ${steps.length}`}
-   >
-     {/* Content */}
-   </div>
+3. **Cross-Origin Resource Sharing (CORS)**
+   - Check for CORS headers in server response
+   - Verify allowed origins match request origins
+   - Test with wildcard origin temporarily
+   - Check for preflight request handling
 
-   <button
-     className="next-button"
-     onClick={handleNext}
-     aria-label={t('common:next')}
-     aria-describedby={`onboarding-step-${currentStep + 1}`}
-   >
-     {t('common:next')}
-   </button>
-   ```
+4. **Firebase-Specific Patterns**
+   - Verify Firebase SDK version compatibility
+   - Check for required CSP directives
+   - Ensure correct initialization order
+   - Test with minimal Firebase configuration
 
-3. **Unified Analytics Pattern**
-   ```javascript
-   /**
-    * Track an analytics event
-    * @param {string} eventName - Name of the event to track
-    * @param {Object} eventData - Data associated with the event
-    * @returns {Promise<boolean>} - True if successful, false otherwise
-    */
-   export const trackEvent = async (eventName, eventData) => {
-     try {
-       // Sanitize inputs
-       const sanitizedEventName = sanitizeValue(eventName);
-       const sanitizedEventData = sanitizeValue(eventData);
-       
-       // Add common properties
-       const commonData = {
-         timestamp: new Date().toISOString(),
-         platform: 'web',
-         browser: navigator.userAgent ? sanitizeValue(navigator.userAgent) : 'unknown',
-         language: navigator.language || 'en',
-         url: window.location.href,
-         referrer: document.referrer || 'direct'
-       };
-       
-       // Merge with event data
-       const fullEventData = {
-         ...sanitizedEventData,
-         ...commonData
-       };
-       
-       // Web implementation (gtag)
-       if (typeof window !== 'undefined' && window.gtag) {
-         window.gtag('event', sanitizedEventName, fullEventData);
-       }
-       
-       return true;
-     } catch (error) {
-       console.error('Analytics error:', error);
-       return false;
-     }
-   };
-   ```
+### Firebase Authentication Debugging Patterns
 
-4. **Multilingual Support Pattern**
-   ```javascript
-   // Translation files structure
-   // translations/en.json
-   {
-     "onboarding": {
-       "welcome": {
-         "title": "Welcome to AI Sports Edge",
-         "description": "Get an edge in sports betting with AI-powered predictions and analysis."
-       },
-       // More translations...
-     }
-   }
+1. **API Key Issues**
+   - Verify API key format (should start with "AIza")
+   - Check API key in Firebase console
+   - Test API key with curl or Postman
+   - Check for API key restrictions
 
-   // translations/es.json
-   {
-     "onboarding": {
-       "welcome": {
-         "title": "Bienvenido a AI Sports Edge",
-         "description": "Obtenga ventaja en las apuestas deportivas con predicciones y análisis impulsados por IA."
-       },
-       // More translations...
-     }
-   }
+2. **CSP Requirements**
+   - Add 'unsafe-eval' to script-src directive
+   - Add authentication domains to connect-src
+   - Add accounts.google.com to frame-src
+   - Test with minimal CSP
 
-   // Usage in components
-   const { t, i18n } = useTranslation(['common', 'onboarding']);
-   
-   <h1>{t('onboarding:welcome.title')}</h1>
-   <p>{t('onboarding:welcome.description')}</p>
-   ```
+3. **Authentication Flow**
+   - Test anonymous authentication first
+   - Check for auth state changes
+   - Monitor network requests during authentication
+   - Verify correct auth domain
 
-## Implementation Approaches
+4. **Misleading Error Messages**
+   - "auth/api-key-not-valid" often indicates CSP issues, not API key problems
+   - "auth/network-request-failed" can indicate CSP or CORS issues
+   - "auth/internal-error" often indicates script loading issues
 
-### Modular Design
+### Mobile App Debugging Patterns
 
-Each script is designed to be modular and focused on a specific concern:
-- `ci-cd-pipeline.sh` - CI/CD pipeline setup
-- `versioning-strategy.sh` - Version management
-- `rollback-procedure.sh` - Rollback procedures
-- `feature-flags.sh` - Feature flag management
-- `canary-deployments.sh` - Canary deployment management
-- `release-management.sh` - Orchestration of release management
-- `penetration-testing.sh` - Penetration testing
-- `vulnerability-scanning.sh` - Vulnerability scanning
-- `api-rate-limiting.sh` - API rate limiting
-- `security-management.sh` - Orchestration of security components
-- `edge-cases-testing.sh` - Edge cases testing
-- `accessibility-audit.sh` - Accessibility testing
-- `internationalization-testing.sh` - Internationalization testing
-- `regression-testing.sh` - Regression testing
-- `testing-management.sh` - Orchestration of testing components
+1. **iOS-Web Compatibility Issues**
+   - Check for platform-specific API usage
+   - Verify Firebase configuration matches between platforms
+   - Test authentication flows on both platforms
+   - Ensure consistent data models
 
-### Orchestration Pattern
+2. **Firebase SDK Integration**
+   - Verify correct SDK versions
+   - Check initialization code
+   - Test each Firebase service individually
+   - Monitor network requests to Firebase endpoints
 
-Higher-level scripts orchestrate lower-level scripts:
-- `deploy-production.sh` orchestrates all components
-- `release-management.sh` orchestrates release management scripts
-- `security-management.sh` orchestrates security scripts
-- `testing-management.sh` orchestrates testing scripts
-
-### Documentation Pattern
-
-Comprehensive documentation for all components:
-- `docs/production-infrastructure.md` - Infrastructure documentation
-- `docs/release-management-plan.md` - Release management documentation
-- `docs/security-plan.md` - Security documentation
-- `docs/testing-plan.md` - Testing documentation
-- `docs/onboarding-process.md` - Onboarding process documentation
-
-### Payment Processing Patterns
-
-1. **API Key Management Pattern**
-   ```bash
-   # Configuration options
-   ENV_FILE=".env"
-   CONFIG_FILE="config/payment.json"
-   BACKUP_SUFFIX=".test-backup"
-
-   # Create backups
-   cp "$ENV_FILE" "$ENV_FILE$BACKUP_SUFFIX"
-   cp "$CONFIG_FILE" "$CONFIG_FILE$BACKUP_SUFFIX"
-
-   # Update configuration
-   sed -i.bak 's/STRIPE_TEST_PUBLISHABLE_KEY/STRIPE_PUBLISHABLE_KEY/g' "$ENV_FILE"
-   sed -i.bak 's/PAYMENT_MODE=test/PAYMENT_MODE=production/g' "$ENV_FILE"
-
-   # Verify changes
-   if grep -q "PAYMENT_MODE=production" "$ENV_FILE"; then
-     echo "Configuration successfully updated to production mode!"
-   else
-     echo "Verification failed. Restoring backups..."
-     mv "$ENV_FILE$BACKUP_SUFFIX" "$ENV_FILE"
-     mv "$CONFIG_FILE$BACKUP_SUFFIX" "$CONFIG_FILE"
-   fi
-   ```
-
-   This pattern provides:
-   - Safe switching between test and production environments
-   - Automatic backup of configuration files
-   - Verification of changes before committing
-   - Easy rollback to previous configuration
-   - Consistent environment configuration
-
-2. **Webhook Configuration Pattern**
-   ```javascript
-   // Define events to listen for
-   const STRIPE_EVENTS = [
-     "payment_intent.succeeded",
-     "payment_intent.payment_failed",
-     "checkout.session.completed",
-     "customer.subscription.created",
-     "customer.subscription.updated",
-     "customer.subscription.deleted",
-     "invoice.payment_succeeded",
-     "invoice.payment_failed",
-     "charge.refunded"
-   ];
-
-   // Create webhook
-   const webhook = await stripe.webhookEndpoints.create({
-     url: WEBHOOK_ENDPOINT,
-     enabled_events: STRIPE_EVENTS,
-     description: "Production webhook for payment events"
-   });
-
-   // Store webhook secret securely
-   await storeWebhookSecret(webhook.secret);
-   ```
-
-   This pattern provides:
-   - Consistent webhook configuration across environments
-   - Event-specific configuration for different payment scenarios
-   - Secure storage of webhook secrets
-   - Proper error handling and validation
-   - Support for multiple payment providers
-
-3. **Refund Processing Pattern**
-   ```javascript
-   // Process a refund
-   async function processRefund(paymentId, amount, reason) {
-     try {
-       // Validate inputs
-       if (!paymentId) throw new Error("Payment ID is required");
-       if (amount <= 0) throw new Error("Amount must be greater than 0");
-       
-       // Get payment details
-       const payment = await getPaymentDetails(paymentId);
-       
-       // Validate payment status
-       if (payment.status !== "succeeded") {
-         throw new Error(`Cannot refund payment with status: ${payment.status}`);
-       }
-       
-       // Check if already refunded
-       if (payment.refunded) {
-         throw new Error("Payment has already been refunded");
-       }
-       
-       // Check refund amount
-       if (amount > payment.amount) {
-         throw new Error("Refund amount cannot exceed payment amount");
-       }
-       
-       // Process refund with payment provider
-       const refund = await paymentProvider.refunds.create({
-         payment: paymentId,
-         amount: amount,
-         reason: reason
-       });
-       
-       // Record refund in database
-       await saveRefundRecord(refund.id, paymentId, amount, reason);
-       
-       // Notify customer
-       await notifyCustomerOfRefund(payment.customerId, refund.id, amount);
-       
-       return refund;
-     } catch (error) {
-       // Log error
-       console.error("Refund processing error:", error);
-       
-       // Rethrow with appropriate message
-       throw new Error(`Failed to process refund: ${error.message}`);
-     }
-   }
-   ```
-
-   This pattern provides:
-   - Comprehensive input validation
-   - Payment status verification
-   - Amount validation to prevent over-refunding
-   - Proper error handling with detailed messages
-   - Database recording of refund details
-   - Customer notification of refund status
-
-## Best Practices
-
-1. **Error Handling**
-   - All scripts include proper error handling
-   - Errors are reported with clear messages
-   - Non-zero exit codes for failures
-
-2. **Idempotency**
-   - Scripts can be run multiple times without side effects
-   - Configuration files are created only if they don't exist
-   - Existing configurations are preserved
-
-3. **Automation**
-   - All processes are automated
-   - Scheduled tasks for regular operations
-   - Minimal manual intervention required
-
-4. **Monitoring**
-   - All operations are logged
-   - Reports are generated for all tests
-   - Alerts for critical issues
-
-5. **Security**
-   - Secure coding practices
-   - Regular security testing
-   - Proper authentication and authorization
-
-6. **Accessibility**
-   - ARIA attributes for screen readers
-   - Keyboard navigation support
-   - High contrast support
-   - Reduced motion options
-
-7. **Internationalization**
-   - Translation files for all supported languages
-   - Context-based translation keys
-   - Proper handling of RTL languages
-   - Localized formatting for dates, numbers, and currencies
-
-8. **Payment Processing**
-   - Test mode for development and testing
-   - Production mode for live transactions
-   - Comprehensive webhook handling
-   - Robust refund procedures
-   - Detailed transaction logging
+3. **UI/UX Consistency**
+   - Compare component behavior across platforms
+   - Test responsive layouts
+   - Verify consistent error handling
+   - Check accessibility features

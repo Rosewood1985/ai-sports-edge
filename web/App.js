@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BettingAffiliateProvider } from './contexts/BettingAffiliateContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LanguageSwitcher from './components/LanguageSwitcher';
@@ -195,8 +196,9 @@ const App = () => {
   };
 
   return (
-    <BettingAffiliateProvider>
-      <div className="app">
+    <ThemeProvider>
+      <BettingAffiliateProvider>
+        <div className="app">
         {/* Only show Header, LanguageSwitcher, and Footer if not on login page */}
         {!isLoginPage && <Header />}
         {!isLoginPage && <LanguageSwitcher />}
@@ -303,8 +305,9 @@ const App = () => {
           </Routes>
         </main>
         {!isLoginPage && <Footer />}
-      </div>
-    </BettingAffiliateProvider>
+        </div>
+      </BettingAffiliateProvider>
+    </ThemeProvider>
   );
 };
 

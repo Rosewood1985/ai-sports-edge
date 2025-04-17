@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import '../styles/header.css';
 import PersonalizationPanel from './PersonalizationPanel';
 import BetNowButton from './BetNowButton';
-import { useBettingAffiliate } from '../../contexts/BettingAffiliateContext';
+import ThemeToggle from './ThemeToggle';
+import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -79,6 +80,10 @@ const Header = () => {
               </li>
               <li className="nav-item">
                 <Link to="/download" className="download-button" onClick={closeMenu}>Download</Link>
+              </li>
+              {/* Theme Toggle */}
+              <li className="nav-item">
+                <ThemeToggle />
               </li>
               {/* Add Bet Now button to header */}
               {showBetButton('header') && (

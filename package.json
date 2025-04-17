@@ -6,12 +6,15 @@
     "start": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
+    "web": "NODE_ENV=development expo start --web",
     "eject": "expo eject",
-    "build": "expo export --platform web --output-dir dist"
+    "build": "expo export --platform web --output-dir dist",
+    "build:dev": "NODE_ENV=development webpack --config webpack.config.js",
+    "build:prod": "NODE_ENV=production webpack --config webpack.prod.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
+    "@firebase/app-check": "^0.8.13",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-native-firebase/analytics": "^21.12.2",
     "@react-navigation/bottom-tabs": "^6.5.8",
@@ -39,7 +42,7 @@
     "expo-status-bar": "~1.4.4",
     "expo-system-ui": "~2.2.1",
     "expo-web-browser": "~12.1.1",
-    "firebase": "^10.1.0",
+    "firebase": "^10.14.1",
     "i18n-js": "^4.2.3",
     "pg": "^8.14.1",
     "react": "18.2.0",
@@ -57,8 +60,11 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@tsconfig/react-native": "^3.0.5",
+    "babel-jest": "^29.7.0",
     "depcheck": "^1.4.7",
+    "dotenv-webpack": "^8.1.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "node-fetch": "^2.7.0",
     "react-test-renderer": "18.2.0"
   },

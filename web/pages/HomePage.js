@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import '../styles/home.css';
 import BetNowButton from '../components/BetNowButton';
 import BetNowPopup from '../components/BetNowPopup';
-import { useBettingAffiliate } from '../../contexts/BettingAffiliateContext';
+import ThemeToggle from '../components/ThemeToggle';
+import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 
 const HomePage = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -170,6 +171,9 @@ const HomePage = () => {
       <section className="cta-section">
         <div className="container">
           <div className="cta-content">
+            <div className="theme-toggle-container">
+              <ThemeToggle />
+            </div>
             <h2>{t('home:cta.title')}</h2>
             <p>{t('home:cta.description')}</p>
             <div className="cta-buttons">

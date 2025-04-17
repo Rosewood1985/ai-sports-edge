@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/40</span>
+                <span class='fraction'>0/41</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -335,7 +335,10 @@
 <a name='L270'></a><a href='#L270'>270</a>
 <a name='L271'></a><a href='#L271'>271</a>
 <a name='L272'></a><a href='#L272'>272</a>
-<a name='L273'></a><a href='#L273'>273</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -369,6 +372,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -608,12 +612,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   Alert
 } from 'react-native';
@@ -622,6 +626,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
+import { useI18n } from '../contexts/I18nContext';
 &nbsp;
 type RootStackParamList = {
   Payment: { planId: string };
@@ -644,6 +649,7 @@ const PaymentScreen = <span class="cstat-no" title="statement not covered" ><spa
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation&lt;PaymentScreenNavigationProp&gt;();</span>
   const route = <span class="cstat-no" title="statement not covered" >useRoute&lt;PaymentScreenRouteProp&gt;();</span>
   const { createPaymentMethod } = <span class="cstat-no" title="statement not covered" >useStripe();</span>
+  const { t } = <span class="cstat-no" title="statement not covered" >useI18n();</span>
   
   const { planId } = <span class="cstat-no" title="statement not covered" >route.params;</span>
 &nbsp;
@@ -653,15 +659,15 @@ const PaymentScreen = <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >    if (plan) {</span>
 <span class="cstat-no" title="statement not covered" >      setSelectedPlan(plan);</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      Alert.alert('Error', 'Invalid subscription plan');</span>
+<span class="cstat-no" title="statement not covered" >      Alert.alert(t('common.error'), t('payment.errors.invalidPlan'));</span>
 <span class="cstat-no" title="statement not covered" >      navigation.goBack();</span>
     }
-  }, [planId, navigation]);
+  }, [planId, navigation, t]);
 &nbsp;
   const handlePayment = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      if (!cardComplete) {</span>
-<span class="cstat-no" title="statement not covered" >        Alert.alert('Error', 'Please complete the card details');</span>
+<span class="cstat-no" title="statement not covered" >        Alert.alert(t('common.error'), t('payment.errors.incompleteCard'));</span>
 <span class="cstat-no" title="statement not covered" >        return;</span>
       }
 &nbsp;
@@ -677,30 +683,30 @@ const PaymentScreen = <span class="cstat-no" title="statement not covered" ><spa
       }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!paymentMethod) {</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error('Payment method creation failed');</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error(t('payment.errors.paymentMethodFailed'));</span>
       }
 &nbsp;
       // Create the subscription
       const userId = <span class="cstat-no" title="statement not covered" >auth.currentUser?.uid;</span>
 <span class="cstat-no" title="statement not covered" >      if (!userId) {</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error('User not authenticated');</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error(t('payment.errors.notAuthenticated'));</span>
       }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      await createSubscription(userId, paymentMethod.id, planId);</span>
 &nbsp;
       // Show success message
 <span class="cstat-no" title="statement not covered" >      Alert.alert(</span>
-        'Subscription Successful',
-        'Your subscription has been activated successfully!',
+        t('payment.success.title'),
+        t('payment.success.message'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('Main'),</span>
           },
         ]
       );
     } catch (error: any) {
-<span class="cstat-no" title="statement not covered" >      Alert.alert('Error', error.message || 'An error occurred during payment processing');</span>
+<span class="cstat-no" title="statement not covered" >      Alert.alert(t('common.error'), error.message || t('payment.errors.generic'));</span>
     } finally {
 <span class="cstat-no" title="statement not covered" >      setLoading(false);</span>
     }
@@ -716,28 +722,28 @@ const PaymentScreen = <span class="cstat-no" title="statement not covered" ><spa
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;ScrollView style={styles.container}&gt;
-      &lt;Text style={styles.title}&gt;Payment Information&lt;/Text&gt;
+      &lt;Text style={styles.title}&gt;{t('payment.title')}&lt;/Text&gt;
       &lt;Text style={styles.subtitle}&gt;
-        Enter your card details to subscribe to {selectedPlan.name}
+        {t('payment.subtitle', { planName: selectedPlan.name })}
       &lt;/Text&gt;
 &nbsp;
       &lt;View style={styles.planSummary}&gt;
-        &lt;Text style={styles.planSummaryTitle}&gt;Plan Summary&lt;/Text&gt;
+        &lt;Text style={styles.planSummaryTitle}&gt;{t('payment.planSummary.title')}&lt;/Text&gt;
         &lt;View style={styles.planSummaryRow}&gt;
-          &lt;Text style={styles.planSummaryLabel}&gt;Plan:&lt;/Text&gt;
+          &lt;Text style={styles.planSummaryLabel}&gt;{t('payment.planSummary.plan')}:&lt;/Text&gt;
           &lt;Text style={styles.planSummaryValue}&gt;{selectedPlan.name}&lt;/Text&gt;
         &lt;/View&gt;
         &lt;View style={styles.planSummaryRow}&gt;
-          &lt;Text style={styles.planSummaryLabel}&gt;Price:&lt;/Text&gt;
+          &lt;Text style={styles.planSummaryLabel}&gt;{t('payment.planSummary.price')}:&lt;/Text&gt;
           &lt;Text style={styles.planSummaryValue}&gt;
             ${(selectedPlan.amount || selectedPlan.price * 100) / 100}
-            /{selectedPlan.interval}
+            /{t(`payment.interval.${selectedPlan.interval}`)}
           &lt;/Text&gt;
         &lt;/View&gt;
       &lt;/View&gt;
 &nbsp;
       &lt;View style={styles.cardContainer}&gt;
-        &lt;Text style={styles.cardLabel}&gt;Card Information&lt;/Text&gt;
+        &lt;Text style={styles.cardLabel}&gt;{t('payment.cardInformation')}&lt;/Text&gt;
         &lt;CardField
           postalCodeEnabled={true}
           placeholders={{
@@ -761,12 +767,12 @@ const PaymentScreen = <span class="cstat-no" title="statement not covered" ><spa
         {loading ? (
           &lt;ActivityIndicator size="small" color="#fff" /&gt;
         ) : (
-          &lt;Text style={styles.payButtonText}&gt;Subscribe Now&lt;/Text&gt;
+          &lt;Text style={styles.payButtonText}&gt;{t('payment.subscribeNow')}&lt;/Text&gt;
         )}
       &lt;/TouchableOpacity&gt;
 &nbsp;
       &lt;Text style={styles.secureText}&gt;
-        🔒 Your payment information is secure and encrypted
+        🔒 {t('payment.secureInfo')}
       &lt;/Text&gt;
 &nbsp;
       &lt;TouchableOpacity
@@ -774,7 +780,7 @@ const PaymentScreen = <span class="cstat-no" title="statement not covered" ><spa
         onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.goBack()}</span>
         disabled={loading}
       &gt;
-        &lt;Text style={styles.cancelButtonText}&gt;Cancel&lt;/Text&gt;
+        &lt;Text style={styles.cancelButtonText}&gt;{t('common.cancel')}&lt;/Text&gt;
       &lt;/TouchableOpacity&gt;
     &lt;/ScrollView&gt;
   );
@@ -886,7 +892,7 @@ export default PaymentScreen;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-22T18:47:12.636Z
+                at 2025-04-16T23:12:34.886Z
             </div>
         <script src="../prettify.js"></script>
         <script>
