@@ -1746,7 +1746,7 @@
     },
     {
       "path": "screens/Auth/SignupScreen.tsx",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "roo_edited",
       "roo_read_date": 1744916664959,
       "roo_edit_date": 1744916664959,
@@ -2390,6 +2390,158 @@
       "record_source": "roo_edited",
       "roo_read_date": 1744917883319,
       "roo_edit_date": 1744917883319,
+      "user_edit_date": null
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744918227008,
+      "roo_edit_date": 1744916664959,
+      "user_edit_date": 1744916664770
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918227008,
+      "roo_edit_date": 1744916664959,
+      "user_edit_date": 1744918239113
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918239868,
+      "roo_edit_date": 1744918239868,
+      "user_edit_date": 1744918239113
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918239868,
+      "roo_edit_date": 1744918239868,
+      "user_edit_date": 1744918253985
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918254899,
+      "roo_edit_date": 1744918254899,
+      "user_edit_date": 1744918253985
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744918284975,
+      "roo_edit_date": 1744918254899,
+      "user_edit_date": 1744918253985
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918284975,
+      "roo_edit_date": 1744918254899,
+      "user_edit_date": 1744918317433
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918317891,
+      "roo_edit_date": 1744918317891,
+      "user_edit_date": 1744918317433
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744918355478,
+      "roo_edit_date": 1744918317891,
+      "user_edit_date": 1744918317433
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918355478,
+      "roo_edit_date": 1744918317891,
+      "user_edit_date": 1744918392340
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918392905,
+      "roo_edit_date": 1744918392905,
+      "user_edit_date": 1744918392340
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744918412261,
+      "roo_edit_date": 1744918392905,
+      "user_edit_date": 1744918392340
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918412261,
+      "roo_edit_date": 1744918392905,
+      "user_edit_date": 1744918427219
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918427919,
+      "roo_edit_date": 1744918427919,
+      "user_edit_date": 1744918427219
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918427919,
+      "roo_edit_date": 1744918427919,
+      "user_edit_date": 1744918451938
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918452879,
+      "roo_edit_date": 1744918452879,
+      "user_edit_date": 1744918451938
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744918452879,
+      "roo_edit_date": 1744918452879,
+      "user_edit_date": 1744918524141
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918524948,
+      "roo_edit_date": 1744918524948,
+      "user_edit_date": 1744918524141
+    },
+    {
+      "path": "memory-bank/signup-process-improvements.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744918540913,
+      "roo_edit_date": 1744918540913,
       "user_edit_date": null
     }
   ]

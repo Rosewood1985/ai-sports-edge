@@ -1,10 +1,23 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Platform,
+  KeyboardAvoidingView
+} from "react-native";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, OAuthProvider } from "firebase/auth";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useI18n } from "../../contexts/I18nContext";
 import { getAuth } from "firebase/auth";
 import ThemeToggle from "../../components/ThemeToggle";
+import { useTheme } from "../../screens/Onboarding/Context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 // Define the navigation prop type
 type RootStackParamList = {
@@ -25,37 +38,161 @@ export default function SignupScreen({ navigation }: Props): JSX.Element {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [passwordStrength, setPasswordStrength] = useState<number>(0);
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
+  const [socialLoginLoading, setSocialLoginLoading] = useState<boolean>(false);
   
-  // Get translations
+  // Get translations and theme
   const { t } = useI18n();
+  const { theme } = useTheme();
   
-  const handleSignUp = async (): Promise<void> => {
-    // Validate inputs
+  // Calculate password strength whenever password changes
+  useEffect(() => {
+    if (!password) {
+      setPasswordStrength(0);
+      return;
+    }
+    
+    let strength = 0;
+    
+    // Length check
+    if (password.length >= 8) strength += 1;
+    
+    // Contains number
+    if (/\d/.test(password)) strength += 1;
+    
+    // Contains lowercase
+    if (/[a-z]/.test(password)) strength += 1;
+    
+    // Contains uppercase
+    if (/[A-Z]/.test(password)) strength += 1;
+    
+    // Contains special character
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    
+    setPasswordStrength(strength);
+  }, [password]);
+  
+  // Validate email
+  const validateEmail = (): boolean => {
     if (!email.trim()) {
-      Alert.alert(t("common.error"), t("signup.errors.emailRequired") || "Email is required");
-      return;
+      setEmailError(t("signup.errors.emailRequired") || "Email is required");
+      return false;
     }
     
-    if (!password.trim()) {
-      Alert.alert(t("common.error"), t("signup.errors.passwordRequired") || "Password is required");
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      Alert.alert(t("common.error"), t("signup.errors.passwordsDoNotMatch") || "Passwords do not match");
-      return;
-    }
-    
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert(t("common.error"), t("signup.errors.invalidEmail") || "Invalid email format");
-      return;
+      setEmailError(t("signup.errors.invalidEmail") || "Invalid email format");
+      return false;
     }
     
-    // Password strength validation
+    setEmailError("");
+    return true;
+  };
+  
+  // Validate password
+  const validatePassword = (): boolean => {
+    if (!password.trim()) {
+      setPasswordError(t("signup.errors.passwordRequired") || "Password is required");
+      return false;
+    }
+    
     if (password.length < 8) {
-      Alert.alert(t("common.error"), t("signup.errors.passwordTooShort") || "Password must be at least 8 characters");
+      setPasswordError(t("signup.errors.passwordTooShort") || "Password must be at least 8 characters");
+      return false;
+    }
+    
+    if (passwordStrength < 3) {
+      setPasswordError(t("signup.errors.weakPassword") || "Password is too weak");
+      return false;
+    }
+    
+    setPasswordError("");
+    return true;
+  };
+  
+  // Validate confirm password
+  const validateConfirmPassword = (): boolean => {
+    if (password !== confirmPassword) {
+      setConfirmPasswordError(t("signup.errors.passwordsDoNotMatch") || "Passwords do not match");
+      return false;
+    }
+    
+    setConfirmPasswordError("");
+    return true;
+  };
+  
+  // Handle Google sign in
+  const handleGoogleSignIn = async (): Promise<void> => {
+    setSocialLoginLoading(true);
+    
+    try {
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      
+      // On web, use signInWithPopup
+      if (Platform.OS === 'web') {
+        await signInWithPopup(auth, provider);
+        navigation.replace("Main");
+      } else {
+        // For mobile, we would use Expo AuthSession
+        // This is a placeholder - in a real app, you'd implement Expo AuthSession
+        Alert.alert(
+          t("common.info") || "Info",
+          t("signup.alerts.googleSignInMobile") || "Google Sign In on mobile requires Expo AuthSession implementation"
+        );
+      }
+    } catch (error: any) {
+      console.error('Google sign in error:', error);
+      Alert.alert(
+        t("common.error") || "Error",
+        t("signup.errors.googleSignInFailed") || "Google sign in failed"
+      );
+    } finally {
+      setSocialLoginLoading(false);
+    }
+  };
+  
+  // Handle Apple sign in
+  const handleAppleSignIn = async (): Promise<void> => {
+    setSocialLoginLoading(true);
+    
+    try {
+      const auth = getAuth();
+      const provider = new OAuthProvider('apple.com');
+      
+      // On web, use signInWithPopup
+      if (Platform.OS === 'web') {
+        await signInWithPopup(auth, provider);
+        navigation.replace("Main");
+      } else {
+        // For mobile, we would use Expo AuthSession
+        // This is a placeholder - in a real app, you'd implement Expo AuthSession
+        Alert.alert(
+          t("common.info") || "Info",
+          t("signup.alerts.appleSignInMobile") || "Apple Sign In on mobile requires Expo AuthSession implementation"
+        );
+      }
+    } catch (error: any) {
+      console.error('Apple sign in error:', error);
+      Alert.alert(
+        t("common.error") || "Error",
+        t("signup.errors.appleSignInFailed") || "Apple sign in failed"
+      );
+    } finally {
+      setSocialLoginLoading(false);
+    }
+  };
+  
+  const handleSignUp = async (): Promise<void> => {
+    // Validate all inputs
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+    const isConfirmPasswordValid = validateConfirmPassword();
+    
+    if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return;
     }
     
@@ -98,74 +235,216 @@ export default function SignupScreen({ navigation }: Props): JSX.Element {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>{t("signup.title") || "Create Account"}</Text>
-        <Text style={styles.subtitle}>{t("signup.subtitle") || "Join AI Sports Edge for premium betting insights"}</Text>
-        
-        <TextInput
-          style={styles.input}
-          placeholder={t("signup.email") || "Email"}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          testID="signup-email-input"
-        />
-        
-        <TextInput
-          style={styles.input}
-          placeholder={t("signup.password") || "Password"}
-          value={password}
-          secureTextEntry
-          onChangeText={setPassword}
-          testID="signup-password-input"
-        />
-        
-        <TextInput
-          style={styles.input}
-          placeholder={t("signup.confirmPassword") || "Confirm Password"}
-          value={confirmPassword}
-          secureTextEntry
-          onChangeText={setConfirmPassword}
-          testID="signup-confirm-password-input"
-        />
-        
-        <TouchableOpacity 
-          style={styles.signupButton} 
-          onPress={handleSignUp}
-          disabled={isLoading}
-          testID="signup-button"
-        >
-          <Text style={styles.signupButtonText}>
-            {isLoading ? (t("signup.signingUp") || "Creating Account...") : (t("signup.signUp") || "Sign Up")}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={[styles.container, { backgroundColor: theme === 'dark' ? "#121212" : "#f5f5f5" }]}>
+          <Text style={[styles.title, { color: theme === 'dark' ? "#FFD700" : "#0066FF" }]}>
+            {t("signup.title") || "Create Account"}
           </Text>
-        </TouchableOpacity>
-        
-        <View style={styles.loginContainer}>
-          <Text style={styles.alreadyHaveAccount}>
-            {t("signup.alreadyHaveAccount") || "Already have an account?"}
+          <Text style={[styles.subtitle, { color: theme === 'dark' ? "#CCCCCC" : "#555555" }]}>
+            {t("signup.subtitle") || "Join AI Sports Edge for premium betting insights"}
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={styles.loginLink}>{t("signup.login") || "Log In"}</Text>
+          
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input, 
+                { 
+                  backgroundColor: theme === 'dark' ? "#333" : "#FFFFFF",
+                  color: theme === 'dark' ? "#fff" : "#000",
+                  borderColor: emailError ? "#FF3B30" : "transparent",
+                  borderWidth: emailError ? 1 : 0
+                }
+              ]}
+              placeholder={t("signup.email") || "Email"}
+              placeholderTextColor={theme === 'dark' ? "#999" : "#999"}
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (emailError) validateEmail();
+              }}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              testID="signup-email-input"
+            />
+            {emailError ? (
+              <Text style={styles.errorText}>{emailError}</Text>
+            ) : null}
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input, 
+                { 
+                  backgroundColor: theme === 'dark' ? "#333" : "#FFFFFF",
+                  color: theme === 'dark' ? "#fff" : "#000",
+                  borderColor: passwordError ? "#FF3B30" : "transparent",
+                  borderWidth: passwordError ? 1 : 0
+                }
+              ]}
+              placeholder={t("signup.password") || "Password"}
+              placeholderTextColor={theme === 'dark' ? "#999" : "#999"}
+              value={password}
+              secureTextEntry
+              onChangeText={(text) => {
+                setPassword(text);
+                if (passwordError) validatePassword();
+              }}
+              testID="signup-password-input"
+            />
+            {password.length > 0 && (
+              <View style={styles.passwordStrengthContainer}>
+                <View style={styles.strengthMeterContainer}>
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <View 
+                      key={level}
+                      style={[
+                        styles.strengthMeter,
+                        { 
+                          backgroundColor: 
+                            passwordStrength >= level 
+                              ? level <= 2 
+                                ? "#FF3B30" 
+                                : level <= 4 
+                                  ? "#FFCC00" 
+                                  : "#34C759"
+                              : theme === 'dark' ? "#444" : "#DDD"
+                        }
+                      ]}
+                    />
+                  ))}
+                </View>
+                <Text style={[
+                  styles.strengthText,
+                  { color: theme === 'dark' ? "#CCCCCC" : "#555555" }
+                ]}>
+                  {passwordStrength === 0 && (t("signup.passwordStrength.tooWeak") || "Too Weak")}
+                  {passwordStrength === 1 && (t("signup.passwordStrength.weak") || "Weak")}
+                  {passwordStrength === 2 && (t("signup.passwordStrength.fair") || "Fair")}
+                  {passwordStrength === 3 && (t("signup.passwordStrength.good") || "Good")}
+                  {passwordStrength === 4 && (t("signup.passwordStrength.strong") || "Strong")}
+                  {passwordStrength === 5 && (t("signup.passwordStrength.veryStrong") || "Very Strong")}
+                </Text>
+              </View>
+            )}
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : null}
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input, 
+                { 
+                  backgroundColor: theme === 'dark' ? "#333" : "#FFFFFF",
+                  color: theme === 'dark' ? "#fff" : "#000",
+                  borderColor: confirmPasswordError ? "#FF3B30" : "transparent",
+                  borderWidth: confirmPasswordError ? 1 : 0
+                }
+              ]}
+              placeholder={t("signup.confirmPassword") || "Confirm Password"}
+              placeholderTextColor={theme === 'dark' ? "#999" : "#999"}
+              value={confirmPassword}
+              secureTextEntry
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                if (confirmPasswordError) validateConfirmPassword();
+              }}
+              testID="signup-confirm-password-input"
+            />
+            {confirmPasswordError ? (
+              <Text style={styles.errorText}>{confirmPasswordError}</Text>
+            ) : null}
+          </View>
+          
+          <TouchableOpacity 
+            style={[
+              styles.signupButton,
+              { backgroundColor: theme === 'dark' ? "#FFD700" : "#0066FF" },
+              isLoading && { opacity: 0.7 }
+            ]} 
+            onPress={handleSignUp}
+            disabled={isLoading}
+            testID="signup-button"
+          >
+            {isLoading ? (
+              <ActivityIndicator color={theme === 'dark' ? "#121212" : "#FFFFFF"} />
+            ) : (
+              <Text style={[
+                styles.signupButtonText,
+                { color: theme === 'dark' ? "#121212" : "#FFFFFF" }
+              ]}>
+                {t("signup.signUp") || "Sign Up"}
+              </Text>
+            )}
           </TouchableOpacity>
-        </View>
-        
-        <View style={styles.termsContainer}>
-          <Text style={styles.termsText}>
-            {t("signup.termsText") || "By signing up, you agree to our"}
-          </Text>
-          <TouchableOpacity>
-            <Text style={styles.termsLink}>
-              {t("signup.termsLink") || "Terms of Service and Privacy Policy"}
+          
+          <View style={styles.orContainer}>
+            <View style={[styles.divider, { backgroundColor: theme === 'dark' ? "#444" : "#DDD" }]} />
+            <Text style={[styles.orText, { color: theme === 'dark' ? "#CCCCCC" : "#555555" }]}>
+              {t("signup.or") || "OR"}
             </Text>
-          </TouchableOpacity>
+            <View style={[styles.divider, { backgroundColor: theme === 'dark' ? "#444" : "#DDD" }]} />
+          </View>
+          
+          <View style={styles.socialButtonsContainer}>
+            <TouchableOpacity 
+              style={[styles.socialButton, { backgroundColor: "#DB4437" }]}
+              onPress={handleGoogleSignIn}
+              disabled={socialLoginLoading}
+            >
+              <Ionicons name="logo-google" size={24} color="#FFFFFF" />
+              <Text style={styles.socialButtonText}>
+                {t("signup.googleSignIn") || "Google"}
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.socialButton, { backgroundColor: "#000000" }]}
+              onPress={handleAppleSignIn}
+              disabled={socialLoginLoading}
+            >
+              <Ionicons name="logo-apple" size={24} color="#FFFFFF" />
+              <Text style={styles.socialButtonText}>
+                {t("signup.appleSignIn") || "Apple"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.loginContainer}>
+            <Text style={[styles.alreadyHaveAccount, { color: theme === 'dark' ? "#CCCCCC" : "#555555" }]}>
+              {t("signup.alreadyHaveAccount") || "Already have an account?"}
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={[styles.loginLink, { color: theme === 'dark' ? "#FFD700" : "#0066FF" }]}>
+                {t("signup.login") || "Log In"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.termsContainer}>
+            <Text style={[styles.termsText, { color: theme === 'dark' ? "#CCCCCC" : "#555555" }]}>
+              {t("signup.termsText") || "By signing up, you agree to our"}
+            </Text>
+            <TouchableOpacity>
+              <Text style={[styles.termsLink, { color: theme === 'dark' ? "#FFD700" : "#0066FF" }]}>
+                {t("signup.termsLink") || "Terms of Service and Privacy Policy"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          {/* Theme Toggle */}
+          <View style={styles.themeToggleContainer}>
+            <ThemeToggle />
+          </View>
         </View>
-        
-        {/* Theme Toggle */}
-        <ThemeToggle />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -177,43 +456,101 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#121212",
     padding: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#FFD700",
     marginBottom: 10,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "#CCCCCC",
     marginBottom: 30,
     textAlign: "center",
   },
-  input: {
-    width: "90%",
-    padding: 15,
-    backgroundColor: "#333",
-    color: "#fff",
-    borderRadius: 8,
+  inputContainer: {
+    width: "100%",
     marginBottom: 15,
+  },
+  input: {
+    width: "100%",
+    padding: 15,
+    borderRadius: 8,
     fontSize: 16,
+    borderWidth: 0,
+  },
+  errorText: {
+    color: "#FF3B30",
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 5,
+  },
+  passwordStrengthContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  strengthMeterContainer: {
+    flexDirection: "row",
+    height: 6,
+    borderRadius: 3,
+    marginBottom: 5,
+    overflow: "hidden",
+  },
+  strengthMeter: {
+    flex: 1,
+    height: 6,
+    marginHorizontal: 1,
+  },
+  strengthText: {
+    fontSize: 12,
+    textAlign: "right",
   },
   signupButton: {
-    width: "90%",
-    backgroundColor: "#FFD700",
+    width: "100%",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
+    marginBottom: 20,
   },
   signupButtonText: {
-    color: "#121212",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+  },
+  orText: {
+    marginHorizontal: 10,
+    fontSize: 14,
+  },
+  socialButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 20,
+  },
+  socialButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+    borderRadius: 8,
+    width: "48%",
+  },
+  socialButtonText: {
+    color: "#FFFFFF",
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: "600",
   },
   loginContainer: {
     flexDirection: "row",
@@ -221,12 +558,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   alreadyHaveAccount: {
-    color: "#CCCCCC",
     fontSize: 14,
     marginRight: 5,
   },
   loginLink: {
-    color: "#FFD700",
     fontWeight: "bold",
     fontSize: 14,
   },
@@ -235,12 +570,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   termsText: {
-    color: "#CCCCCC",
     fontSize: 12,
   },
   termsLink: {
-    color: "#FFD700",
     fontSize: 12,
     marginTop: 5,
+  },
+  themeToggleContainer: {
+    marginTop: 20,
+    marginBottom: 10,
   }
 });
