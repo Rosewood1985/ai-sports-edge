@@ -42,12 +42,12 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Deploy to Firebase
-echo -e "${YELLOW}Deploying to Firebase...${NC}"
-firebase deploy
+# Deploy to Firebase Functions only
+echo -e "${YELLOW}Deploying to Firebase Functions...${NC}"
+firebase deploy --only functions
 
 if [ $? -ne 0 ]; then
-  echo -e "${RED}Firebase deployment failed!${NC}"
+  echo -e "${RED}Firebase Functions deployment failed!${NC}"
   exit 1
 fi
 
