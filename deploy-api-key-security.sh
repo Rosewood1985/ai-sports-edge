@@ -29,6 +29,11 @@ fi
 
 # Run environment validation
 echo -e "${YELLOW}Validating environment variables...${NC}"
+# Load environment variables from .env file
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+  echo "Loaded environment variables from .env file"
+fi
 node -e "require('./utils/envCheck').validateEnvironment()"
 
 if [ $? -ne 0 ]; then
