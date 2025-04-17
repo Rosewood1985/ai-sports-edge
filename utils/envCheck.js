@@ -6,7 +6,7 @@
  */
 
 // Use console for logging since this might run before logger is initialized
-const apiKeys = require('./apiKeys');
+// Don't require apiKeys to avoid circular dependency
 
 // Required environment variables grouped by category
 const REQUIRED_ENV_VARS = {
