@@ -4,7 +4,8 @@
  * This service handles payment processing with US-only restrictions.
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'your-stripe-secret-key');
+const apiKeys = require('../utils/apiKeys');
+const stripe = require('stripe')(apiKeys.getStripeSecretKey());
 const logger = require('../utils/logger').default;
 
 /**

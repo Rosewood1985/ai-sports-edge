@@ -7,6 +7,7 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const apiKeys = require('../../../utils/apiKeys');
 
 // API configuration
 const bet365ApiWrapper = require('./bet365ApiWrapper');
@@ -14,7 +15,7 @@ const bet365ApiWrapper = require('./bet365ApiWrapper');
 const API_CONFIG = {
   ODDS_API: {
     BASE_URL: 'https://api.the-odds-api.com/v4',
-    API_KEY: process.env.ODDS_API_KEY || 'fdf4ad2d50a6b6d2ca77e52734851aa4',
+    API_KEY: apiKeys.getOddsApiKey(),
     SPORTS: {
       NBA: 'basketball_nba',
       WNBA: 'basketball_wnba',

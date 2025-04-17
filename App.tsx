@@ -14,6 +14,7 @@ import { initErrorTracking } from "./services/errorTrackingService";
 import { initPerformanceMonitoring } from "./services/performanceMonitoringService";
 import { initAlerting } from "./services/alertingService";
 import { initLogging, info, LogCategory } from "./services/loggingService";
+import { validateEnvironment } from "./utils/envCheck";
 import {
   debugServiceInitialization,
   debugServiceDependencies,
@@ -61,7 +62,22 @@ const AppInner = () => {
       debugServiceDependencies();
       debugServiceInitialization();
 
+      // Validate environment variables with basic console logging
+      const envValid = validateEnvironment({ exitOnError: false });
+      if (!envValid) {
+        console.warn("Environment validation failed - app may not function correctly");
+      }
+
       const loggingInitialized = initLogging();
+      
+      // Log environment validation result with proper logging service
+      if (loggingInitialized) {
+        if (!envValid) {
+          info(LogCategory.APP, "Environment validation failed - app may not function correctly");
+        } else {
+          info(LogCategory.APP, "Environment validation passed");
+        }
+      }
       if (loggingInitialized) {
         info(LogCategory.APP, "Logging service initialized");
 

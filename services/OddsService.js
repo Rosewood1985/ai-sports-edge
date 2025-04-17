@@ -4,11 +4,12 @@
  */
 
 import axios from 'axios';
+import apiKeys from '../utils/apiKeys';
 
 // API configuration
 const API_CONFIG = {
   baseUrl: 'https://api.the-odds-api.com/v4',
-  apiKey: process.env.ODDS_API_KEY || 'your-api-key-here', // Replace with your API key
+  apiKey: apiKeys.getOddsApiKey(),
   timeout: 10000,
 };
 

@@ -10,8 +10,9 @@ const WEATHER_CACHE_EXPIRY_KEY_PREFIX = 'weather_cache_expiry_';
 const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
 // API configuration
-// Note: In a real implementation, this would be stored in environment variables
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY || 'your_api_key_here';
+// Get API key from centralized management
+import apiKeys from '../utils/apiKeys';
+const WEATHER_API_KEY = apiKeys.getWeatherApiKey();
 const WEATHER_API_BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 /**

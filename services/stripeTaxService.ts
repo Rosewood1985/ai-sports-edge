@@ -11,9 +11,10 @@ import cache from '../utils/cache';
 import db from '../utils/db';
 import stripeTaxConfig from '../utils/stripeTaxConfig';
 
-// Initialize Stripe with API key from environment variables
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2022-11-15' // Use a compatible API version
+// Initialize Stripe with API key from centralized management
+import apiKeys from '../utils/apiKeys';
+const stripe = new Stripe(apiKeys.getStripeSecretKey(), {
+  apiVersion: '2025-02-24.acacia' // Use the latest API version
 });
 
 // Get configuration
@@ -493,7 +494,10 @@ export {
   recordTaxTransaction,
   getTaxRatesForLocation,
   generateTaxReport,
-  // Types for external use
+};
+
+// Types for external use
+export type {
   TaxCalculationOptions,
   LineItem,
   PaymentWithTaxOptions,

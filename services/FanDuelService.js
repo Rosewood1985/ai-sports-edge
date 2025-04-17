@@ -3,6 +3,8 @@
  * Service for FanDuel integration and affiliate linking
  */
 
+import apiKeys from '../utils/apiKeys';
+
 /**
  * FanDuelService class for FanDuel integration and affiliate linking
  */
@@ -10,7 +12,7 @@ class FanDuelService {
   constructor() {
     // FanDuel affiliate configuration
     this.config = {
-      affiliateId: process.env.FANDUEL_AFFILIATE_ID || 'your-affiliate-id',
+      affiliateId: apiKeys.getFanDuelAffiliateId(),
       baseUrl: 'https://account.sportsbook.fanduel.com/join',
       deepLinkBaseUrl: 'https://sportsbook.fanduel.com/navigation',
       mobileAppScheme: 'fanduel://',
@@ -168,7 +170,7 @@ class FanDuelService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.FANDUEL_API_KEY || 'api-key-required'}`
+          'Authorization': `Bearer ${apiKeys.getFanDuelApiKey()}`
         },
         body: JSON.stringify({
           userId: data.userId,
