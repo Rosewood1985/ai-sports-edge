@@ -90,7 +90,7 @@
 - [x] Migrate pages to atomic architecture
   - [x] SignupPage
   - [x] ForgotPasswordPage
-  - [ ] LoginPage
+  - [x] LoginScreen
   - [ ] HomePage
   - [ ] ProfilePage
 - [x] Create testing infrastructure for atomic components
