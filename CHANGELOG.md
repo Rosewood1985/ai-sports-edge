@@ -11,6 +11,7 @@
 - 🔐 **Secure SFTP Deployment Implemented**
   - SSH + env-based authentication
   - Single config in `.vscode-sftp-deploy/.vscode/sftp.json`
+  - Added build context and debug logging
 
 - 🛡️ **CSP & Integrity Fixes**
   - Removed integrity/crossorigin from Google Fonts

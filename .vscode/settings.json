@@ -63,5 +63,6 @@
   "workbench.editor.revealIfOpen": false,
   "workbench.editor.showIcons": true,
   "workbench.editor.splitInGroupLayout": "horizontal",
-  "workbench.editor.splitSizing": "distribute"
+  "workbench.editor.splitSizing": "distribute",
+  "sftp.debug": true
 }
