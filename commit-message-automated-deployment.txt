@@ -1,0 +1,12 @@
+feat: Add automated deployment and verification script
+
+- Created automated-deploy-and-verify.sh script that:
+  - Extracts SFTP credentials from configuration
+  - Uploads build folder via SFTP using lftp
+  - SSHs into server and runs fix script
+  - Verifies .htaccess exists
+  - Checks HTTP status of website
+  - Verifies assets are loading
+  - Runs detailed deployment check
+
+This script automates the entire deployment process, from uploading the build folder to verifying the deployment, eliminating the need for manual steps and reducing the chance of deployment errors.
