@@ -13,6 +13,7 @@
   - Single config in `.vscode-sftp-deploy/.vscode/sftp.json`
   - Added build context and debug logging
   - Fixed context path to resolve config loading errors
+  - Created symbolic link to ensure correct config location
 
 - 🛡️ **CSP & Integrity Fixes**
   - Removed integrity/crossorigin from Google Fonts
