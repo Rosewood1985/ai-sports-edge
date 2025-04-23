@@ -1,0 +1,12 @@
+fix: Add script to fix permissions and build location on server
+
+- Created fix-permissions-and-build.sh script that:
+  - Sets proper directory permissions (755) for all directories
+  - Sets proper file permissions (644) for all files
+  - Makes script files executable
+  - Moves all files from build/ to server root directory
+  - Cleans up empty build folder
+
+- Updated upload-fix-script.sh to include the new permissions fix
+
+This script resolves both the file location issue and the permissions issues that were preventing proper site access. The permissions fix ensures directories are executable (755) and files are readable (644), which is the standard for web servers.
