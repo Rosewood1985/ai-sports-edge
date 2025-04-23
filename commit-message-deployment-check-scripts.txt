@@ -1,0 +1,12 @@
+feat: Add deployment status check scripts
+
+- Created check-deployment-status.sh for basic site accessibility checks
+- Created detailed-deployment-check.sh for comprehensive diagnostics:
+  - Server connectivity checks
+  - SSH connection verification
+  - File existence verification on server
+  - Automatic fix script execution if needed
+  - DNS resolution checks
+  - HTTP response analysis
+
+These scripts help diagnose deployment issues by providing detailed information about the server and website status, making it easier to troubleshoot deployment problems.
