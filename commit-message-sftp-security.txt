@@ -1,0 +1,16 @@
+feat(deploy): Add secure SFTP deployment script
+
+- Create secure-sftp-deploy.sh that uses environment variables instead of hardcoded credentials
+- Add support for SSH key-based authentication
+- Create temporary config files that are deleted after use
+- Update documentation with secure deployment instructions
+- Add GitHub Actions integration example
+- Mark legacy deployment scripts as not recommended
+
+Security improvements:
+- No credentials stored in version control
+- Support for SSH key authentication
+- Environment variable-based configuration
+- Temporary configuration files
+
+Resolves: #SECURITY-127

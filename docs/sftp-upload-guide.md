@@ -58,14 +58,39 @@ Alternatively, run the installation script:
 
 ## Alternative Deployment Methods
 
-If you encounter issues with the VS Code SFTP extension, you can try these alternative methods:
+### Recommended: Secure SFTP Deployment (Environment Variables & SSH Keys)
+```bash
+# Set required environment variables
+export SFTP_HOST=sftp.aisportsedge.app
+export SFTP_USER=deploy@aisportsedge.app
+export SFTP_REMOTE_PATH=/home/q15133yvmhnq/public_html/aisportsedge.app
 
-### Using Native SFTP Command
+# Use SSH key authentication (recommended)
+export SFTP_KEY_PATH=~/.ssh/id_rsa
+# OR use password authentication
+# export SFTP_PASSWORD=your_secure_password
+
+# Run the secure deployment script
+./scripts/secure-sftp-deploy.sh
+```
+
+This method is recommended for security as it:
+- Uses environment variables instead of hardcoded credentials
+- Supports SSH key-based authentication
+- Doesn't store credentials in version control
+
+See `scripts/README.md` for detailed setup instructions.
+
+### Legacy Methods (Not Recommended)
+
+If you encounter issues with the secure method, you can try these alternatives:
+
+#### Using Native SFTP Command
 ```bash
 ./scripts/native-sftp-deploy.sh
 ```
 
-### Using SFTP-Deploy NPM Package
+#### Using SFTP-Deploy NPM Package
 ```bash
 ./scripts/sftp-deploy.sh
 ```
@@ -91,6 +116,7 @@ If you encounter issues with the VS Code SFTP extension, you can try these alter
 - Check browser console for any JavaScript errors
 
 ## Next Steps
-- Consider setting up a GitHub Action for automated deployment
+- Consider setting up a GitHub Action for automated deployment (see `scripts/README.md` for example)
 - Document the deployment process in your team wiki
 - Schedule regular checks for CSP and security headers
+- Migrate from legacy deployment scripts to the secure method
