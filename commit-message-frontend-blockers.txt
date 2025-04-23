@@ -1,0 +1,12 @@
+fix: resolve frontend blockers for aisportsedge.app
+
+- Remove integrity and crossorigin attributes from Google Fonts links
+- Comment out service worker registration and remove service-worker.js
+- Update Content Security Policy in .htaccess
+- Fix MIME types for JavaScript files
+- Optimize Firebase initialization with better error handling
+
+These changes fix CSP violations, MIME type mismatches, and integrity check failures
+that were preventing the site from loading properly on GoDaddy hosting.
+
+Tag: fix-frontend-blockers-v1.0
