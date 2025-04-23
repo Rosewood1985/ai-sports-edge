@@ -1,0 +1,12 @@
+feat: Add deployment configuration validator
+
+- Created validate-deployment-config.sh script that:
+  - Ensures we're in the correct root workspace
+  - Verifies .vscode/sftp.json is a symlink to vscode-sftp-deploy/.vscode/sftp.json
+  - Checks if build directory exists
+  - Validates .htaccess exists in build directory (creates if missing)
+  - Updates SFTP configuration with correct credentials
+
+- Updated automated-deploy-and-verify.sh to run the validator before deployment
+
+This ensures all deployment prerequisites are met before attempting to deploy, preventing common deployment issues and ensuring a consistent deployment process.

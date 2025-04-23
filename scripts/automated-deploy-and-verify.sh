@@ -8,6 +8,19 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}🚀 Starting Automated Deployment and Verification...${NC}"
 
+# Validate deployment configuration
+echo -e "${YELLOW}Validating deployment configuration...${NC}"
+./scripts/validate-deployment-config.sh
+
+# Check if validation was successful
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Deployment configuration validation failed${NC}"
+    echo -e "${YELLOW}Please fix the issues and try again${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Deployment configuration validated successfully${NC}"
+
 # Extract credentials from SFTP config
 echo -e "${YELLOW}Extracting SFTP credentials from configuration...${NC}"
 SFTP_CONFIG="vscode-sftp-deploy/.vscode/sftp.json"
