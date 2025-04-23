@@ -1,155 +1,125 @@
 # AI Sports Edge Deployment Guide
 
-This document provides instructions for deploying the AI Sports Edge application to both web and iOS platforms.
+This guide outlines the deployment process for the AI Sports Edge application to the GoDaddy hosting environment.
 
-## Prerequisites
+## Deployment Options
 
-Before deploying, ensure you have the following:
+There are three ways to deploy the application:
 
-1. **Firebase CLI** installed (`npm install -g firebase-tools`)
-2. **Expo CLI** installed (`npm install -g expo-cli`)
-3. **EAS CLI** installed (`npm install -g eas-cli`)
-4. Access to the Firebase project
-5. Access to the Expo account
-6. Access to the GitHub repository
+1. **GitHub Actions (Recommended)** - Automated CI/CD pipeline triggered on push to main
+2. **Automated Script** - Local script that handles validation, upload, and verification
+3. **Manual Fallback** - Step-by-step process for manual deployment via GoDaddy control panel
 
-## Deployment Scripts
+## 1. GitHub Actions Deployment
 
-We've created three deployment scripts to simplify the deployment process:
+The GitHub Actions workflow automatically deploys the application when changes are pushed to the main branch.
 
-1. `scripts/deploy-web.sh` - Deploys the web app to Firebase hosting
-2. `scripts/deploy-ios.sh` - Builds and submits the iOS app to the App Store
-3. `scripts/push-to-github.sh` - Commits and pushes changes to GitHub
+### Setup
 
-## Web Deployment Process
+1. In your GitHub repo, go to: Settings → Secrets and variables → Actions → Secrets
+2. Add a new secret:
+   - Name: `SFTP_PASS`
+   - Value: `hTQ3LQ]#P(b,`
 
-The web deployment process involves the following steps:
+### How It Works
 
-1. Build the web app
-2. Verify Firebase configuration
-3. Check for Spanish version
-4. Deploy to Firebase hosting
+The workflow:
+1. Uploads the build folder via SFTP
+2. SSHs into the server and runs the fix script
+3. Verifies the deployment with a health check
 
-### Running the Web Deployment Script
+### Monitoring
 
-```bash
-./scripts/deploy-web.sh
-```
+You can monitor the deployment status in the "Actions" tab of your GitHub repository.
 
-This script will:
-- Check if Firebase CLI is installed and you're logged in
-- Build the web app
-- Verify Firebase configuration
-- Check for Spanish version
-- Deploy to Firebase hosting
-- Verify deployment
+## 2. Automated Script Deployment
 
-### Firebase Hosting Configuration
+The automated script provides a local way to deploy the application with validation and verification.
 
-The web app is deployed to two Firebase hosting sites:
-- Default site: `ai-sports-edge.web.app`
-- Custom domain: `aisportsedge-app.web.app`
+### Prerequisites
 
-The configuration for these sites is in `firebase.json` and `.firebaserc`.
+- Install dependencies: `sshpass` and `lftp`
+  ```bash
+  # macOS
+  brew install sshpass lftp
+  
+  # Ubuntu/Debian
+  sudo apt-get install -y sshpass lftp
+  ```
 
-## iOS Deployment Process
+### Deployment Steps
 
-The iOS deployment process involves the following steps:
+1. Run the validation script to ensure all prerequisites are met:
+   ```bash
+   ./scripts/validate-deployment-config.sh
+   ```
 
-1. Update app version
-2. Check for Spanish localization
-3. Build the app using EAS
-4. Submit to App Store Connect (for TestFlight or Production)
+2. Run the automated deployment script:
+   ```bash
+   ./scripts/automated-deploy-and-verify.sh
+   ```
 
-### Running the iOS Deployment Script
+3. The script will:
+   - Validate deployment configuration
+   - Upload build folder via SFTP
+   - SSH into server and run fix script
+   - Verify deployment with health check
 
-```bash
-./scripts/deploy-ios.sh
-```
+## 3. Manual Fallback Deployment
 
-This script will:
-- Check if Expo CLI and EAS CLI are installed and you're logged in
-- Prompt for a new version number
-- Check for Spanish localization
-- Prompt for build type (Preview, Internal, TestFlight, or Production)
-- Build the app using EAS
-- Submit to App Store Connect (for TestFlight or Production)
+If automated methods fail, you can use the manual fallback process.
 
-### EAS Build Profiles
+### Steps
 
-The EAS build profiles are defined in `eas.json`:
-- `preview` - For development testing
-- `internal` - For internal testing
-- `testflight` - For TestFlight distribution
-- `production` - For App Store distribution
+1. Run the manual fallback script to create a zip file:
+   ```bash
+   ./scripts/manual-fallback-deploy.sh
+   ```
 
-## GitHub Workflow
+2. Log in to GoDaddy hosting control panel
+3. Navigate to File Manager
+4. Go to `/home/q15133yvmhnq/public_html/aisportsedge.app`
+5. Upload `aisportsedge-deploy.zip`
+6. Extract the zip file
+7. Run the following commands in the terminal:
+   ```bash
+   cd /home/q15133yvmhnq/public_html/aisportsedge.app
+   chmod -R 755 .
+   find . -type f -exec chmod 644 {} \;
+   find . -name "*.sh" -exec chmod +x {} \;
+   ```
 
-To push changes to GitHub:
-
-```bash
-./scripts/push-to-github.sh
-```
-
-This script will:
-- Show changes to be committed
-- Prompt for a commit message
-- Add and commit changes
-- Push to the remote repository
-
-## Internationalization
-
-The app supports both English and Spanish languages:
-
-- Web: Spanish version is available at `/es/` path
-- iOS: Spanish localization is in `ios/AISportsEdge/Supporting/es.lproj/`
+8. Verify the deployment at https://aisportsedge.app
 
 ## Troubleshooting
 
-### Web Deployment Issues
+If deployment issues occur:
 
-1. **Firebase Configuration Missing**
-   - Check if `public/firebase-config.js` exists
-   - Ensure environment variables are set correctly
+1. Run the detailed deployment check:
+   ```bash
+   ./scripts/detailed-deployment-check.sh
+   ```
 
-2. **Spanish Version Missing**
-   - Check if `public/es/index.html` exists
-   - Ensure language tag is set to `es`
+2. Check for common issues:
+   - SFTP credentials incorrect
+   - File permissions not set correctly
+   - .htaccess file missing or incorrect
+   - Build files not in the correct location
 
-### iOS Deployment Issues
+3. If needed, SSH into the server and run the fix script manually:
+   ```bash
+   ssh deploy@aisportsedge.app
+   cd /home/q15133yvmhnq/public_html/aisportsedge.app
+   chmod +x fix-permissions-and-build.sh
+   ./fix-permissions-and-build.sh
+   ```
 
-1. **EAS Build Fails**
-   - Check EAS build logs
-   - Ensure all dependencies are installed
-   - Verify app.json configuration
+## Deployment Configuration
 
-2. **Spanish Localization Missing**
-   - Check if `ios/AISportsEdge/Supporting/es.lproj/` exists
-   - Ensure InfoPlist.strings is properly translated
+The deployment configuration is stored in:
+- `.vscode/sftp.json` (symlink to `vscode-sftp-deploy/.vscode/sftp.json`)
 
-## Post-Deployment Verification
-
-After deployment, verify the following:
-
-1. **Web App**
-   - Visit both hosting sites
-   - Test Spanish version
-   - Verify Firebase authentication
-   - Test core functionality
-
-2. **iOS App**
-   - Install from TestFlight or App Store
-   - Test Spanish localization
-   - Verify push notifications
-   - Test core functionality
-
-## Rollback Procedure
-
-If issues are found after deployment:
-
-1. **Web App**
-   - Use Firebase hosting rollback: `firebase hosting:rollback`
-
-2. **iOS App**
-   - For TestFlight: Stop testing the current build
-   - For Production: Submit a new build with fixes
+Key configuration values:
+- Host: `aisportsedge.app`
+- Username: `deploy@aisportsedge.app`
+- Remote Path: `/home/q15133yvmhnq/public_html/aisportsedge.app`
