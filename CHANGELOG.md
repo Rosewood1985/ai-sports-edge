@@ -14,6 +14,7 @@
   - Added build context and debug logging
   - Fixed context path to resolve config loading errors
   - Created symbolic link to ensure correct config location
+  - Added script to fix build location on server after upload
 
 - 🛡️ **CSP & Integrity Fixes**
   - Removed integrity/crossorigin from Google Fonts
