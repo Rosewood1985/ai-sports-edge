@@ -9,13 +9,21 @@
 
 
 
+
+
+
+
+
+
  *
  * Atoms Index
  * This file exports all atom components for easier imports.
  */
 /**
 // Environment atoms
+// External imports
 // Firebase atoms
+// Internal imports
 // Monitoring atoms
 // Theme atoms
 export { default as envConfig } from './envConfig';

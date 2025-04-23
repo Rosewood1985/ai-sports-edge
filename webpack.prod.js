@@ -1,6 +1,4 @@
 const path = require('path');
-const Dotenv = require("dotenv-webpack");
-
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');

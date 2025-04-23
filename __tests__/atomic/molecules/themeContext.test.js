@@ -1,47 +1,65 @@
-/**
- * Theme Context Molecule Tests
- * 
- * Tests for the theme context molecule.
- */
-
+// External imports
 import React from 'react';
+
+
 import { renderHook, act } from '@testing-library/react-hooks';
+
+
+// Internal imports
 import { ThemeContext, useTheme } from '../../../atomic/molecules/themeContext';
 
-describe('Theme Context Molecule', () => {
-  it('should provide default theme', () => {
-    // Arrange
-    const wrapper = ({ children }) => (
-      <ThemeContext.Provider value={{ theme: 'light', effectiveTheme: 'light', toggleTheme: jest.fn() }}>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        value={{ theme: 'light', effectiveTheme: 'light', toggleTheme: jest.fn() }}
+        {children}
         {children}
       </ThemeContext.Provider>
+      </ThemeContext.Provider>
+      <ThemeContext.Provider
+      <ThemeContext.Provider value={{ theme: 'light', effectiveTheme: 'light', toggleTheme }}>
+      >
+      result.current.toggleTheme();
     );
-    
+    );
     // Act
-    const { result } = renderHook(() => useTheme(), { wrapper });
-    
-    // Assert
-    expect(result.current.theme).toBe('light');
-    expect(result.current.effectiveTheme).toBe('light');
-    expect(typeof result.current.toggleTheme).toBe('function');
-  });
-  
-  it('should toggle theme', () => {
+    // Act
     // Arrange
+    // Arrange
+    // Assert
+    // Assert
+    act(() => {
     const toggleTheme = jest.fn();
     const wrapper = ({ children }) => (
-      <ThemeContext.Provider value={{ theme: 'light', effectiveTheme: 'light', toggleTheme }}>
-        {children}
-      </ThemeContext.Provider>
-    );
-    
-    // Act
+    const wrapper = ({ children }) => (
     const { result } = renderHook(() => useTheme(), { wrapper });
-    act(() => {
-      result.current.toggleTheme();
-    });
-    
-    // Assert
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    expect(result.current.effectiveTheme).toBe('light');
+    expect(result.current.theme).toBe('light');
     expect(toggleTheme).toHaveBeenCalledTimes(1);
+    expect(typeof result.current.toggleTheme).toBe('function');
+    });
+  it('should provide default theme', () => {
+  it('should toggle theme', () => {
   });
+  });
+ *
+ * Tests for the theme context molecule.
+ * Theme Context Molecule Tests
+ */
+/**
+// External imports
+// Internal imports
+describe('Theme Context Molecule', () => {
 });
+

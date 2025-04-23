@@ -103,29 +103,22 @@ const BetNowButton = ({
     trackButtonClick(position, teamId, userId, gameId);
     
     try {
-      // Generate affiliate URL
-      const baseUrl = 'https://fanduel.com/';
+      // Import the FANDUEL_CONFIG to get the affiliate link
+      const { FANDUEL_CONFIG } = await import('../../config/affiliateConfig');
       
-      // Import the service dynamically to avoid issues with SSR
+      // Use the direct affiliate link from environment variables
+      const affiliateUrl = FANDUEL_CONFIG.AFFILIATE_URL;
+      
+      // Track the click using the service
       const { bettingAffiliateService } = await import('../../services/bettingAffiliateService');
-      
-      const affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
-        baseUrl,
-        affiliateCode,
-        teamId,
-        userId,
-        gameId
-      );
       
       // Open in new tab
       window.open(affiliateUrl, '_blank');
     } catch (error) {
       console.error('Error generating affiliate link:', error);
       
-      // Fallback to basic URL if there's an error
-      const fallbackUrl = `https://fanduel.com/?aff_id=${affiliateCode}${
-        userId || gameId ? `&subId=${[userId, gameId].filter(Boolean).join('-')}` : ''
-      }${teamId ? `&team=${teamId}` : ''}`;
+      // Fallback to the direct affiliate link if there's an error
+      const fallbackUrl = FANDUEL_CONFIG.AFFILIATE_URL;
       
       window.open(fallbackUrl, '_blank');
     }

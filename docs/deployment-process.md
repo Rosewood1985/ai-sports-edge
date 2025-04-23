@@ -314,27 +314,56 @@ The deployment configuration is defined in the following files:
 
 ### 1. `.env`
 
-This file contains all the environment variables and API keys needed for the application. It is not committed to version control for security reasons. A template file `.env.template` is provided as a reference.
+This file contains all the environment variables and API keys needed for the application. It is not committed to version control for security reasons. A template file `.env.example` is provided as a reference.
 
 To set up the environment variables:
 
 ```bash
-# Copy the template file
-cp .env.template .env
+# Using the provided script
+npm run setup-env
+
+# Or manually
+cp .env.example .env
 
 # Edit the .env file with your actual API keys
 nano .env
 ```
 
-The environment variables are loaded using the dotenv package:
+The environment variables are validated using the check-env script:
+
+```bash
+# Validate environment variables
+npm run check-env
+```
+
+The environment variables are loaded using the centralized utility in `utils/envConfig.js`:
 
 ```javascript
-// At the top of server.js
-require('dotenv').config();
+// Import the utility
+import { getEnvVar, firebaseConfig } from './utils/envConfig';
 
-// Access environment variables
-const apiKey = process.env.FIREBASE_API_KEY;
+// Access individual environment variables with fallbacks
+const apiKey = getEnvVar('FIREBASE_API_KEY', 'default-value');
+
+// Use pre-configured objects
+const app = initializeApp(firebaseConfig);
 ```
+
+### Environment Variable Deployment
+
+For deploying environment variable changes, use the dedicated deployment script:
+
+```bash
+# Deploy environment variable changes
+npm run deploy:env-changes
+```
+
+This script will:
+1. Validate environment variables
+2. Build the application with the environment variables
+3. Deploy to Firebase or GoDaddy based on your selection
+
+For more details on environment variable setup and usage, see the [Environment Setup Documentation](../docs/environment-setup.md).
 
 ### 2. `firebase.json`
 

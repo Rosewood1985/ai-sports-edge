@@ -1,0 +1,228 @@
+{
+  "files_in_context": [
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946049618,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744946049618,
+      "roo_edit_date": null,
+      "user_edit_date": 1744946058035
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744946058099,
+      "roo_edit_date": 1744946058099,
+      "user_edit_date": 1744946058035
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946060886,
+      "roo_edit_date": 1744946058099,
+      "user_edit_date": 1744946058035
+    },
+    {
+      "path": "index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946065550,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946069516,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "index.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946072653,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "login.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946079449,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "login.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946082554,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "signup.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946085449,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".htaccess",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744946226908,
+      "roo_edit_date": 1744946226908,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946313061,
+      "roo_edit_date": 1744946058099,
+      "user_edit_date": 1744946058035
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744946321246,
+      "roo_edit_date": 1744946321246,
+      "user_edit_date": 1744946058035
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744946321246,
+      "roo_edit_date": 1744946321246,
+      "user_edit_date": 1744946321279
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744946324472,
+      "roo_edit_date": 1744946321246,
+      "user_edit_date": 1744946321279
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744946324472,
+      "roo_edit_date": 1744946321246,
+      "user_edit_date": 1744946426856
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744946426927,
+      "roo_edit_date": 1744946426927,
+      "user_edit_date": 1744946426856
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744946426927,
+      "roo_edit_date": 1744946426927,
+      "user_edit_date": 1744946586169
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744946586248,
+      "roo_edit_date": 1744946586248,
+      "user_edit_date": 1744946586169
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744946736443,
+      "roo_edit_date": 1744946736443,
+      "user_edit_date": 1744946586169
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744946736443,
+      "roo_edit_date": 1744946736443,
+      "user_edit_date": 1744946736469
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744947280673,
+      "roo_edit_date": 1744947280673,
+      "user_edit_date": 1744946736469
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744947280673,
+      "roo_edit_date": 1744947280673,
+      "user_edit_date": 1744947280693
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744947288476,
+      "roo_edit_date": 1744947288476,
+      "user_edit_date": 1744947280693
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744947288476,
+      "roo_edit_date": 1744947288476,
+      "user_edit_date": 1744947288505
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744947293327,
+      "roo_edit_date": 1744947293327,
+      "user_edit_date": 1744947288505
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744947293327,
+      "roo_edit_date": 1744947293327,
+      "user_edit_date": 1744947293363
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744947293327,
+      "roo_edit_date": 1744947293327,
+      "user_edit_date": 1744949079225
+    }
+  ]
+}

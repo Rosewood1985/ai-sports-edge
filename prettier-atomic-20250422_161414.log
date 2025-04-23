@@ -1,0 +1,434 @@
+Starting Prettier formatting at Tue Apr 22 16:14:14 EDT 2025
+----------------------------------------
+Formatting atomic components...
+Formatting atoms...
+[warn] jsxBracketSameLine is deprecated.
+atomic/atoms/envConfig.js 24ms (unchanged)
+atomic/atoms/envValidator.js 6ms (unchanged)
+atomic/atoms/errorUtils.js 8ms (unchanged)
+atomic/atoms/firebaseApp.js 2ms (unchanged)
+atomic/atoms/index.js 2ms
+atomic/atoms/serviceConfig.js 3ms (unchanged)
+atomic/atoms/themeColors.js 6ms (unchanged)
+atomic/atoms/themeTokens.js 6ms (unchanged)
+Formatting molecules...
+[warn] jsxBracketSameLine is deprecated.
+atomic/molecules/environmentValidator.js 25ms (unchanged)
+atomic/molecules/errorTracking.js 12ms (unchanged)
+atomic/molecules/firebaseAuth.js 7ms (unchanged)
+atomic/molecules/firebaseFirestore.js 16ms (unchanged)
+atomic/molecules/index.js 1ms
+atomic/molecules/logging.js 10ms (unchanged)
+atomic/molecules/performance.js 11ms (unchanged)
+atomic/molecules/themeContext.js 5ms (unchanged)
+Formatting organisms...
+[warn] jsxBracketSameLine is deprecated.
+atomic/organisms/environmentBootstrap.js 28ms (unchanged)
+atomic/organisms/firebaseService.js 11ms (unchanged)
+atomic/organisms/index.js 1ms
+atomic/organisms/monitoringService.js 12ms (unchanged)
+atomic/organisms/themeProvider.js 5ms (unchanged)
+Formatting templates...
+[warn] jsxBracketSameLine is deprecated.
+atomic/templates/index.js 13ms
+atomic/templates/MainLayout.js 15ms (unchanged)
+Formatting pages...
+[warn] jsxBracketSameLine is deprecated.
+atomic/pages/ForgotPasswordPage.js 34ms
+atomic/pages/HomePage.js 16ms
+atomic/pages/index.js 1ms
+atomic/pages/LoginScreen.js 15ms
+atomic/pages/SignupPage.js 8ms
+Formatting tests...
+[warn] jsxBracketSameLine is deprecated.
+__tests__/atomic/atoms/firebaseApp.test.js 27ms
+__tests__/atomic/molecules/themeContext.test.js 5ms
+__tests__/atomic/pages/ForgotPasswordPage.test.js 8ms
+__tests__/atomic/pages/HomePage.test.js 9ms
+__tests__/atomic/pages/LoginScreen.test.js 8ms
+__tests__/atomic/pages/SignupPage.test.js 6ms
+__tests__/atomic/templates/MainLayout.test.js 3ms
+__tests__/atomic/test-template.js 2ms
+Formatting index files...
+[warn] jsxBracketSameLine is deprecated.
+atomic/atoms/index.js 15ms (unchanged)
+atomic/index.js 2ms
+atomic/molecules/index.js 2ms (unchanged)
+atomic/organisms/index.js 1ms (unchanged)
+atomic/pages/index.js 0ms (unchanged)
+atomic/templates/index.js 1ms (unchanged)
+Optimizing imports...
+Optimizing imports in atomic/molecules/logging.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/logging.js: SyntaxError: Unexpected token (93:7)
+[error]   91 |       logToSentry(entry);
+[error]   92 |       message,
+[error] > 93 |       return 'debug';
+[error]      |       ^
+[error]   94 |       return 'error';
+[error]   95 |       return 'fatal';
+[error]   96 |       return 'info';
+Optimizing imports in atomic/molecules/index.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/index.js: SyntaxError: Unexpected token (12:2)
+[error]   10 |
+[error]   11 |
+[error] > 12 |  *
+[error]      |  ^
+[error]   13 |  * Molecules Index
+[error]   14 |  * This file exports all molecule components for easier imports.
+[error]   15 |  */
+Optimizing imports in atomic/molecules/errorTracking.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/errorTracking.js: SyntaxError: Unexpected token (50:13)
+[error]   48 |             }
+[error]   49 |           email: user.email || undefined,
+[error] > 50 |           id: user.id,
+[error]      |             ^
+[error]   51 |           try {
+[error]   52 |           }
+[error]   53 |           } catch (beforeSendError) {
+Optimizing imports in atomic/molecules/performance.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/performance.js: SyntaxError: Unexpected token (59:9)
+[error]   57 |           transaction.setTag(key, String(value));
+[error]   58 |           });
+[error] > 59 |         ...data,
+[error]      |         ^
+[error]   60 |         ...data,
+[error]   61 |         // Add additional data
+[error]   62 |         // Finish transaction
+Optimizing imports in atomic/molecules/firebaseAuth.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/firebaseAuth.js: SyntaxError: Unexpected token, expected "," (8:8)
+[error]    6 |
+[error]    7 | // Internal imports
+[error] >  8 | import { getFirebaseApp } from '../atoms/firebaseApp';
+[error]      |        ^
+[error]    9 |
+[error]   10 |
+[error]   11 |
+Optimizing imports in atomic/molecules/firebaseFirestore.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/firebaseFirestore.js: SyntaxError: Unexpected token, expected "," (8:8)
+[error]    6 |
+[error]    7 | // Internal imports
+[error] >  8 | import { getFirebaseApp } from '../atoms/firebaseApp';
+[error]      |        ^
+[error]    9 |
+[error]   10 |
+[error]   11 |
+Optimizing imports in atomic/molecules/themeContext.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/themeContext.js: SyntaxError: Unexpected token (30:9)
+[error]   28 |
+[error]   29 |
+[error] > 30 |         ...DarkTheme.colors,
+[error]      |         ^
+[error]   31 |         background: Colors.dark.background,
+[error]   32 |         border: Colors.dark.border,
+[error]   33 |         card: Colors.dark.card,
+Optimizing imports in atomic/molecules/environmentValidator.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/molecules/environmentValidator.js: SyntaxError: Unexpected token, expected "," (8:8)
+[error]    6 |
+[error]    7 | // Internal imports
+[error] >  8 | import { isDevelopment } from '../atoms/envConfig';
+[error]      |        ^
+[error]    9 | import { validateConfig } from '../atoms/envConfig';
+[error]   10 |
+[error]   11 |
+Optimizing imports in atomic/atoms/firebaseApp.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/firebaseApp.js: SyntaxError: Unexpected token (28:5)
+[error]   26 |     return null;
+[error]   27 |     }
+[error] > 28 |     } else {
+[error]      |     ^
+[error]   29 |   firebaseApp = null;
+[error]   30 |   if (!firebaseApp) {
+[error]   31 |   return firebaseApp;
+Optimizing imports in atomic/atoms/index.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/index.js: SyntaxError: Unexpected token (12:2)
+[error]   10 |
+[error]   11 |
+[error] > 12 |  *
+[error]      |  ^
+[error]   13 |  * Atoms Index
+[error]   14 |  * This file exports all atom components for easier imports.
+[error]   15 |  */
+Optimizing imports in atomic/atoms/themeColors.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/themeColors.js: SyntaxError: Unexpected token (34:8)
+[error]   32 |
+[error]   33 |
+[error] > 34 |     100: '#b3d1ff',
+[error]      |        ^
+[error]   35 |     100: '#c3eac3',
+[error]   36 |     100: '#f1f3f5',
+[error]   37 |     100: '#ffb3b3',
+Optimizing imports in atomic/atoms/serviceConfig.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/serviceConfig.js: SyntaxError: Unexpected token (17:9)
+[error]   15 |
+[error]   16 |   apiKey: getEnvVar('FIREBASE_API_KEY'),
+[error] > 17 |   apiKey: getEnvVar('ONESIGNAL_API_KEY'),
+[error]      |         ^
+[error]   18 |   appId: getEnvVar('FIREBASE_APP_ID'),
+[error]   19 |   appId: getEnvVar('ONESIGNAL_APP_ID'),
+[error]   20 |   authDomain: getEnvVar('FIREBASE_AUTH_DOMAIN'),
+Optimizing imports in atomic/atoms/errorUtils.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/errorUtils.js: SyntaxError: Unexpected token (48:21)
+[error]   46 |     'Network Error',
+[error]   47 |     'Network request failed',
+[error] > 48 |     'already-exists': 'This resource already exists',
+[error]      |                     ^
+[error]   49 |     'auth/email-already-in-use': 'This email is already in use',
+[error]   50 |     'auth/invalid-email': 'Invalid email address',
+[error]   51 |     'auth/network-request-failed',
+Optimizing imports in atomic/atoms/envValidator.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/envValidator.js: SyntaxError: Unexpected token (30:5)
+[error]   28 |     'FIREBASE_PROJECT_ID',
+[error]   29 |     'FIREBASE_STORAGE_BUCKET',
+[error] > 30 |     const missingInCategory = vars.filter(varName => !process.env[varName]);
+[error]      |     ^
+[error]   31 |     if (missingInCategory.length > 0) {
+[error]   32 |     message +=
+[error]   33 |     message += 'API keys are missing. See .env.example for required keys.\n';
+Optimizing imports in atomic/atoms/themeTokens.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/themeTokens.js: SyntaxError: Unexpected token (42:12)
+[error]   40 |
+[error]   41 |     android: 'Roboto',
+[error] > 42 |     android: 'Roboto-Bold',
+[error]      |            ^
+[error]   43 |     android: 'Roboto-Medium',
+[error]   44 |     android: 'Roboto-Medium',
+[error]   45 |     android: 'monospace',
+Optimizing imports in atomic/atoms/envConfig.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/atoms/envConfig.js: SyntaxError: Unexpected token (15:11)
+[error]   13 |
+[error]   14 |
+[error] > 15 |           : {};
+[error]      |           ^
+[error]   16 |           ? global.__FIREBASE_DEFAULTS__
+[error]   17 |         : typeof global !== 'undefined' && global.__FIREBASE_DEFAULTS__
+[error]   18 |         ? window.__FIREBASE_DEFAULTS__
+Optimizing imports in atomic/index.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/index.js: SyntaxError: Unexpected token (14:2)
+[error]   12 |
+[error]   13 |
+[error] > 14 |  *
+[error]      |  ^
+[error]   15 |  * Atomic Architecture Index
+[error]   16 |  * It provides a single entry point for importing components from any level.
+[error]   17 |  * This file exports all components from the atomic architecture.
+Optimizing imports in atomic/templates/MainLayout.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/templates/MainLayout.js: SyntaxError: Unexpected token (28:9)
+[error]   26 |
+[error]   27 |           {contentComponent}
+[error] > 28 |         : 'dark-content'
+[error]      |         ^
+[error]   29 |         : 'dark-content';
+[error]   30 |         </ScrollView>
+[error]   31 |         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+Optimizing imports in atomic/templates/index.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/templates/index.js: SyntaxError: Unexpected token (9:2)
+[error]    7 |
+[error]    8 |
+[error] >  9 |  *
+[error]      |  ^
+[error]   10 |  * Templates Index
+[error]   11 |  * This file exports all template components for easier imports.
+[error]   12 |  */
+Optimizing imports in atomic/pages/index.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/pages/index.js: SyntaxError: Unexpected token (9:2)
+[error]    7 |
+[error]    8 |
+[error] >  9 |  *
+[error]      |  ^
+[error]   10 |  * Pages Index
+[error]   11 |  * This file exports all page components for easier imports.
+[error]   12 |  */
+Optimizing imports in atomic/pages/LoginScreen.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/pages/LoginScreen.js: SyntaxError: Unexpected token (52:16)
+[error]   50 |                 {t('download.appStore')}
+[error]   51 |                 {t('download.playStore')}
+[error] > 52 |               </Text>
+[error]      |                ^
+[error]   53 |               </Text>
+[error]   54 |               <Text style={[styles.storeButtonText, { color: colors.onPrimary }]}>
+[error]   55 |               <Text style={[styles.storeButtonText, { color: colors.onPrimary }]}>
+Optimizing imports in atomic/pages/HomePage.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/pages/HomePage.js: SyntaxError: Unexpected token (40:48)
+[error]   38 |
+[error]   39 |
+[error] > 40 |                     {recommendation.confidence}%
+[error]      |                                                ^
+[error]   41 |                   </Text>
+[error]   42 |                   <Text style={[styles.recommendationBadgeText, { color: colors.onSecondary }]}>
+[error]   43 |                   {game.subtitle}
+Optimizing imports in atomic/pages/SignupPage.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/pages/SignupPage.js: SyntaxError: Unexpected token (37:30)
+[error]   35 |
+[error]   36 |               backgroundColor: colors.surface,
+[error] > 37 |               backgroundColor: colors.surface,
+[error]      |                              ^
+[error]   38 |               backgroundColor: colors.surface,
+[error]   39 |               borderColor: colors.border,
+[error]   40 |               borderColor: colors.border,
+Optimizing imports in atomic/pages/ForgotPasswordPage.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/pages/ForgotPasswordPage.js: SyntaxError: Unexpected token (35:26)
+[error]   33 |
+[error]   34 |               backgroundColor: colors.surface,
+[error] > 35 |               borderColor: colors.border,
+[error]      |                          ^
+[error]   36 |               color: colors.text,
+[error]   37 |             styles.input,
+[error]   38 |             {
+Optimizing imports in atomic/organisms/monitoringService.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/organisms/monitoringService.js: SyntaxError: Unexpected token, expected "," (5:8)
+[error]   3 |
+[error]   4 | import {
+[error] > 5 | import {
+[error]     |        ^
+[error]   6 | import {
+[error]   7 | import {
+[error]   8 |
+Optimizing imports in atomic/organisms/firebaseService.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/organisms/firebaseService.js: SyntaxError: Unexpected token, expected "," (5:8)
+[error]   3 |
+[error]   4 | import {
+[error] > 5 | import {
+[error]     |        ^
+[error]   6 |
+[error]   7 |
+[error]   8 | // Internal imports
+Optimizing imports in atomic/organisms/themeProvider.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/organisms/themeProvider.js: SyntaxError: Unexpected token, expected "," (32:24)
+[error]   30 |
+[error]   31 |
+[error] > 32 |           setThemeState(savedTheme);
+[error]      |                        ^
+[error]   33 |         // If system, switch to the opposite of the effective theme
+[error]   34 |         // Otherwise toggle between light and dark
+[error]   35 |         await AsyncStorage.setItem(THEME_STORAGE_KEY, theme);
+Optimizing imports in atomic/organisms/index.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/organisms/index.js: SyntaxError: Unexpected token (12:2)
+[error]   10 |
+[error]   11 |
+[error] > 12 |  *
+[error]      |  ^
+[error]   13 |  * Organisms Index
+[error]   14 |  * This file exports all organism components for easier imports.
+[error]   15 |  */
+Optimizing imports in atomic/organisms/environmentBootstrap.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] atomic/organisms/environmentBootstrap.js: SyntaxError: Unexpected token, expected "," (5:8)
+[error]   3 |
+[error]   4 | import {
+[error] > 5 | import {
+[error]     |        ^
+[error]   6 |
+[error]   7 |
+[error]   8 | // Internal imports
+Optimizing imports in __tests__/atomic/molecules/themeContext.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/molecules/themeContext.test.js: SyntaxError: Unexpected token (18:16)
+[error]   16 |
+[error]   17 |
+[error] > 18 |         value={{ theme: 'light', effectiveTheme: 'light', toggleTheme: jest.fn() }}
+[error]      |                ^
+[error]   19 |         {children}
+[error]   20 |         {children}
+[error]   21 |       </ThemeContext.Provider>
+Optimizing imports in __tests__/atomic/atoms/firebaseApp.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/atoms/firebaseApp.test.js: SyntaxError: Unexpected token (30:19)
+[error]   28 |
+[error]   29 |         apiKey: 'custom-api-key',
+[error] > 30 |         authDomain: 'custom-auth-domain',
+[error]      |                   ^
+[error]   31 |         projectId: 'custom-project-id',
+[error]   32 |         throw new Error('Initialization error');
+[error]   33 |       // Act
+Optimizing imports in __tests__/atomic/test-template.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/test-template.js: SyntaxError: Unexpected token (93:2)
+[error]   91 |   });
+[error]   92 |   });
+[error] > 93 |  *
+[error]      |  ^
+[error]   94 |  * Atomic Component Test Template
+[error]   95 |  * Copy this file and modify it for each component you want to test.
+[error]   96 |  * This template provides a starting point for testing atomic components.
+Optimizing imports in __tests__/atomic/templates/MainLayout.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/templates/MainLayout.test.js: SyntaxError: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (20:7)
+[error]   18 |
+[error]   19 |         <div>Content</div>
+[error] > 20 |       </MainLayout>
+[error]      |       ^
+[error]   21 |       <MainLayout header={header} footer={footer}>
+[error]   22 |       background: '#FFFFFF',
+[error]   23 |       text: '#000000',
+Optimizing imports in __tests__/atomic/pages/LoginScreen.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/pages/LoginScreen.test.js: SyntaxError: Unexpected token (37:23)
+[error]   35 |
+[error]   36 |
+[error] > 37 |         'common.close': 'Close',
+[error]      |                       ^
+[error]   38 |         'common.error': 'Error',
+[error]   39 |         'common.loading': 'Loading...',
+[error]   40 |         'common.success': 'Success',
+Optimizing imports in __tests__/atomic/pages/HomePage.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/pages/HomePage.test.js: SyntaxError: Unexpected token (33:15)
+[error]   31 |
+[error]   32 |             confidence: 85,
+[error] > 33 |             id: 'game1',
+[error]      |               ^
+[error]   34 |             id: 'game2',
+[error]   35 |             id: 'rec1',
+[error]   36 |             imageUrl: 'https://example.com/game1.jpg',
+Optimizing imports in __tests__/atomic/pages/ForgotPasswordPage.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/pages/ForgotPasswordPage.test.js: SyntaxError: Unexpected token (33:13)
+[error]   31 |
+[error]   32 |       background: '#FFFFFF',
+[error] > 33 |       border: '#E0E0E0',
+[error]      |             ^
+[error]   34 |       captureException: jest.fn(),
+[error]   35 |       error: '#FF3B30',
+[error]   36 |       expect(firebaseService.auth.sendPasswordResetEmail).toHaveBeenCalledWith('test@example.com');
+Optimizing imports in __tests__/atomic/pages/SignupPage.test.js...
+[warn] jsxBracketSameLine is deprecated.
+[error] __tests__/atomic/pages/SignupPage.test.js: SyntaxError: Unexpected token (31:7)
+[error]   29 |         'password123'
+[error]   30 |         'test@example.com',
+[error] > 31 |       );
+[error]      |       ^
+[error]   32 |       background: '#FFFFFF',
+[error]   33 |       border: '#E0E0E0',
+[error]   34 |       captureException: jest.fn(),
+Running ESLint to fix any issues...
+Need to install the following packages:
+eslint@9.25.1
+Ok to proceed? (y) 

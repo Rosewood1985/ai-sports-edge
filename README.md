@@ -44,6 +44,30 @@ yarn start
 
 4. Follow the instructions in the terminal to open the app on your device or emulator.
 
+### Environment Setup
+
+The application uses environment variables for configuration. To set up your environment:
+
+1. Create your environment file:
+```bash
+npm run setup-env
+# or manually
+cp .env.example .env
+```
+
+2. Edit the `.env` file with your actual values for:
+   - Firebase credentials
+   - Stripe API keys
+   - Sports data API keys
+   - Other service credentials
+
+3. Validate your environment setup:
+```bash
+npm run check-env
+```
+
+For more detailed information, see the [Environment Setup Documentation](docs/environment-setup.md).
+
 ## Project Structure
 
 ```

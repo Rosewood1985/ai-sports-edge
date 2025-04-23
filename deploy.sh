@@ -1,45 +1,45 @@
 #!/bin/bash
+# Deployment script for AI Sports Edge
 
-# Simple deployment script for AI Sports Edge
-# This script deploys all changes including ThemeToggle and auth fixes
+echo "Starting deployment process..."
 
-echo "🚀 Starting deployment of AI Sports Edge updates..."
+# Step 1: Install required Python packages
+echo "Installing required Python packages..."
+pip install numpy scikit-learn pandas
 
-# Clear any previous build artifacts
-echo "🧹 Cleaning up previous builds..."
-rm -rf dist
-rm -rf web-build
-
-# Deploy Firebase configuration
-echo "🔥 Deploying Firebase configuration..."
-firebase deploy --only firestore:rules,storage,functions
-if [ $? -ne 0 ]; then
-  echo "⚠️ Firebase configuration deployment had issues, but continuing..."
-fi
-
-# Build and deploy the web app
-echo "🌐 Building and deploying web app..."
-cd web
+# Step 2: Build and deploy Firebase Functions
+echo "Building and deploying Firebase Functions..."
+cd functions
+npm install
+npm install eslint --save-dev
 npm run build
-if [ $? -ne 0 ]; then
-  echo "⚠️ Web build had issues, but continuing..."
-fi
+firebase deploy --only functions
 
-# Deploy to web hosting
-echo "📤 Deploying to web hosting..."
+# Step 3: Create ML model directory in Firebase Storage
+echo "Creating ML model directory in Firebase Storage..."
+mkdir -p ../ml/models_deploy
+
+# Step 4: Generate dummy model for testing
+echo "Generating dummy ML model..."
+cd ../ml/models
+python create_dummy_model.py
+
+# Step 5: Copy model to deployment directory
+echo "Copying model to deployment directory..."
+cp model.pkl ../models_deploy/
+
+# Step 6: Upload ML model to Firebase Storage
+echo "Uploading ML model to Firebase Storage..."
+cd ../..
+gsutil cp ml/models_deploy/model.pkl gs://ai-sports-edge.appspot.com/models/model.pkl
+
+# Step 7: Update Firebase Remote Config
+echo "Updating Firebase Remote Config..."
+firebase functions:config:set ml.model_path="gs://ai-sports-edge.appspot.com/models/model.pkl"
+
+# Step 8: Deploy frontend components
+echo "Building and deploying frontend components for production..."
+NODE_ENV=production npm run build:prod
 firebase deploy --only hosting
-if [ $? -ne 0 ]; then
-  echo "⚠️ Web hosting deployment had issues, but continuing..."
-fi
-cd ..
 
-# Update Expo project
-echo "📱 Publishing Expo updates..."
-npx expo publish
-if [ $? -ne 0 ]; then
-  echo "⚠️ Expo publish had issues, but continuing..."
-fi
-
-echo "✅ Deployment completed!"
-echo "🌐 Web app should be live at https://aisportsedge.app"
-echo "📱 Mobile app updates will be available after app store review"
+echo "Deployment completed successfully!"

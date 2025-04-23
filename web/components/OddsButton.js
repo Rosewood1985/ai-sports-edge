@@ -342,15 +342,9 @@ const OddsButton = ({
         console.warn('[OddsButton] Betting affiliate service not available for tracking');
       }
       
-      // Generate affiliate URL
-      let baseUrl = FANDUEL_CONFIG.BASE_URL;
-      if (game.fanduelEventId) {
-        baseUrl = `${FANDUEL_CONFIG.BASE_URL}event/${game.fanduelEventId}`;
-      }
-      
-      // Add affiliate parameters
-      const affiliateUrl = `${baseUrl}?aff_id=${affiliateId}&subId=${userId}-${game.id}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton&utm_content=web`;
-      console.log('[OddsButton] Generated affiliate URL:', affiliateUrl);
+      // Use the direct affiliate link from environment variables
+      const affiliateUrl = FANDUEL_CONFIG.AFFILIATE_URL;
+      console.log('[OddsButton] Using affiliate URL:', affiliateUrl);
       
       // Track conversion
       if (window.bettingAffiliateService) {

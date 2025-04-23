@@ -1,0 +1,6 @@
+Remove X-Frame-Options meta tag for iframe compatibility
+
+- Removed <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"> from index.html
+- Allows the site to be embedded in iframes on other domains
+- Fixes Chrome DevTools warning about X-Frame-Options
+- Improves compatibility with embedding partners and affiliate sites

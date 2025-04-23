@@ -6,6 +6,7 @@
  */
 import {
   FANDUEL_AFFILIATE_ID,
+  FANDUEL_AFFILIATE_LINK,
   API_BASE_URL,
   ENABLE_MICROTRANSACTIONS,
   ENABLE_AFFILIATE_LINKS,
@@ -20,6 +21,9 @@ export const FANDUEL_CONFIG = {
   
   // Base URL for FanDuel
   BASE_URL: 'https://sportsbook.fanduel.com/',
+  
+  // Affiliate link from environment variable
+  AFFILIATE_URL: FANDUEL_AFFILIATE_LINK || 'https://fndl.co/lr9jbkg',
   
   // Default tracking parameters
   TRACKING_PARAMS: {

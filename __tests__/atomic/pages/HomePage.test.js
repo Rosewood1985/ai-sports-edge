@@ -1,136 +1,207 @@
-/**
- * Home Page Tests
- * 
- * Tests for the Home page component.
- */
-
+// External imports
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+
+
+import { render, fireEvent, waitFor } from '@testing-library/react';
+
+
+// Internal imports
 import { HomePage } from '../../../atomic/pages';
 
-// Mock dependencies
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: jest.fn(),
-  }),
-}));
 
-jest.mock('../../../atomic/molecules/themeContext', () => ({
-  useTheme: jest.fn(() => ({
-    colors: {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            confidence: 85,
+            id: 'game1',
+            id: 'game2',
+            id: 'rec1',
+            imageUrl: 'https://example.com/game1.jpg',
+            imageUrl: 'https://example.com/game2.jpg',
+            imageUrl: 'https://example.com/rec1.jpg',
+            subtitle: 'Team A vs Team B',
+            subtitle: 'Team C vs Team D',
+            subtitle: 'Team E vs Team F',
+            time: '7:30 PM',
+            time: '8:00 PM',
+            title: 'Game 1',
+            title: 'Game 2',
+            title: 'Recommendation 1',
+          id: 'featured1',
+          imageUrl: 'https://example.com/featured.jpg',
+          subtitle: 'Big Match of the Week',
+          title: 'Featured Game',
+          {
+          {
+          {
+          },
+          },
+          },
+        'common.loading': 'Loading...',
+        'home.noGames': 'No games available',
+        'home.recommendations': 'Recommendations',
+        'home.upcomingGames': 'Upcoming Games',
+        'home.viewFeatured': 'View Featured',
+        Promise.resolve([
+        Promise.resolve([
+        Promise.resolve({
+        ])
+        ])
+        email: 'test@example.com',
+        uid: 'test-uid',
+        })
+      ),
+      ),
+      ),
       background: '#FFFFFF',
-      surface: '#F5F5F5',
-      primary: '#007BFF',
+      border: '#E0E0E0',
+      captureException: jest.fn(),
+      const translations = {
+      error: '#FF3B30',
+      expect(getByText('85%')).toBeTruthy();
+      expect(getByText('Big Match of the Week')).toBeTruthy();
+      expect(getByText('Featured Game')).toBeTruthy();
+      expect(getByText('Game 1')).toBeTruthy();
+      expect(getByText('Game 2')).toBeTruthy();
+      expect(getByText('Recommendation 1')).toBeTruthy();
+      expect(getByText('Recommendations')).toBeTruthy();
+      expect(getByText('Team A vs Team B')).toBeTruthy();
+      expect(getByText('Team C vs Team D')).toBeTruthy();
+      expect(getByText('Team E vs Team F')).toBeTruthy();
+      expect(getByText('Upcoming Games')).toBeTruthy();
+      expect(getByText('View Featured')).toBeTruthy();
+      fireEvent.press(getByText('Featured Game'));
+      fireEvent.press(getByText('Game 1'));
+      getCurrentUser: jest.fn(() => ({
+      getFeaturedGame: jest.fn(() =>
+      getGames: jest.fn(() =>
+      getRecommendations: jest.fn(() =>
+      onError: '#FFFFFF',
       onPrimary: '#FFFFFF',
+      onSecondary: '#FFFFFF',
+      onSuccess: '#FFFFFF',
+      primary: '#007BFF',
+      return translations[key] || key;
+      secondary: '#6C757D',
+      success: '#4CD964',
+      surface: '#F5F5F5',
       text: '#000000',
       textSecondary: '#757575',
-      border: '#E0E0E0',
-    },
-    toggleTheme: jest.fn(),
-  })),
-}));
-
-jest.mock('../../../atomic/organisms', () => ({
-  firebaseService: {
-    auth: {
-      getCurrentUser: jest.fn(() => ({
-        uid: 'test-uid',
-        email: 'test@example.com',
-        displayName: 'Test User',
       })),
-    },
-    firestore: {
-      getDocument: jest.fn(() => Promise.resolve({
-        id: 'test-uid',
-        name: 'Test User',
-        email: 'test@example.com',
-        preferences: {
-          notifications: true,
-          darkMode: false,
-        },
-      })),
-    },
-  },
-  monitoringService: {
-    error: {
-      captureException: jest.fn(),
-      getUserFriendlyMessage: jest.fn(() => 'An error occurred'),
-    },
-    performance: {
-      startTrace: jest.fn(() => ({
-        stop: jest.fn(),
-      })),
-    },
-  },
-}));
-
-jest.mock('../../../atomic/templates', () => ({
-  MainLayout: ({ children, header }) => (
-    <>
-      {header}
-      {children}
-    </>
-  ),
-}));
-
-describe('HomePage', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('renders correctly', async () => {
+      };
+    // Act
+    // Act
+    // Act & Assert
+    // Act & Assert
+    // Act & Assert
+    // Arrange
+    // Arrange
+    // Arrange
+    // Arrange
+    // Arrange
     // Arrange & Act
-    const { getByText, findByText } = render(<HomePage />);
-    
     // Assert
-    expect(getByText('AI Sports Edge')).toBeTruthy();
-    
-    // Wait for async content to load
-    const welcomeText = await findByText('Welcome, Test User');
-    expect(welcomeText).toBeTruthy();
-  });
-
-  it('navigates to profile when profile button is pressed', () => {
-    // Arrange
-    const { getByTestId } = render(<HomePage />);
+    // Assert
+    // Assert
+    auth: {
+    await waitFor(() => {
+    await waitFor(() => {
+    await waitFor(() => {
+    await waitFor(() => {
+    await waitFor(() => {
+    colors: {
     const navigation = require('@react-navigation/native').useNavigation();
-    
-    // Act
-    fireEvent.press(getByTestId('profile-button'));
-    
-    // Assert
-    expect(navigation.navigate).toHaveBeenCalledWith('Profile');
+    const navigation = require('@react-navigation/native').useNavigation();
+    const { getByText } = render(<HomePage />);
+    const { getByText } = render(<HomePage />);
+    const { getByText } = render(<HomePage />);
+    const { getByText } = render(<HomePage />);
+    const { getByText } = render(<HomePage />);
+    const { getByText } = render(<HomePage />);
+    error: {
+    expect(getByText('Loading...')).toBeTruthy();
+    expect(navigation.navigate).toHaveBeenCalledWith('GameDetail', { gameId: 'featured1' });
+    expect(navigation.navigate).toHaveBeenCalledWith('GameDetail', { gameId: 'game1' });
+    firestore: {
+    jest.clearAllMocks();
+    navigate: jest.fn(),
+    t: jest.fn(key => {
+    }),
+    });
+    });
+    });
+    });
+    });
+    },
+    },
+    },
+    },
+  MainLayout: ({ children }) => <>{children}</>,
+  beforeEach(() => {
+  firebaseService: {
+  it('navigates to game detail when featured game is selected', async () => {
+  it('navigates to game detail when game is selected', async () => {
+  it('renders featured game after loading', async () => {
+  it('renders games after loading', async () => {
+  it('renders loading state initially', () => {
+  it('renders recommendations after loading', async () => {
+  monitoringService: {
+  useI18n: jest.fn(() => ({
+  useNavigation: () => ({
+  useTheme: jest.fn(() => ({
+  })),
+  })),
+  }),
   });
-
-  it('toggles theme when theme button is pressed', () => {
-    // Arrange
-    const { getByTestId } = render(<HomePage />);
-    const { useTheme } = require('../../../atomic/molecules/themeContext');
-    const { toggleTheme } = useTheme();
-    
-    // Act
-    fireEvent.press(getByTestId('theme-toggle-button'));
-    
-    // Assert
-    expect(toggleTheme).toHaveBeenCalled();
   });
-
-  it('fetches user data on mount', () => {
-    // Arrange
-    render(<HomePage />);
-    const { firebaseService } = require('../../../atomic/organisms');
-    
-    // Assert
-    expect(firebaseService.auth.getCurrentUser).toHaveBeenCalled();
-    expect(firebaseService.firestore.getDocument).toHaveBeenCalledWith('users', 'test-uid');
   });
-
-  it('starts performance trace on mount', () => {
-    // Arrange
-    render(<HomePage />);
-    const { monitoringService } = require('../../../atomic/organisms');
-    
-    // Assert
-    expect(monitoringService.performance.startTrace).toHaveBeenCalledWith('home_page_load');
   });
+  });
+  });
+  });
+  },
+  },
+ *
+ * Home Page Tests
+ * Tests for the Home Page component.
+ */
+/**
+// External imports
+// Internal imports
+// Mock dependencies
+describe('HomePage', () => {
+jest.mock('../../../atomic/molecules/i18nContext', () => ({
+jest.mock('../../../atomic/molecules/themeContext', () => ({
+jest.mock('../../../atomic/organisms', () => ({
+jest.mock('../../../atomic/templates', () => ({
+jest.mock('@react-navigation/native', () => ({
+}));
+}));
+}));
+}));
+}));
 });
+

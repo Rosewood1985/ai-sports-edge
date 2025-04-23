@@ -202,8 +202,18 @@ export default function SignupScreen({ navigation }: Props): JSX.Element {
       // Get auth instance directly
       const auth = getAuth();
       
+      // Log Firebase configuration for debugging
+      console.log('Firebase Auth Configuration:', {
+        apiKey: process.env.FIREBASE_API_KEY ? 'Present (masked)' : 'Missing',
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        environment: process.env.NODE_ENV || 'Not set'
+      });
+      
       // Create user with Firebase
+      console.log('Attempting to create user with Firebase...');
       await createUserWithEmailAndPassword(auth, email, password);
+      console.log('User created successfully');
       Alert.alert(
         t("signup.features.signUp") || "Sign Up", 
         t("signup.alerts.accountCreated") || "Account created successfully!"
@@ -212,6 +222,13 @@ export default function SignupScreen({ navigation }: Props): JSX.Element {
       // Navigate to main screen
       navigation.replace("Main");
     } catch (error: any) {
+      // Log detailed error information for debugging
+      console.error('Sign up error details:', {
+        code: error.code,
+        message: error.message,
+        fullError: JSON.stringify(error, null, 2)
+      });
+      
       // Sanitize error messages to avoid exposing sensitive information
       let errorMessage = t("signup.errors.signUpFailed") || "Failed to create account";
       
@@ -225,10 +242,16 @@ export default function SignupScreen({ navigation }: Props): JSX.Element {
       } else if (error.code === 'auth/api-key-not-valid') {
         errorMessage = t("signup.errors.apiKeyInvalid") || "API key is not valid";
         console.error('API Key validation failed:', error);
+      } else if (error.code === 'auth/operation-not-allowed') {
+        errorMessage = t("signup.errors.operationNotAllowed") || "Email/password accounts are not enabled";
+        console.error('Firebase auth not properly configured:', error);
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = t("signup.errors.networkFailed") || "Network request failed";
+        console.error('Network request failed:', error);
       }
       
       Alert.alert(t("common.error") || "Error", errorMessage);
-      console.error('Sign up error:', error);
+      console.error('Sign up error:', error.code, error.message);
     } finally {
       setIsLoading(false);
     }

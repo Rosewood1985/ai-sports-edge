@@ -1,13 +1,15 @@
 /**
  * Theme Context Molecule
- *
  * Provides theme context and hooks for the application.
  * Combines theme atoms into a usable context system.
  */
 
-import React, { createContext, useContext } from 'react';
-import { useColorScheme } from 'react-native';
+// External imports
+import React, { memo, useCallback, useMemo, createContext, useContext } from 'react';
 import { DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { useColorScheme } from 'react-native';
+
+// Internal imports
 import Colors from '../atoms/themeColors';
 import ThemeTokens from '../atoms/themeTokens';
 
@@ -24,8 +26,8 @@ import ThemeTokens from '../atoms/themeTokens';
  * @property {Function} setTheme - Function to set theme
  * @property {Function} toggleTheme - Function to toggle between light and dark themes
  * @property {Object} colors - Current theme colors
- * @property {Object} tokens - Theme tokens
  * @property {Object} navigationTheme - Navigation theme for React Navigation
+ * @property {Object} tokens - Theme tokens
  */
 
 /**
@@ -38,8 +40,8 @@ const defaultThemeContext = {
   setTheme: () => {},
   toggleTheme: () => {},
   colors: Colors.light,
-  tokens: ThemeTokens,
   navigationTheme: DefaultTheme,
+  tokens: ThemeTokens,
 };
 
 /**
@@ -55,44 +57,8 @@ export const ThemeContext = createContext(defaultThemeContext);
 export const useTheme = () => useContext(ThemeContext);
 
 /**
- * Get navigation theme based on theme type
- * @param {ThemeType} themeType - Theme type
- * @returns {Object} Navigation theme
- */
-export const getNavigationTheme = themeType => {
-  const isDark = themeType === 'dark';
-
-  if (isDark) {
-    return {
-      ...DarkTheme,
-      colors: {
-        ...DarkTheme.colors,
-        primary: Colors.dark.primary,
-        background: Colors.dark.background,
-        card: Colors.dark.card,
-        text: Colors.dark.text,
-        border: Colors.dark.border,
-        notification: Colors.dark.error,
-      },
-    };
-  }
-
-  return {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      primary: Colors.light.primary,
-      background: Colors.light.background,
-      card: Colors.light.card,
-      text: Colors.light.text,
-      border: Colors.light.border,
-      notification: Colors.light.error,
-    },
-  };
-};
-
-/**
  * Resolve theme type to effective theme
+ * 
  * @param {ThemeType} theme - Theme type
  * @param {string|null} systemTheme - System theme from useColorScheme
  * @returns {ThemeType} Effective theme ('light' or 'dark')
@@ -106,6 +72,7 @@ export const resolveTheme = (theme, systemTheme) => {
 
 /**
  * Get theme colors based on theme type
+ * 
  * @param {ThemeType} themeType - Theme type
  * @returns {Object} Theme colors
  */
@@ -114,7 +81,44 @@ export const getThemeColors = themeType => {
 };
 
 /**
+ * Get navigation theme based on theme type
+ * 
+ * @param {ThemeType} themeType - Theme type
+ * @returns {Object} Navigation theme
+ */
+export const getNavigationTheme = themeType => {
+  if (themeType === 'dark') {
+    return {
+      ...DarkTheme,
+      colors: {
+        ...DarkTheme.colors,
+        background: Colors.dark.background,
+        card: Colors.dark.card,
+        text: Colors.dark.text,
+        border: Colors.dark.border,
+        primary: Colors.dark.primary,
+        notification: Colors.dark.error,
+      },
+    };
+  }
+  
+  return {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: Colors.light.background,
+      card: Colors.light.card,
+      text: Colors.light.text,
+      border: Colors.light.border,
+      primary: Colors.light.primary,
+      notification: Colors.light.error,
+    },
+  };
+};
+
+/**
  * Get shadow style based on theme and size
+ * 
  * @param {ThemeType} themeType - Theme type
  * @param {string} size - Shadow size ('none', 'xs', 'sm', 'md', 'lg', 'xl')
  * @returns {Object} Shadow style
@@ -126,6 +130,7 @@ export const getShadow = (themeType, size = 'md') => {
 
 /**
  * Create text style based on variant
+ * 
  * @param {ThemeType} themeType - Theme type
  * @param {string} variant - Text variant ('heading1', 'heading2', 'heading3', 'heading4', 'heading5', 'body', 'bodySmall', 'caption', 'button', 'label')
  * @param {Object} additionalStyle - Additional style to merge
@@ -133,22 +138,17 @@ export const getShadow = (themeType, size = 'md') => {
  */
 export const createTextStyle = (themeType, variant = 'body', additionalStyle = {}) => {
   const colors = getThemeColors(themeType);
+  const isDark = themeType === 'dark';
   const { fontSize, lineHeight, fontFamily, fontWeight } = ThemeTokens;
-
-  const baseStyle = {
-    color: colors.text,
-    fontSize: fontSize[variant] || fontSize.body,
-    lineHeight: lineHeight[variant] || lineHeight.body,
-    fontFamily: fontFamily.regular,
-  };
-
+  
   // Apply variant-specific styles
   let variantStyle = {};
-
+  
   if (variant.startsWith('heading')) {
     variantStyle = {
       fontFamily: fontFamily.bold,
       fontWeight: fontWeight.bold,
+      color: colors.text,
     };
   } else if (variant === 'button') {
     variantStyle = {
@@ -158,6 +158,8 @@ export const createTextStyle = (themeType, variant = 'body', additionalStyle = {
     };
   } else if (variant === 'caption') {
     variantStyle = {
+      fontFamily: fontFamily.medium,
+      fontWeight: fontWeight.medium,
       color: colors.textSecondary,
     };
   } else if (variant === 'label') {
@@ -166,7 +168,14 @@ export const createTextStyle = (themeType, variant = 'body', additionalStyle = {
       fontWeight: fontWeight.medium,
     };
   }
-
+  
+  const baseStyle = {
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize[variant] || fontSize.body,
+    lineHeight: lineHeight[variant] || lineHeight.body,
+    color: colors.text,
+  };
+  
   return {
     ...baseStyle,
     ...variantStyle,

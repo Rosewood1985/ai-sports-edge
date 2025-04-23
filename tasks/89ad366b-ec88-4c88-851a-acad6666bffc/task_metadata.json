@@ -18,7 +18,7 @@
     },
     {
       "path": "config/firebase.ts",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "read_tool",
       "roo_read_date": 1744864367836,
       "roo_edit_date": null,
@@ -546,7 +546,7 @@
     },
     {
       "path": "memory-bank/activeContext.md",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "roo_edited",
       "roo_read_date": 1744906284517,
       "roo_edit_date": 1744906284517,
@@ -610,7 +610,7 @@
     },
     {
       "path": "memory-bank/decisionLog.md",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "roo_edited",
       "roo_read_date": 1744906350516,
       "roo_edit_date": 1744906350516,
@@ -634,7 +634,7 @@
     },
     {
       "path": "memory-bank/progress.md",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "roo_edited",
       "roo_read_date": 1744906379578,
       "roo_edit_date": 1744906379578,
@@ -1690,7 +1690,7 @@
     },
     {
       "path": "screens/Onboarding/Context/ThemeContext.tsx",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "read_tool",
       "roo_read_date": 1744916630500,
       "roo_edit_date": null,
@@ -2194,7 +2194,7 @@
     },
     {
       "path": "deploy.sh",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "roo_edited",
       "roo_read_date": 1744917152430,
       "roo_edit_date": 1744917152430,
@@ -2543,6 +2543,1422 @@
       "roo_read_date": 1744918540913,
       "roo_edit_date": 1744918540913,
       "user_edit_date": null
+    },
+    {
+      "path": "screens/Onboarding/Context/ThemeContext.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744919032219,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "screens/OnboardingScreen.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744919037313,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "contexts/I18nContext.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744919042572,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/onboardingService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744919056584,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/post-signup-onboarding-architecture.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744919638876,
+      "roo_edit_date": 1744919638876,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/ai-sports-edge-features-architecture.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744919889954,
+      "roo_edit_date": 1744919889954,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/firebase-optimization-strategies.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744919998916,
+      "roo_edit_date": 1744919998916,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/firebase-write-optimization-strategies.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744922805174,
+      "roo_edit_date": 1744922805174,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/combined-architecture-with-optimizations.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744923467255,
+      "roo_edit_date": 1744923467255,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/phased-implementation-plan.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744923604665,
+      "roo_edit_date": 1744923604665,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/phased-implementation-plan.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744923604665,
+      "roo_edit_date": 1744923604665,
+      "user_edit_date": 1744923636511
+    },
+    {
+      "path": "config/firebase.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744923668702,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/cacheService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744923681853,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/userService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744923687052,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/userPreferencesService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744923692529,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/userSportsPreferencesService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744923698253,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/enhancedCacheService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744923784637,
+      "roo_edit_date": 1744923784637,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/loggingService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744923798662,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/enhancedCacheService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924455314,
+      "roo_edit_date": 1744924455314,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/enhancedCacheService.ts",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924455314,
+      "roo_edit_date": 1744924455314,
+      "user_edit_date": 1744924455353
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924560300,
+      "roo_edit_date": 1744924560300,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924560300,
+      "roo_edit_date": 1744924560300,
+      "user_edit_date": 1744924621888
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924622331,
+      "roo_edit_date": 1744924622331,
+      "user_edit_date": 1744924621888
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744924630885,
+      "roo_edit_date": 1744924622331,
+      "user_edit_date": 1744924621888
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744924638782,
+      "roo_edit_date": 1744924622331,
+      "user_edit_date": 1744924621888
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924638782,
+      "roo_edit_date": 1744924622331,
+      "user_edit_date": 1744924655119
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924655350,
+      "roo_edit_date": 1744924655350,
+      "user_edit_date": 1744924655119
+    },
+    {
+      "path": "config/firebase.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744924678760,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924655350,
+      "roo_edit_date": 1744924655350,
+      "user_edit_date": 1744924693099
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924693322,
+      "roo_edit_date": 1744924693322,
+      "user_edit_date": 1744924693099
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924693322,
+      "roo_edit_date": 1744924693322,
+      "user_edit_date": 1744924703845
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744924720736,
+      "roo_edit_date": 1744924693322,
+      "user_edit_date": 1744924703845
+    },
+    {
+      "path": "services/optimizedUserService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744924726372,
+      "roo_edit_date": 1744924693322,
+      "user_edit_date": 1744924703845
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924812853,
+      "roo_edit_date": 1744924812853,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924812853,
+      "roo_edit_date": 1744924812853,
+      "user_edit_date": 1744924827287
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924827406,
+      "roo_edit_date": 1744924827406,
+      "user_edit_date": 1744924827287
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924827406,
+      "roo_edit_date": 1744924827406,
+      "user_edit_date": 1744924844513
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924844519,
+      "roo_edit_date": 1744924844519,
+      "user_edit_date": 1744924844513
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924844519,
+      "roo_edit_date": 1744924844519,
+      "user_edit_date": 1744924851299
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924870835,
+      "roo_edit_date": 1744924870835,
+      "user_edit_date": 1744924851299
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924870835,
+      "roo_edit_date": 1744924870835,
+      "user_edit_date": 1744924870876
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744924875437,
+      "roo_edit_date": 1744924870835,
+      "user_edit_date": 1744924870876
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744924875437,
+      "roo_edit_date": 1744924870835,
+      "user_edit_date": 1744924918979
+    },
+    {
+      "path": "services/batchLoadingService.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924919359,
+      "roo_edit_date": 1744924919359,
+      "user_edit_date": 1744924918979
+    },
+    {
+      "path": "services/firebaseMonitoringService.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744924967264,
+      "roo_edit_date": 1744924967264,
+      "user_edit_date": null
+    },
+    {
+      "path": "utils/dataMigrationUtils.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925015921,
+      "roo_edit_date": 1744925015921,
+      "user_edit_date": null
+    },
+    {
+      "path": "utils/dataMigrationUtils.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925024584,
+      "roo_edit_date": 1744925024584,
+      "user_edit_date": null
+    },
+    {
+      "path": "utils/dataMigrationUtils.ts",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744925024584,
+      "roo_edit_date": 1744925024584,
+      "user_edit_date": 1744925024642
+    },
+    {
+      "path": "firebase-optimization/README.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925062959,
+      "roo_edit_date": 1744925062959,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-optimization/examples/OptimizedUserProfile.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925099722,
+      "roo_edit_date": 1744925099722,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-optimization/examples/OptimizedUserProfile.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925107552,
+      "roo_edit_date": 1744925107552,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-optimization/index.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925123322,
+      "roo_edit_date": 1744925123322,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-optimization/index.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744925123322,
+      "roo_edit_date": 1744925123322,
+      "user_edit_date": 1744925149786
+    },
+    {
+      "path": "firebase-optimization/index.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925149879,
+      "roo_edit_date": 1744925149879,
+      "user_edit_date": 1744925149786
+    },
+    {
+      "path": "firebase-optimization/index.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744925155300,
+      "roo_edit_date": 1744925149879,
+      "user_edit_date": 1744925149786
+    },
+    {
+      "path": "memory-bank/ai-sports-edge-features-architecture.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744925766026,
+      "roo_edit_date": 1744919889954,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/firebase-optimization-strategies.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744925770634,
+      "roo_edit_date": 1744919998916,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/phased-implementation-plan.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744925775176,
+      "roo_edit_date": 1744923604665,
+      "user_edit_date": 1744923636511
+    },
+    {
+      "path": "memory-bank/momentum-engine-implementation-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744925920744,
+      "roo_edit_date": 1744925920744,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/ai-pick-of-day-implementation-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926067710,
+      "roo_edit_date": 1744926067710,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/comprehensive-ai-sports-edge-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926426333,
+      "roo_edit_date": 1744926426333,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/training/prepare_dataset.py",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926593861,
+      "roo_edit_date": 1744926593861,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/training/feature_engineering.py",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926629288,
+      "roo_edit_date": 1744926629288,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/training/train_model.py",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926675325,
+      "roo_edit_date": 1744926675325,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/inference/predict_outcome.py",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926726227,
+      "roo_edit_date": 1744926726227,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/train_and_push.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744926763807,
+      "roo_edit_date": 1744926763807,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927688360,
+      "roo_edit_date": 1744927688360,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927688360,
+      "roo_edit_date": 1744927688360,
+      "user_edit_date": 1744927698099
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927698112,
+      "roo_edit_date": 1744927698112,
+      "user_edit_date": 1744927698099
+    },
+    {
+      "path": "functions/tsconfig.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927706926,
+      "roo_edit_date": 1744927706926,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927718293,
+      "roo_edit_date": 1744927718293,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/src/index.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927725363,
+      "roo_edit_date": 1744927725363,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/src/markAIPickOfDay.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927748024,
+      "roo_edit_date": 1744927748024,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/src/markAIPickOfDay.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927748024,
+      "roo_edit_date": 1744927748024,
+      "user_edit_date": 1744927758588
+    },
+    {
+      "path": "functions/src/markAIPickOfDay.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927758591,
+      "roo_edit_date": 1744927758591,
+      "user_edit_date": 1744927758588
+    },
+    {
+      "path": "functions/src/markAIPickOfDay.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927758591,
+      "roo_edit_date": 1744927758591,
+      "user_edit_date": 1744927769363
+    },
+    {
+      "path": "functions/src/markAIPickOfDay.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927769382,
+      "roo_edit_date": 1744927769382,
+      "user_edit_date": 1744927769363
+    },
+    {
+      "path": "functions/src/index.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927725363,
+      "roo_edit_date": 1744927725363,
+      "user_edit_date": 1744927776999
+    },
+    {
+      "path": "functions/src/index.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927777016,
+      "roo_edit_date": 1744927777016,
+      "user_edit_date": 1744927776999
+    },
+    {
+      "path": "src/components/AIPickCard.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927817357,
+      "roo_edit_date": 1744927817357,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/contexts/ThemeContext.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927845263,
+      "roo_edit_date": 1744927845263,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/i18n/index.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927858755,
+      "roo_edit_date": 1744927858755,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/i18n/translations/en.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927875425,
+      "roo_edit_date": 1744927875425,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/i18n/translations/es.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927888221,
+      "roo_edit_date": 1744927888221,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/components/AIPickCard.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927817357,
+      "roo_edit_date": 1744927817357,
+      "user_edit_date": 1744927898586
+    },
+    {
+      "path": "src/components/AIPickCard.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927898706,
+      "roo_edit_date": 1744927898706,
+      "user_edit_date": 1744927898586
+    },
+    {
+      "path": "src/i18n/mock.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927908331,
+      "roo_edit_date": 1744927908331,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/components/AIPickCard.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927898706,
+      "roo_edit_date": 1744927898706,
+      "user_edit_date": 1744927916737
+    },
+    {
+      "path": "src/components/AIPickCard.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927916908,
+      "roo_edit_date": 1744927916908,
+      "user_edit_date": 1744927916737
+    },
+    {
+      "path": "src/services/aiPickSelector.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927951368,
+      "roo_edit_date": 1744927951368,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927967489,
+      "roo_edit_date": 1744927967489,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/services/cacheService.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927982742,
+      "roo_edit_date": 1744927982742,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/services/cacheService.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927982742,
+      "roo_edit_date": 1744927982742,
+      "user_edit_date": 1744927990739
+    },
+    {
+      "path": "src/services/cacheService.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744927990800,
+      "roo_edit_date": 1744927990800,
+      "user_edit_date": 1744927990739
+    },
+    {
+      "path": "src/screens/LeaderboardScreen.tsx",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928040998,
+      "roo_edit_date": 1744928040998,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/screens/LeaderboardScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928040998,
+      "roo_edit_date": 1744928040998,
+      "user_edit_date": 1744928055119
+    },
+    {
+      "path": "src/screens/LeaderboardScreen.tsx",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928040998,
+      "roo_edit_date": 1744928040998,
+      "user_edit_date": 1744928065131
+    },
+    {
+      "path": "src/screens/LeaderboardScreen.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928065246,
+      "roo_edit_date": 1744928065246,
+      "user_edit_date": 1744928065131
+    },
+    {
+      "path": "src/screens/AIPickOfDayScreen.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928100706,
+      "roo_edit_date": 1744928100706,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/navigation/AIPicksNavigator.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928115922,
+      "roo_edit_date": 1744928115922,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/inference/predict_outcome.py",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744926726227,
+      "roo_edit_date": 1744926726227,
+      "user_edit_date": 1744928158767
+    },
+    {
+      "path": "ml/inference/predict_outcome.py",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928159090,
+      "roo_edit_date": 1744928159090,
+      "user_edit_date": 1744928158767
+    },
+    {
+      "path": "ml/models/create_dummy_model.py",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928186150,
+      "roo_edit_date": 1744928186150,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/inference/test_prediction.py",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928243048,
+      "roo_edit_date": 1744928243048,
+      "user_edit_date": null
+    },
+    {
+      "path": "ml/README.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928271997,
+      "roo_edit_date": 1744928271997,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/README.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928292934,
+      "roo_edit_date": 1744928292934,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/ai-pick-of-day-implementation.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928316062,
+      "roo_edit_date": 1744928316062,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/activeContext.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928331147,
+      "roo_edit_date": 1744928331147,
+      "user_edit_date": 1744906284012
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928348032,
+      "roo_edit_date": 1744928348032,
+      "user_edit_date": 1744906379074
+    },
+    {
+      "path": "memory-bank/decisionLog.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928371589,
+      "roo_edit_date": 1744928371589,
+      "user_edit_date": 1744906350087
+    },
+    {
+      "path": "deploy.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928409328,
+      "roo_edit_date": 1744928409328,
+      "user_edit_date": null
+    },
+    {
+      "path": "remoteconfig.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928426892,
+      "roo_edit_date": 1744928426892,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928348032,
+      "roo_edit_date": 1744928348032,
+      "user_edit_date": 1744928458926
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928458948,
+      "roo_edit_date": 1744928458948,
+      "user_edit_date": 1744928458926
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928458948,
+      "roo_edit_date": 1744928458948,
+      "user_edit_date": 1744928468653
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928468798,
+      "roo_edit_date": 1744928468798,
+      "user_edit_date": 1744928468653
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928468798,
+      "roo_edit_date": 1744928468798,
+      "user_edit_date": 1744928477527
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928477644,
+      "roo_edit_date": 1744928477644,
+      "user_edit_date": 1744928477527
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927698112,
+      "roo_edit_date": 1744927698112,
+      "user_edit_date": 1744928517853
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928517999,
+      "roo_edit_date": 1744928517999,
+      "user_edit_date": 1744928517853
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744928535914,
+      "roo_edit_date": 1744928517999,
+      "user_edit_date": 1744928517853
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928535914,
+      "roo_edit_date": 1744928517999,
+      "user_edit_date": 1744928547049
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928547161,
+      "roo_edit_date": 1744928547161,
+      "user_edit_date": 1744928547049
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744928564574,
+      "roo_edit_date": 1744928547161,
+      "user_edit_date": 1744928547049
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928564574,
+      "roo_edit_date": 1744928547161,
+      "user_edit_date": 1744928578789
+    },
+    {
+      "path": "functions/src/predictTodayGames.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928578910,
+      "roo_edit_date": 1744928578910,
+      "user_edit_date": 1744928578789
+    },
+    {
+      "path": "functions/src/microtransactions.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744928588574,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/src/microtransactions.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928588574,
+      "roo_edit_date": null,
+      "user_edit_date": 1744928597496
+    },
+    {
+      "path": "functions/src/microtransactions.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928597633,
+      "roo_edit_date": 1744928597633,
+      "user_edit_date": 1744928597496
+    },
+    {
+      "path": "deploy.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928409328,
+      "roo_edit_date": 1744928409328,
+      "user_edit_date": 1744928613092
+    },
+    {
+      "path": "deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928613193,
+      "roo_edit_date": 1744928613193,
+      "user_edit_date": 1744928613092
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927718293,
+      "roo_edit_date": 1744927718293,
+      "user_edit_date": 1744928900588
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928477644,
+      "roo_edit_date": 1744928477644,
+      "user_edit_date": 1744928955551
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928955663,
+      "roo_edit_date": 1744928955663,
+      "user_edit_date": 1744928955551
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928955663,
+      "roo_edit_date": 1744928955663,
+      "user_edit_date": 1744928968274
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928968442,
+      "roo_edit_date": 1744928968442,
+      "user_edit_date": 1744928968274
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928968442,
+      "roo_edit_date": 1744928968442,
+      "user_edit_date": 1744928984999
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744928985012,
+      "roo_edit_date": 1744928985012,
+      "user_edit_date": 1744928984999
+    },
+    {
+      "path": "functions/.eslintrc.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744929028598,
+      "roo_edit_date": 1744929028598,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744927718293,
+      "roo_edit_date": 1744927718293,
+      "user_edit_date": 1744929040064
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744929041470,
+      "roo_edit_date": 1744927718293,
+      "user_edit_date": 1744929040064
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744929041470,
+      "roo_edit_date": 1744927718293,
+      "user_edit_date": 1744929074496
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744929074509,
+      "roo_edit_date": 1744929074509,
+      "user_edit_date": 1744929074496
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744929324277,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744929324277,
+      "roo_edit_date": null,
+      "user_edit_date": 1744929332383
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744929332414,
+      "roo_edit_date": 1744929332414,
+      "user_edit_date": 1744929332383
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744929332414,
+      "roo_edit_date": 1744929332414,
+      "user_edit_date": 1744930476036
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930476200,
+      "roo_edit_date": 1744930476200,
+      "user_edit_date": 1744930476036
+    },
+    {
+      "path": "functions/tsconfig.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744930562008,
+      "roo_edit_date": 1744927706926,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744930569068,
+      "roo_edit_date": 1744929074509,
+      "user_edit_date": 1744929074496
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744930569068,
+      "roo_edit_date": 1744929074509,
+      "user_edit_date": 1744930581657
+    },
+    {
+      "path": "functions/package.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930581664,
+      "roo_edit_date": 1744930581664,
+      "user_edit_date": 1744930581657
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744928985012,
+      "roo_edit_date": 1744928985012,
+      "user_edit_date": 1744930780832
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930781051,
+      "roo_edit_date": 1744930781051,
+      "user_edit_date": 1744930780832
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744930781051,
+      "roo_edit_date": 1744930781051,
+      "user_edit_date": 1744930793058
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930793173,
+      "roo_edit_date": 1744930793173,
+      "user_edit_date": 1744930793058
+    },
+    {
+      "path": "functions/src/index.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744930926364,
+      "roo_edit_date": 1744927777016,
+      "user_edit_date": 1744927776999
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930961489,
+      "roo_edit_date": 1744930961489,
+      "user_edit_date": 1744930793058
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744930961489,
+      "roo_edit_date": 1744930961489,
+      "user_edit_date": 1744930961515
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744930961489,
+      "roo_edit_date": 1744930961489,
+      "user_edit_date": 1744930984572
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930984701,
+      "roo_edit_date": 1744930984701,
+      "user_edit_date": 1744930984572
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744930984701,
+      "roo_edit_date": 1744930984701,
+      "user_edit_date": 1744930997609
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744930997738,
+      "roo_edit_date": 1744930997738,
+      "user_edit_date": 1744930997609
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744930997738,
+      "roo_edit_date": 1744930997738,
+      "user_edit_date": 1744931121293
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931121310,
+      "roo_edit_date": 1744931121310,
+      "user_edit_date": 1744931121293
+    },
+    {
+      "path": "upload_model.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931195197,
+      "roo_edit_date": 1744931195197,
+      "user_edit_date": null
+    },
+    {
+      "path": "upload_model.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931349755,
+      "roo_edit_date": 1744931349755,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744931121310,
+      "roo_edit_date": 1744931121310,
+      "user_edit_date": 1744931379772
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931379786,
+      "roo_edit_date": 1744931379786,
+      "user_edit_date": 1744931379772
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744931379786,
+      "roo_edit_date": 1744931379786,
+      "user_edit_date": 1744931403977
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931404154,
+      "roo_edit_date": 1744931404154,
+      "user_edit_date": 1744931403977
+    },
+    {
+      "path": "update_remote_config.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931420139,
+      "roo_edit_date": 1744931420139,
+      "user_edit_date": null
+    },
+    {
+      "path": "remoteconfig.template.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744931435955,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "remoteconfig.template.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744931435955,
+      "roo_edit_date": null,
+      "user_edit_date": 1744931462136
+    },
+    {
+      "path": "remoteconfig.template.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931462719,
+      "roo_edit_date": 1744931462719,
+      "user_edit_date": 1744931462136
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744931404154,
+      "roo_edit_date": 1744931404154,
+      "user_edit_date": 1744931486410
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744931486678,
+      "roo_edit_date": 1744931486678,
+      "user_edit_date": 1744931486410
     }
   ]
 }

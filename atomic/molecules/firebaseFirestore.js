@@ -1,19 +1,19 @@
 /**
  * Firebase Firestore Molecule
- *
  * Provides Firebase Firestore database functionality.
  * Combines the Firebase app atom with Firestore-specific features.
  */
 
+// External imports
 import {
   getFirestore,
   collection,
   doc,
   addDoc,
+  getDoc,
   setDoc,
   updateDoc,
   deleteDoc,
-  getDoc,
   getDocs,
   query,
   where,
@@ -21,13 +21,15 @@ import {
   limit,
   startAfter,
   onSnapshot,
-  enableIndexedDbPersistence,
-  disableNetwork,
-  enableNetwork,
   serverTimestamp,
   Timestamp,
   writeBatch,
+  enableIndexedDbPersistence,
+  enableNetwork,
+  disableNetwork
 } from 'firebase/firestore';
+
+// Internal imports
 import { getFirebaseApp } from '../atoms/firebaseApp';
 
 // Firebase Firestore instance (singleton)
@@ -35,6 +37,7 @@ let db = null;
 
 /**
  * Initialize Firebase Firestore
+ * 
  * @param {Object} options - Firestore initialization options
  * @param {boolean} options.enablePersistence - Whether to enable offline persistence
  * @returns {Object|null} Firebase Firestore instance or null if initialization failed
@@ -43,14 +46,15 @@ export const initializeFirestore = (options = { enablePersistence: true }) => {
   try {
     // Get Firebase app instance
     const app = getFirebaseApp();
+    
     if (!app) {
       console.error('Firestore initialization failed: Firebase app not initialized');
       return null;
     }
-
+    
     // Initialize Firestore
     db = getFirestore(app);
-
+    
     // Enable offline persistence if requested
     if (options.enablePersistence) {
       enableIndexedDbPersistence(db)
@@ -61,7 +65,7 @@ export const initializeFirestore = (options = { enablePersistence: true }) => {
           if (error.code === 'failed-precondition') {
             console.warn(
               'Firestore persistence could not be enabled: Multiple tabs open. ' +
-                'Persistence can only be enabled in one tab at a time.'
+              'Persistence can only be enabled in one tab at a time.'
             );
           } else if (error.code === 'unimplemented') {
             console.warn(
@@ -72,7 +76,7 @@ export const initializeFirestore = (options = { enablePersistence: true }) => {
           }
         });
     }
-
+    
     console.log('Firestore initialized successfully');
     return db;
   } catch (error) {
@@ -84,7 +88,7 @@ export const initializeFirestore = (options = { enablePersistence: true }) => {
 /**
  * Get Firebase Firestore instance
  * Initializes Firestore if it hasn't been initialized yet
- *
+ * 
  * @returns {Object|null} Firebase Firestore instance or null if initialization failed
  */
 export const getFirestoreDb = () => {
@@ -96,6 +100,7 @@ export const getFirestoreDb = () => {
 
 /**
  * Create a document in a collection
+ * 
  * @param {string} collectionPath - Collection path
  * @param {Object} data - Document data
  * @param {Object} options - Options
@@ -103,19 +108,20 @@ export const getFirestoreDb = () => {
  * @returns {Promise<string>} Document ID
  */
 export const createDocument = async (collectionPath, data, options = { addTimestamp: true }) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     const documentData = { ...data };
-
+    
     if (options.addTimestamp) {
       documentData.createdAt = serverTimestamp();
       documentData.updatedAt = serverTimestamp();
     }
-
+    
     const docRef = await addDoc(collection(dbInstance, collectionPath), documentData);
     return docRef.id;
   } catch (error) {
@@ -126,6 +132,7 @@ export const createDocument = async (collectionPath, data, options = { addTimest
 
 /**
  * Set a document with a specific ID
+ * 
  * @param {string} collectionPath - Collection path
  * @param {string} documentId - Document ID
  * @param {Object} data - Document data
@@ -140,21 +147,22 @@ export const setDocument = async (
   data,
   options = { merge: true, addTimestamp: true }
 ) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     const documentData = { ...data };
-
+    
     if (options.addTimestamp) {
       if (!documentData.createdAt) {
         documentData.createdAt = serverTimestamp();
       }
       documentData.updatedAt = serverTimestamp();
     }
-
+    
     await setDoc(doc(dbInstance, collectionPath, documentId), documentData, {
       merge: options.merge,
     });
@@ -166,6 +174,7 @@ export const setDocument = async (
 
 /**
  * Update a document
+ * 
  * @param {string} collectionPath - Collection path
  * @param {string} documentId - Document ID
  * @param {Object} data - Document data
@@ -179,18 +188,19 @@ export const updateDocument = async (
   data,
   options = { addTimestamp: true }
 ) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     const documentData = { ...data };
-
+    
     if (options.addTimestamp) {
       documentData.updatedAt = serverTimestamp();
     }
-
+    
     await updateDoc(doc(dbInstance, collectionPath, documentId), documentData);
   } catch (error) {
     console.error('Error updating document:', error);
@@ -200,17 +210,19 @@ export const updateDocument = async (
 
 /**
  * Delete a document
+ * 
  * @param {string} collectionPath - Collection path
  * @param {string} documentId - Document ID
  * @returns {Promise<void>}
  */
 export const deleteDocument = async (collectionPath, documentId) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     await deleteDoc(doc(dbInstance, collectionPath, documentId));
   } catch (error) {
     console.error('Error deleting document:', error);
@@ -220,19 +232,21 @@ export const deleteDocument = async (collectionPath, documentId) => {
 
 /**
  * Get a document
+ * 
  * @param {string} collectionPath - Collection path
  * @param {string} documentId - Document ID
  * @returns {Promise<Object|null>} Document data or null if not found
  */
 export const getDocument = async (collectionPath, documentId) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     const docSnap = await getDoc(doc(dbInstance, collectionPath, documentId));
-
+    
     if (docSnap.exists()) {
       return { id: docSnap.id, ...docSnap.data() };
     } else {
@@ -246,6 +260,7 @@ export const getDocument = async (collectionPath, documentId) => {
 
 /**
  * Query documents
+ * 
  * @param {string} collectionPath - Collection path
  * @param {Array} conditions - Query conditions
  * @param {Array} orderByFields - Order by fields
@@ -260,24 +275,25 @@ export const queryDocuments = async (
   limitCount = 0,
   startAfterDoc = null
 ) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     let q = collection(dbInstance, collectionPath);
-
+    
     // Apply conditions
     if (conditions.length > 0) {
       const queryConstraints = conditions.map(condition => {
         const [field, operator, value] = condition;
         return where(field, operator, value);
       });
-
+      
       q = query(q, ...queryConstraints);
     }
-
+    
     // Apply order by
     if (orderByFields.length > 0) {
       const orderByConstraints = orderByFields.map(field => {
@@ -288,27 +304,27 @@ export const queryDocuments = async (
           return orderBy(fieldName, direction);
         }
       });
-
+      
       q = query(q, ...orderByConstraints);
     }
-
+    
     // Apply start after
     if (startAfterDoc) {
       q = query(q, startAfter(startAfterDoc));
     }
-
+    
     // Apply limit
     if (limitCount > 0) {
       q = query(q, limit(limitCount));
     }
-
+    
     const querySnapshot = await getDocs(q);
-
     const documents = [];
+    
     querySnapshot.forEach(doc => {
       documents.push({ id: doc.id, ...doc.data() });
     });
-
+    
     return documents;
   } catch (error) {
     console.error('Error querying documents:', error);
@@ -318,18 +334,20 @@ export const queryDocuments = async (
 
 /**
  * Subscribe to document changes
+ * 
  * @param {string} collectionPath - Collection path
  * @param {string} documentId - Document ID
  * @param {Function} callback - Callback function
  * @returns {Function} Unsubscribe function
  */
 export const subscribeToDocument = (collectionPath, documentId, callback) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     const unsubscribe = onSnapshot(
       doc(dbInstance, collectionPath, documentId),
       docSnapshot => {
@@ -344,7 +362,7 @@ export const subscribeToDocument = (collectionPath, documentId, callback) => {
         callback(null, error);
       }
     );
-
+    
     return unsubscribe;
   } catch (error) {
     console.error('Error setting up document subscription:', error);
@@ -354,6 +372,7 @@ export const subscribeToDocument = (collectionPath, documentId, callback) => {
 
 /**
  * Subscribe to query changes
+ * 
  * @param {string} collectionPath - Collection path
  * @param {Array} conditions - Query conditions
  * @param {Array} orderByFields - Order by fields
@@ -368,24 +387,25 @@ export const subscribeToQuery = (
   limitCount = 0,
   callback
 ) => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     let q = collection(dbInstance, collectionPath);
-
+    
     // Apply conditions
     if (conditions.length > 0) {
       const queryConstraints = conditions.map(condition => {
         const [field, operator, value] = condition;
         return where(field, operator, value);
       });
-
+      
       q = query(q, ...queryConstraints);
     }
-
+    
     // Apply order by
     if (orderByFields.length > 0) {
       const orderByConstraints = orderByFields.map(field => {
@@ -396,23 +416,24 @@ export const subscribeToQuery = (
           return orderBy(fieldName, direction);
         }
       });
-
+      
       q = query(q, ...orderByConstraints);
     }
-
+    
     // Apply limit
     if (limitCount > 0) {
       q = query(q, limit(limitCount));
     }
-
+    
     const unsubscribe = onSnapshot(
       q,
       querySnapshot => {
         const documents = [];
+        
         querySnapshot.forEach(doc => {
           documents.push({ id: doc.id, ...doc.data() });
         });
-
+        
         callback(documents);
       },
       error => {
@@ -420,7 +441,7 @@ export const subscribeToQuery = (
         callback([], error);
       }
     );
-
+    
     return unsubscribe;
   } catch (error) {
     console.error('Error setting up query subscription:', error);
@@ -430,47 +451,51 @@ export const subscribeToQuery = (
 
 /**
  * Create a batch write operation
+ * 
  * @returns {Object} Batch write object
  */
 export const createBatch = () => {
   const dbInstance = getFirestoreDb();
+  
   if (!dbInstance) {
     throw new Error('Firestore not initialized');
   }
-
+  
   return writeBatch(dbInstance);
 };
 
 /**
- * Disable network (work offline)
- * @returns {Promise<void>}
+ * Get server timestamp
+ * 
+ * @returns {Object} Server timestamp
  */
-export const goOffline = async () => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
+export const getServerTimestamp = () => {
+  return serverTimestamp();
+};
 
-  try {
-    await disableNetwork(dbInstance);
-    console.log('Firestore network disabled');
-  } catch (error) {
-    console.error('Error disabling Firestore network:', error);
-    throw error;
-  }
+/**
+ * Create a timestamp from date
+ * 
+ * @param {Date} date - Date
+ * @returns {Object} Timestamp
+ */
+export const createTimestamp = date => {
+  return Timestamp.fromDate(date);
 };
 
 /**
  * Enable network (work online)
+ * 
  * @returns {Promise<void>}
  */
 export const goOnline = async () => {
-  const dbInstance = getFirestoreDb();
-  if (!dbInstance) {
-    throw new Error('Firestore not initialized');
-  }
-
   try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
     await enableNetwork(dbInstance);
     console.log('Firestore network enabled');
   } catch (error) {
@@ -480,20 +505,24 @@ export const goOnline = async () => {
 };
 
 /**
- * Get server timestamp
- * @returns {Object} Server timestamp
+ * Disable network (work offline)
+ * 
+ * @returns {Promise<void>}
  */
-export const getServerTimestamp = () => {
-  return serverTimestamp();
-};
-
-/**
- * Create a timestamp from date
- * @param {Date} date - Date
- * @returns {Object} Timestamp
- */
-export const createTimestamp = date => {
-  return Timestamp.fromDate(date);
+export const goOffline = async () => {
+  try {
+    const dbInstance = getFirestoreDb();
+    
+    if (!dbInstance) {
+      throw new Error('Firestore not initialized');
+    }
+    
+    await disableNetwork(dbInstance);
+    console.log('Firestore network disabled');
+  } catch (error) {
+    console.error('Error disabling Firestore network:', error);
+    throw error;
+  }
 };
 
 // Initialize Firestore on module load

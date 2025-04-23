@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(functions.config().stripe.secret, {
-  apiVersion: '2022-11-15',
+  apiVersion: '2025-02-24.acacia',
 });
 
 // Initialize Firestore

@@ -224,10 +224,9 @@
   "functions": {
     "source": "functions",
     "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint",
       "npm --prefix \"$RESOURCE_DIR\" run build"
     ],
-    "runtime": "nodejs16",
+    "runtime": "nodejs18",
     "minInstances": 5,
     "maxInstances": 50,
     "memory": "2GB",

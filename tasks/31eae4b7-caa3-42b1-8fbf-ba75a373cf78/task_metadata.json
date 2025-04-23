@@ -1,0 +1,260 @@
+{
+  "files_in_context": [
+    {
+      "path": "memory-bank/atomic-architecture-memory.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351071904,
+      "roo_edit_date": 1745351071904,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-atomic-updates.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351086783,
+      "roo_edit_date": 1745351086783,
+      "user_edit_date": null
+    },
+    {
+      "path": "screens/LoginScreen.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745351466989,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic/pages/LoginScreen.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351581764,
+      "roo_edit_date": 1745351581764,
+      "user_edit_date": null
+    },
+    {
+      "path": "__tests__/atomic/pages/LoginScreen.test.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351613904,
+      "roo_edit_date": 1745351613904,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic/pages/index.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351621890,
+      "roo_edit_date": 1745351621890,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic/pages/index.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745351621890,
+      "roo_edit_date": 1745351621890,
+      "user_edit_date": 1745351621898
+    },
+    {
+      "path": "ai-sports-edge-todo.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1745351629784
+    },
+    {
+      "path": "ai-sports-edge-todo.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351629878,
+      "roo_edit_date": 1745351629878,
+      "user_edit_date": 1745351629784
+    },
+    {
+      "path": "push-login-migration.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351679001,
+      "roo_edit_date": 1745351679001,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-atomic-to-production.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351735506,
+      "roo_edit_date": 1745351735506,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic-deployment-summary.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351764315,
+      "roo_edit_date": 1745351764315,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-deployment-summary.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351799754,
+      "roo_edit_date": 1745351799754,
+      "user_edit_date": null
+    },
+    {
+      "path": "continue-atomic-migration.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351878558,
+      "roo_edit_date": 1745351878558,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-continue-script.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745351901179,
+      "roo_edit_date": 1745351901179,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic-architecture-final-summary.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352003686,
+      "roo_edit_date": 1745352003686,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-final-summary.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352018631,
+      "roo_edit_date": 1745352018631,
+      "user_edit_date": null
+    },
+    {
+      "path": "complete-atomic-project.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352115011,
+      "roo_edit_date": 1745352115011,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-complete-script.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352147104,
+      "roo_edit_date": 1745352147104,
+      "user_edit_date": null
+    },
+    {
+      "path": "implement-atomic-architecture.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352246042,
+      "roo_edit_date": 1745352246042,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-implement-script.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352273155,
+      "roo_edit_date": 1745352273155,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic-architecture-deployment-final.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352416885,
+      "roo_edit_date": 1745352416885,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-final-deployment.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352431659,
+      "roo_edit_date": 1745352431659,
+      "user_edit_date": null
+    },
+    {
+      "path": "migrate-home-page.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352586426,
+      "roo_edit_date": 1745352586426,
+      "user_edit_date": null
+    },
+    {
+      "path": "prettier-atomic.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352841372,
+      "roo_edit_date": 1745352841372,
+      "user_edit_date": null
+    },
+    {
+      "path": "optimize-atomic.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745352920633,
+      "roo_edit_date": 1745352920633,
+      "user_edit_date": null
+    },
+    {
+      "path": "migrate-profile-page.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745353697123,
+      "roo_edit_date": 1745353697123,
+      "user_edit_date": null
+    },
+    {
+      "path": "migrate-betting-page.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745354558047,
+      "roo_edit_date": 1745354558047,
+      "user_edit_date": null
+    },
+    {
+      "path": "migrate-settings-page.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745354765735,
+      "roo_edit_date": 1745354765735,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-atomic-to-production.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745355246265,
+      "roo_edit_date": 1745355246265,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic-architecture-final-summary.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745355377350,
+      "roo_edit_date": 1745355377350,
+      "user_edit_date": null
+    },
+    {
+      "path": "push-final-summary.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745355391684,
+      "roo_edit_date": 1745355391684,
+      "user_edit_date": null
+    }
+  ]
+}

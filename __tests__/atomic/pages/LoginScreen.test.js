@@ -1,217 +1,233 @@
-/**
- * Login Screen Tests
- * 
- * Tests for the Login Screen component.
- */
-
+// External imports
 import React from 'react';
+
+
 import { render, fireEvent, waitFor } from '@testing-library/react';
+
+
+// Internal imports
 import { LoginScreen } from '../../../atomic/pages';
 
-// Mock dependencies
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: jest.fn(),
-    replace: jest.fn(),
-  }),
-}));
 
-jest.mock('../../../atomic/molecules/themeContext', () => ({
-  useTheme: jest.fn(() => ({
-    colors: {
-      background: '#FFFFFF',
-      surface: '#F5F5F5',
-      primary: '#007BFF',
-      onPrimary: '#FFFFFF',
-      secondary: '#6C757D',
-      onSecondary: '#FFFFFF',
-      text: '#000000',
-      textSecondary: '#757575',
-      border: '#E0E0E0',
-      error: '#FF3B30',
-      onError: '#FFFFFF',
-      success: '#4CD964',
-      onSuccess: '#FFFFFF',
-    },
-  })),
-}));
 
-jest.mock('../../../atomic/molecules/i18nContext', () => ({
-  useI18n: jest.fn(() => ({
-    t: jest.fn((key) => {
-      const translations = {
-        'common.error': 'Error',
-        'common.success': 'Success',
-        'common.loading': 'Loading...',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         'common.close': 'Close',
-        'login.title': 'Welcome Back',
-        'login.subtitle': 'Sign in to continue',
+        'common.error': 'Error',
+        'common.loading': 'Loading...',
+        'common.success': 'Success',
+        'download.appStore': 'App Store',
+        'download.playStore': 'Play Store',
+        'download.subtitle': 'Download our app for a better experience',
+        'download.title': 'Get the App',
+        'login.alerts.accountCreated': 'Account created successfully',
+        'login.alerts.loggedIn': 'Logged in successfully',
+        'login.dontHaveAccount': "Don't have an account?",
         'login.email': 'Email',
+        'login.errors.accountDisabled': 'Account has been disabled',
+        'login.errors.emailInUse': 'Email already in use',
+        'login.errors.emailRequired': 'Email is required',
+        'login.errors.invalidCredentials': 'Invalid email or password',
+        'login.errors.invalidEmail': 'Invalid email format',
+        'login.errors.loginFailed': 'Login failed',
+        'login.errors.passwordRequired': 'Password is required',
+        'login.errors.signUpFailed': 'Sign up failed',
+        'login.errors.tooManyAttempts': 'Too many attempts, try again later',
+        'login.errors.weakPassword': 'Password is too weak',
+        'login.features.signUp': 'Sign Up',
+        'login.forgotPassword': 'Forgot Password?',
         'login.password': 'Password',
         'login.signIn': 'Sign In',
         'login.signUp': 'Sign Up',
-        'login.forgotPassword': 'Forgot Password?',
-        'login.dontHaveAccount': 'Don\'t have an account?',
-        'login.features.signUp': 'Sign Up',
-        'login.alerts.accountCreated': 'Account created successfully',
-        'login.alerts.loggedIn': 'Logged in successfully',
-        'login.errors.emailRequired': 'Email is required',
-        'login.errors.passwordRequired': 'Password is required',
-        'login.errors.invalidEmail': 'Invalid email format',
-        'login.errors.signUpFailed': 'Sign up failed',
-        'login.errors.emailInUse': 'Email already in use',
-        'login.errors.weakPassword': 'Password is too weak',
-        'login.errors.loginFailed': 'Login failed',
-        'login.errors.invalidCredentials': 'Invalid email or password',
-        'login.errors.accountDisabled': 'Account has been disabled',
-        'login.errors.tooManyAttempts': 'Too many attempts, try again later',
-        'download.title': 'Get the App',
-        'download.subtitle': 'Download our app for a better experience',
-        'download.appStore': 'App Store',
-        'download.playStore': 'Play Store',
-      };
-      return translations[key] || key;
-    }),
-  })),
-}));
-
-jest.mock('../../../atomic/organisms', () => ({
-  firebaseService: {
-    auth: {
-      signInWithEmailAndPassword: jest.fn(() => Promise.resolve()),
-      createUserWithEmailAndPassword: jest.fn(() => Promise.resolve()),
-      getCurrentUser: jest.fn(() => ({
-        uid: 'test-uid',
+        'login.subtitle': 'Sign in to continue',
+        'login.title': 'Welcome Back',
+        'password123'
+        'password123'
+        'test@example.com',
+        'test@example.com',
         email: 'test@example.com',
-      })),
-    },
-  },
-  monitoringService: {
-    error: {
-      captureException: jest.fn(),
-    },
-  },
-  appDownloadService: {
-    getAppStoreUrls: jest.fn(() => ({
+        uid: 'test-uid',
+      );
+      );
       appStoreUrl: 'https://apps.apple.com/app/id123456789',
+      background: '#FFFFFF',
+      border: '#E0E0E0',
+      captureException: jest.fn(),
+      code: 'auth/user-not-found',
+      const translations = {
+      createUserWithEmailAndPassword: jest.fn(() => Promise.resolve()),
+      error: '#FF3B30',
+      expect(firebaseService.auth.createUserWithEmailAndPassword).toHaveBeenCalledWith(
+      expect(firebaseService.auth.signInWithEmailAndPassword).toHaveBeenCalledWith(
+      expect(global.Alert.alert).toHaveBeenCalledWith('Error', 'Invalid email or password');
+      getCurrentUser: jest.fn(() => ({
+      onError: '#FFFFFF',
+      onPrimary: '#FFFFFF',
+      onSecondary: '#FFFFFF',
+      onSuccess: '#FFFFFF',
       playStoreUrl: 'https://play.google.com/store/apps/details?id=com.example.app',
+      primary: '#007BFF',
+      return translations[key] || key;
+      secondary: '#6C757D',
+      signInWithEmailAndPassword: jest.fn(() => Promise.resolve()),
+      success: '#4CD964',
+      surface: '#F5F5F5',
+      text: '#000000',
+      textSecondary: '#757575',
       webAppUrl: 'https://example.com',
-    })),
-    shouldShowDownloadPrompt: jest.fn(() => Promise.resolve(false)),
-    markDownloadPromptAsShown: jest.fn(() => Promise.resolve()),
-    openAppStore: jest.fn(),
-    openPlayStore: jest.fn(),
-  },
-}));
-
-jest.mock('../../../atomic/templates', () => ({
-  MainLayout: ({ children }) => <>{children}</>,
-}));
-
-// Mock Alert
-global.Alert = {
-  alert: jest.fn(),
-};
-
-describe('LoginScreen', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('renders correctly', () => {
+      })),
+      };
+    // Act
+    // Act
+    // Act
+    // Act
+    // Act
+    // Arrange
+    // Arrange
+    // Arrange
+    // Arrange
+    // Arrange
     // Arrange & Act
-    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    
     // Assert
-    expect(getByText('Welcome Back')).toBeTruthy();
-    expect(getByText('Sign in to continue')).toBeTruthy();
+    // Assert
+    // Assert
+    // Assert
+    // Assert
+    // Assert
+    // Mock the login to fail
+    auth: {
+    await waitFor(() => {
+    await waitFor(() => {
+    await waitFor(() => {
+    colors: {
+    const navigation = require('@react-navigation/native').useNavigation();
+    const { firebaseService } = require('../../../atomic/organisms');
+    const { firebaseService } = require('../../../atomic/organisms');
+    const { firebaseService } = require('../../../atomic/organisms');
+    const { getByText } = render(<LoginScreen />);
+    const { getByText } = render(<LoginScreen />);
+    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
+    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
+    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
+    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
+    error: {
     expect(getByPlaceholderText('Email')).toBeTruthy();
     expect(getByPlaceholderText('Password')).toBeTruthy();
+    expect(getByText("Don't have an account?")).toBeTruthy();
+    expect(getByText('Forgot Password?')).toBeTruthy();
     expect(getByText('Sign In')).toBeTruthy();
     expect(getByText('Sign Up')).toBeTruthy();
-    expect(getByText('Forgot Password?')).toBeTruthy();
-    expect(getByText("Don't have an account?")).toBeTruthy();
-  });
-
-  it('validates email and password on login', () => {
-    // Arrange
-    const { getByText } = render(<LoginScreen />);
-    
-    // Act
-    fireEvent.press(getByText('Sign In'));
-    
-    // Assert
+    expect(getByText('Sign in to continue')).toBeTruthy();
+    expect(getByText('Welcome Back')).toBeTruthy();
     expect(global.Alert.alert).toHaveBeenCalledWith('Error', 'Email is required');
-  });
-
-  it('calls signInWithEmailAndPassword when form is valid', async () => {
-    // Arrange
-    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    const { firebaseService } = require('../../../atomic/organisms');
-    
-    // Act
-    fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
-    fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-    fireEvent.press(getByText('Sign In'));
-    
-    // Assert
-    await waitFor(() => {
-      expect(firebaseService.auth.signInWithEmailAndPassword).toHaveBeenCalledWith(
-        'test@example.com',
-        'password123'
-      );
-    });
-  });
-
-  it('calls createUserWithEmailAndPassword when signing up', async () => {
-    // Arrange
-    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    const { firebaseService } = require('../../../atomic/organisms');
-    
-    // Act
-    fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
-    fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-    fireEvent.press(getByText('Sign Up'));
-    
-    // Assert
-    await waitFor(() => {
-      expect(firebaseService.auth.createUserWithEmailAndPassword).toHaveBeenCalledWith(
-        'test@example.com',
-        'password123'
-      );
-    });
-  });
-
-  it('shows error message when login fails', async () => {
-    // Arrange
-    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    const { firebaseService } = require('../../../atomic/organisms');
-    
-    // Mock the login to fail
-    firebaseService.auth.signInWithEmailAndPassword.mockRejectedValueOnce({
-      code: 'auth/user-not-found',
-    });
-    
-    // Act
-    fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
-    fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-    fireEvent.press(getByText('Sign In'));
-    
-    // Assert
-    await waitFor(() => {
-      expect(global.Alert.alert).toHaveBeenCalledWith('Error', 'Invalid email or password');
-    });
-  });
-
-  it('navigates to ForgotPassword when forgot password link is pressed', () => {
-    // Arrange
-    const { getByText } = render(<LoginScreen />);
-    const navigation = require('@react-navigation/native').useNavigation();
-    
-    // Act
-    fireEvent.press(getByText('Forgot Password?'));
-    
-    // Assert
     expect(navigation.navigate).toHaveBeenCalledWith('ForgotPassword');
+    fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+    fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+    fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+    fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+    fireEvent.press(getByText('Forgot Password?'));
+    fireEvent.press(getByText('Sign In'));
+    fireEvent.press(getByText('Sign In'));
+    fireEvent.press(getByText('Sign In'));
+    fireEvent.press(getByText('Sign Up'));
+    firebaseService.auth.signInWithEmailAndPassword.mockRejectedValueOnce({
+    getAppStoreUrls: jest.fn(() => ({
+    jest.clearAllMocks();
+    markDownloadPromptAsShown: jest.fn(() => Promise.resolve()),
+    navigate: jest.fn(),
+    openAppStore: jest.fn(),
+    openPlayStore: jest.fn(),
+    replace: jest.fn(),
+    shouldShowDownloadPrompt: jest.fn(() => Promise.resolve(false)),
+    t: jest.fn(key => {
+    })),
+    }),
+    });
+    });
+    });
+    });
+    },
+    },
+    },
+  MainLayout: ({ children }) => <>{children}</>,
+  alert: jest.fn(),
+  appDownloadService: {
+  beforeEach(() => {
+  firebaseService: {
+  it('calls createUserWithEmailAndPassword when signing up', async () => {
+  it('calls signInWithEmailAndPassword when form is valid', async () => {
+  it('navigates to ForgotPassword when forgot password link is pressed', () => {
+  it('renders correctly', () => {
+  it('shows error message when login fails', async () => {
+  it('validates email and password on login', () => {
+  monitoringService: {
+  useI18n: jest.fn(() => ({
+  useNavigation: () => ({
+  useTheme: jest.fn(() => ({
+  })),
+  })),
+  }),
   });
+  });
+  });
+  });
+  });
+  });
+  });
+  },
+  },
+  },
+ *
+ * Login Screen Tests
+ * Tests for the Login Screen component.
+ */
+/**
+// External imports
+// Internal imports
+// Mock Alert
+// Mock dependencies
+describe('LoginScreen', () => {
+global.Alert = {
+jest.mock('../../../atomic/molecules/i18nContext', () => ({
+jest.mock('../../../atomic/molecules/themeContext', () => ({
+jest.mock('../../../atomic/organisms', () => ({
+jest.mock('../../../atomic/templates', () => ({
+jest.mock('@react-navigation/native', () => ({
+}));
+}));
+}));
+}));
+}));
 });
+};
+

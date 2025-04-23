@@ -1,0 +1,175 @@
+/**
+ * Theme Context Molecule
+ *
+ * Provides theme context and hooks for the application.
+ * Combines theme atoms into a usable context system.
+ */
+
+import React, { createContext, useContext } from 'react';
+import { useColorScheme } from 'react-native';
+import { DefaultTheme, DarkTheme } from '@react-navigation/native';
+import Colors from '../atoms/themeColors';
+import ThemeTokens from '../atoms/themeTokens';
+
+/**
+ * Theme type
+ * @typedef {'light' | 'dark' | 'system'} ThemeType
+ */
+
+/**
+ * Theme context value
+ * @typedef {Object} ThemeContextValue
+ * @property {ThemeType} theme - Current theme ('light', 'dark', or 'system')
+ * @property {ThemeType} effectiveTheme - Effective theme after resolving 'system' ('light' or 'dark')
+ * @property {Function} setTheme - Function to set theme
+ * @property {Function} toggleTheme - Function to toggle between light and dark themes
+ * @property {Object} colors - Current theme colors
+ * @property {Object} tokens - Theme tokens
+ * @property {Object} navigationTheme - Navigation theme for React Navigation
+ */
+
+/**
+ * Default theme context value
+ * @type {ThemeContextValue}
+ */
+const defaultThemeContext = {
+  theme: 'system',
+  effectiveTheme: 'light',
+  setTheme: () => {},
+  toggleTheme: () => {},
+  colors: Colors.light,
+  tokens: ThemeTokens,
+  navigationTheme: DefaultTheme,
+};
+
+/**
+ * Theme context
+ * @type {React.Context<ThemeContextValue>}
+ */
+export const ThemeContext = createContext(defaultThemeContext);
+
+/**
+ * Custom hook to use theme context
+ * @returns {ThemeContextValue} Theme context value
+ */
+export const useTheme = () => useContext(ThemeContext);
+
+/**
+ * Get navigation theme based on theme type
+ * @param {ThemeType} themeType - Theme type
+ * @returns {Object} Navigation theme
+ */
+export const getNavigationTheme = themeType => {
+  const isDark = themeType === 'dark';
+
+  if (isDark) {
+    return {
+      ...DarkTheme,
+      colors: {
+        ...DarkTheme.colors,
+        primary: Colors.dark.primary,
+        background: Colors.dark.background,
+        card: Colors.dark.card,
+        text: Colors.dark.text,
+        border: Colors.dark.border,
+        notification: Colors.dark.error,
+      },
+    };
+  }
+
+  return {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: Colors.light.primary,
+      background: Colors.light.background,
+      card: Colors.light.card,
+      text: Colors.light.text,
+      border: Colors.light.border,
+      notification: Colors.light.error,
+    },
+  };
+};
+
+/**
+ * Resolve theme type to effective theme
+ * @param {ThemeType} theme - Theme type
+ * @param {string|null} systemTheme - System theme from useColorScheme
+ * @returns {ThemeType} Effective theme ('light' or 'dark')
+ */
+export const resolveTheme = (theme, systemTheme) => {
+  if (theme === 'system') {
+    return systemTheme === 'dark' ? 'dark' : 'light';
+  }
+  return theme;
+};
+
+/**
+ * Get theme colors based on theme type
+ * @param {ThemeType} themeType - Theme type
+ * @returns {Object} Theme colors
+ */
+export const getThemeColors = themeType => {
+  return themeType === 'dark' ? Colors.dark : Colors.light;
+};
+
+/**
+ * Get shadow style based on theme and size
+ * @param {ThemeType} themeType - Theme type
+ * @param {string} size - Shadow size ('none', 'xs', 'sm', 'md', 'lg', 'xl')
+ * @returns {Object} Shadow style
+ */
+export const getShadow = (themeType, size = 'md') => {
+  const shadows = themeType === 'dark' ? ThemeTokens.shadowDark : ThemeTokens.shadowLight;
+  return shadows[size] || shadows.md;
+};
+
+/**
+ * Create text style based on variant
+ * @param {ThemeType} themeType - Theme type
+ * @param {string} variant - Text variant ('heading1', 'heading2', 'heading3', 'heading4', 'heading5', 'body', 'bodySmall', 'caption', 'button', 'label')
+ * @param {Object} additionalStyle - Additional style to merge
+ * @returns {Object} Text style
+ */
+export const createTextStyle = (themeType, variant = 'body', additionalStyle = {}) => {
+  const colors = getThemeColors(themeType);
+  const { fontSize, lineHeight, fontFamily, fontWeight } = ThemeTokens;
+
+  const baseStyle = {
+    color: colors.text,
+    fontSize: fontSize[variant] || fontSize.body,
+    lineHeight: lineHeight[variant] || lineHeight.body,
+    fontFamily: fontFamily.regular,
+  };
+
+  // Apply variant-specific styles
+  let variantStyle = {};
+
+  if (variant.startsWith('heading')) {
+    variantStyle = {
+      fontFamily: fontFamily.bold,
+      fontWeight: fontWeight.bold,
+    };
+  } else if (variant === 'button') {
+    variantStyle = {
+      fontFamily: fontFamily.medium,
+      fontWeight: fontWeight.medium,
+      textAlign: 'center',
+    };
+  } else if (variant === 'caption') {
+    variantStyle = {
+      color: colors.textSecondary,
+    };
+  } else if (variant === 'label') {
+    variantStyle = {
+      fontFamily: fontFamily.medium,
+      fontWeight: fontWeight.medium,
+    };
+  }
+
+  return {
+    ...baseStyle,
+    ...variantStyle,
+    ...additionalStyle,
+  };
+};

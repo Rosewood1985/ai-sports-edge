@@ -18,9 +18,9 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
-# Build the application
-echo -e "${YELLOW}Building application...${NC}"
-npm run build
+# Build the application for production
+echo -e "${YELLOW}Building application for production...${NC}"
+NODE_ENV=production npm run build:prod
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}Build failed! Aborting deployment.${NC}"

@@ -1,0 +1,7 @@
+Fix CSP and remove integrity attributes for better compatibility
+
+- Removed integrity attributes from Google Fonts and Google Tag Manager
+- Added explicit i.imgiw.com to img-src CSP directive
+- Improves compatibility with third-party resources
+- Fixes Chrome DevTools warnings about integrity mismatches
+- Allows images from i.imgiw.com to load properly

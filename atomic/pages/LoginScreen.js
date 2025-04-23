@@ -1,392 +1,399 @@
-/**
- * Login Screen
- * 
- * A page component for user authentication using the atomic architecture.
- */
+// External imports
+import React, { memo, useCallback, useMemo, useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 
-// Import atomic components
-import { MainLayout } from "../templates";
-import { useTheme } from "../molecules/themeContext";
-import { firebaseService } from "../organisms";
-import { monitoringService } from "../organisms";
-import { appDownloadService } from "../organisms";
-import { useI18n } from "../molecules/i18nContext";
 
-/**
- * Login Screen component
- * @returns {React.ReactNode} Rendered component
- */
-const LoginScreen = () => {
-  // Get theme from context
-  const { colors } = useTheme();
-  
-  // Navigation
-  const navigation = useNavigation();
-  
-  // Get translations
-  const { t } = useI18n();
-  
-  // State
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showDownloadPrompt, setShowDownloadPrompt] = useState(false);
-  const [isNewUser, setIsNewUser] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
-  // Get app store URLs
-  const { appStoreUrl, playStoreUrl, webAppUrl } = appDownloadService.getAppStoreUrls();
-  
-  // Check if we should show the download prompt after registration
-  useEffect(() => {
-    if (isNewUser && firebaseService.auth.getCurrentUser()) {
-      const checkDownloadPrompt = async () => {
-        const userId = firebaseService.auth.getCurrentUser()?.uid;
-        if (userId) {
+
+// Internal imports
+import { MainLayout } from '../templates';
+import { appDownloadService } from '../organisms';
+import { firebaseService } from '../organisms';
+import { monitoringService } from '../organisms';
+import { useI18n } from '../molecules/i18nContext';
+import { useTheme } from '../molecules/themeContext';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                {t('download.appStore')}
+                {t('download.playStore')}
+              </Text>
+              </Text>
+              <Text style={[styles.storeButtonText, { color: colors.onPrimary }]}>
+              <Text style={[styles.storeButtonText, { color: colors.onPrimary }]}>
+              onPress={() => appDownloadService.openAppStore(appStoreUrl)}
+              onPress={() => appDownloadService.openPlayStore(playStoreUrl)}
+              style={[styles.storeButton, { backgroundColor: colors.primary }]}
+              style={[styles.storeButton, { backgroundColor: colors.primary }]}
+              {t('common.close')}
+            </Text>
+            </TouchableOpacity>
+            </TouchableOpacity>
+            <Text style={[styles.closeButtonText, { color: colors.primary }]}>
+            <TouchableOpacity
+            <TouchableOpacity
+            >
+            >
+            backgroundColor: colors.surface,
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            borderColor: colors.border,
+            color: colors.text,
+            color: colors.text,
+            {t('download.subtitle')}
+          </Text>
+          </TouchableOpacity>
+          </View>
+          <Text style={[styles.downloadSubtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.downloadTitle, { color: colors.text }]}>{t('download.title')}</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={handleCloseDownloadPrompt}>
+          <View style={styles.downloadButtons}>
           const shouldShow = await appDownloadService.shouldShowDownloadPrompt(userId);
+          navigation.replace('Main');
           setShowDownloadPrompt(shouldShow);
-        }
-      };
-      
-      checkDownloadPrompt();
-    }
-  }, [isNewUser]);
-  
-  // Handle closing the download prompt
-  const handleCloseDownloadPrompt = async () => {
-    const userId = firebaseService.auth.getCurrentUser()?.uid;
-    if (userId) {
-      try {
+          styles.input,
+          styles.input,
+          {
+          {
+          {loading ? t('common.loading') : t('login.signIn')}
+          {loading ? t('common.loading') : t('login.signUp')}
+          {t('login.forgotPassword')}
+          {t('login.signUp')}
+          },
+          },
+        // If for some reason we don't have a user ID, navigate anyway
+        </Text>
+        </Text>
+        </Text>
+        </Text>
+        </View>
+        <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
+        <Text style={[styles.buttonText, { color: colors.onSecondary }]}>
+        <Text style={[styles.forgotPassword, { color: colors.primary }]}>
+        <Text style={[styles.signUpLink, { color: colors.primary }]} onPress={handleSignUp}>
+        <View style={styles.downloadPrompt}>
+        ]}
+        ]}
+        autoCapitalize="none"
         await appDownloadService.markDownloadPromptAsShown(userId);
-      } catch (error) {
+        const userId = firebaseService.auth.getCurrentUser()?.uid;
+        disabled={loading}
+        disabled={loading}
+        errorMessage = t('login.errors.accountDisabled');
+        errorMessage = t('login.errors.emailInUse');
+        errorMessage = t('login.errors.invalidCredentials');
+        errorMessage = t('login.errors.invalidEmail');
+        errorMessage = t('login.errors.invalidEmail');
+        errorMessage = t('login.errors.tooManyAttempts');
+        errorMessage = t('login.errors.weakPassword');
+        if (!(await appDownloadService.shouldShowDownloadPrompt(userId))) {
+        if (userId) {
+        keyboardType="email-address"
         monitoringService.error.captureException(error);
-      }
-    }
-    setShowDownloadPrompt(false);
-    navigation.replace("Main");
-  };
-
-  /**
-   * Handle sign up form submission
-   */
-  const handleSignUp = async () => {
-    // Validate inputs
-    if (!email.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.emailRequired"));
-      return;
-    }
-    
-    if (!password.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.passwordRequired"));
-      return;
-    }
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert(t("common.error"), t("login.errors.invalidEmail"));
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      await firebaseService.auth.createUserWithEmailAndPassword(email, password);
-      Alert.alert(t("login.features.signUp"), t("login.alerts.accountCreated"));
-      setIsNewUser(true);
-      
+        navigation.replace('Main');
+        onChangeText={setEmail}
+        onChangeText={setPassword}
+        onPress={handleLogin}
+        onPress={handleSignUp}
+        placeholder={t('login.email')}
+        placeholder={t('login.password')}
+        placeholderTextColor={colors.textSecondary}
+        placeholderTextColor={colors.textSecondary}
+        secureTextEntry
+        style={[
+        style={[
+        style={[styles.button, { backgroundColor: colors.primary }]}
+        style={[styles.button, { backgroundColor: colors.secondary }]}
+        value={email}
+        value={password}
+        {t('login.dontHaveAccount')}
+        }
+        }
+      )}
+      // Only show specific error messages for known error codes
+      // Only show specific error messages for known error codes
+      // Sanitize error messages to avoid exposing sensitive information
+      // Sanitize error messages to avoid exposing sensitive information
       // We'll navigate after the user has seen the download prompt
       // or immediately if the prompt isn't shown
-      const userId = firebaseService.auth.getCurrentUser()?.uid;
-      if (userId) {
-        if (!(await appDownloadService.shouldShowDownloadPrompt(userId))) {
-          navigation.replace("Main");
-        }
-      } else {
-        // If for some reason we don't have a user ID, navigate anyway
-        navigation.replace("Main");
-      }
-    } catch (error) {
-      // Sanitize error messages to avoid exposing sensitive information
-      let errorMessage = t("login.errors.signUpFailed");
-      
-      // Only show specific error messages for known error codes
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = t("login.errors.emailInUse");
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = t("login.errors.weakPassword");
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t("login.errors.invalidEmail");
-      }
-      
-      Alert.alert(t("common.error"), errorMessage);
-      monitoringService.error.captureException(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Handle login form submission
-   */
-  const handleLogin = async () => {
-    // Validate inputs
-    if (!email.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.emailRequired"));
-      return;
-    }
-    
-    if (!password.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.passwordRequired"));
-      return;
-    }
-    
-    try {
-      setLoading(true);
+      />
+      />
+      </Text>
+      </TouchableOpacity>
+      </TouchableOpacity>
+      </TouchableOpacity>
+      <Content />
+      <Text style={[styles.dontHaveAccount, { color: colors.textSecondary }]}>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t('login.subtitle')}</Text>
+      <Text style={[styles.title, { color: colors.primary }]}>{t('login.title')}</Text>
+      <TextInput
+      <TextInput
+      <TouchableOpacity
+      <TouchableOpacity
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+      >
+      >
+      Alert.alert(t('common.error'), errorMessage);
+      Alert.alert(t('common.error'), errorMessage);
+      Alert.alert(t('common.error'), t('login.errors.emailRequired'));
+      Alert.alert(t('common.error'), t('login.errors.emailRequired'));
+      Alert.alert(t('common.error'), t('login.errors.invalidEmail'));
+      Alert.alert(t('common.error'), t('login.errors.passwordRequired'));
+      Alert.alert(t('common.error'), t('login.errors.passwordRequired'));
+      Alert.alert(t('common.success'), t('login.alerts.loggedIn'));
+      Alert.alert(t('login.features.signUp'), t('login.alerts.accountCreated'));
+      await firebaseService.auth.createUserWithEmailAndPassword(email, password);
       await firebaseService.auth.signInWithEmailAndPassword(email, password);
-      Alert.alert(t("common.success"), t("login.alerts.loggedIn"));
-      navigation.replace("Main");
-    } catch (error) {
-      // Sanitize error messages to avoid exposing sensitive information
-      let errorMessage = t("login.errors.loginFailed");
-      
-      // Only show specific error messages for known error codes
+      checkDownloadPrompt();
+      const checkDownloadPrompt = async () => {
+      const userId = firebaseService.auth.getCurrentUser()?.uid;
+      if (error.code === 'auth/email-already-in-use') {
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = t("login.errors.invalidCredentials");
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t("login.errors.invalidEmail");
-      } else if (error.code === 'auth/user-disabled') {
-        errorMessage = t("login.errors.accountDisabled");
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = t("login.errors.tooManyAttempts");
-      }
-      
-      Alert.alert(t("common.error"), errorMessage);
+      if (userId) {
+      let errorMessage = t('login.errors.loginFailed');
+      let errorMessage = t('login.errors.signUpFailed');
       monitoringService.error.captureException(error);
-    } finally {
+      monitoringService.error.captureException(error);
+      navigation.replace('Main');
+      return;
+      return;
+      return;
+      return;
+      return;
+      setIsNewUser(true);
       setLoading(false);
-    }
-  };
-  
-  // Content component
-  const Content = () => (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      setLoading(false);
+      setLoading(true);
+      setLoading(true);
+      try {
       {/* Show download prompt if needed */}
       {showDownloadPrompt && (
-        <View style={styles.downloadPrompt}>
-          <Text style={[styles.downloadTitle, { color: colors.text }]}>
-            {t("download.title")}
-          </Text>
-          <Text style={[styles.downloadSubtitle, { color: colors.textSecondary }]}>
-            {t("download.subtitle")}
-          </Text>
-          <View style={styles.downloadButtons}>
-            <TouchableOpacity 
-              style={[styles.storeButton, { backgroundColor: colors.primary }]}
-              onPress={() => appDownloadService.openAppStore(appStoreUrl)}
-            >
-              <Text style={[styles.storeButtonText, { color: colors.onPrimary }]}>
-                {t("download.appStore")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.storeButton, { backgroundColor: colors.primary }]}
-              onPress={() => appDownloadService.openPlayStore(playStoreUrl)}
-            >
-              <Text style={[styles.storeButtonText, { color: colors.onPrimary }]}>
-                {t("download.playStore")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity 
-            style={styles.closeButton}
-            onPress={handleCloseDownloadPrompt}
-          >
-            <Text style={[styles.closeButtonText, { color: colors.primary }]}>
-              {t("common.close")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      
-      <Text style={[styles.title, { color: colors.primary }]}>
-        {t("login.title")}
-      </Text>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        {t("login.subtitle")}
-      </Text>
-      
-      <TextInput
-        style={[styles.input, { 
-          backgroundColor: colors.surface,
-          color: colors.text,
-          borderColor: colors.border
-        }]}
-        placeholder={t("login.email")}
-        placeholderTextColor={colors.textSecondary}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      
-      <TextInput
-        style={[styles.input, { 
-          backgroundColor: colors.surface,
-          color: colors.text,
-          borderColor: colors.border
-        }]}
-        placeholder={t("login.password")}
-        placeholderTextColor={colors.textSecondary}
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-      />
-      
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors.primary }]}
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
-          {loading ? t("common.loading") : t("login.signIn")}
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors.secondary }]}
-        onPress={handleSignUp}
-        disabled={loading}
-      >
-        <Text style={[styles.buttonText, { color: colors.onSecondary }]}>
-          {loading ? t("common.loading") : t("login.signUp")}
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
-        <Text style={[styles.forgotPassword, { color: colors.primary }]}>
-          {t("login.forgotPassword")}
-        </Text>
-      </TouchableOpacity>
-      
-      <Text style={[styles.dontHaveAccount, { color: colors.textSecondary }]}>
-        {t("login.dontHaveAccount")} 
-        <Text 
-          style={[styles.signUpLink, { color: colors.primary }]}
-          onPress={handleSignUp}
-        >
-          {t("login.signUp")}
-        </Text>
-      </Text>
-    </View>
-  );
-  
-  // Render page using MainLayout template
-  return (
-    <MainLayout
-      scrollable={true}
-      safeArea={true}
-    >
-      <Content />
+      }
+      }
+      }
+      }
+      } catch (error) {
+      } else if (error.code === 'auth/invalid-email') {
+      } else if (error.code === 'auth/invalid-email') {
+      } else if (error.code === 'auth/too-many-requests') {
+      } else if (error.code === 'auth/user-disabled') {
+      } else if (error.code === 'auth/weak-password') {
+      } else {
+      };
+    // Basic email validation
+    // Validate inputs
+    // Validate inputs
     </MainLayout>
+    </View>
+    <MainLayout scrollable={true} safeArea={true}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    alignItems: 'center',
+    alignItems: 'center',
+    alignItems: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    borderRadius: 5,
+    borderRadius: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    bottom: 0,
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const userId = firebaseService.auth.getCurrentUser()?.uid;
+    flex: 1,
+    flexDirection: 'row',
+    fontSize: 14,
+    fontSize: 14,
+    fontSize: 14,
+    fontSize: 16,
+    fontSize: 16,
+    fontSize: 16,
+    fontSize: 16,
+    fontSize: 24,
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontWeight: 'bold',
+    fontWeight: 'bold',
+    fontWeight: 'bold',
+    fontWeight: 'bold',
+    fontWeight: 'bold',
+    if (!email.trim()) {
+    if (!email.trim()) {
+    if (!emailRegex.test(email)) {
+    if (!password.trim()) {
+    if (!password.trim()) {
+    if (isNewUser && firebaseService.auth.getCurrentUser()) {
+    if (userId) {
+    justifyContent: 'center',
+    justifyContent: 'center',
+    justifyContent: 'space-around',
+    left: 0,
+    marginBottom: 10,
+    marginBottom: 10,
+    marginBottom: 10,
+    marginBottom: 20,
+    marginBottom: 20,
+    marginBottom: 20,
+    marginTop: 10,
+    marginTop: 15,
+    marginTop: 20,
+    marginTop: 20,
+    navigation.replace('Main');
+    padding: 10,
+    padding: 12,
+    padding: 12,
+    padding: 20,
+    padding: 20,
+    position: 'absolute',
+    right: 0,
+    setShowDownloadPrompt(false);
+    textAlign: 'center',
+    textAlign: 'center',
+    textAlign: 'center',
+    top: 0,
+    try {
+    try {
+    width: '100%',
+    width: '45%',
+    width: '80%',
+    width: '80%',
+    zIndex: 10,
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    } catch (error) {
+    } catch (error) {
+    } finally {
+    } finally {
+   * Handle login form submission
+   * Handle sign up form submission
+   */
+   */
   );
+  );
+  /**
+  /**
+  // Check if we should show the download prompt after registration
+  // Content component
+  // Get app store URLs
+  // Get theme from context
+  // Get translations
+  // Handle closing the download prompt
+  // Navigation
+  // Render page using MainLayout template
+  // State
+  button: {
+  buttonText: {
+  closeButton: {
+  closeButtonText: {
+  const Content = () => (
+  const [email, setEmail] = useState('');
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showDownloadPrompt, setShowDownloadPrompt] = useState(false);
+  const handleCloseDownloadPrompt = async () => {
+  const handleLogin = async () => {
+  const handleSignUp = async () => {
+  const navigation = useNavigation();
+  const { appStoreUrl, playStoreUrl, webAppUrl } = appDownloadService.getAppStoreUrls();
+  const { colors } = useTheme();
+  const { t } = useI18n();
+  container: {
+  dontHaveAccount: {
+  downloadButtons: {
+  downloadPrompt: {
+  downloadSubtitle: {
+  downloadTitle: {
+  forgotPassword: {
+  input: {
+  return (
+  signUpLink: {
+  storeButton: {
+  storeButtonText: {
+  subtitle: {
+  title: {
+  useEffect(() => {
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  },
+  }, [isNewUser]);
+  };
+  };
+  };
+ *
+ * @returns {React.ReactNode} Rendered component
+ * A page component for user authentication using the atomic architecture.
+ * Login Screen
+ * Login Screen component
+ */
+ */
+/**
+/**
+// External imports
+// Import atomic components
+// Internal imports
+// Styles
+const LoginScreen = () => {
+const styles = StyleSheet.create({
+export default memo(LoginScreen);
+});
 };
 
-// Styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    width: "80%",
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  button: {
-    width: "80%",
-    padding: 12,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  forgotPassword: {
-    marginTop: 15,
-    fontSize: 14,
-  },
-  dontHaveAccount: {
-    marginTop: 20,
-    fontSize: 14,
-  },
-  signUpLink: {
-    fontWeight: "bold",
-  },
-  downloadPrompt: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.9)",
-    zIndex: 10,
-    padding: 20,
-  },
-  downloadTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  downloadSubtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  downloadButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginBottom: 20,
-  },
-  storeButton: {
-    padding: 12,
-    borderRadius: 5,
-    alignItems: "center",
-    width: "45%",
-  },
-  storeButtonText: {
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  closeButton: {
-    marginTop: 20,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
-
-export default LoginScreen;

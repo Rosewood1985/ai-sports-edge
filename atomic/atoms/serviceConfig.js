@@ -1,10 +1,12 @@
 /**
  * Service Configuration Atom
- *
  * Provides configuration objects for various services.
  * These are primitive configurations that can be used by higher-level components.
  */
 
+// External imports
+
+// Internal imports
 import { getEnvVar } from './envConfig';
 
 /**
@@ -21,29 +23,22 @@ export const firebaseConfig = {
 };
 
 /**
+ * Sentry configuration
+ */
+export const sentryConfig = {
+  dsn: getEnvVar('SENTRY_DSN', 'https://examplePublicKey@o0.ingest.sentry.io/0'),
+  environment: getEnvVar('NODE_ENV', 'development'),
+  release: 'ai-sports-edge@1.0.0',
+  tracesSampleRate: 0.2,
+};
+
+/**
  * Stripe configuration
  */
 export const stripeConfig = {
   publishableKey: getEnvVar('STRIPE_PUBLISHABLE_KEY'),
   secretKey: getEnvVar('STRIPE_SECRET_KEY'),
   webhookSecret: getEnvVar('STRIPE_WEBHOOK_SECRET'),
-};
-
-/**
- * Sports data API configuration
- */
-export const sportsDataConfig = {
-  sportsDataApiKey: getEnvVar('SPORTS_DATA_API_KEY'),
-  oddsApiKey: getEnvVar('ODDS_API_KEY'),
-  sportradarApiKey: getEnvVar('SPORTRADAR_API_KEY'),
-};
-
-/**
- * OneSignal configuration
- */
-export const oneSignalConfig = {
-  apiKey: getEnvVar('ONESIGNAL_API_KEY'),
-  appId: getEnvVar('ONESIGNAL_APP_ID'),
 };
 
 /**
@@ -55,11 +50,18 @@ export const mlConfig = {
 };
 
 /**
- * Sentry configuration
+ * OneSignal configuration
  */
-export const sentryConfig = {
-  dsn: getEnvVar('SENTRY_DSN', 'https://examplePublicKey@o0.ingest.sentry.io/0'),
-  environment: getEnvVar('NODE_ENV', 'development'),
-  release: 'ai-sports-edge@1.0.0',
-  tracesSampleRate: 0.2,
+export const oneSignalConfig = {
+  apiKey: getEnvVar('ONESIGNAL_API_KEY'),
+  appId: getEnvVar('ONESIGNAL_APP_ID'),
+};
+
+/**
+ * Sports data API configuration
+ */
+export const sportsDataConfig = {
+  oddsApiKey: getEnvVar('ODDS_API_KEY'),
+  sportsDataApiKey: getEnvVar('SPORTS_DATA_API_KEY'),
+  sportradarApiKey: getEnvVar('SPORTRADAR_API_KEY'),
 };

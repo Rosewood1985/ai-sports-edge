@@ -1,59 +1,55 @@
 /**
  * Environment Bootstrap Organism
- *
- * Orchestrates the environment setup and validation process.
  * This is a high-level component that combines multiple molecules and atoms
  * to provide a complete environment initialization solution.
+ * Orchestrates the environment setup and validation process.
  */
 
-import {
-  validateEnvironment,
-  validateServiceConfig,
-  logEnvironmentInfo,
+// External imports
+
+// Internal imports
+import { 
+  validateEnvironment, 
+  validateServiceConfig, 
+  logEnvironmentInfo 
 } from '../molecules/environmentValidator';
-import {
-  firebaseConfig,
-  stripeConfig,
-  sportsDataConfig,
-  oneSignalConfig,
-  mlConfig,
-  sentryConfig,
+
+import { 
+  firebaseConfig, 
+  sentryConfig, 
+  stripeConfig, 
+  mlConfig, 
+  oneSignalConfig, 
+  sportsDataConfig 
 } from '../atoms/serviceConfig';
 
 /**
  * Bootstrap environment configuration
  * Validates all required environment variables and service configurations
- *
+ * 
  * @param {Object} options - Bootstrap options
  * @param {boolean} options.exitOnError - Whether to exit the process on error
- * @param {boolean} options.logResults - Whether to log validation results
  * @param {boolean} options.logEnvironmentInfo - Whether to log environment information
+ * @param {boolean} options.logResults - Whether to log validation results
  * @returns {Object} Bootstrap result with validation status for each service
  */
-export function bootstrapEnvironment(
-  options = {
-    exitOnError: true,
-    logResults: true,
-    logEnvironmentInfo: true,
-  }
-) {
-  // Log environment information if requested
-  if (options.logEnvironmentInfo) {
-    logEnvironmentInfo();
-  }
-
+export function bootstrapEnvironment(options = {}) {
   // Initialize result object
   const result = {
     success: true,
     environment: false,
     services: {
       firebase: false,
-      stripe: false,
-      sportsData: false,
-      oneSignal: false,
-      ml: false,
       sentry: false,
+      stripe: false,
+      ml: false,
+      oneSignal: false,
+      sportsData: false,
     },
+    timestamp: new Date().toISOString(),
+    nodeEnv: process.env.NODE_ENV || 'not set',
+    nodeVersion: process.version,
+    platform: process.platform,
   };
 
   // Validate environment variables
@@ -62,8 +58,6 @@ export function bootstrapEnvironment(
     logResults: options.logResults,
   });
 
-  // If environment validation failed and exitOnError is true,
-  // the process would have exited already
   if (!result.environment) {
     result.success = false;
     return result;
@@ -77,27 +71,19 @@ export function bootstrapEnvironment(
     { exitOnError: options.exitOnError, logResults: options.logResults }
   );
 
+  // Validate Sentry configuration
+  result.services.sentry = validateServiceConfig(
+    sentryConfig, 
+    ['dsn', 'environment'], 
+    'Sentry', 
+    { exitOnError: false, logResults: options.logResults }
+  );
+
   // Validate Stripe configuration
   result.services.stripe = validateServiceConfig(
     stripeConfig,
     ['publishableKey', 'secretKey'],
     'Stripe',
-    { exitOnError: false, logResults: options.logResults }
-  );
-
-  // Validate Sports Data configuration
-  result.services.sportsData = validateServiceConfig(
-    sportsDataConfig,
-    ['oddsApiKey'],
-    'Sports Data',
-    { exitOnError: false, logResults: options.logResults }
-  );
-
-  // Validate OneSignal configuration
-  result.services.oneSignal = validateServiceConfig(
-    oneSignalConfig,
-    ['apiKey', 'appId'],
-    'OneSignal',
     { exitOnError: false, logResults: options.logResults }
   );
 
@@ -109,14 +95,29 @@ export function bootstrapEnvironment(
     { exitOnError: false, logResults: options.logResults }
   );
 
-  // Validate Sentry configuration
-  result.services.sentry = validateServiceConfig(sentryConfig, ['dsn', 'environment'], 'Sentry', {
-    exitOnError: false,
-    logResults: options.logResults,
-  });
+  // Validate OneSignal configuration
+  result.services.oneSignal = validateServiceConfig(
+    oneSignalConfig,
+    ['apiKey', 'appId'],
+    'OneSignal',
+    { exitOnError: false, logResults: options.logResults }
+  );
+
+  // Validate Sports Data configuration
+  result.services.sportsData = validateServiceConfig(
+    sportsDataConfig,
+    ['oddsApiKey'],
+    'Sports Data',
+    { exitOnError: false, logResults: options.logResults }
+  );
 
   // Update overall success status
   result.success = result.environment && result.services.firebase; // Only Firebase is critical
+
+  // Log environment information if requested
+  if (options.logEnvironmentInfo) {
+    logEnvironmentInfo();
+  }
 
   // Log final result
   if (options.logResults) {
@@ -133,32 +134,36 @@ export function bootstrapEnvironment(
 /**
  * Get environment status summary
  * Useful for displaying environment status in admin panels or logs
- *
+ * 
  * @param {Object} bootstrapResult - Result from bootstrapEnvironment
- * @returns {Object} Environment status summary
+ * @returns {Object} Environment status
  */
 export function getEnvironmentStatus(bootstrapResult) {
   return {
-    timestamp: new Date().toISOString(),
     success: bootstrapResult.success,
     environment: bootstrapResult.environment,
     services: {
       ...bootstrapResult.services,
     },
-    nodeEnv: process.env.NODE_ENV || 'not set',
-    platform: process.platform,
-    nodeVersion: process.version,
   };
 }
 
 /**
  * Initialize environment
  * Convenience function that bootstraps the environment and returns the status
- *
+ * 
  * @param {Object} options - Bootstrap options
- * @returns {Object} Environment status
+ * @returns {Object} Environment status summary
  */
 export function initializeEnvironment(options = {}) {
+  // If environment validation failed and exitOnError is true,
+  // the process would have exited already
   const bootstrapResult = bootstrapEnvironment(options);
   return getEnvironmentStatus(bootstrapResult);
 }
+
+export default {
+  bootstrapEnvironment,
+  getEnvironmentStatus,
+  initializeEnvironment,
+};

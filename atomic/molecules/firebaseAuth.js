@@ -1,10 +1,10 @@
 /**
  * Firebase Auth Molecule
- *
  * Provides Firebase authentication functionality.
  * Combines the Firebase app atom with authentication-specific features.
  */
 
+// External imports
 import {
   getAuth,
   onAuthStateChanged,
@@ -12,10 +12,12 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  updateProfile,
   updateEmail,
   updatePassword,
+  updateProfile,
 } from 'firebase/auth';
+
+// Internal imports
 import { getFirebaseApp } from '../atoms/firebaseApp';
 
 // Firebase Auth instance (singleton)
@@ -23,20 +25,22 @@ let auth = null;
 
 /**
  * Initialize Firebase Auth
+ * 
  * @returns {Object|null} Firebase Auth instance or null if initialization failed
  */
 export const initializeFirebaseAuth = () => {
   try {
     // Get Firebase app instance
     const app = getFirebaseApp();
+    
     if (!app) {
       console.error('Firebase Auth initialization failed: Firebase app not initialized');
       return null;
     }
-
+    
     // Initialize Auth
     auth = getAuth(app);
-
+    
     // Add better error handling for auth operations
     onAuthStateChanged(
       auth,
@@ -47,7 +51,7 @@ export const initializeFirebaseAuth = () => {
         console.error('Auth state change error:', error);
       }
     );
-
+    
     console.log('Firebase Auth initialized successfully');
     return auth;
   } catch (error) {
@@ -59,7 +63,7 @@ export const initializeFirebaseAuth = () => {
 /**
  * Get Firebase Auth instance
  * Initializes auth if it hasn't been initialized yet
- *
+ * 
  * @returns {Object|null} Firebase Auth instance or null if initialization failed
  */
 export const getFirebaseAuth = () => {
@@ -70,18 +74,30 @@ export const getFirebaseAuth = () => {
 };
 
 /**
+ * Get current user
+ * 
+ * @returns {Object|null} Current user or null if not signed in
+ */
+export const getCurrentUser = () => {
+  const authInstance = getFirebaseAuth();
+  return authInstance ? authInstance.currentUser : null;
+};
+
+/**
  * Sign in with email and password
+ * 
  * @param {string} email - User email
  * @param {string} password - User password
  * @returns {Promise<Object>} User credential
  */
 export const signIn = async (email, password) => {
-  const authInstance = getFirebaseAuth();
-  if (!authInstance) {
-    throw new Error('Firebase Auth not initialized');
-  }
-
   try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
     const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
     return userCredential;
   } catch (error) {
@@ -92,17 +108,19 @@ export const signIn = async (email, password) => {
 
 /**
  * Create a new user with email and password
+ * 
  * @param {string} email - User email
  * @param {string} password - User password
  * @returns {Promise<Object>} User credential
  */
 export const createUser = async (email, password) => {
-  const authInstance = getFirebaseAuth();
-  if (!authInstance) {
-    throw new Error('Firebase Auth not initialized');
-  }
-
   try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
     const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
     return userCredential;
   } catch (error) {
@@ -113,15 +131,17 @@ export const createUser = async (email, password) => {
 
 /**
  * Sign out the current user
+ * 
  * @returns {Promise<void>}
  */
 export const logOut = async () => {
-  const authInstance = getFirebaseAuth();
-  if (!authInstance) {
-    throw new Error('Firebase Auth not initialized');
-  }
-
   try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
     await signOut(authInstance);
   } catch (error) {
     console.error('Sign out error:', error);
@@ -131,16 +151,18 @@ export const logOut = async () => {
 
 /**
  * Send password reset email
+ * 
  * @param {string} email - User email
  * @returns {Promise<void>}
  */
 export const resetPassword = async email => {
-  const authInstance = getFirebaseAuth();
-  if (!authInstance) {
-    throw new Error('Firebase Auth not initialized');
-  }
-
   try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
     await sendPasswordResetEmail(authInstance, email);
   } catch (error) {
     console.error('Password reset error:', error);
@@ -149,38 +171,24 @@ export const resetPassword = async email => {
 };
 
 /**
- * Update user profile
- * @param {Object} user - User object
- * @param {Object} profileData - Profile data to update
- * @param {string} profileData.displayName - User display name
- * @param {string} profileData.photoURL - User photo URL
- * @returns {Promise<void>}
- */
-export const updateUserProfile = async (user, profileData) => {
-  if (!user) {
-    throw new Error('User not provided');
-  }
-
-  try {
-    await updateProfile(user, profileData);
-  } catch (error) {
-    console.error('Update profile error:', error);
-    throw error;
-  }
-};
-
-/**
  * Update user email
+ * 
  * @param {Object} user - User object
  * @param {string} newEmail - New email
  * @returns {Promise<void>}
  */
 export const updateUserEmail = async (user, newEmail) => {
-  if (!user) {
-    throw new Error('User not provided');
-  }
-
   try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
+    if (!user) {
+      throw new Error('User not provided');
+    }
+    
     await updateEmail(user, newEmail);
   } catch (error) {
     console.error('Update email error:', error);
@@ -190,16 +198,23 @@ export const updateUserEmail = async (user, newEmail) => {
 
 /**
  * Update user password
+ * 
  * @param {Object} user - User object
  * @param {string} newPassword - New password
  * @returns {Promise<void>}
  */
 export const updateUserPassword = async (user, newPassword) => {
-  if (!user) {
-    throw new Error('User not provided');
-  }
-
   try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
+    if (!user) {
+      throw new Error('User not provided');
+    }
+    
     await updatePassword(user, newPassword);
   } catch (error) {
     console.error('Update password error:', error);
@@ -208,16 +223,31 @@ export const updateUserPassword = async (user, newPassword) => {
 };
 
 /**
- * Get current user
- * @returns {Object|null} Current user or null if not signed in
+ * Update user profile
+ * 
+ * @param {Object} user - User object
+ * @param {Object} profileData - Profile data to update
+ * @param {string} profileData.displayName - User display name
+ * @param {string} profileData.photoURL - User photo URL
+ * @returns {Promise<void>}
  */
-export const getCurrentUser = () => {
-  const authInstance = getFirebaseAuth();
-  if (!authInstance) {
-    return null;
+export const updateUserProfile = async (user, profileData) => {
+  try {
+    const authInstance = getFirebaseAuth();
+    
+    if (!authInstance) {
+      throw new Error('Firebase Auth not initialized');
+    }
+    
+    if (!user) {
+      throw new Error('User not provided');
+    }
+    
+    await updateProfile(user, profileData);
+  } catch (error) {
+    console.error('Update profile error:', error);
+    throw error;
   }
-
-  return authInstance.currentUser;
 };
 
 // Initialize Firebase Auth on module load

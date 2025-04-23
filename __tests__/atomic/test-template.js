@@ -1,113 +1,117 @@
-/**
- * Atomic Component Test Template
- * 
- * This template provides a starting point for testing atomic components.
- * Copy this file and modify it for each component you want to test.
- */
-
+// External imports
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+
+
 import { act } from 'react-test-renderer';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
-// Mock dependencies as needed
-// jest.mock('../atomic/atoms/firebaseApp', () => ({
-//   getFirebaseApp: jest.fn(() => ({ name: 'mock-app' })),
-//   initializeFirebaseApp: jest.fn(() => ({ name: 'mock-app' })),
-// }));
 
-describe('Component Name', () => {
-  // Setup before tests
-  beforeEach(() => {
-    // Reset mocks, set up test environment
-    jest.clearAllMocks();
-  });
+// Internal imports
 
-  // Clean up after tests
-  afterEach(() => {
-    // Clean up test environment
-  });
 
-  // Test cases
-  describe('Initialization', () => {
-    it('should initialize correctly', () => {
-      // Arrange
-      // const props = {};
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      //   fireEvent.press(getByTestId('button-id'));
+      //   throw mockError;
       // Act
-      // const { getByText } = render(<ComponentName {...props} />);
-
-      // Assert
-      // expect(getByText('Expected Text')).toBeTruthy();
-    });
-  });
-
-  describe('Functionality', () => {
-    it('should handle user interactions', async () => {
+      // Act
+      // Act
+      // Act
       // Arrange
+      // Arrange
+      // Arrange
+      // Arrange
+      // Assert
+      // Assert
+      // Assert
+      // Assert
+      // SomeDependency.mockImplementationOnce(() => {
+      // await act(async () => {
+      // const mockError = new Error('Test error');
       // const onPressMock = jest.fn();
       // const props = { onPress: onPressMock };
-
-      // Act
-      // const { getByTestId } = render(<ComponentName {...props} />);
-      // fireEvent.press(getByTestId('button-id'));
-
-      // Assert
-      // expect(onPressMock).toHaveBeenCalledTimes(1);
-    });
-
-    it('should update state correctly', async () => {
-      // Arrange
       // const props = {};
-
-      // Act
-      // const { getByTestId } = render(<ComponentName {...props} />);
-      // await act(async () => {
-      //   fireEvent.press(getByTestId('button-id'));
-      // });
-
-      // Assert
-      // expect(getByTestId('state-display')).toHaveTextContent('Updated State');
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should handle errors gracefully', async () => {
-      // Arrange
-      // const mockError = new Error('Test error');
-      // SomeDependency.mockImplementationOnce(() => {
-      //   throw mockError;
-      // });
-
-      // Act
+      // const props = {};
       // const { getByTestId } = render(<ComponentName />);
-
-      // Assert
+      // const { getByTestId } = render(<ComponentName {...props} />);
+      // const { getByTestId } = render(<ComponentName {...props} />);
+      // const { getByText } = render(<ComponentName {...props} />);
       // expect(getByTestId('error-message')).toHaveTextContent('Error occurred');
-    });
-  });
-});
-
-// Example test for a non-React function
-describe('Utility Function', () => {
-  it('should return expected result', () => {
+      // expect(getByTestId('state-display')).toHaveTextContent('Updated State');
+      // expect(getByText('Expected Text')).toBeTruthy();
+      // expect(onPressMock).toHaveBeenCalledTimes(1);
+      // fireEvent.press(getByTestId('button-id'));
+      // });
+      // });
+    // Act
+    // Act
     // Arrange
+    // Arrange
+    // Assert
+    // Assert
+    // Clean up test environment
+    // Reset mocks, set up test environment
     // const input = 'test';
-
-    // Act
-    // const result = utilityFunction(input);
-
-    // Assert
-    // expect(result).toBe('expected result');
-  });
-
-  it('should handle edge cases', () => {
-    // Arrange
     // const input = null;
-
-    // Act
     // const result = utilityFunction(input);
-
-    // Assert
+    // const result = utilityFunction(input);
     // expect(result).toBe('default value');
+    // expect(result).toBe('expected result');
+    it('should handle errors gracefully', async () => {
+    it('should handle user interactions', async () => {
+    it('should initialize correctly', () => {
+    it('should update state correctly', async () => {
+    jest.clearAllMocks();
+    });
+    });
+    });
+    });
+  // Clean up after tests
+  // Setup before tests
+  // Test cases
+  afterEach(() => {
+  beforeEach(() => {
+  describe('Error Handling', () => {
+  describe('Functionality', () => {
+  describe('Initialization', () => {
+  it('should handle edge cases', () => {
+  it('should return expected result', () => {
   });
+  });
+  });
+  });
+  });
+  });
+  });
+ *
+ * Atomic Component Test Template
+ * Copy this file and modify it for each component you want to test.
+ * This template provides a starting point for testing atomic components.
+ */
+/**
+//   getFirebaseApp: jest.fn(() => ({ name: 'mock-app' })),
+//   initializeFirebaseApp: jest.fn(() => ({ name: 'mock-app' })),
+// Example test for a non-React function
+// External imports
+// Internal imports
+// Mock dependencies as needed
+// jest.mock('../atomic/atoms/firebaseApp', () => ({
+// }));
+describe('Component Name', () => {
+describe('Utility Function', () => {
 });
+});
+

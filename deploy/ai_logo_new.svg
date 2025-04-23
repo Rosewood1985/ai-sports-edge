@@ -1,0 +1,17 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#FFC0CB" fill-opacity="0.5"/>
+  <path d="M706.5 89.5H475.5V209.5H706.5V89.5Z" stroke="white" stroke-width="15"/>
+  <path d="M955.5 139.5H706.5V159.5H955.5V139.5Z" stroke="white" stroke-width="15"/>
+  <path d="M475.5 139.5H226.5V159.5H475.5V139.5Z" stroke="white" stroke-width="15"/>
+  <path d="M955.5 159.5V296.5H935.5V159.5H955.5Z" stroke="white" stroke-width="15"/>
+  <path d="M246.5 159.5V296.5H226.5V159.5H246.5Z" stroke="white" stroke-width="15"/>
+  <path d="M706.5 542.5H475.5V662.5H706.5V542.5Z" stroke="white" stroke-width="15"/>
+  <path d="M955.5 592.5H706.5V612.5H955.5V592.5Z" stroke="white" stroke-width="15"/>
+  <path d="M475.5 592.5H226.5V612.5H475.5V592.5Z" stroke="white" stroke-width="15"/>
+  <path d="M955.5 612.5V749.5H935.5V612.5H955.5Z" stroke="white" stroke-width="15"/>
+  <path d="M246.5 612.5V749.5H226.5V612.5H246.5Z" stroke="white" stroke-width="15"/>
+  <path d="M201.5 323.5L121.5 443.5H201.5L241.5 363.5L281.5 443.5H361.5L281.5 323.5H201.5Z" fill="white"/>
+  <path d="M318.5 323.5V443.5H398.5V323.5H318.5Z" fill="white"/>
+  <text x="600" y="400" font-family="Arial" font-size="120" fill="white" text-anchor="middle">SPORTS</text>
+  <text x="600" y="520" font-family="Arial" font-size="120" fill="white" text-anchor="middle">EDGE</text>
+</svg>

@@ -117,11 +117,8 @@ const BetNowPopup = ({
         window.bettingAffiliateService.trackButtonClick('popup', FANDUEL_CONFIG.AFFILIATE_ID, teamId, userId, gameId);
       }
       
-      // Generate affiliate URL
-      let baseUrl = FANDUEL_CONFIG.BASE_URL;
-      
-      // Add affiliate parameters
-      const affiliateUrl = `${baseUrl}?aff_id=${FANDUEL_CONFIG.AFFILIATE_ID}&subId=${userId}-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton&utm_content=web-popup`;
+      // Use the direct affiliate link from environment variables
+      const affiliateUrl = FANDUEL_CONFIG.AFFILIATE_URL;
       
       // Track conversion
       if (window.bettingAffiliateService) {

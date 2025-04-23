@@ -1,54 +1,13 @@
 /**
  * Theme Tokens Atom
- *
  * Defines design tokens for the application.
  * These are the primitive values used for spacing, typography, shadows, etc.
  */
 
+// External imports
 import { Platform } from 'react-native';
 
-/**
- * Spacing tokens
- * Used for margins, paddings, and layout spacing
- */
-export const spacing = {
-  none: 0,
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-  xxxl: 64,
-
-  // Specific use cases
-  screenPadding: 16,
-  cardPadding: 16,
-  inputPadding: 12,
-  buttonPadding: 12,
-  iconPadding: 8,
-};
-
-/**
- * Border radius tokens
- */
-export const borderRadius = {
-  none: 0,
-  xs: 2,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 24,
-  round: 9999,
-
-  // Specific use cases
-  button: 8,
-  card: 12,
-  input: 8,
-  dialog: 16,
-  chip: 16,
-};
+// Internal imports
 
 /**
  * Font family tokens
@@ -60,31 +19,32 @@ export const fontFamily = {
     android: 'Roboto',
     default: 'sans-serif',
   }),
-
   medium: Platform.select({
     ios: 'System',
     android: 'Roboto-Medium',
     default: 'sans-serif-medium',
   }),
-
-  semibold: Platform.select({
-    ios: 'System',
-    android: 'Roboto-Medium',
-    default: 'sans-serif-medium',
-  }),
-
   bold: Platform.select({
     ios: 'System',
     android: 'Roboto-Bold',
     default: 'sans-serif-bold',
   }),
-
   // Monospace font for code, numbers, etc.
   mono: Platform.select({
     ios: 'Menlo',
     android: 'monospace',
     default: 'monospace',
   }),
+};
+
+/**
+ * Font weight tokens
+ */
+export const fontWeight = {
+  regular: '400',
+  medium: '500',
+  semibold: '600',
+  bold: '700',
 };
 
 /**
@@ -98,7 +58,6 @@ export const fontSize = {
   xl: 20,
   xxl: 24,
   xxxl: 32,
-
   // Specific use cases
   heading1: 32,
   heading2: 24,
@@ -123,7 +82,6 @@ export const lineHeight = {
   xl: 32,
   xxl: 36,
   xxxl: 40,
-
   // Specific use cases
   heading1: 40,
   heading2: 32,
@@ -138,13 +96,45 @@ export const lineHeight = {
 };
 
 /**
- * Font weight tokens
+ * Spacing tokens
+ * Used for margins, paddings, and layout spacing
  */
-export const fontWeight = {
-  regular: '400',
-  medium: '500',
-  semibold: '600',
-  bold: '700',
+export const spacing = {
+  none: 0,
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+  xxxl: 64,
+  // Specific use cases
+  screenPadding: 16,
+  cardPadding: 16,
+  buttonPadding: 12,
+  inputPadding: 12,
+  iconPadding: 8,
+};
+
+/**
+ * Border radius tokens
+ */
+export const borderRadius = {
+  none: 0,
+  xs: 2,
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+  xxl: 24,
+  round: 9999,
+  // Specific use cases
+  button: 8,
+  card: 12,
+  input: 8,
+  chip: 16,
+  dialog: 16,
+  dropdown: 10,
 };
 
 /**
@@ -158,7 +148,6 @@ export const shadowLight = {
     shadowRadius: 0,
     elevation: 0,
   },
-
   xs: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -166,7 +155,6 @@ export const shadowLight = {
     shadowRadius: 2,
     elevation: 1,
   },
-
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -174,7 +162,6 @@ export const shadowLight = {
     shadowRadius: 4,
     elevation: 2,
   },
-
   md: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -182,19 +169,17 @@ export const shadowLight = {
     shadowRadius: 6,
     elevation: 4,
   },
-
   lg: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
   },
-
   xl: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
   },
@@ -211,7 +196,6 @@ export const shadowDark = {
     shadowRadius: 0,
     elevation: 0,
   },
-
   xs: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -219,7 +203,6 @@ export const shadowDark = {
     shadowRadius: 2,
     elevation: 1,
   },
-
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -227,7 +210,6 @@ export const shadowDark = {
     shadowRadius: 4,
     elevation: 2,
   },
-
   md: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -235,7 +217,6 @@ export const shadowDark = {
     shadowRadius: 6,
     elevation: 4,
   },
-
   lg: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -243,7 +224,6 @@ export const shadowDark = {
     shadowRadius: 8,
     elevation: 6,
   },
-
   xl: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -259,9 +239,8 @@ export const shadowDark = {
 export const zIndex = {
   base: 0,
   above: 1,
-  dropdown: 10,
-  sticky: 100,
   fixed: 200,
+  sticky: 100,
   modal: 300,
   popover: 400,
   toast: 500,
@@ -277,7 +256,6 @@ export const animation = {
     normal: 300,
     slow: 500,
   },
-
   easing: {
     easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
     easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
@@ -289,12 +267,12 @@ export const animation = {
  * Theme tokens object
  */
 export const ThemeTokens = {
-  spacing,
-  borderRadius,
   fontFamily,
+  fontWeight,
   fontSize,
   lineHeight,
-  fontWeight,
+  spacing,
+  borderRadius,
   shadowLight,
   shadowDark,
   zIndex,
