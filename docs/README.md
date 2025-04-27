@@ -20,6 +20,7 @@ It supports operational management, product development, investor communications
 | `GIT_HELPER_CHEATSHEET.md` | Daily Git workflow and best practices cheat sheet |
 | `FOUNDER_OVERVIEW_v1.0.md` | 6–8 page founder document outlining product, ML model, market, roadmap |
 | `README_WATCHDOG.md` | Explains Docs Watchdog automation system |
+| `README_GITHUB_LABELS.md` | GitHub issue/PR label standardization guide |
 
 ---
 
