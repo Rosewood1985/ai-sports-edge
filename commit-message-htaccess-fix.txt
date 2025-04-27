@@ -1,0 +1,22 @@
+fix: ensure .htaccess is included in deployment
+
+This commit fixes a critical deployment issue where the .htaccess file was being
+systematically excluded from all deployments. The .htaccess file is essential for:
+
+1. Setting proper Content-Security-Policy headers
+2. Configuring X-Frame-Options via HTTP headers
+3. Setting correct MIME types for JavaScript and JSON files
+4. Enabling SPA routing for React
+
+The fix includes:
+- A new deployment script that explicitly includes .htaccess
+- Proper CSP configuration that allows all required external resources
+- Commenting out references to missing JS files in index.html
+
+This resolves frontend rendering issues including:
+- Black screen / infinite spinner
+- X-Frame-Options errors
+- Integrity check failures for external resources
+- MIME type mismatches
+
+Closes #ISSUE-123

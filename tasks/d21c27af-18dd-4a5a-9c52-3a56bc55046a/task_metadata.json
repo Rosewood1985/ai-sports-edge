@@ -1,0 +1,468 @@
+{
+  "files_in_context": [
+    {
+      "path": "docs/vscode-workspace-fix.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385052467,
+      "roo_edit_date": 1745385052467,
+      "user_edit_date": null
+    },
+    {
+      "path": "commit-message-vscode-fix.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385061214,
+      "roo_edit_date": 1745385061214,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-vscode-fix.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385071490,
+      "roo_edit_date": 1745385071490,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-vscode-fix.sh",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385071490,
+      "roo_edit_date": 1745385071490,
+      "user_edit_date": 1745385130327
+    },
+    {
+      "path": ".github/workflows/auto-deploy.yml",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385249795,
+      "roo_edit_date": 1745385249795,
+      "user_edit_date": null
+    },
+    {
+      "path": ".github/workflows/daily-health-check.yml",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385267402,
+      "roo_edit_date": 1745385267402,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/performance-audit.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385326437,
+      "roo_edit_date": 1745385326437,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385347583,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385354140,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385358807,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385363581,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385368646,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/homepage-preview.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385373052,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/homepage-preview.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385386566,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385398205,
+      "roo_edit_date": 1745385398205,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385398205,
+      "roo_edit_date": 1745385398205,
+      "user_edit_date": 1745385398218
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385408887,
+      "roo_edit_date": 1745385408887,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385408887,
+      "roo_edit_date": 1745385408887,
+      "user_edit_date": 1745385408898
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385416612,
+      "roo_edit_date": 1745385416612,
+      "user_edit_date": 1745385408898
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385416612,
+      "roo_edit_date": 1745385416612,
+      "user_edit_date": 1745385416621
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385368646,
+      "roo_edit_date": null,
+      "user_edit_date": 1745385424769
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385424788,
+      "roo_edit_date": 1745385424788,
+      "user_edit_date": 1745385424769
+    },
+    {
+      "path": "dist/homepage-preview.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385434161,
+      "roo_edit_date": 1745385434161,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/homepage-preview.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385434161,
+      "roo_edit_date": 1745385434161,
+      "user_edit_date": 1745385434176
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385445385,
+      "roo_edit_date": 1745385445385,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385453117,
+      "roo_edit_date": 1745385453117,
+      "user_edit_date": 1745385416621
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385424788,
+      "roo_edit_date": 1745385424788,
+      "user_edit_date": 1745385460349
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385470185,
+      "roo_edit_date": 1745385470185,
+      "user_edit_date": 1745385416621
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385470185,
+      "roo_edit_date": 1745385470185,
+      "user_edit_date": 1745385470189
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385424788,
+      "roo_edit_date": 1745385424788,
+      "user_edit_date": 1745385487744
+    },
+    {
+      "path": "commit-message-frontend-blockers.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385497726,
+      "roo_edit_date": 1745385497726,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-frontend-blockers-fix.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385509866,
+      "roo_edit_date": 1745385509866,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/secure-sftp-deploy.sh",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745385582183,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/secure-sftp-deploy.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385599739,
+      "roo_edit_date": 1745385599739,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/secure-sftp-deploy.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385599739,
+      "roo_edit_date": 1745385599739,
+      "user_edit_date": 1745385599742
+    },
+    {
+      "path": "scripts/secure-sftp-deploy.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385618542,
+      "roo_edit_date": 1745385618542,
+      "user_edit_date": 1745385599742
+    },
+    {
+      "path": "scripts/secure-sftp-deploy.sh",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385618542,
+      "roo_edit_date": 1745385618542,
+      "user_edit_date": 1745385618546
+    },
+    {
+      "path": "scripts/reset-web-deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385775473,
+      "roo_edit_date": 1745385775473,
+      "user_edit_date": null
+    },
+    {
+      "path": "commit-message-reset-deploy.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385805922,
+      "roo_edit_date": 1745385805922,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-reset-deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385818039,
+      "roo_edit_date": 1745385818039,
+      "user_edit_date": null
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385950996,
+      "roo_edit_date": 1745385950996,
+      "user_edit_date": null
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385959629,
+      "roo_edit_date": 1745385959629,
+      "user_edit_date": null
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385959629,
+      "roo_edit_date": 1745385959629,
+      "user_edit_date": 1745385959633
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745385969511,
+      "roo_edit_date": 1745385969511,
+      "user_edit_date": 1745385959633
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385969511,
+      "roo_edit_date": 1745385969511,
+      "user_edit_date": 1745385969515
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745385969511,
+      "roo_edit_date": 1745385969511,
+      "user_edit_date": 1745385979451
+    },
+    {
+      "path": "scripts/backup-remote-deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386015391,
+      "roo_edit_date": 1745386015391,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/verify-deployment-health.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386097034,
+      "roo_edit_date": 1745386097034,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/lint-html.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386147156,
+      "roo_edit_date": 1745386147156,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/aiSummaryService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745386196839,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/aiPredictionService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745386201373,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/mlPredictionService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745386207184,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/aiNewsAnalysisService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745386212452,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/claudeOptimizationService.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386406978,
+      "roo_edit_date": 1745386406978,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/claude-usage-report.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386471433,
+      "roo_edit_date": 1745386471433,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-claude-optimization.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386603041,
+      "roo_edit_date": 1745386603041,
+      "user_edit_date": null
+    },
+    {
+      "path": "commit-message-claude-optimization.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386622754,
+      "roo_edit_date": 1745386622754,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-claude-optimization.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745386642367,
+      "roo_edit_date": 1745386642367,
+      "user_edit_date": null
+    }
+  ]
+}

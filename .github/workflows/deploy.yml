@@ -1,0 +1,257 @@
+name: AI Sports Edge Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - feature/atomic-architecture*
+    paths:
+      - 'dist/**'
+      - '.htaccess'
+      - 'scripts/secure-sftp-deploy.sh'
+      - 'scripts/verify-deployment-health.sh'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  validate:
+    name: Validate Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate dist structure
+        run: |
+          echo "🔍 Validating dist structure..."
+          
+          # Check for required files
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ dist/index.html is missing"
+            exit 1
+          fi
+          
+          if [ ! -f "dist/login.html" ]; then
+            echo "❌ dist/login.html is missing"
+            exit 1
+          fi
+          
+          if [ ! -f "dist/.htaccess" ]; then
+            echo "❌ dist/.htaccess is missing"
+            exit 1
+          fi
+          
+          if [ ! -f "dist/firebase-config.js" ]; then
+            echo "❌ dist/firebase-config.js is missing"
+            exit 1
+          fi
+          
+          # Check for required directories
+          if [ ! -d "dist/assets" ]; then
+            echo "❌ dist/assets directory is missing"
+            exit 1
+          fi
+          
+          # Validate HTML files
+          echo "🔍 Validating HTML files..."
+          npx html-validate dist/*.html
+          
+          echo "✅ Dist structure validation passed"
+
+      - name: Run health check
+        run: |
+          echo "🔍 Running deployment health check..."
+          if [ -f "scripts/verify-deployment-health.sh" ]; then
+            chmod +x scripts/verify-deployment-health.sh
+            ./scripts/verify-deployment-health.sh --local
+          else
+            echo "⚠️ verify-deployment-health.sh not found, skipping health check"
+          fi
+
+  deploy:
+    name: Deploy to Production
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SFTP_PRIVATE_KEY }}
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy to production
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_REMOTE_PATH: ${{ secrets.SFTP_REMOTE_PATH }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT || 22 }}
+        run: |
+          echo "🚀 Deploying to production..."
+          chmod +x scripts/secure-sftp-deploy.sh
+          ./scripts/secure-sftp-deploy.sh
+          
+          # Update deployment status
+          echo "✅ Deployment completed at $(date)"
+          echo "DEPLOY_DATE=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+          echo "DEPLOY_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Generate deployment report
+        run: |
+          echo "📝 Generating deployment report..."
+          
+          cat > deployment-report.md << EOL
+          # Deployment Report
+          
+          - **Date:** ${{ env.DEPLOY_DATE }}
+          - **Commit:** ${{ env.DEPLOY_SHA }}
+          - **Branch:** ${GITHUB_REF#refs/heads/}
+          - **Workflow:** [${GITHUB_WORKFLOW}](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
+          
+          ## Deployed Files
+          
+          \`\`\`
+          $(find dist -type f | sort)
+          \`\`\`
+          
+          ## Environment
+          
+          - Node.js: $(node -v)
+          - npm: $(npm -v)
+          - OS: $(uname -a)
+          
+          ## Status
+          
+          ✅ Deployment successful
+          EOL
+          
+          mkdir -p health-report
+          cp deployment-report.md health-report/deployment-report-$(date +'%Y%m%d%H%M%S').md
+
+      - name: Update CHANGELOG
+        run: |
+          echo "📝 Updating CHANGELOG.md..."
+          
+          # Get the latest version from CHANGELOG.md
+          LATEST_VERSION=$(grep -o 'v[0-9]\+\.[0-9]\+' CHANGELOG.md | head -n 1 || echo "v1.0")
+          
+          # Increment the minor version
+          MAJOR_VERSION=$(echo $LATEST_VERSION | cut -d. -f1)
+          MINOR_VERSION=$(echo $LATEST_VERSION | cut -d. -f2)
+          NEW_MINOR_VERSION=$((MINOR_VERSION + 1))
+          NEW_VERSION="${MAJOR_VERSION}.${NEW_MINOR_VERSION}"
+          
+          # Update CHANGELOG.md
+          DATE=$(date +'%Y-%m-%d')
+          
+          # Prepend new entry to CHANGELOG.md
+          cat > CHANGELOG.tmp << EOL
+          # AI Sports Edge Changelog
+          
+          ## ${NEW_VERSION} (${DATE})
+          
+          ### 🚀 Deployment
+          
+          - Deployed from branch: ${GITHUB_REF#refs/heads/}
+          - Commit: ${{ env.DEPLOY_SHA }}
+          - Workflow: [${GITHUB_WORKFLOW}](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
+          
+          ### 🔧 Changes
+          
+          $(git log -1 --pretty=format:"- %s")
+          
+          EOL
+          
+          # Append existing content (skipping the first line)
+          tail -n +2 CHANGELOG.md >> CHANGELOG.tmp
+          mv CHANGELOG.tmp CHANGELOG.md
+
+      - name: Create deployment tag
+        run: |
+          echo "🏷️ Creating deployment tag..."
+          
+          # Get the latest version from CHANGELOG.md
+          LATEST_VERSION=$(grep -o 'v[0-9]\+\.[0-9]\+' CHANGELOG.md | head -n 1)
+          
+          # Create and push tag
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "${LATEST_VERSION}" -m "Production deployment ${LATEST_VERSION} at $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin "${LATEST_VERSION}"
+          
+          echo "✅ Created tag ${LATEST_VERSION}"
+
+      - name: Update README badge
+        run: |
+          echo "🔄 Updating README badge..."
+          
+          # Update or add status badge to README.md
+          if grep -q "Production Deployment:" README.md; then
+            # Update existing badge
+            sed -i 's/Production Deployment: .*$/Production Deployment: Passing/' README.md
+          else
+            # Add badge if it doesn't exist
+            echo -e "\n## Status\n\n✅ Production Deployment: Passing\n" >> README.md
+          fi
+          
+          # Commit changes
+          git add CHANGELOG.md README.md health-report/
+          git commit -m "chore: update deployment status [skip ci]"
+          git push
+
+  notify:
+    name: Notify Team
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack notification
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send email notification
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "✅ AI Sports Edge Deployment Successful"
+          body: |
+            AI Sports Edge has been successfully deployed to production.
+            
+            - Date: ${{ env.DEPLOY_DATE }}
+            - Commit: ${{ env.DEPLOY_SHA }}
+            - Branch: ${GITHUB_REF#refs/heads/}
+            - Workflow: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+            
+            Visit https://aisportsedge.app to verify the deployment.
+          to: ${{ secrets.EMAIL_NOTIFICATION }}
+          from: AI Sports Edge Deployment <noreply@aisportsedge.app>

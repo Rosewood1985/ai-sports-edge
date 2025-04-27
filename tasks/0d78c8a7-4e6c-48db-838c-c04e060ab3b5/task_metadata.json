@@ -1,0 +1,564 @@
+{
+  "files_in_context": [
+    {
+      "path": "dist/enhanced-index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418087536,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/enhanced-index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418095291,
+      "roo_edit_date": 1745418095291,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/enhanced-index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745418095291,
+      "roo_edit_date": 1745418095291,
+      "user_edit_date": 1745418095321
+    },
+    {
+      "path": "dist/enhanced-index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745418095291,
+      "roo_edit_date": 1745418095291,
+      "user_edit_date": 1745418102559
+    },
+    {
+      "path": "dist/enhanced-index.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418102636,
+      "roo_edit_date": 1745418102636,
+      "user_edit_date": 1745418102559
+    },
+    {
+      "path": "dist/register-service-worker.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418202232,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418224425,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418235870,
+      "roo_edit_date": 1745418235870,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418246678,
+      "roo_edit_date": 1745418246678,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745418246678,
+      "roo_edit_date": 1745418246678,
+      "user_edit_date": 1745418246694
+    },
+    {
+      "path": "dist/dev-login.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418250772,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/test-us-payment.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418255452,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418268412,
+      "roo_edit_date": 1745418268412,
+      "user_edit_date": 1745418246694
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745418268412,
+      "roo_edit_date": 1745418268412,
+      "user_edit_date": 1745418268426
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418272710,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/test-secure-deploy.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418347305,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/secure-sftp-deploy.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418350848,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418357184,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-final-frontend-fixes.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745418367944,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-htaccess.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418384594,
+      "roo_edit_date": 1745418384594,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-htaccess-vscode.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745418465166,
+      "roo_edit_date": 1745418465166,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745419029871,
+      "roo_edit_date": 1745418268412,
+      "user_edit_date": 1745418268426
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745419034558,
+      "roo_edit_date": 1745418235870,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-with-htaccess.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745420062423,
+      "roo_edit_date": 1745420062423,
+      "user_edit_date": null
+    },
+    {
+      "path": "commit-message-htaccess-fix.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745420081297,
+      "roo_edit_date": 1745420081297,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-htaccess-fix.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745420094465,
+      "roo_edit_date": 1745420094465,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-fixed-public-url.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745420743276,
+      "roo_edit_date": 1745420743276,
+      "user_edit_date": null
+    },
+    {
+      "path": "commit-message-fixed-public-url.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745420761324,
+      "roo_edit_date": 1745420761324,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-fixed-public-url.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745420774367,
+      "roo_edit_date": 1745420774367,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745420851825,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745420903606,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "build/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745420919843,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "build/.htaccess",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745420924595,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745421588287,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745421595056,
+      "roo_edit_date": 1745421595056,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745421595056,
+      "roo_edit_date": 1745421595056,
+      "user_edit_date": 1745421595072
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745419029871,
+      "roo_edit_date": 1745418268412,
+      "user_edit_date": 1745421640784
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745419029871,
+      "roo_edit_date": 1745418268412,
+      "user_edit_date": 1745421645126
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745421645519,
+      "roo_edit_date": 1745421645519,
+      "user_edit_date": 1745421645126
+    },
+    {
+      "path": "build/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745421696584,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "build/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745421696584,
+      "roo_edit_date": null,
+      "user_edit_date": 1745421704117
+    },
+    {
+      "path": "build/index.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745421704140,
+      "roo_edit_date": 1745421704140,
+      "user_edit_date": 1745421704117
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745421722449,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-fixed-build.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745421732751,
+      "roo_edit_date": 1745421732751,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-fixed-build.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745421791533,
+      "roo_edit_date": 1745421791533,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-fixed-build.sh",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745421791533,
+      "roo_edit_date": 1745421791533,
+      "user_edit_date": 1745421791540
+    },
+    {
+      "path": "scripts/deploy-scp.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745421843982,
+      "roo_edit_date": 1745421843982,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422164857,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422169144,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/README.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422173218,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "install-vscode-sftp-extension.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422183256,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/settings.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422192571,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sftp-deployment-fix-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422351290,
+      "roo_edit_date": 1745422351290,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422396965,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422400760,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/settings.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422405096,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745422400760,
+      "roo_edit_date": null,
+      "user_edit_date": 1745422415576
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422415587,
+      "roo_edit_date": 1745422415587,
+      "user_edit_date": 1745422415576
+    },
+    {
+      "path": ".vscode/settings.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422421771,
+      "roo_edit_date": 1745422421771,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/settings.json",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745422421771,
+      "roo_edit_date": 1745422421771,
+      "user_edit_date": 1745422421790
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745422396965,
+      "roo_edit_date": null,
+      "user_edit_date": 1745422428922
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422428993,
+      "roo_edit_date": 1745422428993,
+      "user_edit_date": 1745422428922
+    },
+    {
+      "path": "commit-message-sftp-config-fix.txt",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422437206,
+      "roo_edit_date": 1745422437206,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/push-sftp-config-fix.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422445459,
+      "roo_edit_date": 1745422445459,
+      "user_edit_date": null
+    },
+    {
+      "path": "CHANGELOG.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745422454368,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "CHANGELOG.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422462039,
+      "roo_edit_date": 1745422462039,
+      "user_edit_date": null
+    },
+    {
+      "path": "CHANGELOG.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745422462039,
+      "roo_edit_date": 1745422462039,
+      "user_edit_date": 1745422462057
+    },
+    {
+      "path": "scripts/push-sftp-config-fix.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745422445459,
+      "roo_edit_date": 1745422445459,
+      "user_edit_date": 1745422470365
+    },
+    {
+      "path": "scripts/push-sftp-config-fix.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422470446,
+      "roo_edit_date": 1745422470446,
+      "user_edit_date": 1745422470365
+    },
+    {
+      "path": "scripts/deploy-sftp-config.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745422500739,
+      "roo_edit_date": 1745422500739,
+      "user_edit_date": null
+    }
+  ]
+}

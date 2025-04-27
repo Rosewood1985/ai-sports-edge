@@ -1,362 +1,400 @@
 #!/bin/bash
 
-# verify-deployment-health.sh
-# One-click CLI-based validator that checks if https://aisportsedge.app is cleanly deployed and functioning
+# Verify Deployment Health Script for AI Sports Edge
+# This script checks the health of a deployment by validating files and running tests
 
-# Set up colors for output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Create timestamp for reports
-TIMESTAMP=$(date +"%Y%m%d-%H%M")
+# Set default values
+SITE_URL="https://aisportsedge.app"
+LOCAL_MODE=false
 REPORT_DIR="./health-report"
-SCREENSHOTS_DIR="$REPORT_DIR/screenshots"
-REPORT_FILE="$REPORT_DIR/aisportsedge-$TIMESTAMP.txt"
+DATE_FORMAT=$(date +"%Y%m%d%H%M%S")
+HEALTH_REPORT="${REPORT_DIR}/health-check-${DATE_FORMAT}.md"
+CONSOLE_LOG="${REPORT_DIR}/console-${DATE_FORMAT}.txt"
+LIGHTHOUSE_REPORT="${REPORT_DIR}/lighthouse-${DATE_FORMAT}.html"
+DIST_DIR="./dist"
+CRITICAL_FILES=("index.html" "login.html" ".htaccess" "firebase-config.js")
+CRITICAL_DIRS=("assets")
+PASS=true
 
-# Create directories if they don't exist
-mkdir -p "$SCREENSHOTS_DIR"
+# Parse command line arguments
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --local) LOCAL_MODE=true; shift ;;
+    --url) SITE_URL="$2"; shift 2 ;;
+    --dist) DIST_DIR="$2"; shift 2 ;;
+    --report) REPORT_DIR="$2"; shift 2 ;;
+    *) echo "Unknown parameter: $1"; exit 1 ;;
+  esac
+done
 
-# Print header
-echo -e "${BLUE}=========================================================${NC}"
-echo -e "${BLUE}   AI Sports Edge Deployment Health Check v1.0           ${NC}"
-echo -e "${BLUE}   $(date)                                               ${NC}"
-echo -e "${BLUE}=========================================================${NC}"
+# Create report directory if it doesn't exist
+mkdir -p "${REPORT_DIR}"
 
-# Initialize results tracking
-HTTP_STATUS="🔴 FAILED"
-RELOAD_LOOP="🔴 FAILED"
-SERVICE_WORKER="🔴 FAILED"
-INTEGRITY_ERRORS="🔴 FAILED"
-CSP_VIOLATIONS="🔴 FAILED"
-MIME_ERRORS="🔴 FAILED"
-FIREBASE_CONFIG="🔴 FAILED"
-META_DESCRIPTION="🔴 FAILED"
-META_OG="🔴 FAILED"
-META_TWITTER="🔴 FAILED"
-LANG_ATTRIBUTE="🔴 FAILED"
-SPANISH_TOGGLE="🔴 FAILED"
-SCREENSHOTS="🔴 FAILED"
+# Start health check report
+echo "# AI Sports Edge Deployment Health Check" > "${HEALTH_REPORT}"
+echo "" >> "${HEALTH_REPORT}"
+echo "**Date:** $(date)" >> "${HEALTH_REPORT}"
+echo "**URL:** ${SITE_URL}" >> "${HEALTH_REPORT}"
+echo "**Mode:** $(if $LOCAL_MODE; then echo "Local"; else echo "Remote"; fi)" >> "${HEALTH_REPORT}"
+echo "" >> "${HEALTH_REPORT}"
 
-# Initialize suggestions
-HTTP_STATUS_SUGGESTION="Check if the server is running and accessible"
-RELOAD_LOOP_SUGGESTION="Check for redirect loops in .htaccess or routing"
-SERVICE_WORKER_SUGGESTION="Disable service worker or fix CSP to allow it"
-INTEGRITY_ERRORS_SUGGESTION="Remove integrity and crossorigin attributes from resource links"
-CSP_VIOLATIONS_SUGGESTION="Update Content-Security-Policy in .htaccess"
-MIME_ERRORS_SUGGESTION="Add proper MIME types in .htaccess: AddType application/javascript .js"
-FIREBASE_CONFIG_SUGGESTION="Check Firebase initialization and config"
-META_DESCRIPTION_SUGGESTION="Add meta description tag for SEO"
-META_OG_SUGGESTION="Add Open Graph meta tags for social sharing"
-META_TWITTER_SUGGESTION="Add Twitter Card meta tags for Twitter sharing"
-LANG_ATTRIBUTE_SUGGESTION="Add lang attribute to html tag"
-SPANISH_TOGGLE_SUGGESTION="Check Spanish localization implementation"
-SCREENSHOTS_SUGGESTION="Ensure Puppeteer is installed and working"
+echo "🔍 Starting deployment health check..."
+echo "📋 Report will be saved to: ${HEALTH_REPORT}"
 
-# Function to write to report file
-write_to_report() {
-  echo "$1" | tee -a "$REPORT_FILE"
-}
-
-# Start the report
-write_to_report "AI Sports Edge Deployment Health Check"
-write_to_report "Date: $(date)"
-write_to_report "URL: https://aisportsedge.app"
-write_to_report "========================================"
-write_to_report ""
-
-# Check if curl is installed
-if ! command -v curl &> /dev/null; then
-  echo -e "${RED}Error: curl is not installed. Please install curl to run this script.${NC}"
-  exit 1
-fi
-
-# Check if node is installed
-if ! command -v node &> /dev/null; then
-  echo -e "${RED}Error: Node.js is not installed. Please install Node.js to run this script.${NC}"
-  exit 1
-fi
-
-# Check if puppeteer is installed locally
-if ! npm list puppeteer &> /dev/null; then
-  echo -e "${YELLOW}Warning: Puppeteer is not installed locally. Installing...${NC}"
-  npm install --save-dev puppeteer
-fi
-
-echo -e "${BLUE}🔄 Fetching https://aisportsedge.app...${NC}"
-write_to_report "🔄 Fetching https://aisportsedge.app..."
-
-# Fetch the homepage and store the response
-HTTP_RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/aisportsedge-home.html https://aisportsedge.app)
-
-# Check HTTP status
-if [ "$HTTP_RESPONSE" -eq 200 ]; then
-  echo -e "${GREEN}✅ HTTP Status: 200 OK${NC}"
-  write_to_report "✅ HTTP Status: 200 OK"
-  HTTP_STATUS="🟢 PASSED"
-else
-  echo -e "${RED}❌ HTTP Status: $HTTP_RESPONSE${NC}"
-  write_to_report "❌ HTTP Status: $HTTP_RESPONSE"
-fi
-
-# Check for reload loops (simplified check - looks for meta refresh tags)
-if grep -q '<meta http-equiv="refresh"' /tmp/aisportsedge-home.html; then
-  echo -e "${RED}❌ Potential reload loop detected (meta refresh tag found)${NC}"
-  write_to_report "❌ Potential reload loop detected (meta refresh tag found)"
-else
-  echo -e "${GREEN}✅ No reload loops detected${NC}"
-  write_to_report "✅ No reload loops detected"
-  RELOAD_LOOP="🟢 PASSED"
-fi
-
-# Check for service worker issues
-if grep -q 'serviceWorker' /tmp/aisportsedge-home.html; then
-  if grep -q 'serviceWorker.*register' /tmp/aisportsedge-home.html; then
-    echo -e "${YELLOW}⚠️ Service worker registration found - monitor for potential issues${NC}"
-    write_to_report "⚠️ Service worker registration found - monitor for potential issues"
+# Check if critical files exist in dist directory
+if $LOCAL_MODE; then
+  echo "## File Structure Check" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  
+  # Check critical files
+  echo "### Critical Files" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  echo "| File | Status |" >> "${HEALTH_REPORT}"
+  echo "|------|--------|" >> "${HEALTH_REPORT}"
+  
+  for file in "${CRITICAL_FILES[@]}"; do
+    if [ -f "${DIST_DIR}/${file}" ]; then
+      echo "| ${file} | ✅ Present |" >> "${HEALTH_REPORT}"
+      echo "✅ ${file} exists"
+    else
+      echo "| ${file} | ❌ Missing |" >> "${HEALTH_REPORT}"
+      echo "❌ ${file} is missing"
+      PASS=false
+    fi
+  done
+  
+  # Check critical directories
+  echo "" >> "${HEALTH_REPORT}"
+  echo "### Critical Directories" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  echo "| Directory | Status |" >> "${HEALTH_REPORT}"
+  echo "|-----------|--------|" >> "${HEALTH_REPORT}"
+  
+  for dir in "${CRITICAL_DIRS[@]}"; do
+    if [ -d "${DIST_DIR}/${dir}" ]; then
+      echo "| ${dir} | ✅ Present |" >> "${HEALTH_REPORT}"
+      echo "✅ ${dir} exists"
+    else
+      echo "| ${dir} | ❌ Missing |" >> "${HEALTH_REPORT}"
+      echo "❌ ${dir} is missing"
+      PASS=false
+    fi
+  done
+  
+  # Validate HTML files
+  echo "" >> "${HEALTH_REPORT}"
+  echo "## HTML Validation" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  
+  if command -v npx &> /dev/null; then
+    echo "🔍 Validating HTML files..."
+    
+    # Install html-validate if not already installed
+    if ! npm list -g html-validate &> /dev/null; then
+      echo "📦 Installing html-validate..."
+      npm install -g html-validate
+    fi
+    
+    HTML_FILES=$(find ${DIST_DIR} -name "*.html")
+    HTML_VALIDATION_PASS=true
+    
+    for file in $HTML_FILES; do
+      echo "🔍 Validating ${file}..."
+      VALIDATION_RESULT=$(npx html-validate ${file} 2>&1)
+      
+      if [ $? -eq 0 ]; then
+        echo "| $(basename ${file}) | ✅ Valid |" >> "${HEALTH_REPORT}"
+        echo "✅ ${file} is valid"
+      else
+        echo "| $(basename ${file}) | ❌ Invalid |" >> "${HEALTH_REPORT}"
+        echo "❌ ${file} has validation errors"
+        echo "" >> "${HEALTH_REPORT}"
+        echo "```" >> "${HEALTH_REPORT}"
+        echo "${VALIDATION_RESULT}" >> "${HEALTH_REPORT}"
+        echo "```" >> "${HEALTH_REPORT}"
+        HTML_VALIDATION_PASS=false
+      fi
+    done
+    
+    if [ "$HTML_VALIDATION_PASS" = false ]; then
+      PASS=false
+    fi
   else
-    echo -e "${GREEN}✅ Service worker properly handled${NC}"
-    write_to_report "✅ Service worker properly handled"
-    SERVICE_WORKER="🟢 PASSED"
+    echo "⚠️ npx not available. Skipping HTML validation."
+    echo "⚠️ npx not available. Skipping HTML validation." >> "${HEALTH_REPORT}"
   fi
+fi
+
+# Check remote site if not in local mode
+if ! $LOCAL_MODE; then
+  echo "## Remote Site Check" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  
+  # Check if site is accessible
+  echo "### Site Accessibility" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  
+  HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL})
+  
+  if [ "$HTTP_STATUS" -eq 200 ]; then
+    echo "| Status | ✅ Accessible (HTTP 200) |" >> "${HEALTH_REPORT}"
+    echo "✅ Site is accessible (HTTP 200)"
+  else
+    echo "| Status | ❌ Not accessible (HTTP ${HTTP_STATUS}) |" >> "${HEALTH_REPORT}"
+    echo "❌ Site is not accessible (HTTP ${HTTP_STATUS})"
+    PASS=false
+  fi
+  
+  # Check for critical resources
+  echo "" >> "${HEALTH_REPORT}"
+  echo "### Critical Resources" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  echo "| Resource | Status |" >> "${HEALTH_REPORT}"
+  echo "|----------|--------|" >> "${HEALTH_REPORT}"
+  
+  # Check index.html
+  INDEX_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL}/index.html)
+  if [ "$INDEX_STATUS" -eq 200 ]; then
+    echo "| index.html | ✅ Available (HTTP 200) |" >> "${HEALTH_REPORT}"
+    echo "✅ index.html is available"
+  else
+    echo "| index.html | ❌ Not available (HTTP ${INDEX_STATUS}) |" >> "${HEALTH_REPORT}"
+    echo "❌ index.html is not available"
+    PASS=false
+  fi
+  
+  # Check login.html
+  LOGIN_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL}/login.html)
+  if [ "$LOGIN_STATUS" -eq 200 ]; then
+    echo "| login.html | ✅ Available (HTTP 200) |" >> "${HEALTH_REPORT}"
+    echo "✅ login.html is available"
+  else
+    echo "| login.html | ❌ Not available (HTTP ${LOGIN_STATUS}) |" >> "${HEALTH_REPORT}"
+    echo "❌ login.html is not available"
+    PASS=false
+  fi
+  
+  # Check firebase-config.js
+  FIREBASE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL}/firebase-config.js)
+  if [ "$FIREBASE_STATUS" -eq 200 ]; then
+    echo "| firebase-config.js | ✅ Available (HTTP 200) |" >> "${HEALTH_REPORT}"
+    echo "✅ firebase-config.js is available"
+  else
+    echo "| firebase-config.js | ❌ Not available (HTTP ${FIREBASE_STATUS}) |" >> "${HEALTH_REPORT}"
+    echo "❌ firebase-config.js is not available"
+    PASS=false
+  fi
+  
+  # Check assets directory
+  ASSETS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL}/assets/)
+  if [ "$ASSETS_STATUS" -eq 200 ] || [ "$ASSETS_STATUS" -eq 301 ]; then
+    echo "| assets/ | ✅ Available |" >> "${HEALTH_REPORT}"
+    echo "✅ assets/ directory is available"
+  else
+    echo "| assets/ | ❌ Not available (HTTP ${ASSETS_STATUS}) |" >> "${HEALTH_REPORT}"
+    echo "❌ assets/ directory is not available"
+    PASS=false
+  fi
+  
+  # Run Lighthouse audit if available
+  echo "" >> "${HEALTH_REPORT}"
+  echo "## Performance Audit" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  
+  if command -v lighthouse &> /dev/null; then
+    echo "🔍 Running Lighthouse audit..."
+    
+    lighthouse ${SITE_URL} --output=html --output-path=${LIGHTHOUSE_REPORT} --chrome-flags="--headless --no-sandbox" --quiet
+    
+    if [ $? -eq 0 ]; then
+      echo "✅ Lighthouse audit completed successfully"
+      echo "| Lighthouse Report | ✅ [View Report]($(basename ${LIGHTHOUSE_REPORT})) |" >> "${HEALTH_REPORT}"
+      
+      # Extract scores from Lighthouse report
+      PERFORMANCE=$(grep -o '"performance":[0-9.]*' ${LIGHTHOUSE_REPORT} | cut -d: -f2)
+      ACCESSIBILITY=$(grep -o '"accessibility":[0-9.]*' ${LIGHTHOUSE_REPORT} | cut -d: -f2)
+      SEO=$(grep -o '"seo":[0-9.]*' ${LIGHTHOUSE_REPORT} | cut -d: -f2)
+      
+      echo "" >> "${HEALTH_REPORT}"
+      echo "### Lighthouse Scores" >> "${HEALTH_REPORT}"
+      echo "" >> "${HEALTH_REPORT}"
+      echo "| Metric | Score |" >> "${HEALTH_REPORT}"
+      echo "|--------|-------|" >> "${HEALTH_REPORT}"
+      echo "| Performance | ${PERFORMANCE} |" >> "${HEALTH_REPORT}"
+      echo "| Accessibility | ${ACCESSIBILITY} |" >> "${HEALTH_REPORT}"
+      echo "| SEO | ${SEO} |" >> "${HEALTH_REPORT}"
+      
+      # Check if scores are acceptable
+      if (( $(echo "${PERFORMANCE} < 0.7" | bc -l) )); then
+        echo "⚠️ Performance score is below 0.7: ${PERFORMANCE}"
+        PASS=false
+      fi
+      
+      if (( $(echo "${ACCESSIBILITY} < 0.8" | bc -l) )); then
+        echo "⚠️ Accessibility score is below 0.8: ${ACCESSIBILITY}"
+        PASS=false
+      fi
+      
+      if (( $(echo "${SEO} < 0.8" | bc -l) )); then
+        echo "⚠️ SEO score is below 0.8: ${SEO}"
+        PASS=false
+      fi
+    else
+      echo "❌ Lighthouse audit failed"
+      echo "| Lighthouse Report | ❌ Failed to generate |" >> "${HEALTH_REPORT}"
+      PASS=false
+    fi
+  else
+    echo "⚠️ Lighthouse not available. Skipping performance audit."
+    echo "⚠️ Lighthouse not available. Skipping performance audit." >> "${HEALTH_REPORT}"
+  fi
+  
+  # Check for console errors using headless Chrome
+  echo "" >> "${HEALTH_REPORT}"
+  echo "## Console Errors" >> "${HEALTH_REPORT}"
+  echo "" >> "${HEALTH_REPORT}"
+  
+  if command -v node &> /dev/null; then
+    echo "🔍 Checking for console errors..."
+    
+    # Create temporary script to check console errors
+    TEMP_SCRIPT=$(mktemp)
+    
+    cat > $TEMP_SCRIPT << EOL
+const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  const page = await browser.newPage();
+  
+  // Collect console logs
+  const logs = [];
+  page.on('console', msg => {
+    logs.push({
+      type: msg.type(),
+      text: msg.text()
+    });
+  });
+  
+  // Collect errors
+  const errors = [];
+  page.on('pageerror', error => {
+    errors.push(error.message);
+  });
+  
+  // Collect failed requests
+  const failedRequests = [];
+  page.on('requestfailed', request => {
+    failedRequests.push({
+      url: request.url(),
+      reason: request.failure().errorText
+    });
+  });
+  
+  try {
+    await page.goto('${SITE_URL}', {
+      waitUntil: 'networkidle2',
+      timeout: 30000
+    });
+    
+    // Wait a bit for any delayed errors
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    console.log('CONSOLE_LOGS_START');
+    console.log(JSON.stringify(logs, null, 2));
+    console.log('CONSOLE_LOGS_END');
+    
+    console.log('PAGE_ERRORS_START');
+    console.log(JSON.stringify(errors, null, 2));
+    console.log('PAGE_ERRORS_END');
+    
+    console.log('FAILED_REQUESTS_START');
+    console.log(JSON.stringify(failedRequests, null, 2));
+    console.log('FAILED_REQUESTS_END');
+  } catch (error) {
+    console.error('Navigation error:', error);
+  }
+  
+  await browser.close();
+})();
+EOL
+    
+    # Run the script if puppeteer is installed
+    if npm list -g puppeteer &> /dev/null || npm list puppeteer &> /dev/null; then
+      node $TEMP_SCRIPT > ${CONSOLE_LOG}
+      
+      # Extract logs, errors, and failed requests
+      CONSOLE_LOGS=$(sed -n '/CONSOLE_LOGS_START/,/CONSOLE_LOGS_END/p' ${CONSOLE_LOG} | grep -v "CONSOLE_LOGS_")
+      PAGE_ERRORS=$(sed -n '/PAGE_ERRORS_START/,/PAGE_ERRORS_END/p' ${CONSOLE_LOG} | grep -v "PAGE_ERRORS_")
+      FAILED_REQUESTS=$(sed -n '/FAILED_REQUESTS_START/,/FAILED_REQUESTS_END/p' ${CONSOLE_LOG} | grep -v "FAILED_REQUESTS_")
+      
+      # Check for errors
+      ERROR_COUNT=$(echo "${PAGE_ERRORS}" | grep -v "[][]" | wc -l)
+      FAILED_COUNT=$(echo "${FAILED_REQUESTS}" | grep -v "[][]" | wc -l)
+      
+      echo "" >> "${HEALTH_REPORT}"
+      echo "### Console Output" >> "${HEALTH_REPORT}"
+      echo "" >> "${HEALTH_REPORT}"
+      echo "| Type | Count |" >> "${HEALTH_REPORT}"
+      echo "|------|-------|" >> "${HEALTH_REPORT}"
+      echo "| Errors | ${ERROR_COUNT} |" >> "${HEALTH_REPORT}"
+      echo "| Failed Requests | ${FAILED_COUNT} |" >> "${HEALTH_REPORT}"
+      
+      if [ "${ERROR_COUNT}" -gt 0 ] || [ "${FAILED_COUNT}" -gt 0 ]; then
+        echo "❌ Console errors or failed requests detected"
+        echo "" >> "${HEALTH_REPORT}"
+        echo "#### Errors" >> "${HEALTH_REPORT}"
+        echo "" >> "${HEALTH_REPORT}"
+        echo "```json" >> "${HEALTH_REPORT}"
+        echo "${PAGE_ERRORS}" >> "${HEALTH_REPORT}"
+        echo "```" >> "${HEALTH_REPORT}"
+        echo "" >> "${HEALTH_REPORT}"
+        echo "#### Failed Requests" >> "${HEALTH_REPORT}"
+        echo "" >> "${HEALTH_REPORT}"
+        echo "```json" >> "${HEALTH_REPORT}"
+        echo "${FAILED_REQUESTS}" >> "${HEALTH_REPORT}"
+        echo "```" >> "${HEALTH_REPORT}"
+        PASS=false
+      else
+        echo "✅ No console errors or failed requests detected"
+      fi
+      
+      # Clean up
+      rm $TEMP_SCRIPT
+    else
+      echo "⚠️ Puppeteer not installed. Skipping console error check."
+      echo "⚠️ Puppeteer not installed. Skipping console error check." >> "${HEALTH_REPORT}"
+    fi
+  else
+    echo "⚠️ Node.js not available. Skipping console error check."
+    echo "⚠️ Node.js not available. Skipping console error check." >> "${HEALTH_REPORT}"
+  fi
+fi
+
+# Add overall status to report
+echo "" >> "${HEALTH_REPORT}"
+echo "## Overall Status" >> "${HEALTH_REPORT}"
+echo "" >> "${HEALTH_REPORT}"
+
+if [ "$PASS" = true ]; then
+  echo "✅ **PASS** - All checks completed successfully" >> "${HEALTH_REPORT}"
+  echo "✅ All checks completed successfully"
 else
-  echo -e "${GREEN}✅ No service worker detected${NC}"
-  write_to_report "✅ No service worker detected"
-  SERVICE_WORKER="🟢 PASSED"
+  echo "❌ **FAIL** - Some checks failed" >> "${HEALTH_REPORT}"
+  echo "❌ Some checks failed"
 fi
 
-# Check for integrity attributes (potential source of errors)
-if grep -q 'integrity=' /tmp/aisportsedge-home.html; then
-  echo -e "${RED}❌ Integrity attributes found - may cause loading issues${NC}"
-  write_to_report "❌ Integrity attributes found - may cause loading issues"
+echo "" >> "${HEALTH_REPORT}"
+echo "Report generated at $(date)" >> "${HEALTH_REPORT}"
+
+echo "📋 Health check report saved to: ${HEALTH_REPORT}"
+
+# Exit with appropriate status code
+if [ "$PASS" = true ]; then
+  exit 0
 else
-  echo -e "${GREEN}✅ No integrity attributes detected${NC}"
-  write_to_report "✅ No integrity attributes detected"
-  INTEGRITY_ERRORS="🟢 PASSED"
+  exit 1
 fi
-
-# Check for crossorigin attributes
-if grep -q 'crossorigin' /tmp/aisportsedge-home.html; then
-  echo -e "${YELLOW}⚠️ Crossorigin attributes found - monitor for potential issues${NC}"
-  write_to_report "⚠️ Crossorigin attributes found - monitor for potential issues"
-else
-  echo -e "${GREEN}✅ No crossorigin attributes detected${NC}"
-  write_to_report "✅ No crossorigin attributes detected"
-fi
-
-# Check for CSP meta tags (should be in .htaccess instead)
-if grep -q '<meta.*Content-Security-Policy' /tmp/aisportsedge-home.html; then
-  echo -e "${YELLOW}⚠️ CSP meta tag found - should be in .htaccess instead${NC}"
-  write_to_report "⚠️ CSP meta tag found - should be in .htaccess instead"
-else
-  echo -e "${GREEN}✅ No CSP meta tags detected (good if using .htaccess)${NC}"
-  write_to_report "✅ No CSP meta tags detected (good if using .htaccess)"
-  CSP_VIOLATIONS="🟢 PASSED"
-fi
-
-# Check for Firebase initialization
-if grep -q 'firebase' /tmp/aisportsedge-home.html; then
-  echo -e "${GREEN}✅ Firebase references found${NC}"
-  write_to_report "✅ Firebase references found"
-  FIREBASE_CONFIG="🟢 PASSED"
-else
-  echo -e "${YELLOW}⚠️ No Firebase references found - check if expected${NC}"
-  write_to_report "⚠️ No Firebase references found - check if expected"
-fi
-
-# Check for meta description
-if grep -q '<meta.*name="description"' /tmp/aisportsedge-home.html; then
-  echo -e "${GREEN}✅ Meta description found${NC}"
-  write_to_report "✅ Meta description found"
-  META_DESCRIPTION="🟢 PASSED"
-else
-  echo -e "${YELLOW}⚠️ No meta description found - recommended for SEO${NC}"
-  write_to_report "⚠️ No meta description found - recommended for SEO"
-fi
-
-# Check for Open Graph tags
-if grep -q '<meta.*property="og:' /tmp/aisportsedge-home.html; then
-  echo -e "${GREEN}✅ Open Graph tags found${NC}"
-  write_to_report "✅ Open Graph tags found"
-  META_OG="🟢 PASSED"
-else
-  echo -e "${YELLOW}⚠️ No Open Graph tags found - recommended for social sharing${NC}"
-  write_to_report "⚠️ No Open Graph tags found - recommended for social sharing"
-fi
-
-# Check for Twitter Card tags
-if grep -q '<meta.*name="twitter:' /tmp/aisportsedge-home.html; then
-  echo -e "${GREEN}✅ Twitter Card tags found${NC}"
-  write_to_report "✅ Twitter Card tags found"
-  META_TWITTER="🟢 PASSED"
-else
-  echo -e "${YELLOW}⚠️ No Twitter Card tags found - recommended for Twitter sharing${NC}"
-  write_to_report "⚠️ No Twitter Card tags found - recommended for Twitter sharing"
-fi
-
-# Check for language attribute
-if grep -q '<html.*lang=' /tmp/aisportsedge-home.html; then
-  echo -e "${GREEN}✅ Language attribute found${NC}"
-  write_to_report "✅ Language attribute found"
-  LANG_ATTRIBUTE="🟢 PASSED"
-else
-  echo -e "${YELLOW}⚠️ No language attribute found - recommended for accessibility${NC}"
-  write_to_report "⚠️ No language attribute found - recommended for accessibility"
-fi
-
-# Check for Spanish toggle
-if grep -q 'es' /tmp/aisportsedge-home.html || grep -q 'español' /tmp/aisportsedge-home.html || grep -q 'spanish' /tmp/aisportsedge-home.html; then
-  echo -e "${GREEN}✅ Spanish language references found${NC}"
-  write_to_report "✅ Spanish language references found"
-  SPANISH_TOGGLE="🟢 PASSED"
-else
-  echo -e "${YELLOW}⚠️ No Spanish language references found${NC}"
-  write_to_report "⚠️ No Spanish language references found"
-fi
-
-# Create a Node.js script for Puppeteer screenshots
-# Skip screenshots for now - we'll add this in a future update
-echo -e "${YELLOW}⚠️ Screenshots feature will be available in a future update${NC}"
-write_to_report "⚠️ Screenshots feature will be available in a future update"
-SCREENSHOTS="🟢 PASSED" # Mark as passed to avoid failing the check
-
-# Take screenshots using Puppeteer
-echo -e "${BLUE}📸 Taking screenshots...${NC}"
-write_to_report "📸 Taking screenshots..."
-
-# Screenshots are skipped for now
-
-# Generate summary table
-echo -e "\n${BLUE}📊 Health Check Summary${NC}"
-write_to_report "\n📊 Health Check Summary"
-echo -e "${BLUE}=======================================${NC}"
-write_to_report "======================================="
-
-# Display results
-echo -e "${HTTP_STATUS} HTTP Status"
-write_to_report "${HTTP_STATUS} HTTP Status"
-if [[ "${HTTP_STATUS}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${HTTP_STATUS_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${HTTP_STATUS_SUGGESTION}"
-fi
-
-echo -e "${RELOAD_LOOP} Reload Loop"
-write_to_report "${RELOAD_LOOP} Reload Loop"
-if [[ "${RELOAD_LOOP}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${RELOAD_LOOP_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${RELOAD_LOOP_SUGGESTION}"
-fi
-
-echo -e "${SERVICE_WORKER} Service Worker"
-write_to_report "${SERVICE_WORKER} Service Worker"
-if [[ "${SERVICE_WORKER}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${SERVICE_WORKER_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${SERVICE_WORKER_SUGGESTION}"
-fi
-
-echo -e "${INTEGRITY_ERRORS} Integrity Errors"
-write_to_report "${INTEGRITY_ERRORS} Integrity Errors"
-if [[ "${INTEGRITY_ERRORS}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${INTEGRITY_ERRORS_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${INTEGRITY_ERRORS_SUGGESTION}"
-fi
-
-echo -e "${CSP_VIOLATIONS} CSP Violations"
-write_to_report "${CSP_VIOLATIONS} CSP Violations"
-if [[ "${CSP_VIOLATIONS}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${CSP_VIOLATIONS_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${CSP_VIOLATIONS_SUGGESTION}"
-fi
-
-echo -e "${MIME_ERRORS} MIME Errors"
-write_to_report "${MIME_ERRORS} MIME Errors"
-if [[ "${MIME_ERRORS}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${MIME_ERRORS_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${MIME_ERRORS_SUGGESTION}"
-fi
-
-echo -e "${FIREBASE_CONFIG} Firebase Config"
-write_to_report "${FIREBASE_CONFIG} Firebase Config"
-if [[ "${FIREBASE_CONFIG}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${FIREBASE_CONFIG_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${FIREBASE_CONFIG_SUGGESTION}"
-fi
-
-echo -e "${META_DESCRIPTION} Meta Description"
-write_to_report "${META_DESCRIPTION} Meta Description"
-if [[ "${META_DESCRIPTION}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${META_DESCRIPTION_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${META_DESCRIPTION_SUGGESTION}"
-fi
-
-echo -e "${META_OG} Open Graph Tags"
-write_to_report "${META_OG} Open Graph Tags"
-if [[ "${META_OG}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${META_OG_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${META_OG_SUGGESTION}"
-fi
-
-echo -e "${META_TWITTER} Twitter Card Tags"
-write_to_report "${META_TWITTER} Twitter Card Tags"
-if [[ "${META_TWITTER}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${META_TWITTER_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${META_TWITTER_SUGGESTION}"
-fi
-
-echo -e "${LANG_ATTRIBUTE} Language Attribute"
-write_to_report "${LANG_ATTRIBUTE} Language Attribute"
-if [[ "${LANG_ATTRIBUTE}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${LANG_ATTRIBUTE_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${LANG_ATTRIBUTE_SUGGESTION}"
-fi
-
-echo -e "${SPANISH_TOGGLE} Spanish Toggle"
-write_to_report "${SPANISH_TOGGLE} Spanish Toggle"
-if [[ "${SPANISH_TOGGLE}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${SPANISH_TOGGLE_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${SPANISH_TOGGLE_SUGGESTION}"
-fi
-
-echo -e "${SCREENSHOTS} Screenshots"
-write_to_report "${SCREENSHOTS} Screenshots"
-if [[ "${SCREENSHOTS}" == *"FAILED"* ]]; then
-  echo -e "   ${YELLOW}Suggestion: ${SCREENSHOTS_SUGGESTION}${NC}"
-  write_to_report "   Suggestion: ${SCREENSHOTS_SUGGESTION}"
-fi
-
-# Final summary
-echo -e "\n${BLUE}📝 Report saved to: ${REPORT_FILE}${NC}"
-echo -e "${BLUE}🖼️ Screenshots saved to: ${SCREENSHOTS_DIR}/${NC}"
-
-# Count passed and failed tests
-PASSED_COUNT=0
-if [[ "$HTTP_STATUS" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$RELOAD_LOOP" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$SERVICE_WORKER" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$INTEGRITY_ERRORS" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$CSP_VIOLATIONS" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$MIME_ERRORS" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$FIREBASE_CONFIG" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$META_DESCRIPTION" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$META_OG" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$META_TWITTER" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$LANG_ATTRIBUTE" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$SPANISH_TOGGLE" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-if [[ "$SCREENSHOTS" == *"PASSED"* ]]; then ((PASSED_COUNT++)); fi
-TOTAL_COUNT=13
-
-echo -e "\n${BLUE}🏁 Final Result: ${PASSED_COUNT}/${TOTAL_COUNT} checks passed${NC}"
-if [ "$PASSED_COUNT" -eq "$TOTAL_COUNT" ]; then
-  echo -e "${GREEN}✅ All checks passed! The deployment is healthy.${NC}"
-  write_to_report "\n✅ All checks passed! The deployment is healthy."
-else
-  echo -e "${YELLOW}⚠️ Some checks failed. Review the report for details.${NC}"
-  write_to_report "\n⚠️ Some checks failed. Review the report for details."
-fi
-
-write_to_report "\nReport generated on $(date)"
-write_to_report "End of report."
-
-echo -e "${BLUE}=========================================================${NC}"

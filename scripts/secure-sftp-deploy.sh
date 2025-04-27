@@ -5,20 +5,33 @@
 
 echo "🚀 Starting secure SFTP deployment..."
 
-# Check for required environment variables
+# Load SFTP configuration from VS Code settings if environment variables aren't set
 if [ -z "$SFTP_HOST" ] || [ -z "$SFTP_USER" ] || [ -z "$SFTP_REMOTE_PATH" ]; then
-  echo "❌ Missing required environment variables. Please set:"
-  echo "   - SFTP_HOST (e.g., sftp.aisportsedge.app)"
-  echo "   - SFTP_USER (e.g., deploy@aisportsedge.app)"
-  echo "   - SFTP_REMOTE_PATH (e.g., /home/q15133yvmhnq/public_html/aisportsedge.app)"
-  echo ""
-  echo "Example:"
-  echo "export SFTP_HOST=sftp.aisportsedge.app"
-  echo "export SFTP_USER=deploy@aisportsedge.app"
-  echo "export SFTP_REMOTE_PATH=/home/q15133yvmhnq/public_html/aisportsedge.app"
-  echo "export SFTP_PASSWORD=your_password  # Optional: only if not using SSH keys"
-  echo "export SFTP_KEY_PATH=~/.ssh/id_rsa  # Optional: path to SSH private key"
-  exit 1
+  echo "📋 Environment variables not found, loading from .vscode/sftp.json..."
+  
+  if [ -f ".vscode/sftp.json" ]; then
+    # Extract values from sftp.json using grep and sed
+    SFTP_HOST=$(grep -o '"host": *"[^"]*"' .vscode/sftp.json | sed 's/"host": *"\(.*\)"/\1/')
+    SFTP_USER=$(grep -o '"username": *"[^"]*"' .vscode/sftp.json | sed 's/"username": *"\(.*\)"/\1/')
+    SFTP_REMOTE_PATH=$(grep -o '"remotePath": *"[^"]*"' .vscode/sftp.json | sed 's/"remotePath": *"\(.*\)"/\1/')
+    SFTP_PASSWORD=$(grep -o '"password": *"[^"]*"' .vscode/sftp.json | sed 's/"password": *"\(.*\)"/\1/')
+    SFTP_PORT=$(grep -o '"port": *[0-9]*' .vscode/sftp.json | sed 's/"port": *\([0-9]*\)/\1/')
+    
+    echo "✅ Loaded SFTP configuration from .vscode/sftp.json"
+  else
+    echo "❌ Missing required environment variables and .vscode/sftp.json not found. Please set:"
+    echo "   - SFTP_HOST (e.g., sftp.aisportsedge.app)"
+    echo "   - SFTP_USER (e.g., deploy@aisportsedge.app)"
+    echo "   - SFTP_REMOTE_PATH (e.g., /home/q15133yvmhnq/public_html/aisportsedge.app)"
+    echo ""
+    echo "Example:"
+    echo "export SFTP_HOST=sftp.aisportsedge.app"
+    echo "export SFTP_USER=deploy@aisportsedge.app"
+    echo "export SFTP_REMOTE_PATH=/home/q15133yvmhnq/public_html/aisportsedge.app"
+    echo "export SFTP_PASSWORD=your_password  # Optional: only if not using SSH keys"
+    echo "export SFTP_KEY_PATH=~/.ssh/id_rsa  # Optional: path to SSH private key"
+    exit 1
+  fi
 fi
 
 # Set local directory (default to ./dist if not specified)
@@ -86,7 +99,38 @@ fi
 
 # Run the deployment with the config file
 echo "🔄 Running deployment..."
-npx sftp-deploy --config $TEMP_CONFIG
+
+# Check if npx is available
+if command -v npx &> /dev/null; then
+  npx sftp-deploy --config $TEMP_CONFIG
+else
+  echo "⚠️ npx not found, trying direct deployment with scp..."
+  
+  # Create a temporary script for scp deployment
+  TEMP_SCRIPT=$(mktemp)
+  
+  # Write deployment script
+  cat > $TEMP_SCRIPT << EOL
+#!/bin/bash
+cd $SFTP_LOCAL_DIR
+if [ ! -z "$SFTP_PASSWORD" ]; then
+  # Use sshpass if password is provided
+  sshpass -p "$SFTP_PASSWORD" scp -r -P ${SFTP_PORT:-22} * $SFTP_USER@$SFTP_HOST:$SFTP_REMOTE_PATH/
+else
+  # Use SSH key
+  scp -r -P ${SFTP_PORT:-22} * $SFTP_USER@$SFTP_HOST:$SFTP_REMOTE_PATH/
+fi
+EOL
+  
+  # Make script executable
+  chmod +x $TEMP_SCRIPT
+  
+  # Run the script
+  $TEMP_SCRIPT
+  
+  # Clean up
+  rm $TEMP_SCRIPT
+fi
 
 # Check if deployment was successful
 if [ $? -eq 0 ]; then
