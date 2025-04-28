@@ -1,0 +1,60 @@
+{
+  "files_in_context": [
+    {
+      "path": "src/config/firebase.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812696774,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812706460,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic/atoms/firebaseApp.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812711797,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic/atoms/serviceConfig.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812716583,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "atomic/atoms/envConfig.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812722664,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-config/GoogleService-Info.plist",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812750183,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-config/google-services.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812766553,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

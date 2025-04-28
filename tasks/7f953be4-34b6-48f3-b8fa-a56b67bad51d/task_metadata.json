@@ -258,11 +258,27 @@
     },
     {
       "path": "scripts/daily_progress_logger.sh",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "roo_edited",
       "roo_read_date": 1745811307834,
       "roo_edit_date": 1745811307834,
       "user_edit_date": null
+    },
+    {
+      "path": "scripts/daily_progress_logger.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745811307834,
+      "roo_edit_date": 1745811307834,
+      "user_edit_date": 1745811956306
+    },
+    {
+      "path": "scripts/daily_progress_logger.sh",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745811307834,
+      "roo_edit_date": 1745811307834,
+      "user_edit_date": 1745811957044
     }
   ]
 }

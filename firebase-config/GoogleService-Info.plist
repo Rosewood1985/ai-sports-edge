@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw</string>
+	<string>AIzaSyDNBnQaHukUdPfaF2HEnwi6B9-cN4aDiRc</string>
 	<key>GCM_SENDER_ID</key>
-	<string>63216708515</string>
+	<string>67679896425</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.aisportsedge.app</string>
 	<key>PROJECT_ID</key>
-	<string>ai-sports-edge</string>
+	<string>ai-sports-edge-final</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ai-sports-edge.appspot.com</string>
+	<string>ai-sports-edge-final.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:63216708515:ios:209e6baf130386edb00816</string>
+	<string>1:67679896425:ios:82641620e8b8bedd6dd218</string>
 </dict>
 </plist>

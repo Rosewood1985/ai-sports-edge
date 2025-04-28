@@ -1,0 +1,140 @@
+{
+  "files_in_context": [
+    {
+      "path": "src/config/firebase.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812824730,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812828870,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-config/GoogleService-Info.plist",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812832745,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-config/google-services.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812837138,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.development",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812841365,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.production",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745812845702,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase-config/GoogleService-Info.plist",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812832745,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812857939
+    },
+    {
+      "path": "firebase-config/GoogleService-Info.plist",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745812858220,
+      "roo_edit_date": 1745812858220,
+      "user_edit_date": 1745812857939
+    },
+    {
+      "path": "firebase-config/google-services.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812837138,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812866386
+    },
+    {
+      "path": "firebase-config/google-services.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812837138,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812868880
+    },
+    {
+      "path": "firebase-config/google-services.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745812869162,
+      "roo_edit_date": 1745812869162,
+      "user_edit_date": 1745812868880
+    },
+    {
+      "path": ".env.development",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812841365,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812875595
+    },
+    {
+      "path": ".env.development",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812841365,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812879953
+    },
+    {
+      "path": ".env.development",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745812880234,
+      "roo_edit_date": 1745812880234,
+      "user_edit_date": 1745812879953
+    },
+    {
+      "path": ".env.production",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812845702,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812886457
+    },
+    {
+      "path": ".env.production",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745812845702,
+      "roo_edit_date": null,
+      "user_edit_date": 1745812891246
+    },
+    {
+      "path": ".env.production",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745812891519,
+      "roo_edit_date": 1745812891519,
+      "user_edit_date": 1745812891246
+    }
+  ]
+}
