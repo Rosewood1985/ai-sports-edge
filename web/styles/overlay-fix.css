@@ -1,0 +1,75 @@
+/**
+ * Subtle fix for pricing overlay issue
+ * This CSS ensures that pricing elements don't overlay other sections
+ * while preserving the original aesthetic
+ */
+
+/* Only hide pricing elements on non-pricing pages */
+body:not(.pricing-page) .pricing-overlay,
+body:not(.pricing-page) .pricing-modal,
+body:not(.pricing-page) .elite-plan-modal,
+body:not(.pricing-page) .pro-plan-modal,
+body:not(.pricing-page) .bet-now-popup-overlay,
+body:not(.pricing-page) .annual-discount,
+body:not(.pricing-page) [id^="pricing-"],
+body:not(.pricing-page) [class^="pricing-"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Subtle z-index boost for about page sections */
+body.about-page .about-hero,
+body.about-page .about-mission,
+body.about-page .about-story,
+body.about-page .about-team,
+body.about-page .about-values,
+body.about-page .about-cta {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure bet-now-popup is properly removed when fading out */
+.bet-now-popup-overlay.fade-out {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease-out;
+}
+
+/* Preserve original styling while fixing overlay issues */
+.about-hero,
+.about-mission,
+.about-story,
+.about-team,
+.about-values,
+.about-cta {
+  position: relative;
+  z-index: 2;
+}
+
+/* Only apply minimal background to cover elements if needed */
+.about-hero::after,
+.about-mission::after,
+.about-story::after,
+.about-team::after,
+.about-values::after,
+.about-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: inherit;
+  opacity: 0.98; /* Slightly transparent to blend better */
+}
+
+/* Only reset fixed positioning when absolutely necessary */
+body.about-page .fixed.pricing-related,
+body.about-page [style*="position: fixed"].pricing-related,
+body.about-page [style*="position:fixed"].pricing-related {
+  position: relative !important;
+}

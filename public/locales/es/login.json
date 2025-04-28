@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "title": "Iniciar Sesión - AI Sports Edge",
+    "description": "Inicie sesión en su cuenta de AI Sports Edge para acceder a sus predicciones y análisis personalizados de apuestas deportivas.",
+    "keywords": "inicio de sesión apuestas deportivas, cuenta de predicciones de IA, inicio de sesión análisis de apuestas",
+    "ogTitle": "Iniciar Sesión - AI Sports Edge",
+    "ogDescription": "Inicie sesión en su cuenta de AI Sports Edge para acceder a sus predicciones y análisis personalizados de apuestas deportivas."
+  },
+  "login": {
+    "title": "Iniciar Sesión en Su Cuenta",
+    "subtitle": "Acceda a sus predicciones y análisis personalizados de apuestas.",
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Ingrese su correo electrónico",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingrese su contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "loginButton": "Iniciar Sesión",
+    "orContinueWith": "O continuar con",
+    "googleLogin": "Continuar con Google",
+    "appleLogin": "Continuar con Apple",
+    "facebookLogin": "Continuar con Facebook",
+    "noAccount": "¿No tiene una cuenta?",
+    "signUp": "Registrarse",
+    "errors": {
+      "invalidCredentials": "Correo electrónico o contraseña inválidos. Por favor, inténtelo de nuevo.",
+      "accountLocked": "Su cuenta ha sido bloqueada. Por favor, contacte con soporte.",
+      "serverError": "Estamos experimentando dificultades técnicas. Por favor, inténtelo más tarde."
+    }
+  },
+  "signup": {
+    "title": "Crear Su Cuenta",
+    "subtitle": "Únase a miles de apostadores que toman decisiones más inteligentes con IA.",
+    "nameLabel": "Nombre Completo",
+    "namePlaceholder": "Ingrese su nombre completo",
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Ingrese su correo electrónico",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Cree una contraseña (mín. 8 caracteres)",
+    "confirmPasswordLabel": "Confirmar Contraseña",
+    "confirmPasswordPlaceholder": "Confirme su contraseña",
+    "termsAgreement": "Acepto los <terms>Términos de Servicio</terms> y la <privacy>Política de Privacidad</privacy>",
+    "marketingConsent": "Quiero recibir consejos de apuestas, promociones y actualizaciones por correo electrónico",
+    "signupButton": "Crear Cuenta",
+    "orContinueWith": "O continuar con",
+    "googleSignup": "Continuar con Google",
+    "appleSignup": "Continuar con Apple",
+    "facebookSignup": "Continuar con Facebook",
+    "alreadyHaveAccount": "¿Ya tiene una cuenta?",
+    "login": "Iniciar sesión",
+    "errors": {
+      "emailInUse": "Este correo electrónico ya está en uso. Por favor, inicie sesión o use un correo electrónico diferente.",
+      "passwordTooWeak": "La contraseña es demasiado débil. Por favor, incluya al menos 8 caracteres con una combinación de letras, números y símbolos.",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden. Por favor, inténtelo de nuevo.",
+      "termsNotAccepted": "Debe aceptar los Términos de Servicio y la Política de Privacidad para crear una cuenta."
+    }
+  },
+  "forgotPassword": {
+    "title": "Restablecer Su Contraseña",
+    "subtitle": "Ingrese su correo electrónico y le enviaremos un enlace para restablecer su contraseña.",
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Ingrese su correo electrónico",
+    "resetButton": "Enviar Enlace de Restablecimiento",
+    "backToLogin": "Volver al inicio de sesión",
+    "checkEmail": "Revise su correo electrónico",
+    "checkEmailMessage": "Si existe una cuenta para {email}, hemos enviado un enlace para restablecer la contraseña a esta dirección de correo electrónico.",
+    "didNotReceive": "¿No recibió el correo electrónico?",
+    "resendLink": "Reenviar enlace",
+    "contactSupport": "Contactar soporte"
+  }
+}

@@ -1,0 +1,295 @@
+{
+  "redirects": [
+    {
+      "source": "http://ai-sports-edge.com/*",
+      "destination": "https://ai-sports-edge.com/:splat",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "http://www.ai-sports-edge.com/*",
+      "destination": "https://ai-sports-edge.com/:splat",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "https://www.ai-sports-edge.com/*",
+      "destination": "https://ai-sports-edge.com/:splat",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/home",
+      "destination": "/",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/blog/posts/*",
+      "destination": "/blog/:splat",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/old-app/*",
+      "destination": "/app/:splat",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/sports/nfl",
+      "destination": "/sports/football",
+      "type": 301,
+      "regex": false
+    },
+    {
+      "source": "/sports/mlb",
+      "destination": "/sports/baseball",
+      "type": 301,
+      "regex": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/v1/**",
+      "destination": "https://api.ai-sports-edge.com/v1/:splat",
+      "regex": false
+    },
+    {
+      "source": "/api/v2/**",
+      "destination": "https://api.ai-sports-edge.com/v2/:splat",
+      "regex": false
+    },
+    {
+      "source": "/admin/**",
+      "destination": "https://admin.ai-sports-edge.com/:splat",
+      "regex": false
+    },
+    {
+      "source": "/app/**",
+      "destination": "/index.html",
+      "regex": false
+    },
+    {
+      "source": "/sports/**",
+      "destination": "/index.html",
+      "regex": false
+    },
+    {
+      "source": "/predictions/**",
+      "destination": "/index.html",
+      "regex": false
+    },
+    {
+      "source": "/account/**",
+      "destination": "/index.html",
+      "regex": false
+    },
+    {
+      "source": "/auth/**",
+      "destination": "/index.html",
+      "regex": false
+    },
+    {
+      "source": "/checkout/**",
+      "destination": "/index.html",
+      "regex": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "**/*.@(js|css)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "**/*.@(jpg|jpeg|png|gif|webp|svg|ico)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
+      "source": "**/*.@(html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/api/**",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://ai-sports-edge.com"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS, PUT, DELETE"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    },
+    {
+      "source": "**",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(self), interest-cohort=()"
+        }
+      ]
+    }
+  ],
+  "errorPages": [
+    {
+      "code": 404,
+      "path": "/404.html"
+    },
+    {
+      "code": 500,
+      "path": "/500.html"
+    }
+  ],
+  "customRouting": {
+    "routes": [
+      {
+        "path": "/",
+        "component": "HomePage"
+      },
+      {
+        "path": "/about",
+        "component": "AboutPage"
+      },
+      {
+        "path": "/contact",
+        "component": "ContactPage"
+      },
+      {
+        "path": "/blog",
+        "component": "BlogPage"
+      },
+      {
+        "path": "/blog/:id",
+        "component": "BlogPostPage"
+      },
+      {
+        "path": "/sports/:sport",
+        "component": "SportPage"
+      },
+      {
+        "path": "/sports/:sport/:league",
+        "component": "LeaguePage"
+      },
+      {
+        "path": "/sports/:sport/:league/:team",
+        "component": "TeamPage"
+      },
+      {
+        "path": "/predictions",
+        "component": "PredictionsPage"
+      },
+      {
+        "path": "/predictions/:id",
+        "component": "PredictionDetailPage"
+      },
+      {
+        "path": "/account",
+        "component": "AccountPage",
+        "protected": true
+      },
+      {
+        "path": "/account/settings",
+        "component": "AccountSettingsPage",
+        "protected": true
+      },
+      {
+        "path": "/account/billing",
+        "component": "BillingPage",
+        "protected": true
+      },
+      {
+        "path": "/account/purchased",
+        "component": "PurchasedOddsPage",
+        "protected": true
+      },
+      {
+        "path": "/auth/login",
+        "component": "LoginPage"
+      },
+      {
+        "path": "/auth/register",
+        "component": "RegisterPage"
+      },
+      {
+        "path": "/auth/forgot-password",
+        "component": "ForgotPasswordPage"
+      },
+      {
+        "path": "/auth/reset-password",
+        "component": "ResetPasswordPage"
+      },
+      {
+        "path": "/checkout",
+        "component": "CheckoutPage",
+        "protected": true
+      },
+      {
+        "path": "/checkout/success",
+        "component": "CheckoutSuccessPage",
+        "protected": true
+      },
+      {
+        "path": "/checkout/cancel",
+        "component": "CheckoutCancelPage",
+        "protected": true
+      },
+      {
+        "path": "*",
+        "component": "NotFoundPage"
+      }
+    ]
+  }
+}

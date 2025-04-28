@@ -1,0 +1,68 @@
+{
+  "files_in_context": [
+    {
+      "path": "deploy-to-firebase.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745281481929,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "build-and-deploy.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745281486952,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745281582512,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745281582512,
+      "roo_edit_date": null,
+      "user_edit_date": 1745281588312
+    },
+    {
+      "path": "deploy/index.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745281588371,
+      "roo_edit_date": 1745281588371,
+      "user_edit_date": 1745281588312
+    },
+    {
+      "path": "deploy/bundle.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745281591415,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy/bundle.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745281600559,
+      "roo_edit_date": 1745281600559,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy/bundle.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745281600559,
+      "roo_edit_date": 1745281600559,
+      "user_edit_date": 1745281600582
+    }
+  ]
+}

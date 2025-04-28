@@ -325,7 +325,7 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     };
     
     // Helper function to generate revenue by month
-    const generateRevenueByMonth = (start, end) => {
+    const generateRevenueByMonth = async (start, end, db) => {
       const months = [];
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       
@@ -336,23 +336,78 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
       while (current <= end) {
         months.push({
           month: monthNames[current.getMonth()],
+          year: current.getFullYear(),
           revenue: 0
         });
         current.setMonth(current.getMonth() + 1);
       }
       
-      // If we have revenue data, distribute it across months
-      // This is a simplified approach - in a real implementation, you'd use actual data
-      if (report.revenue.total > 0) {
-        const monthCount = months.length;
-        const revenuePerMonth = report.revenue.total / monthCount / 100; // Convert cents to dollars
+      try {
+        // Get actual revenue data from Firestore
+        const revenueData = {};
         
+        // Query monthly revenue data
+        for (const monthData of months) {
+          const monthKey = `${monthData.year}-${String(monthNames.indexOf(monthData.month) + 1).padStart(2, '0')}`;
+          const monthlyRevenueDoc = await db.collection('analytics')
+            .doc('subscriptions')
+            .collection('monthly')
+            .doc(monthKey)
+            .get();
+          
+          if (monthlyRevenueDoc.exists) {
+            const data = monthlyRevenueDoc.data();
+            // Sum up all revenue types (new subscriptions, renewals, etc.)
+            let monthRevenue = 0;
+            if (data.revenue) {
+              monthRevenue = data.revenue;
+            } else {
+              // If no direct revenue field, try to calculate from other fields
+              const newSubRevenue = data.new_subscription_revenue || 0;
+              const renewalRevenue = data.renewal_revenue || 0;
+              const upgradeRevenue = data.upgrade_revenue || 0;
+              monthRevenue = newSubRevenue + renewalRevenue + upgradeRevenue;
+            }
+            
+            revenueData[monthData.month] = monthRevenue / 100; // Convert cents to dollars
+          }
+        }
+        
+        // Apply the actual revenue data to our months array
         months.forEach(month => {
-          month.revenue = revenuePerMonth;
+          if (revenueData[month.month] !== undefined) {
+            month.revenue = revenueData[month.month];
+          }
         });
+        
+        // If we still have no revenue data (e.g., in development), distribute total revenue evenly
+        const hasRevenueData = months.some(month => month.revenue > 0);
+        if (!hasRevenueData && report.revenue.total > 0) {
+          const monthCount = months.length;
+          const revenuePerMonth = report.revenue.total / monthCount / 100; // Convert cents to dollars
+          
+          months.forEach(month => {
+            month.revenue = revenuePerMonth;
+          });
+        }
+      } catch (error) {
+        console.error('Error getting monthly revenue data:', error);
+        // Fallback to even distribution if there's an error
+        if (report.revenue.total > 0) {
+          const monthCount = months.length;
+          const revenuePerMonth = report.revenue.total / monthCount / 100; // Convert cents to dollars
+          
+          months.forEach(month => {
+            month.revenue = revenuePerMonth;
+          });
+        }
       }
       
-      return months;
+      // Return only the month name and revenue for the client
+      return months.map(month => ({
+        month: month.month,
+        revenue: month.revenue
+      }));
     };
     
     // Format the report for the client
@@ -367,35 +422,42 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
       // Format subscriptions by plan
       subscriptionsByPlan: Object.entries(report.revenue.by_plan).map(([planId, amount]) => {
         const planName = getPlanNameById(planId);
-        const count = report.metrics.new_subscriptions; // This is simplified, should be per plan
+        
+        // Calculate count and percentage for each plan
+        // In a real implementation, this would be based on actual subscription counts
+        const count = Math.round(amount / (report.revenue.total || 1) * report.metrics.new_subscriptions);
+        const percentage = report.revenue.total > 0 ?
+          Math.round((amount / report.revenue.total) * 100) : 0;
+        
         return {
           name: planName,
           count,
-          percentage: 100 // Simplified, should calculate actual percentage
+          percentage
         };
       }),
       
-      // Generate revenue by month
-      revenueByMonth: generateRevenueByMonth(startDate, endDate),
+      // Generate revenue by month with actual data
+      revenueByMonth: await generateRevenueByMonth(startDate, endDate, db),
       
-      // Subscriptions by status
+      // Subscriptions by status with more accurate data
       subscriptionsByStatus: [
         {
           status: 'Active',
           count: totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions,
           percentage: totalSubscriptionsAtStart > 0 ?
-            ((totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions) / totalSubscriptionsAtStart) * 100 : 0
+            Math.round(((totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions) / totalSubscriptionsAtStart) * 100) : 0
         },
         {
           status: 'Canceled',
           count: report.metrics.cancelled_subscriptions,
           percentage: totalSubscriptionsAtStart > 0 ?
-            (report.metrics.cancelled_subscriptions / totalSubscriptionsAtStart) * 100 : 0
+            Math.round((report.metrics.cancelled_subscriptions / totalSubscriptionsAtStart) * 100) : 0
         },
         {
           status: 'Past Due',
-          count: 0, // This would need to be calculated
-          percentage: 0
+          count: report.metrics.failed_payments || 0,
+          percentage: totalSubscriptionsAtStart > 0 ?
+            Math.round((report.metrics.failed_payments || 0) / totalSubscriptionsAtStart * 100) : 0
         }
       ]
     };

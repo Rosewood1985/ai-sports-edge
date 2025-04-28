@@ -1,16 +1,15 @@
 {
-  "extends": "@tsconfig/react-native/tsconfig.json",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "atomic/*": ["atomic/*"],
+      "atomic/atoms/*": ["atomic/atoms/*"],
+      "atomic/molecules/*": ["atomic/molecules/*"],
+      "atomic/organisms/*": ["atomic/organisms/*"],
+      "atomic/templates/*": ["atomic/templates/*"],
+      "atomic/pages/*": ["atomic/pages/*"]
     }
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  }
 }

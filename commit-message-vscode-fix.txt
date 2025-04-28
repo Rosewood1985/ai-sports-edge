@@ -1,0 +1,15 @@
+fix: resolve VS Code workspace storage path issues
+
+- Create proper .vscode directory with correct permissions
+- Add settings.json with editor configuration
+- Copy SFTP configuration to main .vscode directory
+- Ensure code-workspace file points to correct root
+- Add reset-vscode-workspace.sh script for one-click fixes
+- Document fix process in docs/vscode-workspace-fix.md
+
+This resolves the "Custom storage path is unusable" error by
+ensuring VS Code can properly access and write to the workspace
+configuration files. The fix maintains compatibility with all
+deployment scripts and SFTP integration.
+
+Tag: vscode-fix-v1.0

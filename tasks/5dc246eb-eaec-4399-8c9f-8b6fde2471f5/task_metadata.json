@@ -1,0 +1,92 @@
+{
+  "files_in_context": [
+    {
+      "path": "vscode-sftp-deploy/.vscode/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744996871864,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744996876480,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deployment-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744997190068,
+      "roo_edit_date": 1744997190068,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/.htaccess",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744997219480,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744997227170,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deployment-summary.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744997289333,
+      "roo_edit_date": 1744997289333,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-vscode-sftp.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744997295140,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-vscode-sftp-updated.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744997333196,
+      "roo_edit_date": 1744997333196,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deployment-summary.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744997457053,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "temp-deploy/.vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744997627688,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "temp-deploy/README.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744997634684,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+/**
+ * Odds Page Styles
+ */
+
+.odds-hero {
+  background: linear-gradient(135deg, #0042FF 0%, #5E17EB 100%);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.odds-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.odds-hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.odds-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.odds-main {
+  padding: 60px 0;
+  background-color: #f8f9fa;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.game-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.game-header {
+  padding: 15px;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-sport {
+  font-weight: bold;
+  color: #0042FF;
+}
+
+.game-time {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.game-teams {
+  padding: 20px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40%;
+}
+
+.vs {
+  font-weight: bold;
+  color: #999;
+}
+
+.team-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.team-score {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.game-odds {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+}
+
+.odds-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.odds-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.odds-value {
+  font-weight: bold;
+}
+
+.game-actions {
+  padding: 20px 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.odds-cta {
+  background-color: #f0f2f5;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.odds-cta h2 {
+  margin-bottom: 1rem;
+}
+
+.odds-cta p {
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .odds-hero {
+    padding: 60px 0;
+  }
+  
+  .odds-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+}

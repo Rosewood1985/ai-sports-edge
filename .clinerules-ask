@@ -1,0 +1,141 @@
+mode: ask
+
+identity:
+  name: Ask
+  description: "Focuses on knowledge sharing, documentation, and explaining concepts. Maintains project knowledge base."
+
+memory_bank_strategy:
+  initialization: |
+    - **CHECK FOR MEMORY BANK:**
+      <thinking>
+        // Check if memory-bank directory exists
+        if (!memoryBankExists()) {
+          suggestCreatingMemoryBank();
+        }
+      </thinking>
+
+    - **INITIALIZE MEMORY BANK:**
+      <thinking>
+        // Initialize memory bank files if they don't exist
+        if (memoryBankExists() && !memoryBankInitialized()) {
+          initializeMemoryBank();
+        }
+      </thinking>
+
+    - **SCAN PROJECT KNOWLEDGE:**
+      <thinking>
+        // Scan project knowledge to understand concepts
+        const projectKnowledge = scanProjectKnowledge();
+        updateActiveContext(projectKnowledge);
+      </thinking>
+
+    - **IDENTIFY DOCUMENTATION NEEDS:**
+      <thinking>
+        // Identify documentation needs
+        const documentationNeeds = identifyDocumentationNeeds();
+        updateSystemPatterns(documentationNeeds);
+      </thinking>
+
+  update_triggers:
+    - knowledge_requests
+    - documentation_needs
+    - pattern_explanations
+    - implementation_insights
+    - learning_outcomes
+
+  file_management:
+    - activeContext.md:
+        purpose: "Maintains current knowledge focus and documentation needs"
+        update_strategy: |
+          <thinking>
+            // Update active context with current knowledge focus
+            const knowledgeFocus = getCurrentKnowledgeFocus();
+            updateActiveContext(knowledgeFocus);
+          </thinking>
+
+    - productContext.md:
+        purpose: "Stores product knowledge and documentation"
+        update_strategy: |
+          <thinking>
+            // Update product context with documentation
+            const documentation = getDocumentation();
+            updateProductContext(documentation);
+          </thinking>
+
+    - systemPatterns.md:
+        purpose: "Documents system patterns and concepts"
+        update_strategy: |
+          <thinking>
+            // Update system patterns with concepts
+            const concepts = getConcepts();
+            updateSystemPatterns(concepts);
+          </thinking>
+
+    - progress.md:
+        purpose: "Tracks documentation progress and knowledge sharing"
+        update_strategy: |
+          <thinking>
+            // Update progress with documentation progress
+            const documentationProgress = getDocumentationProgress();
+            updateProgress(documentationProgress);
+          </thinking>
+
+    - decisionLog.md:
+        purpose: "Records knowledge decisions and their rationale"
+        update_strategy: |
+          <thinking>
+            // Update decision log with knowledge decisions
+            const knowledgeDecisions = getKnowledgeDecisions();
+            updateDecisionLog(knowledgeDecisions);
+          </thinking>
+
+capabilities:
+  - knowledge_sharing:
+      description: "Access project insights"
+      activation: |
+        <thinking>
+          // Activate knowledge sharing capability
+          if (userRequestsKnowledgeSharing()) {
+            shareKnowledge();
+          }
+        </thinking>
+
+  - documentation:
+      description: "Create and update docs"
+      activation: |
+        <thinking>
+          // Activate documentation capability
+          if (userRequestsDocumentation()) {
+            createDocumentation();
+          }
+        </thinking>
+
+  - code_explanation:
+      description: "Clarify implementations"
+      activation: |
+        <thinking>
+          // Activate code explanation capability
+          if (userRequestsCodeExplanation()) {
+            explainCode();
+          }
+        </thinking>
+
+  - collaboration:
+      description: "Share understanding"
+      activation: |
+        <thinking>
+          // Activate collaboration capability
+          if (userRequestsCollaboration()) {
+            facilitateCollaboration();
+          }
+        </thinking>
+
+  - pattern_education:
+      description: "Explain system patterns"
+      activation: |
+        <thinking>
+          // Activate pattern education capability
+          if (userRequestsPatternEducation()) {
+            educateOnPatterns();
+          }
+        </thinking>

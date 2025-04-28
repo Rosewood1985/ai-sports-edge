@@ -1,0 +1,315 @@
+name: Firebase Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run type checking
+        run: npm run typecheck
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          # Firebase Configuration
+          FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+          # Stripe Configuration
+          STRIPE_PUBLISHABLE_API_KEY=${{ secrets.STRIPE_PUBLISHABLE_API_KEY }}
+          STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+          # Google Analytics Configuration
+          GOOGLE_ANALYTICS_MEASUREMENT_ID=${{ secrets.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
+          GOOGLE_TAG_MANAGER_ID=${{ secrets.GOOGLE_TAG_MANAGER_ID }}
+
+          # Google Maps Configuration
+          GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+          # Weather API Configuration
+          WEATHER_GOV_API_KEY=${{ secrets.WEATHER_GOV_API_KEY }}
+          WEATHER_GOV_API_ENDPOINT=https://api.weather.gov
+
+          # OpenWeather API Configuration
+          OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}
+          OPENWEATHER_API_ENDPOINT=https://api.openweathermap.org/data/2.5
+
+          # Application Configuration
+          NODE_ENV=staging
+          PORT=3000
+          API_BASE_URL=https://api-staging.ai-sports-edge.com
+          CORS_ORIGIN=https://ai-sports-edge-staging.web.app
+          EOF
+
+      - name: Build
+        run: npm run build
+        env:
+          REACT_APP_ENV: staging
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Check API Keys
+        run: |
+          chmod +x scripts/check-api-keys.sh
+          ./scripts/check-api-keys.sh
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+      - name: Deploy to Firebase Staging
+        run: |
+          firebase use ai-sports-edge-staging
+          firebase deploy --only hosting,firestore,storage,functions --project ai-sports-edge-staging
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Test Staging Deployment
+        run: |
+          chmod +x scripts/test-staging-deployment.sh
+          ./scripts/test-staging-deployment.sh
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: staging-test-results
+          path: test-results/
+          retention-days: 7
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [test, deploy-staging]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          # Firebase Configuration
+          FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+          # Stripe Configuration
+          STRIPE_PUBLISHABLE_API_KEY=${{ secrets.STRIPE_PUBLISHABLE_API_KEY }}
+          STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+          # Google Analytics Configuration
+          GOOGLE_ANALYTICS_MEASUREMENT_ID=${{ secrets.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
+          GOOGLE_TAG_MANAGER_ID=${{ secrets.GOOGLE_TAG_MANAGER_ID }}
+
+          # Google Maps Configuration
+          GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+          # Weather API Configuration
+          WEATHER_GOV_API_KEY=${{ secrets.WEATHER_GOV_API_KEY }}
+          WEATHER_GOV_API_ENDPOINT=https://api.weather.gov
+
+          # OpenWeather API Configuration
+          OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}
+          OPENWEATHER_API_ENDPOINT=https://api.openweathermap.org/data/2.5
+
+          # Application Configuration
+          NODE_ENV=production
+          PORT=3000
+          API_BASE_URL=https://api.ai-sports-edge.com
+          CORS_ORIGIN=https://ai-sports-edge.com,https://aisportsedge.app
+          EOF
+
+      - name: Build
+        run: npm run build
+        env:
+          REACT_APP_ENV: production
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Check API Keys
+        run: |
+          chmod +x scripts/check-api-keys.sh
+          ./scripts/check-api-keys.sh
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+      - name: Deploy to Firebase Production
+        run: |
+          firebase use ai-sports-edge-prod
+          firebase deploy --only hosting,firestore,storage,functions --project ai-sports-edge-prod
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Set up Custom Domains and SSL
+        run: |
+          chmod +x scripts/setup-firebase-domains.sh
+          ./scripts/setup-firebase-domains.sh
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Configure Webhooks
+        run: |
+          chmod +x scripts/configure-webhooks.sh
+          ./scripts/configure-webhooks.sh
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+      - name: Test Web App Functionality
+        run: |
+          chmod +x scripts/test-webapp-functionality.sh
+          ./scripts/test-webapp-functionality.sh
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-test-results
+          path: test-results/
+          retention-days: 14
+
+  notify:
+    name: Notify
+    needs: [deploy-production]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Success
+        if: ${{ needs.deploy-production.result == 'success' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": "✅ Production deployment successful! 🚀",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "✅ *Production deployment successful!* 🚀\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*URL:* https://ai-sports-edge.com"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify Failure
+        if: ${{ needs.deploy-production.result != 'success' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": "❌ Production deployment failed! 🚨",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ *Production deployment failed!* 🚨\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*URL:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

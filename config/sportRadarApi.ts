@@ -11,6 +11,7 @@ export const ENDPOINTS = {
     GAME_SUMMARY: "/nba/trial/v7/en/games/{game_id}/summary.json",
     PLAYER_PROFILE: "/nba/trial/v7/en/players/{player_id}/profile.json",
     LEAGUE_SCHEDULE: "/nba/trial/v7/en/games/{year}/{month}/{day}/schedule.json",
+    PLAYER_GAME_STATS: "/nba/trial/v7/en/games/{game_id}/boxscore.json",
   },
   NFL: {
     GAME_STATISTICS: "/nfl/official/trial/v7/en/games/{game_id}/statistics.json",

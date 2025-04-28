@@ -1,12 +1,13 @@
 /**
  * Stripe configuration
- * 
+ *
  * This file contains Stripe-related configuration values.
- * In a production environment, these should be loaded from environment variables.
+ * Values are loaded from environment variables for security.
  */
+import { STRIPE_PUBLISHABLE_KEY as ENV_STRIPE_KEY } from '@env';
 
-// Stripe publishable key
-export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51NxSdILkdIwIjOxOG8VKMq2pZ0XxuzQumDOtC9cRiRlSKpYfKyYMQvUeKjGQpLFrKVgxKvQXdLrF9zJ5U5VbKVgx00aBcdefgh';
+// Stripe publishable key - loaded from environment variables
+export const STRIPE_PUBLISHABLE_KEY = ENV_STRIPE_KEY || 'pk_live_51R3nPsEQcCDah3pyvQ59Ju2bGs5YZKys6OGhJfIL8RhsfHawGDfeSLxLAmouy50UPEvzT5J5klnIzsl5BWxiHgEW00oSQeW9xi';
 
 // Stripe price IDs for subscription plans
 export const STRIPE_PRICE_IDS = {
@@ -14,6 +15,7 @@ export const STRIPE_PRICE_IDS = {
   BASIC_MONTHLY: 'price_basic_monthly',
   PREMIUM_MONTHLY: 'price_premium_monthly',
   PREMIUM_YEARLY: 'price_premium_yearly',
+  GROUP_PRO_MONTHLY: 'price_group_pro_monthly', // New group subscription tier
   
   // One-time purchases
   WEEKEND_PASS: 'price_weekend_pass',
@@ -28,9 +30,8 @@ export const STRIPE_PRICE_IDS = {
   PLAYER_PLUS_MINUS: 'price_player_plus_minus'
 };
 
-// Stripe webhook secret
-// This is only used on the server side, but included here for reference
-export const STRIPE_WEBHOOK_SECRET = 'whsec_your_webhook_secret';
+// Note: Stripe webhook secret should only be used on the server side
+// and should be loaded from environment variables there
 
 export default {
   STRIPE_PUBLISHABLE_KEY,

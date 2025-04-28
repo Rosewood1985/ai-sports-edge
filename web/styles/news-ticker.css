@@ -1,0 +1,297 @@
+/* News Ticker Styles */
+.news-ticker-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.news-ticker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.news-ticker-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.preferences-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.news-ticker {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  margin-bottom: 15px;
+  padding: 10px 0;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  scrollbar-width: thin;
+}
+
+.news-ticker::-webkit-scrollbar {
+  height: 6px;
+}
+
+.news-ticker::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.news-ticker-items {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.news-ticker-item {
+  display: inline-block;
+  margin-right: 30px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.news-ticker-item:hover {
+  background-color: #e9ecef;
+}
+
+.news-ticker-item .news-source {
+  font-weight: bold;
+  margin-right: 8px;
+  color: #007bff;
+}
+
+.news-ticker-item.betting-content .news-source {
+  color: #28a745;
+}
+
+.news-ticker-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.news-ticker-error, .news-ticker-empty {
+  padding: 20px;
+  text-align: center;
+  color: #dc3545;
+}
+
+.news-ticker-empty {
+  color: #6c757d;
+}
+
+/* Odds Suggestions Styles */
+.odds-suggestions {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f1f8ff;
+  border-radius: 8px;
+  border: 1px solid #d1e9ff;
+}
+
+.odds-suggestions h4 {
+  margin-top: 0;
+  color: #0056b3;
+  margin-bottom: 10px;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.suggestion-item {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-game {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.suggestion-odds {
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.suggestion-action {
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.suggestion-action.bet {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.suggestion-action.avoid {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* ESPN Odds Styles */
+.espn-odds {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.espn-odds h4 {
+  margin-top: 0;
+  color: #d00;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.espn-odds h4::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-image: url('https://a.espncdn.com/favicon.ico');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 8px;
+}
+
+.espn-odds-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.espn-odds-item {
+  flex: 1;
+  min-width: 250px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.espn-odds-game {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.team-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.vs {
+  margin: 0 10px;
+  font-weight: bold;
+  color: #666;
+}
+
+.espn-odds-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.espn-odds-teams {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.espn-odds-values {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.espn-odds-moneyline, .espn-odds-spread, .espn-odds-overunder {
+  flex: 1;
+  min-width: 30%;
+  padding: 4px;
+  text-align: center;
+  font-size: 0.9em;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.espn-game-link {
+  text-align: center;
+  color: #d00;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.espn-game-link:hover {
+  background-color: #f8f9fa;
+  text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .suggestions-list, .espn-odds-list {
+    flex-direction: column;
+  }
+  
+  .suggestion-item, .espn-odds-item {
+    min-width: 100%;
+  }
+  
+  .espn-odds-values {
+    flex-direction: column;
+  }
+  
+  .espn-odds-moneyline, .espn-odds-spread, .espn-odds-overunder {
+    margin-bottom: 5px;
+  }
+}

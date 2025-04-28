@@ -1,0 +1,193 @@
+import React, { useEffect } from "react";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from "@react-navigation/native";
+import { Text, View, StyleSheet } from "react-native";
+import AppNavigator from "./navigation/AppNavigator";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import { NavigationStateProvider } from "./contexts/NavigationStateContext";
+// Import from atomic architecture
+import { environmentBootstrap } from './atomic/organisms';
+import monitoringService from './atomic/organisms/monitoringService';
+import { ThemeProvider } from './atomic/organisms/themeProvider';
+import { useTheme } from './atomic/molecules/themeContext';
+
+// Legacy imports - to be fully migrated in future phases
+import { initAlerting } from "./services/alertingService";
+import { info, LogCategory } from "./services/loggingService";
+import {
+  debugServiceInitialization,
+  debugServiceDependencies,
+} from "./debug-services";
+import ErrorBoundary from "./components/ErrorBoundary";
+// Keep using original Colors for now
+import { Colors } from "./constants/Colors";
+
+// Custom light/dark theme objects based on your Colors.ts
+const lightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Colors.light.tint,
+    background: Colors.light.background,
+    card: "#f0f2f5",
+    text: Colors.light.text,
+    border: "#d1d5db",
+    notification: "#FF3B30",
+    icon: Colors.light.icon,
+  },
+};
+
+const darkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Colors.dark.primaryAction,
+    background: Colors.dark.primaryBackground,
+    card: "#2a2c2d",
+    text: Colors.dark.primaryText,
+    border: Colors.dark.borderSubtle,
+    notification: "#FF453A",
+    icon: Colors.dark.iconPrimary,
+  },
+};
+
+// ⛑️ App body wrapped inside custom ThemeConsumer
+const AppInner = () => {
+  const { theme } = useTheme(); // Get current theme from context
+
+  // Monitoring setup
+  useEffect(() => {
+    try {
+      debugServiceDependencies();
+      debugServiceInitialization();
+
+      // Initialize environment using atomic architecture
+      const envResult = environmentBootstrap.bootstrapEnvironment({ exitOnError: false });
+      if (!envResult.success) {
+        console.warn("Environment validation failed - app may not function correctly");
+      }
+
+      // Initialize monitoring services using atomic architecture
+      const monitoringResult = monitoringService.initialize();
+      const { logging } = monitoringService;
+      
+      // Log environment validation result with proper logging service
+      // Use original logging for now, but initialize with monitoring service
+      const loggingInitialized = monitoringService.logging ? true : false;
+      
+      if (loggingInitialized) {
+        if (!envResult.success) {
+          info(LogCategory.APP, "Environment validation failed - app may not function correctly");
+        } else {
+          info(LogCategory.APP, "Environment validation passed");
+        }
+        
+        info(LogCategory.APP, "Logging service initialized");
+        
+        if (monitoringService.error) {
+          info(LogCategory.APP, "Error tracking service initialized");
+        }
+        
+        if (monitoringService.performance) {
+          info(LogCategory.APP, "Performance monitoring service initialized");
+        }
+
+        try {
+          const alertingInit = initAlerting();
+          if (alertingInit) {
+            info(LogCategory.APP, "Alerting service initialized");
+          }
+        } catch (err) {
+          console.error("Alerting failed:", err);
+        }
+      }
+    } catch (err) {
+      console.error("Init failed:", err);
+    }
+  }, []);
+
+  const fallbackUI = (
+    <View style={styles.fallbackContainer}>
+      <Text style={styles.fallbackTitle}>App Error</Text>
+      <Text style={styles.fallbackText}>
+        We encountered a problem. Please restart the app.
+      </Text>
+    </View>
+  );
+
+  return (
+    <ErrorBoundary fallback={fallbackUI}>
+      <SafeAreaProvider>
+        <ErrorBoundary>
+          <LanguageProvider>
+            <NavigationStateProvider>
+              <NavigationContainer
+                theme={theme === "dark" ? darkTheme : lightTheme}
+                onReady={() => {
+                  info(LogCategory.NAVIGATION, "Navigation container ready");
+                }}
+                onStateChange={(state) => {
+                  const currentRoute = state?.routes[state.index]?.name;
+                  if (currentRoute) {
+                    info(
+                      LogCategory.NAVIGATION,
+                      `Navigated to ${currentRoute}`
+                    );
+                    
+                    // Track navigation with performance monitoring
+                    if (monitoringService.performance) {
+                      monitoringService.performance.trackNavigation(currentRoute);
+                    }
+                  }
+                }}
+              >
+                <StatusBar style={theme === "dark" ? "light" : "dark"} />
+                <ErrorBoundary>
+                  <AppNavigator />
+                </ErrorBoundary>
+              </NavigationContainer>
+            </NavigationStateProvider>
+          </LanguageProvider>
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </ErrorBoundary>
+  );
+};
+
+// Final wrapped export
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
+  );
+}
+
+// Fallback UI styles
+const styles = StyleSheet.create({
+  fallbackContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+    backgroundColor: Colors.light.background,
+  },
+  fallbackTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+    color: "#dc3545",
+    textAlign: "center",
+  },
+  fallbackText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: Colors.light.text,
+    lineHeight: 24,
+  },
+});

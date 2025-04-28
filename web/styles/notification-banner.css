@@ -1,0 +1,76 @@
+/* Notification Banner Styles */
+.notification-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-shadow: var(--box-shadow-md);
+  animation: slideDown 0.3s ease-out;
+}
+
+.notification-banner p {
+  margin: 0 var(--spacing-4) 0 0;
+}
+
+.notification-banner button {
+  background-color: var(--white);
+  color: var(--primary-color);
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: var(--spacing-2);
+  transition: background-color 0.2s ease;
+}
+
+.notification-banner button:hover {
+  background-color: var(--gray-100);
+}
+
+.notification-banner .close-button {
+  background-color: transparent;
+  color: var(--white);
+  font-size: 1.5rem;
+  padding: var(--spacing-1);
+  margin-left: var(--spacing-2);
+}
+
+.notification-banner .close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .notification-banner {
+    flex-direction: column;
+    padding: var(--spacing-2);
+  }
+  
+  .notification-banner p {
+    margin: 0 0 var(--spacing-2) 0;
+    text-align: center;
+  }
+  
+  .notification-banner .close-button {
+    position: absolute;
+    top: var(--spacing-1);
+    right: var(--spacing-1);
+  }
+}

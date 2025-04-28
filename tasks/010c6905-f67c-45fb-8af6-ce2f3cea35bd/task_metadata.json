@@ -1,0 +1,124 @@
+{
+  "files_in_context": [
+    {
+      "path": "dist/README-DEPLOYMENT.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857004255,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-godaddy-solution-plan.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857015642,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase-fixed.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857025227,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857033593,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857041263,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857050614,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-godaddy-compatibility.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857059253,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-verification.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857065829,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/env-verification.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857072674,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-advanced-diagnostics.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857081654,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857089320,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857099113,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857103710,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857110623,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/GODADDY-DEPLOYMENT-GUIDE.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744857134881,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

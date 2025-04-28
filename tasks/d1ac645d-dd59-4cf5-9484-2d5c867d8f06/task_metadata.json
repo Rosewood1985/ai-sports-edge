@@ -1,0 +1,140 @@
+{
+  "files_in_context": [
+    {
+      "path": "webpack.config.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855416308,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855420241,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855424520,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.production",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855427940,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.example",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855432631,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.development",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855436043,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855439554,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/ftp-deployment-checklist.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855443616,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855447558,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/firebase-security-implementation.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744855450061,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855541877,
+      "roo_edit_date": 1744855541877,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744855541877,
+      "roo_edit_date": 1744855541877,
+      "user_edit_date": 1744855541917
+    },
+    {
+      "path": "dist/env-debug.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855556194,
+      "roo_edit_date": 1744855556194,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/env-test.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855566612,
+      "roo_edit_date": 1744855566612,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase-debug.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855595209,
+      "roo_edit_date": 1744855595209,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.fixed.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855636709,
+      "roo_edit_date": 1744855636709,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/config/firebase-fixed.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744855661383,
+      "roo_edit_date": 1744855661383,
+      "user_edit_date": null
+    }
+  ]
+}

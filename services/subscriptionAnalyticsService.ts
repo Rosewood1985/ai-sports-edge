@@ -1,5 +1,16 @@
 import { auth, firestore, functions } from '../config/firebase';
 import { trackEvent } from './analyticsService';
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+  DocumentData,
+  QueryDocumentSnapshot
+} from 'firebase/firestore';
+import { httpsCallable, HttpsCallableResult } from 'firebase/functions';
 
 /**
  * Interface for subscription analytics report
@@ -37,8 +48,8 @@ export const generateSubscriptionReport = async (
   timeRange: '7d' | '30d' | '90d' | 'all' = '30d'
 ): Promise<SubscriptionAnalyticsReport> => {
   try {
-    // In a real implementation, we would call a Firebase function
-    const generateReportFunc = functions.httpsCallable('generateSubscriptionReport');
+    // Call the Firebase function to generate the report
+    const generateReportFunc = httpsCallable(functions, 'generateSubscriptionReport');
     const result = await generateReportFunc({
       timeRange
     });
@@ -48,11 +59,27 @@ export const generateSubscriptionReport = async (
       time_range: timeRange
     });
     
-    return result.data as SubscriptionAnalyticsReport;
+    // Format the data if needed
+    const reportData = result.data as SubscriptionAnalyticsReport;
+    
+    // Ensure all required fields are present
+    const formattedReport: SubscriptionAnalyticsReport = {
+      activeSubscriptions: reportData.activeSubscriptions || 0,
+      totalRevenue: reportData.totalRevenue || 0,
+      averageRevenue: reportData.averageRevenue || 0,
+      churnRate: reportData.churnRate || 0,
+      conversionRate: reportData.conversionRate || 0,
+      subscriptionsByPlan: reportData.subscriptionsByPlan || [],
+      revenueByMonth: reportData.revenueByMonth || [],
+      subscriptionsByStatus: reportData.subscriptionsByStatus || []
+    };
+    
+    return formattedReport;
   } catch (error) {
     console.error('Error generating subscription report:', error);
     
-    // Return mock data for development
+    // For development or when errors occur, return mock data
+    // In production, you might want to show an error message instead
     return getMockAnalyticsData();
   }
 };
@@ -90,26 +117,64 @@ const getMockAnalyticsData = (): SubscriptionAnalyticsReport => {
 };
 
 /**
+ * Interface for user subscription metrics
+ */
+export interface UserSubscriptionMetrics {
+  hasActiveSubscription: boolean;
+  subscriptionPlan: string | null;
+  subscriptionStatus: string | null;
+  currentPeriodEnd: Timestamp | null;
+  totalSpent: number;
+}
+
+/**
+ * Interface for subscription data
+ */
+interface SubscriptionData {
+  status: string;
+  planName: string;
+  currentPeriodEnd: Timestamp;
+}
+
+/**
+ * Interface for purchase data
+ */
+interface PurchaseData {
+  amount?: number;
+}
+
+/**
  * Get subscription metrics for a specific user
  * @param userId User ID
  * @returns User subscription metrics
  */
-export const getUserSubscriptionMetrics = async (userId: string) => {
+export const getUserSubscriptionMetrics = async (userId: string): Promise<UserSubscriptionMetrics> => {
   try {
-    const db = firestore;
-    const userRef = db.collection('users').doc(userId);
-    
     // Get user's subscriptions
-    const subscriptionsSnapshot = await userRef.collection('subscriptions').get();
-    const subscriptions = subscriptionsSnapshot.docs.map(doc => doc.data());
+    const userDocRef = doc(firestore, 'users', userId);
+    const subscriptionsCollectionRef = collection(userDocRef, 'subscriptions');
+    const subscriptionsSnapshot = await getDocs(subscriptionsCollectionRef);
+    
+    const subscriptions: SubscriptionData[] = [];
+    subscriptionsSnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data() as SubscriptionData;
+      subscriptions.push(data);
+    });
     
     // Get user's purchases
-    const purchasesSnapshot = await userRef.collection('purchases').get();
-    const purchases = purchasesSnapshot.docs.map(doc => doc.data());
+    const purchasesCollectionRef = collection(userDocRef, 'purchases');
+    const purchasesSnapshot = await getDocs(purchasesCollectionRef);
+    
+    const purchases: PurchaseData[] = [];
+    purchasesSnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data() as PurchaseData;
+      purchases.push(data);
+    });
     
     // Calculate metrics
     const activeSubscription = subscriptions.find(sub => sub.status === 'active');
-    const totalSpent = purchases.reduce((total, purchase) => total + (purchase.amount || 0) / 100, 0);
+    const totalSpent = purchases.reduce((total: number, purchase: PurchaseData) =>
+      total + (purchase.amount || 0) / 100, 0);
     
     return {
       hasActiveSubscription: !!activeSubscription,

@@ -1,0 +1,412 @@
+{
+  "files_in_context": [
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1745378400911
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378400945,
+      "roo_edit_date": 1745378400945,
+      "user_edit_date": 1745378400911
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745378410927,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378410927,
+      "roo_edit_date": null,
+      "user_edit_date": 1745378419971
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378420276,
+      "roo_edit_date": 1745378420276,
+      "user_edit_date": 1745378419971
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378443676,
+      "roo_edit_date": 1745378443676,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745378603129,
+      "roo_edit_date": 1745378400945,
+      "user_edit_date": 1745378400911
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378603129,
+      "roo_edit_date": 1745378400945,
+      "user_edit_date": 1745378615730
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378615850,
+      "roo_edit_date": 1745378615850,
+      "user_edit_date": 1745378615730
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378443676,
+      "roo_edit_date": 1745378443676,
+      "user_edit_date": 1745378630469
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378443676,
+      "roo_edit_date": 1745378443676,
+      "user_edit_date": 1745378643284
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378443676,
+      "roo_edit_date": 1745378443676,
+      "user_edit_date": 1745378653264
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378653565,
+      "roo_edit_date": 1745378653565,
+      "user_edit_date": 1745378653264
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378615850,
+      "roo_edit_date": 1745378615850,
+      "user_edit_date": 1745378683476
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378683510,
+      "roo_edit_date": 1745378683510,
+      "user_edit_date": 1745378683476
+    },
+    {
+      "path": "dist/language-switcher.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378712220,
+      "roo_edit_date": 1745378712220,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378683510,
+      "roo_edit_date": 1745378683510,
+      "user_edit_date": 1745378719312
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378719443,
+      "roo_edit_date": 1745378719443,
+      "user_edit_date": 1745378719312
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378653565,
+      "roo_edit_date": 1745378653565,
+      "user_edit_date": 1745378759944
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378653565,
+      "roo_edit_date": 1745378653565,
+      "user_edit_date": 1745378761310
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378653565,
+      "roo_edit_date": 1745378653565,
+      "user_edit_date": 1745378771649
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378653565,
+      "roo_edit_date": 1745378653565,
+      "user_edit_date": 1745378785095
+    },
+    {
+      "path": "scripts/deploy-without-htaccess.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745378785417,
+      "roo_edit_date": 1745378785417,
+      "user_edit_date": 1745378785095
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745378719443,
+      "roo_edit_date": 1745378719443,
+      "user_edit_date": 1745378933106
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379080288,
+      "roo_edit_date": 1745379080288,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379112829,
+      "roo_edit_date": 1745379112829,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/sftp-deploy.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379664828,
+      "roo_edit_date": 1745379664828,
+      "user_edit_date": null
+    },
+    {
+      "path": "sftp-config.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379686906,
+      "roo_edit_date": 1745379686906,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/sftp-deploy.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745379664828,
+      "roo_edit_date": 1745379664828,
+      "user_edit_date": 1745379705977
+    },
+    {
+      "path": "scripts/sftp-deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379706289,
+      "roo_edit_date": 1745379706289,
+      "user_edit_date": 1745379705977
+    },
+    {
+      "path": "scripts/direct-sftp-deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379740323,
+      "roo_edit_date": 1745379740323,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/native-sftp-deploy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745379885897,
+      "roo_edit_date": 1745379885897,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/install-sftp-extension.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380138024,
+      "roo_edit_date": 1745380138024,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/install-sftp-extension.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745380138024,
+      "roo_edit_date": 1745380138024,
+      "user_edit_date": 1745380250723
+    },
+    {
+      "path": "scripts/install-sftp-extension.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380251185,
+      "roo_edit_date": 1745380251185,
+      "user_edit_date": 1745380250723
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745379080288,
+      "roo_edit_date": 1745379080288,
+      "user_edit_date": 1745380273580
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380273888,
+      "roo_edit_date": 1745380273888,
+      "user_edit_date": 1745380273580
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745379112829,
+      "roo_edit_date": 1745379112829,
+      "user_edit_date": 1745380298738
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745379112829,
+      "roo_edit_date": 1745379112829,
+      "user_edit_date": 1745380314877
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380315202,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380314877
+    },
+    {
+      "path": "docs/install-sftp-extension.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380418736,
+      "roo_edit_date": 1745380418736,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745380675037,
+      "roo_edit_date": 1745380273888,
+      "user_edit_date": 1745380273580
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745380675037,
+      "roo_edit_date": 1745380273888,
+      "user_edit_date": 1745380698848
+    },
+    {
+      "path": "docs/sftp-upload-guide.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380699541,
+      "roo_edit_date": 1745380699541,
+      "user_edit_date": 1745380698848
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745380705876,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380314877
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745380711881,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380314877
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745380718099,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380314877
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745380718099,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380746177
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745380718099,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380757878
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745380718099,
+      "roo_edit_date": 1745380315202,
+      "user_edit_date": 1745380758825
+    },
+    {
+      "path": "docs/sftp-visual-guide.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745380759356,
+      "roo_edit_date": 1745380759356,
+      "user_edit_date": 1745380758825
+    }
+  ]
+}

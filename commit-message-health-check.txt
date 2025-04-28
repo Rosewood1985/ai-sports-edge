@@ -1,0 +1,21 @@
+feat: add deployment health check script
+
+Add verify-deployment-health.sh script that performs comprehensive validation of the deployed site:
+
+- Checks HTTP status and accessibility
+- Scans for common frontend issues:
+  - Reload loops
+  - Service worker interference
+  - Integrity/crossorigin errors
+  - CSP violations
+  - MIME-type errors
+  - Firebase config issues
+- Verifies meta tags and SEO elements
+- Checks Spanish toggle functionality
+- Takes screenshots of homepage and login page
+- Generates detailed health report with suggestions
+
+This script provides a one-click validation solution that can be run manually
+or integrated into CI/CD pipelines to ensure clean deployments.
+
+Tag: health-check-v1.0

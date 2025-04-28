@@ -1,0 +1,85 @@
+AI Sports Edge Deployment Health Check
+Date: Wed Apr 23 00:57:15 EDT 2025
+URL: https://aisportsedge.app
+========================================
+
+🔄 Fetching https://aisportsedge.app...
+✅ HTTP Status: 200 OK
+✅ No reload loops detected
+✅ No service worker detected
+❌ Integrity attributes found - may cause loading issues
+⚠️ Crossorigin attributes found - monitor for potential issues
+⚠️ CSP meta tag found - should be in .htaccess instead
+✅ Firebase references found
+✅ Meta description found
+✅ Open Graph tags found
+⚠️ No Twitter Card tags found - recommended for Twitter sharing
+✅ Language attribute found
+✅ Spanish language references found
+📸 Taking screenshots...
+❌ Failed to capture screenshots
+\n📊 Health Check Summary
+=======================================
+🟢 PASSED HTTP Status
+🟢 PASSED Reload Loop
+🟢 PASSED Service Worker
+🔴 FAILED Integrity Errors
+   Suggestion: Remove integrity and crossorigin attributes from resource links
+🔴 FAILED CSP Violations
+   Suggestion: Update Content-Security-Policy in .htaccess
+🔴 FAILED MIME Errors
+   Suggestion: Add proper MIME types in .htaccess: AddType application/javascript .js
+🟢 PASSED Firebase Config
+🟢 PASSED Meta Description
+🟢 PASSED Open Graph Tags
+🔴 FAILED Twitter Card Tags
+   Suggestion: Add Twitter Card meta tags for Twitter sharing
+🟢 PASSED Language Attribute
+🟢 PASSED Spanish Toggle
+🔴 FAILED Screenshots
+   Suggestion: Ensure Puppeteer is installed and working
+\n⚠️ Some checks failed. Review the report for details.
+\nReport generated on Wed Apr 23 00:57:17 EDT 2025
+End of report.
+AI Sports Edge Deployment Health Check
+Date: Wed Apr 23 00:57:48 EDT 2025
+URL: https://aisportsedge.app
+========================================
+
+🔄 Fetching https://aisportsedge.app...
+✅ HTTP Status: 200 OK
+✅ No reload loops detected
+✅ No service worker detected
+❌ Integrity attributes found - may cause loading issues
+⚠️ Crossorigin attributes found - monitor for potential issues
+⚠️ CSP meta tag found - should be in .htaccess instead
+✅ Firebase references found
+✅ Meta description found
+✅ Open Graph tags found
+⚠️ No Twitter Card tags found - recommended for Twitter sharing
+✅ Language attribute found
+✅ Spanish language references found
+⚠️ Screenshots feature will be available in a future update
+📸 Taking screenshots...
+\n📊 Health Check Summary
+=======================================
+🟢 PASSED HTTP Status
+🟢 PASSED Reload Loop
+🟢 PASSED Service Worker
+🔴 FAILED Integrity Errors
+   Suggestion: Remove integrity and crossorigin attributes from resource links
+🔴 FAILED CSP Violations
+   Suggestion: Update Content-Security-Policy in .htaccess
+🔴 FAILED MIME Errors
+   Suggestion: Add proper MIME types in .htaccess: AddType application/javascript .js
+🟢 PASSED Firebase Config
+🟢 PASSED Meta Description
+🟢 PASSED Open Graph Tags
+🔴 FAILED Twitter Card Tags
+   Suggestion: Add Twitter Card meta tags for Twitter sharing
+🟢 PASSED Language Attribute
+🟢 PASSED Spanish Toggle
+🟢 PASSED Screenshots
+\n⚠️ Some checks failed. Review the report for details.
+\nReport generated on Wed Apr 23 00:57:50 EDT 2025
+End of report.

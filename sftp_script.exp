@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn sftp -o StrictHostKeyChecking=no deploy@aisportsedge.app
+expect "password:"
+send "hTQ3LQ]#P(b,\r"
+expect "sftp>"
+send "cd /home/q15133yvmhnq/public_html/aisportsedge.app\r"
+expect "sftp>"
+send "put -r ./build/*\r"
+expect "sftp>"
+send "bye\r"
+expect eof

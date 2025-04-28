@@ -1,0 +1,83 @@
+[
+  {
+    "gameId": "401704520",
+    "date": "2025-03-19T01:05Z",
+    "homeTeam": {
+      "id": "13",
+      "name": "Texas Rangers",
+      "abbreviation": "TEX",
+      "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tex.png"
+    },
+    "awayTeam": {
+      "id": "5",
+      "name": "Cleveland Guardians",
+      "abbreviation": "CLE",
+      "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/cle.png"
+    },
+    "odds": {
+      "homeMoneyline": -110,
+      "awayMoneyline": 110,
+      "spread": 0,
+      "homeSpreadOdds": -110,
+      "awaySpreadOdds": -110,
+      "overUnder": 8.5,
+      "overOdds": -110,
+      "underOdds": -110
+    },
+    "espnGameLink": "https://www.espn.com/baseball/mlb/game/_/gameId/401704520"
+  },
+  {
+    "gameId": "401704522",
+    "date": "2025-03-19T01:05Z",
+    "homeTeam": {
+      "id": "26",
+      "name": "San Francisco Giants",
+      "abbreviation": "SF",
+      "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sf.png"
+    },
+    "awayTeam": {
+      "id": "25",
+      "name": "San Diego Padres",
+      "abbreviation": "SD",
+      "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sd.png"
+    },
+    "odds": {
+      "homeMoneyline": -110,
+      "awayMoneyline": 110,
+      "spread": 0,
+      "homeSpreadOdds": -110,
+      "awaySpreadOdds": -110,
+      "overUnder": 8,
+      "overOdds": -110,
+      "underOdds": -110
+    },
+    "espnGameLink": "https://www.espn.com/baseball/mlb/game/_/gameId/401704522"
+  },
+  {
+    "gameId": "401704523",
+    "date": "2025-03-19T01:40Z",
+    "homeTeam": {
+      "id": "27",
+      "name": "Colorado Rockies",
+      "abbreviation": "COL",
+      "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/col.png"
+    },
+    "awayTeam": {
+      "id": "26",
+      "name": "San Francisco Giants",
+      "abbreviation": "SF",
+      "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sf.png"
+    },
+    "odds": {
+      "homeMoneyline": -110,
+      "awayMoneyline": 110,
+      "spread": 0,
+      "homeSpreadOdds": -110,
+      "awaySpreadOdds": -110,
+      "overUnder": 8.5,
+      "overOdds": -110,
+      "underOdds": -110
+    },
+    "espnGameLink": "https://www.espn.com/baseball/mlb/game/_/gameId/401704523"
+  }
+]

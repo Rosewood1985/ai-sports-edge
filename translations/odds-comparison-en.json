@@ -1,0 +1,71 @@
+{
+  "oddsComparison": {
+    "title": "Odds Comparison",
+    "subtitle": "Compare odds between DraftKings and FanDuel for NBA games",
+    "selectSport": "Select Sport:",
+    "gameMatchup": "Game Matchup",
+    "versus": "VS",
+    "gameDate": "{{date}} at {{time}}",
+    "noGameSelected": "No game selected",
+    "lastUpdated": "Last updated: {{time}}",
+    "refresh": "Refresh",
+    "sortBy": "Sort by:",
+    "bestOdds": "Best Odds",
+    "filter": "Filter",
+    "showDraftKings": "DraftKings",
+    "showFanDuel": "FanDuel",
+    "notAvailable": "N/A",
+    "unlockOdds": "Unlock Odds",
+    "purchaseOdds": "Purchase Odds Access",
+    "purchaseSuccess": "Purchase Successful!",
+    "purchaseError": "Purchase Error",
+    "dataSource": {
+      "cached": "CACHED",
+      "stale": "STALE",
+      "fallback": "FALLBACK",
+      "error": "ERROR"
+    },
+    "errors": {
+      "apiFailure": "Failed to load odds data. Please try again later.",
+      "networkError": "Network error. Please check your connection and try again.",
+      "rateLimit": "Rate limit exceeded. Please try again in a few minutes.",
+      "noData": "Could not find odds for DraftKings or FanDuel at this time.",
+      "configuration": "Configuration error. Please contact support."
+    },
+    "loading": "Loading odds comparison...",
+    "retry": "Retry",
+    "alerts": {
+      "title": "Odds Movement Alerts",
+      "noAlerts": "No odds movement alerts yet",
+      "noAlertsSubtext": "You'll be notified when odds change significantly",
+      "loading": "Loading alerts..."
+    },
+    "accessibility": {
+      "refreshButton": "Refresh button",
+      "refreshButtonHint": "Refreshes the odds data",
+      "alertsButton": "Alerts button",
+      "alertsButtonHint": "Shows odds movement alerts",
+      "settingsButton": "Settings button",
+      "settingsButtonHint": "Opens personalization settings",
+      "sortOption": "Sort option: {{option}}",
+      "sortOptionHint": "Changes the display order of odds",
+      "filterOption": "Filter option: {{option}}",
+      "filterOptionHint": "Filters the displayed sportsbooks",
+      "bookmakerButton": "{{bookmaker}} odds: {{odds}}",
+      "bookmakerButtonHint": "Tap to visit sportsbook site",
+      "lockedOdds": "locked odds",
+      "selectSport": "Select {{sport}}",
+      "selectSportHint": "Changes odds comparison to show {{sport}} odds"
+    }
+  },
+  "sports": {
+    "basketball_nba": "NBA Basketball",
+    "basketball_ncaab": "NCAA Basketball",
+    "football_nfl": "NFL Football",
+    "hockey_nhl": "NHL Hockey",
+    "baseball_mlb": "MLB Baseball",
+    "soccer_epl": "Premier League",
+    "soccer_mls": "MLS Soccer",
+    "mma_ufc": "UFC MMA"
+  }
+}

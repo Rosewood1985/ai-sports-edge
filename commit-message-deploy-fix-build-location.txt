@@ -1,0 +1,11 @@
+feat: Add script to fix build location on server after SFTP upload
+
+- Created deploy-and-fix-build-location.sh script that:
+  - Uploads build folder via SFTP
+  - Creates fix-build-location.sh script inside build folder
+  - Executes the fix script on the server after upload
+  - Moves all build files to the root directory on the server
+  - Cleans up empty build folder on server
+  - Logs deployment status
+
+This script solves the issue where files uploaded to the build/ directory on the server need to be moved to the root directory for the site to function properly.

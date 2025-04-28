@@ -1,0 +1,63 @@
+name: Auto Deploy to GoDaddy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dist/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to GoDaddy via SFTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: sftp.aisportsedge.app
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          protocol: sftp
+          port: 22
+          local-dir: ./dist/
+          server-dir: /home/q15133yvmhnq/public_html/aisportsedge.app/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .htaccess
+
+      - name: Run health check
+        run: |
+          chmod +x ./scripts/verify-deployment-health.sh
+          ./scripts/verify-deployment-health.sh
+
+      - name: Upload health report
+        uses: actions/upload-artifact@v3
+        with:
+          name: health-report
+          path: ./health-report/
+          retention-days: 7
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "::notice::🚀 Successfully deployed to GoDaddy"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::❌ Deployment to GoDaddy failed"

@@ -1,0 +1,51 @@
+{
+  "required": [
+    {
+      "name": "FIREBASE_API_KEY",
+      "description": "Firebase API key for authentication and other Firebase services",
+      "link": "https://console.firebase.google.com/project/ai-sports-edge-prod/settings/general/"
+    },
+    {
+      "name": "STRIPE_API_KEY",
+      "description": "Stripe API key for payment processing",
+      "link": "https://dashboard.stripe.com/apikeys"
+    },
+    {
+      "name": "STRIPE_WEBHOOK_SECRET",
+      "description": "Stripe webhook secret for verifying webhook events",
+      "link": "https://dashboard.stripe.com/webhooks"
+    },
+    {
+      "name": "GOOGLE_MAPS_API_KEY",
+      "description": "Google Maps API key for location services",
+      "link": "https://console.cloud.google.com/apis/credentials"
+    },
+    {
+      "name": "OPENWEATHER_API_KEY",
+      "description": "OpenWeather API key for weather data",
+      "link": "https://home.openweathermap.org/api_keys"
+    }
+  ],
+  "optional": [
+    {
+      "name": "GOOGLE_ANALYTICS_ID",
+      "description": "Google Analytics ID for tracking user behavior",
+      "link": "https://analytics.google.com/analytics/web/"
+    },
+    {
+      "name": "SENTRY_DSN",
+      "description": "Sentry DSN for error tracking",
+      "link": "https://sentry.io/settings/projects/"
+    },
+    {
+      "name": "ALGOLIA_APP_ID",
+      "description": "Algolia App ID for search functionality",
+      "link": "https://www.algolia.com/apps/"
+    },
+    {
+      "name": "ALGOLIA_API_KEY",
+      "description": "Algolia API key for search functionality",
+      "link": "https://www.algolia.com/apps/"
+    }
+  ]
+}

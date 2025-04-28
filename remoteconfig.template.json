@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "name": "ios",
+      "expression": "device.os == 'ios'"
+    },
+    {
+      "name": "android",
+      "expression": "device.os == 'android'"
+    },
+    {
+      "name": "web",
+      "expression": "device.os == 'web'"
+    }
+  ],
+  "parameters": {
+    "ml_model_path": {
+      "defaultValue": {
+        "value": "https://ai-sports-edge-com.web.app/models/model.pkl"
+      },
+      "description": "Path to the ML model file",
+      "valueType": "STRING"
+    },
+    "ai_pick_of_day_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Whether the AI Pick of the Day feature is enabled",
+      "valueType": "STRING"
+    },
+    "min_confidence_threshold": {
+      "defaultValue": {
+        "value": "65"
+      },
+      "description": "Minimum confidence threshold for Pick of the Day",
+      "valueType": "STRING"
+    },
+    "prediction_schedule": {
+      "defaultValue": {
+        "value": "0 10 * * *"
+      },
+      "description": "Cron schedule for the predictTodayGames function",
+      "valueType": "STRING"
+    },
+    "pick_of_day_schedule": {
+      "defaultValue": {
+        "value": "0 9 * * *"
+      },
+      "description": "Cron schedule for the markAIPickOfDay function",
+      "valueType": "STRING"
+    }
+  },
+  "version": {
+    "versionNumber": "3",
+    "updateTime": "2025-04-17T19:30:00Z",
+    "updateUser": {
+      "email": "admin@ai-sports-edge.com"
+    },
+    "description": "Added AI Pick of the Day parameters"
+  }
+}

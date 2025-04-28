@@ -1,0 +1,180 @@
+{
+  "files_in_context": [
+    {
+      "path": "dist/firebase-godaddy-solution-plan.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856562782,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics-README.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856568868,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-advanced-diagnostics.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856572714,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856578884,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-diagnostics.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856585200,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856591555,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856598908,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856604501,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/env-verification.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744856609932,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856647812,
+      "roo_edit_date": 1744856647812,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744856647812,
+      "roo_edit_date": 1744856647812,
+      "user_edit_date": 1744856647870
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856660503,
+      "roo_edit_date": 1744856660503,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/.htaccess",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744856660503,
+      "roo_edit_date": 1744856660503,
+      "user_edit_date": 1744856660511
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856683169,
+      "roo_edit_date": 1744856683169,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-config.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744856683169,
+      "roo_edit_date": 1744856683169,
+      "user_edit_date": 1744856683197
+    },
+    {
+      "path": "dist/env-verification.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856743397,
+      "roo_edit_date": 1744856743397,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/env-verification.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744856743397,
+      "roo_edit_date": 1744856743397,
+      "user_edit_date": 1744856743482
+    },
+    {
+      "path": "dist/firebase-godaddy-compatibility.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856774760,
+      "roo_edit_date": 1744856774760,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856783443,
+      "roo_edit_date": 1744856783443,
+      "user_edit_date": 1744856647870
+    },
+    {
+      "path": "dist/index.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744856783443,
+      "roo_edit_date": 1744856783443,
+      "user_edit_date": 1744856783466
+    },
+    {
+      "path": "dist/GODADDY-DEPLOYMENT-GUIDE.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856818177,
+      "roo_edit_date": 1744856818177,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/firebase-test.html",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744856868925,
+      "roo_edit_date": 1744856868925,
+      "user_edit_date": null
+    }
+  ]
+}

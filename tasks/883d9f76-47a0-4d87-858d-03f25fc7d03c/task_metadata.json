@@ -1,0 +1,52 @@
+{
+  "files_in_context": [
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744766878962,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "app.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744766889452,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "netlify.toml",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744766898334,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744766923118,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.config.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744766936213,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "eas.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744766944451,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

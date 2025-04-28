@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "title": "Precios - AI Sports Edge",
+    "description": "Elija el plan perfecto de AI Sports Edge para sus necesidades de apuestas. Desde predicciones gratuitas hasta análisis premium, tenemos opciones para cada apostador.",
+    "keywords": "precios de apuestas deportivas, costo de predicciones de IA, planes de análisis de apuestas, suscripción de ventaja deportiva",
+    "ogTitle": "Precios - AI Sports Edge",
+    "ogDescription": "Elija el plan perfecto de AI Sports Edge para sus necesidades de apuestas. Desde predicciones gratuitas hasta análisis premium, tenemos opciones para cada apostador."
+  },
+  "hero": {
+    "title": "Elija Su Plan",
+    "subtitle": "Seleccione el plan perfecto para elevar su estrategia de apuestas con información impulsada por IA."
+  },
+  "plans": {
+    "free": {
+      "title": "Gratis",
+      "price": "$0",
+      "period": "para siempre",
+      "description": "Predicciones y características básicas para apostadores ocasionales.",
+      "features": {
+        "feature1": "Selección gratuita diaria",
+        "feature2": "Predicciones básicas de juegos",
+        "feature3": "Datos históricos limitados",
+        "feature4": "Acceso a la comunidad"
+      },
+      "button": "Comenzar"
+    },
+    "pro": {
+      "title": "Pro",
+      "price": "$19.99",
+      "period": "por mes",
+      "description": "Predicciones y análisis avanzados para apostadores serios.",
+      "features": {
+        "feature1": "Todas las características gratuitas",
+        "feature2": "Predicciones avanzadas para todos los juegos",
+        "feature3": "Métricas de rendimiento de jugadores",
+        "feature4": "Análisis del historial de apuestas",
+        "feature5": "Alertas por correo electrónico y notificaciones",
+        "feature6": "Soporte prioritario al cliente"
+      },
+      "button": "Suscribirse Ahora",
+      "popular": "Más Popular"
+    },
+    "elite": {
+      "title": "Elite",
+      "price": "$39.99",
+      "period": "por mes",
+      "description": "Características premium y contenido exclusivo para apostadores profesionales.",
+      "features": {
+        "feature1": "Todas las características Pro",
+        "feature2": "Recomendaciones de apuestas de proposición",
+        "feature3": "Estadísticas avanzadas de jugadores",
+        "feature4": "Optimizadores de parlay",
+        "feature5": "Análisis e información de expertos",
+        "feature6": "Acceso anticipado a nuevas características",
+        "feature7": "Soporte prioritario 24/7"
+      },
+      "button": "Elegir Elite"
+    }
+  },
+  "annualDiscount": {
+    "title": "Ahorre con Facturación Anual",
+    "description": "Obtenga 2 meses gratis cuando elija facturación anual.",
+    "proAnnual": "$199.99/año",
+    "eliteAnnual": "$399.99/año",
+    "switchToAnnual": "Cambiar a Anual",
+    "switchToMonthly": "Cambiar a Mensual"
+  },
+  "comparison": {
+    "title": "Comparación de Planes",
+    "feature": "Característica",
+    "free": "Gratis",
+    "pro": "Pro",
+    "elite": "Elite",
+    "features": {
+      "dailyPicks": "Selección Gratuita Diaria",
+      "gamePredictions": "Predicciones de Juegos",
+      "playerMetrics": "Métricas de Rendimiento de Jugadores",
+      "bettingHistory": "Análisis del Historial de Apuestas",
+      "alerts": "Alertas y Notificaciones",
+      "propBets": "Recomendaciones de Apuestas de Proposición",
+      "advancedStats": "Estadísticas Avanzadas de Jugadores",
+      "parlayOptimizer": "Optimizador de Parlay",
+      "expertAnalysis": "Análisis de Expertos",
+      "support": "Atención al Cliente"
+    },
+    "availability": {
+      "yes": "Sí",
+      "no": "No",
+      "limited": "Limitado",
+      "basic": "Básico",
+      "advanced": "Avanzado",
+      "premium": "Premium",
+      "standard": "Estándar",
+      "priority": "Prioritario",
+      "24/7": "Prioritario 24/7"
+    }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "questions": {
+      "q1": "¿Puedo cancelar mi suscripción en cualquier momento?",
+      "a1": "Sí, puede cancelar su suscripción en cualquier momento. Su acceso continuará hasta el final de su período de facturación.",
+      "q2": "¿Hay una prueba gratuita para los planes de pago?",
+      "a2": "Sí, ofrecemos una prueba gratuita de 7 días para los planes Pro y Elite. No se requiere tarjeta de crédito para comenzar su prueba.",
+      "q3": "¿Qué métodos de pago aceptan?",
+      "a3": "Aceptamos todas las principales tarjetas de crédito, PayPal y Apple Pay.",
+      "q4": "¿Puedo cambiar entre planes?",
+      "a4": "Sí, puede actualizar o degradar su plan en cualquier momento. Al actualizar, se le cobrará la diferencia prorrateada. Al degradar, el cambio entrará en vigor al final de su período de facturación actual.",
+      "q5": "¿Ofrecen reembolsos?",
+      "a5": "Ofrecemos una garantía de devolución de dinero de 30 días si no está satisfecho con su suscripción."
+    }
+  },
+  "cta": {
+    "title": "¿Listo para Elevar Su Estrategia de Apuestas?",
+    "description": "Únase a miles de apostadores que están tomando decisiones más inteligentes con AI Sports Edge.",
+    "button": "Elija Su Plan"
+  }
+}

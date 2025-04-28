@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const personalizedNotificationService = require('./personalizedNotificationService');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -195,13 +196,14 @@ exports.applyReferralCode = functions.https.onCall(async (data, context) => {
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
     
-    // Create a notification for the referrer
-    await referrerRef.collection('notifications').add({
-      type: 'new_referral',
-      title: 'New Referral',
-      message: 'Someone has used your referral code! You\'ll receive your reward when they subscribe.',
-      read: false,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    // Send a personalized notification to the referrer
+    await personalizedNotificationService.sendReferralNotification({
+      userId: referrerId,
+      referredUserId: data.newUserId,
+      type: 'newReferral',
+      data: {
+        referralCode: data.referralCode
+      }
     });
     
     return {
@@ -328,13 +330,16 @@ exports.processReferralReward = functions.firestore
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
       
-      // Create a notification for the referrer
-      await referrerRef.collection('notifications').add({
-        type: 'referral_reward',
-        title: 'Referral Reward',
-        message: `Your referral has subscribed! You've earned ${REFERRAL_REWARD_POINTS} loyalty points and a 1-month subscription extension.`,
-        read: false,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      // Send a personalized notification to the referrer
+      await personalizedNotificationService.sendReferralNotification({
+        userId: referrerId,
+        referredUserId: userId,
+        type: 'referralReward',
+        data: {
+          rewardPoints: REFERRAL_REWARD_POINTS,
+          rewardDuration: 30, // 1 month in days
+          subscriptionId: context.params.subscriptionId
+        }
       });
       
       return {
@@ -436,13 +441,17 @@ exports.processMilestoneReward = functions.firestore
             createdAt: admin.firestore.FieldValue.serverTimestamp()
           });
           
-          // Create a notification for the user
-          await db.collection('users').doc(userId).collection('notifications').add({
-            type: 'milestone_reward',
-            title: 'Referral Milestone Reached!',
-            message: `Congratulations! You've reached ${milestone.count} referrals and earned: ${milestone.reward.description}`,
-            read: false,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          // Send a personalized notification to the user
+          await personalizedNotificationService.sendReferralNotification({
+            userId,
+            type: 'milestoneReached',
+            data: {
+              count: milestone.count,
+              rewardDescription: milestone.reward.description,
+              rewardType: milestone.reward.type,
+              rewardDuration: milestone.reward.duration || 0,
+              rewardAmount: milestone.reward.amount || 0
+            }
           });
           
           // Track the milestone in analytics

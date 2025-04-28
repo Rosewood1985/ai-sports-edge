@@ -254,8 +254,20 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
         <ThemedText style={styles.subtitle}>Player Plus/Minus</ThemedText>
       </View>
       
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity
+          style={[styles.advancedStatsButton, { borderColor: primaryColor }]}
+          onPress={() => navigation.navigate('AdvancedPlayerStats', { gameId, gameTitle })}
+        >
+          <Ionicons name="analytics-outline" size={16} color={primaryColor} style={styles.buttonIcon} />
+          <ThemedText style={[styles.advancedStatsText, { color: primaryColor }]}>
+            Advanced Metrics
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
+      
       <ScrollView style={styles.scrollView}>
-        <PlayerPlusMinusList 
+        <PlayerPlusMinusList
           gameId={gameId}
           title="Player Impact"
           onPlayerPress={handlePlayerPress}
@@ -351,6 +363,30 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     opacity: 0.7,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e1e1e1',
+  },
+  advancedStatsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  buttonIcon: {
+    marginRight: 4,
+  },
+  advancedStatsText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   scrollView: {
     flex: 1,

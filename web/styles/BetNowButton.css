@@ -1,0 +1,158 @@
+/**
+ * BetNowButton Component Styles
+ */
+
+.bet-now-button {
+  display: inline-block;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  color: #FFFFFF;
+  background: linear-gradient(90deg, #FF0055 0%, #FF3300 100%);
+  box-shadow: 0 0 10px #FF3300;
+}
+
+.bet-now-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #FF3300;
+}
+
+.bet-now-button:active {
+  transform: scale(0.98);
+}
+
+/* Size variations */
+.bet-now-button--small {
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+.bet-now-button--medium {
+  font-size: 16px;
+  padding: 10px 20px;
+}
+
+.bet-now-button--large {
+  font-size: 18px;
+  padding: 12px 24px;
+}
+
+/* Position variations */
+.bet-now-button--inline {
+  margin: 0.5rem;
+}
+
+.bet-now-button--floating {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px #FF3300;
+}
+
+.bet-now-button--fixed {
+  width: 100%;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+/* Animation states */
+.bet-now-button.animating {
+  animation: pulse 2s infinite;
+}
+
+.bet-now-button.flickering {
+  animation: flicker 0.2s;
+}
+
+.bet-now-button.surging {
+  animation: surge 0.5s;
+}
+
+/* Animation keyframes */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 20px currentColor;
+  }
+  100% {
+    box-shadow: 0 0 10px currentColor;
+  }
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes surge {
+  0% {
+    box-shadow: 0 0 10px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 30px currentColor;
+  }
+  100% {
+    box-shadow: 0 0 10px currentColor;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .bet-now-button--floating {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .bet-now-button--small {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .bet-now-button--medium {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  
+  .bet-now-button--large {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+}
+
+/* Accessibility - respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .bet-now-button {
+    transition: none;
+  }
+  
+  .bet-now-button:hover {
+    transform: none;
+  }
+  
+  .bet-now-button.animating,
+  .bet-now-button.flickering,
+  .bet-now-button.surging {
+    animation: none;
+  }
+}

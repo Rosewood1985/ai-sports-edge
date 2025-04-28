@@ -1,267 +1,187 @@
+/**
+ * Analytics Service
+ * 
+ * A unified analytics interface that works across platforms (web and mobile)
+ * This service abstracts away the platform-specific implementation details
+ * and provides a consistent API for tracking events.
+ */
+
+import { Platform } from 'react-native';
+import { firestore } from '../config/firebase';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { auth } from '../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Analytics event types
-export type AnalyticsEventType =
-  // Onboarding events
-  | 'onboarding_started'
-  | 'onboarding_completed'
-  | 'onboarding_skipped'
-  | 'onboarding_step_viewed'
-  
-  // AI prediction events
-  | 'ai_prediction_viewed'
-  | 'ai_prediction_shared'
-  | 'daily_insights_viewed'
-  | 'bet_comparison_viewed'
-  | 'ai_summary_generated'
-  
-  // Subscription events
-  | 'subscription_page_viewed'
-  | 'subscription_started'
-  | 'subscription_completed'
-  | 'subscription_cancelled'
-  | 'subscription_renewed'
-  | 'subscription_auto_renewed'
-  | 'payment_method_added'
-  | 'payment_failed'
-  | 'plan_upgraded'
-  | 'plan_downgraded'
-  | 'auto_resubscribe_enabled'
-  | 'auto_resubscribe_disabled'
-  | 'subscription_report_generated'
-  
-  // Microtransaction events
-  | 'single_prediction_purchased'
-  | 'weekend_pass_purchased'
-  | 'alert_package_purchased'
-  
-  // Referral events
-  | 'referral_code_generated'
-  | 'referral_code_applied'
-  | 'referral_converted'
-  | 'referral_reward_earned'
-  | 'gift_subscription_redeemed'
-  
-  // App usage events
-  | 'app_opened'
-  | 'app_backgrounded'
-  | 'search_performed'
-  | 'filter_applied'
-  | 'game_viewed'
-  | 'odds_refreshed'
-  | 'theme_changed'
-  | 'notification_settings_changed'
-  | 'sports_news_fetched'
-  | 'sports_news_viewed'
-  | 'sports_news_focus_changed'
-  | 'sports_preferences_updated'
-  | 'ai_sentiment_analysis_generated'
-  | 'ai_odds_impact_predicted'
-  | 'ai_historical_correlation_analyzed'
-  | 'ai_personalized_summary_generated'
-  
-  // Achievement events
-  | 'achievement_unlocked'
-  | 'loyalty_level_up'
-  | 'streak_reward_earned';
-
-// Analytics event interface
-export interface AnalyticsEvent {
-  eventType: AnalyticsEventType;
-  timestamp: number;
-  userId?: string;
-  sessionId: string;
-  properties?: Record<string, any>;
-}
-
-// Session management
-let currentSessionId: string = '';
-
-/**
- * Initialize analytics and start a new session
- */
-export const initAnalytics = async (): Promise<void> => {
-  // Generate a new session ID
-  currentSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  
-  // Track app opened event
-  await trackEvent('app_opened');
-  
-  // Store session start time
-  await AsyncStorage.setItem('analytics_session_start', Date.now().toString());
+// Sanitize values for XSS prevention
+const sanitizeValue = (value: any): any => {
+  if (typeof value === 'string') {
+    // More comprehensive XSS prevention
+    // Escape HTML special chars, script tags, event handlers, and data URIs
+    return value
+      .replace(/[&<>"']/g, (char) => {
+        const entities: Record<string, string> = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        };
+        return entities[char];
+      })
+      .replace(/javascript:/gi, 'blocked:')
+      .replace(/on\w+=/gi, 'data-blocked=')
+      .replace(/data:(?!image\/(jpeg|png|gif|webp))/gi, 'blocked:');
+  }
+  if (typeof value === 'object' && value !== null) {
+    // Handle arrays
+    if (Array.isArray(value)) {
+      return value.map(item => sanitizeValue(item));
+    }
+    // Handle objects
+    return Object.keys(value).reduce((acc: Record<string, any>, key) => {
+      acc[key] = sanitizeValue(value[key]);
+      return acc;
+    }, {});
+  }
+  return value;
 };
 
 /**
  * Track an analytics event
- * @param eventType - Type of event
- * @param properties - Additional properties for the event
+ * @param {string} eventName - Name of the event to track
+ * @param {Object} eventData - Data associated with the event
+ * @returns {Promise<boolean>} - True if successful, false otherwise
  */
-export const trackEvent = async (
-  eventType: AnalyticsEventType,
-  properties?: Record<string, any>
-): Promise<void> => {
+export const trackEvent = async (eventName: string, eventData: Record<string, any>): Promise<boolean> => {
   try {
-    // Get current user ID if logged in
-    const userId = auth.currentUser?.uid;
+    // Sanitize inputs
+    const sanitizedEventName = sanitizeValue(eventName);
+    const sanitizedEventData = sanitizeValue(eventData);
     
-    // Create event object
-    const event: AnalyticsEvent = {
-      eventType,
-      timestamp: Date.now(),
-      userId,
-      sessionId: currentSessionId,
-      properties
+    // Add common properties
+    const commonData = {
+      timestamp: new Date().toISOString(),
+      platform: Platform.OS,
     };
     
-    // In a real app, this would send the event to an analytics service
-    // For now, we'll just log it and store locally
-    console.log('Analytics event:', event);
+    // Merge with event data
+    const fullEventData = {
+      ...sanitizedEventData,
+      ...commonData
+    };
     
-    // Store events locally for debugging/development
-    const storedEvents = await AsyncStorage.getItem('analytics_events');
-    const events: AnalyticsEvent[] = storedEvents ? JSON.parse(storedEvents) : [];
-    events.push(event);
-    
-    // Only keep the last 1000 events to avoid storage issues
-    const trimmedEvents = events.slice(-1000);
-    await AsyncStorage.setItem('analytics_events', JSON.stringify(trimmedEvents));
-    
-    // In a production app, we would batch and send events to a server
-  } catch (error) {
-    console.error('Error tracking analytics event:', error);
-  }
-};
-
-/**
- * Track screen view
- * @param screenName - Name of the screen
- * @param properties - Additional properties
- */
-export const trackScreenView = async (
-  screenName: string,
-  properties?: Record<string, any>
-): Promise<void> => {
-  await trackEvent('app_opened' as AnalyticsEventType, {
-    screen: screenName,
-    ...properties
-  });
-};
-
-/**
- * Track onboarding step
- * @param stepNumber - Onboarding step number
- * @param stepName - Onboarding step name
- */
-export const trackOnboardingStep = async (
-  stepNumber: number,
-  stepName: string
-): Promise<void> => {
-  await trackEvent('onboarding_step_viewed', {
-    step_number: stepNumber,
-    step_name: stepName
-  });
-};
-
-/**
- * Track AI prediction interaction
- * @param gameId - Game ID
- * @param predictionType - Type of prediction
- * @param interactionType - Type of interaction
- */
-export const trackPredictionInteraction = async (
-  gameId: string,
-  predictionType: 'game_prediction' | 'daily_insight' | 'trending_bet',
-  interactionType: 'view' | 'share' | 'purchase'
-): Promise<void> => {
-  let eventType: AnalyticsEventType;
-  
-  if (interactionType === 'view') {
-    eventType = 'ai_prediction_viewed';
-  } else if (interactionType === 'share') {
-    eventType = 'ai_prediction_shared';
-  } else {
-    eventType = 'single_prediction_purchased';
-  }
-  
-  await trackEvent(eventType, {
-    game_id: gameId,
-    prediction_type: predictionType
-  });
-};
-
-/**
- * Track purchase event
- * @param productId - Product ID
- * @param productType - Type of product
- * @param amount - Purchase amount
- * @param currency - Currency code
- */
-export const trackPurchase = async (
-  productId: string,
-  productType: 'subscription' | 'single_prediction' | 'weekend_pass' | 'alert_package',
-  amount: number,
-  currency: string = 'USD'
-): Promise<void> => {
-  let eventType: AnalyticsEventType;
-  
-  switch (productType) {
-    case 'subscription':
-      eventType = 'subscription_completed';
-      break;
-    case 'single_prediction':
-      eventType = 'single_prediction_purchased';
-      break;
-    case 'weekend_pass':
-      eventType = 'weekend_pass_purchased';
-      break;
-    case 'alert_package':
-      eventType = 'alert_package_purchased';
-      break;
-  }
-  
-  await trackEvent(eventType, {
-    product_id: productId,
-    product_type: productType,
-    amount,
-    currency
-  });
-};
-
-/**
- * Get analytics data for the current user
- * @returns Analytics data
- */
-export const getUserAnalytics = async (): Promise<Record<string, any>> => {
-  try {
-    const userId = auth.currentUser?.uid;
-    
-    if (!userId) {
-      return {};
+    // Web implementation (gtag)
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', sanitizedEventName, fullEventData);
     }
     
-    // In a real app, this would fetch analytics from a backend
-    // For now, we'll return mock data
-    return {
-      total_sessions: 12,
-      total_predictions_viewed: 45,
-      total_purchases: 2,
-      favorite_teams: ['Lakers', 'Chiefs'],
-      most_viewed_sports: ['basketball', 'football'],
-      average_session_duration: 340, // seconds
-    };
+    // React Native implementation (Firebase)
+    if (Platform.OS !== 'web') {
+      // Store in Firestore if user is logged in
+      if (auth.currentUser) {
+        const userId = auth.currentUser.uid;
+        const deviceId = await getDeviceId();
+        
+        const analyticsRef = doc(
+          firestore,
+          'analytics_events',
+          `${userId || deviceId}_${sanitizedEventName}_${Date.now()}`
+        );
+        
+        await setDoc(analyticsRef, {
+          eventName: sanitizedEventName,
+          userId: userId || null,
+          deviceId: deviceId,
+          ...fullEventData,
+          serverTimestamp: Timestamp.now()
+        });
+      }
+    }
+    
+    return true;
   } catch (error) {
-    console.error('Error getting user analytics:', error);
-    return {};
+    console.error('Analytics error:', error);
+    // Don't let analytics errors affect the main functionality
+    return false;
   }
 };
 
-export default {
-  initAnalytics,
-  trackEvent,
-  trackScreenView,
-  trackOnboardingStep,
-  trackPredictionInteraction,
-  trackPurchase,
-  getUserAnalytics
+/**
+ * Get a unique device ID
+ * @returns {Promise<string>} - Device ID
+ */
+const getDeviceId = async (): Promise<string> => {
+  try {
+    // For React Native
+    if (Platform.OS !== 'web') {
+      let deviceId = await AsyncStorage.getItem('@AISportsEdge:deviceId');
+      
+      if (!deviceId) {
+        deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        await AsyncStorage.setItem('@AISportsEdge:deviceId', deviceId);
+      }
+      
+      return deviceId;
+    }
+    
+    // For Web
+    if (typeof localStorage !== 'undefined') {
+      let deviceId = localStorage.getItem('ai_sports_edge_device_id');
+      
+      if (!deviceId) {
+        deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('ai_sports_edge_device_id', deviceId);
+      }
+      
+      return deviceId;
+    }
+    
+    // Fallback
+    return `anonymous_${Date.now()}`;
+  } catch (error) {
+    console.error('Error getting device ID:', error);
+    return `anonymous_${Date.now()}`;
+  }
+};
+
+/**
+ * Track onboarding started event
+ * @param {number} totalSteps - Total number of onboarding steps
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackOnboardingStarted = async (totalSteps: number): Promise<boolean> => {
+  return trackEvent('onboarding_started', {
+    event_category: 'engagement',
+    event_label: 'onboarding',
+    total_steps: totalSteps
+  });
+};
+
+/**
+ * Track onboarding step viewed event
+ * @param {number} currentStep - Current step index (1-based)
+ * @param {number} totalSteps - Total number of steps
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackOnboardingStep = async (currentStep: number, totalSteps: number): Promise<boolean> => {
+  const progressPercentage = Math.round((currentStep / totalSteps) * 100);
+  
+  return trackEvent('onboarding_step', {
+    event_category: 'engagement',
+    event_label: `step_${currentStep}`,
+    current_step: currentStep,
+    total_steps: totalSteps,
+    progress_percentage: progressPercentage
+  });
+};
+
+/**
+ * Track onboarding completed event
+ * @returns {Promise<boolean>} - True if successful, false otherwise
+ */
+export const trackOnboardingCompleted = async (): Promise<boolean> => {
+  return trackEvent('onboarding_completed', {
+    event_category: 'engagement',
+    event_label: 'onboarding'
+  });
 };

@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "title": "Características - AI Sports Edge",
+    "description": "Explore las potentes características de AI Sports Edge que le ayudan a tomar decisiones de apuestas más inteligentes con predicciones y análisis impulsados por IA.",
+    "keywords": "características de apuestas deportivas, predicciones de IA, análisis de apuestas, características de ventaja deportiva",
+    "ogTitle": "Características - AI Sports Edge",
+    "ogDescription": "Explore las potentes características de AI Sports Edge que le ayudan a tomar decisiones de apuestas más inteligentes con predicciones y análisis impulsados por IA."
+  },
+  "hero": {
+    "title": "Potentes Características para Apuestas Más Inteligentes",
+    "subtitle": "Descubra cómo AI Sports Edge puede transformar su estrategia de apuestas con análisis y predicciones avanzadas."
+  },
+  "aiPredictions": {
+    "title": "Predicciones Impulsadas por IA",
+    "description": "Nuestros algoritmos avanzados de aprendizaje automático analizan grandes cantidades de datos para proporcionar predicciones precisas de apuestas en múltiples deportes.",
+    "feature1": "Modelos estadísticos avanzados",
+    "feature2": "Análisis de rendimiento histórico",
+    "feature3": "Integración de datos en tiempo real",
+    "feature4": "Aprendizaje y mejora continuos"
+  },
+  "analytics": {
+    "title": "Análisis Completo",
+    "description": "Obtenga análisis detallados e información para entender el razonamiento detrás de las predicciones y tomar decisiones informadas de apuestas.",
+    "feature1": "Tendencias y patrones de rendimiento",
+    "feature2": "Comparaciones directas",
+    "feature3": "Análisis situacional",
+    "feature4": "Cálculos de probabilidad"
+  },
+  "multiSport": {
+    "title": "Cobertura Multi-Deporte",
+    "description": "Desde las principales ligas hasta competiciones de nicho, proporcionamos predicciones y análisis en una amplia gama de deportes.",
+    "sports": {
+      "football": "Fútbol Americano",
+      "basketball": "Baloncesto",
+      "baseball": "Béisbol",
+      "hockey": "Hockey",
+      "soccer": "Fútbol",
+      "tennis": "Tenis",
+      "mma": "MMA",
+      "formula1": "Fórmula 1",
+      "golf": "Golf"
+    }
+  },
+  "personalizedAlerts": {
+    "title": "Alertas Personalizadas",
+    "description": "Reciba notificaciones personalizadas sobre sus equipos, jugadores y oportunidades de apuestas favoritos.",
+    "feature1": "Recordatorios de inicio de juego",
+    "feature2": "Alertas de movimiento de probabilidades",
+    "feature3": "Actualizaciones de lesiones",
+    "feature4": "Notificaciones de apuestas de valor"
+  },
+  "bettingHistory": {
+    "title": "Seguimiento del Historial de Apuestas",
+    "description": "Realice un seguimiento de su rendimiento de apuestas a lo largo del tiempo e identifique fortalezas y áreas de mejora.",
+    "feature1": "Registros de victorias/derrotas",
+    "feature2": "Análisis de ROI",
+    "feature3": "Rendimiento por deporte",
+    "feature4": "Información sobre patrones de apuestas"
+  },
+  "premiumFeatures": {
+    "title": "Características Premium",
+    "description": "Actualice para acceder a características exclusivas diseñadas para apostadores serios.",
+    "feature1": "Estadísticas avanzadas de jugadores",
+    "feature2": "Recomendaciones de apuestas de proposición",
+    "feature3": "Optimizadores de parlay",
+    "feature4": "Análisis e información de expertos",
+    "upgradeButton": "Actualizar Ahora"
+  },
+  "cta": {
+    "title": "¿Listo para Experimentar Estas Características?",
+    "description": "Descargue AI Sports Edge hoy y comience a tomar decisiones de apuestas más inteligentes.",
+    "downloadButton": "Descargar Ahora",
+    "learnMoreButton": "Conocer los Precios"
+  }
+}

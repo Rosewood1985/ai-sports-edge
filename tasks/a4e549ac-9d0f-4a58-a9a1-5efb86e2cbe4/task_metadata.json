@@ -1,0 +1,460 @@
+{
+  "files_in_context": [
+    {
+      "path": "components/AIPickCard.tsx",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744935249446,
+      "roo_edit_date": 1744935249446,
+      "user_edit_date": null
+    },
+    {
+      "path": "dist/login.html",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744938162477
+    },
+    {
+      "path": "memory-bank/firebase-auth-debugging-summary.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938476625,
+      "roo_edit_date": 1744938476625,
+      "user_edit_date": null
+    },
+    {
+      "path": "debug-app-detailed.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938617810,
+      "roo_edit_date": 1744938617810,
+      "user_edit_date": null
+    },
+    {
+      "path": "debug-app.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938652414,
+      "roo_edit_date": 1744938652414,
+      "user_edit_date": null
+    },
+    {
+      "path": "debug-service-init.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938709386,
+      "roo_edit_date": 1744938709386,
+      "user_edit_date": null
+    },
+    {
+      "path": "debug-services.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938752336,
+      "roo_edit_date": 1744938752336,
+      "user_edit_date": null
+    },
+    {
+      "path": "debug-services.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938763563,
+      "roo_edit_date": 1744938763563,
+      "user_edit_date": null
+    },
+    {
+      "path": "debug-services.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744938763563,
+      "roo_edit_date": 1744938763563,
+      "user_edit_date": 1744938763572
+    },
+    {
+      "path": "debug-services.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938779086,
+      "roo_edit_date": 1744938779086,
+      "user_edit_date": 1744938763572
+    },
+    {
+      "path": "debug-services.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744938779086,
+      "roo_edit_date": 1744938779086,
+      "user_edit_date": 1744938779093
+    },
+    {
+      "path": "deploy-firebase-fix.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744938808753,
+      "roo_edit_date": 1744938808753,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-spanish-localization.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939101166,
+      "roo_edit_date": 1744939101166,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/comprehensive-deployment-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939161899,
+      "roo_edit_date": 1744939161899,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-combined.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939201570,
+      "roo_edit_date": 1744939201570,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939308685,
+      "roo_edit_date": 1744939308685,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939387072,
+      "roo_edit_date": 1744939387072,
+      "user_edit_date": null
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744939308685,
+      "roo_edit_date": 1744939308685,
+      "user_edit_date": 1744939436720
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939436808,
+      "roo_edit_date": 1744939436808,
+      "user_edit_date": 1744939436720
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939447354,
+      "roo_edit_date": 1744939447354,
+      "user_edit_date": 1744939436720
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744939447354,
+      "roo_edit_date": 1744939447354,
+      "user_edit_date": 1744939447359
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744939463259,
+      "roo_edit_date": 1744939447354,
+      "user_edit_date": 1744939447359
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939473380,
+      "roo_edit_date": 1744939473380,
+      "user_edit_date": 1744939447359
+    },
+    {
+      "path": "memory-bank/progress.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744939473380,
+      "roo_edit_date": 1744939473380,
+      "user_edit_date": 1744939473385
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744939578049,
+      "roo_edit_date": 1744939387072,
+      "user_edit_date": null
+    },
+    {
+      "path": "update-package-json.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939590538,
+      "roo_edit_date": 1744939590538,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939599496,
+      "roo_edit_date": 1744939599496,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1744939599496,
+      "roo_edit_date": 1744939599496,
+      "user_edit_date": 1744939599501
+    },
+    {
+      "path": "update-index-html.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939623546,
+      "roo_edit_date": 1744939623546,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744939647129,
+      "roo_edit_date": 1744939599496,
+      "user_edit_date": 1744939599501
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744939656636,
+      "roo_edit_date": 1744939656636,
+      "user_edit_date": 1744939599501
+    },
+    {
+      "path": "deploy-performance-optimization.sh",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1744939656636,
+      "roo_edit_date": 1744939656636,
+      "user_edit_date": 1744939656641
+    },
+    {
+      "path": "SignupPage.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744940076510,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "ForgotPasswordPage.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744940082348,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1744940088256,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "screens/Auth/SignupScreen.tsx",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1744940093568,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-signup.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744940178273,
+      "roo_edit_date": 1744940178273,
+      "user_edit_date": null
+    },
+    {
+      "path": "build-and-deploy.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744940255926,
+      "roo_edit_date": 1744940255926,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-to-firebase.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744940339092,
+      "roo_edit_date": 1744940339092,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940392238
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940398861
+    },
+    {
+      "path": "implement-firebase-auth.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744940591267,
+      "roo_edit_date": 1744940591267,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940612709
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940618890
+    },
+    {
+      "path": "fix-firebase-auth.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744940700397,
+      "roo_edit_date": 1744940700397,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940717640
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940723553
+    },
+    {
+      "path": "final-firebase-fix.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744940805654,
+      "roo_edit_date": 1744940805654,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940816413
+    },
+    {
+      "path": "firebase.json",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": null,
+      "roo_edit_date": null,
+      "user_edit_date": 1744940822500
+    },
+    {
+      "path": "deploy-to-godaddy.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744941194278,
+      "roo_edit_date": 1744941194278,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-to-godaddy-ftp.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744941310982,
+      "roo_edit_date": 1744941310982,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-to-godaddy-sftp.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744941365626,
+      "roo_edit_date": 1744941365626,
+      "user_edit_date": null
+    },
+    {
+      "path": "manual-deploy-instructions.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744942197197,
+      "roo_edit_date": 1744942197197,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744942311730,
+      "roo_edit_date": 1744942311730,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-vscode-sftp.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744942350539,
+      "roo_edit_date": 1744942350539,
+      "user_edit_date": null
+    },
+    {
+      "path": "install-vscode-sftp-extension.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1744942493144,
+      "roo_edit_date": 1744942493144,
+      "user_edit_date": null
+    }
+  ]
+}

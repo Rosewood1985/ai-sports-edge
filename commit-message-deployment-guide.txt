@@ -1,0 +1,9 @@
+docs: Add comprehensive deployment guide
+
+- Created deployment-guide.md that documents:
+  - Three deployment options (GitHub Actions, Automated Script, Manual Fallback)
+  - Step-by-step instructions for each deployment method
+  - Troubleshooting steps for common deployment issues
+  - Configuration details for deployment settings
+
+This guide provides a single source of truth for all deployment-related information, making it easier for team members to understand and execute deployments consistently.

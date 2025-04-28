@@ -1,0 +1,204 @@
+{
+  "files_in_context": [
+    {
+      "path": "build/index.html",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439810358,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "build/index.html",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439876116,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-to-godaddy-sftp.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439890285,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/direct-sftp-deploy.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439984650,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/quick-deploy.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439990218,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/sftp-deploy-cleanup.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439994203,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-build-sftp.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745439998723,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "upload-index.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440016010,
+      "roo_edit_date": 1745440016010,
+      "user_edit_date": null
+    },
+    {
+      "path": "manual-deploy-instructions.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440026279,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "fix-permissions-and-build.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440032383,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/detailed-deployment-check.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440035830,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "sftp-config.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440198626,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deployment-summary.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440210323,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "upload-index.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440221122,
+      "roo_edit_date": 1745440221122,
+      "user_edit_date": null
+    },
+    {
+      "path": "upload-index.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745440221122,
+      "roo_edit_date": 1745440221122,
+      "user_edit_date": 1745440239675
+    },
+    {
+      "path": "upload-index.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440240461,
+      "roo_edit_date": 1745440240461,
+      "user_edit_date": 1745440239675
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440255679,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "upload-index.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745440240461,
+      "roo_edit_date": 1745440240461,
+      "user_edit_date": 1745440264581
+    },
+    {
+      "path": "upload-index.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440265362,
+      "roo_edit_date": 1745440265362,
+      "user_edit_date": 1745440264581
+    },
+    {
+      "path": "deployment-plan.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440287451,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-vscode-sftp.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745440292133,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "run-server-commands.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440371490,
+      "roo_edit_date": 1745440371490,
+      "user_edit_date": null
+    },
+    {
+      "path": ".vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440444753,
+      "roo_edit_date": 1745440444753,
+      "user_edit_date": null
+    },
+    {
+      "path": "vscode-sftp-deploy/.vscode/sftp.json",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440511958,
+      "roo_edit_date": 1745440511958,
+      "user_edit_date": null
+    },
+    {
+      "path": "deployment-instructions.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745440527540,
+      "roo_edit_date": 1745440527540,
+      "user_edit_date": null
+    }
+  ]
+}

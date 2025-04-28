@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const groupSubscriptions = require('./groupSubscriptions');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -131,6 +132,14 @@ async function handlePaymentIntentFailed(paymentIntent) {
 async function handleSubscriptionCreated(subscription) {
   console.log('Subscription created:', subscription.id);
   
+  // Check if this is a group subscription
+  if (subscription.metadata && subscription.metadata.type === 'group_subscription') {
+    // Group subscriptions are handled by the createGroupSubscription function
+    // This webhook is just for tracking and additional processing
+    console.log('Group subscription created, handled by createGroupSubscription function');
+    return;
+  }
+  
   const db = admin.firestore();
   const customerId = subscription.customer;
   
@@ -187,6 +196,16 @@ async function handleSubscriptionCreated(subscription) {
 async function handleSubscriptionUpdated(subscription) {
   console.log('Subscription updated:', subscription.id);
   
+  // Check if this is a group subscription
+  if (subscription.metadata && subscription.metadata.type === 'group_subscription') {
+    // Handle group subscription update
+    await groupSubscriptions.handleGroupSubscriptionWebhook({
+      type: 'customer.subscription.updated',
+      data: { object: subscription }
+    });
+    return;
+  }
+  
   const db = admin.firestore();
   const customerId = subscription.customer;
   
@@ -227,6 +246,16 @@ async function handleSubscriptionUpdated(subscription) {
  */
 async function handleSubscriptionDeleted(subscription) {
   console.log('Subscription deleted:', subscription.id);
+  
+  // Check if this is a group subscription
+  if (subscription.metadata && subscription.metadata.type === 'group_subscription') {
+    // Handle group subscription deletion
+    await groupSubscriptions.handleGroupSubscriptionWebhook({
+      type: 'customer.subscription.deleted',
+      data: { object: subscription }
+    });
+    return;
+  }
   
   const db = admin.firestore();
   const customerId = subscription.customer;

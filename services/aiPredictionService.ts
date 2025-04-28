@@ -1,59 +1,40 @@
 import { Game, AIPrediction, ConfidenceLevel, DailyInsight, GameResult } from '../types/odds';
 import { PropBetLine, PropBetPrediction, PropBetType } from '../types/playerProps';
 import { auth } from '../config/firebase';
+import { useI18n } from '../contexts/I18nContext';
 import {
   hasPremiumAccess,
   hasUsedFreeDailyPick,
   markFreeDailyPickAsUsed
-} from './subscriptionService';
+} from './firebaseSubscriptionService';
+import { mlPredictionService } from './mlPredictionService';
 
 /**
  * Generate an AI prediction for a game
  * @param game - The game to predict
+ * @param language - The language code (en or es)
  * @returns AI prediction
  */
-export const generateAIPrediction = async (game: Game): Promise<AIPrediction> => {
-  // In a real app, this would call an AI model API
-  // For now, we'll simulate AI predictions with random data
-  
-  // Randomly select a winner
-  const teams = [game.home_team, game.away_team];
-  const predictedWinner = teams[Math.floor(Math.random() * teams.length)];
-  
-  // Generate a confidence score (0-100)
-  const confidenceScore = Math.floor(Math.random() * 100);
-  
-  // Determine confidence level based on score
-  let confidence: ConfidenceLevel;
-  if (confidenceScore >= 70) {
-    confidence = 'high';
-  } else if (confidenceScore >= 40) {
-    confidence = 'medium';
-  } else {
-    confidence = 'low';
+export const generateAIPrediction = async (
+  game: Game,
+  language = 'en'
+): Promise<AIPrediction> => {
+  try {
+    // Use the ML prediction service to generate a prediction
+    return await mlPredictionService.generatePrediction(game, language);
+  } catch (error) {
+    console.error('Error generating AI prediction:', error);
+    // Return a fallback prediction with error message
+    return {
+      predicted_winner: game.home_team,
+      confidence: 'low', // Always 'low' confidence for error cases
+      confidence_score: 30,
+      reasoning: language === 'es'
+        ? 'Error al generar la predicción. Usando predicción de respaldo.'
+        : 'Error generating prediction. Using fallback prediction.',
+      historical_accuracy: 60
+    };
   }
-  
-  // Generate reasoning
-  const reasonings = [
-    `${predictedWinner} has won 7 of their last 10 games.`,
-    `${predictedWinner} has a strong historical performance against their opponent.`,
-    `${predictedWinner} has key players returning from injury.`,
-    `${predictedWinner} has a statistical advantage in offensive efficiency.`,
-    `${predictedWinner} has performed well in similar weather conditions.`
-  ];
-  
-  const reasoning = reasonings[Math.floor(Math.random() * reasonings.length)];
-  
-  // Simulate historical accuracy (60-95%)
-  const historicalAccuracy = 60 + Math.floor(Math.random() * 35);
-  
-  return {
-    predicted_winner: predictedWinner,
-    confidence,
-    confidence_score: confidenceScore,
-    reasoning,
-    historical_accuracy: historicalAccuracy
-  };
 };
 
 /**
@@ -76,10 +57,10 @@ export const getAIPredictions = async (games: Game[]): Promise<Game[]> => {
       return games;
     }
     
-    // Generate predictions for each game
+    // Generate predictions for each game using the ML prediction service
     const gamesWithPredictions = await Promise.all(
       games.map(async (game) => {
-        const prediction = await generateAIPrediction(game);
+        const prediction = await mlPredictionService.generatePrediction(game);
         return {
           ...game,
           ai_prediction: prediction
@@ -500,7 +481,7 @@ export const getFreeDailyPick = async (games: Game[]): Promise<Game | null> => {
     const selectedGame = games[randomIndex];
     
     // Generate prediction for the selected game
-    const prediction = await generateAIPrediction(selectedGame);
+    const prediction = await mlPredictionService.generatePrediction(selectedGame);
     
     // Mark the free daily pick as used
     await markFreeDailyPickAsUsed(userId, selectedGame.id);
@@ -525,7 +506,7 @@ export const getBlurredPredictions = async (games: Game[]): Promise<Game[]> => {
     // Generate predictions for each game but blur the confidence scores
     const gamesWithBlurredPredictions = await Promise.all(
       games.map(async (game) => {
-        const prediction = await generateAIPrediction(game);
+        const prediction = await mlPredictionService.generatePrediction(game);
         
         // Create a blurred version of the prediction
         const blurredPrediction = {
@@ -653,6 +634,28 @@ export const getAILeaderboard = async (): Promise<{
   return entries;
 };
 
+
+/**
+ * Record prediction feedback
+ * @param gameId - Game ID
+ * @param prediction - Prediction made
+ * @param actualWinner - Actual winner
+ * @returns Success status
+ */
+export const recordPredictionFeedback = async (
+  gameId: string,
+  prediction: AIPrediction,
+  actualWinner: string
+): Promise<boolean> => {
+  try {
+    // Use the ML prediction service to record feedback
+    return await mlPredictionService.recordFeedback(gameId, actualWinner);
+  } catch (error) {
+    console.error('Error recording prediction feedback:', error);
+    return false;
+  }
+};
+
 export default {
   getAIPredictions,
   getLiveUpdates,
@@ -664,5 +667,7 @@ export default {
   getBlurredPredictions,
   getTrendingBets,
   getCommunityPolls,
-  getAILeaderboard
+  getAILeaderboard,
+  recordPredictionFeedback,
+  generateAIPrediction
 };

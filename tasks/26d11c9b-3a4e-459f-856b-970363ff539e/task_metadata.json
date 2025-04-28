@@ -1,0 +1,724 @@
+{
+  "files_in_context": [
+    {
+      "path": "firebase-upgrade-todo.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013260785,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013264823,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deployment-summary.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013269737,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "debugging-summary.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013274029,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013278449,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "ai-sports-edge-todo.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013305035,
+      "roo_edit_date": 1745013305035,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.example",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013337716,
+      "roo_edit_date": 1745013337716,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013342032,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013360784,
+      "roo_edit_date": 1745013360784,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745013360784,
+      "roo_edit_date": 1745013360784,
+      "user_edit_date": 1745013360813
+    },
+    {
+      "path": "utils/envConfig.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013379036,
+      "roo_edit_date": 1745013379036,
+      "user_edit_date": null
+    },
+    {
+      "path": "firebase.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013396589,
+      "roo_edit_date": 1745013396589,
+      "user_edit_date": 1745013360813
+    },
+    {
+      "path": "firebase.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745013396589,
+      "roo_edit_date": 1745013396589,
+      "user_edit_date": 1745013396619
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013413026,
+      "roo_edit_date": 1745013413026,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/check-env.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013434320,
+      "roo_edit_date": 1745013434320,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013439680,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013451580,
+      "roo_edit_date": 1745013451580,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745013451580,
+      "roo_edit_date": 1745013451580,
+      "user_edit_date": 1745013451595
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745013594048,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745013594048,
+      "roo_edit_date": null,
+      "user_edit_date": 1745013602694
+    },
+    {
+      "path": "README.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745013602769,
+      "roo_edit_date": 1745013602769,
+      "user_edit_date": 1745013602694
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745014749643,
+      "roo_edit_date": 1745014749643,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745014880576,
+      "roo_edit_date": 1745014880576,
+      "user_edit_date": 1745013451595
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745014880576,
+      "roo_edit_date": 1745014880576,
+      "user_edit_date": 1745014880590
+    },
+    {
+      "path": "docs/deployment-process.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745014885903,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/deployment-process.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745014900481,
+      "roo_edit_date": 1745014900481,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/deployment-process.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745014900481,
+      "roo_edit_date": 1745014900481,
+      "user_edit_date": 1745014900508
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015136482,
+      "roo_edit_date": 1745015136482,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015136482,
+      "roo_edit_date": 1745015136482,
+      "user_edit_date": 1745015136511
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015152543,
+      "roo_edit_date": 1745015152543,
+      "user_edit_date": 1745015136511
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015152543,
+      "roo_edit_date": 1745015152543,
+      "user_edit_date": 1745015152568
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745015928459,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.example",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015937357,
+      "roo_edit_date": 1745015937357,
+      "user_edit_date": null
+    },
+    {
+      "path": ".env.example",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015937357,
+      "roo_edit_date": 1745015937357,
+      "user_edit_date": 1745015937385
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015951741,
+      "roo_edit_date": 1745015951741,
+      "user_edit_date": null
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015951741,
+      "roo_edit_date": 1745015951741,
+      "user_edit_date": 1745015951775
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015962427,
+      "roo_edit_date": 1745015962427,
+      "user_edit_date": 1745015951775
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015962427,
+      "roo_edit_date": 1745015962427,
+      "user_edit_date": 1745015962477
+    },
+    {
+      "path": "web/components/BetNowPopup.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745015966949,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "web/components/BetNowPopup.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015975488,
+      "roo_edit_date": 1745015975488,
+      "user_edit_date": null
+    },
+    {
+      "path": "web/components/BetNowPopup.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015975488,
+      "roo_edit_date": 1745015975488,
+      "user_edit_date": 1745015975508
+    },
+    {
+      "path": "web/components/OddsButton.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745015978804,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "web/components/OddsButton.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745015978804,
+      "roo_edit_date": null,
+      "user_edit_date": 1745015986969
+    },
+    {
+      "path": "web/components/OddsButton.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745015987046,
+      "roo_edit_date": 1745015987046,
+      "user_edit_date": 1745015986969
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745015994219,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "services/bettingAffiliateService.ts",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745016008213,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745016017097,
+      "roo_edit_date": 1745016017097,
+      "user_edit_date": null
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745016017097,
+      "roo_edit_date": 1745016017097,
+      "user_edit_date": 1745016017119
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745016024847,
+      "roo_edit_date": 1745016024847,
+      "user_edit_date": 1745016017119
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745016024847,
+      "roo_edit_date": 1745016024847,
+      "user_edit_date": 1745016024877
+    },
+    {
+      "path": "scripts/check-env.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745016028594,
+      "roo_edit_date": 1745013434320,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/check-env.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745016036124,
+      "roo_edit_date": 1745016036124,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/check-env.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745016036124,
+      "roo_edit_date": 1745016036124,
+      "user_edit_date": 1745016036150
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745016039930,
+      "roo_edit_date": 1745013413026,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745016046329,
+      "roo_edit_date": 1745016046329,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745016046329,
+      "roo_edit_date": 1745016046329,
+      "user_edit_date": 1745016046354
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745016054079,
+      "roo_edit_date": 1745016054079,
+      "user_edit_date": 1745016046354
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745016054079,
+      "roo_edit_date": 1745016054079,
+      "user_edit_date": 1745016054103
+    },
+    {
+      "path": "ai-sports-edge-todo.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745013305035,
+      "roo_edit_date": 1745013305035,
+      "user_edit_date": 1745016070821
+    },
+    {
+      "path": "ai-sports-edge-todo.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745016071099,
+      "roo_edit_date": 1745016071099,
+      "user_edit_date": 1745016070821
+    },
+    {
+      "path": ".env",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745020492475,
+      "roo_edit_date": 1745020492475,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745014880576,
+      "roo_edit_date": 1745014880576,
+      "user_edit_date": 1745020505385
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745020516806,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745020516806,
+      "roo_edit_date": null,
+      "user_edit_date": 1745020528582
+    },
+    {
+      "path": "webpack.prod.js",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745020528657,
+      "roo_edit_date": 1745020528657,
+      "user_edit_date": 1745020528582
+    },
+    {
+      "path": "package.json",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745014880576,
+      "roo_edit_date": 1745014880576,
+      "user_edit_date": 1745020544206
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745020556151,
+      "roo_edit_date": 1745020556151,
+      "user_edit_date": 1745015152568
+    },
+    {
+      "path": "scripts/deploy-env-changes.sh",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745020556151,
+      "roo_edit_date": 1745020556151,
+      "user_edit_date": 1745020556176
+    },
+    {
+      "path": "affiliate-implementation-plan.md",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745020896750,
+      "roo_edit_date": 1745020896750,
+      "user_edit_date": null
+    },
+    {
+      "path": "fanduel-implementation-plan.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745021565437,
+      "roo_edit_date": 1745021565437,
+      "user_edit_date": null
+    },
+    {
+      "path": "fanduel-implementation-plan.md",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745021767190,
+      "roo_edit_date": 1745021767190,
+      "user_edit_date": null
+    },
+    {
+      "path": "fanduel-implementation-plan.md",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745021767190,
+      "roo_edit_date": 1745021767190,
+      "user_edit_date": 1745021767205
+    },
+    {
+      "path": ".env.example",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076597089,
+      "roo_edit_date": 1745015937357,
+      "user_edit_date": 1745015937385
+    },
+    {
+      "path": ".env",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076601205,
+      "roo_edit_date": 1745020492475,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/check-env.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076606028,
+      "roo_edit_date": 1745016036124,
+      "user_edit_date": 1745016036150
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076610592,
+      "roo_edit_date": 1745015962427,
+      "user_edit_date": 1745015962477
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745076610592,
+      "roo_edit_date": 1745015962427,
+      "user_edit_date": 1745076621455
+    },
+    {
+      "path": "config/affiliateConfig.ts",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745076621519,
+      "roo_edit_date": 1745076621519,
+      "user_edit_date": 1745076621455
+    },
+    {
+      "path": "web/components/BetNowPopup.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076626648,
+      "roo_edit_date": 1745015975488,
+      "user_edit_date": 1745015975508
+    },
+    {
+      "path": "web/components/BetNowPopup.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745076633730,
+      "roo_edit_date": 1745076633730,
+      "user_edit_date": 1745015975508
+    },
+    {
+      "path": "web/components/BetNowPopup.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745076633730,
+      "roo_edit_date": 1745076633730,
+      "user_edit_date": 1745076633765
+    },
+    {
+      "path": "web/components/OddsButton.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076638029,
+      "roo_edit_date": 1745015987046,
+      "user_edit_date": 1745015986969
+    },
+    {
+      "path": "web/components/OddsButton.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745076646089,
+      "roo_edit_date": 1745076646089,
+      "user_edit_date": 1745015986969
+    },
+    {
+      "path": "web/components/OddsButton.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745076646089,
+      "roo_edit_date": 1745076646089,
+      "user_edit_date": 1745076646110
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076650840,
+      "roo_edit_date": 1745016024847,
+      "user_edit_date": 1745016024877
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745076659047,
+      "roo_edit_date": 1745076659047,
+      "user_edit_date": 1745016024877
+    },
+    {
+      "path": "web/components/BetNowButton.js",
+      "record_state": "active",
+      "record_source": "user_edited",
+      "roo_read_date": 1745076659047,
+      "roo_edit_date": 1745076659047,
+      "user_edit_date": 1745076659050
+    },
+    {
+      "path": "docs/environment-setup.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076664306,
+      "roo_edit_date": 1745016054079,
+      "user_edit_date": 1745016054103
+    },
+    {
+      "path": "docs/deployment-process.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076669119,
+      "roo_edit_date": 1745014900481,
+      "user_edit_date": 1745014900508
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745076918081,
+      "roo_edit_date": 1745014880576,
+      "user_edit_date": 1745020544206
+    }
+  ]
+}

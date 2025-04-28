@@ -1,0 +1,14 @@
+--- App Debug Log ---
+
+[17:58:00] [DEBUG] Debug script started - Simulating App.tsx
+[17:58:00] [DEBUG] App component rendering
+[17:58:00] [DEBUG] useEffect running - initializing services
+[17:58:00] [DEBUG] Logging initialized successfully
+[17:58:00] [INFO] [17:58:00] [INFO] [app] Application started 
+[17:58:00] [DEBUG] Simulating NavigationContainer setup
+[17:58:00] [DEBUG] NavigationContainer onReady triggered
+[17:58:00] [INFO] [17:58:00] [INFO] [navigation] Navigation container ready 
+[17:58:01] [DEBUG] NavigationContainer onStateChange triggered
+[17:58:01] [INFO] [17:58:01] [INFO] [navigation] Navigated to Home 
+[17:58:01] [DEBUG] Component re-rendered
+[17:58:02] [DEBUG] Debug script completed

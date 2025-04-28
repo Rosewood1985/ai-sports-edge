@@ -1,0 +1,14 @@
+fix(deploy): Resolve CSP and service worker issues
+
+- Remove integrity and crossorigin attributes from Google Fonts links
+- Comment out service worker registration to prevent CSP errors
+- Remove service-worker.js file
+- Create .htaccess with proper CSP headers for Google Tag Manager and TikTok
+- Rebuild production folder with Expo export
+
+These changes fix common deployment issues by:
+1. Eliminating integrity check failures on Google Fonts
+2. Preventing service worker conflicts with CSP
+3. Adding proper security headers for third-party services
+
+Resolves: #DEPLOY-127

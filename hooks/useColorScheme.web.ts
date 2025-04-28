@@ -9,7 +9,7 @@ export function useColorScheme() {
 
   useEffect(() => {
     setHasHydrated(true);
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once
 
   const colorScheme = useRNColorScheme();
 

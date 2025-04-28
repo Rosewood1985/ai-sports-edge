@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   Alert
 } from 'react-native';
@@ -13,6 +13,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
+import { useI18n } from '../contexts/I18nContext';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -35,6 +36,7 @@ const PaymentScreen = (): JSX.Element => {
   const navigation = useNavigation<PaymentScreenNavigationProp>();
   const route = useRoute<PaymentScreenRouteProp>();
   const { createPaymentMethod } = useStripe();
+  const { t } = useI18n();
   
   const { planId } = route.params;
 
@@ -44,15 +46,15 @@ const PaymentScreen = (): JSX.Element => {
     if (plan) {
       setSelectedPlan(plan);
     } else {
-      Alert.alert('Error', 'Invalid subscription plan');
+      Alert.alert(t('common.error'), t('payment.errors.invalidPlan'));
       navigation.goBack();
     }
-  }, [planId, navigation]);
+  }, [planId, navigation, t]);
 
   const handlePayment = async () => {
     try {
       if (!cardComplete) {
-        Alert.alert('Error', 'Please complete the card details');
+        Alert.alert(t('common.error'), t('payment.errors.incompleteCard'));
         return;
       }
 
@@ -68,30 +70,30 @@ const PaymentScreen = (): JSX.Element => {
       }
 
       if (!paymentMethod) {
-        throw new Error('Payment method creation failed');
+        throw new Error(t('payment.errors.paymentMethodFailed'));
       }
 
       // Create the subscription
       const userId = auth.currentUser?.uid;
       if (!userId) {
-        throw new Error('User not authenticated');
+        throw new Error(t('payment.errors.notAuthenticated'));
       }
 
       await createSubscription(userId, paymentMethod.id, planId);
 
       // Show success message
       Alert.alert(
-        'Subscription Successful',
-        'Your subscription has been activated successfully!',
+        t('payment.success.title'),
+        t('payment.success.message'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => navigation.navigate('Main'),
           },
         ]
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'An error occurred during payment processing');
+      Alert.alert(t('common.error'), error.message || t('payment.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -107,28 +109,28 @@ const PaymentScreen = (): JSX.Element => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Payment Information</Text>
+      <Text style={styles.title}>{t('payment.title')}</Text>
       <Text style={styles.subtitle}>
-        Enter your card details to subscribe to {selectedPlan.name}
+        {t('payment.subtitle', { planName: selectedPlan.name })}
       </Text>
 
       <View style={styles.planSummary}>
-        <Text style={styles.planSummaryTitle}>Plan Summary</Text>
+        <Text style={styles.planSummaryTitle}>{t('payment.planSummary.title')}</Text>
         <View style={styles.planSummaryRow}>
-          <Text style={styles.planSummaryLabel}>Plan:</Text>
+          <Text style={styles.planSummaryLabel}>{t('payment.planSummary.plan')}:</Text>
           <Text style={styles.planSummaryValue}>{selectedPlan.name}</Text>
         </View>
         <View style={styles.planSummaryRow}>
-          <Text style={styles.planSummaryLabel}>Price:</Text>
+          <Text style={styles.planSummaryLabel}>{t('payment.planSummary.price')}:</Text>
           <Text style={styles.planSummaryValue}>
             ${(selectedPlan.amount || selectedPlan.price * 100) / 100}
-            /{selectedPlan.interval}
+            /{t(`payment.interval.${selectedPlan.interval}`)}
           </Text>
         </View>
       </View>
 
       <View style={styles.cardContainer}>
-        <Text style={styles.cardLabel}>Card Information</Text>
+        <Text style={styles.cardLabel}>{t('payment.cardInformation')}</Text>
         <CardField
           postalCodeEnabled={true}
           placeholders={{
@@ -152,12 +154,12 @@ const PaymentScreen = (): JSX.Element => {
         {loading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text style={styles.payButtonText}>Subscribe Now</Text>
+          <Text style={styles.payButtonText}>{t('payment.subscribeNow')}</Text>
         )}
       </TouchableOpacity>
 
       <Text style={styles.secureText}>
-        🔒 Your payment information is secure and encrypted
+        🔒 {t('payment.secureInfo')}
       </Text>
 
       <TouchableOpacity
@@ -165,7 +167,7 @@ const PaymentScreen = (): JSX.Element => {
         onPress={() => navigation.goBack()}
         disabled={loading}
       >
-        <Text style={styles.cancelButtonText}>Cancel</Text>
+        <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

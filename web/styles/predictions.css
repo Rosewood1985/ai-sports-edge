@@ -1,0 +1,176 @@
+/**
+ * Predictions Page Styles
+ */
+
+.predictions-page {
+  background-color: #f8f9fa;
+}
+
+/* Prediction Card Styles */
+.ml-prediction-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ml-prediction-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ml-prediction-card .card-header {
+  background-color: #343a40;
+  color: white;
+  padding: 0.75rem 1rem;
+}
+
+.ml-prediction-card .card-body {
+  padding: 1.25rem;
+}
+
+.ml-prediction-card .card-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding: 0.75rem 1.25rem;
+}
+
+/* Confidence Progress Bar */
+.ml-prediction-card .progress {
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+/* Sport-specific styling */
+.ml-prediction-card[data-sport="NBA"] .card-header {
+  background-color: #17408B; /* NBA blue */
+}
+
+.ml-prediction-card[data-sport="MLB"] .card-header {
+  background-color: #BF0D3E; /* MLB red */
+}
+
+.ml-prediction-card[data-sport="NHL"] .card-header {
+  background-color: #041E42; /* NHL navy */
+}
+
+.ml-prediction-card[data-sport="NCAA_MENS"] .card-header,
+.ml-prediction-card[data-sport="NCAA_WOMENS"] .card-header {
+  background-color: #7B68EE; /* NCAA purple */
+}
+
+.ml-prediction-card[data-sport="FORMULA1"] .card-header {
+  background-color: #E10600; /* F1 red */
+}
+
+.ml-prediction-card[data-sport="UFC"] .card-header {
+  background-color: #D20A0A; /* UFC red */
+}
+
+/* Prediction details */
+.prediction-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Badge styling */
+.ml-prediction-card .badge {
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+}
+
+/* Feedback buttons */
+.ml-prediction-card .btn-outline-success,
+.ml-prediction-card .btn-outline-danger {
+  border-width: 1px;
+  padding: 0.25rem 0.5rem;
+}
+
+.ml-prediction-card .btn-outline-success:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+.ml-prediction-card .btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Analysis section */
+.ml-prediction-card .card-footer h6 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.ml-prediction-card .card-footer ul {
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.ml-prediction-card .card-footer ul:last-child {
+  margin-bottom: 0;
+}
+
+/* Premium badge */
+.ml-prediction-card .premium-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #ffc107;
+  color: #212529;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .ml-prediction-card {
+    margin-bottom: 1rem;
+  }
+  
+  .ml-prediction-card .card-body {
+    padding: 1rem;
+  }
+  
+  .ml-prediction-card .card-footer {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Tab navigation styling */
+.nav-pills .nav-link {
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  transition: all 0.2s ease;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #e9ecef;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* About predictions box */
+.bg-light {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Loading spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #007bff;
+}

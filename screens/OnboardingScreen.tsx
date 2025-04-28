@@ -1,16 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  FlatList, 
-  Animated, 
-  TouchableOpacity, 
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Animated,
+  TouchableOpacity,
   Text,
   SafeAreaView,
   Dimensions,
-  StatusBar
+  StatusBar,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+// Define the navigation types
+type RootStackParamList = {
+  Main: undefined;
+  GroupSubscription: undefined;
+  // Add other screens as needed
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+import { useI18n } from '../contexts/I18nContext';
 import OnboardingSlide from '../components/OnboardingSlide';
 import { 
   isOnboardingCompleted, 
@@ -21,55 +33,6 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-// Define the onboarding slides
-const slides = [
-  {
-    id: '1',
-    title: 'Welcome to AI Sports Edge',
-    description: 'Your ultimate companion for AI-powered sports betting insights and predictions.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#3498db',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '2',
-    title: 'AI-Powered Predictions',
-    description: 'Get access to cutting-edge AI predictions with confidence scores to make informed betting decisions.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#2ecc71',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '3',
-    title: 'Live Betting Odds',
-    description: 'Stay updated with real-time odds from multiple bookmakers, all in one place.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#9b59b6',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '4',
-    title: 'Track Your Performance',
-    description: 'Compare AI predictions with actual results to see how well our system performs.',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#e74c3c',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  },
-  {
-    id: '5',
-    title: 'Ready to Start?',
-    description: 'Get started now and elevate your betting strategy with AI-powered insights!',
-    image: require('../assets/images/icon.png'),
-    backgroundColor: '#f39c12',
-    titleColor: '#ffffff',
-    descriptionColor: '#f0f0f0'
-  }
-];
-
 /**
  * Onboarding screen component
  * @returns {JSX.Element} - Rendered component
@@ -78,13 +41,97 @@ const OnboardingScreen = (): JSX.Element => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
+  const { t, language } = useI18n();
+  
+  // Define the onboarding slides with translations
+  const translatedSlides = [
+    {
+      id: '1',
+      title: t('welcome.title'),
+      description: t('welcome.description'),
+      image: require('../assets/images/onboarding/welcome.png'),
+      backgroundColor: '#3498db',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '2',
+      title: t('aiPredictions.title'),
+      description: t('aiPredictions.description'),
+      image: require('../assets/images/onboarding/ai-predictions.png'),
+      backgroundColor: '#2ecc71',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '3',
+      title: t('liveOdds.title'),
+      description: t('liveOdds.description'),
+      image: require('../assets/images/onboarding/live-odds.png'),
+      backgroundColor: '#9b59b6',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '4',
+      title: t('performance.title'),
+      description: t('performance.description'),
+      image: require('../assets/images/onboarding/performance.png'),
+      backgroundColor: '#e74c3c',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    },
+    {
+      id: '5',
+      title: t('groupSubscription.title'),
+      description: t('groupSubscription.description'),
+      image: require('../assets/images/onboarding/group-subscription.png'),
+      backgroundColor: '#16a085',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0',
+      actionButton: {
+        text: t('groupSubscription.actionButton'),
+        onPress: () => {
+          // Show 24-hour registration requirement alert before navigating
+          Alert.alert(
+            t('groupSubscription.title'),
+            t('groupSubscription.timeRequirement'),
+            [
+              {
+                text: t('common.cancel'),
+                style: 'cancel'
+              },
+              {
+                text: t('common.confirm'),
+                onPress: () => navigation.navigate('GroupSubscription')
+              }
+            ]
+          );
+        }
+      }
+    },
+    {
+      id: '6',
+      title: t('getStarted.title'),
+      description: t('getStarted.description'),
+      image: require('../assets/images/onboarding/get-started.png'),
+      backgroundColor: '#f39c12',
+      titleColor: '#ffffff',
+      descriptionColor: '#f0f0f0'
+    }
+  ];
 
   // Initialize analytics when component mounts
   useEffect(() => {
     const initAnalytics = async () => {
-      await initOnboardingAnalytics(slides.length);
-      await updateOnboardingProgress(1, slides.length);
+      try {
+        await initOnboardingAnalytics(translatedSlides.length);
+        await updateOnboardingProgress(1, translatedSlides.length);
+      } catch (error) {
+        console.error('Failed to initialize onboarding analytics:', error);
+        // Continue with onboarding even if analytics fails
+      }
     };
     
     initAnalytics();
@@ -93,28 +140,99 @@ const OnboardingScreen = (): JSX.Element => {
   // Update analytics when slide changes
   useEffect(() => {
     const updateAnalytics = async () => {
-      await updateOnboardingProgress(currentIndex + 1, slides.length);
+      try {
+        await updateOnboardingProgress(currentIndex + 1, translatedSlides.length);
+      } catch (error) {
+        console.error('Failed to update onboarding progress:', error);
+        // Continue with onboarding even if analytics update fails
+      }
     };
     
     updateAnalytics();
   }, [currentIndex]);
 
   const handleSkip = () => {
-    flatListRef.current?.scrollToIndex({ index: slides.length - 1 });
+    try {
+      flatListRef.current?.scrollToIndex({
+        index: translatedSlides.length - 1,
+        animated: true,
+        viewOffset: 0,
+        viewPosition: 0
+      });
+    } catch (error) {
+      console.error('Error skipping to last slide:', error);
+      // Fallback to manually setting the current index
+      setCurrentIndex(translatedSlides.length - 1);
+    }
   };
 
   const handleNext = () => {
-    if (currentIndex < slides.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
+    if (currentIndex < translatedSlides.length - 1) {
+      try {
+        flatListRef.current?.scrollToIndex({
+          index: currentIndex + 1,
+          animated: true,
+          viewOffset: 0,
+          viewPosition: 0
+        });
+      } catch (error) {
+        console.error('Error navigating to next slide:', error);
+        // Fallback to manually setting the current index
+        setCurrentIndex(currentIndex + 1);
+      }
     }
   };
 
   const handleComplete = async () => {
-    await markOnboardingCompleted();
-    navigation.navigate('Main' as never);
+    try {
+      const success = await markOnboardingCompleted();
+      if (!success) {
+        // Show error alert but still allow navigation
+        Alert.alert(
+          t('common.error'),
+          t('errors.saveFailed', {
+            defaultValue: 'We couldn\'t save your onboarding progress. Some features may ask you to complete onboarding again.'
+          }),
+          [
+            {
+              text: t('common.ok'),
+              onPress: () => navigation.navigate('Main')
+            }
+          ]
+        );
+        return;
+      }
+      
+      // Success case
+      Alert.alert(
+        t('completion.title'),
+        t('completion.message'),
+        [
+          {
+            text: t('completion.gotIt'),
+            onPress: () => navigation.navigate('Main')
+          }
+        ]
+      );
+    } catch (error) {
+      // Handle unexpected errors
+      console.error('Error completing onboarding:', error);
+      Alert.alert(
+        t('common.error'),
+        t('errors.generalError', {
+          defaultValue: 'There was a problem completing the onboarding process. You can try again later.'
+        }),
+        [
+          {
+            text: t('common.ok'),
+            onPress: () => navigation.navigate('Main')
+          }
+        ]
+      );
+    }
   };
 
-  const renderItem = ({ item }: { item: typeof slides[0] }) => (
+  const renderItem = ({ item }: { item: typeof translatedSlides[0] }) => (
     <OnboardingSlide
       title={item.title}
       description={item.description}
@@ -122,6 +240,7 @@ const OnboardingScreen = (): JSX.Element => {
       backgroundColor={item.backgroundColor}
       titleColor={item.titleColor}
       descriptionColor={item.descriptionColor}
+      actionButton={item.actionButton}
     />
   );
 
@@ -129,8 +248,12 @@ const OnboardingScreen = (): JSX.Element => {
     const dotPosition = Animated.divide(scrollX, width);
     
     return (
-      <View style={styles.dotsContainer}>
-        {slides.map((_, index) => {
+      <View
+        style={styles.dotsContainer}
+        accessibilityLabel={`${t('step', { defaultValue: 'Step' })} ${currentIndex + 1} ${t('of', { defaultValue: 'of' })} ${translatedSlides.length}`}
+        accessibilityRole="tablist"
+      >
+        {translatedSlides.map((_, index) => {
           const opacity = dotPosition.interpolate({
             inputRange: [index - 1, index, index + 1],
             outputRange: [0.3, 1, 0.3],
@@ -150,6 +273,11 @@ const OnboardingScreen = (): JSX.Element => {
                 styles.dot,
                 { opacity, transform: [{ scale }] }
               ]}
+              accessibilityLabel={index === currentIndex ?
+                t('currentStep', { defaultValue: 'Current step', number: index + 1 }) :
+                t('step', { defaultValue: 'Step', number: index + 1 })}
+              accessibilityRole="button"
+              accessible={true}
             />
           );
         })}
@@ -163,7 +291,7 @@ const OnboardingScreen = (): JSX.Element => {
       
       <FlatList
         ref={flatListRef}
-        data={slides}
+        data={translatedSlides}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         horizontal
@@ -179,26 +307,35 @@ const OnboardingScreen = (): JSX.Element => {
           );
           setCurrentIndex(index);
         }}
+        accessible={true}
+        accessibilityLabel={t('progressNav', { defaultValue: 'Onboarding progress' })}
+        accessibilityHint={t('swipeHint', { defaultValue: 'Swipe left or right to navigate between slides' })}
       />
       
       {renderDots()}
       
       <View style={styles.buttonsContainer}>
-        {currentIndex < slides.length - 1 ? (
+        {currentIndex < translatedSlides.length - 1 ? (
           <>
             <TouchableOpacity
               style={styles.button}
               onPress={handleSkip}
+              accessibilityLabel={t('common.skip')}
+              accessibilityRole="button"
+              accessibilityHint={t('skipHint', { defaultValue: 'Skip to the last slide' })}
             >
-              <Text style={styles.buttonText}>Skip</Text>
+              <Text style={styles.buttonText}>{t('common.skip')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={[styles.button, styles.nextButton]}
               onPress={handleNext}
+              accessibilityLabel={t('common.next')}
+              accessibilityRole="button"
+              accessibilityHint={t('nextHint', { defaultValue: 'Go to the next slide' })}
             >
               <Text style={[styles.buttonText, styles.nextButtonText]}>
-                Next
+                {t('common.next')}
               </Text>
             </TouchableOpacity>
           </>
@@ -206,9 +343,12 @@ const OnboardingScreen = (): JSX.Element => {
           <TouchableOpacity
             style={[styles.button, styles.getStartedButton]}
             onPress={handleComplete}
+            accessibilityLabel={t('common.getStarted')}
+            accessibilityRole="button"
+            accessibilityHint={t('getStartedHint', { defaultValue: 'Complete onboarding and go to the main app' })}
           >
             <Text style={[styles.buttonText, styles.getStartedButtonText]}>
-              Get Started
+              {t('common.getStarted')}
             </Text>
           </TouchableOpacity>
         )}

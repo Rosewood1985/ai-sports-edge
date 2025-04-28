@@ -11,14 +11,17 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
-import { ReferralProgramCard } from '../components/ReferralProgramCard';
-import { trackEvent } from '../services/analyticsService';
+import ReferralProgramCard from '../components/ReferralProgramCard';
+import { analyticsService } from '../services';
+import { useI18n } from '../contexts/I18nContext';
+import { AnalyticsEventType } from '../services/analyticsService';
 
 type RootStackParamList = {
   Payment: { planId: string };
   SubscriptionManagement: undefined;
   RefundPolicy: undefined;
   GiftRedemption: undefined;
+  GroupSubscription: undefined;
   // Other screens...
 };
 
@@ -32,6 +35,7 @@ const SubscriptionScreen = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [hasSubscription, setHasSubscription] = useState<boolean>(false);
   const navigation = useNavigation<SubscriptionScreenNavigationProp>();
+  const { t } = useI18n();
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -53,7 +57,7 @@ const SubscriptionScreen = (): JSX.Element => {
 
   const handleSelectPlan = (planId: string) => {
     // Track subscription started event
-    trackEvent('subscription_started', {
+    analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_STARTED, {
       plan_id: planId,
       plan_name: SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name || 'Unknown'
     });
@@ -65,28 +69,28 @@ const SubscriptionScreen = (): JSX.Element => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#3498db" />
-        <Text style={styles.loadingText}>Loading subscription options...</Text>
+        <Text style={styles.loadingText}>{t('subscription.loading')}</Text>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Choose a Subscription Plan</Text>
+      <Text style={styles.title}>{t('subscription.title')}</Text>
       <Text style={styles.subtitle}>
-        Get access to premium AI-powered betting insights
+        {t('subscription.subtitle')}
       </Text>
 
       {hasSubscription && (
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
-            You already have an active subscription. You can manage your subscription in the settings.
+            {t('subscription.alreadySubscribed')}
           </Text>
           <TouchableOpacity
             style={styles.manageButton}
             onPress={() => navigation.navigate('SubscriptionManagement')}
           >
-            <Text style={styles.manageButtonText}>Manage Subscription</Text>
+            <Text style={styles.manageButtonText}>{t('subscription.manageSubscription')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -102,7 +106,7 @@ const SubscriptionScreen = (): JSX.Element => {
             <Text style={styles.planPrice}>
               ${(plan.amount || plan.price * 100) / 100}
               <Text style={styles.planInterval}>
-                /{plan.interval}
+                /{t(`subscription.interval.${plan.interval}`)}
               </Text>
             </Text>
           </View>
@@ -110,7 +114,7 @@ const SubscriptionScreen = (): JSX.Element => {
           <Text style={styles.planDescription}>{plan.description}</Text>
           
           <View style={styles.featuresContainer}>
-            <Text style={styles.featuresTitle}>Features:</Text>
+            <Text style={styles.featuresTitle}>{t('subscription.features')}:</Text>
             {plan.features.map((feature, index) => (
               <View key={index} style={styles.featureItem}>
                 <Text style={styles.featureText}>• {feature}</Text>
@@ -122,14 +126,29 @@ const SubscriptionScreen = (): JSX.Element => {
             style={styles.selectButton}
             onPress={() => handleSelectPlan(plan.id)}
           >
-            <Text style={styles.selectButtonText}>Select Plan</Text>
+            <Text style={styles.selectButtonText}>{t('subscription.selectPlan')}</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       ))}
 
       {!hasSubscription && (
-        <ReferralProgramCard isSubscribed={false} />
+        <ReferralProgramCard />
       )}
+
+      <View style={styles.groupSubscriptionCard}>
+        <Text style={styles.groupTitle}>{t('subscription.group.title')}</Text>
+        <Text style={styles.groupDescription}>
+          {t('subscription.group.description')}
+        </Text>
+        <TouchableOpacity
+          style={styles.groupButton}
+          onPress={() => navigation.navigate('GroupSubscription')}
+        >
+          <Text style={styles.groupButtonText}>
+            {t('subscription.group.createButton')}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.footerLinks}>
         <TouchableOpacity
@@ -137,7 +156,7 @@ const SubscriptionScreen = (): JSX.Element => {
           onPress={() => navigation.navigate('GiftRedemption')}
         >
           <Text style={styles.giftButtonText}>
-            Redeem a Gift Subscription
+            {t('subscription.gift.redeemButton')}
           </Text>
         </TouchableOpacity>
 
@@ -146,7 +165,7 @@ const SubscriptionScreen = (): JSX.Element => {
           onPress={() => navigation.navigate('RefundPolicy')}
         >
           <Text style={styles.policyLinkText}>
-            View our Cancellation & Refund Policy
+            {t('subscription.refundPolicy')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -267,6 +286,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  groupSubscriptionCard: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 12,
+    padding: 20,
+    marginVertical: 20,
+    borderWidth: 1,
+    borderColor: '#bde0fe',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  groupTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  groupDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  groupButton: {
+    backgroundColor: '#8e44ad',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+  },
+  groupButtonText: {
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,

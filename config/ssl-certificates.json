@@ -1,0 +1,55 @@
+{
+  "certificates": [
+    {
+      "domain": "ai-sports-edge.com",
+      "type": "managed",
+      "provider": "firebase",
+      "status": "active",
+      "issuer": "Let's Encrypt",
+      "validFrom": "2025-01-01T00:00:00Z",
+      "validTo": "2026-01-01T00:00:00Z",
+      "autoRenew": true
+    },
+    {
+      "domain": "www.ai-sports-edge.com",
+      "type": "managed",
+      "provider": "firebase",
+      "status": "active",
+      "issuer": "Let's Encrypt",
+      "validFrom": "2025-01-01T00:00:00Z",
+      "validTo": "2026-01-01T00:00:00Z",
+      "autoRenew": true
+    },
+    {
+      "domain": "api.ai-sports-edge.com",
+      "type": "managed",
+      "provider": "firebase",
+      "status": "active",
+      "issuer": "Let's Encrypt",
+      "validFrom": "2025-01-01T00:00:00Z",
+      "validTo": "2026-01-01T00:00:00Z",
+      "autoRenew": true
+    },
+    {
+      "domain": "admin.ai-sports-edge.com",
+      "type": "managed",
+      "provider": "firebase",
+      "status": "active",
+      "issuer": "Let's Encrypt",
+      "validFrom": "2025-01-01T00:00:00Z",
+      "validTo": "2026-01-01T00:00:00Z",
+      "autoRenew": true
+    }
+  ],
+  "settings": {
+    "minimumTlsVersion": "TLS_1_2",
+    "httpStrictTransportSecurity": {
+      "enabled": true,
+      "maxAge": 31536000,
+      "includeSubdomains": true,
+      "preload": true
+    },
+    "ocspStapling": true,
+    "certificateTransparency": true
+  }
+}

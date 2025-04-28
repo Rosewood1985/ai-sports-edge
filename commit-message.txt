@@ -1,0 +1,14 @@
+Standardize SFTP deployment configuration
+
+- Delete duplicate SFTP configs, set single source of truth
+- Configure localPath to ./dist for production assets only
+- Add remote cleanup to preserve assets/ images/ locales/ folders
+- Implement guided deployment with interactive confirmation
+- Add deployment scripts:
+  - check-sftp-configs.sh: Detect duplicate configs
+  - check-sftp-sync.sh: Check for mismatched files
+  - sftp-deploy-cleanup.sh: Handle cleanup and verification
+  - pre-deploy-checks.sh: Run all checks before deployment
+  - quick-deploy.sh: Fast deployment option
+  - deployment-checklist.sh: Interactive guided deployment
+- Add comprehensive documentation in docs/sftp-deployment.md

@@ -1,0 +1,26 @@
+{
+  "development": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "ai_sports_edge_dev",
+    "user": "postgres",
+    "password": "postgres",
+    "ssl": false
+  },
+  "test": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "ai_sports_edge_test",
+    "user": "postgres",
+    "password": "postgres",
+    "ssl": false
+  },
+  "production": {
+    "host": "PRODUCTION_DB_HOST",
+    "port": 5432,
+    "database": "PRODUCTION_DB_NAME",
+    "user": "PRODUCTION_DB_USER",
+    "password": "PRODUCTION_DB_PASSWORD",
+    "ssl": true
+  }
+}
