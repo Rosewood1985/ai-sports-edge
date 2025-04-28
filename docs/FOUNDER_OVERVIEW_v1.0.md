@@ -6,123 +6,164 @@
 
 # 1. Executive Summary
 
-AI Sports Edge is a cross-platform application that provides AI-driven sports betting insights, predictive analytics, and betting optimization tools. By combining real-time sports data, proprietary machine learning models, and a streamlined user experience, AI Sports Edge empowers users to make smarter, faster, and more informed betting decisions. Our mission is to democratize sophisticated betting intelligence for both casual and professional bettors.
+AI Sports Edge is a next-generation sports betting intelligence platform that combines proprietary machine learning, real-time analytics, and a personalized user experience to deliver sharper, faster, and smarter betting insights. Our mission is simple: democratize sophisticated sports intelligence for everyday bettors while leveling the playing field between the casual market and professionals.
+
+Unlike traditional betting apps that merely display odds, AI Sports Edge dynamically analyzes live market movements, player conditions, weather factors, and historical trends to provide users with predictive recommendations tailored to their betting style, risk appetite, and favorite sports.
 
 ---
 
 # 2. Product Overview
 
-AI Sports Edge delivers a multi-layered betting experience:
+AI Sports Edge is designed from the ground up to deliver a multidimensional sports betting experience:
 
-- **AI Predictions:** Proprietary machine learning models analyze thousands of variables, delivering optimized predictions across multiple sports leagues.
-- **Real-Time Analytics:** Instant updates on injuries, lineup changes, odds movements, and betting trends.
-- **Multi-Sport Coverage:** NBA, NFL, MLB, NHL, NCAA sports, tennis, soccer, eSports, and more.
-- **Personalized Betting Insights:** Dynamic risk profiles, personalized staking recommendations, and trend alerts.
-- **Community Features:** Social interaction layer where users can view aggregated community bets, share insights, and learn from crowd wisdom.
-- **Location-Based Odds:** Localized promotions and odds boosts based on user location.
-- **Performance Tracking:** Visual dashboards for tracking bet histories, ROI, and identifying strengths/weaknesses.
-- **Flexible Access:** Web app (https://aisportsedge.app), iOS/Android apps via Expo framework, subscription-based access.
+- **AI-Powered Predictions:**
+
+  - Multi-model ensemble forecasts across NBA, NFL, MLB, NHL, NCAA, tennis, soccer, and eSports.
+  - Dynamic prediction confidence scores.
+
+- **Real-Time Adjustments:**
+
+  - Instant adaptation to lineup changes, injury reports, betting market shifts, and weather changes.
+  - Automatic adjustment of recommended bets as new information becomes available.
+
+- **Personalization Engine:**
+
+  - Personalized betting suggestions based on each user’s preferred leagues, historical betting behavior, and risk tolerance.
+
+- **Community Intelligence Layer:**
+
+  - Aggregated consensus bets, crowd sentiment analysis, and peer strategy comparisons.
+
+- **Fallback Odds Systems:**
+
+  - Automatic odds replacement when live odds APIs fail, ensuring continuous uptime.
+
+- **Performance Tracking:**
+
+  - Personalized dashboards to track betting ROI, bet history, and strengths vs. weaknesses over time.
+
+- **Mobile-First Design:**
+  - Seamless web and mobile app experience using React Native and Expo.
 
 ---
 
 # 3. Machine Learning Model Overview
 
-The AI Sports Edge prediction engine is built on a **multi-algorithm ensemble architecture**, designed to maximize predictive stability while adapting to real-world betting market volatility.
+Our predictive engine utilizes a proprietary ensemble approach combining:
 
-- **Inputs Include:**
-  - Real-time player and team statistics
-  - Weather conditions (temperature, humidity, wind, precipitation)
-  - Home vs. away performance splits
-  - Injury reports and lineup adjustments
-  - Historical betting market movements
-  - Proprietary momentum indices and efficiency ratings
+- Gradient Boosted Trees, Logistic Regression, and Shallow Neural Networks.
+- Real-time inputs including:
+  - Player/team performance trends
+  - Opening and live betting lines
+  - Weather forecasts
+  - Home vs. away splits
+  - Injury reports and lineup volatility
+- Confidence scoring algorithms for each prediction.
+- Bias-correction modules for home advantage and late injury news.
 
-- **Model Composition:**
-  - Weighted ensemble of gradient boosting, logistic regression, and neural net variants
-  - Dynamic feature selection based on sport-specific variables
-  - Confidence scoring to dynamically adjust bet aggressiveness
-  - Home vs. away bias correction algorithms
+**Security Measures:**
 
-- **Security Measures:**
-  - Model source code is obfuscated and compartmentalized at build-time.
-  - Training pipelines are secured in a private cloud environment.
-
-*Note: Details are sufficient to demonstrate sophistication but are intentionally non-replicable to protect proprietary IP.*
+- Training pipelines are kept private and isolated.
+- Production inference code is obfuscated.
+- Feature sets are dynamically rotated to prevent reverse engineering.
 
 ---
 
 # 4. Market Opportunity
 
-The legal U.S. sports betting market exceeded **$100 billion** in annual handle in 2023, with rapid year-over-year growth fueled by regulatory expansion and mobile betting adoption. There is a widening gap between casual bettors and professional sharps, creating an urgent demand for smarter, more accessible betting tools.
+The U.S. sports betting market crossed **$100 billion** in annual legal handle by 2023, with rapid expansion internationally. Despite this growth, most platforms continue to focus on odds display, leaving a major gap for intelligent, AI-driven prediction platforms aimed at the casual to semi-professional bettor.
 
-- **Addressable Market:**
-  - 50+ million active bettors in North America
-  - Expanding internationally across regulated markets
-- **Trends:**
-  - Rise of AI applications in predictive analytics
-  - Increased consumer demand for personalized betting guidance
-  - Fragmentation of betting platforms driving demand for consolidated intelligence hubs
+- **TAM:** Over 50 million active sports bettors in the U.S.
+- **Key Trends:**
+  - Rise of mobile-first betting.
+  - Demand for AI-enhanced, real-time decision support.
+  - Increasing legalization across states and countries.
 
 ---
 
 # 5. Competitive Advantage
 
-- **True Proprietary AI:** Not "rules-based" or "trend-following" like many competitors; real machine learning with adaptive retraining.
-- **Cross-Platform Delivery:** Web and mobile apps with seamless user experience.
-- **Personalization Engine:** Dynamic user profiling and adaptive betting recommendations.
-- **First-Mover Advantage in Spanish Localization:** Targeted bilingual expansion into Spanish-speaking markets.
-- **Community Layer:** Real-time user insights and consensus bets, providing additional decision support.
+AI Sports Edge offers multiple differentiated advantages:
+
+- **Real Machine Learning Core:**
+
+  - No simple rules engines or trend following — true predictive analytics updated daily.
+
+- **Dynamic Personalization:**
+
+  - Recommendations tailored dynamically for each user, not generic picks.
+
+- **Live Market Responsiveness:**
+
+  - Ability to adjust in real-time as betting markets shift, something traditional apps cannot do.
+
+- **Spanish-Language Expansion:**
+
+  - First wave of bilingual sports betting experiences for Spanish-speaking users, launching in 2026.
+
+- **Private GPT Integrations:**
+
+  - Automated financial reporting, odds monitoring, user support, and content generation using private, secured GPTs.
+
+- **Community Layer:**
+  - Augmenting ML predictions with real-time aggregated consensus bets for an additional decision layer.
 
 ---
 
 # 6. Business Model
 
-- **Subscription Tiers:**
-  - Free Tier (ad-supported, limited access)
-  - Standard Subscription ($9.99-$19.99/month)
-  - Premium Subscription ($24.99-$39.99/month)
-  - Pro Subscription ($99.99/month for syndicates and professional users)
-- **Affiliate Revenue:** Integrated with FanDuel, BetMGM, DraftKings affiliate programs.
-- **Future Expansion:**
-  - Institutional licensing of predictive models
-  - API access for sportsbooks and betting syndicates
+- **Subscriptions:**
+
+  - Free Tier (ad-supported, limited picks)
+  - Standard Tier ($9.99–$19.99/month)
+  - Premium Tier ($24.99–$39.99/month)
+  - Pro Tier ($99.99/month, unlimited features and pro tools)
+
+- **Affiliate Revenue Streams:**
+
+  - Partnerships with FanDuel, BetMGM, DraftKings, and others.
+
+- **Enterprise Licensing (Future):**
+  - Selling AI insights and APIs to sportsbooks, betting syndicates, and international operators.
 
 ---
 
-# 7. Team Structure
+# 7. Future Vision
 
-Refer to `/docs/INTERNAL_TEAM_STRUCTURE.md` and `/docs/PRIVATE_GPTS.md` for detailed breakdown.
+AI Sports Edge is positioned to rapidly expand and deepen its platform offerings:
 
-Current roles include:
-- Founder / Product Lead (Lisa Dario)
-- Lead Engineer (Placeholder)
-- Machine Learning Lead (Placeholder)
-- UI/UX Designer (Placeholder)
-- Social Media Manager (Placeholder)
-- Financial/Tax Advisor (Placeholder)
-- Marketing and Growth Manager (Placeholder)
-- Customer Support Manager (Placeholder)
-- Private GPTs to automate financial tracking, marketing drafts, social media, and customer support functions.
+- **Spanish-First Expansion:**
+
+  - Launching dedicated Spanish-language versions of the app targeting U.S. Hispanic and Latin American markets.
+
+- **Live Betting Prediction Models:**
+
+  - Real-time betting models adapting odds and predictions mid-game.
+
+- **Custom Betting Syndicates:**
+
+  - Tools for groups of users to pool bets and strategies collectively.
+
+- **Deeper Community Intelligence:**
+
+  - Advanced aggregation of crowd-sourced bets, power ratings, and sharps-vs-public dynamics.
+
+- **Institutional Partnerships:**
+
+  - Licensing predictive models to sportsbooks and sports betting technology providers.
+
+- **Private AI Expansion:**
+  - Continued use of private GPT agents to automate customer support, odds trend monitoring, and financial reporting internally.
 
 ---
 
-# 8. Roadmap
+# 8. Closing
 
-| Phase | Milestone | Target Date |
-|:--|:--|:--|
-| Phase 1 | Complete web and mobile MVP | May 2025 |
-| Phase 2 | Launch marketing campaigns and onboarding flows | June 2025 |
-| Phase 3 | Launch premium tiers + affiliate integrations | Summer 2025 |
-| Phase 4 | Expand ML model to include parlay generation and live betting models | Q4 2025 |
-| Phase 5 | Explore international expansion (Spanish-first markets) | Q1 2026 |
+AI Sports Edge is building the future of sports betting intelligence:  
+personalized, adaptive, real-time, and global.  
+By combining proprietary machine learning with intuitive user experience design and a vision for community-driven intelligence, AI Sports Edge will enable bettors at all levels to make smarter, faster, and more profitable decisions.
 
----
-
-# 9. Closing
-
-AI Sports Edge was founded with a simple but ambitious mission: to deliver smarter, faster, more adaptive sports betting intelligence to a growing global market. By building a scalable foundation of proprietary AI, cross-platform accessibility, and user-first experience design, AI Sports Edge is positioned to become a market leader in the next generation of sports betting technology.
-
-We invite strategic partners, advisors, and early investors to join us in shaping the future of sports betting intelligence.
+We are actively seeking strategic partnerships and early advisory support to accelerate our vision into the market in 2025 and beyond.
 
 ---
 
