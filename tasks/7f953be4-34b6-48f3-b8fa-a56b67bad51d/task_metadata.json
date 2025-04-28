@@ -18,7 +18,7 @@
     },
     {
       "path": ".gitignore",
-      "record_state": "active",
+      "record_state": "stale",
       "record_source": "user_edited",
       "roo_read_date": null,
       "roo_edit_date": null,
@@ -231,6 +231,14 @@
       "roo_read_date": 1745810722106,
       "roo_edit_date": 1745810559672,
       "user_edit_date": 1745810559696
+    },
+    {
+      "path": ".gitignore",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745810906981,
+      "roo_edit_date": null,
+      "user_edit_date": 1745800916189
     }
   ]
 }
