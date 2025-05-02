@@ -1,0 +1,68 @@
+{
+  "files_in_context": [
+    {
+      "path": "run-server-commands.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745814324600,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745814338999,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-vscode-sftp-updated.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745814546858,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-signup.sh",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745814563526,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-firebase-fix.sh",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745814915177,
+      "roo_edit_date": 1745814915177,
+      "user_edit_date": null
+    },
+    {
+      "path": "deploy-firebase-fix.sh",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1745814915177,
+      "roo_edit_date": 1745814915177,
+      "user_edit_date": 1745814985863
+    },
+    {
+      "path": "deploy-firebase-fix.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745814986189,
+      "roo_edit_date": 1745814986189,
+      "user_edit_date": 1745814985863
+    },
+    {
+      "path": "upload-firebase-fix.sh",
+      "record_state": "active",
+      "record_source": "roo_edited",
+      "roo_read_date": 1745849315274,
+      "roo_edit_date": 1745849315274,
+      "user_edit_date": null
+    }
+  ]
+}

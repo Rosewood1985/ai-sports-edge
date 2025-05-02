@@ -1,0 +1,52 @@
+{
+  "files_in_context": [
+    {
+      "path": "src/firebase/config.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745813025989,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/firebase/auth.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745813031748,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/firebase/firestore.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745813036770,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "package.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745813044288,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/firebase/examples/AuthExample.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745813080796,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/firebase/examples/FirestoreExample.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1745813089177,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    }
+  ]
+}

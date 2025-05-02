@@ -19,14 +19,8 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-    <meta
-      http-equiv="Referrer-Policy"
-      content="strict-origin-when-cross-origin"
-    />
-    <meta
-      http-equiv="Permissions-Policy"
-      content="camera=(), microphone=(), geolocation=(self), interest-cohort=()"
-    />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(self), interest-cohort=()" />
 
     <!-- Favicon -->
     <link rel="icon" href="/images/ai_logo.webp" />
@@ -409,7 +403,7 @@
     <script>
       // Add detailed logging
       console.log("Starting Firebase initialization...");
-
+      
       // Initialize Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw",
@@ -419,16 +413,16 @@
         messagingSenderId: "63216708515",
         appId: "1:63216708515:web:209e6baf130386edb00816",
         // Added measurementId for completeness
-        measurementId: "G-ABCDEF1234",
+        measurementId: "G-ABCDEF1234"
       };
 
       console.log("Firebase config:", JSON.stringify(firebaseConfig));
-      console.log("Firebase SDK loaded:", typeof firebase !== "undefined");
-
+      console.log("Firebase SDK loaded:", typeof firebase !== 'undefined');
+      
       try {
         // Initialize Firebase
         console.log("Attempting to initialize Firebase...");
-
+        
         // Validate Firebase config before initialization
         if (!firebaseConfig.apiKey) {
           throw new Error("Firebase API key is missing");
@@ -436,7 +430,7 @@
         if (!firebaseConfig.appId) {
           throw new Error("Firebase App ID is missing");
         }
-
+        
         // Log the exact config being used
         console.log("Using Firebase config:", {
           apiKey: firebaseConfig.apiKey.substring(0, 10) + "...",
@@ -444,16 +438,13 @@
           projectId: firebaseConfig.projectId,
           appId: firebaseConfig.appId,
           databaseURL: firebaseConfig.databaseURL || "not set",
-          measurementId: firebaseConfig.measurementId || "not set",
+          measurementId: firebaseConfig.measurementId || "not set"
         });
-
+        
         firebase.initializeApp(firebaseConfig);
         console.log("Firebase initialized successfully!");
-        console.log(
-          "Firebase auth available:",
-          typeof firebase.auth === "function"
-        );
-
+        console.log("Firebase auth available:", typeof firebase.auth === 'function');
+        
         // Test auth instance
         const auth = firebase.auth();
         console.log("Firebase auth instance created successfully");
@@ -462,7 +453,7 @@
         console.error("Error code:", error.code);
         console.error("Error message:", error.message);
         console.error("Error stack:", error.stack);
-
+        
         // Display error on page for debugging
         document.getElementById("errorMessage").textContent =
           "Firebase initialization error: " + error.message;
@@ -536,25 +527,19 @@
 
       // Handle signup
       console.log("Setting up signup button click handler");
-
+      
       try {
         signupButton.addEventListener("click", async () => {
           console.log("Signup button clicked");
-
+          
           try {
             const email = emailInput.value;
             const password = passwordInput.value;
 
             console.log("Sign up attempt with email:", email);
-            console.log(
-              "Firebase config being used:",
-              JSON.stringify(firebaseConfig)
-            );
+            console.log("Firebase config being used:", JSON.stringify(firebaseConfig));
             console.log("Firebase initialized:", firebase.apps.length > 0);
-            console.log(
-              "Firebase auth available:",
-              typeof firebase.auth === "function"
-            );
+            console.log("Firebase auth available:", typeof firebase.auth === 'function');
 
             if (!email || !password) {
               showError("Please enter both email and password");
@@ -572,15 +557,10 @@
 
             try {
               console.log("Attempting to create user with Firebase...");
-              console.log(
-                "Firebase auth method:",
-                typeof firebase.auth().createUserWithEmailAndPassword
-              );
-
+              console.log("Firebase auth method:", typeof firebase.auth().createUserWithEmailAndPassword);
+              
               // Create user with Firebase
-              const authResult = await firebase
-                .auth()
-                .createUserWithEmailAndPassword(email, password);
+              const authResult = await firebase.auth().createUserWithEmailAndPassword(email, password);
               console.log("User creation successful, auth result:", authResult);
 
               console.log("User created successfully!");
@@ -594,25 +574,16 @@
               console.error("Error code:", error.code);
               console.error("Error message:", error.message);
               console.error("Error stack:", error.stack);
-
+              
               // Log more details about the error
-              console.error(
-                "Error is instance of:",
-                Object.prototype.toString.call(error)
-              );
+              console.error("Error is instance of:", Object.prototype.toString.call(error));
               console.error("Error properties:", Object.keys(error));
-
+              
               // Check if it's an API key error
-              if (error.code === "auth/api-key-not-valid") {
-                console.error(
-                  "API Key validation failed. Current API key:",
-                  firebaseConfig.apiKey
-                );
+              if (error.code === 'auth/api-key-not-valid') {
+                console.error("API Key validation failed. Current API key:", firebaseConfig.apiKey);
                 console.error("API Key length:", firebaseConfig.apiKey.length);
-                console.error(
-                  "API Key format valid:",
-                  /^AIza[0-9A-Za-z-_]{35}$/.test(firebaseConfig.apiKey)
-                );
+                console.error("API Key format valid:", /^AIza[0-9A-Za-z-_]{35}$/.test(firebaseConfig.apiKey));
               }
 
               // Show error message
@@ -677,5 +648,3 @@
     </script>
   </body>
 </html>
-
-<!-- Manually updated at 2:20 PM -->
