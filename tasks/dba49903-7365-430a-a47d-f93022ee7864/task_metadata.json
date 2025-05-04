@@ -1,0 +1,36 @@
+{
+  "files_in_context": [
+    {
+      "path": "functions/index.js",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "roo_read_date": 1746219786568,
+      "roo_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/index.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1746219795214,
+      "roo_edit_date": 1746219795214,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/index.js",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "roo_read_date": 1746219795214,
+      "roo_edit_date": 1746219795214,
+      "user_edit_date": 1746219795226
+    },
+    {
+      "path": "functions/index.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1746219802821,
+      "roo_edit_date": 1746219795214,
+      "user_edit_date": 1746219795226
+    }
+  ]
+}

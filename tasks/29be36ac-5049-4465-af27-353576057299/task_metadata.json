@@ -1,0 +1,36 @@
+{
+  "files_in_context": [
+    {
+      "path": "functions/generateReferralCode.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1746219708090,
+      "roo_edit_date": 1746219708090,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/rewardReferrer.js",
+      "record_state": "stale",
+      "record_source": "roo_edited",
+      "roo_read_date": 1746219719012,
+      "roo_edit_date": 1746219719012,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/generateReferralCode.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1746219728227,
+      "roo_edit_date": 1746219708090,
+      "user_edit_date": null
+    },
+    {
+      "path": "functions/rewardReferrer.js",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "roo_read_date": 1746219731220,
+      "roo_edit_date": 1746219719012,
+      "user_edit_date": null
+    }
+  ]
+}

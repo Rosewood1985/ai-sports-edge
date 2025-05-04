@@ -322,3 +322,9 @@ exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
     return null;
   }
 });
+
+// Referral + Reward Functions
+const { generateReferralCode } = require('./generateReferralCode');
+const { rewardReferrer } = require('./rewardReferrer');
+exports.generateReferralCode = generateReferralCode;
+exports.rewardReferrer = rewardReferrer;
