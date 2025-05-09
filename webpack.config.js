@@ -1,19 +1,21 @@
 const createExpoWebpackConfigAsync = require('@expo/webpack-config');
 const path = require('path');
 
-module.exports = async function (env, argv) {
-  const config = await createExpoWebpackConfigAsync(env, argv);
-
-  // Add atomic architecture aliases
-  config.resolve.alias = {
-    ...config.resolve.alias,
-    'atomic': path.resolve(__dirname, 'atomic'),
-    'atomic/atoms': path.resolve(__dirname, 'atomic/atoms'),
-    'atomic/molecules': path.resolve(__dirname, 'atomic/molecules'),
-    'atomic/organisms': path.resolve(__dirname, 'atomic/organisms'),
-    'atomic/templates': path.resolve(__dirname, 'atomic/templates'),
-    'atomic/pages': path.resolve(__dirname, 'atomic/pages'),
-  };
-
+module.exports = async function(env, argv) {
+  const config = await createExpoWebpackConfigAsync(
+    {
+      ...env,
+      babel: {
+        dangerouslyAddModulePathsToTranspile: [
+          // Add any packages that need transpiling
+        ]
+      }
+    },
+    argv
+  );
+  
+  // Set output path to 'dist' to match Firebase configuration
+  config.output.path = path.resolve(__dirname, 'dist');
+  
   return config;
 };

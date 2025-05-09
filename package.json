@@ -15,8 +15,10 @@
     "lint": "eslint .",
     "lint:atomic": "eslint --config .eslintrc.atomic.js atomic/**/*.js",
     "build": "expo build",
-    "deploy": "firebase deploy",
-    "deploy:atomic": "./deploy-atomic-to-production.sh"
+    "deploy": "firebase deploy --only hosting",
+    "deploy:atomic": "./deploy-atomic-to-production.sh",
+    "build:web": "expo build:web",
+    "export:web": "expo export:web"
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
@@ -46,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@expo/webpack-config": "^0.17.0",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.67.6",
     "babel-preset-expo": "~9.1.0",
