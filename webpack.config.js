@@ -17,5 +17,12 @@ module.exports = async function(env, argv) {
   // Set output path to 'dist' to match Firebase configuration
   config.output.path = path.resolve(__dirname, 'dist');
   
+  // Fix the node configuration
+  config.node = {
+    __dirname: false,
+    __filename: false,
+    global: false
+  };
+  
   return config;
 };
