@@ -22,17 +22,8 @@ jobs:
         
       - name: Prepare dist directory
         run: |
-          # Ensure dist directory exists
+          # Ensure dist directory exists and has content
           mkdir -p dist
-          
-          # Only copy from public if dist is empty
-          if [ -z "$(ls -A dist 2>/dev/null)" ]; then
-            if [ -d "public" ]; then
-              cp -r public/* dist/ 2>/dev/null || echo "No files to copy from public"
-            fi
-          fi
-          
-          # Make sure there's at least an index.html file
           if [ ! -f "dist/index.html" ]; then
             echo "<html><body><h1>AI Sports Edge</h1><p>Coming Soon</p></body></html>" > dist/index.html
           fi
