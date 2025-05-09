@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "ai-sports-edge-com",
+    "site": "aisportsedge-app",
     "public": "dist",
     "ignore": [
       "firebase.json",
@@ -10,15 +10,15 @@
     "rewrites": [
       {
         "source": "/api/v1/**",
-        "destination": "https://api.ai-sports-edge.com/v1/:splat"
+        "destination": "https://api.aisportsedge.app/v1/:splat"
       },
       {
         "source": "/api/v2/**",
-        "destination": "https://api.ai-sports-edge.com/v2/:splat"
+        "destination": "https://api.aisportsedge.app/v2/:splat"
       },
       {
         "source": "/admin/**",
-        "destination": "https://admin.ai-sports-edge.com/:splat"
+        "destination": "https://admin.aisportsedge.app/:splat"
       },
       {
         "source": "/app/**",
@@ -50,21 +50,6 @@
       }
     ],
     "redirects": [
-      {
-        "source": "http://ai-sports-edge.com/*",
-        "destination": "https://ai-sports-edge.com/:splat",
-        "type": 301
-      },
-      {
-        "source": "http://www.ai-sports-edge.com/*",
-        "destination": "https://ai-sports-edge.com/:splat",
-        "type": 301
-      },
-      {
-        "source": "https://www.ai-sports-edge.com/*",
-        "destination": "https://ai-sports-edge.com/:splat",
-        "type": 301
-      },
       {
         "source": "/home",
         "destination": "/",
@@ -98,6 +83,16 @@
       {
         "source": "/sports/mlb",
         "destination": "/sports/baseball",
+        "type": 301
+      },
+      {
+        "source": "http://aisportsedge.app/*",
+        "destination": "https://www.aisportsedge.app/:splat",
+        "type": 301
+      },
+      {
+        "source": "https://aisportsedge.app/*",
+        "destination": "https://www.aisportsedge.app/:splat",
         "type": 301
       }
     ],
@@ -143,7 +138,7 @@
         "headers": [
           {
             "key": "Access-Control-Allow-Origin",
-            "value": "https://ai-sports-edge.com"
+            "value": "https://www.aisportsedge.app"
           },
           {
             "key": "Access-Control-Allow-Methods",
@@ -197,19 +192,19 @@
     "appAssociation": "AUTO",
     "customDomains": [
       {
-        "domain": "ai-sports-edge.com",
+        "domain": "aisportsedge.app",
         "ssl": true
       },
       {
-        "domain": "www.ai-sports-edge.com",
+        "domain": "www.aisportsedge.app",
         "ssl": true
       },
       {
-        "domain": "api.ai-sports-edge.com",
+        "domain": "api.aisportsedge.app",
         "ssl": true
       },
       {
-        "domain": "admin.ai-sports-edge.com",
+        "domain": "admin.aisportsedge.app",
         "ssl": true
       }
     ]

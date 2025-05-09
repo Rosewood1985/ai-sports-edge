@@ -1,34 +1,19 @@
-# AI Sports Edge Project Documentation
+# AI Sports Edge Project
 
-## Project Overview
-- **Name**: AI Sports Edge
-- **Description**: AI-powered sports analytics and prediction platform
-- **GitHub Repository**: https://github.com/Rosewood1985/ai-sports-edge
+## Project Setup
 - **Firebase Project**: ai-sports-edge
+- **Main Hosting Site**: aisportsedge-app (https://aisportsedge-app.web.app)
+- **Custom Domain**: www.aisportsedge.app
 
-## Current Status
-- Using Expo v45 (outdated)
-- Mixed web and mobile implementation
-- Deployment issues with web build
+## Deployment Instructions
+1. Make changes to files in the `dist` directory
+2. Run `./deploy.sh` to deploy to Firebase
 
-## Hosting
-- Using Firebase Hosting
-- Site: ai-sports-edge-com
-- URL: https://ai-sports-edge-com.web.app
-- Custom domains: ai-sports-edge.com, www.ai-sports-edge.com
+## Project Structure
+- `/dist`: Files for web deployment
+- `/components`: React Native components
+- `/src`: Source code for the application
 
-## Action Items
-1. Update Expo to latest version
-2. Set up proper web build process
-3. Establish CI/CD pipeline
-4. Clean up project structure
-
-## Future Development Plan
-- Focus on web first
-- Mobile implementation to follow
-- Ensure proper Git workflow
-
-## Important Files and Directories
-- `/src`: Main source code
-- `/components`: UI components
-- `/dist`: Web deployment files
+## Notes
+- This project uses Expo 45 for mobile development
+- Web deployment uses Firebase Hosting
