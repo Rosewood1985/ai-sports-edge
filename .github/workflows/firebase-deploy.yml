@@ -1,8 +1,10 @@
 name: Build and Deploy
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -18,10 +20,22 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
         
-      - name: Build
+      - name: Prepare dist directory
         run: |
+          # Ensure dist directory exists
           mkdir -p dist
-          cp -r public/* dist/ || true
+          
+          # Only copy from public if dist is empty
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then
+            if [ -d "public" ]; then
+              cp -r public/* dist/ 2>/dev/null || echo "No files to copy from public"
+            fi
+          fi
+          
+          # Make sure there's at least an index.html file
+          if [ ! -f "dist/index.html" ]; then
+            echo "<html><body><h1>AI Sports Edge</h1><p>Coming Soon</p></body></html>" > dist/index.html
+          fi
       
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
