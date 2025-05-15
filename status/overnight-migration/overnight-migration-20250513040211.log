@@ -1,0 +1,94 @@
+# Overnight Firebase Migration Log
+Started at Tue May 13 04:02:11 UTC 2025
+Configuration:
+  Batch Size: 5
+  Max Batches: 1000
+
+2025-05-13 04:02:11 - Starting overnight Firebase migration...
+2025-05-13 04:02:11 - Initial migration status: 165/532 (31%)
+2025-05-13 04:02:11 - Running accelerated migration with batch size 5 and max batches 1000...
+[0;32mStarting accelerated Firebase migration...[0m
+[0;34mIdentifying files that need migration...[0m
+[0;34mFound 186 total Firebase files[0m
+[0;32m177 files already migrated[0m
+[1;33m11 files still need migration[0m
+[0;34mPrioritizing files for migration...[0m
+[0;34mPrioritized files:[0m
+[0;31m  High priority: 11 files[0m
+[1;33m  Medium priority: 0 files[0m
+[0;32m  Low priority: 0 files[0m
+[0;34mReady to migrate 11 files in 3 batches of up to 5 files each[0m
+[0;34mMigrating batch 1 (files 1-5)...[0m
+[1;33mMigrating file: ./archive/screens/RedeemGiftScreen.tsx[0m
+[0;32m✅ Successfully migrated: ./archive/screens/RedeemGiftScreen.tsx[0m
+[1;33mMigrating file: ./functions/lib/config.js[0m
+[0;32m✅ Successfully migrated: ./functions/lib/config.js[0m
+[1;33mMigrating file: ./functions/lib/index.js[0m
+[0;32m✅ Successfully migrated: ./functions/lib/index.js[0m
+[1;33mMigrating file: ./functions/lib/markAIPickOfDay.js[0m
+[0;32m✅ Successfully migrated: ./functions/lib/markAIPickOfDay.js[0m
+[1;33mMigrating file: ./functions/lib/microtransactions.js[0m
+[0;32m✅ Successfully migrated: ./functions/lib/microtransactions.js[0m
+[0;34mBatch 1 completed: 5 succeeded, 0 failed[0m
+[0;34mUpdating memory bank...[0m
+[0;32mMemory bank updated via update-firebase-migration-status.sh[0m
+[0;32mMemory bank checkpoint created[0m
+[0;34mMigrating batch 2 (files 6-10)...[0m
+[1;33mMigrating file: ./functions/lib/predictTodayGames.js[0m
+[0;32m✅ Successfully migrated: ./functions/lib/predictTodayGames.js[0m
+[1;33mMigrating file: ./functions/lib/updateStatsPage.js[0m
+[0;32m✅ Successfully migrated: ./functions/lib/updateStatsPage.js[0m
+[1;33mMigrating file: ./src/components/VelocityChart.jsx[0m
+[0;32m✅ Successfully migrated: ./src/components/VelocityChart.jsx[0m
+[1;33mMigrating file: ./xcode-git-ai-sports-edge/screens/SettingsScreen.tsx[0m
+[0;32m✅ Successfully migrated: ./xcode-git-ai-sports-edge/screens/SettingsScreen.tsx[0m
+[1;33mMigrating file: ./xcode-git-ai-sports-edge/services/analyticsService.ts[0m
+[0;32m✅ Successfully migrated: ./xcode-git-ai-sports-edge/services/analyticsService.ts[0m
+[0;34mBatch 2 completed: 5 succeeded, 0 failed[0m
+[0;34mUpdating memory bank...[0m
+[0;32mMemory bank updated via update-firebase-migration-status.sh[0m
+[0;32mMemory bank checkpoint created[0m
+[0;34mMigrating batch 3 (files 11-11)...[0m
+[1;33mMigrating file: ./xcode-git-ai-sports-edge/services/onboardingService.ts[0m
+[0;32m✅ Successfully migrated: ./xcode-git-ai-sports-edge/services/onboardingService.ts[0m
+[0;34mBatch 3 completed: 1 succeeded, 0 failed[0m
+[0;34mUpdating memory bank...[0m
+[0;32mMemory bank updated via update-firebase-migration-status.sh[0m
+[0;32mMemory bank checkpoint created[0m
+[0;34mUpdating memory bank...[0m
+[0;32mMemory bank updated via update-firebase-migration-status.sh[0m
+[0;32mMemory bank checkpoint created[0m
+[0;34mRunning retroactive tagging...[0m
+[0;32mRetroactive tagging completed[0m
+[0;32mAccelerated migration completed! See status/accelerated-migration-20250513040211.log for details.[0m
+Completed batch 1 of 1000
+[0;32mStarting accelerated Firebase migration...[0m
+[0;34mIdentifying files that need migration...[0m
+[0;34mFound 186 total Firebase files[0m
+[0;32m188 files already migrated[0m
+[1;33m0 files still need migration[0m
+[0;32mNo files need migration. All done![0m
+Migration complete, no more files to migrate.
+2025-05-13 04:11:41 - Accelerated migration completed
+2025-05-13 04:11:41 - Updating memory bank...
+[0;34mStarting Firebase migration status update...[0m
+[0;34mScanning for migrated files...[0m
+[0;32mFound 188 migrated files[0m
+[0;34mScanning for pending files...[0m
+[1;33mFound 0 pending files[0m
+[0;34mUpdating migration status JSON...[0m
+[0;32mMigration status JSON updated[0m
+[0;34mUpdating active context...[0m
+[0;32mActive context updated[0m
+[0;34mUpdating progress file...[0m
+[0;32mProgress file updated[0m
+[0;32mFirebase migration status update completed[0m
+2025-05-13 04:12:24 - Memory bank updated via update-firebase-migration-status.sh
+[0;34m[INFO][0m Creating checkpoint...
+./scripts/maintain-context.sh: line 66: node: command not found
+[0;31m[ERROR][0m Failed to create checkpoint
+2025-05-13 04:12:24 - Memory bank checkpoint created
+2025-05-13 04:12:24 - Final migration status: / (%)
+2025-05-13 04:12:24 - Creating summary report...
+2025-05-13 04:12:24 - Summary report created at status/overnight-migration/overnight-migration-summary-20250513040211.md
+2025-05-13 04:12:24 - Overnight migration process completed!

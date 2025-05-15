@@ -1,0 +1,1609 @@
+
+=== CronRC Runner ===
+
+[SUCCESS] Loaded 8 tasks from .cronrc
+
+=== Starting Tasks ===
+
+[INFO] Task "save-context" scheduled to run every 3m (next run: 6:45:33 PM)
+[INFO] Task "sync-tasks" scheduled to run every 5m (next run: 6:47:33 PM)
+[INFO] Task "tag-scan" scheduled to run every 10m (next run: 6:52:33 PM)
+[INFO] Task "update-progress" scheduled to run every 15m (next run: 6:57:33 PM)
+[INFO] Task "log-summary" scheduled to run every 30m (next run: 7:12:33 PM)
+[INFO] Task "checkpoint" scheduled to run every 1h (next run: 7:42:33 PM)
+[INFO] Task "weekly-review" scheduled to run every 12h (next run: 6:42:33 AM)
+[INFO] Task "security-audit" scheduled to run every 24h (next run: 6:42:33 PM)
+[INFO] Log rotation set up (retention: 7 days)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬──────────┬─────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │ Last Run │        Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼──────────┼─────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ 'Never'  │ '5/13/2025, 6:45:33 PM' │ 'Idle' │
+│    1    │   'sync-tasks'    │   '5m'   │ 'Never'  │ '5/13/2025, 6:47:33 PM' │ 'Idle' │
+│    2    │    'tag-scan'     │  '10m'   │ 'Never'  │ '5/13/2025, 6:52:33 PM' │ 'Idle' │
+│    3    │ 'update-progress' │  '15m'   │ 'Never'  │ '5/13/2025, 6:57:33 PM' │ 'Idle' │
+│    4    │   'log-summary'   │  '30m'   │ 'Never'  │ '5/13/2025, 7:12:33 PM' │ 'Idle' │
+│    5    │   'checkpoint'    │   '1h'   │ 'Never'  │ '5/13/2025, 7:42:33 PM' │ 'Idle' │
+│    6    │  'weekly-review'  │  '12h'   │ 'Never'  │ '5/14/2025, 6:42:33 AM' │ 'Idle' │
+│    7    │ 'security-audit'  │  '24h'   │ 'Never'  │ '5/14/2025, 6:42:33 PM' │ 'Idle' │
+└─────────┴─────────────[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sp[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cro[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edg[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/wor[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edg[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/wor[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "checkpoint" (./scripts/update-memory-bank.js --checkpoint)
+[ERROR] Failed to execute task "checkpoint" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬─────────────────────────┬─────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │        Last Run         │        Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼─────────────────────────┼─────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ '5/13/2025, 7:34:34 PM' │ '5/13/2025, 7:37:34 PM' │ 'Idle' │
+│    1    │    'tag-scan'     │  '10m'   │ '5/13/2025, 7:27:34 PM' │ '5/13/2025, 7:37:34 PM' │ 'Idle' │
+│    2    │ 'update-progress' │  '15m'   │ '5/13/2025, 7:22:34 PM' │ '5/13/2025, 7:37:34 PM' │ 'Idle' │
+│    3    │   'checkpoint'    │   '1h'   │ '5/13/2025, 7:37:34 PM' │ '5/13/2025, 8:37:34 PM' │ 'Idle' │
+└─────────┴───────────────────┴──────────┴─────────────────────────┴─────────────────────────┴────────┘
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "checkpoint" (./scripts/update-memory-bank.js --checkpoint)
+[ERROR] Failed to execute task "checkpoint" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬─────────────────────────┬─────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │        Last Run         │        Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼─────────────────────────┼─────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ '5/13/2025, 8:34:34 PM' │ '5/13/2025, 8:37:34 PM' │ 'Idle' │
+│    1    │    'tag-scan'     │  '10m'   │ '5/13/2025, 8:27:34 PM' │ '5/13/2025, 8:37:34 PM' │ 'Idle' │
+│    2    │ 'update-progress' │  '15m'   │ '5/13/2025, 8:22:34 PM' │ '5/13/2025, 8:37:34 PM' │ 'Idle' │
+│    3    │   'checkpoint'    │   '1h'   │ '5/13/2025, 8:37:34 PM' │ '5/13/2025, 9:37:34 PM' │ 'Idle' │
+└─────────┴───────────────────┴──────────┴─────────────────────────┴─────────────────────────┴────────┘
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "checkpoint" (./scripts/update-memory-bank.js --checkpoint)
+[ERROR] Failed to execute task "checkpoint" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬─────────────────────────┬──────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │        Last Run         │         Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼─────────────────────────┼──────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ '5/13/2025, 9:34:34 PM' │ '5/13/2025, 9:37:34 PM'  │ 'Idle' │
+│    1    │    'tag-scan'     │  '10m'   │ '5/13/2025, 9:27:34 PM' │ '5/13/2025, 9:37:34 PM'  │ 'Idle' │
+│    2    │ 'update-progress' │  '15m'   │ '5/13/2025, 9:22:34 PM' │ '5/13/2025, 9:37:34 PM'  │ 'Idle' │
+│    3    │   'checkpoint'    │   '1h'   │ '5/13/2025, 9:37:34 PM' │ '5/13/2025, 10:37:34 PM' │ 'Idle' │
+└─────────┴───────────────────┴──────────┴─────────────────────────┴──────────────────────────┴────────┘
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "checkpoint" (./scripts/update-memory-bank.js --checkpoint)
+[ERROR] Failed to execute task "checkpoint" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬──────────────────────────┬──────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │         Last Run         │         Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼──────────────────────────┼──────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ '5/13/2025, 11:01:28 PM' │ '5/13/2025, 11:04:28 PM' │ 'Idle' │
+│    1    │    'tag-scan'     │  '10m'   │ '5/13/2025, 10:27:34 PM' │ '5/13/2025, 10:37:34 PM' │ 'Idle' │
+│    2    │ 'update-progress' │  '15m'   │ '5/13/2025, 10:22:34 PM' │ '5/13/2025, 10:37:34 PM' │ 'Idle' │
+│    3    │   'checkpoint'    │   '1h'   │ '5/13/2025, 11:19:26 PM' │ '5/14/2025, 12:19:26 AM' │ 'Idle' │
+└─────────┴───────────────────┴──────────┴──────────────────────────┴──────────────────────────┴────────┘
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "checkpoint" (./scripts/update-memory-bank.js --checkpoint)
+[ERROR] Failed to execute task "checkpoint" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬──────────────────────────┬──────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │         Last Run         │         Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼──────────────────────────┼──────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ '5/14/2025, 12:18:53 AM' │ '5/14/2025, 12:21:53 AM' │ 'Idle' │
+│    1    │    'tag-scan'     │  '10m'   │ '5/14/2025, 12:11:52 AM' │ '5/14/2025, 12:21:52 AM' │ 'Idle' │
+│    2    │ 'update-progress' │  '15m'   │ '5/14/2025, 12:06:52 AM' │ '5/14/2025, 12:21:52 AM' │ 'Idle' │
+│    3    │   'checkpoint'    │   '1h'   │ '5/14/2025, 12:21:51 AM' │ '5/14/2025, 1:21:51 AM'  │ 'Idle' │
+└─────────┴───────────────────┴──────────┴──────────────────────────┴──────────────────────────┴────────┘
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+ceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "log-summary" (./scripts/generate-summary-log.sh)
+[ERROR] Failed to execute task "log-summary" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "checkpoint" (./scripts/update-memory-bank.js --checkpoint)
+[ERROR] Failed to execute task "checkpoint" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+
+=== Task Status ===
+
+┌─────────┬───────────────────┬──────────┬──────────────────────────┬──────────────────────────┬────────┐
+│ (index) │       Label       │ Interval │         Last Run         │         Next Run         │ Status │
+├─────────┼───────────────────┼──────────┼──────────────────────────┼──────────────────────────┼────────┤
+│    0    │  'save-context'   │   '3m'   │ '5/14/2025, 12:23:52 AM' │ '5/14/2025, 12:26:52 AM' │ 'Idle' │
+│    1    │   'sync-tasks'    │   '5m'   │ '5/14/2025, 12:21:51 AM' │ '5/14/2025, 12:26:51 AM' │ 'Idle' │
+│    2    │    'tag-scan'     │  '10m'   │ '5/14/2025, 12:16:51 AM' │ '5/14/2025, 12:26:51 AM' │ 'Idle' │
+│    3    │ 'update-progress' │  '15m'   │ '5/14/2025, 12:11:51 AM' │ '5/14/2025, 12:26:51 AM' │ 'Idle' │
+│    4    │   'log-summary'   │  '30m'   │ '5/13/2025, 11:56:51 PM' │ '5/14/2025, 12:26:51 AM' │ 'Idle' │
+│    5    │   'checkpoint'    │   '1h'   │ '5/14/2025, 12:26:51 AM' │ '5/14/2025, 1:26:51 AM'  │ 'Idle' │
+│    6    │  'weekly-review'  │  '12h'   │         'Never'          │ '5/14/2025, 6:42:33 AM'  │ 'Idle' │
+│    7    │ 'security-audit'  │  '24h'   │         'Never'          │ '5/14/2025, 6:42:33 PM'  │ 'Idle' │
+└─────────┴───────────────────┴──────────┴──────────────────────────┴──────────────────────────┴────────┘
+[INFO] Executing task "log-summary" (./scripts/generate-summary-log.sh)
+[ERROR] Failed to execute task "log-summary" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "log-summary" (./scripts/generate-summary-log.sh)
+[ERROR] Failed to execute task "log-summary" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "update-progress" (./scripts/clean-and-sort-progress.sh)
+[ERROR] Failed to execute task "update-progress" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "save-context" (./scripts/save-context.sh "[AUTO] Recurring context save")
+[ERROR] Failed to execute task "save-context" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "tag-scan" (./scripts/tag-context.sh --auto)
+[ERROR] Failed to execute task "tag-scan" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)
+[INFO] Executing task "sync-tasks" (./scripts/sync-tasks-with-memory-bank.sh)
+[ERROR] Failed to execute task "sync-tasks" ReferenceError: Cannot access 'process' before initialization
+    at Task.execute (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:111:14)
+    at Timeout._onTimeout (/workspaces/ai-sports-edge/scripts/cronrc-runner.js:76:41)
+    at listOnTimeout (node:internal/timers:569:17)
+    at process.processTimers (node:internal/timers:512:7)

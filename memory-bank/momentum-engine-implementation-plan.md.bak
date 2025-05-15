@@ -1,0 +1,247 @@
+# AI Sports Edge: Momentum Engine Implementation Plan
+
+## Overview
+
+This implementation plan outlines the approach for adding momentum-based analytics and AI insights to the AI Sports Edge platform. The plan includes creating new services for momentum calculation, confidence adjustment, and AI insight generation, along with the necessary infrastructure for daily updates and admin monitoring.
+
+## Project Structure
+
+We'll implement the following folder structure, integrating with the existing project architecture:
+
+```mermaid
+flowchart TD
+    A[Project Root] --> B[src]
+    B --> C[components]
+    B --> D[context]
+    B --> E[screens]
+    E --> E1[Onboarding]
+    B --> F[services]
+    F --> F1[momentumEngine.ts]
+    F --> F2[confidenceAdjuster.ts]
+    F --> F3[aiInsightGenerator.ts]
+    B --> G[utils]
+    B --> H[firebase]
+    H --> H1[updateGameData.ts]
+    B --> I[i18n]
+    I --> I1[index.ts]
+    I --> I2[languageUtils.ts]
+    A --> J[functions]
+    J --> J1[dailyMomentumUpdate.ts]
+    A --> K[ml]
+    K --> K1[training]
+    K1 --> K1a[prepare_dataset.py]
+    K1 --> K1b[feature_engineering.py]
+    K1 --> K1c[train_model.py]
+    K1 --> K1d[evaluate_model.py]
+    K --> K2[inference]
+    K2 --> K2a[predict_outcome.py]
+    K2 --> K2b[confidence_adjuster.py]
+    A --> L[tests]
+    L --> L1[unit]
+    L1 --> L1a[test_momentumEngine.ts]
+    A --> M[admin]
+    M --> M1[AdminDashboard.tsx]
+    A --> N[analytics]
+    A --> O[docs]
+```
+
+## Implementation Plan
+
+### Phase 1: Core Services (1 week)
+
+1. **Momentum Engine (`src/services/momentumEngine.ts`)**
+   - Implement `getLastNGames(team, n)` function
+   - Create `calculatePointDifferential(games)` function
+   - Develop `generateMomentumAndInsight(gameId, teamA, teamB)` function
+   - Integrate with Firebase for data updates
+
+2. **Confidence Adjuster (`src/services/confidenceAdjuster.ts`)**
+   - Implement `adjustConfidence(baseConfidence, lineMovement, sharpEdgeSignal)` function
+   - Add validation to ensure confidence stays within 0-100 range
+
+3. **AI Insight Generator (`src/services/aiInsightGenerator.ts`)**
+   - Create `generateAiInsight(momentumScore, publicBetPct, lineMovement, confidence)` function
+   - Implement conditional text generation based on input parameters
+   - Add support for internationalization
+
+4. **Firebase Integration (`src/firebase/updateGameData.ts`)**
+   - Implement `updateGameData(gameId, newFields)` function
+   - Add error handling and validation
+
+### Phase 2: Cloud Functions & ML (1 week)
+
+1. **Daily Momentum Update (`functions/dailyMomentumUpdate.ts`)**
+   - Create Pub/Sub triggered function to run daily
+   - Implement `getTodaysGames()` function
+   - Process each game with momentum engine
+   - Add logging for monitoring
+
+2. **ML Training Scripts**
+   - Implement data preparation from Firestore
+   - Create feature engineering pipeline
+   - Train XGBoost model for outcome prediction
+   - Evaluate model performance by confidence bracket
+
+3. **ML Inference Scripts**
+   - Implement model loading and prediction
+   - Create Python version of confidence adjuster
+   - Add JSON output formatting
+
+### Phase 3: Admin Dashboard & Testing (1 week)
+
+1. **Admin Dashboard (`admin/AdminDashboard.tsx`)**
+   - Create admin authentication check
+   - Implement game data display
+   - Add manual refresh functionality
+   - Integrate with Firebase
+
+2. **Unit Tests (`tests/unit/test_momentumEngine.ts`)**
+   - Test positive momentum calculation
+   - Test negative momentum calculation
+   - Test AI insight text generation
+   - Mock Firebase dependencies
+
+### Phase 4: Internationalization & Integration (1 week)
+
+1. **Internationalization**
+   - Update existing translation files
+   - Create new i18n utilities
+   - Add momentum-specific translations
+   - Integrate with existing LanguageContext
+
+2. **Google Tag Integration**
+   - Add Google tag to web app pages
+   - Ensure tag is added only once per page
+   - Implement proper event tracking
+
+3. **Code Cleanup**
+   - Use Prettier for code formatting
+   - Remove irrelevant or old code
+   - Optimize imports and dependencies
+
+## Implementation Details
+
+### Momentum Engine Core Logic
+
+```typescript
+// Core function to calculate momentum
+export async function generateMomentumAndInsight(
+  gameId: string,
+  teamA: string,
+  teamB: string
+): Promise<{
+  momentumScore: number;
+  aiInsightText: string;
+}> {
+  // Fetch last 5 games for each team
+  const teamAGames = await getLastNGames(teamA, 5);
+  const teamBGames = await getLastNGames(teamB, 5);
+  
+  // Calculate point differentials
+  const teamADifferential = calculatePointDifferential(teamAGames);
+  const teamBDifferential = calculatePointDifferential(teamBGames);
+  
+  // Calculate momentum score
+  const momentumScore = teamADifferential - teamBDifferential;
+  
+  // Generate insight text based on momentum score
+  const aiInsightText = generateInsightText(momentumScore, teamA, teamB);
+  
+  // Update game data in Firestore
+  await updateGameData(gameId, { momentumScore, aiInsightText });
+  
+  return { momentumScore, aiInsightText };
+}
+```
+
+### Confidence Adjuster Logic
+
+```typescript
+export function adjustConfidence(
+  baseConfidence: number,
+  lineMovement: number,
+  sharpEdgeSignal: boolean
+): number {
+  let adjustedConfidence = baseConfidence;
+  
+  // Apply adjustments based on sharp money signal
+  if (sharpEdgeSignal) {
+    adjustedConfidence += 5;
+  }
+  
+  // Apply adjustments based on line movement and base confidence
+  if (lineMovement > 2.5) {
+    if (baseConfidence > 75) {
+      adjustedConfidence += 3;
+    } else if (baseConfidence < 60) {
+      adjustedConfidence -= 5;
+    }
+  }
+  
+  // Ensure confidence stays within 0-100 range
+  return Math.max(0, Math.min(100, adjustedConfidence));
+}
+```
+
+### AI Insight Generator Logic
+
+```typescript
+export function generateAiInsight(
+  momentumScore: number,
+  publicBetPct: number,
+  lineMovement: number,
+  confidence: number
+): string {
+  const insights: string[] = [];
+  
+  // Add momentum insight
+  if (Math.abs(momentumScore) > 10) {
+    if (momentumScore > 0) {
+      insights.push("Team A has strong momentum based on recent performance.");
+    } else {
+      insights.push("Team B has strong momentum based on recent performance.");
+    }
+  }
+  
+  // Add public betting insight
+  if (publicBetPct < 40) {
+    insights.push("This pick is going against public sentiment, which can indicate value.");
+  }
+  
+  // Add line movement insight
+  if (lineMovement > 2.5 && confidence > 75) {
+    insights.push("Line movement aligns with our model's prediction, strengthening our confidence.");
+  }
+  
+  // Combine insights or provide default
+  return insights.length > 0 
+    ? insights.join(" ") 
+    : "Our model indicates a balanced matchup with no strong signals in either direction.";
+}
+```
+
+## Google Tag Integration
+
+The Google tag should be added to the `<head>` section of each web page:
+
+```html
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-52JHSJCWN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-52JHSJCWN');
+</script>
+```
+
+## Next Steps
+
+1. Review and approve this implementation plan
+2. Switch to Code mode to begin implementation
+3. Start with the core services in Phase 1
+4. Implement the remaining components in the order outlined
+5. Test thoroughly at each phase
+6. Deploy and monitor performance
+
+Last updated: 2025-05-13 18:23:48

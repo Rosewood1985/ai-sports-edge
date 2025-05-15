@@ -1,0 +1,33 @@
+/**
+ * Fix for pricing overlay issue
+ * This CSS ensures that pricing elements don't overlay other sections
+ */
+
+/* Hide pricing elements when not on pricing page */
+body:not(.pricing-page) .pricing-overlay,
+body:not(.pricing-page) .pricing-modal,
+body:not(.pricing-page) .elite-plan-modal,
+body:not(.pricing-page) .pro-plan-modal,
+body:not(.pricing-page) #annual-discount-section,
+body:not(.pricing-page) .bet-now-popup-overlay {
+  display: none !important;
+  z-index: -1 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure about page sections have higher z-index */
+.about-hero,
+.about-mission,
+.about-story,
+.about-team,
+.about-values,
+.about-cta {
+  position: relative;
+  z-index: 10;
+}
+
+/* Force remove any pricing elements that might be stuck */
+.pricing-cleanup {
+  display: none !important;
+}

@@ -1,0 +1,307 @@
+# API Key Security Implementation
+
+## Overview
+
+This document details the implementation of the API key security system in the AI Sports Edge app.
+
+## Problem Statement
+
+The codebase had several security issues related to API keys:
+
+1. Hardcoded API keys in source code
+2. Inconsistent error handling for missing keys
+3. Lack of validation for required environment variables
+4. No centralized management of API credentials
+
+## Implementation Details
+
+### 1. Centralized API Key Management (`utils/apiKeys.ts`)
+
+Created a TypeScript module that provides:
+- Type-safe access to API keys
+- Consistent error handling
+- Logging for missing keys
+- Clear identification of which service requires which key
+
+```typescript
+/**
+ * API Keys Management
+ * 
+ * This module centralizes all API key access and provides proper error handling
+ * for missing keys. In production, all keys should be set as environment variables.
+ */
+
+import logger from './logger';
+
+// Interface for API configuration
+interface ApiConfig {
+  key: string;
+  isRequired: boolean;
+  serviceName: string;
+}
+
+// Get API key with proper error handling
+export function getApiKey(key: string, isRequired: boolean = true, serviceName: string): string {
+  const apiKey = process.env[key] || '';
+  
+  if (!apiKey && isRequired) {
+    const errorMessage = `Missing required API key: ${key} for service: ${serviceName}`;
+    logger.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+  
+  if (!apiKey && !isRequired) {
+    logger.warn(`Missing optional API key: ${key} for service: ${serviceName}`);
+  }
+  
+  return apiKey;
+}
+
+// API key configurations
+const API_KEYS = {
+  ODDS_API_KEY: {
+    key: 'ODDS_API_KEY',
+    isRequired: true,
+    serviceName: 'The Odds API'
+  },
+  // ... other API keys
+};
+
+// Export API key getters
+export const getOddsApiKey = () => getApiKey(API_KEYS.ODDS_API_KEY.key, API_KEYS.ODDS_API_KEY.isRequired, API_KEYS.ODDS_API_KEY.serviceName);
+// ... other getters
+
+export default {
+  getOddsApiKey,
+  // ... other getters
+};
+```
+
+### 2. Environment Validation (`utils/envCheck.js`)
+
+Created a JavaScript module that:
+- Validates required environment variables at startup
+- Groups variables by category for easier troubleshooting
+- Provides clear error messages for missing variables
+- Can be configured to exit the process or continue with warnings
+
+```javascript
+/**
+ * Environment Variable Checker
+ * 
+ * This script checks for required environment variables at startup
+ * and provides clear error messages for missing variables.
+ */
+
+// Required environment variables grouped by category
+const REQUIRED_ENV_VARS = {
+  firebase: [
+    'FIREBASE_API_KEY',
+    // ... other Firebase variables
+  ],
+  api: [
+    'ODDS_API_KEY',
+    // ... other API keys
+  ],
+  app: [
+    'APP_ENV',
+    // ... other app variables
+  ]
+};
+
+/**
+ * Check if required environment variables are set
+ * @returns {Object} Result of the check with missing variables
+ */
+function checkEnvVars() {
+  const missing = {};
+  let hasErrors = false;
+  
+  // Check each category
+  Object.entries(REQUIRED_ENV_VARS).forEach(([category, vars]) => {
+    const missingInCategory = vars.filter(varName => !process.env[varName]);
+    
+    if (missingInCategory.length > 0) {
+      missing[category] = missingInCategory;
+      hasErrors = true;
+    }
+  });
+  
+  return {
+    success: !hasErrors,
+    missing
+  };
+}
+
+/**
+ * Validate environment at startup
+ * @param {Object} options - Validation options
+ * @param {boolean} options.exitOnError - Whether to exit the process on error
+ * @returns {boolean} Whether validation passed
+ */
+function validateEnvironment(options = { exitOnError: true }) {
+  console.log('Validating environment variables...');
+  
+  const result = checkEnvVars();
+  
+  if (!result.success) {
+    console.error('Missing required environment variables:', result.missing);
+    
+    // Log specific instructions for each category
+    if (result.missing.firebase) {
+      console.error('Firebase config is incomplete. Check firebase-config directory for setup instructions.');
+    }
+    
+    if (result.missing.api) {
+      console.error('API keys are missing. See .env.example for required keys.');
+    }
+    
+    if (options.exitOnError) {
+      console.error('Exiting due to missing environment variables');
+      process.exit(1);
+    }
+    
+    return false;
+  }
+  
+  console.log('Environment validation passed');
+  return true;
+}
+
+// Export functions
+module.exports = {
+  checkEnvVars,
+  validateEnvironment
+};
+```
+
+### 3. App Initialization (App.tsx)
+
+Updated the app initialization to validate environment variables at startup:
+
+```typescript
+// Validate environment variables with basic console logging
+const envValid = validateEnvironment({ exitOnError: false });
+if (!envValid) {
+  console.warn("Environment validation failed - app may not function correctly");
+}
+
+const loggingInitialized = initLogging();
+
+// Log environment validation result with proper logging service
+if (loggingInitialized) {
+  if (!envValid) {
+    info(LogCategory.APP, "Environment validation failed - app may not function correctly");
+  } else {
+    info(LogCategory.APP, "Environment validation passed");
+  }
+}
+```
+
+### 4. Service Updates
+
+Updated the following services to use the centralized API key management system:
+
+#### Weather Service (`weatherService.ts`)
+```typescript
+// Get API key from centralized management
+import apiKeys from '../utils/apiKeys';
+const WEATHER_API_KEY = apiKeys.getWeatherApiKey();
+```
+
+#### Odds Service (`OddsService.js`)
+```javascript
+import apiKeys from '../utils/apiKeys';
+
+// API configuration
+const API_CONFIG = {
+  baseUrl: 'https://api.the-odds-api.com/v4',
+  apiKey: apiKeys.getOddsApiKey(),
+  timeout: 10000,
+};
+```
+
+#### FanDuel Service (`FanDuelService.js`)
+```javascript
+import apiKeys from '../utils/apiKeys';
+
+/**
+ * FanDuelService class for FanDuel integration and affiliate linking
+ */
+class FanDuelService {
+  constructor() {
+    // FanDuel affiliate configuration
+    this.config = {
+      affiliateId: apiKeys.getFanDuelAffiliateId(),
+      // ... other config
+    };
+  }
+  
+  // ... in trackConversion method
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKeys.getFanDuelApiKey()}`
+  },
+}
+```
+
+#### Payment Service (`paymentService.js`)
+```javascript
+const apiKeys = require('../utils/apiKeys');
+const stripe = require('stripe')(apiKeys.getStripeSecretKey());
+```
+
+#### Stripe Tax Service (`stripeTaxService.ts`)
+```typescript
+// Initialize Stripe with API key from centralized management
+import apiKeys from '../utils/apiKeys';
+const stripe = new Stripe(apiKeys.getStripeSecretKey(), {
+  apiVersion: '2025-02-24.acacia' // Use the latest API version
+});
+```
+
+#### ML Data Fetch (`fetch-enhanced.js`)
+```javascript
+const apiKeys = require('../../../utils/apiKeys');
+
+const API_CONFIG = {
+  ODDS_API: {
+    BASE_URL: 'https://api.the-odds-api.com/v4',
+    API_KEY: apiKeys.getOddsApiKey(),
+  }
+}
+```
+
+### 5. Documentation
+
+#### Environment Template (`.env.example`)
+Created a template file with all required environment variables and documentation.
+
+#### API Key Management Guide (`docs/api-key-management.md`)
+Created a comprehensive guide for developers on how to use the API key management system.
+
+#### Deployment Script (`deploy-api-key-security.sh`)
+Created a deployment script that validates environment variables before deployment.
+
+## Testing
+
+The implementation was tested by:
+1. Removing API keys from the environment to verify error handling
+2. Adding API keys to verify successful initialization
+3. Running the deployment script to verify validation
+
+## Security Benefits
+
+- **Reduced Risk**: No more API keys in source code
+- **Better Error Handling**: Clear messages when keys are missing
+- **Improved Developer Experience**: Consistent pattern for accessing keys
+- **Early Detection**: Validation at startup prevents runtime errors
+- **Documentation**: Clear guidance for new developers
+
+## Future Improvements
+
+1. Implement key rotation procedures
+2. Add monitoring for API key usage and rate limits
+3. Consider using a secrets management service for production
+4. Add automated testing for API key validation
+Last updated: 2025-05-13 18:22:54

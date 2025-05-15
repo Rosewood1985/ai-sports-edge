@@ -1,0 +1,100 @@
+# AI Pick of the Day Implementation
+
+## Overview
+
+The AI Pick of the Day feature is a core component of the AI Sports Edge application. It uses machine learning to predict game outcomes and selects the highest confidence prediction as the "Pick of the Day" to showcase to users.
+
+## Architecture
+
+The feature consists of several components:
+
+1. **ML Model**: A trained machine learning model that predicts game outcomes
+2. **Firebase Cloud Functions**: Automated functions that run daily to make predictions and select the top pick
+3. **Firestore Database**: Stores game data, predictions, and historical picks
+4. **React Native Components**: UI components to display the AI Pick of the Day to users
+
+## Implementation Details
+
+### ML Component
+
+- Located in: `ml/` directory
+- Key files:
+  - `ml/inference/predict_outcome.py`: Python script for making predictions
+  - `ml/models/model.pkl`: Trained ML model
+
+The ML model uses features such as momentum score, line movement, public betting percentages, and team-specific factors to predict game outcomes and calculate confidence scores.
+
+### Firebase Cloud Functions
+
+- Located in: `functions/src/` directory
+- Key files:
+  - `functions/src/predictTodayGames.ts`: Predicts outcomes for today's games
+  - `functions/src/markAIPickOfDay.ts`: Selects the top prediction as the Pick of the Day
+
+These functions run on a daily schedule to ensure fresh predictions are available to users.
+
+### Frontend Components
+
+- Located in: `src/components/` and `src/screens/` directories
+- Key files:
+  - `src/components/AIPickCard.tsx`: Card component to display a prediction
+  - `src/screens/AIPickOfDayScreen.tsx`: Screen to display the Pick of the Day and other top picks
+  - `src/services/aiPickSelector.ts`: Service to fetch predictions from Firestore
+
+### Data Flow
+
+1. The `predictTodayGames` function runs daily at 10 AM to predict outcomes for today's games
+2. The `markAIPickOfDay` function runs daily at 9 AM to select the top prediction as the Pick of the Day
+3. The frontend fetches the Pick of the Day from Firestore and displays it to users
+4. Users can follow picks to receive notifications about the outcome
+
+## Technical Decisions
+
+### ML Model Selection
+
+We chose a RandomForest classifier for the initial implementation due to:
+- Good performance with limited training data
+- Ability to handle both numerical and categorical features
+- Interpretability of feature importance
+
+### Confidence Adjustment
+
+Raw confidence scores from the model are adjusted based on:
+- Sport-specific factors (e.g., NBA games are more predictable than MLB games)
+- League-specific factors (e.g., Premier League games are more predictable than MLS games)
+- Momentum factors (higher momentum leads to higher confidence)
+
+### Scheduling Strategy
+
+- Predictions are made at 10 AM to ensure all game data is available
+- The Pick of the Day is selected at 9 AM to ensure it's available when users check the app in the morning
+
+### Caching Strategy
+
+- Predictions are cached on the client side to reduce Firestore reads
+- Cache is invalidated when new predictions are available
+
+## Future Improvements
+
+1. **Enhanced ML Models**:
+   - Implement ensemble methods to combine multiple models
+   - Add more features (e.g., player injuries, weather conditions)
+   - Train sport-specific models for better accuracy
+
+2. **Real-time Updates**:
+   - Update predictions based on pre-game information (e.g., lineup changes)
+   - Implement live prediction adjustments during games
+
+3. **Personalization**:
+   - Allow users to customize which sports they see predictions for
+   - Provide personalized confidence adjustments based on user preferences
+
+4. **Performance Optimization**:
+   - Implement batch processing for large numbers of games
+   - Optimize Firestore queries to reduce costs
+
+## Monitoring and Maintenance
+
+- Prediction accuracy is tracked in the `predictionLogs` collection
+- Historical picks are stored in the `aiPicksOfDay` collection for analysis
+- Regular model retraining is scheduled based on performance metrics

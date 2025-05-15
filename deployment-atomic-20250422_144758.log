@@ -1,0 +1,89 @@
+Starting atomic architecture deployment at Tue Apr 22 14:47:58 EDT 2025
+----------------------------------------
+Creating build directory...
+Creating documentation directory...
+Copying atomic components to build directory...
+✅ Atomic components copied to build directory
+Generating documentation...
+✅ Documentation generated
+Running tests...
+  console.log
+    Firebase app initialized successfully
+
+      at log (atomic/atoms/firebaseApp.js:22:15)
+
+  console.log
+    Firebase app initialized successfully
+
+      at log (atomic/atoms/firebaseApp.js:22:15)
+
+PASS __tests__/atomic/atoms/firebaseApp.test.js
+  Firebase App Atom
+    initializeFirebaseApp
+      ✓ should initialize Firebase app with default config (11 ms)
+      ✓ should initialize Firebase app with custom config (1 ms)
+      ✓ should handle initialization errors
+    getFirebaseApp
+      ✓ should return Firebase app instance (2 ms)
+      ✓ should return the same instance on subsequent calls
+      ○ skipped should handle initialization errors
+
+--------------------------|---------|----------|---------|---------|-------------------
+File                      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+--------------------------|---------|----------|---------|---------|-------------------
+All files                 |    3.18 |      3.9 |     2.5 |    3.15 |                   
+ atoms                    |   24.13 |    24.67 |   21.73 |   25.95 |                   
+  envConfig.js            |      75 |       75 |     100 |   73.68 | 30-33,49-51       
+  envValidator.js         |       0 |        0 |       0 |       0 | 8-80              
+  errorUtils.js           |       0 |        0 |       0 |       0 | 22-194            
+  firebaseApp.js          |   82.35 |       80 |   66.66 |   82.35 | 25-26,55          
+  serviceConfig.js        |     100 |      100 |     100 |     100 |                   
+  themeColors.js          |       0 |      100 |     100 |       0 | 12-204            
+  themeTokens.js          |       0 |      100 |     100 |       0 | 14-291            
+ molecules                |       0 |        0 |       0 |       0 |                   
+  environmentValidator.js |       0 |        0 |       0 |       0 | 24-111            
+  errorTracking.js        |       0 |        0 |       0 |       0 | 15-268            
+  firebaseAuth.js         |       0 |        0 |       0 |       0 | 22-224            
+  firebaseFirestore.js    |       0 |        0 |       0 |       0 | 34-500            
+  logging.js              |       0 |        0 |       0 |       0 | 16-499            
+  performance.js          |       0 |        0 |       0 |       0 | 16-421            
+  themeContext.js         |       0 |        0 |       0 |       0 | 35-170            
+ organisms                |       0 |        0 |       0 |       0 |                   
+  environmentBootstrap.js |       0 |        0 |       0 |       0 | 41-163            
+  firebaseService.js      |       0 |        0 |       0 |       0 | 53-275            
+  monitoringService.js    |       0 |        0 |       0 |       0 | 93-382            
+  themeProvider.js        |       0 |        0 |       0 |       0 | 19-142            
+ pages                    |       0 |        0 |       0 |       0 |                   
+  HomePage.js             |       0 |        0 |       0 |       0 | 22-227            
+ templates                |       0 |        0 |       0 |       0 |                   
+  MainLayout.js           |       0 |        0 |       0 |       0 | 30-109            
+--------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       1 skipped, 5 passed, 6 total
+Snapshots:   0 total
+Time:        0.675 s, estimated 1 s
+Ran all test suites matching /__tests__\/atomic\//i.
+✅ Tests passed
+Updating imports in App.tsx...
+Scanning for imports to update...
+Scanning src...
+Scanning components...
+Scanning screens...
+Scanning navigation...
+
+Found imports to update:
+========================
+
+Found 0 imports to update in 0 files.
+To update imports, run this script with the --update flag.
+
+Updating imports...
+
+Update complete: 0 files updated, 0 files failed.
+✅ Imports updated
+Creating deployment summary...
+✅ Deployment summary created
+----------------------------------------
+Atomic architecture deployment completed at Tue Apr 22 14:48:00 EDT 2025
+See deployment-atomic-summary.md for details
+✅ Deployment completed successfully

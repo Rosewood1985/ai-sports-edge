@@ -1,0 +1,8 @@
+fix: Resolve SFTP "Config Not Found" error
+
+- Removed duplicate sftp.json from .vscode/ directory
+- Created symbolic link from .vscode/sftp.json to vscode-sftp-deploy/.vscode/sftp.json
+- Ensured configuration uses "context": "build" instead of "./build"
+- Added documentation in sftp-config-fix-summary.md
+
+This fix resolves the issue where the SFTP extension was failing with "Config Not Found" errors by ensuring there's only one configuration file in the correct location with the proper path format.

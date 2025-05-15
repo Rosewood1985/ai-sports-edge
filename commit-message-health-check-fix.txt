@@ -1,0 +1,14 @@
+fix: improve deployment health check script
+
+- Fix shell compatibility issues by removing associative arrays
+- Add local Puppeteer installation with --legacy-peer-deps
+- Disable screenshot functionality temporarily
+- Improve error handling and reporting
+- Fix counting of passed/failed checks
+- Add detailed suggestions for each failed check
+
+These changes make the health check script more robust and compatible
+with different shell environments while providing clear guidance on
+fixing detected issues.
+
+Tag: health-check-fix-v1.0

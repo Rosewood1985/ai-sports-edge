@@ -1,0 +1,155 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is accessing their own data
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Function to check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Function to check if the document was created by the user
+    function isCreatedByUser() {
+      return request.resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Function to check if the document is being updated by its creator
+    function isUpdatedByCreator() {
+      return resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Function to validate timestamp fields
+    function hasValidTimestamps() {
+      let requiredFields = ['createdAt', 'updatedAt'];
+      let allFieldsExist = requiredFields.hasAll(request.resource.data.keys());
+      let createdAtValid = request.resource.data.createdAt is timestamp;
+      let updatedAtValid = request.resource.data.updatedAt is timestamp;
+      
+      return allFieldsExist && createdAtValid && updatedAtValid;
+    }
+    
+    // Function to validate that createdAt is not modified on updates
+    function createdAtNotModified() {
+      return request.resource.data.createdAt == resource.data.createdAt;
+    }
+    
+    // Function to validate that updatedAt is set to server timestamp
+    function updatedAtIsServerTimestamp() {
+      return request.resource.data.updatedAt == request.time;
+    }
+    
+    // Rate limiting function (basic implementation)
+    function isNotRateLimited() {
+      let recentWrites = get(/databases/$(database)/documents/users/$(request.auth.uid)/rateLimit/writes).data;
+      return recentWrites == null || recentWrites.count < 100;
+    }
+    
+    // User profiles
+    match /users/{userId} {
+      // Allow users to read and update their own profile
+      allow read: if isUser(userId) || isAdmin();
+      allow create: if isUser(userId) && hasValidTimestamps();
+      allow update: if (isUser(userId) || isAdmin()) && 
+                     createdAtNotModified() && 
+                     updatedAtIsServerTimestamp();
+      allow delete: if isAdmin();
+      
+      // User's purchased odds
+      match /purchasedOdds/{oddId} {
+        allow read: if isUser(userId) || isAdmin();
+        allow create: if isUser(userId) && hasValidTimestamps() && isNotRateLimited();
+        allow update: if isUser(userId) && createdAtNotModified() && updatedAtIsServerTimestamp();
+        allow delete: if isUser(userId) || isAdmin();
+      }
+      
+      // User's payment methods (highly restricted)
+      match /paymentMethods/{methodId} {
+        allow read: if isUser(userId);
+        allow create, update, delete: if isUser(userId);
+      }
+      
+      // Rate limiting document
+      match /rateLimit/{document} {
+        allow read: if isUser(userId) || isAdmin();
+        // Only system functions should write to rate limit documents
+        allow write: if false;
+      }
+    }
+    
+    // Public data that anyone can read
+    match /publicData/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Sports data
+    match /sports/{sportId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      // Leagues within sports
+      match /leagues/{leagueId} {
+        allow read: if true;
+        allow write: if isAdmin();
+        
+        // Teams within leagues
+        match /teams/{teamId} {
+          allow read: if true;
+          allow write: if isAdmin();
+        }
+        
+        // Games within leagues
+        match /games/{gameId} {
+          allow read: if true;
+          allow write: if isAdmin();
+          
+          // Odds for games
+          match /odds/{oddId} {
+            allow read: if true;
+            allow write: if isAdmin();
+          }
+        }
+      }
+    }
+    
+    // Predictions and analytics
+    match /predictions/{predictionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Admin-only collections
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // System configuration
+    match /systemConfig/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Audit logs (admin only)
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated(); // Allow creation for audit trail
+      allow update, delete: if false; // Immutable once created
+    }
+    
+    // Feedback and reports
+    match /feedback/{feedbackId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && isCreatedByUser() && hasValidTimestamps();
+      allow update, delete: if isAdmin();
+    }
+  }
+}

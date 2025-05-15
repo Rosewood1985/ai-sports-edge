@@ -1,0 +1,26 @@
+AI Sports Edge Deployment Health Check
+Date: Wed Apr 23 00:55:37 EDT 2025
+URL: https://aisportsedge.app
+========================================
+
+🔄 Fetching https://aisportsedge.app...
+✅ HTTP Status: 200 OK
+✅ No reload loops detected
+✅ No service worker detected
+❌ Integrity attributes found - may cause loading issues
+⚠️ Crossorigin attributes found - monitor for potential issues
+⚠️ CSP meta tag found - should be in .htaccess instead
+✅ Firebase references found
+✅ Meta description found
+✅ Open Graph tags found
+⚠️ No Twitter Card tags found - recommended for Twitter sharing
+✅ Language attribute found
+✅ Spanish language references found
+📸 Taking screenshots...
+❌ Failed to capture screenshots
+\n📊 Health Check Summary
+=======================================
+🟢 PASSED 0
+\n✅ All checks passed! The deployment is healthy.
+\nReport generated on Wed Apr 23 00:55:41 EDT 2025
+End of report.

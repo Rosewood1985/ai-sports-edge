@@ -1,0 +1,10 @@
+refactor(devcontainer): simplify Docker setup for faster builds
+
+- Reduce Dockerfile to minimal dependencies (node:18, git, curl, typescript)
+- Simplify devcontainer.json to essential settings and extensions
+- Remove unnecessary tools and configurations
+- Forward only required Expo ports (19000-19002)
+- Document changes in status/devcontainer-minimal-setup.md
+
+This change improves container build times and reduces resource usage
+while maintaining core development capabilities.

@@ -1,0 +1,104 @@
+# 📘 AI Sports Edge — Background Consolidation System
+
+This document outlines the standing authority directives for the background consolidation system in the AI Sports Edge project.
+
+## 🔁 Background Consolidation System (Primary Authority)
+
+- **Script**: `scripts/background-consolidate.sh`
+- **Interval**: Every 12 minutes (`.cronrc` label: `consolidate`)
+
+### ✅ Responsibilities:
+- Detect duplicate, orphaned, and legacy files
+- Deduplicate entries in `progress.md` and `task-rolling-log.md`
+- Merge tagged context from source code into the memory bank
+- Archive outdated or superseded files
+- Sync `todo.json` tasks into `task-rolling-log.md`
+
+### 🧠 Roo Instructions:
+1. Treat `background-consolidate.sh` as the **single source of truth** for background consolidation.
+2. Never create a new consolidation script unless it builds on this one.
+3. Avoid `.cronrc` duplication for tasks like `dedupe`, `merge`, `cleanup` unless functionally distinct.
+4. Always update the following files:
+   - memory-bank/consolidation-components-found.md
+   - memory-bank/task-rolling-log.md
+   - memory-bank/app-history.md
+   - memory-bank/progress.md
+   - status/orphaned-files.md
+   - status/roo-observations.md
+5. Apply `// ROO-CONSOLIDATED` tag to legacy files once processed.
+6. Archive safely and clean directory structure where possible.
+
+## 📂 Context + Task Memory Bank Synchronization
+
+- **Files Involved**:
+  - `memory-bank/activeContext.md`
+  - `memory-bank/todo.json`
+  - `memory-bank/progress.md`
+  - `memory-bank/decisionLog.md`
+  - `memory-bank/task-rolling-log.md`
+
+- **Tag Directives in Source Code**:
+  - `// ROO-CONTEXT:` → Architectural context or implementation notes
+  - `// ROO-TASK:` → Queued or active task
+  - `// ROO-MIGRATED:` → Marked as migrated
+  - `// ROO-CLEANED:` → Marked as cleaned or legacy safe
+  - `// ROO-CONSOLIDATED:` → Marked as processed by the consolidation system
+
+## 🔄 Implementation Details
+
+### Modular Structure
+
+The `background-consolidate.sh` script is organized into five key sections:
+
+1. **DETECT CANDIDATES**: Functions that identify files for processing
+   - `detect_duplicate_files`: Find duplicate files based on MD5 hashes
+   - `detect_orphaned_files`: Find files not referenced anywhere
+   - `detect_firebase_duplicates`: Find duplicate Firebase implementations
+
+2. **DEDUPLICATE TAGS**: Functions that remove redundant tags
+   - `deduplicate_progress_entries`: Remove duplicate entries from progress.md
+   - `deduplicate_task_entries`: Remove duplicate entries from task-rolling-log.md
+
+3. **MERGE CONTEXT**: Functions that combine related context data
+   - `ensure_memory_bank`: Ensure memory bank directory exists
+   - `update_active_context`: Update active context with new information
+   - `merge_context_from_tags`: Merge context from code tags into memory bank
+
+4. **REMOVE LEGACY**: Functions that clean outdated files
+   - `create_archive_directories`: Create archive directories
+   - `archive_backup_files`: Move backup files to archive
+   - `cleanup_expired_cache`: Clean up expired cache entries
+
+5. **SYNC WITH MEMORY BANK**: Functions that update memory storage
+   - `sync_todo_to_log`: Sync tasks from todo.json to task-rolling-log.md
+
+### Execution Flow
+
+The script follows this execution flow:
+
+1. Create archive directories
+2. Ensure memory bank exists
+3. Detect candidates for processing
+4. Deduplicate tags in memory bank files
+5. Merge context from code tags
+6. Remove legacy files
+7. Sync with memory bank
+8. Log completion
+
+## 🚫 Forbidden Terms & Refactors
+
+During consolidation or migration, **remove all references** to:
+- `bet`, `bettor`, `gamble`, `wager`, etc.
+
+Allowable language includes:
+- `parlay`, `odds`, `lines`, `picks`
+
+Use `// ROO-CLEANED:` to tag files once terms are sanitized.
+
+## 📌 Final Note
+
+This document serves as the single source of truth for the background consolidation system. Always reference it before making changes to the system or creating new consolidation scripts.
+
+---
+
+Last updated: 2025-05-13

@@ -1,0 +1,372 @@
+.user-preferences-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  max-width: 600px;
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  z-index: 1000;
+}
+
+.user-preferences-header {
+  align-items: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e1e4e8;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.user-preferences-header h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.user-preferences-content {
+  padding: 20px;
+}
+
+.preferences-section {
+  border-bottom: 1px solid #e1e4e8;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+.preferences-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.preferences-section h3 {
+  color: #333;
+  font-size: 1.2rem;
+  margin: 0 0 16px 0;
+}
+
+.sports-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sport-option {
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.sport-option:hover {
+  background-color: #f0f5ff;
+  border-color: #c0d3ff;
+}
+
+.sport-option input {
+  margin-right: 8px;
+}
+
+.betting-option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.betting-option input {
+  margin-right: 8px;
+}
+
+.max-items {
+  margin-top: 16px;
+}
+
+.max-items label {
+  align-items: center;
+  display: flex;
+  font-size: 0.9rem;
+}
+
+.max-items input {
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  margin-left: 8px;
+  padding: 6px;
+  width: 60px;
+}
+
+.add-team {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.add-team input {
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  flex-grow: 1;
+  padding: 8px 12px;
+}
+
+.add-team button {
+  background-color: #4a80ff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 8px 16px;
+}
+
+.add-team button:hover {
+  background-color: #3a70ef;
+}
+
+.favorite-teams-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.favorite-teams-list li {
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+}
+
+.favorite-teams-list button {
+  background-color: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+.favorite-teams-list button:hover {
+  background-color: #ffebee;
+  border-color: #ffcdd2;
+  color: #e53935;
+}
+
+.no-teams {
+  color: #666;
+  font-style: italic;
+}
+
+.location-option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.location-option input {
+  margin-right: 8px;
+}
+
+.location-status {
+  background-color: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  padding: 12px;
+}
+
+.loading-spinner {
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #4a80ff;
+  height: 24px;
+  margin: 0 auto 12px;
+  width: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.local-teams {
+  margin-top: 12px;
+}
+
+.local-teams p {
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.local-teams ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.local-teams li {
+  background-color: #f0f5ff;
+  border: 1px solid #c0d3ff;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.85rem;
+  margin: 0 8px 8px 0;
+  padding: 4px 8px;
+}
+
+.privacy-notice {
+  background-color: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-top: 16px;
+  padding: 12px;
+}
+
+.privacy-notice p {
+  margin: 0;
+}
+
+.espn-option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.espn-option input {
+  margin-right: 8px;
+}
+
+.espn-info {
+  background-color: #f0f5ff;
+  border: 1px solid #c0d3ff;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-top: 16px;
+  padding: 12px;
+}
+
+.espn-info p {
+  margin: 0;
+}
+
+.user-preferences-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e1e4e8;
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+}
+
+.save-button {
+  background-color: #4a80ff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-left: 12px;
+  padding: 8px 16px;
+}
+
+.save-button:hover {
+  background-color: #3a70ef;
+}
+
+.cancel-button {
+  background-color: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+}
+
+.cancel-button:hover {
+  background-color: #f1f1f1;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .user-preferences-container {
+    max-height: 95vh;
+    width: 95%;
+  }
+  
+  .sports-options {
+    gap: 8px;
+  }
+  
+  .sport-option {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-preferences-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .preferences-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .sports-options {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .add-team {
+    flex-direction: column;
+  }
+  
+  .add-team button {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  
+  .user-preferences-footer {
+    flex-direction: column;
+  }
+  
+  .save-button, .cancel-button {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+  }
+}

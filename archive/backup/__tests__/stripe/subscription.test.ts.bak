@@ -1,0 +1,197 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import '../../services/firebaseSubscriptionService';
+import { auth } from '../../config/firebase';
+import { STRIPE_PRICE_IDS } from '../../config/stripe';
+
+// Mock Firebase auth
+jest.mock('../../config/firebase', () => ({
+  auth: {
+    currentUser: {
+      uid: 'test-user-id'
+    }
+  },
+  firestore: jest.fn()
+}));
+
+// Test user ID
+const TEST_USER_ID = 'test-user-id';
+
+// Mock firebaseSubscriptionService
+jest.mock('../../services/firebaseSubscriptionService', () => ({
+  subscribeToPlan: jest.fn(),
+  cancelSubscription: jest.fn(),
+  getUserSubscription: jest.fn()
+}));
+
+/**
+ * Stripe Individual Subscription Tests
+ * 
+ * These tests verify the subscription functionality for individual plans.
+ */
+describe('Stripe Individual Subscriptions', () => {
+  // Reset mocks before each test
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // Test ID: STRIPE-SUB-001
+  describe('Basic Monthly Subscription', () => {
+    test('should successfully subscribe to Basic Monthly plan', async () => {
+      // Mock successful subscription
+      (subscribeToPlan as jest.Mock).mockResolvedValue(true);
+      
+      // Test data
+      const planId = 'basic-monthly';
+      const paymentMethodId = 'pm_test_card_visa';
+      
+      // Execute subscription
+      const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
+      
+      // Verify results
+      expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
+      expect(result).toBe(true);
+    });
+
+    test('should handle failed subscription to Basic Monthly plan', async () => {
+      // Mock failed subscription
+      (subscribeToPlan as jest.Mock).mockResolvedValue(false);
+      
+      // Test data
+      const planId = 'basic-monthly';
+      const paymentMethodId = 'pm_test_card_declined';
+      
+      // Execute subscription
+      const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
+      
+      // Verify results
+      expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
+      expect(result).toBe(false);
+    });
+  });
+
+  // Test ID: STRIPE-SUB-002
+  describe('Premium Monthly Subscription', () => {
+    test('should successfully subscribe to Premium Monthly plan', async () => {
+      // Mock successful subscription
+      (subscribeToPlan as jest.Mock).mockResolvedValue(true);
+      
+      // Test data
+      const planId = 'premium-monthly';
+      const paymentMethodId = 'pm_test_card_visa';
+      
+      // Execute subscription
+      const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
+      
+      // Verify results
+      expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
+      expect(result).toBe(true);
+    });
+  });
+
+  // Test ID: STRIPE-SUB-003
+  describe('Premium Yearly Subscription', () => {
+    test('should successfully subscribe to Premium Yearly plan', async () => {
+      // Mock successful subscription
+      (subscribeToPlan as jest.Mock).mockResolvedValue(true);
+      
+      // Test data
+      const planId = 'premium-yearly';
+      const paymentMethodId = 'pm_test_card_visa';
+      
+      // Execute subscription
+      const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
+      
+      // Verify results
+      expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
+      expect(result).toBe(true);
+    });
+  });
+
+  // Test ID: STRIPE-SUB-004
+  describe('Failed Payment Subscription', () => {
+    test('should handle declined card', async () => {
+      // Mock failed subscription
+      (subscribeToPlan as jest.Mock).mockRejectedValue(new Error('Your card was declined'));
+      
+      // Test data
+      const planId = 'premium-monthly';
+      const paymentMethodId = 'pm_test_card_declined';
+      
+      // Execute subscription and expect it to throw
+      await expect(subscribeToPlan(TEST_USER_ID, planId, paymentMethodId))
+        .rejects.toThrow('Your card was declined');
+      
+      // Verify the function was called with correct parameters
+      expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
+    });
+  });
+
+  // Test ID: STRIPE-MGMT-002
+  describe('Cancel Subscription', () => {
+    test('should successfully cancel subscription', async () => {
+      // Mock successful cancellation
+      (cancelSubscription as jest.Mock).mockResolvedValue(true);
+      
+      // Execute cancellation
+      const result = await cancelSubscription(TEST_USER_ID);
+      
+      // Verify results
+      expect(cancelSubscription).toHaveBeenCalledWith(TEST_USER_ID, false);
+      expect(result).toBe(true);
+    });
+
+    test('should handle immediate cancellation', async () => {
+      // Mock successful cancellation
+      (cancelSubscription as jest.Mock).mockResolvedValue(true);
+      
+      // Test data
+      const immediate = true;
+      
+      // Execute cancellation
+      const result = await cancelSubscription(TEST_USER_ID, immediate);
+      
+      // Verify results
+      expect(cancelSubscription).toHaveBeenCalledWith(TEST_USER_ID, immediate);
+      expect(result).toBe(true);
+    });
+  });
+
+  // Test ID: STRIPE-MGMT-001
+  describe('Get User Subscription', () => {
+    test('should retrieve active subscription', async () => {
+      // Mock subscription data
+      const mockSubscription = {
+        id: 'sub_123456',
+        status: 'active',
+        planId: 'premium-monthly',
+        currentPeriodEnd: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        cancelAtPeriodEnd: false,
+        trialEnd: null,
+        defaultPaymentMethod: 'pm_test_card_visa'
+      };
+      
+      // Mock successful retrieval
+      (getUserSubscription as jest.Mock).mockResolvedValue(mockSubscription);
+      
+      // Execute retrieval
+      const result = await getUserSubscription(TEST_USER_ID);
+      
+      // Verify results
+      expect(getUserSubscription).toHaveBeenCalledWith(TEST_USER_ID);
+      expect(result).toEqual(mockSubscription);
+      expect(result?.status).toBe('active'); // Added optional chaining
+    });
+
+    test('should handle no subscription', async () => {
+      // Mock no subscription
+      (getUserSubscription as jest.Mock).mockResolvedValue(null);
+      
+      // Execute retrieval
+      const result = await getUserSubscription(TEST_USER_ID);
+      
+      // Verify results
+      expect(getUserSubscription).toHaveBeenCalledWith(TEST_USER_ID);
+      expect(result).toBeNull();
+    });
+  });
+});

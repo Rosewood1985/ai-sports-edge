@@ -1,0 +1,9 @@
+chore: Consolidate payment systems and improve documentation
+
+- Archived legacy JavaScript implementations (stripeTaxService.js, paymentService.js)
+- Archived duplicate screen implementation (RedeemGiftScreen.tsx)
+- Archived duplicate Xcode project files
+- Created comprehensive payment systems documentation index
+- Improved organization following atomic architecture principles
+
+This commit implements the recommendations from the payment systems inventory analysis, focusing on consolidating duplicates, archiving outdated files, and maintaining a clean structure.

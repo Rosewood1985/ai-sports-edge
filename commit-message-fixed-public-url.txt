@@ -1,0 +1,25 @@
+fix: set correct public URL and ensure .htaccess is included in deployment
+
+This commit fixes critical deployment issues that were causing frontend rendering problems:
+
+1. Sets the correct public URL (https://aisportsedge.app/) in package.json
+   - Ensures all static asset paths are properly prefixed
+   - Prevents 404 errors for JS/CSS files
+
+2. Creates a comprehensive deployment script that:
+   - Rebuilds the app with the correct public URL
+   - Ensures .htaccess is included in the deployment
+   - Comments out references to missing JS files
+   - Provides multiple deployment methods with fallbacks
+
+3. Fixes .htaccess configuration with:
+   - Proper Content-Security-Policy headers
+   - SPA routing for React
+   - Correct MIME types for JavaScript and JSON files
+   - X-Frame-Options via HTTP headers
+
+This resolves the frontend rendering issues including black screen, infinite spinner,
+and CSP/integrity errors by addressing the root causes: incorrect asset paths and
+missing .htaccess configuration.
+
+Closes #ISSUE-124

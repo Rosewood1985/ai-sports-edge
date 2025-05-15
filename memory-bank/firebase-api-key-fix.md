@@ -1,0 +1,71 @@
+# Firebase API Key Issue Fix
+
+## Problem
+
+Users were unable to sign up on the AI Sports Edge website due to an invalid Firebase API key. The error message displayed was:
+
+```
+Firebase: Error (auth/api-key-not-valid.-please-pass-a-valid-api-key.)
+```
+
+## Root Cause
+
+The application was using the test Firebase API key from `.env` instead of the real API key from `.env.production` when deployed to production. This happened because all deployment scripts were using `npm run build` which runs `expo export --platform web --output-dir dist` instead of `npm run build:prod` which runs `NODE_ENV=production webpack --config webpack.prod.js`.
+
+The webpack configuration for production (`webpack.prod.js`) is correctly set up to load environment variables from `.env.production`, but it wasn't being used during deployment.
+
+## Investigation Steps
+
+1. Added detailed logging to the SignupScreen.tsx file to capture the Firebase configuration and error details
+2. Confirmed the error was `auth/api-key-not-valid`
+3. Examined the environment files and found:
+   - `.env` with test API key: `FIREBASE_API_KEY=test-firebase-api-key`
+   - `.env.production` with real API key: `FIREBASE_API_KEY=AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw`
+4. Reviewed the webpack configuration and found that `webpack.prod.js` correctly loads from `.env.production`
+5. Checked the deployment scripts and found they were all using `npm run build` instead of `npm run build:prod`
+
+## Fix
+
+Updated all deployment scripts to use the production build command:
+
+1. `deploy.sh`
+2. `deploy-api-key-security.sh`
+3. `deploy-ai-features.sh`
+
+Changed:
+
+```bash
+npm run build
+```
+
+To:
+
+```bash
+NODE_ENV=production npm run build:prod
+```
+
+This ensures that the application uses the correct Firebase API key from `.env.production` when deployed to production.
+
+## Verification
+
+After deploying with the updated scripts, users should be able to sign up successfully. The application will use the real Firebase API key from `.env.production` instead of the test API key from `.env`.
+
+## Lessons Learned
+
+1. Always use environment-specific build commands for different environments
+2. Add proper logging to capture configuration details and error messages
+3. Ensure deployment scripts use the correct build commands
+4. Consider adding a pre-deployment check to verify that the correct environment variables are being used
+
+## Related Files
+
+- `.env` - Contains test API keys
+- `.env.production` - Contains production API keys
+- `webpack.config.js` - Development webpack configuration
+- `webpack.prod.js` - Production webpack configuration
+- `deploy.sh` - Main deployment script
+- `deploy-api-key-security.sh` - API key security deployment script
+- `deploy-ai-features.sh` - AI features deployment script
+- `babel.config.js` - Babel configuration for React Native
+- `package.json` - NPM scripts
+  Last updated: 2025-05-13 20:43:32

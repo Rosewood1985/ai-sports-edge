@@ -1,0 +1,22 @@
+# .cronrc.staging — Proposed Additions (Generated from legacy scans)
+# ROO: When merging, prioritize unique functionality, remove duplication, and consolidate files when safe.
+
+# FORMAT: <interval> <label> <command>
+
+5m sync-tasks ./scripts/sync-tasks-with-memory-bank.sh
+30m log-summary ./scripts/generate-summary-log.sh
+1h checkpoint-docs ./scripts/update-memory-bank.js --checkpoint
+12h weekly-review ./scripts/run-weekly-checks.sh
+24h security-audit ./scripts/check-security-policies.sh
+
+# Legacy Reference Log
+# - sync-tasks → Found in GPT persona instructions (task cache sync)
+# - log-summary → Extracted from memory-bank/weekly-review.md
+# - checkpoint-docs → Matches prior `update-memory-bank.js --checkpoint` cron job
+# - weekly-review → Was run via setInterval in legacy context-check.js
+# - security-audit → Defined in systemPatterns.md but never automated
+
+# Merge Guidance:
+# ✅ Avoid duplicating labels that already exist in .cronrc
+# ✅ Use only one command per functionality (deduplicate log generators, checkers, etc.)
+# ✅ Defer to .cronrc if duplicate functionality is found

@@ -1,0 +1,10 @@
+[2025-05-14T00:06:40Z] Making context checkpoint scripts executable...
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/update-context-checkpoint.js
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/update-context-checkpoint.sh
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/enforce-context-checkpoint.js
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/enforce-context-checkpoint.sh
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/start-session-with-checkpoint.sh
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/generate-daily-recap.js
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/generate-daily-recap.sh
+[2025-05-14T00:06:40Z] Made executable: /workspaces/ai-sports-edge/scripts/setup-daily-recap-cron.sh
+[2025-05-14T00:06:40Z] All context checkpoint scripts are now executable

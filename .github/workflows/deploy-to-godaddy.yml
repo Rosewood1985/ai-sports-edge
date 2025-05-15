@@ -1,0 +1,60 @@
+name: 🚀 Deploy to GoDaddy on Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Install SSH & SFTP Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: 🔒 Ensure .env Files Are Not Included
+        run: |
+          echo "Checking for .env files in build directory..."
+          if [ -f "build/.env" ]; then
+            echo "Warning: .env file found in build directory. Removing..."
+            rm build/.env
+          fi
+          if ls build/.env* 1> /dev/null 2>&1; then
+            echo "Warning: .env.* files found in build directory. Removing..."
+            rm build/.env*
+          fi
+          echo "Environment files check complete."
+
+      - name: � Upload Build Folder via SFTP
+        env:
+          SFTP_PASS: ${{ secrets.SFTP_PASS }}
+        run: |
+          # Create a temporary exclude file
+          echo ".env" > exclude.txt
+          echo ".env.*" >> exclude.txt
+          
+          sshpass -p "$SFTP_PASS" sftp -o StrictHostKeyChecking=no deploy@aisportsedge.app <<EOF
+          cd /home/q15133yvmhnq/public_html/aisportsedge.app
+          put -r build/*
+          bye
+          EOF
+
+      - name: 🧰 Run Server-Side Fix Script
+        env:
+          SFTP_PASS: ${{ secrets.SFTP_PASS }}
+        run: |
+          sshpass -p "$SFTP_PASS" ssh -o StrictHostKeyChecking=no deploy@aisportsedge.app <<EOF
+          cd /home/q15133yvmhnq/public_html/aisportsedge.app
+          chmod +x fix-permissions-and-build.sh
+          ./fix-permissions-and-build.sh
+          EOF
+
+      - name: 🔍 Optional - Run Post-Deploy Check
+        run: |
+          curl -I https://aisportsedge.app || echo "Manual verification required"

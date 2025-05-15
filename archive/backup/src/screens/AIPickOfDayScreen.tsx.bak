@@ -1,0 +1,301 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  SafeAreaView,
+  RefreshControl,
+} from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/mock';
+import { useTheme } from '../contexts/ThemeContext';
+import AIPickCard from '../components/AIPickCard';
+import { aiPickSelector, AIPickData } from '../services/aiPickSelector';
+import { auth } from '../config/firebase';
+
+/**
+ * AIPickOfDayScreen component
+ * Displays the AI Pick of the Day and other top picks
+ */
+const AIPickOfDayScreen: React.FC = () => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  
+  // State
+  const [pickOfDay, setPickOfDay] = useState<AIPickData | null>(null);
+  const [topPicks, setTopPicks] = useState<AIPickData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [followedPicks, setFollowedPicks] = useState<Record<string, boolean>>({});
+  const [isPremium, setIsPremium] = useState(false);
+  
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+    checkPremiumStatus();
+  }, []);
+  
+  // Check if user has premium subscription
+  const checkPremiumStatus = async () => {
+    try {
+      // In a real app, this would check the user's subscription status
+      // For now, we'll just set it to true for demonstration
+      setIsPremium(true);
+    } catch (error) {
+      console.error('Error checking premium status:', error);
+    }
+  };
+  
+  // Load data from services
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      
+      // Get Pick of the Day
+      const pickOfDayData = await aiPickSelector.getPickOfTheDay();
+      setPickOfDay(pickOfDayData);
+      
+      // Get top picks (excluding Pick of the Day)
+      const topPicksData = await aiPickSelector.getTopPicks(3);
+      if (pickOfDayData) {
+        // Filter out the Pick of the Day from top picks
+        const filteredTopPicks = topPicksData.filter(
+          (pick) => pick.gameId !== pickOfDayData.gameId
+        );
+        setTopPicks(filteredTopPicks);
+      } else {
+        setTopPicks(topPicksData);
+      }
+      
+      // Check which picks are followed
+      if (firebaseService.auth.instance.currentUser) {
+        const userId = firebaseService.auth.instance.currentUser.uid;
+        const followed: Record<string, boolean> = {};
+        
+        // Check Pick of the Day
+        if (pickOfDayData) {
+          followed[pickOfDayData.gameId] = await aiPickSelector.isFollowingPick(
+            userId,
+            pickOfDayData.gameId
+          );
+        }
+        
+        // Check top picks
+        for (const pick of topPicksData) {
+          followed[pick.gameId] = await aiPickSelector.isFollowingPick(
+            userId,
+            pick.gameId
+          );
+        }
+        
+        setFollowedPicks(followed);
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+  
+  // Handle refresh
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadData();
+  };
+  
+  // Handle follow pick
+  const handleFollowPick = async (gameId: string) => {
+    try {
+      if (!firebaseService.auth.instance.currentUser) {
+        // Handle not logged in case
+        console.log('User not logged in');
+        return;
+      }
+      
+      const userId = firebaseService.auth.instance.currentUser.uid;
+      const isFollowing = followedPicks[gameId] || false;
+      
+      // Toggle follow status
+      const success = await aiPickSelector.toggleFollowPick(
+        userId,
+        gameId,
+        !isFollowing
+      );
+      
+      if (success) {
+        // Update local state
+        setFollowedPicks((prev) => ({
+          ...prev,
+          [gameId]: !isFollowing,
+        }));
+      }
+    } catch (error) {
+      console.error('Error following pick:', error);
+    }
+  };
+  
+  // Render loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
+            {t('Loading AI Picks...')}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+  
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>
+            {t('AI Sports Edge')}
+          </Text>
+          <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
+            {t('Powered by advanced machine learning')}
+          </Text>
+        </View>
+        
+        {/* Pick of the Day */}
+        {pickOfDay ? (
+          <View style={styles.pickOfDayContainer}>
+            <AIPickCard
+              gameId={pickOfDay.gameId}
+              teamA={pickOfDay.teamA}
+              teamB={pickOfDay.teamB}
+              confidence={pickOfDay.confidence}
+              momentumScore={pickOfDay.momentumScore}
+              aiInsightText={pickOfDay.aiInsightText}
+              onFollow={handleFollowPick}
+              isFollowed={followedPicks[pickOfDay.gameId] || false}
+              isPremium={isPremium}
+            />
+          </View>
+        ) : (
+          <View style={[styles.noPickContainer, { backgroundColor: theme.cardBackground }]}>
+            <FontAwesome name="calendar" size={24} color={theme.textSecondary} />
+            <Text style={[styles.noPickText, { color: theme.textSecondary }]}>
+              {t('No AI Pick of the Day available')}
+            </Text>
+          </View>
+        )}
+        
+        {/* Top Picks Section */}
+        {topPicks.length > 0 && (
+          <View style={styles.topPicksSection}>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              {t('More Top Picks')}
+            </Text>
+            
+            {topPicks.map((pick) => (
+              <View key={pick.gameId} style={styles.topPickItem}>
+                <AIPickCard
+                  gameId={pick.gameId}
+                  teamA={pick.teamA}
+                  teamB={pick.teamB}
+                  confidence={pick.confidence}
+                  momentumScore={pick.momentumScore}
+                  aiInsightText={pick.aiInsightText}
+                  onFollow={handleFollowPick}
+                  isFollowed={followedPicks[pick.gameId] || false}
+                  isPremium={isPremium}
+                />
+              </View>
+            ))}
+          </View>
+        )}
+        
+        {/* Disclaimer */}
+        <View style={styles.disclaimerContainer}>
+          <Text style={[styles.disclaimerText, { color: theme.textSecondary }]}>
+            {t('Disclaimer: Sports predictions are for entertainment purposes only. Please gamble responsibly.')}
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
+  header: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+  pickOfDayContainer: {
+    marginBottom: 16,
+  },
+  noPickContainer: {
+    margin: 16,
+    padding: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noPickText: {
+    marginTop: 12,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  topPicksSection: {
+    marginTop: 8,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
+  topPickItem: {
+    marginBottom: 12,
+  },
+  disclaimerContainer: {
+    marginTop: 24,
+    marginHorizontal: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  disclaimerText: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+});
+
+export default AIPickOfDayScreen;

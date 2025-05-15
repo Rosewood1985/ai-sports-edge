@@ -1,0 +1,3 @@
+=== Task "tag-scan" executed at 2025-05-14T01:16:50.013Z ===
+Command: ./scripts/tag-context.sh --auto
+

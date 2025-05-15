@@ -1,0 +1,473 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import '../config/firebase';
+import { hasPremiumAccess } from './firebaseSubscriptionService';
+
+/**
+ * Cricket match data interface
+ */
+export interface CricketMatch {
+  id: string;
+  format: 'Test' | 'ODI' | 'T20I' | 'T20';
+  series: string;
+  homeTeam: string;
+  awayTeam: string;
+  date: string;
+  time: string;
+  venue: string;
+  status: 'scheduled' | 'in_progress' | 'completed';
+}
+
+/**
+ * Cricket team data interface
+ */
+export interface CricketTeam {
+  id: string;
+  name: string;
+  country: string;
+  format: 'Test' | 'ODI' | 'T20I';
+  ranking: number;
+  points: number;
+  matches: number;
+  won: number;
+  lost: number;
+  drawn: number; // Only for Test matches
+  noResult: number;
+}
+
+/**
+ * Cricket player data interface
+ */
+export interface CricketPlayer {
+  id: string;
+  name: string;
+  team: string;
+  role: 'Batsman' | 'Bowler' | 'All-rounder' | 'Wicket-keeper';
+  battingStyle: string;
+  bowlingStyle: string;
+  battingStats: {
+    matches: number;
+    innings: number;
+    runs: number;
+    average: number;
+    strikeRate: number;
+    hundreds: number;
+    fifties: number;
+    highestScore: number;
+  };
+  bowlingStats: {
+    matches: number;
+    innings: number;
+    wickets: number;
+    average: number;
+    economy: number;
+    bestBowling: string;
+  };
+}
+
+/**
+ * Cricket match prediction interface
+ */
+export interface CricketPrediction {
+  matchId: string;
+  format: 'Test' | 'ODI' | 'T20I' | 'T20';
+  homeTeam: string;
+  awayTeam: string;
+  winProbability: {
+    home: number;
+    away: number;
+    draw: number; // Only for Test matches
+  };
+  predictedScores: {
+    homeTeamScore: string;
+    awayTeamScore: string;
+    confidence: number;
+  };
+  keyPlayerPredictions: {
+    player: string;
+    team: string;
+    role: string;
+    predictedPerformance: string;
+    impactScore: number;
+  }[];
+  weatherImpact: {
+    condition: string;
+    impact: string;
+    favoringTeam: string | null;
+  };
+  generatedAt: string;
+}
+
+/**
+ * Get upcoming Cricket matches
+ * @returns List of upcoming matches
+ */
+export const getUpcomingMatches = async (): Promise<CricketMatch[]> => {
+  try {
+    // In a real implementation, this would call the Cricket API
+    // For now, we'll return mock data
+    return [
+      {
+        id: 'match-2025-1',
+        format: 'Test',
+        series: 'The Ashes',
+        homeTeam: 'England',
+        awayTeam: 'Australia',
+        date: '2025-06-12',
+        time: '10:00:00Z',
+        venue: 'Lord\'s Cricket Ground',
+        status: 'scheduled'
+      },
+      {
+        id: 'match-2025-2',
+        format: 'ODI',
+        series: 'India Tour of South Africa',
+        homeTeam: 'South Africa',
+        awayTeam: 'India',
+        date: '2025-01-15',
+        time: '08:00:00Z',
+        venue: 'Wanderers Stadium',
+        status: 'scheduled'
+      },
+      {
+        id: 'match-2025-3',
+        format: 'T20I',
+        series: 'T20 World Cup',
+        homeTeam: 'India',
+        awayTeam: 'Pakistan',
+        date: '2025-02-20',
+        time: '14:00:00Z',
+        venue: 'Melbourne Cricket Ground',
+        status: 'scheduled'
+      }
+    ];
+  } catch (error) {
+    console.error('Error fetching Cricket matches:', error);
+    return [];
+  }
+};
+
+/**
+ * Get Cricket team rankings for a specific format
+ * @param format Match format (Test, ODI, T20I)
+ * @returns List of teams with their rankings
+ */
+export const getTeamRankings = async (format: 'Test' | 'ODI' | 'T20I'): Promise<CricketTeam[]> => {
+  try {
+    // In a real implementation, this would call the Cricket API
+    // For now, we'll return mock data for Test format
+    if (format === 'Test') {
+      return [
+        {
+          id: 'team-1',
+          name: 'India',
+          country: 'India',
+          format: 'Test',
+          ranking: 1,
+          points: 120,
+          matches: 30,
+          won: 22,
+          lost: 5,
+          drawn: 3,
+          noResult: 0
+        },
+        {
+          id: 'team-2',
+          name: 'Australia',
+          country: 'Australia',
+          format: 'Test',
+          ranking: 2,
+          points: 116,
+          matches: 28,
+          won: 20,
+          lost: 6,
+          drawn: 2,
+          noResult: 0
+        },
+        {
+          id: 'team-3',
+          name: 'England',
+          country: 'England',
+          format: 'Test',
+          ranking: 3,
+          points: 112,
+          matches: 32,
+          won: 18,
+          lost: 10,
+          drawn: 4,
+          noResult: 0
+        }
+      ];
+    }
+    
+    // Return empty array for other formats
+    return [];
+  } catch (error) {
+    console.error('Error fetching Cricket team rankings:', error);
+    return [];
+  }
+};
+
+/**
+ * Get Cricket player statistics
+ * @param teamId Team ID
+ * @returns List of players with their statistics
+ */
+export const getPlayerStats = async (teamId: string): Promise<CricketPlayer[]> => {
+  try {
+    // In a real implementation, this would call the Cricket API
+    // For now, we'll return mock data for India
+    if (teamId === 'team-1') {
+      return [
+        {
+          id: 'player-1',
+          name: 'Virat Kohli',
+          team: 'India',
+          role: 'Batsman',
+          battingStyle: 'Right-handed',
+          bowlingStyle: 'Right-arm medium',
+          battingStats: {
+            matches: 106,
+            innings: 180,
+            runs: 8416,
+            average: 49.95,
+            strikeRate: 57.48,
+            hundreds: 29,
+            fifties: 28,
+            highestScore: 254
+          },
+          bowlingStats: {
+            matches: 106,
+            innings: 38,
+            wickets: 5,
+            average: 32.25,
+            economy: 3.52,
+            bestBowling: '1/13'
+          }
+        },
+        {
+          id: 'player-2',
+          name: 'Jasprit Bumrah',
+          team: 'India',
+          role: 'Bowler',
+          battingStyle: 'Right-handed',
+          bowlingStyle: 'Right-arm fast',
+          battingStats: {
+            matches: 32,
+            innings: 36,
+            runs: 148,
+            average: 7.40,
+            strikeRate: 37.00,
+            hundreds: 0,
+            fifties: 0,
+            highestScore: 24
+          },
+          bowlingStats: {
+            matches: 32,
+            innings: 60,
+            wickets: 128,
+            average: 21.99,
+            economy: 2.69,
+            bestBowling: '6/27'
+          }
+        }
+      ];
+    }
+    
+    // Return empty array for other teams
+    return [];
+  } catch (error) {
+    console.error('Error fetching Cricket player statistics:', error);
+    return [];
+  }
+};
+
+/**
+ * Get match prediction for a specific Cricket match
+ * @param matchId Match ID
+ * @param userId User ID
+ * @returns Match prediction or null if user doesn't have access
+ */
+export const getMatchPrediction = async (
+  matchId: string,
+  userId: string = auth.currentUser?.uid || ''
+): Promise<CricketPrediction | null> => {
+  try {
+    // Check if user has premium access or has purchased this prediction
+    const hasPremium = await hasPremiumAccess(userId);
+    
+    if (!hasPremium) {
+      // Check if user has purchased this specific prediction
+      const db = firestore;
+      const purchasesSnapshot = await db.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection('users').firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(userId)
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection('purchases')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('productId', '==', 'cricket-match-prediction')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('matchId', '==', matchId)
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('status', '==', 'succeeded')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.limit(1)
+        .get();
+      
+      if (purchasesSnapshot.empty) {
+        return null; // User doesn't have access
+      }
+    }
+    
+    // In a real implementation, this would call the Cricket API or a machine learning service
+    // For now, we'll return mock data
+    return {
+      matchId,
+      format: 'Test',
+      homeTeam: 'England',
+      awayTeam: 'Australia',
+      winProbability: {
+        home: 0.45,
+        away: 0.40,
+        draw: 0.15
+      },
+      predictedScores: {
+        homeTeamScore: '342 & 289',
+        awayTeamScore: '315 & 298',
+        confidence: 0.70
+      },
+      keyPlayerPredictions: [
+        {
+          player: 'Joe Root',
+          team: 'England',
+          role: 'Batsman',
+          predictedPerformance: '85+ runs in first innings',
+          impactScore: 8.5
+        },
+        {
+          player: 'Pat Cummins',
+          team: 'Australia',
+          role: 'Bowler',
+          predictedPerformance: '5+ wickets in the match',
+          impactScore: 8.2
+        },
+        {
+          player: 'Ben Stokes',
+          team: 'England',
+          role: 'All-rounder',
+          predictedPerformance: '50+ runs and 3+ wickets',
+          impactScore: 7.9
+        }
+      ],
+      weatherImpact: {
+        condition: 'Overcast with chance of rain on day 3',
+        impact: 'Will favor swing bowling',
+        favoringTeam: 'England'
+      },
+      generatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error fetching Cricket match prediction:', error);
+    return null;
+  }
+};
+
+/**
+ * Get player statistics and analysis
+ * @param playerId Player ID
+ * @param userId User ID
+ * @returns Player statistics and analysis or null if user doesn't have access
+ */
+export const getPlayerAnalysis = async (
+  playerId: string,
+  userId: string = auth.currentUser?.uid || ''
+): Promise<any | null> => {
+  try {
+    // Check if user has premium access or has purchased this analysis
+    const hasPremium = await hasPremiumAccess(userId);
+    
+    if (!hasPremium) {
+      // Check if user has purchased this specific analysis
+      const db = firestore;
+      const purchasesSnapshot = await db.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection('users').firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(userId)
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection('purchases')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('productId', '==', 'cricket-player-stats')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('playerId', '==', playerId)
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('status', '==', 'succeeded')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.limit(1)
+        .get();
+      
+      if (purchasesSnapshot.empty) {
+        return null; // User doesn't have access
+      }
+    }
+    
+    // In a real implementation, this would call the Cricket API or a machine learning service
+    // For now, we'll return mock data for Virat Kohli
+    if (playerId === 'player-1') {
+      return {
+        playerId,
+        playerName: 'Virat Kohli',
+        strengths: [
+          'Exceptional against pace bowling',
+          'Strong on the front foot',
+          'Excellent in run chases'
+        ],
+        weaknesses: [
+          'Vulnerable to off-spin early in innings',
+          'Tendency to chase wide deliveries when under pressure'
+        ],
+        recentForm: {
+          matches: 5,
+          runs: 342,
+          average: 68.40,
+          hundreds: 1,
+          fifties: 2,
+          trend: 'Upward'
+        },
+        matchupAnalysis: [
+          {
+            bowlerName: 'James Anderson',
+            dismissals: 7,
+            ballsFaced: 245,
+            runsScored: 112,
+            recommendation: 'High risk matchup'
+          },
+          {
+            bowlerName: 'Nathan Lyon',
+            dismissals: 5,
+            ballsFaced: 320,
+            runsScored: 180,
+            recommendation: 'Medium risk matchup'
+          }
+        ],
+        venuePerformance: [
+          {
+            venue: 'Lord\'s Cricket Ground',
+            matches: 2,
+            runs: 149,
+            average: 37.25,
+            hundreds: 0,
+            fifties: 1
+          },
+          {
+            venue: 'Melbourne Cricket Ground',
+            matches: 3,
+            runs: 335,
+            average: 83.75,
+            hundreds: 2,
+            fifties: 0
+          }
+        ],
+        bettingInsight: 'Strong candidate for top run-scorer in the series. Consider backing for a century in Melbourne Test.',
+        generatedAt: new Date().toISOString()
+      };
+    }
+    
+    // Return null for other players
+    return null;
+  } catch (error) {
+    console.error('Error fetching Cricket player analysis:', error);
+    return null;
+  }
+};
+
+export default {
+  getUpcomingMatches,
+  getTeamRankings,
+  getPlayerStats,
+  getMatchPrediction,
+  getPlayerAnalysis
+};

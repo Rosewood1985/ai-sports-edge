@@ -1,0 +1,9 @@
+feat: Add manual fallback deployment script
+
+- Created manual-fallback-deploy.sh script that:
+  - Validates deployment configuration
+  - Creates a zip file of the build directory
+  - Provides step-by-step instructions for manual deployment via GoDaddy control panel
+  - Includes commands for setting proper file permissions
+
+This script provides a reliable fallback method for deployment when automated SFTP deployment fails, ensuring the site can still be deployed even when there are connectivity or permission issues with the automated process.

@@ -1,0 +1,285 @@
+# AI Sports Edge: Post-Signup Onboarding Architecture
+
+## Overview
+
+This architecture creates a separate post-signup onboarding flow that runs after the existing onboarding process. It will guide users through personalization steps, offer an optional guided tour, and save preferences to Firebase.
+
+## Key Requirements
+
+- Create a separate post-signup onboarding flow after existing onboarding
+- Guide users through personalization steps:
+  - Favorite team selection
+  - Dashboard color theme selection (8 predefined + custom)
+  - Athlete selection (limit 10, upgradable for premium users)
+- Offer guided tour with toggleable interactive/passive modes
+- Make tour available during onboarding and from help menu
+- Support English and Spanish languages
+- Save preferences to Firebase user profile
+- Use modular screen components for future flexibility
+- Ensure web and iOS compatibility
+- Implement with React, Firebase Auth, and Firestore
+- Support ThemeToggle context for dark/light modes
+- Include animated transitions using framer-motion
+- Use hybrid asset approach (Firebase Storage + CDN)
+
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    A[User Signs Up] --> B[Existing Onboarding]
+    B --> C[Post-Signup Onboarding]
+    C --> D{Personalization Steps}
+    D --> E[Favorite Team Selection]
+    D --> F[Dashboard Color Theme]
+    D --> G[Athlete Selection]
+    D --> H[Guided Tour Option]
+    H -->|Yes| I[Interactive/Passive Tour]
+    H -->|No| J[Main App]
+    I --> J
+    E & F & G --> K[Save to Firebase]
+    K --> L[Update Local Context]
+    L --> J
+    M[Help Menu] --> I
+```
+
+## Component Architecture
+
+```mermaid
+flowchart TD
+    A[PostSignupOnboardingContainer] --> B[OnboardingContext Provider]
+    B --> C[OnboardingStepController]
+    C --> D[StepIndicator]
+    C --> E{Current Step}
+    E --> F[FavoriteTeamStep]
+    E --> G[DashboardThemeStep]
+    E --> H[AthleteSelectionStep]
+    E --> I[GuidedTourOptionStep]
+    F --> J[TeamBrowser]
+    G --> K[ThemeSelector]
+    H --> L[AthleteBrowser]
+    I --> M[TourModeToggle]
+    I --> N[TourController]
+    N --> O{Tour Steps}
+    O --> P[BettingTourStep]
+    O --> Q[TeamTrackingTourStep]
+    O --> R[OddsComparisonTourStep]
+    O --> S[NotificationsTourStep]
+```
+
+## Folder Structure
+
+```
+screens/
+  PostSignupOnboarding/
+    index.tsx                      # Main container and flow controller
+    Context/
+      OnboardingContext.tsx        # Manages onboarding state
+    Steps/
+      FavoriteTeamStep.tsx         # Team selection step
+      DashboardThemeStep.tsx       # Color theme selection step
+      AthleteSelectionStep.tsx     # Athlete selection step
+      GuidedTourOptionStep.tsx     # Tour option selection step
+    Tour/
+      TourController.tsx           # Controls tour flow
+      TourSteps/
+        BettingTourStep.tsx        # "See how to place a bet" tour step
+        TeamTrackingTourStep.tsx   # "Track your favorite teams" tour step
+        OddsComparisonTourStep.tsx # "Compare odds" tour step
+        NotificationsTourStep.tsx  # "Customize notifications" tour step
+    Components/
+      StepIndicator.tsx            # Shows progress through steps
+      TeamBrowser.tsx              # Browse teams by league/sport
+      ThemeSelector.tsx            # Theme selection component
+      AthleteBrowser.tsx           # Browse athletes by team
+      TourModeToggle.tsx           # Toggle between interactive/passive
+      AnimatedTransition.tsx       # Framer-motion transitions
+      PremiumUpgradePrompt.tsx     # Prompt for premium upgrade (athletes)
+      
+services/
+  postSignupOnboardingService.ts   # Service for managing onboarding data
+  assetService.ts                  # Service for managing hybrid asset loading
+
+hooks/
+  usePostSignupOnboarding.ts       # Custom hook for onboarding state
+  useTour.ts                       # Custom hook for tour state
+
+types/
+  onboarding.ts                    # TypeScript types for onboarding
+```
+
+## Data Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant OnboardingUI as Onboarding UI
+    participant OnboardingContext as Onboarding Context
+    participant OnboardingService as Onboarding Service
+    participant Firebase as Firebase/Firestore
+    participant AssetService as Asset Service
+    participant CDN as CDN
+    participant FirebaseStorage as Firebase Storage
+    participant UserPreferences as User Preferences Context
+
+    User->>OnboardingUI: Completes signup & initial onboarding
+    OnboardingUI->>OnboardingContext: Initialize post-signup flow
+    OnboardingContext->>OnboardingService: Check if already completed
+    OnboardingService->>Firebase: Query user profile
+    Firebase-->>OnboardingService: Return profile data
+    
+    alt First time user
+        OnboardingService-->>OnboardingContext: Start onboarding
+        OnboardingContext-->>OnboardingUI: Show first step
+        
+        # Team Selection
+        OnboardingUI->>AssetService: Request team data
+        AssetService->>CDN: Fetch team logos & data
+        CDN-->>AssetService: Return team assets
+        AssetService-->>OnboardingUI: Display teams
+        User->>OnboardingUI: Select favorite team
+        
+        # Theme Selection
+        OnboardingUI->>User: Show 8 themes + custom
+        User->>OnboardingUI: Select theme
+        
+        # Athlete Selection
+        OnboardingUI->>AssetService: Request athlete data
+        AssetService->>CDN: Fetch common athlete data
+        CDN-->>AssetService: Return athlete data
+        AssetService-->>OnboardingUI: Display athletes (max 10)
+        User->>OnboardingUI: Select athletes
+        
+        alt User selects >10 athletes
+            OnboardingUI->>User: Show premium upgrade prompt
+        end
+        
+        # Save Preferences
+        OnboardingUI->>OnboardingService: Save all preferences
+        OnboardingService->>Firebase: Update user profile
+        
+        # Custom Assets
+        OnboardingService->>FirebaseStorage: Store user-specific assets
+        
+        # Guided Tour Option
+        OnboardingUI->>User: Ask about guided tour
+        User->>OnboardingUI: Select tour preference
+        
+        alt User wants tour
+            OnboardingUI->>User: Show tour mode options
+            User->>OnboardingUI: Select interactive/passive
+            OnboardingUI->>User: Present guided tour
+        end
+        
+        OnboardingService->>Firebase: Mark onboarding complete
+        OnboardingService->>UserPreferences: Update app preferences
+    else Returning user
+        OnboardingService-->>OnboardingContext: Skip onboarding
+        OnboardingContext-->>OnboardingUI: Navigate to main app
+    end
+```
+
+## Firebase Data Model
+
+```typescript
+interface UserOnboardingPreferences {
+  favoriteTeam: {
+    id: string;
+    name: string;
+    sport: string;
+    league: string;
+    logoUrl: string;
+  };
+  dashboardTheme: {
+    id: string;
+    name: string;
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+    isCustom: boolean;
+  };
+  favoriteAthletes: Array<{
+    id: string;
+    name: string;
+    team: string;
+    sport: string;
+    position: string;
+    imageUrl: string;
+  }>;
+  guidedTourCompleted: boolean;
+  guidedTourPreference: 'interactive' | 'passive' | 'skipped';
+  onboardingCompleted: boolean;
+  onboardingCompletedAt: Timestamp;
+  language: 'en' | 'es';
+}
+```
+
+## Theme System
+
+The architecture will include 8 predefined themes:
+- 4 Light themes: Light Blue, Light Green, Light Purple, Light Red
+- 4 Dark themes: Dark Blue, Dark Green, Dark Purple, Dark Red
+- Plus a custom theme option
+
+Each theme will include:
+- Primary color (main brand color)
+- Secondary color (background color)
+- Accent color (highlights and CTAs)
+
+## Asset Management Strategy
+
+The hybrid asset approach will:
+1. Use CDN for common assets (team logos, default athlete images)
+2. Use Firebase Storage for user-specific assets (custom themes, user uploads)
+3. Implement caching for frequently accessed assets
+4. Use lazy loading for athlete images to improve performance
+
+## Animation Strategy
+
+Using framer-motion, we'll implement:
+1. Slide transitions between steps
+2. Fade-in effects for new content
+3. Micro-interactions for selections
+4. Highlight animations for the guided tour
+5. Smooth transitions for theme changes
+
+## Implementation Plan
+
+### Phase 1: Core Structure
+1. Create folder structure and base components
+2. Implement OnboardingContext
+3. Set up navigation flow between steps
+4. Create basic UI for each step (without styling)
+
+### Phase 2: Firebase Integration
+1. Extend user profile schema in Firestore
+2. Implement save/load functionality
+3. Create service for managing onboarding data
+4. Add progress tracking
+
+### Phase 3: UI Enhancement
+1. Implement full UI for each step
+2. Add animations with framer-motion
+3. Implement theme support
+4. Add responsive layouts for web/mobile
+
+### Phase 4: Guided Tour
+1. Implement tour controller
+2. Create tour steps for each feature
+3. Add interactive/passive mode toggle
+4. Implement tour animations and overlays
+
+### Phase 5: Testing & Refinement
+1. Test on both web and iOS
+2. Verify language switching
+3. Test theme compatibility
+4. Optimize animations for performance
+
+## Key Technical Considerations
+
+1. **Cross-Platform Compatibility**: Using React Native's Platform API to handle platform-specific behavior
+2. **Theme Integration**: Ensuring all components work with both light and dark modes
+3. **Performance**: Lazy-loading tour components to reduce initial load time
+4. **Accessibility**: Ensuring all components are accessible
+5. **Error Handling**: Graceful fallbacks if Firebase operations fail
+6. **Premium Features**: Clear upgrade paths for premium features
+7. **Internationalization**: Full support for English and Spanish

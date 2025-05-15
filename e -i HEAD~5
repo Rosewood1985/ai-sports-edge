@@ -1,0 +1,171 @@
+* [33m2c09637[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m 🔄 Sync checkpoint: 2025-05-15 19:25:27
+* [33m9c3d3f5[m Remove deprecated betting and affiliate-related docs
+* [33m7bb8dde[m 📌 Snapshot: clean-history-2025-05-14 and upstream sync confirmation
+* [33mcd11185[m Remove leftover .git-backup references after history cleanup
+* [33m0e67b5c[m[33m ([m[1;33mtag: [m[1;33mclean-history-2025-05-14[m[33m)[m Finalize repo cleanup – remove large files, reset history, reinitialize Git
+* [33m4c2a3e1[m Save in-progress work before pulling
+* [33ma6d36bf[m Reinitialize git in container with current files
+* [33m2716f2b[m[33m ([m[1;32mmain[m[33m, [m[1;32mfeature/analysis-tools[m[33m)[m Simplify GitHub Actions workflow for reliable deployment
+* [33me48a0f4[m Update firebase.json with simplified configuration
+* [33m9360128[m Fix GitHub Actions workflow issues
+* [33m0b92512[m Update GitHub Actions workflow to specify hosting target
+* [33md27929c[m Update configuration for aisportsedge.app domain and clean up project
+* [33m57208c0[m Update configuration for aisportsedge.app domain and clean up project
+* [33m62465ef[m[33m ([m[1;32mcleanup-project[m[33m)[m Add webpack config and web build scripts
+* [33m2824ddc[m Add project documentation
+* [33m9d2a7f4[m Clean up duplicate deployment folders
+* [33m75ec11d[m[33m ([m[1;32mbackup-before-update[m[33m)[m Add placeholder site
+* [33ma522003[m Update model cache files
+* [33m8666d0a[m Recovering assistant-created files
+* [33mda6ba56[m auto: add subscription analytics documentation
+* [33m319b67e[m auto: update status log with referral system integration
+* [33m9985ac1[m add: referral code function and updated cron tasks
+* [33m54f1924[m fix: Correct Firebase configuration to enable signup
+* [33m902a1d8[m chore: Validate project structure, update firebase config, confirm npm and git readiness
+* [33mf48b314[m chore: Add logs directory for cron job output
+* [33m6af84d9[m chore: Update task files with latest session changes
+* [33mfd0a235[m docs: Add Cron Jobs Status Report and Daily Progress Logger script
+* [33m73fccc5[m chore: Update task files with latest session changes
+* [33mc00b38f[m chore: Update task files with latest changes
+* [33mb522b12[m chore: Update task files
+* [33m7e47f78[m chore: Add corrected Firebase configuration and prepare for signup testing
+* [33mbc07523[m docs: Add Founder Overview Delivery Confirmation v1.0
+* [33m65a127d[m docs: Rewrite Founder Overview v1.0 with expanded features and vision
+*   [33m623121e[m Merge pull request #1 from Rosewood1985/feature/atomic-architecture-20250422_152356
+[33m|[m[34m\[m  
+[33m|[m [34m|[m * [33mb12e1fc[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/analysis-tools[m[33m, [m[1;31morigin/HEAD[m[33m)[m Simplify GitHub Actions workflow for reliable deployment
+[33m|[m [34m|[m * [33m91be076[m Update firebase.json with simplified configuration
+[33m|[m [34m|[m * [33m4361190[m Fix GitHub Actions workflow issues
+[33m|[m [34m|[m * [33me67d779[m Update GitHub Actions workflow to specify hosting target
+[33m|[m [34m|[m * [33me7910a5[m Update configuration for aisportsedge.app domain and clean up project
+[33m|[m [34m|[m * [33md1db2da[m Update configuration for aisportsedge.app domain and clean up project
+[33m|[m [34m|[m * [33m482bd24[m[33m ([m[1;31morigin/cleanup-project[m[33m)[m Add webpack config and web build scripts
+[33m|[m [34m|[m * [33mdecb6a3[m Add project documentation
+[33m|[m [34m|[m * [33m5767442[m Clean up duplicate deployment folders
+[33m|[m [34m|[m * [33m04a2295[m[33m ([m[1;31morigin/backup-before-update[m[33m)[m Add placeholder site
+[33m|[m [34m|[m * [33m8b808ff[m Update model cache files
+[33m|[m [34m|[m * [33m6aab2d5[m Recovering assistant-created files
+[33m|[m [34m|[m * [33mc6180d8[m auto: add subscription analytics documentation
+[33m|[m [34m|[m * [33m2440c61[m auto: update status log with referral system integration
+[33m|[m [34m|[m * [33m4261f70[m add: referral code function and updated cron tasks
+[33m|[m [34m|[m * [33m0959ec3[m fix: Correct Firebase configuration to enable signup
+[33m|[m [34m|[m * [33m9266071[m chore: Validate project structure, update firebase config, confirm npm and git readiness
+[33m|[m [34m|[m * [33mdfaa9b3[m chore: Add logs directory for cron job output
+[33m|[m [34m|[m * [33m1053eea[m chore: Update task files with latest session changes
+[33m|[m [34m|[m * [33m05f82f0[m docs: Add Cron Jobs Status Report and Daily Progress Logger script
+[33m|[m [34m|[m * [33m16ce4be[m chore: Update task files with latest session changes
+[33m|[m [34m|[m * [33m874624d[m chore: Update task files with latest changes
+[33m|[m [34m|[m * [33m3f6dc94[m chore: Update task files
+[33m|[m [34m|[m * [33m31786c9[m chore: Add corrected Firebase configuration and prepare for signup testing
+[33m|[m [34m|[m * [33mf9fe882[m docs: Add Founder Overview Delivery Confirmation v1.0
+[33m|[m [34m|[m * [33m5a2b232[m docs: Rewrite Founder Overview v1.0 with expanded features and vision
+[33m|[m [34m|[m * [33m5799b28[m Merge pull request #1 from Rosewood1985/feature/atomic-architecture-20250422_152356
+[33m|[m [34m|[m[33m/[m[34m|[m 
+[33m|[m[33m/[m[34m|[m[34m/[m  
+[33m|[m [34m|[m * [33m01710c0[m[33m ([m[1;31morigin/feature/atomic-architecture-20250422_152356[m[33m, [m[1;32mfeature/atomic-architecture-20250422_152356[m[33m)[m feat: Add balldontlie NBA games and season averages service
+[33m|[m [34m|[m[34m/[m  
+[33m|[m * [33m65e8366[m docs: Add README_WATCHDOG.md explaining documentation automation system
+[33m|[m * [33m22c586f[m docs: Update main README.md to include GitHub labels documentation
+[33m|[m * [33m650d0df[m docs: Add README_GITHUB_LABELS.md with label setup instructions
+[33m|[m * [33m4cc0401[m scripts: Add setup_github_labels.py for standardized GitHub issue labels
+[33m|[m * [33m3dafa1b[m docs: Add main README for documentation structure
+[33m|[m * [33m375e948[m scripts: Add schedule_docs_watchdog.sh for daily documentation checks
+[33m|[m * [33mbb357ee[m docs: Auto-create missing critical documentation files
+[33m|[m * [33mb5e3dec[m scripts: Add docs_watchdog.py to auto-create critical documentation files
+[33m|[m * [33m584dc6e[m docs: Add Founder Overview v1.0
+[33m|[m * [33meb3c629[m chore: Stage modified files and new scripts for deployment prep
+[33m|[m * [33m111ed80[m docs: Add comprehensive deployment guide
+[33m|[m * [33m104b750[m ci: Add GitHub Actions workflow for automated deployment
+[33m|[m * [33md6ab9cc[m feat: Add manual fallback deployment script
+[33m|[m * [33ma9bb5ad[m feat: Add deployment configuration validator
+[33m|[m * [33m4d90478[m feat: Add automated deployment and verification script
+[33m|[m * [33m4d8593f[m fix: Add script to fix permissions and build location on server
+[33m|[m * [33mcaed2a5[m feat: Add deployment status check scripts
+[33m|[m * [33m2760b57[m feat: Add script to fix build location on server after SFTP upload
+[33m|[m * [33mf253e9a[m fix: Resolve SFTP "Config Not Found" error
+[33m|[m * [33m9f5f5c9[m fix: Correct SFTP context path to fix config loading
+[33m|[m * [33m5eb07e5[m fix: Update SFTP configuration for reliable deployment
+[33m|[m * [33m0200613[m fix: reset and clean production web deployment
+[33m|[m * [33m84d0617[m fix: resolve frontend blocking issues for aisportsedge.app
+[33m|[m * [33m490ed19[m[33m ([m[1;33mtag: [m[1;33mvscode-fix-v1.0[m[33m)[m fix: resolve VS Code workspace storage path issues
+[33m|[m * [33m048920a[m[33m ([m[1;33mtag: [m[1;33mhealth-check-fix-v1.0[m[33m)[m fix: improve deployment health check script
+[33m|[m * [33m570e303[m[33m ([m[1;33mtag: [m[1;33mchangelog-update-v1.0[m[33m)[m docs: update CHANGELOG with deployment health check
+[33m|[m * [33m26a6f2c[m[33m ([m[1;33mtag: [m[1;33mhealth-check-v1.0[m[33m)[m feat: add deployment health check script
+[33m|[m * [33mb6152d2[m[33m ([m[1;33mtag: [m[1;33mfix-frontend-blockers-v1.0[m[33m)[m fix: resolve frontend blockers for aisportsedge.app
+[33m|[m * [33m0fd34a6[m feat(deploy): Add secure SFTP deployment script
+[33m|[m * [33m7fc9312[m Deploy-ready cleanup + SEO + Spanish toggle
+[33m|[m * [33m9db13c4[m Standardize SFTP deployment configuration
+[33m|[m * [33m73c6cf9[m Add final atomic architecture summary
+[33m|[m * [33m2c4cba6[m Migrate SettingsPage to atomic architecture
+[33m|[m * [33m1304b07[m Migrate BettingPage to atomic architecture
+[33m|[m * [33m45d51a0[m Add final deployment summary
+[33m|[m * [33m9b2f55c[m Add script for implementing atomic architecture in main codebase
+[33m|[m * [33mc655acb[m Add script for completing atomic architecture migration
+[33m|[m * [33m0140f4a[m Add final summary of atomic architecture implementation
+[33m|[m * [33mc0ddce8[m Add script for continuing atomic architecture migration
+[33m|[m * [33m1eef319[m Add atomic architecture deployment summary
+[33m|[m * [33m6b48d4a[m Migrate LoginScreen to atomic architecture
+[33m|[m * [33m9b5dc52[m Update atomic architecture documentation and to-do files
+[33m|[m * [33m666d3d4[m Implement atomic architecture
+[33m|[m * [33mef96362[m[33m ([m[1;31morigin/phase1-implementation[m[33m, [m[1;32mphase1-implementation[m[33m)[m fix: deploy only Firebase Functions in deployment script
+[33m|[m * [33mea0792c[m fix: load environment variables from .env file in deployment script
+[33m|[m * [33m678828f[m fix: remove apiKeys dependency from envCheck.js to avoid circular dependency
+[33m|[m * [33mdf463ec[m feat(security): implement centralized API key management
+[33m|[m * [33mb498fe7[m Enhanced signup process with validation, UI improvements, and social login
+[33m|[m * [33m1578643[m Add ThemeToggle component across all platforms
+[33m|[m * [33mc31e10f[m Implement AI Sports Edge application with deployment configurations
+[33m|[m * [33m6a537ae[m Implement comprehensive web security enhancements
+[33m|[m * [33m47d0818[m Add comprehensive app features list with brief descriptions
+[33m|[m * [33m7bd4dc8[m Implement security features
+[33m|[m * [33mdc9d00d[m Implement performance optimization and user support features
+[33m|[m * [33mce57b8f[m Add enhanced homepage UI/UX improvements
+[33m|[m * [33m2423931[m Implement multilingual onboarding experience with enhanced security, error handling, and accessibility
+[33m|[m * [33m3532c95[m Implement analytics dashboard and machine learning model enhancements
+[33m|[m * [33m2b64c45[m Add Spanish language support and testing for new features
+[33m|[m * [33m5619436[m Complete geolocation features implementation
+[33m|[m * [33m761f642[m Add Spanish translations for payment and subscription screens
+[33m|[m * [33m525bb8b[m Update memory bank with security enhancements documentation
+[33m|[m * [33mdc5161a[m Fix security vulnerabilities in WeatherAdjustmentService
+[33m|[m * [33mf12725d[m Implement weather integration for sports odds prediction services
+[33m|[m * [33ma2a2407[m Add documentation for OddsComparisonComponent improvements
+[33m|[m * [33m01467a0[m Improve OddsComparisonComponent with better error handling, API key management, and monetization flow
+[33m|[m * [33m8ae2947[m Update README and responsive UI documentation with new features
+[33m|[m * [33ma4152e0[m Add personalization options, analytics integration, A/B testing, and performance optimizations
+[33m|[m * [33mb0ffee4[m Implement Phase 1 components: Push Notifications, Deep Linking, and Offline Mode
+[33m|[m * [33m326d30e[m Add pre-deployment documentation and update README
+[33m|[m * [33m436746f[m[33m ([m[1;31morigin/feature/fanduel-affiliate-integration[m[33m, [m[1;32mfeature/fanduel-affiliate-integration[m[33m)[m Complete implementation of Group Subscription feature with ownership transfer
+[33m|[m * [33m1f6e411[m Complete implementation of Geolocation Features and Betting Analytics
+[33m|[m * [33m78e50e0[m Add comprehensive Stripe integration test suite and update memory bank
+[33m|[m * [33mcb06687[m Improve Stripe integration: Add prepareGroupSubscriptionPayment function, fix GroupSubscriptionScreen to use dynamic values, update analytics tracking
+[33m|[m * [33m2e98341[m Add Group Pro subscription plan to build script
+[33m|[m * [33mb5e9189[m Add Group Pro subscription plan to web app
+[33m|[m * [33mab1ec8a[m Implement multiuser payment option for up to 3 users
+[33m|[m * [33mc0ef0f8[m Add OneSignal integration for push notifications
+[33m|[m * [33m7b4177d[m Update AI Sports Edge with ML model enhancements and sportsbookreview.com integration
+[33m|[m * [33mceb8c1c[m Add comprehensive documentation and update scripts for ESPN API, Bet365 API, Pinnacle, and BetMGM integration
+[33m|[m * [33m889e2c5[m Add comprehensive documentation and update scripts for ESPN API and Bet365 API integration
+[33m|[m * [33m0dbae76[m Add comprehensive documentation and update scripts for ESPN API and Bet365 API integration
+[33m|[m * [33m1d089e7[m Add comprehensive documentation and update scripts for ESPN API and Bet365 API integration
+[33m|[m * [33m25ccfd4[m Add ML API integration with multiple sports APIs
+[33m|[m * [33m57144f7[m Implement seamless Bet Now button transition and FanDuel affiliate integration
+[33m|[m * [33mec2e507[m Add FanDuel affiliate integration with A/B testing and game URL integration
+[33m|[m[33m/[m  
+* [33mc1decde[m Implement referral program and leaderboard system
+* [33me45bd82[m Update AI Sports News documentation with implemented premium features
+* [33mf22fac8[m Implement enhanced features for premium subscribers: personalization and advanced AI analytics
+* [33m448f90c[m Integrate The Sports DB API for real sports news data
+* [33md0e4aff[m Implement AI Sports News Feature
+* [33m7cacf79[m Implement Subscription Analytics Dashboard
+* [33ma97237b[m Implement gift subscription redemption feature and add documentation for planned features
+* [33mb348a0c[m Fix LinearGradient component issues by switching to expo-linear-gradient
+* [33m7707da4[m Add subscription features: auto-resubscribe, referral program, subscription analytics, and subscription gifting
+* [33m9d719ad[m Implement Stripe integration with Firebase Functions and Firestore
+* [33m227adfc[m Add NeonLoginScreen and global styles for neon UI design
+* [33m093bd45[m Add neon UI design system with animations and device optimizations
+* [33mc77260c[m Add Horse Racing feature and Mobile App Download prompt
+* [33maca3701[m Add Firebase SDK integration with React Native Firebase
+* [33m8e0d13e[m Add responsive UI optimizations for mobile and tablet layouts
+* [33mddd12e8[m Add UFC API integration, player prop bets, and UI/UX enhancements
+* [33mba04aa4[m first commit
+* [33ma73696d[m Initial commit - AI Sports Edge setup
+* [33m86f3145[m Initial commit

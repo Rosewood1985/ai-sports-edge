@@ -1,0 +1,203 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import { generateRandomCode } from '../utils/codeGenerator';
+// Replaced with firebaseService
+// Replaced with firebaseService
+
+// No need to initialize Firestore and Functions, they're available from firebaseService
+
+// Gift subscription amounts
+export const GIFT_SUBSCRIPTION_AMOUNTS = [
+  { label: '$25 (1 month)', value: 2500 },
+  { label: '$50 (2 months)', value: 5000 },
+  { label: '$75 (3 months)', value: 7500 },
+  { label: '$100 (4 months)', value: 10000 },
+  { label: '$150 (6 months)', value: 15000 },
+  { label: '$300 (1 year)', value: 30000 }
+];
+
+/**
+ * Check if a user has an active subscription
+ * @param userId User ID to check
+ * @returns Boolean indicating if the user has an active subscription
+ */
+export const hasActiveSubscription = async (userId: string): Promise<boolean> => {
+  try {
+    // Get user document
+    const userDoc = await firebaseService.firestore.getDocument('users', userId);
+    
+    if (!userDoc) {
+      return false;
+    }
+    
+    const userData = userDoc as any;
+    
+    // Check if user has an active subscription
+    if (userData.subscriptionStatus === 'active') {
+      // If there's a subscription ID, check if it's still valid
+      if (userData.subscriptionId) {
+        // Get the subscription document
+        const subscriptionDoc = await firebaseService.firestore.getDocument(
+          `users/${userId}/subscriptions`,
+          userData.subscriptionId
+        );
+        
+        if (subscriptionDoc) {
+          const subscriptionData = subscriptionDoc as any;
+          
+          // Check if subscription is active and not expired
+          if (subscriptionData.status === 'active') {
+            // If there's an end date, check if it's in the future
+            if (subscriptionData.currentPeriodEnd) {
+              const endDate = subscriptionData.currentPeriodEnd.toDate();
+              return endDate > new Date();
+            }
+            
+            return true;
+          }
+        }
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking subscription status:', error);
+    return false;
+  }
+};
+
+/**
+ * Create a gift subscription
+ * @param userId User ID of the purchaser
+ * @param paymentMethodId Stripe payment method ID
+ * @param amount Amount in cents
+ * @param recipientEmail Optional email of the recipient
+ * @param message Optional personal message
+ * @returns Gift subscription object
+ */
+export const createGiftSubscription = async (
+  userId: string,
+  paymentMethodId: string,
+  amount: number,
+  recipientEmail?: string,
+  message?: string
+): Promise<any> => {
+  try {
+    // Generate a unique gift code
+    const code = generateRandomCode(8);
+    
+    // Call the Cloud Function to create the gift subscription
+    const result = await firebaseService.functions.callFunction('createGiftSubscription', {
+      paymentMethodId,
+      amount,
+      code,
+      recipientEmail,
+      message
+    });
+    
+    // Return the gift subscription data
+    return result;
+  } catch (error: any) {
+    console.error('Error creating gift subscription:', error);
+    throw new Error(error.message || 'Failed to create gift subscription');
+  }
+};
+
+/**
+ * Get a gift subscription by code
+ * @param code Gift subscription code
+ * @returns Gift subscription object or null if not found
+ */
+export const getGiftSubscriptionByCode = async (code: string): Promise<any> => {
+  try {
+    // Get the gift subscription document
+    const giftSubscriptionDoc = await firebaseService.firestore.getDocument('giftSubscriptions', code);
+    
+    if (!giftSubscriptionDoc) {
+      return null;
+    }
+    
+    return giftSubscriptionDoc;
+  } catch (error) {
+    console.error('Error getting gift subscription:', error);
+    return null;
+  }
+};
+
+/**
+ * Redeem a gift subscription
+ * @param userId User ID of the redeemer
+ * @param code Gift subscription code
+ * @returns Subscription object
+ */
+export const redeemGiftSubscription = async (userId: string, code: string): Promise<any> => {
+  try {
+    // Call the Cloud Function to redeem the gift subscription
+    const result = await firebaseService.functions.callFunction('redeemGiftSubscription', { code });
+    
+    // Return the subscription data
+    return result;
+  } catch (error: any) {
+    console.error('Error redeeming gift subscription:', error);
+    throw new Error(error.message || 'Failed to redeem gift subscription');
+  }
+};
+
+/**
+ * Get all gift subscriptions purchased by a user
+ * @param userId User ID
+ * @returns Array of gift subscriptions
+ */
+export const getPurchasedGiftSubscriptions = async (userId: string): Promise<any[]> => {
+  try {
+    // Query gift subscriptions purchased by the user
+    const queryConstraints = [
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('purchasedBy', '==', userId)
+    ];
+    
+    const giftSubscriptionsCollection = await firebaseService.firestore.getCollection(
+      'giftSubscriptions',
+      queryConstraints
+    );
+    
+    // Convert collection to array of gift subscriptions
+    const giftSubscriptions: any[] = giftSubscriptionsCollection.map((doc: any) => ({
+      id: doc.id,
+      ...doc
+    }));
+    
+    return giftSubscriptions;
+  } catch (error) {
+    console.error('Error getting purchased gift subscriptions:', error);
+    return [];
+  }
+};
+
+/**
+ * Get all gift subscriptions redeemed by a user
+ * @param userId User ID
+ * @returns Array of gift subscriptions
+ */
+export const getRedeemedGiftSubscriptions = async (userId: string): Promise<any[]> => {
+  try {
+    // Query gift subscriptions redeemed by the user
+    const queryConstraints = [
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('redeemedBy', '==', userId)
+    ];
+    
+    const giftSubscriptionsCollection = await firebaseService.firestore.getCollection(
+      'giftSubscriptions',
+      queryConstraints
+    );
+    
+    // Convert collection to array of gift subscriptions
+    const giftSubscriptions: any[] = giftSubscriptionsCollection.map((doc: any) => ({
+      id: doc.id,
+      ...doc
+    }));
+    
+    return giftSubscriptions;
+  } catch (error) {
+    console.error('Error getting redeemed gift subscriptions:', error);
+    return [];
+  }
+};

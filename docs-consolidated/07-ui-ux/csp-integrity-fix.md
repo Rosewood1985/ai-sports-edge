@@ -1,0 +1,63 @@
+# CSP and Integrity Attribute Fixes
+
+**Date:** April 22, 2025
+**Task:** Fix CSP and remove integrity attributes for better compatibility
+
+## Problem
+
+The website had several issues that were causing compatibility problems:
+
+1. **Integrity Attributes**: The Google Fonts and Google Tag Manager scripts had integrity attributes that were causing issues:
+   ```html
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" integrity="sha384-T5i/RU1J7+Wkp+fVBXg+V5VjvHwZ5dJu/nCFZ1QIQCIUkNOHRHnpVzwZmnbc9Ey5" crossorigin="anonymous">
+   ```
+   ```html
+   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" integrity="sha384-Mh8z9e3yCJ0aNEYt4GwJ1FqUQdUDNAUOnBw6C/+7Xzqm0qRatuRYYZ+QQQ/hKY3" crossorigin="anonymous"></script>
+   ```
+
+2. **X-Frame-Options Header**: The site had an X-Frame-Options meta tag set to SAMEORIGIN, preventing embedding in iframes:
+   ```html
+   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+   ```
+
+3. **Blocked 3rd Party Scripts**: The Content Security Policy (CSP) was blocking images from i.imgiw.com.
+
+## Solution
+
+1. **Removed Integrity Attributes**
+   - Removed the integrity attribute from Google Fonts:
+     ```html
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+     ```
+   - Removed the integrity attribute from Google Tag Manager:
+     ```html
+     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+     ```
+
+2. **Removed X-Frame-Options Meta Tag**
+   - Deleted the line: `<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">`
+
+3. **Updated Content Security Policy**
+   - Added i.imgiw.com to the img-src directive:
+     ```html
+     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://i.imgiw.com; connect-src 'self' https://api.aisportsedge.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://firebaseremoteconfig.googleapis.com https://firestore.googleapis.com; frame-src 'self' https://accounts.google.com https://aisportsedge.firebaseapp.com; object-src 'none';">
+     ```
+
+## Benefits
+
+- **Better Compatibility**: The site can now be embedded in iframes on other domains
+- **No DevTools Warnings**: Chrome DevTools no longer shows warnings about X-Frame-Options or integrity mismatches
+- **Third-Party Resources**: Images from i.imgiw.com now load properly
+- **Improved Reliability**: Removing integrity checks allows resources to load even if they've been updated by the provider
+
+## Security Considerations
+
+While removing integrity attributes might seem like a security downgrade, it's a common practice for third-party resources that change frequently. The site still has:
+
+1. **HTTPS**: All resources are loaded over HTTPS
+2. **Content Security Policy**: The CSP header restricts which domains can provide resources
+3. **Other Security Headers**: X-Content-Type-Options, X-XSS-Protection, and Referrer-Policy are still in place
+
+## Implementation Notes
+
+The changes were made directly to the index.html file in the dist directory and deployed using the quick-deploy.sh script. The changes were also committed to git with a descriptive commit message.

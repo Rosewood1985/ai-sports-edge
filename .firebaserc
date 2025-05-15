@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "ai-sports-edge"
+  },
+  "targets": {
+    "ai-sports-edge": {
+      "hosting": {
+        "default": [
+          "ai-sports-edge"
+        ],
+        "custom-domain": [
+          "aisportsedge-app"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

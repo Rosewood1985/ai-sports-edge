@@ -1,0 +1,24 @@
+feat(admin): implement admin dashboard atomic components
+
+This commit implements the admin dashboard components following atomic design principles:
+
+Atoms:
+- StatusIndicator: Visual indicator for status (success, warning, error, info)
+- MetricCard: Card component for displaying metrics with trend indicators
+
+Molecules:
+- MetricsPanel: Panel for displaying multiple metrics in a grid layout
+
+Organisms:
+- AdminHeader: Header component with user info, notifications, and actions
+- AdminSidebar: Sidebar navigation with collapsible items and badges
+- AdminDashboard: Main dashboard component combining header, sidebar, and content
+
+Templates:
+- AdminLayout: Template for consistent admin page layout
+
+These components provide a foundation for building admin interfaces with a consistent design and behavior. They are designed to be modular, reusable, and easy to maintain.
+
+Part of the admin dashboard refactoring initiative outlined in the admin-atomic-architecture.md document.
+
+Closes #ADMIN-123

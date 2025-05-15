@@ -1,0 +1,85 @@
+# SFTP Deployment Standardization
+
+**Date:** April 22, 2025
+**Task:** Standardize SFTP deployment configuration for AI Sports Edge
+
+## Problem
+
+The project had multiple SFTP configuration files with inconsistent settings, leading to:
+- Deployment confusion
+- Potential security issues
+- Inconsistent file uploads
+- No cleanup of old files
+
+## Solution
+
+### 1. Configuration Standardization
+
+- Deleted duplicate SFTP configs
+- Set single source of truth at `vscode-sftp-deploy/.vscode/sftp.json`
+- Updated configuration with:
+  - SFTP protocol (port 22) for secure transfers
+  - Proper host, credentials and paths
+  - `uploadOnSave: true` enabled
+  - `localPath: "./dist"` to deploy only production assets
+
+### 2. Deployment Scripts
+
+Created a suite of deployment scripts:
+
+- `scripts/check-sftp-configs.sh` - Detects and removes duplicate configs
+- `scripts/check-sftp-sync.sh` - Checks for mismatched files between local/remote
+- `scripts/sftp-deploy-cleanup.sh` - Handles remote cleanup and verification:
+  - Removes `.html`, `.js`, `.css`, `.map`, `.json` files before upload
+  - Preserves `assets/`, `images/`, `locales/` folders
+  - Verifies `index.html` exists and matches local hash after deployment
+- `scripts/pre-deploy-checks.sh` - Runs all checks before deployment
+- `scripts/quick-deploy.sh` - Fast deployment option that skips checks
+- `scripts/deployment-checklist.sh` - Interactive guided deployment with step-by-step confirmation
+
+### 3. Documentation
+
+Created comprehensive documentation in `docs/sftp-deployment.md` with:
+- Configuration details
+- Script usage instructions
+- Best practices
+- Troubleshooting tips
+
+## Deployment Options
+
+1. **Guided Interactive Deployment** (Recommended)
+   ```bash
+   ./scripts/deployment-checklist.sh
+   ```
+   - Validates configuration and local files
+   - Offers interactive guided deployment with confirmation at each step
+   - Provides manual instructions if guided deployment is declined
+
+2. **Standard Deployment** (With all checks)
+   ```bash
+   ./scripts/pre-deploy-checks.sh
+   ```
+   - Runs all configuration and sync checks
+   - Offers to proceed with deployment if checks pass
+
+3. **Quick Deployment** (For rapid iterations)
+   ```bash
+   ./scripts/quick-deploy.sh
+   ```
+   - Skips checks but still performs cleanup and verification
+
+## Benefits
+
+- **Security**: SFTP protocol instead of FTP (encrypted connection)
+- **Consistency**: Single source of truth for credentials
+- **Reliability**: Pre-deployment validation and hash verification
+- **Cleanliness**: Remote cleanup to prevent stale files
+- **Flexibility**: Multiple deployment options for different scenarios
+- **Guidance**: Interactive deployment for new team members
+
+## Future Improvements
+
+- Add GitHub Actions integration for CI/CD
+- Implement rollback functionality
+- Add deployment notifications (Slack, email)
+- Create deployment logs for auditing

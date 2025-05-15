@@ -1,0 +1,589 @@
+/**
+ * Betting Analytics Service
+ * Handles tracking and analyzing user bets
+ * Migrated to use atomic architecture
+ */
+
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import { auth } from '../config/firebase';
+import { Timestamp } from 'firebase/firestore';
+
+/**
+ * Interface for a bet record
+ */
+export interface BetRecord {
+  id?: string;
+  userId: string;
+  gameId: string;
+  teamId: string;
+  betType: BetType;
+  amount: number;
+  odds: number;
+  potentialWinnings: number;
+  status: BetStatus;
+  result?: BetResult;
+  createdAt: Timestamp;
+  settledAt?: Timestamp;
+  notes?: string;
+  tags?: string[];
+  sport: string;
+  league: string;
+  teamName: string;
+  opponentName?: string;
+  gameDate: Timestamp;
+}
+
+/**
+ * Enum for bet types
+ */
+export enum BetType {
+  MONEYLINE = 'moneyline',
+  SPREAD = 'spread',
+  OVER_UNDER = 'overUnder',
+  PROP = 'prop',
+  PARLAY = 'parlay',
+  FUTURES = 'futures'
+}
+
+/**
+ * Enum for bet status
+ */
+export enum BetStatus {
+  PENDING = 'pending',
+  SETTLED = 'settled',
+  CANCELLED = 'cancelled'
+}
+
+/**
+ * Enum for bet result
+ */
+export enum BetResult {
+  WIN = 'win',
+  LOSS = 'loss',
+  PUSH = 'push',
+  VOID = 'void'
+}
+
+/**
+ * Interface for analytics summary
+ */
+export interface AnalyticsSummary {
+  totalBets: number;
+  totalWagered: number;
+  totalWinnings: number;
+  netProfit: number;
+  roi: number;
+  winRate: number;
+  averageBetAmount: number;
+  averageOdds: number;
+  bestBet?: BetRecord;
+  worstBet?: BetRecord;
+  mostBetSport?: {
+    sport: string;
+    count: number;
+  };
+  mostBetTeam?: {
+    teamId: string;
+    teamName: string;
+    count: number;
+  };
+  recentForm: BetResult[];
+  streaks: {
+    currentStreak: {
+      type: BetResult;
+      count: number;
+    };
+    longestWinStreak: number;
+    longestLossStreak: number;
+  };
+  betTypeBreakdown: {
+    [key in BetType]?: {
+      count: number;
+      winRate: number;
+      profit: number;
+    };
+  };
+}
+
+/**
+ * Interface for betting statistics
+ */
+export interface BettingStats {
+  totalBets: number;
+  winningBets: number;
+  losingBets: number;
+  totalWagered: number;
+  totalReturns: number;
+  netProfit: number;
+  roi: number;
+  winRate: number;
+  averageOdds: number;
+  streaks: {
+    currentStreak: number;
+    longestWinStreak: number;
+    longestLoseStreak: number;
+  };
+}
+
+/**
+ * Interface for time period filter
+ */
+export interface TimePeriodFilter {
+  startDate?: Date;
+  endDate?: Date;
+  period?: 'all' | 'today' | 'week' | 'month' | 'year' | 'custom';
+  customStartDate?: Date;
+  customEndDate?: Date;
+}
+
+/**
+ * Service for tracking and analyzing user bets
+ */
+class BettingAnalyticsService {
+  private firestore = firebaseService.firestore.instance;
+  private betsCollection = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(this.firestore, 'bets');
+  
+  /**
+   * Add a new bet record
+   * @param bet Bet record to add
+   * @returns Promise with the new bet ID
+   */
+  async addBet(bet: Omit<BetRecord, 'id'>): Promise<string> {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      // Calculate potential winnings if not provided
+      if (!bet.potentialWinnings) {
+        bet.potentialWinnings = this.calculatePotentialWinnings(bet.amount, bet.odds);
+      }
+      
+      const betWithUserId = {
+        ...bet,
+        userId,
+        createdAt: bet.createdAt || Timestamp.now(),
+        status: bet.status || BetStatus.PENDING
+      };
+      
+      // Generate a unique ID for the document
+      const uniqueId = Date.now().toString() + Math.random().toString(36).substring(2, 15);
+      
+      // Set the document data
+      await firebaseService.firestore.setDocument('bets', uniqueId, betWithUserId);
+      
+      return uniqueId;
+      
+      // Return the unique ID
+    } catch (error) {
+      console.error('Error adding bet:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Update a bet record
+   * @param betId Bet ID
+   * @param updates Updates to apply
+   */
+  async updateBet(betId: string, updates: Partial<BetRecord>): Promise<void> {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      const betData = await firebaseService.firestore.getDocument('bets', betId) as BetRecord;
+      
+      if (!betData) {
+        throw new Error('Bet not found');
+      }
+      
+      if (betData.userId !== userId) {
+        throw new Error('Not authorized to update this bet');
+      }
+      
+      // If updating status to settled, add settledAt timestamp
+      if (updates.status === BetStatus.SETTLED && !updates.settledAt) {
+        updates.settledAt = Timestamp.now();
+      }
+      
+      await firebaseService.firestore.updateDocument('bets', betId, updates);
+    } catch (error) {
+      console.error('Error updating bet:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Get all bets for the current user
+   * @param filters Optional filters
+   * @returns Promise with array of bet records
+   */
+  async getUserBets(filters?: {
+    status?: BetStatus;
+    betType?: BetType;
+    sport?: string;
+    league?: string;
+    teamId?: string;
+    timePeriod?: TimePeriodFilter;
+    limit?: number;
+  }): Promise<BetRecord[]> {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      // Build query parameters
+      const queryParams: Record<string, any> = {
+        userId: userId
+      };
+      
+      // Apply filters
+      if (filters) {
+        if (filters.status) {
+          queryParams.status = filters.status;
+        }
+        
+        if (filters.betType) {
+          queryParams.betType = filters.betType;
+        }
+        
+        if (filters.sport) {
+          queryParams.sport = filters.sport;
+        }
+        
+        if (filters.league) {
+          queryParams.league = filters.league;
+        }
+        
+        if (filters.teamId) {
+          queryParams.teamId = filters.teamId;
+        }
+        
+        if (filters.timePeriod) {
+          const { startDate, endDate, period } = filters.timePeriod;
+          
+          if (startDate && endDate) {
+            queryParams.createdAtStart = Timestamp.fromDate(startDate);
+            queryParams.createdAtEnd = Timestamp.fromDate(endDate);
+          } else if (period) {
+            const now = new Date();
+            let periodStartDate: Date;
+            
+            switch (period) {
+              case 'today':
+                periodStartDate = new Date(now.setHours(0, 0, 0, 0));
+                break;
+              case 'week':
+                periodStartDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+              case 'month':
+                periodStartDate = new Date(now.setMonth(now.getMonth() - 1));
+                break;
+              case 'year':
+                periodStartDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                break;
+              default:
+                // 'all' - no date filter
+                periodStartDate = new Date(0); // Beginning of time
+            }
+            
+            queryParams.createdAtStart = Timestamp.fromDate(periodStartDate);
+          }
+        }
+      }
+      
+      // Build query constraints
+      const queryConstraints = [];
+      
+      // Add where clauses
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (key === 'createdAtStart') {
+          queryConstraints.push(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('createdAt', '>=', value));
+        } else if (key === 'createdAtEnd') {
+          queryConstraints.push(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('createdAt', '<=', value));
+        } else {
+          queryConstraints.push(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where(key, '==', value));
+        }
+      });
+      
+      // Add orderBy
+      queryConstraints.push(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.orderBy('createdAt', 'desc'));
+      
+      // Add limit if specified
+      if (filters?.limit) {
+        queryConstraints.push(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.limit(filters.limit));
+      }
+      
+      // Get collection with query constraints
+      const bets = await firebaseService.firestore.getCollection<BetRecord>('bets', queryConstraints);
+      // No need to process the results as getCollection already returns the correct format
+      
+      return bets;
+    } catch (error) {
+      console.error('Error getting user bets:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Get analytics summary for the current user
+   * @param timePeriod Optional time period filter
+   * @returns Promise with analytics summary
+   */
+  async getAnalyticsSummary(timePeriod?: TimePeriodFilter): Promise<AnalyticsSummary> {
+    try {
+      // Get all settled bets for the user within the time period
+      const bets = await this.getUserBets({
+        status: BetStatus.SETTLED,
+        timePeriod
+      });
+      
+      if (bets.length === 0) {
+        return this.getEmptyAnalyticsSummary();
+      }
+      
+      // Calculate basic stats
+      const totalBets = bets.length;
+      const totalWagered = bets.reduce((sum, bet) => sum + bet.amount, 0);
+      
+      const winningBets = bets.filter(bet => bet.result === BetResult.WIN);
+      const losingBets = bets.filter(bet => bet.result === BetResult.LOSS);
+      const pushBets = bets.filter(bet => bet.result === BetResult.PUSH);
+      
+      const totalWinnings = winningBets.reduce((sum, bet) => sum + (bet.potentialWinnings || 0), 0);
+      const netProfit = totalWinnings - totalWagered;
+      const roi = totalWagered > 0 ? (netProfit / totalWagered) * 100 : 0;
+      const winRate = totalBets > 0 ? (winningBets.length / totalBets) * 100 : 0;
+      const averageBetAmount = totalBets > 0 ? totalWagered / totalBets : 0;
+      const averageOdds = totalBets > 0 ? bets.reduce((sum, bet) => sum + bet.odds, 0) / totalBets : 0;
+      
+      // Find best and worst bets
+      const bestBet = this.findBestBet(bets);
+      const worstBet = this.findWorstBet(bets);
+      
+      // Calculate most bet sport and team
+      const sportCounts: Record<string, number> = {};
+      const teamCounts: Record<string, { teamId: string; teamName: string; count: number }> = {};
+      
+      bets.forEach(bet => {
+        // Count sports
+        sportCounts[bet.sport] = (sportCounts[bet.sport] || 0) + 1;
+        
+        // Count teams
+        if (!teamCounts[bet.teamId]) {
+          teamCounts[bet.teamId] = {
+            teamId: bet.teamId,
+            teamName: bet.teamName,
+            count: 0
+          };
+        }
+        teamCounts[bet.teamId].count++;
+      });
+      
+      // Find most bet sport
+      let mostBetSport: { sport: string; count: number } | undefined;
+      Object.entries(sportCounts).forEach(([sport, count]) => {
+        if (!mostBetSport || count > mostBetSport.count) {
+          mostBetSport = { sport, count };
+        }
+      });
+      
+      // Find most bet team
+      let mostBetTeam: { teamId: string; teamName: string; count: number } | undefined;
+      Object.values(teamCounts).forEach(teamCount => {
+        if (!mostBetTeam || teamCount.count > mostBetTeam.count) {
+          mostBetTeam = teamCount;
+        }
+      });
+      
+      // Calculate recent form (last 5 bets)
+      const recentForm = bets
+        .slice(0, 5)
+        .map(bet => bet.result as BetResult)
+        .filter(result => result !== undefined);
+      
+      // Calculate streaks
+      const streaks = this.calculateStreaks(bets);
+      
+      // Calculate bet type breakdown
+      const betTypeBreakdown: AnalyticsSummary['betTypeBreakdown'] = {};
+      
+      Object.values(BetType).forEach(betType => {
+        const betsOfType = bets.filter(bet => bet.betType === betType);
+        if (betsOfType.length > 0) {
+          const winsOfType = betsOfType.filter(bet => bet.result === BetResult.WIN).length;
+          const totalWageredOfType = betsOfType.reduce((sum, bet) => sum + bet.amount, 0);
+          const totalWinningsOfType = betsOfType
+            .filter(bet => bet.result === BetResult.WIN)
+            .reduce((sum, bet) => sum + (bet.potentialWinnings || 0), 0);
+          
+          betTypeBreakdown[betType] = {
+            count: betsOfType.length,
+            winRate: (winsOfType / betsOfType.length) * 100,
+            profit: totalWinningsOfType - totalWageredOfType
+          };
+        }
+      });
+      
+      return {
+        totalBets,
+        totalWagered,
+        totalWinnings,
+        netProfit,
+        roi,
+        winRate,
+        averageBetAmount,
+        averageOdds,
+        bestBet,
+        worstBet,
+        mostBetSport,
+        mostBetTeam,
+        recentForm,
+        streaks,
+        betTypeBreakdown
+      };
+    } catch (error) {
+      console.error('Error getting analytics summary:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Calculate potential winnings based on bet amount and odds
+   * @param amount Bet amount
+   * @param odds Bet odds (American format)
+   * @returns Potential winnings
+   */
+  private calculatePotentialWinnings(amount: number, odds: number): number {
+    if (odds >= 0) {
+      // Positive odds (underdog)
+      return amount * (odds / 100);
+    } else {
+      // Negative odds (favorite)
+      return amount * (100 / Math.abs(odds));
+    }
+  }
+  
+  /**
+   * Find the best bet from a list of bets
+   * @param bets List of bets
+   * @returns Best bet or undefined
+   */
+  private findBestBet(bets: BetRecord[]): BetRecord | undefined {
+    const winningBets = bets.filter(bet => bet.result === BetResult.WIN);
+    if (winningBets.length === 0) {
+      return undefined;
+    }
+    
+    return winningBets.reduce((best, bet) => {
+      const profit = (bet.potentialWinnings || 0) - bet.amount;
+      const bestProfit = (best.potentialWinnings || 0) - best.amount;
+      
+      return profit > bestProfit ? bet : best;
+    }, winningBets[0]);
+  }
+  
+  /**
+   * Find the worst bet from a list of bets
+   * @param bets List of bets
+   * @returns Worst bet or undefined
+   */
+  private findWorstBet(bets: BetRecord[]): BetRecord | undefined {
+    const losingBets = bets.filter(bet => bet.result === BetResult.LOSS);
+    if (losingBets.length === 0) {
+      return undefined;
+    }
+    
+    return losingBets.reduce((worst, bet) => {
+      return bet.amount > worst.amount ? bet : worst;
+    }, losingBets[0]);
+  }
+  
+  /**
+   * Calculate winning and losing streaks
+   * @param bets List of bets
+   * @returns Streak information
+   */
+  private calculateStreaks(bets: BetRecord[]): AnalyticsSummary['streaks'] {
+    let currentStreakType: BetResult | null = null;
+    let currentStreakCount = 0;
+    let longestWinStreak = 0;
+    let longestLossStreak = 0;
+    
+    // Sort bets by date (oldest first) to calculate streaks chronologically
+    const sortedBets = [...bets].sort((a, b) => {
+      // Handle different timestamp types
+      const getMillis = (timestamp: any) => {
+        if (timestamp instanceof Date) return timestamp.getTime();
+        if (timestamp && typeof timestamp.toMillis === 'function') return timestamp.toMillis();
+        if (timestamp && typeof timestamp.seconds === 'number') return timestamp.seconds * 1000;
+        return 0;
+      };
+      
+      return getMillis(a.createdAt) - getMillis(b.createdAt);
+    });
+    
+    sortedBets.forEach(bet => {
+      if (bet.result === BetResult.WIN || bet.result === BetResult.LOSS) {
+        if (currentStreakType === bet.result) {
+          // Continue current streak
+          currentStreakCount++;
+        } else {
+          // Start new streak
+          currentStreakType = bet.result;
+          currentStreakCount = 1;
+        }
+        
+        // Update longest streaks
+        if (bet.result === BetResult.WIN && currentStreakCount > longestWinStreak) {
+          longestWinStreak = currentStreakCount;
+        } else if (bet.result === BetResult.LOSS && currentStreakCount > longestLossStreak) {
+          longestLossStreak = currentStreakCount;
+        }
+      }
+      // Ignore PUSH and VOID results for streak calculations
+    });
+    
+    return {
+      currentStreak: {
+        type: currentStreakType || BetResult.PUSH,
+        count: currentStreakCount
+      },
+      longestWinStreak,
+      longestLossStreak
+    };
+  }
+  
+  /**
+   * Get empty analytics summary for users with no bets
+   * @returns Empty analytics summary
+   */
+  private getEmptyAnalyticsSummary(): AnalyticsSummary {
+    return {
+      totalBets: 0,
+      totalWagered: 0,
+      totalWinnings: 0,
+      netProfit: 0,
+      roi: 0,
+      winRate: 0,
+      averageBetAmount: 0,
+      averageOdds: 0,
+      recentForm: [],
+      streaks: {
+        currentStreak: {
+          type: BetResult.PUSH,
+          count: 0
+        },
+        longestWinStreak: 0,
+        longestLossStreak: 0
+      },
+      betTypeBreakdown: {}
+    };
+  }
+}
+
+export const bettingAnalyticsService = new BettingAnalyticsService();

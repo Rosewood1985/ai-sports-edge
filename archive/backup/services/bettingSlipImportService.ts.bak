@@ -1,0 +1,196 @@
+/**
+ * Betting Slip Import Service
+ * 
+ * This service provides functionality for import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import various sportsbooks.
+ */
+
+import { firestore } from '../config/firebase';
+import { 
+  collection, 
+  doc, 
+  addDoc, 
+  updateDoc, 
+  getDoc, 
+  getDocs, 
+  query, 
+  where, 
+  orderBy, 
+  limit,
+  Timestamp,
+  serverTimestamp
+} from 'firebase/firestore';
+import { 
+  Sportsbook,
+  ImportMethod,
+  ImportedBetType,
+  ImportedBetStatus,
+  ValidationStatus,
+  SuggestionType,
+  ImportedBet,
+  ImportedBetLeg,
+  AISuggestion,
+  ImportResult,
+  ImportHistory,
+  SubscriptionRequirements
+} from '../types/bettingSlipImport';
+import { analyticsService, AnalyticsEventType } from './analyticsService';
+import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * Betting Slip Import Service
+ */
+class BettingSlipImportService {
+  private readonly IMPORTED_BETS_COLLECTION = 'importedBets';
+  private readonly IMPORT_HISTORY_COLLECTION = 'importHistory';
+  private readonly USER_COLLECTION = 'users';
+  private readonly SUBSCRIPTION_COLLECTION = 'subscriptions';
+  
+  /**
+   * Check if the user is eligible to use the betting slip import feature
+   * @param userId User ID
+   * @returns Subscription requirements
+   */
+  public async checkSubscriptionRequirements(userId: string): Promise<SubscriptionRequirements> {
+    try {
+      // Get user document
+      const userDoc = await getDoc(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, this.USER_COLLECTION, userId));
+      
+      if (!userDoc.exists()) {
+        throw new Error('User not found');
+      }
+      
+      const userData = userDoc.data();
+      const currentTier = userData.subscriptionTier || 'free';
+      
+      // Check if the user has an active subscription
+      const subscriptionsQuery = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.query(
+        firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, this.SUBSCRIPTION_COLLECTION),
+        firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('userId', '==', userId),
+        firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('status', '==', 'active')
+      );
+      
+      const subscriptionsSnapshot = await getDocs(subscriptionsQuery);
+      const hasActiveSubscription = !subscriptionsSnapshot.empty;
+      
+      // Define subscription requirements
+      const requiredTier = 'premium';
+      const isEligible = hasActiveSubscription && currentTier === requiredTier;
+      
+      return {
+        isFeatureEnabled: true,
+        requiredTier,
+        currentTier,
+        isEligible,
+        upgradeMessage: isEligible ? undefined : 'Upgrade to Premium to import betting slips',
+        upgradeUrl: isEligible ? undefined : '/subscription?feature=betting-slip-import'
+      };
+    } catch (error) {
+      console.error('Error checking subscription requirements:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to check subscription requirements: ${errorMessage}`);
+    }
+  }
+  
+  /**
+   * Import a betting slip from a screenshot
+   * @param userId User ID
+   * @param sportsbook Sportsbook
+   * @param imageUri URI of the screenshot
+   * @returns Import result
+   */
+  public async importFromScreenshot(
+    userId: string,
+    sportsbook: Sportsbook,
+    imageUri: string
+  ): Promise<ImportResult> {
+    try {
+      // Check subscription requirements
+      const subscriptionRequirements = await this.checkSubscriptionRequirements(userId);
+      
+      if (!subscriptionRequirements.isEligible) {
+        return {
+          success: false,
+          message: subscriptionRequirements.upgradeMessage || 'Subscription required',
+          bets: [],
+          errorDetails: 'User does not have the required subscription tier'
+        };
+      }
+      
+      // Create imported bets
+      const importId = uuidv4();
+      const importTimestamp = Date.now();
+      
+      // Mock data for demonstration
+      const mockBets: ImportedBet[] = [
+        {
+          id: uuidv4(),
+          userId,
+          sportsbook,
+          importMethod: ImportMethod.SCREENSHOT,
+          importTimestamp,
+          betTimestamp: importTimestamp - 24 * 60 * 60 * 1000, // 1 day ago
+          betType: ImportedBetType.MONEYLINE,
+          sport: 'Basketball',
+          league: 'NBA',
+          amount: 50,
+          odds: -110,
+          potentialWinnings: 95.45,
+          status: ImportedBetStatus.PENDING,
+          description: 'Los Angeles Lakers ML',
+          validationStatus: ValidationStatus.VALID,
+          aiSuggestion: {
+            type: SuggestionType.BETTER_ODDS,
+            description: 'FanDuel offers better odds for this bet',
+            confidence: 0.85,
+            alternativeOdds: -105,
+            alternativeSportsbook: Sportsbook.FANDUEL,
+            potentialAdditionalWinnings: 2.38
+          }
+        }
+      ];
+      
+      // Save imported bets to Firestore
+      for (const bet of mockBets) {
+        await addDoc(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, this.IMPORTED_BETS_COLLECTION), bet);
+      }
+      
+      // Save import history
+      await addDoc(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, this.IMPORT_HISTORY_COLLECTION), {
+        id: importId,
+        userId,
+        timestamp: importTimestamp,
+        sportsbook,
+        importMethod: ImportMethod.SCREENSHOT,
+        betCount: mockBets.length,
+        totalAmount: mockBets.reduce((sum: number, bet) => sum + bet.amount, 0)
+      });
+      
+      // Track analytics
+      analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
+        event_name: 'betting_slip_import',
+        method: ImportMethod.SCREENSHOT,
+        sportsbook,
+        bet_count: mockBets.length
+      } as any);
+      
+      return {
+        success: true,
+        message: `Successfully imported ${mockBets.length} bets from ${sportsbook}`,
+        bets: mockBets
+      };
+    } catch (error) {
+      console.error('Error importing betting slip from screenshot:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      return {
+        success: false,
+        message: 'Failed to import betting slip',
+        bets: [],
+        errorDetails: errorMessage
+      };
+    }
+  }
+}
+
+export const bettingSlipImportService = new BettingSlipImportService();

@@ -1,0 +1,70 @@
+# Consolidation Discovery Log
+
+This document tracks files and code patterns identified for consolidation across the AI Sports Edge codebase.
+
+## Overview
+
+This log was generated as part of a system-wide search for previously started tasks related to:
+
+- Consolidation and migration
+- Dashboard development
+- Recurring job automation
+- Orphaned or duplicated feature code
+
+## Consolidation Candidates
+
+### Firebase Integration
+
+| File Path                   | Pattern                 | Status                      | Notes                                                  |
+| --------------------------- | ----------------------- | --------------------------- | ------------------------------------------------------ |
+| src/firebase/config.js      | Firebase initialization | Candidate for consolidation | Should be migrated to atomic architecture              |
+| src/config/firebase.js      | Firebase initialization | Consolidated version        | This is the target for consolidation                   |
+| src/config/firebase.ts      | Firebase initialization | TypeScript version          | This is the preferred implementation                   |
+| services/firebaseService.ts | Firebase service        | Consolidated service        | This is the target service for all Firebase operations |
+
+### Dashboard Components
+
+| File Path                                     | Component        | Status | Notes                           |
+| --------------------------------------------- | ---------------- | ------ | ------------------------------- |
+| src/atomic/organisms/admin/AdminDashboard.tsx | Admin Dashboard  | Active | Main dashboard component        |
+| src/atomic/organisms/admin/AdminHeader.tsx    | Admin Header     | Active | Header for admin dashboard      |
+| src/atomic/organisms/admin/AdminSidebar.tsx   | Admin Sidebar    | Active | Sidebar for admin dashboard     |
+| src/atomic/templates/AdminLayout.tsx          | Admin Layout     | Active | Layout template for admin pages |
+| src/atomic/molecules/admin/MetricsPanel.tsx   | Metrics Panel    | Active | Dashboard metrics component     |
+| src/atomic/atoms/admin/MetricCard.tsx         | Metric Card      | Active | Individual metric display       |
+| src/atomic/atoms/admin/StatusIndicator.tsx    | Status Indicator | Active | Status indicator component      |
+
+### Recurring Jobs
+
+| File Path                     | Job Type            | Status | Notes                                    |
+| ----------------------------- | ------------------- | ------ | ---------------------------------------- |
+| .cronrc                       | Cron configuration  | Active | Main cron job configuration              |
+| scripts/start-cronrc.sh       | Cron runner         | Active | Script to start cronrc-runner.js         |
+| scripts/cronrc-runner.js      | Cron implementation | Active | JavaScript implementation of cron runner |
+| scripts/update-app-history.sh | History backfill    | New    | Script to update app history             |
+
+### Duplicated Code
+
+| File Path                           | Pattern           | Status  | Notes                                                 |
+| ----------------------------------- | ----------------- | ------- | ----------------------------------------------------- |
+| services/analyticsService.js        | Analytics service | Legacy  | Should be consolidated with analyticsService.ts       |
+| services/analyticsService.ts        | Analytics service | Current | TypeScript version is the target                      |
+| services/userPreferencesService.js  | User preferences  | Legacy  | Should be consolidated with userPreferencesService.ts |
+| services/userPreferencesService.ts  | User preferences  | Current | TypeScript version is the target                      |
+| services/aiPredictionService.ts.bak | AI prediction     | Backup  | Should be removed or consolidated                     |
+| services/aiPredictionService.ts     | AI prediction     | Current | Current implementation                                |
+
+## Action Items
+
+1. Continue Firebase migration to atomic architecture
+2. Consolidate analytics services into TypeScript version
+3. Remove backup (.bak) files after verifying current implementations
+4. Update .cronrc to include the new backfill-history task
+
+## Next Steps
+
+1. Review this log with the development team
+2. Prioritize consolidation tasks
+3. Update todo.json with new consolidation tasks
+4. Schedule regular consolidation sprints
+   Last updated: 2025-05-13 20:43:32

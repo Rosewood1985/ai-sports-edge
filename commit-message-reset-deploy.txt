@@ -1,0 +1,18 @@
+fix: reset and clean production web deployment
+
+- Create reset-web-deploy.sh script for full site cleanup
+- Properly handle .htaccess and logo preservation
+- Fix MIME type issues for .js, .mjs, and .json files
+- Update Content Security Policy in .htaccess
+- Remove X-Frame-Options from HTML and set in .htaccess
+- Fix Firebase loading with proper configuration
+- Ensure all assets are properly deployed
+- Add post-deployment verification steps
+
+This comprehensive reset script addresses all frontend blocking issues
+by completely cleaning the production environment and redeploying with
+proper configurations. The script preserves critical files like .htaccess
+while ensuring all new files have correct MIME types and security headers.
+
+The deployment process now includes proper error handling, verification
+steps, and optional Lighthouse auditing to ensure everything works correctly.

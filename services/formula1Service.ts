@@ -1,0 +1,355 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import '../config/firebase';
+import { hasPremiumAccess } from './firebaseSubscriptionService';
+import { shouldUseMockData, logMockDataUsage } from './mockDataService';
+
+/**
+ * Formula 1 race data interface
+ */
+export interface Formula1Race {
+  id: string;
+  name: string;
+  circuit: string;
+  date: string;
+  time: string;
+  country: string;
+  round: number;
+  season: number;
+}
+
+/**
+ * Formula 1 driver data interface
+ */
+export interface Formula1Driver {
+  id: string;
+  name: string;
+  number: number;
+  code: string;
+  team: string;
+  nationality: string;
+  points: number;
+  position: number;
+  wins: number;
+  podiums: number;
+}
+
+/**
+ * Formula 1 team data interface
+ */
+export interface Formula1Team {
+  id: string;
+  name: string;
+  nationality: string;
+  points: number;
+  position: number;
+  championships: number;
+}
+
+/**
+ * Formula 1 race prediction interface
+ */
+export interface Formula1Prediction {
+  raceId: string;
+  raceName: string;
+  predictions: {
+    position: number;
+    driverId: string;
+    driverName: string;
+    team: string;
+    confidence: number;
+  }[];
+  podiumPrediction: {
+    first: string;
+    second: string;
+    third: string;
+    confidence: number;
+  };
+  fastestLapPrediction: {
+    driver: string;
+    confidence: number;
+  };
+  generatedAt: string;
+}
+
+/**
+ * Get upcoming Formula 1 races
+ * @returns List of upcoming races
+ */
+export const getUpcomingRaces = async (): Promise<Formula1Race[]> => {
+  try {
+    // Log if using mock data
+    if (shouldUseMockData(firestore)) {
+      logMockDataUsage('getUpcomingRaces');
+    }
+    
+    // In a real implementation, this would call the Formula 1 API
+    // For now, we'll return mock data
+    return [
+      {
+        id: 'race-2025-1',
+        name: 'Australian Grand Prix',
+        circuit: 'Albert Park Circuit',
+        date: '2025-03-23',
+        time: '05:00:00Z',
+        country: 'Australia',
+        round: 1,
+        season: 2025
+      },
+      {
+        id: 'race-2025-2',
+        name: 'Bahrain Grand Prix',
+        circuit: 'Bahrain International Circuit',
+        date: '2025-04-06',
+        time: '15:00:00Z',
+        country: 'Bahrain',
+        round: 2,
+        season: 2025
+      },
+      {
+        id: 'race-2025-3',
+        name: 'Chinese Grand Prix',
+        circuit: 'Shanghai International Circuit',
+        date: '2025-04-20',
+        time: '07:00:00Z',
+        country: 'China',
+        round: 3,
+        season: 2025
+      }
+    ];
+  } catch (error) {
+    console.error('Error fetching Formula 1 races:', error);
+    return [];
+  }
+};
+
+/**
+ * Get Formula 1 driver standings
+ * @returns List of drivers with their standings
+ */
+export const getDriverStandings = async (): Promise<Formula1Driver[]> => {
+  try {
+    // Log if using mock data
+    if (shouldUseMockData(firestore)) {
+      logMockDataUsage('getDriverStandings');
+    }
+    
+    // In a real implementation, this would call the Formula 1 API
+    // For now, we'll return mock data
+    return [
+      {
+        id: 'driver-1',
+        name: 'Max Verstappen',
+        number: 1,
+        code: 'VER',
+        team: 'Red Bull Racing',
+        nationality: 'Dutch',
+        points: 350,
+        position: 1,
+        wins: 12,
+        podiums: 18
+      },
+      {
+        id: 'driver-2',
+        name: 'Lewis Hamilton',
+        number: 44,
+        code: 'HAM',
+        team: 'Mercedes',
+        nationality: 'British',
+        points: 310,
+        position: 2,
+        wins: 8,
+        podiums: 16
+      },
+      {
+        id: 'driver-3',
+        name: 'Charles Leclerc',
+        number: 16,
+        code: 'LEC',
+        team: 'Ferrari',
+        nationality: 'Monegasque',
+        points: 290,
+        position: 3,
+        wins: 5,
+        podiums: 14
+      }
+    ];
+  } catch (error) {
+    console.error('Error fetching Formula 1 driver standings:', error);
+    return [];
+  }
+};
+
+/**
+ * Get Formula 1 team standings
+ * @returns List of teams with their standings
+ */
+export const getTeamStandings = async (): Promise<Formula1Team[]> => {
+  try {
+    // Log if using mock data
+    if (shouldUseMockData(firestore)) {
+      logMockDataUsage('getTeamStandings');
+    }
+    
+    // In a real implementation, this would call the Formula 1 API
+    // For now, we'll return mock data
+    return [
+      {
+        id: 'team-1',
+        name: 'Red Bull Racing',
+        nationality: 'Austrian',
+        points: 580,
+        position: 1,
+        championships: 5
+      },
+      {
+        id: 'team-2',
+        name: 'Mercedes',
+        nationality: 'German',
+        points: 520,
+        position: 2,
+        championships: 8
+      },
+      {
+        id: 'team-3',
+        name: 'Ferrari',
+        nationality: 'Italian',
+        points: 490,
+        position: 3,
+        championships: 16
+      }
+    ];
+  } catch (error) {
+    console.error('Error fetching Formula 1 team standings:', error);
+    return [];
+  }
+};
+
+/**
+ * Get race prediction for a specific Formula 1 race
+ * @param raceId Race ID
+ * @param userId User ID
+ * @returns Race prediction or null if user doesn't have access
+ */
+export const getRacePrediction = async (
+  raceId: string,
+  userId: string = auth?.currentUser?.uid || ''
+): Promise<Formula1Prediction | null> => {
+  try {
+    // In development mode or if Firebase is not initialized, return mock data
+    if (shouldUseMockData(firestore)) {
+      logMockDataUsage('getRacePrediction');
+      
+      // Return mock prediction data
+      return {
+        raceId,
+        raceName: 'Australian Grand Prix',
+        predictions: [
+          {
+            position: 1,
+            driverId: 'driver-1',
+            driverName: 'Max Verstappen',
+            team: 'Red Bull Racing',
+            confidence: 0.85
+          },
+          {
+            position: 2,
+            driverId: 'driver-2',
+            driverName: 'Lewis Hamilton',
+            team: 'Mercedes',
+            confidence: 0.75
+          },
+          {
+            position: 3,
+            driverId: 'driver-3',
+            driverName: 'Charles Leclerc',
+            team: 'Ferrari',
+            confidence: 0.65
+          }
+        ],
+        podiumPrediction: {
+          first: 'Max Verstappen',
+          second: 'Lewis Hamilton',
+          third: 'Charles Leclerc',
+          confidence: 0.70
+        },
+        fastestLapPrediction: {
+          driver: 'Max Verstappen',
+          confidence: 0.65
+        },
+        generatedAt: new Date().toISOString()
+      };
+    }
+    
+    // Check if user has premium access or has purchased this prediction
+    const hasPremium = await hasPremiumAccess(userId);
+    
+    if (!hasPremium) {
+      // Check if user has purchased this specific prediction
+      const db = firestore;
+      if (!db) return null;
+      
+      const purchasesSnapshot = await db.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection('users').firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(userId)
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection('purchases')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('productId', '==', 'formula1-race-prediction')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('raceId', '==', raceId)
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('status', '==', 'succeeded')
+        .firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.limit(1)
+        .get();
+      
+      if (purchasesSnapshot.empty) {
+        return null; // User doesn't have access
+      }
+    }
+    
+    // In a real implementation, this would call the Formula 1 API or a machine learning service
+    // For now, we'll return mock data
+    return {
+      raceId,
+      raceName: 'Australian Grand Prix',
+      predictions: [
+        {
+          position: 1,
+          driverId: 'driver-1',
+          driverName: 'Max Verstappen',
+          team: 'Red Bull Racing',
+          confidence: 0.85
+        },
+        {
+          position: 2,
+          driverId: 'driver-2',
+          driverName: 'Lewis Hamilton',
+          team: 'Mercedes',
+          confidence: 0.75
+        },
+        {
+          position: 3,
+          driverId: 'driver-3',
+          driverName: 'Charles Leclerc',
+          team: 'Ferrari',
+          confidence: 0.65
+        }
+      ],
+      podiumPrediction: {
+        first: 'Max Verstappen',
+        second: 'Lewis Hamilton',
+        third: 'Charles Leclerc',
+        confidence: 0.70
+      },
+      fastestLapPrediction: {
+        driver: 'Max Verstappen',
+        confidence: 0.65
+      },
+      generatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error fetching Formula 1 race prediction:', error);
+    return null;
+  }
+};
+
+export default {
+  getUpcomingRaces,
+  getDriverStandings,
+  getTeamStandings,
+  getRacePrediction
+};

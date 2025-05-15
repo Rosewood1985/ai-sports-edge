@@ -1,0 +1,67 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import '../config/firebase';
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+
+/**
+ * Test Firebase authentication
+ * @returns Promise that resolves with the current user or null
+ */
+export const testAuth = async (): Promise<any> => {
+  try {
+    // Check if user is signed in
+    const currentUser = auth.currentUser;
+    console.log('Current user:', currentUser ? currentUser.uid : 'No user signed in');
+    return currentUser;
+  } catch (error) {
+    console.error('Firebase auth test failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Test Firestore connection
+ * @returns Promise that resolves with a test document or error
+ */
+export const testFirestore = async (): Promise<any> => {
+  try {
+    // Try to read a test document
+    const testDocRef = firebaseService.firestore.doc(firebaseService.firestore.collection(firestore, 'test'), 'connection');
+    const testDoc = await getDoc(testDocRef);
+    console.log('Firestore test document exists:', testDoc.exists());
+    
+    // If the document doesn't exist, create it
+    if (!testDoc.exists()) {
+      await setDoc(testDocRef, {
+        timestamp: new Date(),
+        message: 'Firebase connection test successful'
+      });
+      console.log('Created test document in Firestore');
+    }
+    
+    return testDoc;
+  } catch (error) {
+    console.error('Firebase Firestore test failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Run all Firebase tests
+ * @returns Promise that resolves when all tests are complete
+ */
+export const testFirebase = async (): Promise<void> => {
+  try {
+    console.log('Testing Firebase connection...');
+    
+    // Test authentication
+    await testAuth();
+    
+    // Test Firestore
+    await testFirestore();
+    
+    console.log('All Firebase tests completed successfully');
+  } catch (error) {
+    console.error('Firebase tests failed:', error);
+    throw error;
+  }
+};

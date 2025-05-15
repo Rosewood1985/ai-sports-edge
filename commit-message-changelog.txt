@@ -1,0 +1,7 @@
+chore: publish deployment log for v1.0
+
+- Add CHANGELOG.md with deployment details for v1.0
+- Document secure SFTP deployment implementation
+- Include CSP and integrity fixes
+- Document service worker cleanup
+- Add verification checklist

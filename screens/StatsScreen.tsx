@@ -1,0 +1,575 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  TouchableOpacity, 
+  ActivityIndicator 
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../src/contexts/ThemeContext';
+// Replaced with firebaseService
+
+// Define interfaces
+interface ConfidenceTierStats {
+  tier: 'high' | 'medium' | 'low';
+  range: string;
+  winPercentage: number;
+  totalPicks: number;
+  wins: number;
+  losses: number;
+  pushes: number;
+  pending: number;
+}
+
+interface SportStats {
+  sport: string;
+  winPercentage: number;
+  totalPicks: number;
+  wins: number;
+  losses: number;
+  pushes: number;
+  pending: number;
+}
+
+interface TimeRangeStats {
+  winPercentage: number;
+  totalPicks: number;
+  wins: number;
+  losses: number;
+}
+
+interface StatsData {
+  lastUpdated: any; // Timestamp
+  overallWinPercentage: number;
+  totalPicks: number;
+  wins: number;
+  losses: number;
+  pushes: number;
+  pending: number;
+  confidenceTiers: ConfidenceTierStats[];
+  sportStats: SportStats[];
+  timeRanges: {
+    last7Days: TimeRangeStats;
+    last30Days: TimeRangeStats;
+    allTime: TimeRangeStats;
+  };
+}
+
+// Time period options
+type TimePeriod = '7days' | '30days' | 'alltime';
+
+/**
+ * StatsScreen Component
+ * 
+ * Displays AI win percentage breakdown by confidence tier
+ */
+const StatsScreen: React.FC = () => {
+  const { theme, themePreset } = useTheme();
+  const isDark = themePreset === 'dark';
+  const db = firebaseService.firestore.instance;
+  
+  // State
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('7days');
+  
+  // Fetch stats data
+  useEffect(() => {
+    fetchStatsData();
+  }, []);
+  
+  const fetchStatsData = async () => {
+    try {
+      setLoading(true);
+      
+      // Get stats document
+      const statsRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(db, 'stats', 'aiPicks');
+      const statsDoc = await getDoc(statsRef);
+      
+      if (statsDoc.exists()) {
+        const statsData = statsDoc.data() as StatsData;
+        setStats(statsData);
+      } else {
+        console.log('No stats document found');
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching stats data:', error);
+      setLoading(false);
+    }
+  };
+  
+  // Get current time range stats based on selected period
+  const getCurrentTimeRangeStats = (): TimeRangeStats | null => {
+    if (!stats) return null;
+    
+    if (timePeriod === '7days') {
+      return stats.timeRanges.last7Days;
+    } else if (timePeriod === '30days') {
+      return stats.timeRanges.last30Days;
+    } else {
+      return stats.timeRanges.allTime;
+    }
+  };
+  
+  // Render time period tabs
+  const renderTimePeriodTabs = () => {
+    return (
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            timePeriod === '7days' && [styles.activeTab, { backgroundColor: theme.primary }]
+          ]}
+          onPress={() => setTimePeriod('7days')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              { color: timePeriod === '7days' ? '#FFFFFF' : theme.text }
+            ]}
+          >
+            7 Days
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            timePeriod === '30days' && [styles.activeTab, { backgroundColor: theme.primary }]
+          ]}
+          onPress={() => setTimePeriod('30days')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              { color: timePeriod === '30days' ? '#FFFFFF' : theme.text }
+            ]}
+          >
+            30 Days
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            timePeriod === 'alltime' && [styles.activeTab, { backgroundColor: theme.primary }]
+          ]}
+          onPress={() => setTimePeriod('alltime')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              { color: timePeriod === 'alltime' ? '#FFFFFF' : theme.text }
+            ]}
+          >
+            All Time
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  
+  // Render overall stats
+  const renderOverallStats = () => {
+    const timeRangeStats = getCurrentTimeRangeStats();
+    
+    if (!timeRangeStats) return null;
+    
+    return (
+      <View style={[styles.overallStatsContainer, { backgroundColor: theme.cardBackground }]}>
+        <Text style={[styles.overallStatsTitle, { color: theme.text }]}>
+          Overall Performance
+        </Text>
+        
+        <View style={styles.overallStatsContent}>
+          <View style={styles.winPercentageContainer}>
+            <Text style={[styles.winPercentageValue, { color: theme.text }]}>
+              {timeRangeStats.winPercentage}%
+            </Text>
+            <Text style={[styles.winPercentageLabel, { color: theme.textSecondary }]}>
+              Win Rate
+            </Text>
+          </View>
+          
+          <View style={styles.statsBreakdown}>
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: theme.success }]}>
+                {timeRangeStats.wins}
+              </Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+                Wins
+              </Text>
+            </View>
+            
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: theme.error }]}>
+                {timeRangeStats.losses}
+              </Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+                Losses
+              </Text>
+            </View>
+            
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: theme.text }]}>
+                {timeRangeStats.totalPicks}
+              </Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+                Total
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+  
+  // Render confidence tier stats
+  const renderConfidenceTierStats = () => {
+    if (!stats) return null;
+    
+    return (
+      <View style={[styles.confidenceTiersContainer, { backgroundColor: theme.cardBackground }]}>
+        <Text style={[styles.confidenceTiersTitle, { color: theme.text }]}>
+          Performance by Confidence
+        </Text>
+        
+        {stats.confidenceTiers.map((tier) => {
+          // Determine tier color
+          let tierColor = theme.primary;
+          if (tier.tier === 'high') tierColor = theme.success;
+          else if (tier.tier === 'medium') tierColor = theme.warning;
+          else if (tier.tier === 'low') tierColor = theme.error;
+          
+          return (
+            <View key={tier.tier} style={styles.confidenceTierItem}>
+              <View style={styles.tierHeader}>
+                <View style={[styles.tierBadge, { backgroundColor: tierColor }]}>
+                  <Text style={styles.tierBadgeText}>
+                    {tier.tier.toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={[styles.tierRange, { color: theme.textSecondary }]}>
+                  {tier.range}
+                </Text>
+              </View>
+              
+              <View style={styles.tierStats}>
+                <View style={styles.tierWinPercentage}>
+                  <Text style={[styles.tierWinPercentageValue, { color: theme.text }]}>
+                    {tier.winPercentage}%
+                  </Text>
+                  <Text style={[styles.tierWinPercentageLabel, { color: theme.textSecondary }]}>
+                    Win Rate
+                  </Text>
+                </View>
+                
+                <View style={styles.tierBreakdown}>
+                  <Text style={[styles.tierBreakdownText, { color: theme.textSecondary }]}>
+                    {tier.wins} W - {tier.losses} L ({tier.totalPicks} total)
+                  </Text>
+                </View>
+              </View>
+              
+              {/* Win percentage bar */}
+              <View style={[styles.winPercentageBar, { backgroundColor: theme.border }]}>
+                <View 
+                  style={[
+                    styles.winPercentageFill, 
+                    { 
+                      width: `${tier.winPercentage}%`, 
+                      backgroundColor: tierColor 
+                    }
+                  ]} 
+                />
+              </View>
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+  
+  // Render sport stats
+  const renderSportStats = () => {
+    if (!stats) return null;
+    
+    return (
+      <View style={[styles.sportStatsContainer, { backgroundColor: theme.cardBackground }]}>
+        <Text style={[styles.sportStatsTitle, { color: theme.text }]}>
+          Performance by Sport
+        </Text>
+        
+        {stats.sportStats.map((sport) => (
+          <View key={sport.sport} style={styles.sportStatItem}>
+            <View style={styles.sportHeader}>
+              <Text style={[styles.sportName, { color: theme.text }]}>
+                {sport.sport}
+              </Text>
+              <Text style={[styles.sportWinPercentage, { color: theme.text }]}>
+                {sport.winPercentage}%
+              </Text>
+            </View>
+            
+            <View style={styles.sportBreakdown}>
+              <Text style={[styles.sportBreakdownText, { color: theme.textSecondary }]}>
+                {sport.wins} W - {sport.losses} L ({sport.totalPicks} total)
+              </Text>
+            </View>
+            
+            {/* Win percentage bar */}
+            <View style={[styles.winPercentageBar, { backgroundColor: theme.border }]}>
+              <View 
+                style={[
+                  styles.winPercentageFill, 
+                  { 
+                    width: `${sport.winPercentage}%`, 
+                    backgroundColor: theme.primary 
+                  }
+                ]} 
+              />
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  };
+  
+  return (
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.title, { color: theme.text }]}>AI Performance Stats</Text>
+      
+      {renderTimePeriodTabs()}
+      
+      {loading ? (
+        <ActivityIndicator size="large" color={theme.primary} style={styles.loader} />
+      ) : stats ? (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {renderOverallStats()}
+          {renderConfidenceTierStats()}
+          {renderSportStats()}
+          
+          <Text style={[styles.lastUpdated, { color: theme.textSecondary }]}>
+            Last updated: {stats.lastUpdated ? stats.lastUpdated.toDate().toLocaleString() : 'N/A'}
+          </Text>
+        </ScrollView>
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="stats-chart-outline" size={48} color={theme.textSecondary} />
+          <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+            No stats available yet. Check back after more AI picks have been made.
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  activeTab: {
+    backgroundColor: '#0066FF',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  overallStatsContainer: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  overallStatsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  overallStatsContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  winPercentageContainer: {
+    alignItems: 'center',
+    marginRight: 24,
+  },
+  winPercentageValue: {
+    fontSize: 36,
+    fontWeight: 'bold',
+  },
+  winPercentageLabel: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  statsBreakdown: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  statLabel: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  confidenceTiersContainer: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  confidenceTiersTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  confidenceTierItem: {
+    marginBottom: 16,
+  },
+  tierHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  tierBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  tierBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  tierRange: {
+    fontSize: 12,
+  },
+  tierStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  tierWinPercentage: {
+    marginRight: 16,
+  },
+  tierWinPercentageValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  tierWinPercentageLabel: {
+    fontSize: 12,
+  },
+  tierBreakdown: {
+    flex: 1,
+  },
+  tierBreakdownText: {
+    fontSize: 12,
+  },
+  winPercentageBar: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  winPercentageFill: {
+    height: '100%',
+  },
+  sportStatsContainer: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sportStatsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  sportStatItem: {
+    marginBottom: 16,
+  },
+  sportHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  sportName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sportWinPercentage: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sportBreakdown: {
+    marginBottom: 8,
+  },
+  sportBreakdownText: {
+    fontSize: 12,
+  },
+  lastUpdated: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+});
+
+export default StatsScreen;

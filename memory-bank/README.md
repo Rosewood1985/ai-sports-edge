@@ -1,0 +1,339 @@
+# Memory Bank for Firebase Atomic Architecture Migration
+
+This directory contains the memory bank for the Firebase atomic architecture migration project. It serves as a persistent storage of project context, decisions, patterns, and progress to maintain awareness throughout the migration process.
+
+## Purpose
+
+The memory bank addresses several challenges in long-running migration projects:
+
+1. **Context Preservation**: Maintains awareness of project state across multiple sessions
+2. **Progress Tracking**: Records which files have been migrated and which are pending
+3. **Pattern Documentation**: Captures established patterns for consistent implementation
+4. **Decision History**: Records important decisions and their rationales
+5. **Recovery Mechanism**: Provides a way to recover context after interruptions
+
+## Memory Bank Structure
+
+The memory bank consists of several key files:
+
+| File                     | Purpose                                              |
+| ------------------------ | ---------------------------------------------------- |
+| `activeContext.md`       | Current focus and migration status                   |
+| `systemPatterns.md`      | Firebase atomic architecture patterns and approaches |
+| `progress.md`            | Detailed migration progress tracking                 |
+| `decisionLog.md`         | Record of key decisions and their rationales         |
+| `productContext.md`      | Project requirements and implementation details      |
+| `.migration-status.json` | Machine-readable migration status                    |
+| `.last-update`           | Timestamp of the last memory bank update             |
+| `checkpoints/`           | Directory containing point-in-time snapshots         |
+
+## Automation Tools
+
+The memory bank is supported by automation tools to keep it updated:
+
+1. **Update Script**: `scripts/update-memory-bank.js`
+
+   - Scans the codebase for migration status
+   - Updates memory bank files with the latest information
+   - Creates checkpoints for recovery
+
+2. **Maintenance Script**: `scripts/maintain-context.sh`
+   - Provides a user-friendly interface to the update script
+   - Supports manual and automatic updates
+   - Handles context recovery
+
+## Usage
+
+### Manual Updates
+
+To manually update the memory bank:
+
+```bash
+./scripts/maintain-context.sh update
+```
+
+### Creating Checkpoints
+
+To create a checkpoint for later recovery:
+
+```bash
+./scripts/maintain-context.sh checkpoint
+```
+
+### Recovering Context
+
+If you experience context loss, recover using:
+
+```bash
+./scripts/maintain-context.sh recover
+```
+
+### Automatic Updates
+
+To set up automatic updates (every 30 minutes):
+
+```bash
+./scripts/maintain-context.sh auto
+```
+
+### Checking Status
+
+To check the current migration status:
+
+```bash
+./scripts/maintain-context.sh status
+```
+
+## Best Practices
+
+1. **Regular Updates**: Update the memory bank after completing each migration
+2. **Create Checkpoints**: Before starting major changes, create a checkpoint
+3. **Review Before Sessions**: Start each session by reviewing the memory bank
+4. **Document Decisions**: Record important decisions in the decision log
+5. **Update Patterns**: When discovering new patterns, add them to systemPatterns.md
+
+## Integration with Development Workflow
+
+The memory bank is designed to integrate seamlessly with your development workflow:
+
+1. **Pre-commit Hook**: Consider adding a pre-commit hook to update the memory bank
+2. **Session Start/End**: Update at the beginning and end of each development session
+3. **Pair Programming**: Use the memory bank to onboard pair programming partners
+4. **Code Reviews**: Reference memory bank files in code review comments
+
+## Maintenance
+
+The memory bank requires minimal maintenance:
+
+1. **Pruning Checkpoints**: Occasionally remove old checkpoints to save space
+2. **Updating Patterns**: Keep systemPatterns.md updated as patterns evolve
+3. **Refining Progress**: Periodically review and refine the progress tracking
+
+By maintaining this memory bank, we ensure consistent progress and knowledge preservation throughout the Firebase atomic architecture migration project.
+
+## Dotfiles Integration
+
+The memory bank is integrated with the dotfiles system to ensure context persistence across sessions and provide a seamless experience for developers.
+
+### Context Initialization
+
+On startup, the dotfiles system:
+
+1. Checks for and initializes the memory bank if it doesn't exist
+2. Restores the last known context from `activeContext.md` and `todo.json`
+3. Logs startup timestamp to `logs/roo-context-sync.log`
+
+### Context Synchronization
+
+The dotfiles system provides functions for:
+
+1. Syncing context between memory-bank files and source code tags
+2. Checking for ROO-\* markers in recently modified files
+3. Updating memory-bank files based on found markers
+
+### Context Logging
+
+The context logging system:
+
+1. Records context synchronization events
+2. Tracks when context is restored or updated
+3. Logs errors or warnings during synchronization
+
+### Usage Examples
+
+```bash
+# Update context with current state
+roo
+
+# Save context with a message
+save "Completed Firebase authentication implementation"
+
+# Check for ROO-* markers in recently modified files
+check-markers
+
+# Sync context between memory-bank and source code
+sync-context
+
+# View active context
+view-context
+
+# Check project health
+check-health
+
+# View context synchronization logs
+view-logs
+```
+
+For more details on the dotfiles integration, see `.dotfiles/README.md`.
+
+## Context Tagging System
+
+The memory bank is integrated with a context tagging system that allows tracking decisions, tasks, migrations, and cleanup status directly in source files. This system provides a single source of truth across memory-bank files, source code tags, and task queues.
+
+### Tag Types
+
+The following tag types are supported:
+
+| Tag                | Purpose                                         |
+| ------------------ | ----------------------------------------------- |
+| `// ROO-CONTEXT:`  | Decisions, requirements, or architectural notes |
+| `// ROO-TASK:`     | Next actions or reminders for Roo               |
+| `// ROO-MIGRATED:` | File completed or partially migrated            |
+| `// ROO-CLEANED:`  | Legacy code cleaned, file safe to archive       |
+
+### Memory Bank Integration
+
+Tags in source files are automatically logged to the appropriate memory bank files:
+
+- Context tags → `activeContext.md` and `decisionLog.md`
+- Task tags → `todo.json`
+- Migration tags → `progress.md`
+- Cleaning tags → `progress.md`
+
+### Usage
+
+The context tagging system is managed by the `scripts/tag-context.sh` script:
+
+```bash
+# Add a context tag to a file
+./scripts/tag-context.sh add-context src/components/Button.tsx "Using atomic design pattern"
+
+# Add a task tag to a file
+./scripts/tag-context.sh add-task src/services/authService.ts "Implement token refresh"
+
+# Mark a file as migrated
+./scripts/tag-context.sh mark-migrated src/config/firebase.ts "Migrated to atomic architecture"
+
+# Mark a file as cleaned
+./scripts/tag-context.sh mark-cleaned src/utils/deprecated.ts "Removed unused functions"
+
+# Scan for tags and update memory bank
+./scripts/tag-context.sh scan src/
+```
+
+### Best Practices
+
+1. **Use Consistently**: Add tags whenever making significant changes or decisions
+2. **Be Specific**: Include enough detail in tag messages to understand the context later
+3. **Scan Regularly**: Run the scan command periodically to update the memory bank
+4. **Review Tags**: Check the memory bank files to get an overview of project status
+5. **Clean Up**: Remove tags when they are no longer relevant
+
+By using this tagging system, we maintain a continuous context across the project, ensuring that decisions, tasks, and progress are tracked consistently.
+
+## Task Caching System
+
+The task caching system provides a structured approach to managing tasks in a JSON format, serving as a single source of truth for task management. It integrates with the context tagging system to ensure tasks are properly tracked and managed throughout the project lifecycle.
+
+### Task Structure
+
+Each task in the `todo.json` file has the following structure:
+
+```json
+{
+  "task": "Description of the task",
+  "status": "pending|in-progress|completed",
+  "timestamp": "ISO timestamp of last update",
+  "source": "File or location where task originated",
+  "priority": "low|medium|high"
+}
+```
+
+### Task Management Script
+
+The task management system is implemented in the `scripts/manage-tasks.sh` script, which provides the following commands:
+
+```bash
+# Add a new task
+./scripts/manage-tasks.sh add "Implement error handling" "src/services/authService.ts" "high"
+
+# Update a task field
+./scripts/manage-tasks.sh update 1 status "in-progress"
+
+# Mark a task as completed
+./scripts/manage-tasks.sh complete 2 "Fixed in PR #123"
+
+# List all tasks
+./scripts/manage-tasks.sh list
+
+# List tasks with a specific status
+./scripts/manage-tasks.sh list pending
+./scripts/manage-tasks.sh list in-progress
+./scripts/manage-tasks.sh list completed
+
+# Search for tasks using fuzzy matching
+./scripts/manage-tasks.sh search "error handling"
+```
+
+### Integration with Context Tagging
+
+The task caching system is integrated with the context tagging system:
+
+1. When a `// ROO-TASK:` tag is added to a file, it automatically creates a task in `todo.json`
+2. The task management script uses fuzzy matching to avoid duplicate entries
+3. Tasks with >70% text similarity are considered duplicates and updated instead of creating new entries
+
+### Bash Aliases and Functions
+
+For convenience, the following bash aliases and functions are available in the `.dotfiles` directory:
+
+#### Aliases
+
+```bash
+alias tasks="scripts/manage-tasks.sh list"
+alias task-add="scripts/manage-tasks.sh add"
+alias task-update="scripts/manage-tasks.sh update"
+alias task-complete="scripts/manage-tasks.sh complete"
+alias task-search="scripts/manage-tasks.sh search"
+alias task-pending="scripts/manage-tasks.sh list pending"
+alias task-progress="scripts/manage-tasks.sh list in-progress"
+alias task-done="scripts/manage-tasks.sh list completed"
+```
+
+#### Functions
+
+```bash
+# Add a task with priority
+task "Implement error handling" "src/components/Button.tsx" "high"
+
+# Mark a task as in-progress
+task-start 2
+
+# Extract tasks from git diff
+extract-tasks-from-diff HEAD main
+
+# Scan current directory for TODO comments
+scan-todos src/
+
+# Generate a task report in Markdown format
+task-report task-report.md
+
+# Sync tasks with memory bank files
+sync-tasks-with-memory-bank
+
+# Update memory bank with task information
+update-memory-bank
+```
+
+### Memory Bank Integration
+
+The task caching system is designed to integrate with the existing memory bank files:
+
+1. **activeContext.md**: Contains sections for pending and in-progress tasks
+2. **progress.md**: Records completed tasks
+3. **decisionLog.md**: Tracks task status changes and decisions
+4. **todo.json**: Serves as the single source of truth for all tasks
+
+The `sync-tasks-with-memory-bank` function ensures that all memory bank files are kept in sync with the task cache.
+
+### Best Practices
+
+1. **Use the Script**: Always use the `manage-tasks.sh` script or provided aliases/functions to manage tasks
+2. **Prioritize Tasks**: Assign appropriate priority levels to tasks
+3. **Update Status**: Keep task status up-to-date as work progresses
+4. **Sync Regularly**: Run `sync-tasks-with-memory-bank` periodically to keep memory bank files in sync
+5. **Deduplicate**: Use the fuzzy matching feature to avoid duplicate tasks
+6. **Document Completion**: Add meaningful completion messages when marking tasks as completed
+
+By using this task caching system, we maintain a unified source of truth across all memory-bank files, source code tags, and task queues, ensuring consistent task tracking and management throughout the project.
+Last updated: 2025-05-13 20:43:32

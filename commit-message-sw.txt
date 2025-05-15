@@ -1,0 +1,6 @@
+Disable service worker for improved performance
+
+- Commented out service worker registration code in register-service-worker.js
+- Disabled service worker implementation in service-worker.js
+- Kept files to prevent 404 errors from existing clients
+- Improves performance by removing unnecessary caching and background processing

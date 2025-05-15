@@ -1,0 +1,143 @@
+// Firebase Authentication Configuration
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import "firebase/app";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDFps9-V4XXXXXXXXXXXXXXXXXXXXXXXXXX",
+  authDomain: "ai-sports-edge.firebaseapp.com",
+  projectId: "ai-sports-edge",
+  storageBucket: "ai-sports-edge.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef1234567890",
+  measurementId: "G-XXXXXXXXXX"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Create a user with email and password
+export const createUser = async (email, password) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return { user: userCredential.user, error: null };
+  } catch (error) {
+    console.error("Error creating user:", error.code, error.message);
+    return { user: null, error: {
+      code: error.code,
+      message: getErrorMessage(error.code)
+    }};
+  }
+};
+
+// Sign in with email and password
+export const signIn = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return { user: userCredential.user, error: null };
+  } catch (error) {
+    console.error("Error signing in:", error.code, error.message);
+    return { user: null, error: {
+      code: error.code,
+      message: getErrorMessage(error.code)
+    }};
+  }
+};
+
+// Sign in with Google
+export const signInWithGoogle = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    return { user: userCredential.user, error: null };
+  } catch (error) {
+    console.error("Error signing in with Google:", error.code, error.message);
+    return { user: null, error: {
+      code: error.code,
+      message: getErrorMessage(error.code)
+    }};
+  }
+};
+
+// Sign out
+export const logOut = async () => {
+  try {
+    await signOut(auth);
+    return { error: null };
+  } catch (error) {
+    console.error("Error signing out:", error.code, error.message);
+    return { error: {
+      code: error.code,
+      message: getErrorMessage(error.code)
+    }};
+  }
+};
+
+// Send password reset email
+export const resetPassword = async (email) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { error: null };
+  } catch (error) {
+    console.error("Error sending password reset email:", error.code, error.message);
+    return { error: {
+      code: error.code,
+      message: getErrorMessage(error.code)
+    }};
+  }
+};
+
+// Get current user
+export const getCurrentUser = () => {
+  return auth.currentUser;
+};
+
+// Listen for auth state changes
+export const onAuthChange = (callback) => {
+  return onAuthStateChanged(auth, callback);
+};
+
+// Get user-friendly error message
+const getErrorMessage = (errorCode) => {
+  switch (errorCode) {
+    case 'auth/email-already-in-use':
+      return 'This email is already in use. Please try another email or sign in.';
+    case 'auth/invalid-email':
+      return 'Invalid email address. Please check your email and try again.';
+    case 'auth/weak-password':
+      return 'Password is too weak. Please use a stronger password.';
+    case 'auth/user-not-found':
+      return 'No account found with this email. Please check your email or sign up.';
+    case 'auth/wrong-password':
+      return 'Incorrect password. Please try again or reset your password.';
+    case 'auth/too-many-requests':
+      return 'Too many unsuccessful login attempts. Please try again later.';
+    case 'auth/network-request-failed':
+      return 'Network error. Please check your internet connection and try again.';
+    case 'auth/popup-closed-by-user':
+      return 'Sign in popup was closed before completing the sign in process.';
+    case 'auth/cancelled-popup-request':
+      return 'The sign in popup was cancelled.';
+    case 'auth/popup-blocked':
+      return 'Sign in popup was blocked by your browser. Please allow popups for this site.';
+    case 'auth/operation-not-allowed':
+      return 'This operation is not allowed. Please contact support.';
+    case 'auth/api-key-not-valid':
+      return 'API key is not valid. Please contact support.';
+    default:
+      return 'An error occurred. Please try again later.';
+  }
+};
+
+export { auth };

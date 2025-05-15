@@ -1,0 +1,546 @@
+# Firebase Optimization Strategies for AI Sports Edge
+
+## Overview
+
+This document outlines strategies to optimize Firebase usage in the AI Sports Edge app, with a focus on reducing read operations for frequently accessed features. These optimizations will help control costs while maintaining performance.
+
+## Key Optimization Strategies
+
+1. **Data Denormalization**
+2. **Composite Documents**
+3. **Client-Side Caching**
+4. **Batch Operations**
+5. **Query Optimization**
+6. **Offline Support**
+
+## Optimized Firebase Schema
+
+### 1. User Document Optimization
+
+**Current Approach:**
+```typescript
+// Multiple collections with separate documents
+interface User { id: string, name: string, email: string, ... }
+interface UserPreferences { userId: string, theme: {...}, ... }
+interface UserStreaks { userId: string, currentStreak: number, ... }
+```
+
+**Optimized Approach:**
+```typescript
+// Composite user document with embedded frequently accessed data
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  // Embed frequently accessed data directly in user document
+  preferences: {
+    theme: {
+      preset: 'light' | 'dark' | 'team_colors';
+      teamId?: string;
+    };
+    favoriteTeamIds: string[]; // Just IDs, not full objects
+  };
+  streaks: {
+    current: number;
+    longest: number;
+    lastActiveDate: Timestamp;
+    availableRewards: number;
+  };
+  // Reference to subcollections for less frequently accessed data
+  // These won't be fetched unless specifically requested
+}
+```
+
+### 2. AI Picks Optimization
+
+**Current Approach:**
+```typescript
+// Separate collections for picks and user interactions
+interface AiPick { id: string, pickDate: Timestamp, sport: string, ... }
+interface UserPick { userId: string, pickId: string, ... }
+```
+
+**Optimized Approach:**
+```typescript
+// Main collection for current picks (limited to active picks)
+interface AiPick {
+  id: string;
+  pickDate: Timestamp;
+  sport: string;
+  league: string;
+  gameId: string;
+  teamId: string;
+  teamName: string;
+  confidence: number;
+  result: 'win' | 'loss' | 'push' | 'pending';
+  followers: number;
+  insightText: string;
+  odds: number;
+  isPickOfDay: boolean;
+}
+
+// User document has embedded followed picks
+interface User {
+  // ... other user fields
+  followedPicks: {
+    [pickId: string]: {
+      followedAt: Timestamp;
+      notificationEnabled: boolean;
+    }
+  };
+}
+
+// Historical picks moved to a separate collection with less frequent access
+interface HistoricalAiPick {
+  // Same fields as AiPick
+  // Accessed only for stats and history views
+}
+```
+
+### 3. Stats Aggregation
+
+**Current Approach:**
+```typescript
+// Daily stats records
+interface AiStats {
+  date: Timestamp;
+  sport: string;
+  league: string;
+  confidenceBreakdown: { ... };
+}
+```
+
+**Optimized Approach:**
+```typescript
+// Pre-aggregated stats at different time intervals
+interface AiStatsAggregated {
+  id: string; // e.g., "weekly_2025_16" or "monthly_2025_04"
+  period: 'daily' | 'weekly' | 'monthly';
+  startDate: Timestamp;
+  endDate: Timestamp;
+  sports: {
+    [sportId: string]: {
+      totalPicks: number;
+      wins: number;
+      losses: number;
+      pushes: number;
+      winRate: number;
+      confidenceBreakdown: {
+        high: { totalPicks: number, wins: number, winRate: number };
+        medium: { totalPicks: number, wins: number, winRate: number };
+        low: { totalPicks: number, wins: number, winRate: number };
+      };
+    }
+  };
+}
+```
+
+## Caching Strategy
+
+### 1. Local Storage Caching
+
+Implement a robust caching layer using AsyncStorage/localStorage:
+
+```typescript
+interface CacheConfig {
+  key: string;
+  ttl: number; // Time to live in milliseconds
+  version: string; // For cache invalidation on app updates
+}
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  version: string;
+}
+
+class CacheService {
+  async get<T>(config: CacheConfig): Promise<T | null> {
+    try {
+      const cached = await AsyncStorage.getItem(config.key);
+      if (!cached) return null;
+      
+      const entry: CacheEntry<T> = JSON.parse(cached);
+      
+      // Check if cache is expired or version mismatch
+      if (
+        Date.now() - entry.timestamp > config.ttl ||
+        entry.version !== config.version
+      ) {
+        await AsyncStorage.removeItem(config.key);
+        return null;
+      }
+      
+      return entry.data;
+    } catch (error) {
+      console.error('Cache read error:', error);
+      return null;
+    }
+  }
+  
+  async set<T>(config: CacheConfig, data: T): Promise<void> {
+    try {
+      const entry: CacheEntry<T> = {
+        data,
+        timestamp: Date.now(),
+        version: config.version
+      };
+      
+      await AsyncStorage.setItem(config.key, JSON.stringify(entry));
+    } catch (error) {
+      console.error('Cache write error:', error);
+    }
+  }
+}
+```
+
+### 2. Feature-Specific Caching
+
+```typescript
+// AI Picks caching
+const CACHE_KEYS = {
+  PICK_OF_DAY: 'ai_pick_of_day',
+  USER_FOLLOWED_PICKS: 'user_followed_picks',
+  TEAM_DATA: 'team_data',
+  STATS_WEEKLY: 'stats_weekly',
+  STATS_MONTHLY: 'stats_monthly'
+};
+
+const CACHE_TTL = {
+  PICK_OF_DAY: 15 * 60 * 1000, // 15 minutes
+  USER_FOLLOWED_PICKS: 5 * 60 * 1000, // 5 minutes
+  TEAM_DATA: 24 * 60 * 60 * 1000, // 24 hours
+  STATS: 60 * 60 * 1000 // 1 hour
+};
+```
+
+## Read Reduction Strategies
+
+### 1. Composite Queries
+
+Use composite queries to fetch multiple related pieces of data in a single read:
+
+```typescript
+// Instead of separate queries for user data and preferences
+const getUserWithPreferences = async (userId: string) => {
+  // Single read operation
+  const userDoc = await firestore.collection('users').doc(userId).get();
+  return userDoc.data();
+};
+```
+
+### 2. Pagination for Large Collections
+
+```typescript
+const getAiPicksHistory = async (
+  userId: string,
+  lastVisible: any = null,
+  limit: number = 10
+) => {
+  let query = firestore
+    .collection('historicalAiPicks')
+    .where('sport', 'in', userPreferredSports)
+    .orderBy('pickDate', 'desc')
+    .limit(limit);
+    
+  if (lastVisible) {
+    query = query.startAfter(lastVisible);
+  }
+  
+  const snapshot = await query.get();
+  return {
+    picks: snapshot.docs.map(doc => doc.data()),
+    lastVisible: snapshot.docs[snapshot.docs.length - 1]
+  };
+};
+```
+
+### 3. Batch Loading Critical Data on App Start
+
+```typescript
+const loadInitialAppData = async (userId: string) => {
+  // Check cache first
+  const cachedData = await cacheService.get({
+    key: 'initial_app_data',
+    ttl: 5 * 60 * 1000, // 5 minutes
+    version: APP_VERSION
+  });
+  
+  if (cachedData) {
+    return cachedData;
+  }
+  
+  // If not cached, fetch in parallel
+  const [
+    userData,
+    pickOfDay,
+    topPicks
+  ] = await Promise.all([
+    firestore.collection('users').doc(userId).get(),
+    firestore.collection('aiPicks')
+      .where('isPickOfDay', '==', true)
+      .where('pickDate', '>=', startOfToday())
+      .limit(1)
+      .get(),
+    firestore.collection('aiPicks')
+      .where('confidence', '>=', 80)
+      .where('pickDate', '>=', startOfToday())
+      .orderBy('confidence', 'desc')
+      .limit(3)
+      .get()
+  ]);
+  
+  const result = {
+    user: userData.data(),
+    pickOfDay: pickOfDay.docs[0]?.data() || null,
+    topPicks: topPicks.docs.map(doc => doc.data())
+  };
+  
+  // Cache the result
+  await cacheService.set({
+    key: 'initial_app_data',
+    ttl: 5 * 60 * 1000,
+    version: APP_VERSION
+  }, result);
+  
+  return result;
+};
+```
+
+## Offline Support
+
+Implement offline support to reduce the need for frequent Firebase reads:
+
+```typescript
+// Configure Firebase for offline persistence
+firebase.firestore().enablePersistence({
+  synchronizeTabs: true
+})
+.catch((err) => {
+  if (err.code === 'failed-precondition') {
+    // Multiple tabs open, persistence can only be enabled in one tab
+    console.warn('Persistence failed: Multiple tabs open');
+  } else if (err.code === 'unimplemented') {
+    // The current browser does not support persistence
+    console.warn('Persistence not supported in this environment');
+  }
+});
+
+// Implement offline indicator
+const useNetworkStatus = () => {
+  const [isOnline, setIsOnline] = useState(true);
+  
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsOnline(state.isConnected && state.isInternetReachable);
+    });
+    
+    return () => unsubscribe();
+  }, []);
+  
+  return isOnline;
+};
+```
+
+## Optimized Data Access Patterns
+
+### 1. AI Pick of the Day
+
+**Before:**
+```typescript
+// Separate reads for pick data and user interaction
+const getPickOfTheDay = async () => {
+  const pickSnapshot = await firestore
+    .collection('aiPicks')
+    .where('isPickOfDay', '==', true)
+    .where('pickDate', '>=', startOfToday())
+    .limit(1)
+    .get();
+    
+  const pick = pickSnapshot.docs[0]?.data();
+  
+  // Additional read to check if user follows this pick
+  const userPickSnapshot = await firestore
+    .collection('userPicks')
+    .where('userId', '==', currentUserId)
+    .where('pickId', '==', pick.id)
+    .get();
+    
+  return {
+    ...pick,
+    isFollowed: !userPickSnapshot.empty
+  };
+};
+```
+
+**After:**
+```typescript
+// Single read with cached data
+const getPickOfTheDay = async () => {
+  // Check cache first
+  const cached = await cacheService.get({
+    key: CACHE_KEYS.PICK_OF_DAY,
+    ttl: CACHE_TTL.PICK_OF_DAY,
+    version: APP_VERSION
+  });
+  
+  if (cached) return cached;
+  
+  // If not cached, fetch from Firestore
+  const pickSnapshot = await firestore
+    .collection('aiPicks')
+    .where('isPickOfDay', '==', true)
+    .where('pickDate', '>=', startOfToday())
+    .limit(1)
+    .get();
+    
+  const pick = pickSnapshot.docs[0]?.data();
+  
+  // Check user document for followed picks (already loaded at app start)
+  const user = await getUserData(); // From app context or cached
+  const isFollowed = user.followedPicks && user.followedPicks[pick.id] !== undefined;
+  
+  const result = {
+    ...pick,
+    isFollowed
+  };
+  
+  // Cache the result
+  await cacheService.set({
+    key: CACHE_KEYS.PICK_OF_DAY,
+    ttl: CACHE_TTL.PICK_OF_DAY,
+    version: APP_VERSION
+  }, result);
+  
+  return result;
+};
+```
+
+### 2. User Streaks
+
+**Before:**
+```typescript
+// Separate document for streaks
+const updateUserStreak = async (userId) => {
+  const streakDoc = await firestore
+    .collection('userStreaks')
+    .doc(userId)
+    .get();
+    
+  const streakData = streakDoc.data() || { currentStreak: 0 };
+  
+  // Update streak logic
+  const newStreak = calculateNewStreak(streakData);
+  
+  await firestore
+    .collection('userStreaks')
+    .doc(userId)
+    .set(newStreak);
+};
+```
+
+**After:**
+```typescript
+// Embedded in user document
+const updateUserStreak = async (userId) => {
+  const userDoc = await firestore
+    .collection('users')
+    .doc(userId)
+    .get();
+    
+  const userData = userDoc.data();
+  const streakData = userData.streaks || { current: 0 };
+  
+  // Update streak logic
+  const newStreakData = calculateNewStreak(streakData);
+  
+  // Update only the streaks field
+  await firestore
+    .collection('users')
+    .doc(userId)
+    .update({
+      'streaks': newStreakData
+    });
+    
+  // Update local cache
+  userData.streaks = newStreakData;
+  await cacheService.set({
+    key: `user_${userId}`,
+    ttl: 30 * 60 * 1000, // 30 minutes
+    version: APP_VERSION
+  }, userData);
+};
+```
+
+## Implementation Recommendations
+
+1. **Implement a Robust Caching Layer**
+   - Use AsyncStorage/localStorage with TTL and versioning
+   - Cache frequently accessed data like user profile, current picks
+   - Implement cache invalidation strategies
+
+2. **Use Firebase Offline Persistence**
+   - Enable offline persistence for Firestore
+   - Implement optimistic UI updates
+   - Show offline indicators when appropriate
+
+3. **Batch Critical Reads on App Start**
+   - Load user data, preferences, and today's picks in parallel
+   - Store in app context for global access
+   - Refresh periodically in the background
+
+4. **Denormalize Frequently Accessed Data**
+   - Embed commonly accessed fields in parent documents
+   - Use subcollections only for large or rarely accessed data
+   - Consider data size limits (1MB per document)
+
+5. **Implement Data Synchronization Service**
+   - Create a service to manage data freshness
+   - Periodically sync local cache with Firestore
+   - Use timestamps to track last sync time
+
+## Cost-Benefit Analysis
+
+| Feature | Before (Reads/Day) | After (Reads/Day) | Savings |
+|---------|-------------------|------------------|---------|
+| User Profile | 5-10 per user | 1-2 per user | 80% |
+| AI Pick of Day | 10-15 per user | 2-3 per user | 80% |
+| Streaks | 5-10 per user | 0-1 per user | 90% |
+| Stats (Premium) | 20-30 per premium user | 5-8 per premium user | 75% |
+| Overall | 40-65 per user | 8-14 per user | ~80% |
+
+## Monitoring Strategy
+
+Implement Firebase usage monitoring to track read/write operations:
+
+```typescript
+// Track Firestore operations
+const trackFirestoreOperation = (
+  operation: 'read' | 'write' | 'delete',
+  collection: string
+) => {
+  analytics.logEvent('firestore_operation', {
+    operation,
+    collection,
+    timestamp: Date.now()
+  });
+};
+
+// Wrap Firestore methods to track usage
+const trackedGet = async (ref) => {
+  const result = await ref.get();
+  trackFirestoreOperation('read', ref.parent.id);
+  return result;
+};
+```
+
+## Conclusion
+
+By implementing these optimization strategies, we can significantly reduce Firebase read operations while maintaining app performance and user experience. The key approaches are:
+
+1. Data denormalization to reduce the number of reads
+2. Robust client-side caching to avoid unnecessary reads
+3. Batch loading of critical data
+4. Offline support to reduce dependency on real-time data
+5. Monitoring to identify further optimization opportunities
+Last updated: 2025-05-13 18:23:48

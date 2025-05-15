@@ -1,0 +1,51 @@
+// ✅ MIGRATED: Firebase Atomic Architecture
+// Import from the atomic architecture
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import '../atomic';
+
+// Firebase SDK types (for TypeScript)
+import type { User } from 'firebase/auth';
+import type { Timestamp } from 'firebase/firestore';
+import type { FirebaseError } from 'firebase/app';
+
+/**
+ * This file is maintained for backward compatibility.
+ * It re-exports the atomic firebaseService with the same interface.
+ * New code should import directly from '../atomic'.
+ */
+
+// Re-export the atomic firebaseService
+export const firebaseService = {
+  // Core Firebase instances
+  auth: atomicFirebaseService.auth.instance,
+  firestore: atomicFirebaseService.firestore.instance,
+  storage: atomicFirebaseService.storage.instance,
+  functions: atomicFirebaseService.functions.instance,
+  analytics: atomicFirebaseService.analytics.instance,
+  
+  // Auth methods
+  signIn: atomicFirebaseService.auth.signIn,
+  signUp: atomicFirebaseService.auth.signUp,
+  signOut: atomicFirebaseService.auth.signOut,
+  resetPassword: atomicFirebaseService.auth.resetPassword,
+  onAuthStateChange: atomicFirebaseService.auth.onAuthStateChange,
+  
+  // Firestore methods
+  getDocument: atomicFirebaseService.firestore.getDocument,
+  setDocument: atomicFirebaseService.firestore.setDocument,
+  updateDocument: atomicFirebaseService.firestore.updateDocument,
+  deleteDocument: atomicFirebaseService.firestore.deleteDocument,
+  
+  // Storage methods
+  uploadFile: atomicFirebaseService.storage.uploadFile,
+  deleteFile: atomicFirebaseService.storage.deleteFile,
+  
+  // Functions methods
+  callFunction: atomicFirebaseService.functions.callFunction,
+  
+  // Analytics methods
+  logAnalyticsEvent: atomicFirebaseService.analytics.logEvent,
+  setUserAnalyticsProperties: atomicFirebaseService.analytics.setUserProperties
+};
+
+export default firebaseService;

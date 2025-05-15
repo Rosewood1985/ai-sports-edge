@@ -1,0 +1,17 @@
+feat: Add simple analysis script for compatibility
+
+Adds a simplified version of the analysis tools script that doesn't rely on external dependencies. This script:
+
+1. Creates the necessary directory structure for the analysis tools
+2. Provides information about the available analysis tools
+3. Lists the documentation for the analysis tools
+4. Checks if the GitHub Actions workflow exists
+
+This script is useful for:
+- Quickly checking the status of the analysis tools
+- Setting up the required directory structure
+- Working around dependency issues with Node.js v22+
+- Providing a lightweight alternative to the full analysis tools
+
+The full analysis tools (roo-duplicates.js, roo-history-analyze.js, roo-complete-analysis.js) 
+are designed to run in the CI/CD pipeline with Node.js v18 as specified in the GitHub Actions workflow.

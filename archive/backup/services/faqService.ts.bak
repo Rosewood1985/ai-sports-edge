@@ -1,0 +1,186 @@
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  Timestamp,
+  orderBy
+} from 'firebase/firestore';
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import '../config/firebase';
+
+// Collection references
+const QUESTIONS_COLLECTION = 'faq_questions';
+
+export interface FAQQuestion {
+  id?: string;
+  question: string;
+  answer?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  userEmail?: string;
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+/**
+ * Submit a new question to Firestore
+ * @param question The question text
+ * @param userEmail Optional user email
+ * @returns Promise with the new question ID
+ */
+export const submitQuestion = async (
+  question: string, 
+  userEmail?: string
+): Promise<string> => {
+  try {
+    const questionData: FAQQuestion = {
+      question,
+      userEmail,
+      status: 'pending',
+      createdAt: Timestamp.now()
+    };
+
+    const docRef = await addDoc(
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, QUESTIONS_COLLECTION), 
+      questionData
+    );
+    
+    return docRef.id;
+  } catch (error) {
+    console.error('Error submitting question:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all approved FAQ questions
+ * @returns Promise with array of approved questions
+ */
+export const getApprovedQuestions = async (): Promise<FAQQuestion[]> => {
+  try {
+    const q = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.query(
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, QUESTIONS_COLLECTION),
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('status', '==', 'approved'),
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as FAQQuestion));
+  } catch (error) {
+    console.error('Error getting approved questions:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all pending questions for moderation
+ * @returns Promise with array of pending questions
+ */
+export const getPendingQuestions = async (): Promise<FAQQuestion[]> => {
+  try {
+    const q = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.query(
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, QUESTIONS_COLLECTION),
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('status', '==', 'pending'),
+      firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as FAQQuestion));
+  } catch (error) {
+    console.error('Error getting pending questions:', error);
+    throw error;
+  }
+};
+
+/**
+ * Approve a question with an answer
+ * @param questionId The question ID
+ * @param answer The answer text
+ * @returns Promise that resolves when the operation is complete
+ */
+export const approveQuestion = async (
+  questionId: string, 
+  answer: string
+): Promise<void> => {
+  try {
+    const questionRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, QUESTIONS_COLLECTION, questionId);
+    
+    await updateDoc(questionRef, {
+      answer,
+      status: 'approved',
+      updatedAt: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error approving question:', error);
+    throw error;
+  }
+};
+
+/**
+ * Reject a question
+ * @param questionId The question ID
+ * @returns Promise that resolves when the operation is complete
+ */
+export const rejectQuestion = async (questionId: string): Promise<void> => {
+  try {
+    const questionRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, QUESTIONS_COLLECTION, questionId);
+    
+    await updateDoc(questionRef, {
+      status: 'rejected',
+      updatedAt: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error rejecting question:', error);
+    throw error;
+  }
+};
+
+/**
+ * Edit a question before approval
+ * @param questionId The question ID
+ * @param updatedQuestion The updated question text
+ * @returns Promise that resolves when the operation is complete
+ */
+export const editQuestion = async (
+  questionId: string, 
+  updatedQuestion: string
+): Promise<void> => {
+  try {
+    const questionRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, QUESTIONS_COLLECTION, questionId);
+    
+    await updateDoc(questionRef, {
+      question: updatedQuestion,
+      updatedAt: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error editing question:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a question
+ * @param questionId The question ID
+ * @returns Promise that resolves when the operation is complete
+ */
+export const deleteQuestion = async (questionId: string): Promise<void> => {
+  try {
+    const questionRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, QUESTIONS_COLLECTION, questionId);
+    await deleteDoc(questionRef);
+  } catch (error) {
+    console.error('Error deleting question:', error);
+    throw error;
+  }
+};

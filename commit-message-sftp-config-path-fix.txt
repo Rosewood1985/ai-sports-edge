@@ -1,0 +1,8 @@
+fix: Correct SFTP context path to fix config loading
+
+- Changed "context": "./build" to "context": "build" in both SFTP config files
+- Removed leading "./" which was causing the extension to look for config in build directory
+- Maintains the intended functionality of uploading from the build directory
+- Fixes "Config Not Found" error in VS Code SFTP extension
+
+This fix resolves the path resolution issue where the SFTP extension was incorrectly looking for its configuration in the build directory instead of the .vscode directory.

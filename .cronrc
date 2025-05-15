@@ -1,0 +1,20 @@
+# .cronrc — Declarative Recurring Task Definitions for Roo Code
+# Format: <interval> <label> <command>
+# Intervals: 3m, 5m, 10m, 1h, etc.
+
+# ROO-OPTIMIZED: Based on scheduler integrity verification
+3m save-context ./scripts/save-context.sh "[AUTO] Recurring context save"
+5m sync-tasks ./scripts/sync-tasks-with-memory-bank.sh
+10m tag-scan ./scripts/tag-context.sh --auto
+12m consolidate ./scripts/background-consolidate.sh
+1d narrative-scan ./scripts/tag-narrative-context.sh
+3d system-health ./scripts/system-health-check.sh
+15m update-progress ./scripts/clean-and-sort-progress.sh
+20m backfill-history ./scripts/update-app-history.sh
+30m log-summary ./scripts/generate-summary-log.sh
+35m rolling-log ./scripts/update-task-log.sh
+1h checkpoint ./scripts/update-memory-bank.js --checkpoint
+12h weekly-review ./scripts/run-weekly-checks.sh
+24h security-audit ./scripts/check-security-policies.sh
+168h full-sweep ./scripts/full-sweep.sh# Memory Bank Consolidation - Check for new files every 5 minutes
+*/5 * * * * /workspaces/ai-sports-edge/scripts/watch-memory-bank.sh

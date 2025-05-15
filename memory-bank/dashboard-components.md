@@ -1,0 +1,105 @@
+# Dashboard Components
+
+This document catalogs all dashboard-related components found in the AI Sports Edge codebase.
+
+## Overview
+
+As part of the system-wide search and reconciliation effort, this document serves as a comprehensive inventory of all dashboard, admin, user, and account-related components. This will help establish a single source of truth for dashboard development.
+
+## Admin Dashboard Components
+
+### Templates
+
+| Component   | File Path                            | Status | Description                          |
+| ----------- | ------------------------------------ | ------ | ------------------------------------ |
+| AdminLayout | src/atomic/templates/AdminLayout.tsx | Active | Main layout template for admin pages |
+
+### Organisms
+
+| Component      | File Path                                     | Status | Description                 |
+| -------------- | --------------------------------------------- | ------ | --------------------------- |
+| AdminDashboard | src/atomic/organisms/admin/AdminDashboard.tsx | Active | Main dashboard component    |
+| AdminHeader    | src/atomic/organisms/admin/AdminHeader.tsx    | Active | Header for admin dashboard  |
+| AdminSidebar   | src/atomic/organisms/admin/AdminSidebar.tsx   | Active | Sidebar for admin dashboard |
+
+### Molecules
+
+| Component    | File Path                                   | Status | Description                 |
+| ------------ | ------------------------------------------- | ------ | --------------------------- |
+| MetricsPanel | src/atomic/molecules/admin/MetricsPanel.tsx | Active | Dashboard metrics component |
+
+### Atoms
+
+| Component       | File Path                                  | Status | Description                |
+| --------------- | ------------------------------------------ | ------ | -------------------------- |
+| MetricCard      | src/atomic/atoms/admin/MetricCard.tsx      | Active | Individual metric display  |
+| StatusIndicator | src/atomic/atoms/admin/StatusIndicator.tsx | Active | Status indicator component |
+
+## User Dashboard Components
+
+### User Account Management
+
+| Component              | File Path                                | Status | Description                     |
+| ---------------------- | ---------------------------------------- | ------ | ------------------------------- |
+| UserProfile            | services/userPreferencesService.ts       | Active | User profile management service |
+| UserPreferences        | services/userPreferencesService.js       | Legacy | Legacy user preferences service |
+| UserSportsPreferences  | services/userSportsPreferencesService.ts | Active | User sports preferences service |
+| PersonalizationService | services/personalizationService.ts       | Active | User personalization service    |
+
+### Authentication Components
+
+| Component   | File Path                | Status | Description                     |
+| ----------- | ------------------------ | ------ | ------------------------------- |
+| AuthContext | contexts/AuthContext.tsx | Active | Authentication context provider |
+| UserContext | contexts/UserContext.tsx | Active | User context provider           |
+
+## Analytics Dashboard Components
+
+| Component                 | File Path                        | Status | Description              |
+| ------------------------- | -------------------------------- | ------ | ------------------------ |
+| AnalyticsService          | services/analyticsService.ts     | Active | Analytics service        |
+| AnalyticsService (Legacy) | services/analyticsService.js     | Legacy | Legacy analytics service |
+| VelocityChart             | src/components/VelocityChart.jsx | Active | Velocity chart component |
+
+## Integration Points
+
+| Service                     | File Path                               | Status | Description                     |
+| --------------------------- | --------------------------------------- | ------ | ------------------------------- |
+| FirebaseSubscriptionService | services/firebaseSubscriptionService.ts | Active | Subscription management service |
+| GroupSubscriptionService    | services/groupSubscriptionService.ts    | Active | Group subscription management   |
+| StripePayments              | functions/stripePayments.js             | Active | Stripe payment integration      |
+
+## Documentation
+
+| Document                 | File Path                           | Status | Description                                |
+| ------------------------ | ----------------------------------- | ------ | ------------------------------------------ |
+| Admin Dashboard Baseline | reports/admin-dashboard-baseline.md | Active | Baseline documentation for admin dashboard |
+
+## Recommendations
+
+1. **Consolidate Legacy Services**:
+
+   - Migrate `userPreferencesService.js` to TypeScript version
+   - Migrate `analyticsService.js` to TypeScript version
+
+2. **Standardize Component Structure**:
+
+   - Ensure all dashboard components follow atomic design principles
+   - Move any remaining dashboard components into the atomic structure
+
+3. **Documentation Updates**:
+
+   - Create comprehensive documentation for each dashboard type
+   - Document integration points between dashboards and services
+
+4. **Testing Strategy**:
+   - Implement unit tests for all dashboard components
+   - Create integration tests for dashboard workflows
+
+## Next Steps
+
+1. Review this inventory with the development team
+2. Prioritize consolidation tasks
+3. Update todo.json with new dashboard-related tasks
+4. Create a roadmap for dashboard feature development
+   Last updated: 2025-05-13 20:43:32

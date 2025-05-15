@@ -1,0 +1,16 @@
+import { auth, firestore } from '../config/firebase';
+
+/**
+ * firebase - Service for interacting with external APIs or Firebase
+ * 
+ * MEMORY BANK: Created after verifying no similar services exist
+ */
+
+/**
+ * Main service function
+ */
+export const firebaseService = {
+  // Service methods here
+};
+
+export default firebaseService;

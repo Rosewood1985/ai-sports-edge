@@ -1,0 +1,1 @@
+*/3 * * * * /bin/bash /workspaces/ai-sports-edge/scripts/save-context.sh >> /workspaces/ai-sports-edge/logs/autosave.log 2>&1

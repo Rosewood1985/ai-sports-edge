@@ -1,0 +1,9 @@
+ci: Add GitHub Actions workflow for automated deployment
+
+- Created deploy-to-godaddy.yml workflow that:
+  - Triggers on push to main branch
+  - Uploads build folder via SFTP to GoDaddy server
+  - Runs server-side fix script to set permissions and move files
+  - Performs a basic health check on the deployed site
+
+This workflow automates the entire deployment process, eliminating manual steps and ensuring consistent deployments. It securely stores credentials as GitHub secrets and provides immediate feedback on deployment status.

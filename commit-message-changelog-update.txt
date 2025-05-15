@@ -1,0 +1,12 @@
+docs: update CHANGELOG with deployment health check
+
+Add deployment health check script details to CHANGELOG.md:
+- Automated validation of deployed site
+- Frontend issue detection
+- Screenshot capture
+- Health report generation
+
+This update ensures the deployment log accurately reflects all
+tools and scripts available for the project.
+
+Tag: changelog-update-v1.0

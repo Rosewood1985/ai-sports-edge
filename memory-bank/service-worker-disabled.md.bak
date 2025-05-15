@@ -1,0 +1,57 @@
+# Service Worker Disabled for Performance
+
+**Date:** April 22, 2025
+**Task:** Disable service worker for improved performance
+
+## Problem
+
+The service worker was causing performance issues and wasn't being actively used for offline caching or push notifications. Service workers can cause:
+
+- Unnecessary caching of resources
+- Background processing that consumes battery
+- Stale content being served from cache
+- Potential conflicts with Firebase authentication
+- Increased complexity in debugging
+
+## Solution
+
+1. **Modified register-service-worker.js**
+   - Commented out the service worker registration code
+   - Added a console log to indicate service worker is disabled
+   - Kept the file to prevent 404 errors from existing clients
+
+2. **Modified service-worker.js**
+   - Disabled all service worker functionality
+   - Kept a minimal file to prevent 404 errors
+   - Added a console log to indicate service worker is disabled
+
+3. **Deployment**
+   - Deployed the modified files to the server using SFTP
+   - No need to modify index.html since it still includes the register-service-worker.js script, which now does nothing
+
+## Benefits
+
+- **Improved Performance**: Eliminates unnecessary background processing and caching
+- **Reduced Battery Usage**: No background sync operations
+- **Simplified Debugging**: Easier to debug without service worker interference
+- **Fresh Content**: Users always get the latest content without cache issues
+- **Backward Compatible**: Existing clients won't get 404 errors
+
+## Implementation Notes
+
+The service worker was previously implementing:
+- Caching of static assets
+- Offline support for API requests
+- Background sync for offline actions
+- IndexedDB integration for pending actions
+
+None of these features were being actively used in the application, making the service worker unnecessary overhead.
+
+## Future Considerations
+
+If offline functionality is needed in the future:
+1. Re-enable the service worker with a new cache version
+2. Implement more targeted caching strategies
+3. Consider using Workbox for better service worker management
+4. Add proper versioning and update flow
+Last updated: 2025-05-13 18:23:48

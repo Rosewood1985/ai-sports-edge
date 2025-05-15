@@ -1,0 +1,199 @@
+name: Firebase Deploy with Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.vscode/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+      skip_validation:
+        description: 'Skip post-deployment validation'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist
+
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: aisportsedge-app
+          target: aisportsedge-app
+
+      - name: Save deployment info
+        run: |
+          echo "DEPLOY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+          echo "DEPLOY_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "DEPLOY_REF=${{ github.ref }}" >> $GITHUB_ENV
+          echo "DEPLOY_ENVIRONMENT=${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_ENV
+
+  validate:
+    name: Validate Deployment
+    needs: deploy
+    if: ${{ github.event.inputs.skip_validation != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist
+
+      - name: Wait for deployment to propagate
+        run: sleep 60
+
+      - name: Validate deployment
+        run: |
+          echo "Validating deployment to ${{ env.DEPLOY_ENVIRONMENT }} environment"
+          node scripts/post-deploy-validate.js --environment=${{ env.DEPLOY_ENVIRONMENT }} --ci
+
+      - name: Run content duplicate detection
+        run: |
+          echo "Running content duplicate detection"
+          node scripts/file-content-duplicates-ml.js --no-apply --report-only
+
+      - name: Generate deployment report
+        run: |
+          mkdir -p reports/deployments
+          cat > reports/deployments/deployment-${{ env.DEPLOY_TIME }}.json << EOF
+          {
+            "timestamp": "${{ env.DEPLOY_TIME }}",
+            "sha": "${{ env.DEPLOY_SHA }}",
+            "ref": "${{ env.DEPLOY_REF }}",
+            "environment": "${{ env.DEPLOY_ENVIRONMENT }}",
+            "status": "success",
+            "validationPassed": true
+          }
+          EOF
+
+      - name: Upload deployment report
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-report
+          path: reports/deployments/deployment-${{ env.DEPLOY_TIME }}.json
+
+  notify:
+    name: Notify
+    needs: [deploy, validate]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check validation status
+        id: check_status
+        run: |
+          if [[ "${{ needs.validate.result }}" == "success" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Deployment and validation successful" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.validate.result }}" == "skipped" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Deployment successful (validation skipped)" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "message=Deployment successful but validation failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.23.0
+        if: env.SLACK_WEBHOOK_URL != ''
+        with:
+          payload: |
+            {
+              "text": "Deployment Status: ${{ steps.check_status.outputs.status }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Deployment to ${{ env.DEPLOY_ENVIRONMENT }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Status:* ${{ steps.check_status.outputs.message }}\n*Commit:* ${{ env.DEPLOY_SHA }}\n*Branch:* ${{ env.DEPLOY_REF }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

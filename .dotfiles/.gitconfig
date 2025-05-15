@@ -1,0 +1,52 @@
+[user]
+    name = AI Sports Edge Developer
+    email = dev@aisportsedge.app
+
+[core]
+    editor = vim
+    autocrlf = input
+    whitespace = trailing-space,space-before-tab
+    excludesfile = ~/.gitignore
+
+[color]
+    ui = auto
+    diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+
+[pull]
+    rebase = false
+
+[push]
+    default = simple
+
+[alias]
+    st = status
+    co = checkout
+    ci = commit
+    br = branch
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+    staged = diff --staged
+    unstaged = diff
+    current = !git symbolic-ref --short HEAD
+    pushup = !git push --set-upstream origin $(git current)
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    amend = commit --amend --no-edit
+    wip = !git add -A && git commit -m 'WIP'
+    undo = reset HEAD~1 --mixed
+
+[merge]
+    tool = vimdiff
+    conflictstyle = diff3
+
+[diff]
+    tool = vimdiff
+
+[help]
+    autocorrect = 1
+
+[init]
+    defaultBranch = main

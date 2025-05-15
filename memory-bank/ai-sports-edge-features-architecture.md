@@ -1,0 +1,607 @@
+# AI Sports Edge: Enhanced Features Architecture
+
+## Overview
+
+This architecture plan outlines the implementation of six new features for AI Sports Edge, designed to enhance user engagement, provide valuable AI-driven insights, and improve the overall user experience. The architecture maintains compatibility with both web and iOS platforms using React Native and Firebase.
+
+## Key Features
+
+1. **AI Pick of the Day + Confidence Tracker**
+2. **Streaks & Micro-Challenges**
+3. **Theme Presets**
+4. **AI Stats Transparency Page (Premium)**
+5. **Smart Defaults During Onboarding**
+6. **Pro Tip / AI Insight Box**
+
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    A[AI Sports Edge App] --> B[Core Features]
+    A --> C[New Features]
+
+    C --> D[AI Pick Module]
+    C --> E[Streaks Module]
+    C --> F[Theme Module]
+    C --> G[Stats Module]
+    C --> H[Smart Defaults]
+    C --> I[Pro Tips Module]
+
+    D --> D1[Pick of the Day]
+    D --> D2[Confidence Tracker]
+    D --> D3[Pick Leaderboard]
+
+    E --> E1[Streak Tracker]
+    E --> E2[Rewards System]
+
+    F --> F1[Theme Presets]
+    F --> F2[Team Colors]
+
+    G --> G1[Win Rate Stats]
+    G --> G2[Confidence Analysis]
+
+    H --> H1[Geo Detection]
+    H --> H2[Team Suggestions]
+
+    I --> I1[Insight Generator]
+    I --> I2[Dynamic Tips]
+
+    %% Firebase Integration
+    D -.-> FB[Firebase/Firestore]
+    E -.-> FB
+    F -.-> FB
+    G -.-> FB
+    H -.-> FB
+    I -.-> FB
+```
+
+## Component Architecture
+
+```mermaid
+flowchart TD
+    A[App Container] --> B[Navigation]
+    B --> C[Home Screen]
+    B --> D[Picks Screen]
+    B --> E[Stats Screen]
+    B --> F[Profile Screen]
+    B --> G[Settings Screen]
+
+    C --> C1[AiPickOfDayCard]
+    C --> C2[StreakTracker]
+    C --> C3[ProTipBox]
+
+    D --> D1[PicksList]
+    D1 --> D1a[PickCard]
+    D1a --> D1a1[ConfidenceIndicator]
+    D1a --> D1a2[FollowButton]
+    D1a --> D1a3[ProTipBox]
+
+    E --> E1[WinRateChart]
+    E --> E2[ConfidenceCategoryBreakdown]
+    E --> E3[SportCategoryPerformance]
+
+    F --> F1[UserStreaks]
+    F --> F2[RewardsHistory]
+
+    G --> G1[ThemeSelector]
+    G --> G2[OnboardingReset]
+```
+
+## Folder Structure
+
+```
+src/
+  features/
+    aiPicks/
+      components/
+        AiPickOfDayCard.tsx
+        PickCard.tsx
+        ConfidenceIndicator.tsx
+        FollowButton.tsx
+        PicksLeaderboard.tsx
+      hooks/
+        useAiPicks.ts
+      services/
+        aiPicksService.ts
+      screens/
+        PicksScreen.tsx
+        PickDetailScreen.tsx
+      types/
+        picks.ts
+      context/
+        AiPicksContext.tsx
+
+    streaks/
+      components/
+        StreakTracker.tsx
+        StreakRewardCard.tsx
+        MicroChallengeCard.tsx
+      hooks/
+        useStreaks.ts
+      services/
+        streaksService.ts
+      screens/
+        StreaksScreen.tsx
+      types/
+        streaks.ts
+      context/
+        StreaksContext.tsx
+
+    themes/
+      components/
+        ThemeSelector.tsx
+        TeamColorPreview.tsx
+      hooks/
+        useThemePresets.ts
+      services/
+        themeService.ts
+      screens/
+        ThemeSettingsScreen.tsx
+      types/
+        themes.ts
+      context/
+        ThemePresetsContext.tsx
+
+    stats/
+      components/
+        WinRateChart.tsx
+        ConfidenceBreakdown.tsx
+        SportPerformance.tsx
+      hooks/
+        useAiStats.ts
+      services/
+        statsService.ts
+      screens/
+        StatsScreen.tsx
+        StatsDetailScreen.tsx
+      types/
+        stats.ts
+
+    smartDefaults/
+      components/
+        LocationBasedSuggestions.tsx
+        SmartDefaultsPrompt.tsx
+      hooks/
+        useSmartDefaults.ts
+      services/
+        geoLocationService.ts
+        teamSuggestionService.ts
+      types/
+        smartDefaults.ts
+
+    proTips/
+      components/
+        ProTipBox.tsx
+        InsightCard.tsx
+      hooks/
+        useProTips.ts
+      services/
+        insightService.ts
+      types/
+        insights.ts
+
+  shared/
+    components/
+      Card.tsx
+      Button.tsx
+      Badge.tsx
+      ProgressBar.tsx
+      PremiumBadge.tsx
+    hooks/
+      useAuth.ts
+      usePremium.ts
+    utils/
+      dateUtils.ts
+      analyticsUtils.ts
+      cacheUtils.ts
+    constants/
+      colors.ts
+      themes.ts
+```
+
+## Firebase Schema
+
+### Collections
+
+#### 1. aiPicks
+
+```typescript
+interface AiPick {
+  id: string;
+  pickDate: Timestamp;
+  sport: string;
+  league: string;
+  gameId: string;
+  teamId: string;
+  teamName: string;
+  confidence: number; // 0-100
+  result: 'win' | 'loss' | 'push' | 'pending';
+  followers: number;
+  insightText: string;
+  odds: number;
+  isPickOfDay: boolean;
+}
+```
+
+#### 2. userPicks
+
+```typescript
+interface UserPick {
+  userId: string;
+  pickId: string;
+  followedAt: Timestamp;
+  notificationEnabled: boolean;
+}
+```
+
+#### 3. userStreaks
+
+```typescript
+interface UserStreak {
+  userId: string;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: Timestamp;
+  rewards: {
+    availableRewards: number;
+    claimedRewards: number;
+    lastRewardDate: Timestamp;
+  };
+  challenges: {
+    activeChallengeId: string | null;
+    completedChallenges: string[];
+  };
+}
+```
+
+#### 4. challenges
+
+```typescript
+interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  type: 'login' | 'follow_picks' | 'track_bets' | 'view_stats';
+  requiredCount: number;
+  reward: 'bonus_pick' | 'premium_day' | 'theme_unlock';
+  startDate: Timestamp;
+  endDate: Timestamp;
+  isActive: boolean;
+}
+```
+
+#### 5. userPreferences
+
+```typescript
+interface UserPreferences {
+  userId: string;
+  theme: {
+    preset: 'light' | 'dark' | 'team_colors';
+    teamId?: string;
+    teamColors?: {
+      primary: string;
+      secondary: string;
+      accent: string;
+    };
+  };
+  favoriteTeams: string[];
+  favoriteAthletes: string[];
+  onboarding: {
+    completed: boolean;
+    completedAt: Timestamp;
+    usedSmartDefaults: boolean;
+  };
+}
+```
+
+#### 6. aiStats
+
+```typescript
+interface AiStats {
+  date: Timestamp;
+  sport: string;
+  league: string;
+  confidenceBreakdown: {
+    high: {
+      // 80-100%
+      totalPicks: number;
+      wins: number;
+      losses: number;
+      pushes: number;
+      winRate: number;
+    };
+    medium: {
+      // 50-79%
+      totalPicks: number;
+      wins: number;
+      losses: number;
+      pushes: number;
+      winRate: number;
+    };
+    low: {
+      // 0-49%
+      totalPicks: number;
+      wins: number;
+      losses: number;
+      pushes: number;
+      winRate: number;
+    };
+  };
+  overallWinRate: number;
+}
+```
+
+## Feature Details
+
+### 1. AI Pick of the Day + Confidence Tracker
+
+The AI Pick of the Day feature showcases the highest confidence AI prediction for the day, allowing users to follow and track its outcome.
+
+#### Key Components:
+
+- **AiPickOfDayCard**: Displays the featured pick with visual confidence indicator
+- **ConfidenceIndicator**: Visual representation of AI confidence (0-100%)
+  - Green: 80-100%
+  - Yellow: 50-79%
+  - Red: 0-49%
+- **FollowButton**: Allows users to track specific picks
+- **PicksLeaderboard**: Weekly view of most accurate AI picks
+
+#### Data Flow:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant App
+    participant AiPicksService
+    participant Firebase
+
+    Firebase->>AiPicksService: Daily AI picks generation
+    AiPicksService->>App: Load Pick of the Day
+    App->>User: Display Pick with confidence
+    User->>App: Follow Pick
+    App->>AiPicksService: Record user follow
+    AiPicksService->>Firebase: Update followers count
+    Firebase->>AiPicksService: Game results update
+    AiPicksService->>App: Update pick results
+    App->>User: Show outcome (Win/Loss)
+```
+
+### 2. Streaks & Micro-Challenges
+
+This feature tracks user engagement through daily activity streaks and offers rewards for consistent usage.
+
+#### Key Components:
+
+- **StreakTracker**: Visual indicator showing current streak (e.g., flame icons)
+- **StreakRewardCard**: Displays available rewards from streaks
+- **MicroChallengeCard**: Shows active challenges and progress
+
+#### Streak Logic:
+
+```typescript
+// Pseudo-code for streak calculation
+function updateStreak(userId: string, currentDate: Date) {
+  const userStreak = getUserStreak(userId);
+  const lastActiveDate = userStreak.lastActiveDate;
+
+  // If user was active yesterday, increment streak
+  if (isYesterday(lastActiveDate)) {
+    userStreak.currentStreak++;
+
+    // Check if reward threshold reached
+    if (userStreak.currentStreak % 3 === 0) {
+      userStreak.rewards.availableRewards++;
+    }
+  }
+  // If user missed a day, reset streak
+  else if (!isToday(lastActiveDate)) {
+    userStreak.currentStreak = 1;
+  }
+
+  userStreak.lastActiveDate = currentDate;
+  saveUserStreak(userId, userStreak);
+}
+```
+
+### 3. Theme Presets
+
+Simplifies the theming system by offering three preset options instead of a custom color picker.
+
+#### Key Components:
+
+- **ThemeSelector**: UI for selecting between Light, Dark, and Team Colors
+- **TeamColorPreview**: Preview of team-based color scheme
+
+#### Theme Options:
+
+1. **Light**: Clean, light background with blue accents
+2. **Dark**: Dark background with gold accents
+3. **Team Colors**: Dynamically generated from user's favorite team
+
+```typescript
+// Theme preset definitions
+const THEME_PRESETS = {
+  light: {
+    background: '#FFFFFF',
+    text: '#000000',
+    primary: '#0066FF',
+    secondary: '#E6F0FF',
+    accent: '#FFD700',
+  },
+  dark: {
+    background: '#121212',
+    text: '#FFFFFF',
+    primary: '#FFD700',
+    secondary: '#333333',
+    accent: '#0066FF',
+  },
+};
+
+// Team colors are fetched dynamically
+function getTeamColors(teamId: string): ThemeColors {
+  // Fetch team colors from database
+  // Return theme object
+}
+```
+
+### 4. AI Stats Transparency Page (Premium)
+
+A premium feature that provides detailed statistics on AI prediction accuracy.
+
+#### Key Components:
+
+- **WinRateChart**: Visualizes win rates over time
+- **ConfidenceBreakdown**: Shows performance by confidence category
+- **SportPerformance**: Breaks down performance by sport
+
+#### Premium Access Control:
+
+```typescript
+function useAiStats() {
+  const { isPremium } = usePremium();
+  const [stats, setStats] = useState<AiStats | null>(null);
+
+  useEffect(() => {
+    if (isPremium) {
+      // Fetch detailed stats
+      const fetchStats = async () => {
+        const aiStats = await statsService.getDetailedStats();
+        setStats(aiStats);
+      };
+
+      fetchStats();
+    } else {
+      // Fetch limited stats for non-premium
+      const fetchLimitedStats = async () => {
+        const limitedStats = await statsService.getLimitedStats();
+        setStats(limitedStats);
+      };
+
+      fetchLimitedStats();
+    }
+  }, [isPremium]);
+
+  return { stats, isPremium };
+}
+```
+
+### 5. Smart Defaults During Onboarding
+
+Uses geolocation to suggest relevant teams and theme during onboarding.
+
+#### Key Components:
+
+- **LocationBasedSuggestions**: Suggests local teams based on IP
+- **SmartDefaultsPrompt**: UI for accepting or modifying suggestions
+
+#### Geolocation Flow:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant OnboardingUI
+    participant GeoService
+    participant TeamService
+    participant Firebase
+
+    OnboardingUI->>GeoService: Get user location from IP
+    GeoService->>OnboardingUI: Return location data
+    OnboardingUI->>TeamService: Request local teams
+    TeamService->>OnboardingUI: Return suggested teams
+    OnboardingUI->>User: Show team suggestions
+    User->>OnboardingUI: Confirm or modify
+    OnboardingUI->>Firebase: Save preferences
+```
+
+### 6. Pro Tip / AI Insight Box
+
+Provides contextual insights explaining the rationale behind AI predictions.
+
+#### Key Components:
+
+- **ProTipBox**: UI component for displaying insights
+- **InsightGenerator**: Service for generating or retrieving insights
+
+#### Insight Types:
+
+1. **Statistical**: "Team has won 8 of last 10 games against left-handed pitchers"
+2. **Trend-based**: "Player performance trending up over last 5 games"
+3. **Odds-based**: "Detected odds inefficiency of 12% compared to our model"
+4. **Historical**: "Team has 75% win rate in similar weather conditions"
+
+## Implementation Plan
+
+### Phase 1: Core Infrastructure
+
+1. Set up Firebase schema extensions
+2. Create base components and contexts
+3. Implement theme presets system
+4. Set up caching utilities for performance
+
+### Phase 2: AI Picks & Insights
+
+1. Implement AI Pick of the Day feature
+2. Build confidence indicator components
+3. Create Pro Tip / Insight system
+4. Set up pick following mechanism
+
+### Phase 3: Engagement Features
+
+1. Implement streak tracking system
+2. Build micro-challenges framework
+3. Create rewards distribution system
+4. Add streak visualizations
+
+### Phase 4: Premium Features
+
+1. Implement AI Stats Transparency page
+2. Create premium access control
+3. Build detailed statistical visualizations
+4. Add export and sharing capabilities
+
+### Phase 5: Onboarding Enhancements
+
+1. Implement geolocation service
+2. Build team suggestion algorithm
+3. Create smart defaults UI
+4. Integrate with existing onboarding flow
+
+### Phase 6: Testing & Optimization
+
+1. Performance testing across platforms
+2. A/B testing of engagement features
+3. Optimize Firebase reads/writes
+4. Implement caching strategies
+
+## Technical Considerations
+
+1. **Performance Optimization**:
+
+   - Implement caching for AI picks and stats
+   - Use lazy loading for stats visualizations
+   - Batch Firebase operations
+
+2. **Cross-Platform Compatibility**:
+
+   - Use React Native's Platform API for platform-specific code
+   - Ensure responsive layouts for web and mobile
+   - Test on both platforms throughout development
+
+3. **Firebase Efficiency**:
+
+   - Design queries to minimize reads
+   - Use composite indexes for complex queries
+   - Implement data denormalization where appropriate
+
+4. **Premium Feature Access**:
+
+   - Create consistent premium checks
+   - Graceful degradation for non-premium users
+   - Clear upgrade paths
+
+5. **Accessibility**:
+   - Ensure color contrast for confidence indicators
+   - Provide alternative text for charts and visualizations
+   - Support screen readers for all components
+     Last updated: 2025-05-13 20:43:32

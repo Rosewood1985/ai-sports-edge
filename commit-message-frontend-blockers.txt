@@ -1,0 +1,21 @@
+fix: resolve frontend blocking issues for aisportsedge.app
+
+- Remove X-Frame-Options meta tag from HTML files
+- Set X-Frame-Options via .htaccess instead (SAMEORIGIN)
+- Fix Google Fonts by adding proper crossorigin attribute
+- Resolve Firebase MIME issues by creating firebase-config.js
+- Update Content Security Policy in .htaccess to allow:
+  * Google Tag Manager
+  * Google Fonts
+  * Firebase services
+  * Unsafe-inline/eval temporarily for development
+- Add proper MIME types for .mjs and .json files
+- Centralize Firebase config in a single file
+
+These changes resolve console errors and improve site loading by:
+1. Moving security headers to server config where they belong
+2. Fixing CORS issues with external resources
+3. Ensuring Firebase loads with correct MIME type
+4. Properly configuring CSP to allow required resources
+
+Testing: Verified all pages load without console errors

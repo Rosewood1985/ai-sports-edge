@@ -1,0 +1,86 @@
+# GPT Instructions Consolidation Log
+
+This file tracks the consolidation of GPT instructions for the AI Sports Edge project.
+
+## Initial Consolidation - May 10, 2025
+
+- Created directory structure for consolidated GPT instructions
+- Categorized 6 instruction files into appropriate directories
+- Created master index file with standardized format
+- Created placeholder files for GPT-4 and GPT-3.5 instructions
+- Created consolidation script for future updates
+
+### Files Processed
+
+- claude-3.7-instructions-ai-sports-edge.md → claude/claude-3.7-instructions.md
+- claude-support-prompts-ai-sports-edge.md → claude/claude-support-prompts.md
+- olive-governance-prompts.md → specialized/olive-governance-prompts.md
+- deployment-instructions.md → specialized/deployment-instructions.md
+- update-instructions.md → specialized/update-instructions.md
+- manual-deploy-instructions.md → specialized/manual-deploy-instructions.md
+- update-summary.md → specialized/update-summary.md
+- sftp-deployment.md → specialized/sftp-deployment.md
+- firebase-fix-deployment-summary.md → specialized/firebase-fix-deployment-summary.md
+- godaddy-deployment-summary.md → specialized/godaddy-deployment-summary.md
+- pre-deployment-completion-summary.md → specialized/pre-deployment-completion-summary.md
+- vscode-sftp-deployment-summary.md → specialized/vscode-sftp-deployment-summary.md
+- pre-deployment-completion-plan.md → specialized/pre-deployment-completion-plan.md
+
+### New Files Created
+
+- 00-MASTER-GPT-INSTRUCTIONS.md
+- chatgpt/gpt-4-instructions.md
+- chatgpt/gpt-3.5-instructions.md
+- scripts/consolidate-gpt-instructions.sh
+- status/gpt-instructions-consolidation.log
+
+### Statistics
+
+- Claude Instructions: 3 files
+- ChatGPT Instructions: 2 files
+- Specialized Instructions: 11 files
+- Archived Instructions: 0 files
+- Total: 16 files
+
+## Next Steps
+
+1. Review all instruction files for consistency and completeness
+2. Add version information to each file
+3. Update the master index with any additional files
+4. Set up automated consolidation process
+
+## Maintenance Schedule
+
+- Weekly review of instruction files
+- Monthly consolidation and cleanup
+- Quarterly audit of all GPT instructions
+
+## Last Updated
+
+May 10, 20252025-05-10 16:27:30 - Starting GPT instructions consolidation...
+2025-05-10 16:27:30 - Creating directory structure...
+2025-05-10 16:27:30 - Directory structure created.
+2025-05-10 16:27:30 - Categorizing instruction files...
+2025-05-10 16:27:30 - Finding Claude instruction files...
+2025-05-10 16:27:30 - Copied claude-support-prompts-ai-sports-edge.md to Claude directory
+2025-05-10 16:27:30 - Copied claude-3.7-instructions-ai-sports-edge.md to Claude directory
+2025-05-10 16:27:30 - Finding ChatGPT instruction files...
+2025-05-10 16:27:30 - Finding specialized instruction files...
+2025-05-10 16:27:30 - Copied update-summary.md to Specialized directory
+2025-05-10 16:27:30 - Copied sftp-deployment.md to Specialized directory
+2025-05-10 16:27:30 - Copied firebase-fix-deployment-summary.md to Specialized directory
+2025-05-10 16:27:30 - File manual-deploy-instructions.md already exists in Specialized directory
+2025-05-10 16:27:30 - File deployment-instructions.md already exists in Specialized directory
+2025-05-10 16:27:30 - Copied godaddy-deployment-summary.md to Specialized directory
+2025-05-10 16:27:30 - File update-instructions.md already exists in Specialized directory
+2025-05-10 16:27:30 - Copied pre-deployment-completion-summary.md to Specialized directory
+2025-05-10 16:27:30 - File olive-governance-prompts.md already exists in Specialized directory
+2025-05-10 16:27:30 - Copied vscode-sftp-deployment-summary.md to Specialized directory
+2025-05-10 16:27:30 - Copied pre-deployment-completion-plan.md to Specialized directory
+2025-05-10 16:27:30 - File categorization complete.
+2025-05-10 16:27:30 - Standardizing file naming...
+2025-05-10 16:27:30 - Renamed claude-3.7-instructions-ai-sports-edge.md to claude-3.7-instructions.md
+2025-05-10 16:27:30 - File naming standardization complete.
+2025-05-10 16:27:30 - Updating master index...
+2025-05-10 16:27:30 - Master index updated with date: May 10, 2025
+2025-05-10 16:27:30 - GPT instructions consolidation complete.

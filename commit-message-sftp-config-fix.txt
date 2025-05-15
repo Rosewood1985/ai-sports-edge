@@ -1,0 +1,8 @@
+fix: Update SFTP configuration for reliable deployment
+
+- Added "context": "./build" to specify the local folder to upload
+- Set "uploadOnSave": false to prevent automatic uploads
+- Enabled SFTP debug logging in VS Code settings
+- Synchronized configuration between project root and vscode-sftp-deploy
+
+This fixes the missing "Upload Folder" command issue by properly configuring the Natizyskunk SFTP extension with the correct context path and debug settings.

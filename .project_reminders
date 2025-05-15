@@ -1,0 +1,5 @@
+- Complete Firebase consolidation
+- Test authentication with new Firebase config
+- Update GitHub Actions workflows
+- Clean up project structure
+- Run performance optimizations

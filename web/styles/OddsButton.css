@@ -1,0 +1,100 @@
+/**
+ * OddsButton Component Styles
+ */
+
+.odds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background-color: #FF6B00;
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 107, 0, 0.3);
+}
+
+.odds-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 107, 0, 0.4);
+}
+
+.odds-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(255, 107, 0, 0.3);
+}
+
+.odds-button--small {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.odds-button--medium {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+.odds-button--large {
+  padding: 12px 24px;
+  font-size: 18px;
+}
+
+.odds-button--loading {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.odds-button__spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Neon glow effect for the button */
+.odds-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(255, 107, 0, 0.8), rgba(255, 107, 0, 0.4));
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.odds-button:hover::before {
+  opacity: 1;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 0, 0);
+  }
+}
+
+.odds-button:hover {
+  animation: pulse 1.5s infinite;
+}

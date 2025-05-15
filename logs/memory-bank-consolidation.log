@@ -1,0 +1,27 @@
+[2025-05-13T22:19:24.704Z] [INFO] Created directory: /workspaces/ai-sports-edge/archive/memory-bank
+[2025-05-13T22:19:24.713Z] [INFO] Found 36 memory bank files for analysis
+[2025-05-13T22:19:24.751Z] [ERROR] Error: File size (7811236930) is greater than 2 GiB
+[2025-05-13T23:24:07.063Z] [INFO] Found 36 memory bank files for analysis
+[2025-05-13T23:24:07.082Z] [WARNING] File /workspaces/ai-sports-edge/memory-bank/app-history.md is too large (8326.43 MB), checking for system tags only
+[2025-05-13T23:25:09.437Z] [INFO] Found 1 clusters of related files
+[2025-05-13T23:25:09.440Z] [ERROR] Error: Cannot read properties of undefined (reading 'length')
+[2025-05-13T23:30:49.313Z] [INFO] Found 36 memory bank files for analysis
+[2025-05-13T23:30:49.321Z] [WARNING] File /workspaces/ai-sports-edge/memory-bank/app-history.md is too large (8680.29 MB), checking for system tags only
+[2025-05-13T23:31:53.329Z] [INFO] Found 1 clusters of related files
+[2025-05-13T23:31:53.330Z] [WARNING] Cluster contains large files, using simplified base file selection
+[2025-05-13T23:31:53.330Z] [INFO] Selected decisionLog.md as base file (most recent non-large file)
+[2025-05-13T23:31:53.330Z] [INFO] Selected a different base file: decisionLog.md (was: activeContext.md)
+[2025-05-13T23:31:53.332Z] [INFO] Generated canonical filename: infra-context-guide-md
+[2025-05-13T23:31:53.334Z] [WARNING] Skipping detailed merge for large file /workspaces/ai-sports-edge/memory-bank/app-history.md
+[2025-05-13T23:31:53.338Z] [INFO] Wrote consolidated content to infra-context-guide-md
+[2025-05-13T23:31:53.339Z] [INFO] Archived deprecated file: app-history.md → app-history.deprecated.md
+[2025-05-13T23:31:53.340Z] [INFO] Archived deprecated file: background-consolidation-authority.md → background-consolidation-authority.deprecated.md
+[2025-05-13T23:31:53.342Z] [INFO] Archived deprecated file: progress.md → progress.deprecated.md
+[2025-05-13T23:31:53.343Z] [INFO] Archived deprecated file: activeContext.md → activeContext.deprecated.md
+[2025-05-13T23:31:53.349Z] [INFO] Added entries to checkpoint and status log files
+[2025-05-13T23:31:53.350Z] [INFO] Deleted original base file: decisionLog.md
+[2025-05-13T23:31:53.350Z] [INFO] Deleted original related file: app-history.md
+[2025-05-13T23:31:53.351Z] [INFO] Deleted original related file: background-consolidation-authority.md
+[2025-05-13T23:31:53.351Z] [INFO] Deleted original related file: progress.md
+[2025-05-13T23:31:53.352Z] [INFO] Deleted original related file: activeContext.md
+[2025-05-13T23:31:53.352Z] [INFO] Consolidation complete: processed 1 clusters, consolidated 5 files

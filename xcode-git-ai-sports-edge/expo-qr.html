@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expo QR Code</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            margin: 20px 0;
+        }
+        .instructions {
+            margin-top: 20px;
+            color: #666;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expo Go QR Code</h1>
+        <div class="qr-container" id="qrcode"></div>
+        <div class="instructions">
+            <p>Scan this QR code with your mobile device's camera app to open the project in Expo Go.</p>
+            <p>Make sure you have the Expo Go app installed on your device.</p>
+            <p>The QR code connects to: <span id="expo-url">exp://10.0.0.84:8081</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Generate QR code
+        function generateQRCode() {
+            // Current Expo URL with the correct IP address and port
+            // Updated after fixing LinearGradient component issues
+            const expoUrl = "exp://10.0.0.84:8081";
+            
+            // Update the URL text
+            document.getElementById('expo-url').textContent = expoUrl;
+            
+            // Generate QR code
+            const qr = qrcode(0, 'L');
+            qr.addData(expoUrl);
+            qr.make();
+            
+            // Display QR code
+            document.getElementById('qrcode').innerHTML = qr.createImgTag(8);
+        }
+        
+        // Generate QR code when page loads
+        window.onload = generateQRCode;
+    </script>
+</body>
+</html>

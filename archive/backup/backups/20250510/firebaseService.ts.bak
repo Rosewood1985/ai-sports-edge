@@ -1,0 +1,195 @@
+import { 
+  auth, 
+  firestore, 
+  storage, 
+  functions, 
+  analytics 
+} from '../config/firebase';
+
+// Firebase SDK types (for TypeScript)
+import type { User } from 'firebase/auth';
+import type { Timestamp } from 'firebase/firestore';
+import type { FirebaseError } from 'firebase/app';
+
+// Import only the necessary methods from Firebase
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  TwitterAuthProvider,
+  updateProfile,
+  sendEmailVerification
+} from 'firebase/auth';
+
+import { 
+  collection, 
+  doc, 
+  getDoc, 
+  getDocs, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  startAfter,
+  serverTimestamp,
+  onSnapshot
+} from 'firebase/firestore';
+
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
+
+import { 
+  httpsCallable 
+} from 'firebase/functions';
+
+import { 
+  logEvent, 
+  setUserProperties 
+} from 'firebase/analytics';
+
+/**
+ * Firebase Service
+ * 
+ * Consolidated service for all Firebase interactions
+ * Uses the centralized Firebase configuration from config/firebase.ts
+ */
+export const firebaseService = {
+  // Core Firebase instances (imported from config/firebase.ts)
+  auth,
+  firestore,
+  storage,
+  functions,
+  analytics,
+  
+  // Auth methods
+  signIn: (email: string, password: string) => 
+    signInWithEmailAndPassword(auth, email, password),
+  
+  signUp: (email: string, password: string) => 
+    createUserWithEmailAndPassword(auth, email, password),
+  
+  signOut: () => signOut(auth),
+  
+  resetPassword: (email: string) => 
+    sendPasswordResetEmail(auth, email),
+  
+  onAuthStateChange: (callback: (user: User | null) => void) => 
+    onAuthStateChanged(auth, callback),
+  
+  // Firestore methods
+  getDocument: async <T>(collectionName: string, docId: string): Promise<T | null> => {
+    try {
+      const docRef = doc(firestore, collectionName, docId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as T;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error getting document ${docId}:`, error);
+      throw error;
+    }
+  },
+  
+  setDocument: async <T>(collectionName: string, docId: string, data: T): Promise<void> => {
+    try {
+      const docRef = doc(firestore, collectionName, docId);
+      await setDoc(docRef, {
+        ...data,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error(`Error setting document ${docId}:`, error);
+      throw error;
+    }
+  },
+  
+  updateDocument: async <T>(collectionName: string, docId: string, data: Partial<T>): Promise<void> => {
+    try {
+      const docRef = doc(firestore, collectionName, docId);
+      await updateDoc(docRef, {
+        ...data,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error(`Error updating document ${docId}:`, error);
+      throw error;
+    }
+  },
+  
+  deleteDocument: async (collectionName: string, docId: string): Promise<void> => {
+    try {
+      const docRef = doc(firestore, collectionName, docId);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error(`Error deleting document ${docId}:`, error);
+      throw error;
+    }
+  },
+  
+  // Storage methods
+  uploadFile: async (path: string, file: File): Promise<string> => {
+    try {
+      const storageRef = ref(storage, path);
+      await uploadBytes(storageRef, file);
+      return await getDownloadURL(storageRef);
+    } catch (error) {
+      console.error(`Error uploading file to ${path}:`, error);
+      throw error;
+    }
+  },
+  
+  deleteFile: async (path: string): Promise<void> => {
+    try {
+      const storageRef = ref(storage, path);
+      await deleteObject(storageRef);
+    } catch (error) {
+      console.error(`Error deleting file at ${path}:`, error);
+      throw error;
+    }
+  },
+  
+  // Functions methods
+  callFunction: async <T, R>(functionName: string, data?: T): Promise<R> => {
+    try {
+      const functionRef = httpsCallable<T, R>(functions, functionName);
+      const result = await functionRef(data);
+      return result.data;
+    } catch (error) {
+      console.error(`Error calling function ${functionName}:`, error);
+      throw error;
+    }
+  },
+  
+  // Analytics methods
+  logAnalyticsEvent: (eventName: string, eventParams?: Record<string, any>) => {
+    try {
+      logEvent(analytics, eventName, eventParams);
+    } catch (error) {
+      console.warn(`Error logging analytics event ${eventName}:`, error);
+    }
+  },
+  
+  setUserAnalyticsProperties: (properties: Record<string, any>) => {
+    try {
+      setUserProperties(analytics, properties);
+    } catch (error) {
+      console.warn('Error setting user analytics properties:', error);
+    }
+  }
+};
+
+export default firebaseService;

@@ -1,0 +1,17 @@
+# Executive Brief Cron Setup Log
+
+2025-05-10 16:51:00 - Starting executive brief cron job setup...
+2025-05-10 16:51:00 - Creating directory structure...
+2025-05-10 16:51:00 - Directory structure created.
+2025-05-10 16:51:00 - macOS detected, using launchd...
+2025-05-10 16:51:00 - LaunchAgent created at /Users/lisadario/Library/LaunchAgents/com.aisportsedge.dailybrief.plist and loaded.
+2025-05-10 16:51:00 - Executive brief scheduling setup complete.
+
+=== Executive Brief Scheduling Summary ===
+Schedule: Daily at 8:00 AM
+Script: /Users/lisadario/Desktop/ai-sports-edge/scripts/generate-executive-brief.sh
+Log File: /Users/lisadario/Desktop/ai-sports-edge/logs/executive-brief.log
+================================================
+
+The executive brief will be automatically generated each morning at 8:00 AM.
+You can also generate it manually by running ./generate-executive-brief.command

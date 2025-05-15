@@ -1,0 +1,160 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import 'react';
+import { OneSignal } from 'react-native-onesignal';
+import { useNavigation } from '@react-navigation/native';
+import { auth, firestore } from '../config/firebase';
+import { getDoc, doc } from 'firebase/firestore';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { NotificationClickEvent } from 'react-native-onesignal/dist/models/NotificationEvents';
+import NotificationWillDisplayEvent from 'react-native-onesignal/dist/events/NotificationWillDisplayEvent';
+
+interface OneSignalProviderProps {
+  children: React.ReactNode;
+}
+
+// Define the type for the navigation stack parameters
+type RootStackParamList = {
+  Login: undefined;
+  Odds: undefined;
+  PlayerStats: { gameId: string; gameTitle?: string };
+  Formula1: undefined;
+  PersonalizedHome: undefined;
+  // Add other screens as needed
+};
+
+// Define the type for notification additional data
+interface NotificationAdditionalData {
+  screen?: string;
+  gameId?: string;
+  gameTitle?: string;
+  [key: string]: any;
+}
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+/**
+ * OneSignalProvider component for handling push notifications
+ * This component initializes OneSignal and handles notification events
+ */
+const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
+  const navigation = useNavigation<NavigationProp>();
+
+  useEffect(() => {
+    // Initialize OneSignal
+    // Replace with your actual OneSignal App ID
+    const ONESIGNAL_APP_ID = 'YOUR_ONESIGNAL_MOBILE_APP_ID';
+    
+    // Initialize OneSignal
+    OneSignal.initialize(ONESIGNAL_APP_ID);
+    
+    // Request permission to send notifications
+    OneSignal.Notifications.requestPermission(true).then((accepted) => {
+      console.log('User accepted notifications:', accepted);
+    });
+    
+    // Handle notification opened
+    const handleNotificationClick = (event: NotificationClickEvent) => {
+      console.log('Notification clicked:', event);
+      
+      // Handle deep linking based on notification data
+      if (event.notification.additionalData) {
+        const data = event.notification.additionalData as NotificationAdditionalData;
+        
+        // Navigate to the specified screen
+        if (data.screen) {
+          switch (data.screen) {
+            case 'Odds':
+              navigation.navigate('Odds');
+              break;
+            case 'PlayerStats':
+              if (data.gameId) {
+                navigation.navigate('PlayerStats', {
+                  gameId: data.gameId,
+                  gameTitle: data.gameTitle || 'Player Statistics'
+                });
+              }
+              break;
+            case 'Formula1':
+              navigation.navigate('Formula1');
+              break;
+            // Add more screens as needed
+            default:
+              navigation.navigate('PersonalizedHome');
+          }
+        }
+      }
+    };
+    
+    // Handle notifications received while app is in foreground
+    const handleNotificationWillDisplay = (event: NotificationWillDisplayEvent) => {
+      console.log('Notification received in foreground:', event);
+      
+      // Display the notification
+      event.preventDefault();
+      event.notification.display();
+    };
+    
+    // Add event listeners
+    OneSignal.Notifications.addEventListener('click', handleNotificationClick);
+    OneSignal.Notifications.addEventListener('foregroundWillDisplay', handleNotificationWillDisplay);
+    
+    // Set external user ID when user logs in
+    const setExternalUserId = async () => {
+      try {
+        // Get current user ID from Firebase Auth
+        const user = auth?.currentUser;
+        if (user && firestore) {
+          OneSignal.login(user.uid);
+          
+          // Set user tags for personalization
+          const userDoc = await getDoc(firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, 'users', user.uid));
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            
+            // Set user tags based on preferences
+            if (userData.preferences) {
+              // Set sports preferences
+              if (userData.preferences.sports) {
+                Object.entries(userData.preferences.sports).forEach(([sport, enabled]) => {
+                  if (enabled === true) {
+                    OneSignal.User.addTag(`sport_${sport.toLowerCase()}`, 'true');
+                  }
+                });
+              }
+              
+              // Set notification preferences
+              if (userData.preferences.notifications) {
+                Object.entries(userData.preferences.notifications).forEach(([type, enabled]) => {
+                  OneSignal.User.addTag(type, enabled === true ? 'true' : 'false');
+                });
+              }
+            }
+            
+            // Set subscription status
+            if (userData.subscription && userData.subscription.status) {
+              OneSignal.User.addTag('subscription_status', userData.subscription.status);
+              if (userData.subscription.plan) {
+                OneSignal.User.addTag('subscription_plan', userData.subscription.plan);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error setting external user ID:', error);
+      }
+    };
+    
+    setExternalUserId();
+    
+    return () => {
+      // Clean up OneSignal listeners
+      OneSignal.Notifications.removeEventListener('click', handleNotificationClick);
+      OneSignal.Notifications.removeEventListener('foregroundWillDisplay', handleNotificationWillDisplay);
+    };
+  }, [navigation]);
+  
+  return <>{children}</>;
+};
+
+export default OneSignalProvider;

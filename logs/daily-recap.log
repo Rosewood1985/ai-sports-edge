@@ -1,0 +1,9 @@
+[2025-05-14T00:12:44Z] Starting daily recap generation...
+[2025-05-14T00:12:44Z] Ensuring Node.js is installed...
+[0;33mnvm found but not in PATH, sourcing it...[0m
+[0;32mNode.js v18.20.8 is installed and active.[0m
+[0;32mnpm 10.8.2 is installed and active.[0m
+[0;32mNode.js environment is ready.[0m
+[2025-05-14T00:12:45.193Z] Generating daily recap...
+[2025-05-14T00:12:45.199Z] Daily recap generated successfully: /workspaces/ai-sports-edge/recaps/daily-recap-2025-05-14.md
+[2025-05-14T00:12:45Z] Daily recap generated successfully

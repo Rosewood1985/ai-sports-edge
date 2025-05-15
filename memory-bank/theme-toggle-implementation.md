@@ -1,0 +1,65 @@
+# Theme Toggle Implementation
+
+## Overview
+
+Added a ThemeToggle component across all platforms (mobile and web) to allow users to switch between light and dark themes. This implementation ensures a consistent user experience across all parts of the application.
+
+## Changes Made
+
+### Mobile App
+
+1. Added ThemeToggle to all auth screens:
+
+   - `screens/Auth/SignupScreen.tsx`
+   - `screens/Auth/LoginScreen.tsx`
+   - `screens/Auth/ForgotPasswordScreen.tsx`
+
+2. Added to main navigation:
+
+   - `navigation/AppNavigator.tsx` - Added to header right in tab navigator
+
+3. Added to settings:
+   - `screens/SettingsScreen.tsx` - Replaced dark mode switch with ThemeToggle
+
+### Web App
+
+1. Created theme infrastructure:
+
+   - `web/contexts/ThemeContext.js` - New context with localStorage persistence
+   - `web/components/ThemeToggle.js` - New toggle with sun/moon icons
+   - `web/styles/ThemeToggle.css` - Styling with hover effects
+
+2. Added ThemeToggle to web components:
+
+   - `web/components/Header.js` - Added to main navigation
+   - `web/pages/LoginPage.js` - Added to login form
+   - `web/pages/HomePage.js` - Added to CTA section
+   - `web/pages/AboutPage.js` - Added to SimpleHeader component
+
+3. Added CSS styles:
+
+   - Updated `web/styles/login.css` with theme toggle styling
+   - Updated `web/styles/home.css` with theme toggle styling
+   - Updated `web/styles/about.css` with theme toggle styling
+
+4. Integrated with app structure:
+   - Updated `web/App.js` to wrap with ThemeProvider
+   - Fixed import paths for proper context access
+
+## Bug Fixes
+
+- Fixed import path in App.tsx to correctly reference ThemeContext
+- Updated Colors references in App.tsx to match the actual structure in Colors.ts
+- Fixed metro.config.js to properly exclude xcode-git-ai-sports-edge directory
+
+## Deployment
+
+- Created deployment script to deploy changes to Firebase hosting
+- Successfully deployed to https://aisportsedge.app
+
+## Next Steps
+
+- Monitor user feedback on theme toggle functionality
+- Consider adding theme toggle to additional screens as needed
+- Ensure theme consistency across all components
+  Last updated: 2025-05-13 20:43:32

@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "commander": "^9.4.1",
+    "inquirer": "^8.2.5",
+    "open": "^8.4.0",
+    "ora": "^5.4.1",
+    "pretty-bytes": "^5.6.0",
+    "pretty-ms": "^7.0.1"
+  },
+  "scripts": {
+    "test:analysis": "./scripts/test-analysis-tools.sh",
+    "analyze": "node ./scripts/roo-complete-analysis.js analyze",
+    "analyze:duplicates": "node ./scripts/roo-duplicates.js find",
+    "analyze:history": "node ./scripts/roo-history-analyze.js analyze",
+    "analyze:list": "node ./scripts/roo-complete-analysis.js list",
+    "analyze:clean": "node ./scripts/roo-complete-analysis.js clean --older-than 30"
+  }
+}

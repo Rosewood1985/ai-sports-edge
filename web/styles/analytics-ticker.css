@@ -1,0 +1,150 @@
+/**
+ * Analytics Ticker Styles
+ * Styling for the news ticker with analytics content
+ */
+
+/* Analytics-related item styling */
+.news-item.analytics-related {
+  background-color: rgba(64, 128, 255, 0.1);
+  border-left: 3px solid #4080ff;
+}
+
+/* Analytics indicator icon */
+.analytics-indicator {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 14px;
+  color: #4080ff;
+}
+
+/* Stats display */
+.news-stats {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 6px;
+  background-color: rgba(64, 128, 255, 0.1);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #4080ff;
+  font-weight: 500;
+}
+
+/* View Analysis button */
+.view-analysis-button {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 8px;
+  background-color: #4080ff;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.view-analysis-button:hover {
+  background-color: #3060dd;
+  text-decoration: none;
+}
+
+.view-analysis-button:active {
+  background-color: #2050bb;
+}
+
+/* Analytics preferences section */
+.analytics-preferences {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: rgba(64, 128, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(64, 128, 255, 0.2);
+}
+
+.analytics-preferences h3 {
+  color: #4080ff;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.analytics-preferences-option {
+  margin-bottom: 10px;
+}
+
+.analytics-preferences-option label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+}
+
+.analytics-preferences-option input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.analytics-preferences-option select {
+  margin-top: 5px;
+  width: 100%;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Stats format selector */
+.stats-format-selector {
+  margin-top: 10px;
+}
+
+.stats-format-selector label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555;
+}
+
+.stats-format-selector select {
+  width: 100%;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Analytics sources section */
+.analytics-sources {
+  margin-top: 15px;
+}
+
+.analytics-sources h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.analytics-source-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.analytics-source-item input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.analytics-source-item label {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .view-analysis-button {
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+  
+  .news-stats {
+    font-size: 11px;
+    padding: 1px 4px;
+  }
+}

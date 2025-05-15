@@ -1,0 +1,790 @@
+# decisionLog (Consolidated)
+
+_This file was automatically consolidated from multiple related files on 2025-05-13._
+
+## Source Files
+
+This file consolidates content from:
+
+- **decisionLog.md** (base file)
+- app-history.md (large file)
+- background-consolidation-authority.md
+- progress.md
+- activeContext.md
+
+## Conflicts Detected
+
+The following sections had conflicting content:
+
+- **Large File**: Conflict between app-history.md. Resolution: skipped detailed merge due to file size
+- **## Overview**: Conflict between background-consolidation-authority.md and progress.md. Resolution: kept both versions
+
+# Firebase Atomic Architecture Migration Decision Log
+
+This document records key decisions made during the Firebase atomic architecture migration process, including rationales and alternatives considered.
+
+# Firebase Atomic Architecture Migration Progress
+
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| // ROO-CLEANED | 2025-05-13 |  Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| // ROO-MIGRATED | 2025-05-13 |  Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| // ROO-CLEANED | 2025-05-13 |  Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| // ROO-CLEANED | 2025-05-13 |  Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| // ROO-MIGRATED | 2025-05-13 |  Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| // ROO-CLEANED | 2025-05-13 |  Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+| ./test-tag-context.js | 2025-05-13 | Migrated to new architecture |
+| ./test-tag-context.js | 2025-05-13 | Removed unused functions |
+```
+</details>
+
+Last updated: 2025-05-13 20:43:32
+
+# Memory Bank Consolidation System
+
+This document describes the automatic memory bank consolidation system that helps maintain a clean, organized, and efficient memory bank by consolidating related files.
+
+## Automatic Triggers
+
+The consolidation system is automatically triggered when:
+
+1. **New files are added** to the memory-bank directory
+   - A file watcher checks for new files every 5 minutes
+2. **Context reload** occurs via the `update-memory-bank.js` script
+   - The consolidation runs after each memory bank update
+3. **Background consolidation** runs via the `background-consolidate.sh` script
+   - Part of the regular maintenance process
+
+## Best Practices
+
+To work effectively with the consolidation system:
+
+1. **Use consistent naming** for related files
+2. **Add system tags** (`#infra`, `#firebase`, etc.) to help identify related files
+3. **Use clear section headings** to help the system identify and merge content correctly
+4. **Include citations and sources** at the end of files to preserve attribution
+5. **Maintain the `.nvmrc` file** to ensure consistent Node.js versions
+
+## Completed Migrations
+
+| Service File | Status | Date Completed | Notes |
+|-------------|--------|----------------|-------|
+| ./App.tsx | ✅ Completed | Prior | Previously migrated |
+| ./archive/screens/RedeemGiftScreen.tsx | ✅ Completed | 2025-05-13 | All functions migrated to use firebaseService |
+| ./atomic/index.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/BettingPage.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/ForgotPasswordPage.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/HomePage.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/LoginScreen.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/ProfilePage.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/SettingsPage.js | ✅ Completed | Prior | Previously migrated |
+| ./atomic/pages/SignupPage.js | ✅ Completed | Prior | Previously migrated |
+| ./backups/20250422/build-backup-20250422_165540/atomic/index.js | ✅ Completed | Prior | Previously migrated |
+| ./backups/20250422/build-backup-20250422_165540/atomic/pages/HomePage.js | ✅ Completed | Prior | Previously migrated |
+| ./build/atomic/index.js | ✅ Completed | Prior | Previously migrated |
+| ./build/atomic/pages/HomePage.js | ✅ Completed | Prior | Previously migrated |
+| ./components/AutoResubscribeToggle.tsx | ✅ Completed | Prior | Previously migrated |
+| ./components/BankrollManagementCard.tsx | ✅ Completed | Prior | Previously migrated |
+| ./components/DailyFreePick.tsx | ✅ Completed | Prior | Previously migrated |
+| ./components/EnhancedPlayerStatistics.tsx | ✅ Completed | Prior | Previously migrated |
+
+## Conclusion
+
+The memory bank consolidation system helps maintain a clean, organized, and efficient memory bank by automatically identifying and merging related files. This reduces duplication, improves knowledge organization, and makes it easier to find and use information in the memory bank.
+
+## Conflict Resolution
+
+When the system detects conflicts between files (significantly different content in the same sections), it:
+
+1. Keeps both versions of the content
+2. Adds a note indicating the conflict
+3. Logs the conflict in the checkpoint and status files
+
+## Consolidation Process
+
+When the system identifies files that should be consolidated, it follows this process:
+
+1. **Cluster** related files using fuzzy matching to group by theme
+2. **Select a base file** - the most refined and up-to-date file as the primary version
+3. **Consolidate** - merge all content into one canonical file following naming conventions:
+   - `firebase-[topic]-overview.md` or `deployment-security-guide.md`
+   - Preserves citations and source comments at the end
+4. **Archive deprecated fragments** - rename merged files with `.deprecated.md` or move to `/archive/memory-bank/`
+   - Adds deprecation notice: `# ❌ Deprecated – merged into [new filename]`
+5. **Log the merge** - update checkpoint and status log files:
+   - `/context/latest-checkpoint.md`
+   - `/status/status-log.md`
+6. **Notify** if there are conflicting advice or ambiguity
+
+## Content
+
+<!-- ROO-MERGE-COMPLETE: 2025-05-13 -->
+
+## Context Tags
+
+- **scripts/memory-bank-consolidation.js**: Implemented persistent rule system for memory bank consolidation with large file handling (2025-05-13)
+- **scripts/setup-memory-bank-consolidation.sh**: Created setup script for memory bank consolidation triggers (2025-05-13)
+- **scripts/ensure-node.sh**: Added Node.js environment setup script for consolidation system (2025-05-13)
+- **memory-bank/background-consolidation-authority.md**: Added documentation for memory bank consolidation system (2025-05-13)
+- **memory-bank/progress.md**: Updated with memory bank consolidation implementation details (2025-05-13)
+- **./test-tag-context.js**: Testing the context tagging system
+- **scripts/manage-tasks.sh**: Implemented task caching system with fuzzy matching for deduplication (2025-05-13)
+- **scripts/tag-context.sh**: Updated to integrate with task caching system (2025-05-13)
+- **.dotfiles/.bash_aliases**: Added aliases for task management (2025-05-13)
+- **.dotfiles/.bash_functions**: Added functions for advanced task operations (2025-05-13)
+
+## Implementation Details
+
+The consolidation system consists of several components:
+
+1. **`memory-bank-consolidation.js`** - The main script that performs the consolidation
+2. **`setup-memory-bank-consolidation.sh`** - Sets up the triggers and hooks
+3. **`ensure-node.sh`** - Ensures Node.js is installed and properly configured
+4. **`watch-memory-bank.sh`** - Watches for new files in the memory bank
+5. **`context-reload-hook.sh`** - Runs after context reload
+6. **`consolidate-memory-bank.sh`** - Manual trigger script
+
+## Large File Handling
+
+The consolidation system includes special handling for large files:
+
+1. **Size Detection** - Files larger than 100MB are detected automatically
+2. **Limited Analysis** - Large files are analyzed using system tags and filenames only
+3. **Grep-Based Scanning** - System tags are detected using grep instead of loading the entire file
+4. **Metadata-Only Merging** - When consolidating large files, only metadata is merged, not content
+5. **Reference Preservation** - The consolidated file includes references to the original large files
+6. **Error Handling** - Files larger than 2GB are handled gracefully without crashing
+
+This approach ensures the system can handle files of any size without running into memory limitations.
+
+## Logs and Status
+
+The consolidation system maintains logs and status information in:
+
+- **`logs/memory-bank-consolidation.log`** - Detailed log of consolidation activities
+- **`context/latest-checkpoint.md`** - Record of consolidation checkpoints
+- **`status/status-log.md`** - Summary of consolidation activities
+
+## Maintenance
+
+The consolidation system is designed to run automatically, but you can:
+
+1. **Review the logs** periodically to ensure it's working correctly
+2. **Manually trigger** consolidation if you notice duplication
+3. **Update the configuration** in `memory-bank-consolidation.js` if needed
+
+## Manual Consolidation
+
+You can also manually trigger the consolidation process by:
+
+1. Running the consolidation script directly:
+   ```bash
+   ./scripts/consolidate-memory-bank.sh
+   ```
+
+2. Using the word "consolidate" in a prompt, which will automatically trigger the consolidation process
+
+## Memory Bank Consolidation System Implementation (2025-05-13)
+
+Implemented a persistent rule system for managing the memory bank with automatic consolidation:
+
+## Migration Patterns Applied
+
+- Replaced direct Firebase imports with atomic architecture imports
+- Updated Firestore operations to use firebaseService.firestore methods
+- Updated Firebase Functions calls to use firebaseService.functions.callFunction
+- Added proper type assertions for backward compatibility
+- Maintained consistent error handling patterns
+
+## Narrative Context Files
+
+The following files contain important narrative context for the project:
+
+- [docs/ai-sports-edge-comprehensive-documentation.md](docs/ai-sports-edge-comprehensive-documentation.md)
+- [memory-bank/comprehensive-ai-sports-edge-plan.md](memory-bank/comprehensive-ai-sports-edge-plan.md)
+- [memory-bank/combined-architecture-with-optimizations.md](memory-bank/combined-architecture-with-optimizations.md)
+- [docs/PROJECT_HISTORY.md](docs/PROJECT_HISTORY.md)
+- [docs/FOUNDER_OVERVIEW_v1.0.md](docs/FOUNDER_OVERVIEW_v1.0.md)
+- [memory-bank/productContext.md](memory-bank/productContext.md)
+- [docs/project-analysis/development-history.md](docs/project-analysis/development-history.md)
+
+## Narrative Context Files Tagging (2025-05-13)
+
+Tagged the following files with ROO-NARRATIVE-CONTEXT:
+
+- [docs/ai-sports-edge-comprehensive-documentation.md](docs/ai-sports-edge-comprehensive-documentation.md)
+- [memory-bank/comprehensive-ai-sports-edge-plan.md](memory-bank/comprehensive-ai-sports-edge-plan.md)
+- [memory-bank/combined-architecture-with-optimizations.md](memory-bank/combined-architecture-with-optimizations.md)
+- [docs/PROJECT_HISTORY.md](docs/PROJECT_HISTORY.md)
+- [docs/FOUNDER_OVERVIEW_v1.0.md](docs/FOUNDER_OVERVIEW_v1.0.md)
+- [memory-bank/productContext.md](memory-bank/productContext.md)
+- [docs/project-analysis/development-history.md](docs/project-analysis/development-history.md)
+
+These files contain strategic vision, user flow psychology, design decisions, and investor insights.
+
+## Next Steps
+
+1. Identify remaining files that need migration
+2. Prioritize based on dependencies and complexity
+3. Create automated tests to verify functionality after migration
+4. Update documentation to reflect new patterns
+
+## Node.js Environment
+
+The consolidation system requires Node.js to run. The system includes an automatic Node.js setup script:
+
+1. **`ensure-node.sh`** - Checks if Node.js is installed and installs it if necessary
+   - Uses nvm (Node Version Manager) to install and manage Node.js
+   - Reads the `.nvmrc` file to determine which Node.js version to use
+   - Falls back to Node.js v18 if no `.nvmrc` file is found
+   - Enables corepack for package manager version control
+   - Installs dependencies if needed
+
+All scripts that use Node.js will automatically check for its presence and install it if necessary.
+
+## Overview
+
+The memory bank consolidation system automatically identifies and merges related files in the memory bank to reduce duplication and improve knowledge organization. It follows a set of rules to determine when files should be consolidated and how the consolidation should be performed.
+
+---
+
+**Note:** Alternative content from progress.md:
+
+This document tracks the progress of migrating service files to the Firebase atomic architecture.
+
+## Pending Migrations
+
+| Service File | Status | Priority | Notes |
+|-------------|--------|----------|-------|
+
+## Progress Summary
+
+- **Total Files**: 188
+- **Migrated Files**: 188
+- **Pending Files**: 0
+- **Completion**: 100%
+
+## Trigger Conditions
+
+The system automatically consolidates memory bank files when:
+
+- 2 or more files in `/roocode/memory_bank.md` or the `memory-bank` directory:
+  - Share ≥75% topic overlap (similar keywords in title or content like "Firebase", "auth", "API key", "headers", "deployment", "CSP", etc.)
+  - OR share system-level tags like `#infra`, `#firebase`, `#security`, `#deployment`
+
+### 1. Centralized Firebase Service
+
+**Decision**: Create a centralized firebaseService in the atomic architecture's organisms layer.
+
+**Date**: Prior to current migration
+
+**Context**: Previously, Firebase was initialized and accessed directly in multiple service files, leading to code duplication and potential inconsistencies.
+
+**Rationale**:
+- Follows atomic design principles by encapsulating Firebase as an organism
+- Provides a single point of initialization and configuration
+- Makes testing easier through centralized mocking
+- Improves maintainability by isolating Firebase-specific code
+
+**Alternatives Considered**:
+- Context-based Firebase provider: Rejected due to complexity and potential performance issues
+- Higher-order component pattern: Rejected as less suitable for service-oriented architecture
+
+### 1. Function-by-Function Migration Approach
+
+**Decision**: Migrate each function individually rather than rewriting entire files.
+
+**Date**: 2025-05-12
+
+**Context**: Service files contain many functions with complex logic.
+
+**Rationale**:
+- Reduces risk by allowing incremental testing
+- Makes it easier to identify and fix issues
+- Allows for partial rollback if needed
+
+**Alternatives Considered**:
+- Complete file rewrites: Higher risk and more difficult to test
+- Parallel implementation: Would lead to code duplication
+
+### 10. Background Consolidation System Implementation
+
+**Decision**: Implement a comprehensive background consolidation system to automate file management, deduplication, and context synchronization tasks.
+
+**Date**: 2025-05-13
+
+**Context**: The project needed a unified approach to file management, deduplication, and context synchronization that could run automatically in the background.
+
+**Rationale**:
+- Reduces manual effort in maintaining project cleanliness
+- Ensures consistent handling of duplicate files and tags
+- Automates synchronization between code tags and memory bank
+- Provides a unified approach to file archiving and cleanup
+- Establishes a single source of truth for consolidation operations
+
+**Implementation Details**:
+- Created `scripts/background-consolidate.sh` with five key sections:
+  - DETECT CANDIDATES: Functions to identify files for processing
+  - DEDUPLICATE TAGS: Functions to remove redundant tags
+  - MERGE CONTEXT: Functions to combine related context data
+  - REMOVE LEGACY: Functions to clean outdated files
+  - SYNC WITH MEMORY BANK: Functions to update memory storage
+- Added `.cronrc` entry to run every 12 minutes with label `consolidate`
+- Created `memory-bank/consolidation-components-found.md` for analysis of consolidation components
+- Created `memory-bank/background-consolidation-authority.md` for standing authority directives
+
+**Alternatives Considered**:
+- Multiple specialized scripts: Would be more modular but harder to maintain
+- Event-driven approach: Would be more responsive but more complex
+- Manual consolidation: Would be more controlled but less consistent
+
+Last updated: 2025-05-13 20:43:32
+
+### 11. Narrative Context Tagging System Implementation
+
+**Decision**: Implement a narrative context tagging system to identify and manage strategic documentation files.
+
+**Date**: 2025-05-13
+
+**Context**: The project needed a way to identify, tag, and manage important documentation files that contain strategic vision, user flow psychology, design decisions, and investor insights.
+
+**Rationale**:
+- Provides a systematic way to identify and track important narrative documents
+- Establishes a clear tagging convention for strategic documentation
+- Facilitates future consolidation of strategic vision and architecture information
+- Integrates with the existing memory bank and context management system
+- Supports the document consolidation and strategic context principles
+
+**Implementation Details**:
+- Created `scripts/tag-narrative-context.sh` to tag specified narrative context files
+- Tagged primary candidates with `<!-- ROO-NARRATIVE-CONTEXT -->`
+- Created `status/essential-documents.md` to maintain a canonical log of key files
+- Updated memory-bank files with narrative context references
+- Added document consolidation and strategic context principles to `background-consolidation-authority.md`
+- Added to `.cronrc` to run daily for continuous scanning and tagging
+
+**Future Plan**:
+- Once other merges complete, consolidate narrative context files into a single, well-formatted document
+- Create a comprehensive vision and system architecture document with sections for vision, design philosophy, feature summary, architecture summary, investor overview, and timeline
+
+Last updated: 2025-05-13 20:48:00
+
+### 12. System Health Check Implementation
+
+**Decision**: Implement a modular system health check script to consolidate verification tasks.
+
+**Date**: 2025-05-13
+
+**Context**: The project had multiple scripts and cron jobs for various verification tasks, which could lead to sprawl and maintenance challenges.
+
+**Rationale**:
+- Reduces sprawl by consolidating multiple verification tasks into a single script
+- Provides a modular structure that can be easily extended with new verification modules
+- Centralizes logging and reporting for system health
+- Improves maintainability by having a single entry point for system verification
+- Follows the principle of having one script with pluggable checks that can grow cleanly
+
+**Implementation Details**:
+- Created `scripts/system-health-check.sh` with modular function blocks:
+  - `verify_consolidation_principles`: Checks adherence to consolidation principles
+  - `verify_atomic_architecture`: Verifies atomic architecture structure
+  - `verify_memory_bank_consistency`: Ensures memory bank files are present and up-to-date
+  - `verify_narrative_context_tagging`: Checks for narrative context tags in key files
+- Implemented structured logging to separate files:
+  - `status/consolidation-compliance.md`: Records compliance with system principles
+  - `status/consolidation-violations.md`: Records violations of system principles
+  - `status/system-health-summary.md`: Provides a brief summary of all module results
+- Added to `.cronrc` to run every 3 days with label `system-health`
+- Designed to reference `memory-bank/systemPatterns.md` for behavioral rules
+
+**Alternatives Considered**:
+- Multiple specialized scripts: Would be more modular but lead to sprawl
+- Event-driven verification: Would be more responsive but more complex
+- Manual verification: Would be more controlled but less consistent and more labor-intensive
+
+Last updated: 2025-05-13 20:52:00
+
+### 13. Memory Bank Consolidation System Implementation
+
+**Decision**: Implement a persistent rule system for automatic memory bank consolidation.
+
+**Date**: 2025-05-13
+
+**Context**: The memory bank had accumulated multiple files with overlapping content, making it difficult to find and use information efficiently. A systematic approach was needed to identify and consolidate related files.
+
+**Rationale**:
+- Reduces duplication by automatically identifying and merging related files
+- Improves knowledge organization through consistent naming conventions
+- Preserves all important information while eliminating redundancy
+- Automates a previously manual and error-prone process
+- Integrates with existing memory bank management systems
+- Follows atomic design principles by creating modular, reusable components
+
+**Implementation Details**:
+- Created `scripts/memory-bank-consolidation.js` as the main consolidation script with:
+  - Fuzzy matching algorithm to identify files with ≥75% topic overlap
+  - System tag detection for #infra, #firebase, #security, #deployment, etc.
+  - Smart base file selection based on recency, comprehensiveness, and structure
+  - Content merging with conflict detection and resolution
+  - Citation and source preservation
+  - Canonical filename generation
+  - Deprecated file archiving with clear notices
+  - Large file handling with special processing for files >100MB
+- Created `scripts/setup-memory-bank-consolidation.sh` to set up automatic triggers:
+  - File watcher for new memory bank files
+  - Context reload hook for integration with update-memory-bank.js
+  - Manual consolidation command
+  - Integration with background-consolidate.sh
+- Created `scripts/ensure-node.sh` for Node.js environment management:
+  - Automatic Node.js installation via nvm
+  - Version control via .nvmrc
+  - Package manager configuration
+- Created `memory-bank/background-consolidation-authority.md` for documentation
+- Updated memory bank files with consolidation information
+
+**Alternatives Considered**:
+- Manual consolidation process: Would be more controlled but less consistent and more labor-intensive
+- Simple file merging without analysis: Would be simpler but risk losing important information
+- External knowledge management tool: Would fragment context across systems
+- Folder-based organization: Would be more visual but less integrated with existing systems
+- Stream-based processing: Would handle large files better but be more complex to implement
+- Fallback bash implementation: Would work without Node.js but have limited functionality
+
+**Future Enhancements**:
+- Add machine learning-based similarity detection for more accurate clustering
+- Implement interactive consolidation mode for complex merges
+- Create visualization tools for memory bank relationships
+- Develop metrics for measuring consolidation effectiveness
+- Implement incremental processing for very large files
+- Add distributed processing for extremely large repositories
+
+Last updated: 2025-05-13 22:21:22
+
+### 2. Preserve Error Handling Patterns
+
+**Decision**: Maintain existing error handling patterns during migration.
+
+**Date**: 2025-05-12
+
+**Context**: Different services have established error handling patterns.
+
+**Rationale**:
+- Maintains consistency with existing code
+- Reduces risk of introducing new bugs
+- Preserves expected behavior for error cases
+
+**Alternatives Considered**:
+- Standardize error handling: Would be more consistent but higher risk
+- Enhanced error reporting: Would be beneficial but outside migration scope
+
+### 2. Type Assertions for Backward Compatibility
+
+**Decision**: Use type assertions (e.g., `(result as any).status`) when accessing Firebase function results.
+
+**Date**: 2025-05-12
+
+**Context**: The migration to atomic architecture changed the return type of Firebase function calls, potentially breaking existing code.
+
+**Rationale**:
+- Maintains backward compatibility with existing code
+- Avoids extensive refactoring of dependent components
+- Provides a clear migration path without breaking changes
+
+**Alternatives Considered**:
+- Define explicit interfaces: Would be cleaner but require more extensive changes
+- Use unknown type with type guards: More type-safe but more verbose
+
+### 3. Path-Based Document References
+
+**Decision**: Use path strings instead of document references for Firestore operations.
+
+**Date**: 2025-05-12
+
+**Context**: The original code used Firestore document references, while the atomic architecture uses path strings.
+
+**Rationale**:
+- Simplifies the API surface
+- Makes code more readable and less verbose
+- Encapsulates Firestore-specific details in the firebaseService
+
+**Alternatives Considered**:
+- Keep using document references: Would require more complex wrapper functions
+- Hybrid approach: Would lead to inconsistent patterns
+
+### 3. Task Caching System Implementation
+
+**Decision**: Implement a structured task caching system in `todo.json` with integration to memory bank files.
+
+**Date**: 2025-05-13
+
+**Context**: The project needed a unified approach to task management that integrates with the existing context tagging system.
+
+**Rationale**:
+- Provides a single source of truth for task management
+- Implements fuzzy matching to avoid duplicate tasks
+- Integrates with memory bank files for consistent context tracking
+- Supports prioritization and status tracking of tasks
+- Enables better workflow through bash aliases and functions
+
+**Alternatives Considered**:
+- External task tracking tool: Would fragment context across systems
+- Simple text-based TODO list: Lacks structure and integration capabilities
+- Extending tag-context.sh: Would mix concerns and complicate the script
+
+### 4. Progress Tracking File Cleanup and Standardization
+
+**Decision**: Clean up and standardize the progress.md file to improve readability and maintainability.
+
+**Date**: 2025-05-13
+
+**Context**: The progress.md file had accumulated numerous duplicate entries and test data, making it difficult to read and maintain.
+
+**Rationale**:
+- Improves readability by removing duplicate entries
+- Preserves all important progress information
+- Establishes clear structure for future updates
+- Adds version tracking to prevent future duplication
+- Provides maintenance guidelines for consistent formatting
+
+**Alternatives Considered**:
+- Automated cleanup script: Would be more efficient but risk losing important information
+- Complete rewrite: Would be cleaner but risk losing historical context
+- Minimal cleanup: Would be safer but not address structural issues
+
+**Implementation Details**:
+- Used fuzzy matching with ≥85% similarity threshold to identify duplicates
+- Preserved the most complete/recent version of duplicates
+- Added timestamp marker for version tracking
+- Created maintenance guidelines section
+- Preserved original log data in a collapsible section for reference
+
+Last updated: 2025-05-13 20:43:32
+
+### 5. Adoption of .cronrc as Declarative Scheduler
+
+**Decision**: Adopted `.cronrc` as a declarative scheduler for recurring system jobs.
+
+**Date**: 2025-05-13
+
+**Context**: The project needed an automated way to handle recurring tasks like context saving, tagging, checkpointing, and sweeping.
+
+**Rationale**:
+- Provides a declarative approach to job scheduling
+- Automates routine maintenance tasks
+- Ensures consistent execution of critical system jobs
+- Reduces manual intervention for recurring tasks
+
+**Implementation Details**:
+- Used to automate context saving, tagging, checkpointing, and sweeping
+
+### 6. Enhanced Consolidation Process
+
+**Decision**: Enhanced consolidation process to include backfill, task deduplication, and marker integration.
+
+**Date**: 2025-05-13
+
+**Context**: The existing consolidation process needed improvements to handle growing complexity.
+
+**Rationale**:
+- Improves data integrity through backfilling missing information
+- Reduces redundancy through task deduplication
+- Enhances traceability with marker integration
+- Creates canonical logs for historical reference
+
+**Implementation Details**:
+- Created `task-rolling-log.md` and `app-history.md` as canonical logs
+
+### 7. Introduction of Scheduler Validation Log
+
+**Decision**: Introduced `status/cron-validation-log.md` for scheduler optimization.
+
+**Date**: 2025-05-13
+
+**Context**: The scheduler needed a way to validate and optimize its operations.
+
+**Rationale**:
+- Provides visibility into scheduler performance
+- Helps identify optimization opportunities
+- Facilitates troubleshooting of scheduler issues
+- Enables data-driven improvements to scheduling
+
+### 8. Formalization of Weekly Maintenance
+
+**Decision**: Formalized `full-sweep.sh` as weekly maintenance orchestrator.
+
+**Date**: 2025-05-13
+
+**Context**: The project needed a structured approach to weekly maintenance tasks.
+
+**Rationale**:
+- Centralizes maintenance operations in a single script
+- Ensures consistent execution of maintenance tasks
+- Reduces risk of missed maintenance activities
+- Improves maintainability through standardization
+
+### 9. Self-Observation Logging
+
+**Decision**: Empowered Roo to log self-observations to `roo-observations.md` after each cron job.
+
+**Date**: 2025-05-13
+
+**Context**: There was a need to capture insights and observations from automated processes.
+
+**Rationale**:
+- Provides valuable insights into system behavior
+- Creates an audit trail of automated activities
+- Helps identify patterns and anomalies
+- Facilitates continuous improvement of automated processes
+
+### Completed Tasks
+
+- **[high]** Clean up and optimize progress.md file (Source: memory-bank/progress.md, ID: 1)
+
+### Consolidation Process
+
+1. **Cluster** related files using fuzzy matching to group by theme
+2. **Select a base file** - the most refined and up-to-date file as the primary version
+3. **Consolidate** - merge all content into one canonical file following naming conventions
+4. **Archive deprecated fragments** - rename merged files with `.deprecated.md` or move to `/archive/memory-bank/`
+5. **Log the merge** - update checkpoint and status log files
+6. **Notify** if there are conflicting advice or ambiguity
+
+### Documentation Optimization
+
+Recent improvements to the documentation system include:
+
+1. **Progress Tracking Cleanup**: The `progress.md` file has been deduplicated and optimized
+2. **Version Tracking**: Added timestamp markers to track document versions
+3. **Maintenance Guidelines**: Added guidelines for maintaining clean document structure
+4. **Decision Documentation**: Updated `decisionLog.md` with rationale for documentation changes
+5. **Reporting**: Created a comprehensive report of cleanup activities and improvements
+
+### Implementation Components
+
+- Created `scripts/memory-bank-consolidation.js` - Main consolidation script
+- Created `scripts/setup-memory-bank-consolidation.sh` - Setup script for triggers
+- Created `scripts/ensure-node.sh` - Node.js environment setup script
+- Created `memory-bank/background-consolidation-authority.md` - Documentation
+- Added automatic triggers for:
+  - New memory-bank file additions
+  - Context reload events
+  - Manual prompts with "consolidate"
+- Added Node.js environment management:
+  - Automatic Node.js installation via nvm
+  - Version control via .nvmrc
+  - Package manager configuration
+- Added large file handling:
+  - Files >100MB analyzed using system tags and filenames only
+  - Files >2GB handled gracefully without memory errors
+  - Grep-based scanning for system tags in large files
+  - Metadata-only merging for large files
+
+This implementation ensures the memory bank remains organized, reduces duplication, and improves knowledge management efficiency while maintaining consistent Node.js environments across different systems.
+
+### In-Progress Tasks
+
+No tasks currently in progress.
+
+Last updated: 2025-05-13 22:21:06
+
+### Integration with Context Tagging
+
+The task caching system is integrated with the existing context tagging system:
+
+1. When a `// ROO-TASK:` tag is added to a file, it automatically creates a task in `todo.json`
+2. The `scripts/tag-context.sh` script has been updated to call `manage-tasks.sh` for task management
+3. The `sync-tasks-with-memory-bank` function ensures memory bank files are kept in sync with the task cache
+
+### Memory Bank Consolidation System
+
+The memory bank consolidation system has been implemented to automatically identify and merge related files in the memory bank:
+
+1. **Automatic Triggers**: Consolidation runs when:
+   - 2+ files have ≥75% topic overlap (similar keywords)
+   - Files share system-level tags like #infra, #firebase, #security, #deployment
+   - New files are added to the memory bank
+   - Context is reloaded
+   - Manual prompt includes "consolidate"
+
+2. **Consolidation Process**:
+   - Cluster related files using fuzzy matching
+   - Select the most refined file as the base
+   - Merge content into a canonical file with proper naming conventions
+   - Archive deprecated files with clear notices
+   - Log the merge in checkpoint and status files
+   - Notify of any conflicts or ambiguities
+
+3. **Implementation Components**:
+   - `scripts/memory-bank-consolidation.js`: Main consolidation script with large file handling
+   - `scripts/setup-memory-bank-consolidation.sh`: Setup script for triggers
+   - `scripts/ensure-node.sh`: Node.js environment setup script
+   - `memory-bank/background-consolidation-authority.md`: Documentation
+   - Integration with existing background consolidation processes
+
+This system ensures the memory bank remains organized, reduces duplication, and improves knowledge management efficiency while handling files of any size.
+
+### Pending Tasks
+
+- **[medium]** Implement error handling for edge cases (Source: test-tag-context.js, ID: 0)
+
+### Structure Maintenance
+
+To maintain the clean structure of this document:
+
+1. **Section Organization**: Keep all entries under their appropriate sections
+2. **Formatting Consistency**: Maintain consistent markdown formatting
+3. **Entry Format**: Follow the established table format for migrations
+4. **Deduplication**: Before adding new entries, check for similar existing entries (≥85% similarity)
+
+### Task Caching System
+
+The task caching system has been implemented to provide a structured approach to task management with the following features:
+
+1. **Centralized Storage**: All tasks are stored in `memory-bank/todo.json` in a structured JSON format
+2. **Fuzzy Matching**: Tasks with >70% similarity are considered duplicates to prevent redundancy
+3. **Status Tracking**: Tasks can be marked as pending, in-progress, or completed
+4. **Priority Levels**: Tasks can be assigned low, medium, or high priority
+5. **Source Tracking**: Each task records its source (file or location)
+6. **Memory Bank Integration**: Tasks are synchronized with activeContext.md, progress.md, and decisionLog.md
+7. **Command-Line Interface**: Bash aliases and functions provide easy access to task management
+
+### Trigger Conditions
+
+- Automatic consolidation triggers when:
+  - 2+ files have ≥75% topic overlap (similar keywords like "Firebase", "auth", "API key", etc.)
+  - OR share system-level tags like #infra, #firebase, #security, #deployment
+
+### Version Tracking
+
+This document uses version tracking to prevent duplication:
+
+- **Version Tag**: The `<!-- ROO-MERGE-COMPLETE: YYYY-MM-DD -->` tag at the top indicates the last merge/cleanup date
+- **Update Process**: When making significant changes, update this tag with the current date
+- **Merge Strategy**: When merging from multiple sources, preserve the most recent and complete information
+
+<details>
+<summary>Original Log Data (Preserved for Reference)</summary>
+
+```
+

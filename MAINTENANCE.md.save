@@ -1,0 +1,49 @@
+# AI Sports Edge Maintenance Guide
+
+## Regular Maintenance Tasks
+
+### Dependency Updates
+1. Check for outdated packages:
+npm outdated
+
+2. Update dependencies (with caution):
+npm update --legacy-peer-deps
+
+### Deployment Process
+1. Always test locally before deployment:
+npm run web
+
+2. Build and deploy:
+npm run build
+firebase deploy --only hosting
+
+### Git Workflow
+1. For new features, create a feature branch:
+git checkout -b feature/new-feature
+
+2. Make changes and commit regularly:
+git add .
+git commit -m "Descriptive message"
+
+3. Push to GitHub:
+git push origin feature/new-feature
+
+4. Create a pull request to main branch on GitHub.
+
+### Troubleshooting Common Issues
+1. If web build fails:
+- Check webpack configuration
+- Verify dependencies are compatible
+- Try clearing cache: `npm cache clean --force`
+
+2. If deployment fails:
+- Check Firebase configuration
+- Verify dist directory has the correct files
+- Check Firebase console for error messages
+
+## Future Upgrade Path
+When ready to upgrade Expo:
+1. Create a backup branch of the current state
+2. Follow Expo's migration guide for the appropriate versions
+3. Test thoroughly before deployment
+4. Consider a phased approach for major version upgradesRetryClaude can make mistakes. Please double-check responses.

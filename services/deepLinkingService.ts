@@ -1,0 +1,423 @@
+import { firebaseService } from '../src/atomic/organisms/firebaseService';
+import 'react-native';
+import { analyticsService } from './analyticsService';
+import { auth, firestore } from '../config/firebase';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  updateDoc
+} from 'firebase/firestore';
+
+/**
+ * Deep Linking Service
+ * 
+ * This service handles deep linking functionality, allowing the app to respond
+ * to external links and track marketing campaigns.
+ */
+
+// URL scheme for the app
+export const APP_URL_SCHEME = 'aisportsedge://';
+
+// Web domain for universal links
+export const APP_WEB_DOMAIN = 'aisportsedge.app';
+
+// Supported deep link paths
+export enum DeepLinkPath {
+  HOME = 'home',
+  GAME = 'game',
+  PLAYER = 'player',
+  TEAM = 'team',
+  BET = 'bet',
+  SUBSCRIPTION = 'subscription',
+  REFERRAL = 'referral',
+  NOTIFICATION = 'notification',
+  SETTINGS = 'settings',
+  PROMO = 'promo'
+}
+
+// Deep link parameters
+export interface DeepLinkParams {
+  [key: string]: string;
+}
+
+// UTM parameters for campaign tracking
+export interface UTMParams {
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  term?: string;
+  content?: string;
+}
+
+// Deep link data structure
+export interface DeepLinkData {
+  url: string;
+  path: DeepLinkPath;
+  params: DeepLinkParams;
+  utmParams: UTMParams;
+  timestamp: Date;
+}
+
+// Deep link history entry
+export interface DeepLinkHistoryEntry extends DeepLinkData {
+  id: string;
+  userId?: string;
+  processed: boolean;
+  result?: string;
+}
+
+class DeepLinkingService {
+  private initialLink: string | null = null;
+  private listeners: ((data: DeepLinkData) => void)[] = [];
+
+  /**
+   * Initialize the deep linking service
+   */
+  public async initialize(): Promise<void> {
+    try {
+      // Get the initial URL if the app was opened from a deep link
+      const initialUrl = await Linking.getInitialURL();
+      this.initialLink = initialUrl;
+      
+      if (initialUrl) {
+        console.log('App opened from deep link:', initialUrl);
+        const deepLinkData = this.parseDeepLink(initialUrl);
+        this.processDeepLink(deepLinkData);
+      }
+      
+      // Add event listener for deep links while the app is running
+      Linking.addEventListener('url', this.handleDeepLink);
+      
+      console.log('Deep linking service initialized');
+    } catch (error) {
+      console.error('Error initializing deep linking service:', error);
+    }
+  }
+
+  /**
+   * Handle deep link event
+   */
+  private handleDeepLink = (event: { url: string }): void => {
+    try {
+      console.log('Deep link received:', event.url);
+      const deepLinkData = this.parseDeepLink(event.url);
+      this.processDeepLink(deepLinkData);
+    } catch (error) {
+      console.error('Error handling deep link:', error);
+    }
+  };
+
+  /**
+   * Parse a deep link URL
+   * @param url Deep link URL
+   * @returns Deep link data
+   */
+  private parseDeepLink(url: string): DeepLinkData {
+    try {
+      // Create URL object
+      const urlObj = new URL(url);
+      
+      // Extract path
+      let path = urlObj.pathname.replace(/^\/+/, '');
+      if (path === '') {
+        path = DeepLinkPath.HOME;
+      }
+      
+      // Validate path
+      if (!Object.values(DeepLinkPath).includes(path as DeepLinkPath)) {
+        console.warn(`Invalid deep link path: ${path}, defaulting to HOME`);
+        path = DeepLinkPath.HOME;
+      }
+      
+      // Extract parameters
+      const params: DeepLinkParams = {};
+      const utmParams: UTMParams = {};
+      
+      urlObj.searchParams.forEach((value, key) => {
+        if (key.startsWith('utm_')) {
+          // Extract UTM parameter
+          const utmKey = key.replace('utm_', '') as keyof UTMParams;
+          utmParams[utmKey] = value;
+        } else {
+          // Regular parameter
+          params[key] = value;
+        }
+      });
+      
+      return {
+        url,
+        path: path as DeepLinkPath,
+        params,
+        utmParams,
+        timestamp: new Date()
+      };
+    } catch (error) {
+      console.error('Error parsing deep link:', error);
+      
+      // Return default deep link data
+      return {
+        url,
+        path: DeepLinkPath.HOME,
+        params: {},
+        utmParams: {},
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Process a deep link
+   * @param data Deep link data
+   */
+  private async processDeepLink(data: DeepLinkData): Promise<void> {
+    try {
+      // Log deep link
+      await this.logDeepLink(data);
+      
+      // Track analytics event
+      analyticsService.trackEvent('deep_link_opened', {
+        path: data.path,
+        params: data.params,
+        utmParams: data.utmParams
+      });
+      
+      // Notify listeners
+      this.notifyListeners(data);
+    } catch (error) {
+      console.error('Error processing deep link:', error);
+    }
+  }
+
+  /**
+   * Log deep link to Firestore
+   * @param data Deep link data
+   */
+  private async logDeepLink(data: DeepLinkData): Promise<void> {
+    try {
+      const userId = auth.currentUser?.uid;
+      
+      const deepLinkEntry: Omit<DeepLinkHistoryEntry, 'id'> = {
+        ...data,
+        userId,
+        processed: false
+      };
+      
+      const deepLinksRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, 'deepLinkHistory');
+      await addDoc(deepLinksRef, {
+        ...deepLinkEntry,
+        timestamp: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error logging deep link:', error);
+    }
+  }
+
+  /**
+   * Add a deep link listener
+   * @param listener Deep link listener function
+   * @returns Unsubscribe function
+   */
+  public addListener(listener: (data: DeepLinkData) => void): () => void {
+    this.listeners.push(listener);
+    
+    // Return unsubscribe function
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  }
+
+  /**
+   * Notify all listeners of a deep link
+   * @param data Deep link data
+   */
+  private notifyListeners(data: DeepLinkData): void {
+    this.listeners.forEach(listener => {
+      try {
+        listener(data);
+      } catch (error) {
+        console.error('Error in deep link listener:', error);
+      }
+    });
+  }
+
+  /**
+   * Get the initial deep link
+   * @returns Initial deep link URL or null
+   */
+  public getInitialLink(): string | null {
+    return this.initialLink;
+  }
+
+  /**
+   * Create a deep link URL
+   * @param path Deep link path
+   * @param params Deep link parameters
+   * @param utmParams UTM parameters
+   * @returns Deep link URL
+   */
+  public createDeepLink(
+    path: DeepLinkPath,
+    params: DeepLinkParams = {},
+    utmParams: UTMParams = {}
+  ): string {
+    try {
+      // Create URL with scheme and path
+      let url = `${APP_URL_SCHEME}${path}`;
+      
+      // Add parameters
+      const urlParams = new URLSearchParams();
+      
+      // Add regular parameters
+      Object.entries(params).forEach(([key, value]) => {
+        urlParams.append(key, value);
+      });
+      
+      // Add UTM parameters
+      Object.entries(utmParams).forEach(([key, value]) => {
+        urlParams.append(`utm_${key}`, value);
+      });
+      
+      // Add parameters to URL
+      const paramsString = urlParams.toString();
+      if (paramsString) {
+        url += `?${paramsString}`;
+      }
+      
+      return url;
+    } catch (error) {
+      console.error('Error creating deep link:', error);
+      return `${APP_URL_SCHEME}${DeepLinkPath.HOME}`;
+    }
+  }
+
+  /**
+   * Create a universal link URL (for web)
+   * @param path Deep link path
+   * @param params Deep link parameters
+   * @param utmParams UTM parameters
+   * @returns Universal link URL
+   */
+  public createUniversalLink(
+    path: DeepLinkPath,
+    params: DeepLinkParams = {},
+    utmParams: UTMParams = {}
+  ): string {
+    try {
+      // Create URL with web domain and path
+      let url = `https://${APP_WEB_DOMAIN}/${path}`;
+      
+      // Add parameters
+      const urlParams = new URLSearchParams();
+      
+      // Add regular parameters
+      Object.entries(params).forEach(([key, value]) => {
+        urlParams.append(key, value);
+      });
+      
+      // Add UTM parameters
+      Object.entries(utmParams).forEach(([key, value]) => {
+        urlParams.append(`utm_${key}`, value);
+      });
+      
+      // Add parameters to URL
+      const paramsString = urlParams.toString();
+      if (paramsString) {
+        url += `?${paramsString}`;
+      }
+      
+      return url;
+    } catch (error) {
+      console.error('Error creating universal link:', error);
+      return `https://${APP_WEB_DOMAIN}/${DeepLinkPath.HOME}`;
+    }
+  }
+
+  /**
+   * Open a deep link
+   * @param url Deep link URL
+   * @returns Promise that resolves when the deep link is opened
+   */
+  public async openDeepLink(url: string): Promise<void> {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error('Error opening deep link:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a URL can be opened by the app
+   * @param url URL to check
+   * @returns Promise that resolves to true if the URL can be opened
+   */
+  public async canOpenURL(url: string): Promise<boolean> {
+    try {
+      return await Linking.canOpenURL(url);
+    } catch (error) {
+      console.error('Error checking if URL can be opened:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get deep link history for the current user
+   * @param maxEntries Maximum number of entries to return
+   * @returns Deep link history entries
+   */
+  public async getDeepLinkHistory(maxEntries: number = 10): Promise<DeepLinkHistoryEntry[]> {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      const deepLinksRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.collection(firestore, 'deepLinkHistory');
+      const q = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.query(
+        deepLinksRef,
+        firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.where('userId', '==', userId),
+        firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.orderBy('timestamp', 'desc'),
+        firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.limit(maxEntries)
+      );
+      
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as DeepLinkHistoryEntry));
+    } catch (error) {
+      console.error('Error getting deep link history:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Mark a deep link as processed
+   * @param id Deep link history entry ID
+   * @param result Processing result
+   */
+  public async markDeepLinkProcessed(id: string, result?: string): Promise<void> {
+    try {
+      const docRef = firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.firebaseService.firestore.doc(firestore, 'deepLinkHistory', id);
+      await updateDoc(docRef, {
+        processed: true,
+        result,
+        processedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error marking deep link as processed:', error);
+    }
+  }
+}
+
+export default new DeepLinkingService();

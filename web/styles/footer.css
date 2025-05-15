@@ -1,0 +1,115 @@
+.footer {
+  background-color: var(--gray-800);
+  color: var(--gray-300);
+  padding: var(--spacing-8) 0 var(--spacing-4);
+  margin-top: var(--spacing-8);
+}
+
+/* Bet Now button in footer */
+.footer-bet-button {
+  margin-bottom: var(--spacing-6);
+  text-align: center;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+}
+
+.footer-title {
+  color: var(--white);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-4);
+}
+
+.footer-description {
+  margin-bottom: var(--spacing-4);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.social-links {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.social-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--gray-700);
+  color: var(--white);
+  transition: background-color var(--transition-speed);
+}
+
+.social-links a:hover {
+  background-color: var(--primary-color);
+}
+
+.footer-links {
+  list-style: none;
+}
+
+.footer-links li {
+  margin-bottom: var(--spacing-2);
+}
+
+.footer-links a {
+  color: var(--gray-400);
+  transition: color var(--transition-speed);
+  font-size: var(--font-size-sm);
+}
+
+.footer-links a:hover {
+  color: var(--white);
+}
+
+.footer-contact {
+  list-style: none;
+}
+
+.footer-contact li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+}
+
+.footer-contact a {
+  color: var(--gray-400);
+  transition: color var(--transition-speed);
+}
+
+.footer-contact a:hover {
+  color: var(--white);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--gray-700);
+  padding-top: var(--spacing-4);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+}
+
+@media (max-width: 992px) {
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-section {
+    margin-bottom: var(--spacing-4);
+  }
+}

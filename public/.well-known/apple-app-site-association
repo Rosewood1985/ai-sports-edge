@@ -1,0 +1,42 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.aisportsedge",
+        "paths": [
+          "/game/*",
+          "/player/*",
+          "/team/*",
+          "/bet/*",
+          "/article/*",
+          "/notification/*",
+          "/referral/*",
+          "/subscription/*",
+          "/settings/*",
+          "/campaign/*",
+          "/promo/*",
+          "/share/*",
+          "/invite/*",
+          "/open/*",
+          "NOT /api/*",
+          "NOT /admin/*",
+          "NOT /auth/*",
+          "NOT /login",
+          "NOT /register",
+          "NOT /privacy",
+          "NOT /terms",
+          "NOT /help",
+          "NOT /support",
+          "*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAM_ID.com.aisportsedge"]
+  },
+  "appclips": {
+    "apps": []
+  }
+}
