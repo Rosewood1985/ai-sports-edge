@@ -255,3 +255,17 @@ jobs:
             Visit https://aisportsedge.app to verify the deployment.
           to: ${{ secrets.EMAIL_NOTIFICATION }}
           from: AI Sports Edge Deployment <noreply@aisportsedge.app>
+jobs:
+  deploy:
+    name: Deploy via SFTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🚀 Deploy to GoDaddy via SFTP
+        run: bash scripts/secure-sftp-deploy.sh
+
+      - name: ✅ Verify deployment health
+        run: bash scripts/verify-deployment-health.sh
