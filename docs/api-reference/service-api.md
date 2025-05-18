@@ -789,7 +789,8 @@ monitoringService.trackPerformance('dataFetch', endTime - startTime, {
 
 ## Cross-References
 
-- For information on the underlying architectural principles, see [Core Concepts](../core-concepts/README.md)
-- For practical guides on using these services, see [Implementation Guides](../implementation-guides/README.md)
+- For information on Firebase services, see [Firebase Integration](../core-concepts/firebase-integration.md)
+- For practical guides on implementing Firebase services, see [Firebase Guide](../implementation-guides/firebase-guide.md)
+- For practical guides on testing services, see [Testing](../implementation-guides/testing.md)
 - For information on components that use these services, see [Component API](component-api.md)
 - For information on utility functions that these services may use, see [Utility Functions](utility-functions.md)

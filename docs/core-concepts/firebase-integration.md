@@ -761,3 +761,7 @@ exports.syncSubscriptionStatus = functions.firestore
 ## Related Documentation
 
 - [Firebase Implementation Guide](../implementation-guides/firebase-guide.md) - Comprehensive guide for implementing Firebase services
+- [Service API](../api-reference/service-api.md) - API documentation for Firebase services
+- [Atomic Architecture](atomic-architecture.md) - Overview of the atomic design principles used in the project
+- [Testing](../implementation-guides/testing.md) - Testing strategies for Firebase services
+- [Component API](../api-reference/component-api.md) - API documentation for components that use Firebase services

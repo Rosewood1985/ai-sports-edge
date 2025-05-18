@@ -582,7 +582,8 @@ console.log('API URL:', apiUrl);
 
 ## Cross-References
 
-- For information on the underlying architectural principles, see [Core Concepts](../core-concepts/README.md)
-- For practical guides on using these utility functions, see [Implementation Guides](../implementation-guides/README.md)
+- For information on internationalization utilities, see [Internationalization](../core-concepts/internationalization.md)
+- For practical guides on implementing internationalization, see [Internationalization Guide](../implementation-guides/internationalization-guide.md)
+- For practical guides on testing utilities, see [Testing](../implementation-guides/testing.md)
 - For information on components that use these utility functions, see [Component API](component-api.md)
 - For information on services that use these utility functions, see [Service API](service-api.md)

@@ -2,6 +2,8 @@
 
 This document provides detailed API documentation for UI components in the AI Sports Edge application, organized by their atomic design level.
 
+> **Note:** This document is part of the [API Reference](./README.md) section and follows the [Atomic Architecture](../core-concepts/atomic-architecture.md) principles.
+
 ## Table of Contents
 
 - [Atoms](#atoms)
@@ -388,7 +390,9 @@ function AnalyticsScreen() {
 
 ## Cross-References
 
-- For information on the underlying architectural principles, see [Core Concepts](../core-concepts/README.md)
-- For practical guides on using these components, see [Implementation Guides](../implementation-guides/README.md)
+- For information on the underlying architectural principles, see [Atomic Architecture](../core-concepts/atomic-architecture.md)
+- For practical guides on creating components, see [Component Guidelines](../implementation-guides/component-guidelines.md)
+- For testing components, see [Testing](../implementation-guides/testing.md)
 - For information on services that these components may use, see [Service API](service-api.md)
 - For information on utility functions that these components may use, see [Utility Functions](utility-functions.md)
+- For information on Firebase services used by components, see [Firebase Integration](../core-concepts/firebase-integration.md)

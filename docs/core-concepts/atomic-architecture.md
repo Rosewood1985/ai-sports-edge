@@ -316,3 +316,11 @@ const Button = ({ text, onPress, variant = 'primary' }) => {
 ## Conclusion
 
 The atomic architecture provides a clear, modular structure for the AI Sports Edge application. By organizing components into a hierarchy based on their complexity and reusability, the architecture promotes maintainability, scalability, and testability. The implementation of this architecture has transformed the codebase into a more developer-friendly structure that will support future growth and make it easier to add new features while maintaining code quality.
+
+## Related Documentation
+
+- [Component API](../api-reference/component-api.md) - API documentation for UI components
+- [Firebase Integration](firebase-integration.md) - Firebase services integration
+- [Component Guidelines](../implementation-guides/component-guidelines.md) - Guidelines for creating and using components
+- [Testing](../implementation-guides/testing.md) - Testing strategies and practices
+- [Service API](../api-reference/service-api.md) - API documentation for services
