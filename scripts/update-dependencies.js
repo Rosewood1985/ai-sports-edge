@@ -39,6 +39,24 @@ const config = {
 
   // Backup directory
   backupDir: './backups/dependencies',
+
+  // Use legacy peer deps flag (helps with React Native dependencies)
+  useLegacyPeerDeps: true,
+
+  // Known security vulnerabilities to prioritize
+  securityPriorities: [
+    'semver',
+    'shell-quote',
+    'react-native-reanimated',
+    'body-parser',
+    'braces',
+    'minimist',
+    'json5',
+    'node-fetch',
+  ],
+
+  // Nested dependency patterns to check
+  nestedDependencyPatterns: ['node_modules/**/node_modules/**'],
 };
 
 // Create interface for user input
@@ -202,7 +220,7 @@ function checkOutdated() {
 
 /**
  * Updates packages based on the specified strategy
- * @param {string} strategy - The update strategy (patch, minor, major, or specific)
+ * @param {string} strategy - The update strategy (patch, minor, major, specific, or security)
  * @param {Array<string>} packages - Specific packages to update (for 'specific' strategy)
  */
 async function updatePackages(strategy, packages = []) {
@@ -213,11 +231,12 @@ async function updatePackages(strategy, packages = []) {
 
   try {
     let command;
+    const legacyFlag = config.useLegacyPeerDeps ? ' --legacy-peer-deps' : '';
 
     switch (strategy) {
       case 'patch':
         // Update patch versions only
-        command = 'npm update';
+        command = `npm update${legacyFlag}`;
         break;
 
       case 'minor':
@@ -232,13 +251,12 @@ async function updatePackages(strategy, packages = []) {
           return;
         }
 
-        command = `npm install ${minorPackages.map(p => `${p}@latest`).join(' ')}`;
+        command = `npm install${legacyFlag} ${minorPackages.map(p => `${p}@latest`).join(' ')}`;
         break;
 
       case 'major':
         // Update all packages to latest versions
-        command =
-          'npm install $(npm outdated --json | jq -r \'keys[] as $k | "\\($k)@\\(.[$k].latest)"\')';
+        command = `npm install${legacyFlag} $(npm outdated --json | jq -r \'keys[] as $k | "\\($k)@\\(.[$k].latest)"\')`;
         break;
 
       case 'specific':
@@ -248,8 +266,13 @@ async function updatePackages(strategy, packages = []) {
           return;
         }
 
-        command = `npm install ${packages.map(p => `${p}@latest`).join(' ')}`;
+        command = `npm install${legacyFlag} ${packages.map(p => `${p}@latest`).join(' ')}`;
         break;
+
+      case 'security':
+        // Update security-focused packages
+        await updateSecurityVulnerabilities();
+        return;
 
       default:
         console.log(`Unknown strategy: ${strategy}`);
@@ -278,6 +301,160 @@ async function updatePackages(strategy, packages = []) {
     console.error('Error updating packages:', error);
     console.log('Restoring backup...');
     restoreBackup(backupPath);
+  }
+}
+
+/**
+ * Updates packages with known security vulnerabilities
+ */
+async function updateSecurityVulnerabilities() {
+  console.log('Updating packages with known security vulnerabilities...');
+
+  // Create backup before updating
+  const backupPath = createBackup();
+
+  try {
+    // Run npm audit to get vulnerability information
+    console.log('Running security audit...');
+    const auditOutput = execute('npm audit --json', true);
+
+    if (!auditOutput) {
+      console.log('No vulnerabilities found or error occurred.');
+      return;
+    }
+
+    try {
+      const auditData = JSON.parse(auditOutput);
+      const vulnerabilities = auditData.vulnerabilities || {};
+
+      // Extract vulnerable packages
+      const vulnerablePackages = Object.keys(vulnerabilities);
+
+      if (vulnerablePackages.length === 0) {
+        console.log('No vulnerable packages found.');
+        return;
+      }
+
+      console.log(`Found ${vulnerablePackages.length} vulnerable packages.`);
+
+      // Prioritize packages based on security priorities
+      const prioritizedPackages = [
+        ...config.securityPriorities.filter(p => vulnerablePackages.includes(p)),
+        ...vulnerablePackages.filter(p => !config.securityPriorities.includes(p)),
+      ];
+
+      // Group by severity
+      const criticalPackages = [];
+      const highPackages = [];
+      const moderatePackages = [];
+
+      for (const pkg of prioritizedPackages) {
+        const vulnerability = vulnerabilities[pkg];
+        if (vulnerability.severity === 'critical') {
+          criticalPackages.push(pkg);
+        } else if (vulnerability.severity === 'high') {
+          highPackages.push(pkg);
+        } else if (vulnerability.severity === 'moderate') {
+          moderatePackages.push(pkg);
+        }
+      }
+
+      console.log(
+        `Critical: ${criticalPackages.length}, High: ${highPackages.length}, Moderate: ${moderatePackages.length}`
+      );
+
+      // Update critical packages first
+      if (criticalPackages.length > 0) {
+        console.log('Updating critical vulnerability packages...');
+        const command = `npm install${
+          config.useLegacyPeerDeps ? ' --legacy-peer-deps' : ''
+        } ${criticalPackages.map(p => `${p}@latest`).join(' ')}`;
+        execute(command);
+      }
+
+      // Update high severity packages
+      if (highPackages.length > 0) {
+        console.log('Updating high vulnerability packages...');
+        const command = `npm install${
+          config.useLegacyPeerDeps ? ' --legacy-peer-deps' : ''
+        } ${highPackages.map(p => `${p}@latest`).join(' ')}`;
+        execute(command);
+      }
+
+      // Check for nested dependencies with vulnerabilities
+      console.log('Checking for nested dependencies with vulnerabilities...');
+      const nestedDeps = findNestedDependencies();
+      if (nestedDeps.length > 0) {
+        console.log(`Found ${nestedDeps.length} nested dependencies that may need updating.`);
+        console.log('Consider updating parent packages to address these nested dependencies:');
+        console.log(nestedDeps.join('\n'));
+      }
+
+      // Run tests to verify updates
+      console.log('Running tests to verify updates...');
+      const testResult = execute('npm test', true);
+
+      if (!testResult) {
+        console.log('Tests failed after update. Restoring backup...');
+        restoreBackup(backupPath);
+        return;
+      }
+
+      console.log('Security updates completed successfully!');
+
+      // Run audit again to see remaining issues
+      console.log('Running audit again to check remaining issues...');
+      execute('npm audit');
+    } catch (error) {
+      console.error('Error parsing audit data:', error);
+      console.log('Restoring backup...');
+      restoreBackup(backupPath);
+    }
+  } catch (error) {
+    console.error('Error updating security vulnerabilities:', error);
+    console.log('Restoring backup...');
+    restoreBackup(backupPath);
+  }
+}
+
+/**
+ * Finds nested dependencies that might have vulnerabilities
+ * @returns {Array<string>} - List of nested dependencies
+ */
+function findNestedDependencies() {
+  console.log('Searching for nested dependencies...');
+
+  try {
+    // Use npm ls to find nested dependencies
+    const nestedDeps = [];
+
+    for (const pattern of config.nestedDependencyPatterns) {
+      const command = `find node_modules -path "${pattern}" -name "package.json" | sort`;
+      const output = execute(command, true);
+
+      if (output) {
+        const paths = output.trim().split('\n').filter(Boolean);
+
+        for (const filePath of paths) {
+          try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const pkg = JSON.parse(content);
+
+            // Check if this is a package we're interested in
+            if (config.securityPriorities.includes(pkg.name)) {
+              nestedDeps.push(`${pkg.name}@${pkg.version} (${filePath})`);
+            }
+          } catch (err) {
+            // Ignore errors reading individual package.json files
+          }
+        }
+      }
+    }
+
+    return nestedDeps;
+  } catch (error) {
+    console.error('Error finding nested dependencies:', error);
+    return [];
   }
 }
 
@@ -384,10 +561,11 @@ async function main() {
   console.log('2. Minor and patch updates (recommended)');
   console.log('3. All updates including major versions (may break compatibility)');
   console.log('4. Update specific packages');
-  console.log('5. Check for security vulnerabilities');
-  console.log('6. Exit\n');
+  console.log('5. Security-focused updates (prioritizes fixing vulnerabilities)');
+  console.log('6. Check for security vulnerabilities');
+  console.log('7. Exit\n');
 
-  const answer = await prompt('Select an option (1-6): ');
+  const answer = await prompt('Select an option (1-7): ');
 
   switch (answer) {
     case '1':
@@ -414,10 +592,19 @@ async function main() {
       break;
 
     case '5':
-      checkVulnerabilities();
+      const securityConfirm = await prompt(
+        'This will update packages with security vulnerabilities. Continue? (y/n): '
+      );
+      if (securityConfirm.toLowerCase() === 'y') {
+        await updatePackages('security');
+      }
       break;
 
     case '6':
+      checkVulnerabilities();
+      break;
+
+    case '7':
       console.log('Exiting...');
       break;
 
