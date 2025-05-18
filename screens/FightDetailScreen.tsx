@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { ufcService } from '../services/ufcService';
 import { UFCFight, RoundBettingOption, FightStatus } from '../types/ufc';
 import { Container } from '../components/ResponsiveLayout';
@@ -32,14 +40,15 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
   const [error, setError] = useState<string | null>(null);
   const [hasRoundBettingAccess, setHasRoundBettingAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
-  
+
   const { colors, isDark } = useTheme();
-  
+  const { t } = useLanguage();
+
   // Track screen view
   useEffect(() => {
     trackScreenView('FightDetailScreen');
   }, []);
-  
+
   // Check if user has access to round betting
   useEffect(() => {
     const checkAccess = async () => {
@@ -50,12 +59,13 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
         setCheckingAccess(false);
         return;
       }
-      
+
       try {
         // Check if user has premium access or has purchased round betting for this fight
-        const hasAccess = await subscriptionService.hasPremiumAccess(user.uid) ||
-          await subscriptionService.hasRoundBettingAccess(user.uid, fightId);
-        
+        const hasAccess =
+          (await subscriptionService.hasPremiumAccess(user.uid)) ||
+          (await subscriptionService.hasRoundBettingAccess(user.uid, fightId));
+
         setHasRoundBettingAccess(hasAccess);
       } catch (error) {
         console.error('Error checking round betting access:', error);
@@ -64,26 +74,26 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
         setCheckingAccess(false);
       }
     };
-    
+
     checkAccess();
   }, [fightId]);
-  
+
   // Load fight details
   useEffect(() => {
     const loadFightData = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Fetch fight details
         const fightDetails = await ufcService.fetchFightDetails(fightId);
-        
+
         if (!fightDetails) {
           throw new Error(`Fight with ID ${fightId} not found`);
         }
-        
+
         setFight(fightDetails);
-        
+
         // Load round betting options if user has access
         if (hasRoundBettingAccess) {
           const options = await ufcService.fetchRoundBettingOptions(fightId);
@@ -96,172 +106,179 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
         setLoading(false);
       }
     };
-    
+
     if (!checkingAccess) {
       loadFightData();
     }
   }, [fightId, hasRoundBettingAccess, checkingAccess]);
-  
+
   // Handle option selection
   const handleSelectOption = (option: RoundBettingOption) => {
     setSelectedOption(option);
   };
-  
+
   // Handle place bet button
   const handlePlaceBet = () => {
     if (!selectedOption) {
-      Alert.alert('Error', 'Please select a betting option first.');
+      Alert.alert(t('ufc.alerts.error'), t('ufc.alerts.select_option'));
       return;
     }
-    
+
     // In a real app, this would call a service to place the bet
     Alert.alert(
-      'Bet Placed',
-      `You bet on ${fight?.fighter1.id === selectedOption.fighterId ? fight?.fighter1.name : fight?.fighter2.name} to win by ${selectedOption.outcome} in round ${selectedOption.round}.`,
-      [{ text: 'OK' }]
+      t('ufc.alerts.bet_placed'),
+      `You bet on ${
+        fight?.fighter1.id === selectedOption.fighterId
+          ? fight?.fighter1.name
+          : fight?.fighter2.name
+      } to win by ${selectedOption.outcome} in round ${selectedOption.round}.`,
+      [{ text: t('ufc.alerts.ok') }]
     );
   };
-  
+
   // Handle purchase access
   const handlePurchaseAccess = async () => {
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert('Error', 'You must be logged in to make a purchase.');
+      Alert.alert(t('ufc.alerts.error'), t('ufc.alerts.login_required'));
       return;
     }
-    
+
     try {
       // Purchase round betting access for this fight
       const success = await subscriptionService.purchaseRoundBettingAccess(user.uid, fightId);
-      
+
       if (success) {
         setHasRoundBettingAccess(true);
-        Alert.alert('Purchase Successful', 'You now have access to round betting for this fight.');
+        Alert.alert(t('ufc.alerts.purchase_success'), t('ufc.alerts.purchase_success_message'));
       } else {
-        Alert.alert('Error', 'Failed to process your purchase. Please try again.');
+        Alert.alert(t('ufc.alerts.error'), t('ufc.alerts.purchase_failed'));
       }
     } catch (error) {
       console.error('Error purchasing round betting access:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+      Alert.alert(t('ufc.alerts.error'), t('ufc.alerts.unexpected_error'));
     }
   };
-  
+
   // Render loading state
   if (loading || checkingAccess) {
     return (
       <Container style={{ backgroundColor: colors.background }}>
-        <LoadingIndicator message="Loading fight details..." />
+        <LoadingIndicator message={t('ufc.loading_fight_details')} />
       </Container>
     );
   }
-  
+
   // Render error state
   if (error || !fight) {
     return (
       <Container style={{ backgroundColor: colors.background }}>
-        <ErrorMessage message={error || 'Fight not found'} />
+        <ErrorMessage message={error || t('ufc.fight_not_found')} />
         <TouchableOpacity
           style={[styles.retryButton, { backgroundColor: colors.primary }]}
           onPress={() => navigation.goBack()}
         >
-          <ThemedText style={styles.retryButtonText}>Go Back</ThemedText>
+          <ThemedText style={styles.retryButtonText}>{t('ufc.go_back')}</ThemedText>
         </TouchableOpacity>
       </Container>
     );
   }
-  
+
   // Filter options for each fighter
   const fighter1Options = roundBettingOptions.filter(opt => opt.fighterId === fight.fighter1.id);
   const fighter2Options = roundBettingOptions.filter(opt => opt.fighterId === fight.fighter2.id);
-  
+
   // Format fight status
   const formatStatus = (status?: FightStatus) => {
-    if (!status) return 'Scheduled';
-    
+    if (!status) return t('ufc.status.scheduled');
+
     switch (status) {
       case FightStatus.SCHEDULED:
-        return 'Scheduled';
+        return t('ufc.status.scheduled');
       case FightStatus.IN_PROGRESS:
-        return 'In Progress';
+        return t('ufc.status.in_progress');
       case FightStatus.COMPLETED:
-        return 'Completed';
+        return t('ufc.status.completed');
       case FightStatus.CANCELLED:
-        return 'Cancelled';
+        return t('ufc.status.cancelled');
       case FightStatus.POSTPONED:
-        return 'Postponed';
+        return t('ufc.status.postponed');
       default:
         return status;
     }
   };
-  
+
   return (
     <Container style={{ backgroundColor: colors.background }}>
       <ScrollView style={styles.scrollView}>
         {/* Header with back button */}
         <View style={styles.headerContainer}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <ThemedText style={styles.headerTitle}>Fight Details</ThemedText>
+          <ThemedText style={styles.headerTitle}>{t('ufc.fight_details')}</ThemedText>
           <View style={styles.headerRight} />
         </View>
-        
+
         {/* Fight status */}
-        <View style={[
-          styles.statusContainer,
-          {
-            backgroundColor: fight.status === FightStatus.IN_PROGRESS
-              ? isDark ? 'rgba(46, 204, 113, 0.2)' : 'rgba(46, 204, 113, 0.1)'
-              : fight.status === FightStatus.COMPLETED
-                ? isDark ? 'rgba(52, 152, 219, 0.2)' : 'rgba(52, 152, 219, 0.1)'
-                : isDark ? 'rgba(241, 196, 15, 0.2)' : 'rgba(241, 196, 15, 0.1)'
-          }
-        ]}>
-          <ThemedText style={styles.statusText}>
-            {formatStatus(fight.status)}
-          </ThemedText>
+        <View
+          style={[
+            styles.statusContainer,
+            {
+              backgroundColor:
+                fight.status === FightStatus.IN_PROGRESS
+                  ? isDark
+                    ? 'rgba(46, 204, 113, 0.2)'
+                    : 'rgba(46, 204, 113, 0.1)'
+                  : fight.status === FightStatus.COMPLETED
+                  ? isDark
+                    ? 'rgba(52, 152, 219, 0.2)'
+                    : 'rgba(52, 152, 219, 0.1)'
+                  : isDark
+                  ? 'rgba(241, 196, 15, 0.2)'
+                  : 'rgba(241, 196, 15, 0.1)',
+            },
+          ]}
+        >
+          <ThemedText style={styles.statusText}>{formatStatus(fight.status)}</ThemedText>
         </View>
-        
+
         {/* Fight info */}
         <View style={styles.fightInfoContainer}>
           <ThemedText style={styles.fightTitle}>
             {fight.fighter1.name} vs {fight.fighter2.name}
           </ThemedText>
-          
+
           <View style={styles.fightDetails}>
             <View style={styles.detailRow}>
-              <ThemedText style={styles.detailLabel}>Weight Class:</ThemedText>
+              <ThemedText style={styles.detailLabel}>{t('ufc.weight_class')}</ThemedText>
               <ThemedText style={styles.detailValue}>{fight.weightClass}</ThemedText>
             </View>
-            
+
             {fight.isTitleFight && (
-              <View style={[
-                styles.titleBadge,
-                { backgroundColor: isDark ? '#D4AF37' : '#FFD700' }
-              ]}>
+              <View
+                style={[styles.titleBadge, { backgroundColor: isDark ? '#D4AF37' : '#FFD700' }]}
+              >
                 <ThemedText style={[styles.titleText, { color: '#000000' }]}>
-                  TITLE FIGHT
+                  {t('ufc.title_fight')}
                 </ThemedText>
               </View>
             )}
-            
+
             <View style={styles.detailRow}>
-              <ThemedText style={styles.detailLabel}>Rounds:</ThemedText>
+              <ThemedText style={styles.detailLabel}>{t('ufc.rounds')}</ThemedText>
               <ThemedText style={styles.detailValue}>{fight.rounds}</ThemedText>
             </View>
-            
+
             {fight.startTime && (
               <View style={styles.detailRow}>
-                <ThemedText style={styles.detailLabel}>Start Time:</ThemedText>
+                <ThemedText style={styles.detailLabel}>{t('ufc.start_time')}</ThemedText>
                 <ThemedText style={styles.detailValue}>{fight.startTime}</ThemedText>
               </View>
             )}
           </View>
         </View>
-        
+
         {/* Fighters comparison */}
         <View style={styles.fightersContainer}>
           <View style={styles.fighterColumn}>
@@ -271,19 +288,27 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
             )}
             <ThemedText style={styles.fighterRecord}>{fight.fighter1.record}</ThemedText>
             {fight.winner === fight.fighter1.id && (
-              <View style={[
-                styles.winnerBadge,
-                { backgroundColor: isDark ? 'rgba(46, 204, 113, 0.2)' : 'rgba(46, 204, 113, 0.1)' }
-              ]}>
-                <ThemedText style={[styles.winnerText, { color: '#2ecc71' }]}>WINNER</ThemedText>
+              <View
+                style={[
+                  styles.winnerBadge,
+                  {
+                    backgroundColor: isDark ? 'rgba(46, 204, 113, 0.2)' : 'rgba(46, 204, 113, 0.1)',
+                  },
+                ]}
+              >
+                <ThemedText style={[styles.winnerText, { color: '#2ecc71' }]}>
+                  {t('ufc.winner')}
+                </ThemedText>
               </View>
             )}
           </View>
-          
+
           <View style={styles.vsContainer}>
-            <ThemedText style={[styles.vsText, { color: colors.primary }]}>VS</ThemedText>
+            <ThemedText style={[styles.vsText, { color: colors.primary }]}>
+              {t('ufc.vs')}
+            </ThemedText>
           </View>
-          
+
           <View style={styles.fighterColumn}>
             <ThemedText style={styles.fighterName}>{fight.fighter2.name}</ThemedText>
             {fight.fighter2.nickname && (
@@ -291,53 +316,59 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
             )}
             <ThemedText style={styles.fighterRecord}>{fight.fighter2.record}</ThemedText>
             {fight.winner === fight.fighter2.id && (
-              <View style={[
-                styles.winnerBadge,
-                { backgroundColor: isDark ? 'rgba(46, 204, 113, 0.2)' : 'rgba(46, 204, 113, 0.1)' }
-              ]}>
-                <ThemedText style={[styles.winnerText, { color: '#2ecc71' }]}>WINNER</ThemedText>
+              <View
+                style={[
+                  styles.winnerBadge,
+                  {
+                    backgroundColor: isDark ? 'rgba(46, 204, 113, 0.2)' : 'rgba(46, 204, 113, 0.1)',
+                  },
+                ]}
+              >
+                <ThemedText style={[styles.winnerText, { color: '#2ecc71' }]}>
+                  {t('ufc.winner')}
+                </ThemedText>
               </View>
             )}
           </View>
         </View>
-        
+
         {/* Result details if fight is completed */}
         {fight.status === FightStatus.COMPLETED && fight.winner && fight.winMethod && (
-          <View style={[
-            styles.resultContainer,
-            { backgroundColor: isDark ? '#222222' : '#F8F8F8' }
-          ]}>
-            <ThemedText style={styles.resultTitle}>Fight Result</ThemedText>
+          <View
+            style={[styles.resultContainer, { backgroundColor: isDark ? '#222222' : '#F8F8F8' }]}
+          >
+            <ThemedText style={styles.resultTitle}>{t('ufc.fight_result')}</ThemedText>
             <ThemedText style={styles.resultText}>
-              {fight.winner === fight.fighter1.id ? fight.fighter1.name : fight.fighter2.name} won by {fight.winMethod}
+              {fight.winner === fight.fighter1.id ? fight.fighter1.name : fight.fighter2.name} won
+              by {fight.winMethod}
               {fight.winRound ? ` in round ${fight.winRound}` : ''}
             </ThemedText>
           </View>
         )}
-        
+
         {/* Round Betting Section */}
         <View style={styles.roundBettingSection}>
-          <ThemedText style={styles.sectionTitle}>Round Betting</ThemedText>
-          
+          <ThemedText style={styles.sectionTitle}>{t('ufc.round_betting')}</ThemedText>
+
           {!hasRoundBettingAccess ? (
             // Premium feature prompt
-            <View style={[
-              styles.premiumFeatureContainer,
-              { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }
-            ]}>
+            <View
+              style={[
+                styles.premiumFeatureContainer,
+                { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' },
+              ]}
+            >
               <Ionicons name="analytics-outline" size={32} color={colors.primary} />
-              <ThemedText style={styles.premiumFeatureTitle}>
-                Round Betting
-              </ThemedText>
+              <ThemedText style={styles.premiumFeatureTitle}>{t('ufc.round_betting')}</ThemedText>
               <ThemedText style={styles.premiumFeatureDescription}>
-                Get access to round-by-round betting options for this fight.
+                {t('ufc.round_betting_description')}
               </ThemedText>
               <TouchableOpacity
                 style={[styles.premiumFeatureButton, { backgroundColor: colors.primary }]}
                 onPress={handlePurchaseAccess}
               >
                 <ThemedText style={styles.premiumFeatureButtonText}>
-                  Unlock for $1.99
+                  {t('ufc.unlock_for_price')}
                 </ThemedText>
               </TouchableOpacity>
             </View>
@@ -348,7 +379,7 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
                 <View style={styles.noOptionsContainer}>
                   <ActivityIndicator size="large" color={colors.primary} />
                   <ThemedText style={styles.noOptionsText}>
-                    Loading betting options...
+                    {t('ufc.loading_betting_options')}
                   </ThemedText>
                 </View>
               ) : (
@@ -359,21 +390,21 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
                     onSelectOption={handleSelectOption}
                     selectedOption={selectedOption || undefined}
                   />
-                  
+
                   <RoundBettingCard
                     fighter={fight.fighter2}
                     options={fighter2Options}
                     onSelectOption={handleSelectOption}
                     selectedOption={selectedOption || undefined}
                   />
-                  
+
                   {selectedOption && (
                     <TouchableOpacity
                       style={[styles.placeBetButton, { backgroundColor: colors.primary }]}
                       onPress={handlePlaceBet}
                     >
                       <ThemedText style={styles.placeBetButtonText}>
-                        Place Bet
+                        {t('ufc.place_bet')}
                       </ThemedText>
                     </TouchableOpacity>
                   )}

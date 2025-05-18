@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { RoundBettingOption, FightOutcome, UFCFighter } from '../types/ufc';
 import { ThemedText } from './ThemedText';
 
@@ -16,10 +17,11 @@ const RoundBettingCard: React.FC<RoundBettingCardProps> = ({
   fighter,
   options,
   onSelectOption,
-  selectedOption
+  selectedOption,
 }) => {
   const { colors, isDark } = useTheme();
-  
+  const { t } = useLanguage();
+
   // Group options by round
   const optionsByRound: { [round: number]: RoundBettingOption[] } = {};
   options.forEach(option => {
@@ -28,7 +30,7 @@ const RoundBettingCard: React.FC<RoundBettingCardProps> = ({
     }
     optionsByRound[option.round].push(option);
   });
-  
+
   // Get outcome color
   const getOutcomeColor = (outcome: FightOutcome) => {
     switch (outcome) {
@@ -45,65 +47,62 @@ const RoundBettingCard: React.FC<RoundBettingCardProps> = ({
         return isDark ? '#95a5a680' : '#95a5a620'; // Gray with transparency
     }
   };
-  
+
   return (
-    <View style={[
-      styles.container,
-      { 
-        backgroundColor: isDark ? '#222222' : '#FFFFFF',
-        borderColor: isDark ? '#333333' : '#EEEEEE'
-      }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? '#222222' : '#FFFFFF',
+          borderColor: isDark ? '#333333' : '#EEEEEE',
+        },
+      ]}
+    >
       <View style={styles.header}>
         <View style={styles.fighterInfo}>
           <ThemedText style={styles.fighterName}>{fighter.name}</ThemedText>
           {fighter.nickname && (
-            <ThemedText style={styles.fighterNickname}>"{fighter.nickname}"</ThemedText>
+            <ThemedText style={styles.fighterNickname}>
+              {t('ufc.round_betting_card.nickname_quotes', { nickname: fighter.nickname })}
+            </ThemedText>
           )}
           <ThemedText style={styles.fighterRecord}>{fighter.record}</ThemedText>
         </View>
-        
+
         {fighter.imageUrl && (
           <View style={styles.imageContainer}>
-            <View style={[
-              styles.imageWrapper,
-              { borderColor: isDark ? '#333333' : '#EEEEEE' }
-            ]}>
+            <View style={[styles.imageWrapper, { borderColor: isDark ? '#333333' : '#EEEEEE' }]}>
               <Ionicons name="person" size={24} color={isDark ? '#BBBBBB' : '#666666'} />
             </View>
           </View>
         )}
       </View>
-      
+
       <ScrollView style={styles.optionsContainer}>
         {Object.entries(optionsByRound).map(([round, roundOptions]) => (
           <View key={round} style={styles.roundContainer}>
-            <View style={[
-              styles.roundHeader,
-              { backgroundColor: isDark ? '#333333' : '#F5F5F5' }
-            ]}>
-              <ThemedText style={styles.roundTitle}>Round {round}</ThemedText>
+            <View style={[styles.roundHeader, { backgroundColor: isDark ? '#333333' : '#F5F5F5' }]}>
+              <ThemedText style={styles.roundTitle}>
+                {t('ufc.round_betting_card.round', { round })}
+              </ThemedText>
             </View>
-            
+
             {roundOptions.map(option => (
               <TouchableOpacity
                 key={`${option.id}`}
                 style={[
                   styles.optionButton,
                   {
-                    backgroundColor: selectedOption && 
-                      selectedOption.id === option.id
+                    backgroundColor:
+                      selectedOption && selectedOption.id === option.id
                         ? colors.primary + '33' // Add transparency
-                        : getOutcomeColor(option.outcome)
-                  }
+                        : getOutcomeColor(option.outcome),
+                  },
                 ]}
                 onPress={() => onSelectOption(option)}
               >
                 <ThemedText style={styles.outcomeText}>{option.outcome}</ThemedText>
-                <ThemedText style={[
-                  styles.oddsText,
-                  { color: colors.primary }
-                ]}>
+                <ThemedText style={[styles.oddsText, { color: colors.primary }]}>
                   {option.odds.toFixed(2)}
                 </ThemedText>
               </TouchableOpacity>

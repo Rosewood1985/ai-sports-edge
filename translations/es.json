@@ -1,4 +1,59 @@
 {
+  "auth": {
+    "invalid_credentials": "Credenciales inválidas. Por favor, verifique su correo electrónico y contraseña.",
+    "email_already_in_use": "Este correo electrónico ya está en uso. Por favor, utilice otro correo electrónico o inicie sesión.",
+    "weak_password": "La contraseña es demasiado débil. Debe tener al menos 8 caracteres e incluir letras y números.",
+    "invalid_email": "Correo electrónico inválido. Por favor, ingrese un correo electrónico válido.",
+    "authentication_failed": "Error de autenticación. Por favor, inténtelo de nuevo más tarde.",
+    "password_reset": "Restablecimiento de contraseña",
+    "password_reset_email_sent": "Se ha enviado un correo electrónico con instrucciones para restablecer su contraseña.",
+    "email_required": "Correo electrónico requerido",
+    "please_enter_email_for_reset": "Por favor, ingrese su correo electrónico para restablecer su contraseña.",
+    "password_reset_failed": "Error al restablecer la contraseña",
+    "password_reset_error": "Hubo un error al enviar el correo electrónico de restablecimiento de contraseña. Por favor, inténtelo de nuevo más tarde.",
+    "username": "Nombre de usuario",
+    "confirm_password": "Confirmar contraseña",
+    "passwords_dont_match": "Las contraseñas no coinciden",
+    "sign_in": "Iniciar sesión",
+    "sign_up": "Registrarse",
+    "sign_out": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgot_password": "¿Olvidó su contraseña?",
+    "reset_password": "Restablecer contraseña",
+    "create_account": "Crear cuenta",
+    "already_have_account": "¿Ya tiene una cuenta?",
+    "dont_have_account": "¿No tiene una cuenta?",
+    "sign_in_with": "Iniciar sesión con",
+    "or": "o",
+    "terms_and_conditions": "Términos y condiciones",
+    "privacy_policy": "Política de privacidad",
+    "agree_to_terms": "Al registrarse, acepta nuestros {{terms}} y nuestra {{privacy}}."
+  },
+  "api": {
+    "network_error": "Error de red. Por favor, verifique su conexión a Internet e inténtelo de nuevo.",
+    "server_error": "Error del servidor. Por favor, inténtelo de nuevo más tarde.",
+    "authentication_error": "Error de autenticación. Por favor, inicie sesión de nuevo.",
+    "not_found": "Recurso no encontrado.",
+    "validation_error": "Error de validación. Por favor, verifique los datos ingresados.",
+    "unknown_error": "Error desconocido. Por favor, inténtelo de nuevo más tarde.",
+    "request_failed": "La solicitud falló. Por favor, inténtelo de nuevo más tarde.",
+    "retry_message": "Reintentando solicitud...",
+    "cache_error": "Error al acceder a la caché. Utilizando datos del servidor."
+  },
+  "error": {
+    "general_error": "Ha ocurrido un error. Por favor, inténtelo de nuevo más tarde.",
+    "network_unavailable": "Red no disponible. Por favor, verifique su conexión a Internet.",
+    "timeout": "La solicitud ha excedido el tiempo de espera. Por favor, inténtelo de nuevo.",
+    "unexpected_error": "Error inesperado. Por favor, inténtelo de nuevo más tarde.",
+    "retry": "Reintentar",
+    "cancel": "Cancelar"
+  },
+  "logging": {
+    "error_logged": "Error registrado",
+    "performance_issue_detected": "Problema de rendimiento detectado",
+    "warning": "Advertencia"
+  },
   "common": {
     "app_name": "AI Sports Edge",
     "loading": "Cargando...",
@@ -18,23 +73,6 @@
     "ok": "OK",
     "continue": "Continuar",
     "not_authenticated": "Debe iniciar sesión para realizar esta acción."
-  },
-  "auth": {
-    "sign_in": "Iniciar sesión",
-    "sign_up": "Registrarse",
-    "sign_out": "Cerrar sesión",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
-    "forgot_password": "¿Olvidó su contraseña?",
-    "reset_password": "Restablecer contraseña",
-    "create_account": "Crear cuenta",
-    "already_have_account": "¿Ya tiene una cuenta?",
-    "dont_have_account": "¿No tiene una cuenta?",
-    "sign_in_with": "Iniciar sesión con",
-    "or": "o",
-    "terms_and_conditions": "Términos y condiciones",
-    "privacy_policy": "Política de privacidad",
-    "agree_to_terms": "Al registrarse, acepta nuestros {{terms}} y nuestra {{privacy}}."
   },
   "onboarding": {
     "welcome_title": "Bienvenido a AI Sports Edge",
@@ -201,7 +239,13 @@
     "feature_included": "Incluido",
     "feature_not_included": "No incluido",
     "subscribe_now": "Suscribirse ahora",
-    "subscription_terms": "Al suscribirse, acepta nuestros términos de suscripción y política de privacidad. Su suscripción se renovará automáticamente a menos que se cancele al menos 24 horas antes del final del período actual."
+    "subscription_terms": "Al suscribirse, acepta nuestros términos de suscripción y política de privacidad. Su suscripción se renovará automáticamente a menos que se cancele al menos 24 horas antes del final del período actual.",
+    "expires_on": "Expira el {{date}}",
+    "manage_subscription": "Administrar suscripción",
+    "trial_period": "Prueba gratuita de {{days}} días",
+    "billed_monthly": "Facturado mensualmente",
+    "billed_yearly": "Facturado anualmente",
+    "cancel_anytime": "Cancele en cualquier momento"
   },
   "microtransactions": {
     "purchase": "Comprar",
@@ -258,5 +302,45 @@
     "change_language": "Cambiar Idioma",
     "language_changed": "Idioma Cambiado",
     "restart_required": "Por favor, reinicie la aplicación para que los cambios surtan efecto"
+  },
+  "ufc": {
+    "loading_fight_details": "Cargando detalles de la pelea...",
+    "fight_not_found": "Pelea no encontrada",
+    "go_back": "Volver",
+    "fight_details": "Detalles de la Pelea",
+    "weight_class": "Categoría de Peso:",
+    "title_fight": "PELEA POR EL TÍTULO",
+    "rounds": "Asaltos:",
+    "start_time": "Hora de Inicio:",
+    "winner": "GANADOR",
+    "vs": "VS",
+    "fight_result": "Resultado de la Pelea",
+    "round_betting": "Apuestas por Asalto",
+    "round_betting_description": "Obtenga acceso a opciones de apuestas asalto por asalto para esta pelea.",
+    "unlock_for_price": "Desbloquear por $1.99",
+    "loading_betting_options": "Cargando opciones de apuestas...",
+    "place_bet": "Realizar Apuesta",
+    "status": {
+      "scheduled": "Programada",
+      "in_progress": "En Progreso",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "postponed": "Pospuesta"
+    },
+    "alerts": {
+      "error": "Error",
+      "select_option": "Por favor, seleccione una opción de apuesta primero.",
+      "bet_placed": "Apuesta Realizada",
+      "ok": "Aceptar",
+      "login_required": "Debe iniciar sesión para realizar una compra.",
+      "purchase_success": "Compra Exitosa",
+      "purchase_success_message": "Ahora tiene acceso a apuestas por asalto para esta pelea.",
+      "purchase_failed": "No se pudo procesar su compra. Por favor, inténtelo de nuevo.",
+      "unexpected_error": "Ocurrió un error inesperado. Por favor, inténtelo de nuevo más tarde."
+    },
+    "round_betting_card": {
+      "round": "Asalto {{round}}",
+      "nickname_quotes": "\"{nickname}\""
+    }
   }
 }
