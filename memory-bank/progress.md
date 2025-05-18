@@ -394,3 +394,67 @@ Several tasks remain incomplete and have been added to the .roo-todo.md file for
 2. Verify the sitemap index file properly references all language-specific sitemaps
 3. Test language detection and redirection in a real browser environment
 4. Test and integrate the dependency update script
+
+## Pre-Launch and Post-Launch Tasks
+
+### 2025-05-18: Pre-Launch Tasks Planning
+
+I've organized the upcoming tasks into a structured pre-launch and post-launch plan following atomic design principles. The tasks are now tracked in `.roo-todo.md` with clear categorization:
+
+#### Phase I: Essential for Launch
+
+1. Consolidate Atomic Design Structure (COMPLETED)
+
+   - Successfully migrated core modules to atomic architecture
+   - Consolidated context providers and translation files
+   - Updated component imports to use atomic paths
+
+2. Enhance Accessibility Implementation (NEXT TASK)
+
+   - Modify ThemedText to extend or internally use AccessibleText
+   - Modify ThemedView to extend or internally use AccessibleView
+   - Add accessibility props to TouchableOpacity components
+   - Implement proper focus states for all interactive elements
+   - Implement automated accessibility testing
+
+3. Standardize Responsive Design
+
+   - Create a Responsive Component HOC for responsive styling
+   - Update device optimization utilities
+   - Implement more granular breakpoints
+   - Support system font size settings for accessibility
+   - Test responsive layouts across different device sizes
+
+4. Fix SEO Base URL and Generate Sitemap
+
+   - Fix hreflang validation script
+   - Verify sitemap index file
+   - Test language detection and redirection
+   - Check canonical tags implementation
+   - Verify page tagging and optimization
+
+5. Update Dependencies
+   - Test and integrate the dependency update script
+   - Update outdated dependencies
+   - Verify compatibility with latest React Native
+   - Test application with updated dependencies
+   - Document breaking changes and adjustments
+
+Additional critical tasks include:
+
+- Security & Infrastructure improvements
+- Compliance & Business Model verification
+- Core User Experience enhancements
+- Testing & Validation across platforms
+
+#### Phase II: Post-Launch Enhancements
+
+After completing all Phase I tasks, we'll focus on:
+
+- Comprehensive security audit and monitoring
+- User experience enhancements
+- Internationalization improvements
+- Analytics and feedback systems
+- Design and integration optimizations
+
+The implementation will follow atomic design principles, modifying existing files whenever possible and adding code comments to explain changes. Each task will be completed sequentially, with progress tracked in this file and commits made with descriptive messages.
