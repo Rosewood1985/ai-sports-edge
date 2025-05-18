@@ -23,12 +23,14 @@ AI Sports Edge is a mobile application that provides sports analytics, predictio
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/your-username/ai-sports-edge.git
 cd ai-sports-edge
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -36,6 +38,7 @@ yarn install
 ```
 
 3. Start the development server:
+
 ```bash
 npm start
 # or
@@ -49,6 +52,7 @@ yarn start
 The application uses environment variables for configuration. To set up your environment:
 
 1. Create your environment file:
+
 ```bash
 npm run setup-env
 # or manually
@@ -56,12 +60,14 @@ cp .env.example .env
 ```
 
 2. Edit the `.env` file with your actual values for:
+
    - Firebase credentials
    - Stripe API keys
    - Sports data API keys
    - Other service credentials
 
 3. Validate your environment setup:
+
 ```bash
 npm run check-env
 ```
@@ -107,6 +113,21 @@ The app includes a sophisticated microtransaction system for monetization. Key f
 - Purchase history tracking
 - Server-side validation
 
+### Database Consistency Triggers
+
+The app uses Firebase Cloud Functions to maintain data consistency between duplicated fields in the database:
+
+- `syncSubscriptionStatus`: Syncs subscription status from subscriptions subcollection to users collection
+- `syncCustomerId`: Syncs customer ID changes from users collection to subscriptions subcollection
+- `standardizeStatusSpelling`: Standardizes "canceled"/"cancelled" spelling across collections
+
+See [Database Consistency Guide](database-consistency-triggers-guide.md) for details on:
+
+- Deployment instructions
+- Testing procedures
+- Monitoring recommendations
+- Implementation details
+
 ### Theme Support
 
 The app supports both light and dark themes, automatically switching based on device settings.
@@ -130,6 +151,7 @@ The app supports both light and dark themes, automatically switching based on de
 ### Testing
 
 Run tests with:
+
 ```bash
 npm test
 # or
