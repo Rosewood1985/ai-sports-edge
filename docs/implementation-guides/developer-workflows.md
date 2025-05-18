@@ -370,6 +370,45 @@ We use SFTP to deploy the web version to GoDaddy:
    ```
 4. **Firebase**: If you have issues with Firebase, check your Firebase configuration.
 
+## Dependency Management
+
+We use a custom dependency update script to manage package updates and security vulnerabilities. The script provides several options for updating dependencies with different levels of risk.
+
+### Using the Dependency Update Script
+
+Run the script with:
+
+```bash
+./scripts/update-dependencies.js
+```
+
+The script provides the following options:
+
+1. **Patch updates only (safest)**: Updates only patch versions of dependencies.
+2. **Minor and patch updates (recommended)**: Updates minor and patch versions of dependencies.
+3. **All updates including major versions**: Updates all dependencies to their latest versions (may break compatibility).
+4. **Update specific packages**: Updates only the packages you specify.
+5. **Security-focused updates**: Prioritizes fixing security vulnerabilities, focusing on critical and high severity issues.
+6. **Check for security vulnerabilities**: Runs npm audit to check for vulnerabilities without updating.
+
+### Security Features
+
+The script includes special handling for security vulnerabilities:
+
+- Prioritizes known security-critical packages
+- Detects and reports nested dependencies with vulnerabilities
+- Groups updates by severity (critical, high, moderate)
+- Provides detailed reporting on vulnerability fixes
+- Supports `--legacy-peer-deps` flag for React Native dependencies
+
+### Best Practices for Dependency Updates
+
+1. **Regular Updates**: Run the script regularly to keep dependencies up to date.
+2. **Incremental Updates**: Prefer patch and minor updates over major updates.
+3. **Test After Updates**: Always test the application after updating dependencies.
+4. **Security First**: Prioritize security-focused updates.
+5. **Backup**: The script automatically creates backups before updates, but consider additional backups for major updates.
+
 ### Getting Help
 
 If you need help, you can:
