@@ -562,3 +562,20 @@ With all critical vulnerability packages updated, I'll now move on to addressing
   - Further testing in the actual app (not just unit tests) would be recommended to ensure compatibility
 
 Next, I'll continue with other high severity vulnerabilities, focusing on body-parser.
+
+##### 5. body-parser (High Severity Vulnerability)
+
+- **Current Version**: Various (1.19.0 in some dependencies)
+- **Latest Version**: 2.2.0
+- **Update Command**: `npm install body-parser@latest --save --legacy-peer-deps`
+- **Result**: Successful
+- **Issues Encountered**:
+  - Tests still fail with the same error about missing `@react-native-community/netinfo` module
+  - This is unrelated to the body-parser update and is a general issue with the test setup
+- **Notes**:
+  - The package was successfully updated to version 2.2.0
+  - There are still nested dependencies using older versions (e.g., in expo@45.0.8 → @expo/cli@0.1.7 → @expo/dev-server@0.1.116 → body-parser@1.19.0)
+  - A more comprehensive fix would require updating those parent packages as well
+  - The update should address the high severity vulnerabilities in this package
+
+Next, I'll continue with other high severity vulnerabilities, focusing on braces.
