@@ -43,29 +43,31 @@ The Firebase integration follows the atomic architecture pattern:
 
 ## Implementation
 
+### Implementation Note
+
+This documentation uses the modular Firebase SDK syntax (Firebase v9+), which provides better tree-shaking and smaller bundle sizes compared to the older namespaced syntax.
+
 ### Firebase Initialization
 
 ```javascript
 // atoms/firebaseApp.js
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
-import 'firebase/storage';
-import 'firebase/functions';
-import 'firebase/messaging';
-import 'firebase/analytics';
-import 'firebase/crashlytics';
+import { initializeApp, getApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
 
 let app;
 
 export const initializeFirebaseApp = () => {
-  if (!firebase.apps.length) {
-    app = firebase.initializeApp(firebaseConfig);
-  } else {
-    app = firebase.app();
+  try {
+    if (!app) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
+    }
+    return app;
+  } catch (error) {
+    console.error('Error initializing Firebase app:', error);
+    throw error;
   }
-  return app;
 };
 
 export const getFirebaseApp = () => {
@@ -82,15 +84,19 @@ export default getFirebaseApp();
 
 ```javascript
 // molecules/firebaseAuth.js
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword as signIn,
+  signOut as signOutUser,
+  onAuthStateChanged as onAuthChange,
+} from 'firebase/auth';
 import firebaseApp from '../atoms/firebaseApp';
 
-const auth = firebase.auth(firebaseApp);
+const auth = getAuth(firebaseApp);
 
 export const signInWithEmailAndPassword = async (email, password) => {
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const userCredential = await signIn(auth, email, password);
     return userCredential;
   } catch (error) {
     throw error;
@@ -99,7 +105,7 @@ export const signInWithEmailAndPassword = async (email, password) => {
 
 export const signOut = async () => {
   try {
-    await auth.signOut();
+    await signOutUser(auth);
   } catch (error) {
     throw error;
   }
@@ -110,7 +116,7 @@ export const getCurrentUser = () => {
 };
 
 export const onAuthStateChanged = callback => {
-  return auth.onAuthStateChanged(callback);
+  return onAuthChange(auth, callback);
 };
 
 export default {
@@ -125,17 +131,18 @@ export default {
 
 ```javascript
 // molecules/firebaseFirestore.js
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, query, getDocs } from 'firebase/firestore';
 import firebaseApp from '../atoms/firebaseApp';
 
-const firestore = firebase.firestore(firebaseApp);
+const firestore = getFirestore(firebaseApp);
 
-export const getDocument = async (collection, id) => {
+export const getDocument = async (collectionName, id) => {
   try {
-    const doc = await firestore.collection(collection).doc(id).get();
-    if (doc.exists) {
-      return { id: doc.id, ...doc.data() };
+    const docRef = doc(firestore, collectionName, id);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
     }
     return null;
   } catch (error) {
@@ -143,21 +150,25 @@ export const getDocument = async (collection, id) => {
   }
 };
 
-export const setDocument = async (collection, id, data) => {
+export const setDocument = async (collectionName, id, data) => {
   try {
-    await firestore.collection(collection).doc(id).set(data, { merge: true });
+    const docRef = doc(firestore, collectionName, id);
+    await setDoc(docRef, data, { merge: true });
   } catch (error) {
     throw error;
   }
 };
 
-export const queryDocuments = async (collection, queryFn) => {
+export const queryDocuments = async (collectionName, queryFn) => {
   try {
-    let query = firestore.collection(collection);
+    const collectionRef = collection(firestore, collectionName);
+    let queryRef = collectionRef;
+
     if (queryFn) {
-      query = queryFn(query);
+      queryRef = queryFn(query(collectionRef));
     }
-    const snapshot = await query.get();
+
+    const snapshot = await getDocs(queryRef);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     throw error;
@@ -247,6 +258,7 @@ const listenForAuthChanges = callback => {
 
 ```javascript
 import { firebaseService } from '../atomic/organisms';
+import { where } from 'firebase/firestore';
 
 // Get document
 const getUserData = async userId => {
@@ -279,6 +291,393 @@ const getActiveUsers = async () => {
   } catch (error) {
     console.error('Get active users error:', error);
     throw error;
+  }
+};
+```
+
+### Firebase Analytics
+
+```javascript
+// molecules/firebaseAnalytics.js
+import { getAnalytics, logEvent, setUserId, setUserProperties } from 'firebase/analytics';
+import { Platform } from 'react-native';
+import firebaseApp from '../atoms/firebaseApp';
+
+// Initialize Firebase Analytics
+let analytics = null;
+
+// Only initialize on web platforms or when running in a compatible environment
+export const initializeAnalytics = () => {
+  try {
+    // Firebase Analytics is primarily supported on Web and iOS/Android via native SDKs
+    // It's not available in all React Native environments
+    if (
+      Platform.OS === 'web' ||
+      (Platform.OS !== 'web' && typeof global.nativeModuleProxy !== 'undefined')
+    ) {
+      analytics = getAnalytics(firebaseApp);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error initializing Firebase Analytics:', error);
+    return false;
+  }
+};
+
+// Log an event to Firebase Analytics
+export const trackEvent = (eventName, eventParams = {}) => {
+  try {
+    if (!analytics) {
+      const initialized = initializeAnalytics();
+      if (!initialized) return false;
+    }
+
+    logEvent(analytics, eventName, eventParams);
+    return true;
+  } catch (error) {
+    console.error('Error tracking event in Firebase Analytics:', error);
+    return false;
+  }
+};
+
+// Set the user ID for Firebase Analytics
+export const setAnalyticsUserId = userId => {
+  try {
+    if (!analytics) {
+      const initialized = initializeAnalytics();
+      if (!initialized) return false;
+    }
+
+    if (userId) {
+      setUserId(analytics, userId);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error setting user ID in Firebase Analytics:', error);
+    return false;
+  }
+};
+
+// Set user properties for Firebase Analytics
+export const setAnalyticsUserProperties = properties => {
+  try {
+    if (!analytics) {
+      const initialized = initializeAnalytics();
+      if (!initialized) return false;
+    }
+
+    setUserProperties(analytics, properties);
+    return true;
+  } catch (error) {
+    console.error('Error setting user properties in Firebase Analytics:', error);
+    return false;
+  }
+};
+
+export default {
+  initializeAnalytics,
+  trackEvent,
+  setAnalyticsUserId,
+  setAnalyticsUserProperties,
+};
+```
+
+## Usage Examples
+
+### Firebase Analytics
+
+```javascript
+import { firebaseService } from '../atomic/organisms';
+
+// Initialize Firebase Analytics
+const initAnalytics = () => {
+  const initialized = firebaseService.analytics.initializeAnalytics();
+  return initialized;
+};
+
+// Track a standard event
+const trackPurchase = (transactionId, value, currency, items) => {
+  return firebaseService.analytics.trackEvent('purchase', {
+    transaction_id: transactionId,
+    value: value,
+    currency: currency,
+    items: items,
+  });
+};
+
+// Track a custom event
+const trackBettingSlipCreated = (betType, odds, potentialWinnings) => {
+  return firebaseService.analytics.trackEvent('betting_slip_created', {
+    bet_type: betType,
+    odds: odds,
+    potential_winnings: potentialWinnings,
+    event_category: 'engagement',
+    event_label: 'betting',
+  });
+};
+
+// Set user ID after login
+const setUserIdentifier = userId => {
+  return firebaseService.analytics.setAnalyticsUserId(userId);
+};
+
+// Set user properties
+const setUserPreferences = preferences => {
+  const userProperties = {
+    favorite_sport: preferences.favoriteSport,
+    preferred_odds_format: preferences.oddsFormat,
+    subscription_tier: preferences.subscriptionTier,
+    user_region: preferences.region,
+  };
+
+  return firebaseService.analytics.setAnalyticsUserProperties(userProperties);
+};
+
+// Track user journey through a feature
+const trackUserJourney = async (journeyName, stepNumber, stepName, additionalData = {}) => {
+  return firebaseService.analytics.trackEvent('user_journey_step', {
+    journey_name: journeyName,
+    step_number: stepNumber,
+    step_name: stepName,
+    ...additionalData,
+  });
+};
+
+// Track conversion
+const trackConversion = (conversionType, value) => {
+  return firebaseService.analytics.trackEvent('conversion', {
+    conversion_type: conversionType,
+    value: value,
+    event_category: 'conversion',
+  });
+};
+```
+
+### Common Analytics Events
+
+Firebase Analytics provides a set of recommended events that you should use when applicable:
+
+```javascript
+// User signs up
+firebaseService.analytics.trackEvent('sign_up', {
+  method: 'email', // or 'google', 'facebook', etc.
+});
+
+// User logs in
+firebaseService.analytics.trackEvent('login', {
+  method: 'email', // or 'google', 'facebook', etc.
+});
+
+// User views content
+firebaseService.analytics.trackEvent('screen_view', {
+  firebase_screen: 'GameDetailsScreen',
+  firebase_screen_class: 'GameDetailsScreen',
+});
+
+// User makes a purchase
+firebaseService.analytics.trackEvent('purchase', {
+  transaction_id: 'T12345',
+  value: 29.99,
+  currency: 'USD',
+  items: [
+    {
+      item_id: 'premium_subscription',
+      item_name: 'Premium Subscription',
+      item_category: 'subscription',
+      price: 29.99,
+      quantity: 1,
+    },
+  ],
+});
+
+// User starts a subscription
+firebaseService.analytics.trackEvent('begin_checkout', {
+  value: 29.99,
+  currency: 'USD',
+  items: [
+    {
+      item_id: 'premium_subscription',
+      item_name: 'Premium Subscription',
+      item_category: 'subscription',
+      price: 29.99,
+      quantity: 1,
+    },
+  ],
+});
+
+// User completes a tutorial
+firebaseService.analytics.trackEvent('tutorial_complete', {
+  tutorial_name: 'betting_basics',
+  tutorial_steps: 5,
+  time_spent: 180, // seconds
+});
+
+// User shares content
+firebaseService.analytics.trackEvent('share', {
+  content_type: 'betting_tip',
+  item_id: 'tip_12345',
+});
+```
+
+### Tracking User Journeys
+
+To track a user's journey through your app, you can create a sequence of events that represent the steps in the journey:
+
+```javascript
+// Example: Tracking a user's journey through the betting process
+
+// Step 1: User views available games
+const trackBettingJourneyStep1 = async (sportType, gameCount) => {
+  return firebaseService.analytics.trackEvent('betting_journey', {
+    step: 1,
+    step_name: 'view_games',
+    sport_type: sportType,
+    game_count: gameCount,
+  });
+};
+
+// Step 2: User selects a game
+const trackBettingJourneyStep2 = async (gameId, homeTeam, awayTeam) => {
+  return firebaseService.analytics.trackEvent('betting_journey', {
+    step: 2,
+    step_name: 'select_game',
+    game_id: gameId,
+    home_team: homeTeam,
+    away_team: awayTeam,
+  });
+};
+
+// Step 3: User creates a betting slip
+const trackBettingJourneyStep3 = async (betType, odds, stake) => {
+  return firebaseService.analytics.trackEvent('betting_journey', {
+    step: 3,
+    step_name: 'create_slip',
+    bet_type: betType,
+    odds: odds,
+    stake: stake,
+  });
+};
+
+// Step 4: User confirms bet
+const trackBettingJourneyStep4 = async (slipId, totalStake, potentialWinnings) => {
+  return firebaseService.analytics.trackEvent('betting_journey', {
+    step: 4,
+    step_name: 'confirm_bet',
+    slip_id: slipId,
+    total_stake: totalStake,
+    potential_winnings: potentialWinnings,
+  });
+};
+
+// Track journey completion (conversion)
+const trackBettingJourneyComplete = async (slipId, totalStake, potentialWinnings) => {
+  return firebaseService.analytics.trackEvent('betting_journey_complete', {
+    slip_id: slipId,
+    total_stake: totalStake,
+    potential_winnings: potentialWinnings,
+    journey_name: 'betting_process',
+    conversion_value: totalStake,
+  });
+};
+```
+
+### Best Practices for Firebase Analytics Implementation
+
+1. **Use Standard Events When Possible**: Firebase Analytics provides a set of recommended events. Use these standard events when applicable to benefit from built-in reporting.
+
+2. **Consistent Naming Convention**: Use a consistent naming convention for custom events and parameters. Snake_case is recommended for event names and parameters.
+
+3. **Limit Event Parameters**: Firebase Analytics has a limit of 25 parameters per event. Prioritize the most important parameters.
+
+4. **Set User Properties for Segmentation**: Use user properties to segment your analytics data. This allows you to analyze behavior across different user groups.
+
+5. **Track User Journeys**: Define key user journeys in your app and track each step to identify drop-off points and optimize the user experience.
+
+6. **Implement Early**: Implement analytics early in the development process to collect data from the beginning.
+
+7. **Test Analytics Implementation**: Verify that events are being properly logged using the Firebase Debug View or DebugView in the Firebase console.
+
+8. **Document Custom Events**: Maintain documentation of all custom events and parameters to ensure consistent usage across the app.
+
+9. **Consider Privacy Regulations**: Ensure your analytics implementation complies with privacy regulations like GDPR and CCPA. Implement consent management if necessary.
+
+10. **Analyze and Act on Data**: Regularly review analytics data and use insights to improve the app experience.
+
+### Consent Management
+
+For applications that need to comply with privacy regulations like GDPR, implement consent management:
+
+```javascript
+// molecules/firebaseAnalytics.js (additional functions)
+
+// Analytics consent status
+let analyticsConsent = false;
+
+// Set analytics consent status
+export const setAnalyticsConsent = hasConsent => {
+  analyticsConsent = hasConsent;
+  return analyticsConsent;
+};
+
+// Check if user has given consent
+export const hasAnalyticsConsent = () => {
+  return analyticsConsent;
+};
+
+// Modified trackEvent function with consent check
+export const trackEventWithConsent = (eventName, eventParams = {}) => {
+  if (!analyticsConsent) {
+    console.log('Analytics consent not provided, event not tracked');
+    return false;
+  }
+
+  return trackEvent(eventName, eventParams);
+};
+```
+
+### Integration with Other Analytics Systems
+
+Firebase Analytics can be used alongside other analytics systems:
+
+```javascript
+// services/analyticsService.js
+
+import { firebaseService } from '../atomic/organisms';
+
+// Track event across multiple analytics systems
+export const trackCrossAnalyticsEvent = async (eventName, eventData) => {
+  try {
+    // Track in Firebase Analytics
+    firebaseService.analytics.trackEvent(eventName, eventData);
+
+    // Track in Google Analytics (Web)
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', eventName, eventData);
+    }
+
+    // Track in custom analytics system (e.g., Firestore)
+    if (auth.currentUser) {
+      const userId = auth.currentUser.uid;
+      const analyticsRef = doc(
+        firestore,
+        'analytics_events',
+        `${userId}_${eventName}_${Date.now()}`
+      );
+
+      await setDoc(analyticsRef, {
+        eventName: eventName,
+        userId: userId,
+        ...eventData,
+        timestamp: Timestamp.now(),
+      });
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Cross-analytics tracking error:', error);
+    return false;
   }
 };
 ```
@@ -338,7 +737,7 @@ exports.syncSubscriptionStatus = functions.firestore
     const userId = subscriptionData.userId;
     if (!userId) return null;
 
-    const userRef = admin.firestore().collection('users').doc(userId);
+    const userRef = admin.firestore().doc(`users/${userId}`);
 
     return userRef.update({
       subscriptionStatus: subscriptionData.status,
@@ -361,6 +760,4 @@ exports.syncSubscriptionStatus = functions.firestore
 
 ## Related Documentation
 
-- [Firebase Authentication Guide](../implementation-guides/firebase-authentication-guide.md)
-- [Firestore Data Modeling](../implementation-guides/firestore-data-modeling.md)
-- [Cloud Functions Guide](../implementation-guides/cloud-functions-guide.md)
+- [Firebase Implementation Guide](../implementation-guides/firebase-guide.md) - Comprehensive guide for implementing Firebase services
