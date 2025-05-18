@@ -6,6 +6,8 @@ This section provides practical guides and best practices for implementing featu
 
 - [Developer Workflows](developer-workflows.md) - Common development workflows
 - [Component Guidelines](component-guidelines.md) - Guidelines for creating and using components
+- [Internationalization Guide](internationalization-guide.md) - Practical guide for implementing internationalization
+- [Firebase Guide](firebase-guide.md) - Guide for implementing Firebase services
 - [Testing](testing.md) - Testing strategies and practices
 
 ## Purpose

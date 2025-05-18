@@ -5,8 +5,8 @@ This section covers the fundamental concepts and architectural principles used i
 ## Contents
 
 - [Atomic Architecture](atomic-architecture.md) - Overview of the atomic design principles used in the project
-- [Internationalization](internationalization.md) - Multi-language support implementation
-- [Firebase Integration](firebase-integration.md) - Firebase services integration
+- [Internationalization](internationalization.md) - Multi-language support implementation (see also: [Implementation Guide](../implementation-guides/internationalization-guide.md))
+- [Firebase Integration](firebase-integration.md) - Firebase services integration (see also: [Implementation Guide](../implementation-guides/firebase-guide.md))
 
 ## Purpose
 

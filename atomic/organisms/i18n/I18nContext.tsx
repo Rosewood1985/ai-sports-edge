@@ -9,12 +9,15 @@ const LANGUAGE_STORAGE_KEY = 'app_language';
 import { en, es } from '../../atoms/translations';
 
 // Define supported languages
-export type Language = 'en' | 'es';
+export type Language = 'en' | 'es' | 'es-US' | 'es-MX' | 'es-ES';
 
 // Available translations
 const translations = {
   en,
   es,
+  'es-US': es, // Use generic Spanish for US variant
+  'es-MX': es, // Use generic Spanish for Mexico variant
+  'es-ES': es, // Use generic Spanish for Spain variant
 };
 
 /**
@@ -51,14 +54,20 @@ const getDeviceLanguage = (): string => {
  */
 const getLanguageFromLocale = (locale: string): Language => {
   const langCode = locale.split('-')[0].toLowerCase();
+  const regionCode = locale.split('-')[1]?.toUpperCase();
 
-  // Fix: Add better language detection for Spanish variants
-  if (
-    langCode === 'es' ||
-    locale.startsWith('es-') ||
-    locale === 'spa' ||
-    locale.includes('spanish')
-  ) {
+  // Handle Spanish variants
+  if (langCode === 'es') {
+    if (regionCode === 'US') return 'es-US';
+    if (regionCode === 'MX') return 'es-MX';
+    if (regionCode === 'ES') return 'es-ES';
+
+    // Default to generic Spanish if no specific region or unsupported region
+    return 'es';
+  }
+
+  // Handle other Spanish identifiers
+  if (locale === 'spa' || locale.includes('spanish')) {
     return 'es';
   }
 
@@ -220,7 +229,14 @@ export const I18nProvider: React.FC<{
    * Format a number according to the current locale
    */
   const formatNumber = (value: number, options?: Intl.NumberFormatOptions): string => {
-    const locale = language === 'en' ? 'en-US' : 'es-ES';
+    let locale = 'en-US';
+
+    // Map language to appropriate locale
+    if (language === 'es') locale = 'es-ES';
+    else if (language === 'es-US') locale = 'es-US';
+    else if (language === 'es-MX') locale = 'es-MX';
+    else if (language === 'es-ES') locale = 'es-ES';
+
     return new Intl.NumberFormat(locale, options).format(value);
   };
 
@@ -238,7 +254,14 @@ export const I18nProvider: React.FC<{
    * Format a date according to the current locale
    */
   const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions): string => {
-    const locale = language === 'en' ? 'en-US' : 'es-ES';
+    let locale = 'en-US';
+
+    // Map language to appropriate locale
+    if (language === 'es') locale = 'es-ES';
+    else if (language === 'es-US') locale = 'es-US';
+    else if (language === 'es-MX') locale = 'es-MX';
+    else if (language === 'es-ES') locale = 'es-ES';
+
     return new Intl.DateTimeFormat(locale, options).format(date);
   };
 

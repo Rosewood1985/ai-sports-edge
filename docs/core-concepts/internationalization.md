@@ -392,10 +392,17 @@ If RTL layouts don't display correctly:
 1. Ensure components use `isRTL` for direction
 2. Use start/end positioning instead of left/right
 3. Test with explicit RTL forcing
-2. Avoid unnecessary re-renders
 
 ### Performance Considerations
 
 For better performance:
 
 1. Memoize translated text that doesn't change
+2. Avoid unnecessary re-renders
+3. Consider lazy loading for large translation files
+
+## Related Documentation
+
+- [Internationalization Implementation Guide](../implementation-guides/internationalization-guide.md)
+- [Spanish Version Implementation Plan](../spanish-version-implementation-plan.md)
+- [Multilingual Error Handling](../multilingual-error-handling.md)

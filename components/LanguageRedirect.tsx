@@ -2,27 +2,13 @@ import React, { useEffect } from 'react';
 import { Platform, NativeModules } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-// Type declarations for web-specific globals
-declare global {
-  interface Window {
-    location: {
-      pathname: string;
-    };
-    history: {
-      replaceState(data: any, unused: string, url?: string): void;
-    };
-  }
+// Import types from config
+import { seoConfig } from '../config/seo';
 
-  interface Navigator {
-    language: string;
-  }
-
-  var window: Window | undefined;
-  var navigator: Navigator | undefined;
-}
+// No need for global declarations as these types are already defined in lib.dom.d.ts
 
 // Define supported languages
-export type Language = 'en' | 'es';
+import { Language } from '../config/seo';
 
 interface LanguageRedirectProps {
   currentLanguage: Language;
@@ -31,14 +17,14 @@ interface LanguageRedirectProps {
 
 /**
  * LanguageRedirect component
- * 
+ *
  * This component handles URL-based language selection and redirection.
  * It extracts the language from the URL path and sets the application language accordingly.
  * If no language is specified in the URL, it redirects to a language-specific URL based on the device locale.
  */
-export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({ 
-  currentLanguage, 
-  setLanguage 
+export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
+  currentLanguage,
+  setLanguage,
 }) => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -61,7 +47,7 @@ export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
     if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
       return navigator.language || 'en';
     }
-    
+
     return 'en'; // Default to English
   };
 
@@ -73,7 +59,7 @@ export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
         const path = window.location.pathname;
         const pathSegments = path.split('/').filter((segment: string) => segment.length > 0);
         const pathLang = pathSegments.length > 0 ? pathSegments[0] : '';
-        
+
         if (pathLang === 'en' || pathLang === 'es') {
           // Set language based on URL
           if (pathLang !== currentLanguage) {
@@ -81,13 +67,24 @@ export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
           }
         } else {
           // Determine language based on device locale
-          const deviceLocale = getDeviceLocale().split('-')[0];
-          const redirectLang = deviceLocale === 'es' ? 'es' : 'en';
-          
-          if (redirectLang !== currentLanguage) {
-            setLanguage(redirectLang as Language);
+          const deviceLocale = getDeviceLocale();
+          const langCode = deviceLocale.split('-')[0].toLowerCase();
+          const regionCode = deviceLocale.split('-')[1]?.toUpperCase();
+
+          let redirectLang: Language = 'en';
+
+          // Handle Spanish variants
+          if (langCode === 'es') {
+            if (regionCode === 'US') redirectLang = 'es-US';
+            else if (regionCode === 'MX') redirectLang = 'es-MX';
+            else if (regionCode === 'ES') redirectLang = 'es-ES';
+            else redirectLang = 'es'; // Default to generic Spanish
           }
-          
+
+          if (redirectLang !== currentLanguage) {
+            setLanguage(redirectLang);
+          }
+
           // Redirect to language-specific URL
           const newPath = `/${redirectLang}${path === '/' ? '' : path}`;
           window.history.replaceState(null, '', newPath);
@@ -96,15 +93,26 @@ export const LanguageRedirect: React.FC<LanguageRedirectProps> = ({
         console.error('Error in LanguageRedirect:', error);
       }
     } else {
-      // For native platforms, just use the device locale
-      const deviceLocale = getDeviceLocale().split('-')[0];
-      const detectedLang = deviceLocale === 'es' ? 'es' : 'en';
-      
+      // For native platforms, use the device locale with region detection
+      const deviceLocale = getDeviceLocale();
+      const langCode = deviceLocale.split('-')[0].toLowerCase();
+      const regionCode = deviceLocale.split('-')[1]?.toUpperCase();
+
+      let detectedLang: Language = 'en';
+
+      // Handle Spanish variants
+      if (langCode === 'es') {
+        if (regionCode === 'US') detectedLang = 'es-US';
+        else if (regionCode === 'MX') detectedLang = 'es-MX';
+        else if (regionCode === 'ES') detectedLang = 'es-ES';
+        else detectedLang = 'es'; // Default to generic Spanish
+      }
+
       if (detectedLang !== currentLanguage) {
-        setLanguage(detectedLang as Language);
+        setLanguage(detectedLang);
       }
     }
   }, [currentLanguage, setLanguage]);
-  
+
   return null;
 };
