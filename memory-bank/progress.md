@@ -498,3 +498,20 @@ Then proceed with high severity vulnerabilities, focusing on:
 - ssh2
 
 Updates will be documented here with version changes and any issues encountered.
+
+#### Update Attempts
+
+##### 1. immer (Critical Vulnerability)
+
+- **Current Version**: 9.0.5
+- **Latest Version**: 10.0.3
+- **Update Command**: `npm install immer@latest --save --legacy-peer-deps`
+- **Result**: Failed
+- **Issues Encountered**:
+  - The latest version of immer uses ES modules (import/export syntax) which is not compatible with the current Jest configuration
+  - Tests failed with error: `SyntaxError: Cannot use import statement outside a module`
+  - Additional test failures related to missing `@react-native-community/netinfo` module
+- **Resolution**: Reverted to version 9.0.5 using `npm install immer@9.0.5 --save --legacy-peer-deps`
+- **Notes**: Updating this package would require significant changes to the Jest configuration and test setup. Consider addressing this in a separate task focused on test infrastructure updates.
+
+Next, I'll try updating the loader-utils package which also has critical vulnerabilities.
