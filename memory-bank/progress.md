@@ -515,3 +515,16 @@ Updates will be documented here with version changes and any issues encountered.
 - **Notes**: Updating this package would require significant changes to the Jest configuration and test setup. Consider addressing this in a separate task focused on test infrastructure updates.
 
 Next, I'll try updating the loader-utils package which also has critical vulnerabilities.
+
+##### 2. loader-utils (Critical Vulnerability)
+
+- **Current Version**: Unknown (likely 2.0.0 - 2.0.3)
+- **Latest Version**: 3.3.1
+- **Update Command**: `npm install loader-utils@latest --save --legacy-peer-deps`
+- **Result**: Successful
+- **Issues Encountered**:
+  - Tests still fail with the same error about missing `@react-native-community/netinfo` module
+  - This is unrelated to the loader-utils update and is a general issue with the test setup
+- **Notes**: The package was successfully updated, but we can't verify through tests if it's working correctly. The update should address the critical vulnerabilities in this package.
+
+Next, I'll try updating the shell-quote package which also has critical vulnerabilities.
