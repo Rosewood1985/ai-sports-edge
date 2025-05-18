@@ -8,6 +8,7 @@ This section provides practical guides and best practices for implementing featu
 - [Component Guidelines](component-guidelines.md) - Guidelines for creating and using components
 - [Internationalization Guide](internationalization-guide.md) - Practical guide for implementing internationalization
 - [Firebase Guide](firebase-guide.md) - Guide for implementing Firebase services
+- [Security Features](security-features.md) - Guide for security features implementation
 - [Testing](testing.md) - Testing strategies and practices
 
 ## Purpose
