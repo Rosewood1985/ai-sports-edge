@@ -404,22 +404,7 @@
 <a name='L339'></a><a href='#L339'>339</a>
 <a name='L340'></a><a href='#L340'>340</a>
 <a name='L341'></a><a href='#L341'>341</a>
-<a name='L342'></a><a href='#L342'>342</a>
-<a name='L343'></a><a href='#L343'>343</a>
-<a name='L344'></a><a href='#L344'>344</a>
-<a name='L345'></a><a href='#L345'>345</a>
-<a name='L346'></a><a href='#L346'>346</a>
-<a name='L347'></a><a href='#L347'>347</a>
-<a name='L348'></a><a href='#L348'>348</a>
-<a name='L349'></a><a href='#L349'>349</a>
-<a name='L350'></a><a href='#L350'>350</a>
-<a name='L351'></a><a href='#L351'>351</a>
-<a name='L352'></a><a href='#L352'>352</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L342'></a><a href='#L342'>342</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -516,8 +501,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -529,10 +512,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -766,18 +746,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator
-} from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedText, ThemedView } from '../components/ThemedComponents';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { ThemedText } from '../atomic/atoms/ThemedText';
 &nbsp;
 // Define route params type
 type GameDetailsParams = {
@@ -791,17 +766,17 @@ const MOCK_GAME = <span class="cstat-no" title="statement not covered" >{</span>
     id: 'team1',
     name: 'Lakers',
     logo: '🏀',
-    score: 105
+    score: 105,
   },
   awayTeam: {
     id: 'team2',
     name: 'Warriors',
     logo: '🏀',
-    score: 98
+    score: 98,
   },
   status: 'completed',
   date: new Date(2025, 2, 20, 19, 30),
-  venue: 'Staples Center'
+  venue: 'Staples Center',
 };
 &nbsp;
 const GameDetailsScreen = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
@@ -812,16 +787,16 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
   const [game, setGame] = <span class="cstat-no" title="statement not covered" >useState&lt;typeof MOCK_GAME | null&gt;(null);</span>
   const [loading, setLoading] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
   const [activeTab, setActiveTab] = <span class="cstat-no" title="statement not covered" >useState('overview');</span>
-  
+&nbsp;
   // Get game ID from route params
   const { gameId } = <span class="cstat-no" title="statement not covered" >route.params || {};</span>
-  
+&nbsp;
   // Load game data
 <span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const loadGameData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
 <span class="cstat-no" title="statement not covered" >        setLoading(true);</span>
-        
+&nbsp;
         // In a real app, this would be an API call
         // For now, we'll just use mock data
 <span class="cstat-no" title="statement not covered" >        setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
@@ -833,10 +808,10 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
 <span class="cstat-no" title="statement not covered" >        setLoading(false);</span>
       }
     };
-    
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    loadGameData();</span>
   }, [gameId]);
-  
+&nbsp;
   // Format date
   const formatDate = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(d</span>ate: Date) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    return date.toLocaleDateString(undefined, {</span>
@@ -845,10 +820,10 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
-  
+&nbsp;
   // Render loading state
 <span class="cstat-no" title="statement not covered" >  if (loading) {</span>
 <span class="cstat-no" title="statement not covered" >    return (</span>
@@ -858,15 +833,13 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
       &lt;/ThemedView&gt;
     );
   }
-  
+&nbsp;
   // Render error state if game not found
 <span class="cstat-no" title="statement not covered" >  if (!game) {</span>
 <span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;ThemedView style={styles.errorContainer}&gt;
         &lt;Ionicons name="alert-circle-outline" size={64} color={colors.text} /&gt;
-        &lt;ThemedText style={styles.errorText}&gt;
-          {t('games.game_not_found')}
-        &lt;/ThemedText&gt;
+        &lt;ThemedText style={styles.errorText}&gt;{t('games.game_not_found')}&lt;/ThemedText&gt;
         &lt;TouchableOpacity
           style={[styles.backButton, { backgroundColor: colors.primary }]}
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.goBack()}</span>
@@ -876,14 +849,11 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
       &lt;/ThemedView&gt;
     );
   }
-  
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;ThemedView style={styles.container}&gt;
       &lt;View style={[styles.header, { borderBottomColor: colors.border }]}&gt;
-        &lt;TouchableOpacity
-          style={styles.backButtonContainer}
-          onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.goBack()}</span>
-        &gt;
+        &lt;TouchableOpacity style={styles.backButtonContainer} onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.goBack()}</span>&gt;
           &lt;Ionicons name="arrow-back" size={24} color={colors.text} /&gt;
         &lt;/TouchableOpacity&gt;
         &lt;ThemedText style={styles.headerTitle}&gt;
@@ -891,60 +861,60 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
         &lt;/ThemedText&gt;
         &lt;View style={styles.headerRight} /&gt;
       &lt;/View&gt;
-      
+&nbsp;
       &lt;View style={[styles.tabs, { borderBottomColor: colors.border }]}&gt;
         &lt;TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'overview' &amp;&amp; { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'overview' &amp;&amp; { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setActiveTab('overview')}</span>
         &gt;
           &lt;ThemedText
             style={[
               styles.tabText,
-              activeTab === 'overview' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'overview' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           &gt;
             {t('games.overview')}
           &lt;/ThemedText&gt;
         &lt;/TouchableOpacity&gt;
-        
+&nbsp;
         &lt;TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'stats' &amp;&amp; { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'stats' &amp;&amp; { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setActiveTab('stats')}</span>
         &gt;
           &lt;ThemedText
             style={[
               styles.tabText,
-              activeTab === 'stats' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'stats' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           &gt;
             {t('games.stats')}
           &lt;/ThemedText&gt;
         &lt;/TouchableOpacity&gt;
-        
+&nbsp;
         &lt;TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'players' &amp;&amp; { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'players' &amp;&amp; { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setActiveTab('players')}</span>
         &gt;
           &lt;ThemedText
             style={[
               styles.tabText,
-              activeTab === 'players' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'players' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           &gt;
             {t('games.players')}
           &lt;/ThemedText&gt;
         &lt;/TouchableOpacity&gt;
       &lt;/View&gt;
-      
+&nbsp;
       &lt;ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}&gt;
         &lt;View style={styles.scoreboardContainer}&gt;
           &lt;View style={styles.teamContainer}&gt;
@@ -952,20 +922,20 @@ const GameDetailsScreen = <span class="cstat-no" title="statement not covered" >
             &lt;ThemedText style={styles.teamName}&gt;{game.homeTeam.name}&lt;/ThemedText&gt;
             &lt;ThemedText style={styles.teamScore}&gt;{game.homeTeam.score}&lt;/ThemedText&gt;
           &lt;/View&gt;
-          
+&nbsp;
           &lt;View style={styles.gameInfoContainer}&gt;
             &lt;ThemedText style={styles.gameStatus}&gt;
               {game.status === 'live' ? 'LIVE' : 'FINAL'}
             &lt;/ThemedText&gt;
           &lt;/View&gt;
-          
+&nbsp;
           &lt;View style={styles.teamContainer}&gt;
             &lt;ThemedText style={styles.teamLogo}&gt;{game.awayTeam.logo}&lt;/ThemedText&gt;
             &lt;ThemedText style={styles.teamName}&gt;{game.awayTeam.name}&lt;/ThemedText&gt;
             &lt;ThemedText style={styles.teamScore}&gt;{game.awayTeam.score}&lt;/ThemedText&gt;
           &lt;/View&gt;
         &lt;/View&gt;
-        
+&nbsp;
         &lt;View style={[styles.infoCard, { backgroundColor: colors.card }]}&gt;
           &lt;ThemedText style={styles.infoCardTitle}&gt;{t('games.game_info')}&lt;/ThemedText&gt;
           &lt;View style={styles.infoRow}&gt;
@@ -1112,7 +1082,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
   infoValue: {
     fontSize: 14,
     fontWeight: '500',
-  }
+  },
 });
 &nbsp;
 export default GameDetailsScreen;
@@ -1123,7 +1093,7 @@ export default GameDetailsScreen;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-22T17:47:13.963Z
+                at 2025-05-18T22:24:13.811Z
             </div>
         <script src="../prettify.js"></script>
         <script>

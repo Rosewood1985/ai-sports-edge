@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/53</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/49</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/32</span>
+                <span class='fraction'>0/46</span>
             </div>
         
             
@@ -172,21 +172,16 @@
 <a name='L107'></a><a href='#L107'>107</a>
 <a name='L108'></a><a href='#L108'>108</a>
 <a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -257,6 +252,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -273,6 +279,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -281,31 +298,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useEffect } from 'react';
 import { Platform, NativeModules } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 &nbsp;
-// Type declarations for web-specific globals
-declare global {
-  interface Window {
-    location: {
-      pathname: string;
-    };
-    history: {
-      replaceState(data: any, unused: string, url?: string): void;
-    };
-  }
+// Import types from config
+import { seoConfig } from '../config/seo';
 &nbsp;
-  interface Navigator {
-    language: string;
-  }
-&nbsp;
-  var window: Window | undefined;
-  var navigator: Navigator | undefined;
-}
+// No need for global declarations as these types are already defined in lib.dom.d.ts
 &nbsp;
 // Define supported languages
-export type Language = 'en' | 'es';
+import { Language } from '../config/seo';
 &nbsp;
 interface LanguageRedirectProps {
   currentLanguage: Language;
@@ -314,14 +318,14 @@ interface LanguageRedirectProps {
 &nbsp;
 /**
  * LanguageRedirect component
- * 
+ *
  * This component handles URL-based language selection and redirection.
  * It extracts the language from the URL path and sets the application language accordingly.
  * If no language is specified in the URL, it redirects to a language-specific URL based on the device locale.
  */
-export const LanguageRedirect: React.FC&lt;LanguageRedirectProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({ </span></span>
-  currentLanguage, 
-  setLanguage 
+export const LanguageRedirect: React.FC&lt;LanguageRedirectProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span></span>
+  currentLanguage,
+  setLanguage,
 }) =&gt; {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation();</span>
   const route = <span class="cstat-no" title="statement not covered" >useRoute();</span>
@@ -344,7 +348,7 @@ export const LanguageRedirect: React.FC&lt;LanguageRedirectProps&gt; = <span cla
 <span class="cstat-no" title="statement not covered" >    if (Platform.OS === 'web' &amp;&amp; typeof navigator !== 'undefined') {</span>
 <span class="cstat-no" title="statement not covered" >      return navigator.language || 'en';</span>
     }
-    
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    return 'en'; </span>// Default to English
   };
 &nbsp;
@@ -356,7 +360,7 @@ export const LanguageRedirect: React.FC&lt;LanguageRedirectProps&gt; = <span cla
         const path = <span class="cstat-no" title="statement not covered" >window.location.pathname;</span>
         const pathSegments = <span class="cstat-no" title="statement not covered" >path.split('/').filter(<span class="fstat-no" title="function not covered" >(s</span>egment: string) =&gt; <span class="cstat-no" title="statement not covered" >segment.length &gt; 0)</span>;</span>
         const pathLang = <span class="cstat-no" title="statement not covered" >pathSegments.length &gt; 0 ? pathSegments[0] : '';</span>
-        
+&nbsp;
 <span class="cstat-no" title="statement not covered" >        if (pathLang === 'en' || pathLang === 'es') {</span>
           // Set language based on URL
 <span class="cstat-no" title="statement not covered" >          if (pathLang !== currentLanguage) {</span>
@@ -364,13 +368,24 @@ export const LanguageRedirect: React.FC&lt;LanguageRedirectProps&gt; = <span cla
           }
         } else {
           // Determine language based on device locale
-          const deviceLocale = <span class="cstat-no" title="statement not covered" >getDeviceLocale().split('-')[0];</span>
-          const redirectLang = <span class="cstat-no" title="statement not covered" >deviceLocale === 'es' ? 'es' : 'en';</span>
-          
-<span class="cstat-no" title="statement not covered" >          if (redirectLang !== currentLanguage) {</span>
-<span class="cstat-no" title="statement not covered" >            setLanguage(redirectLang as Language);</span>
+          const deviceLocale = <span class="cstat-no" title="statement not covered" >getDeviceLocale();</span>
+          const langCode = <span class="cstat-no" title="statement not covered" >deviceLocale.split('-')[0].toLowerCase();</span>
+          const regionCode = <span class="cstat-no" title="statement not covered" >deviceLocale.split('-')[1]?.toUpperCase();</span>
+&nbsp;
+          let redirectLang: Language = <span class="cstat-no" title="statement not covered" >'en';</span>
+&nbsp;
+          // Handle Spanish variants
+<span class="cstat-no" title="statement not covered" >          if (langCode === 'es') {</span>
+<span class="cstat-no" title="statement not covered" >            if (regionCode === 'US') <span class="cstat-no" title="statement not covered" >redirectLang = 'es-US';</span></span>
+            else <span class="cstat-no" title="statement not covered" >if (regionCode === 'MX') <span class="cstat-no" title="statement not covered" >redirectLang = 'es-MX';</span></span>
+            else <span class="cstat-no" title="statement not covered" >if (regionCode === 'ES') <span class="cstat-no" title="statement not covered" >redirectLang = 'es-ES';</span></span>
+            else <span class="cstat-no" title="statement not covered" >redirectLang = 'es'; </span>// Default to generic Spanish
           }
-          
+&nbsp;
+<span class="cstat-no" title="statement not covered" >          if (redirectLang !== currentLanguage) {</span>
+<span class="cstat-no" title="statement not covered" >            setLanguage(redirectLang);</span>
+          }
+&nbsp;
           // Redirect to language-specific URL
           const newPath = <span class="cstat-no" title="statement not covered" >`/${redirectLang}${path === '/' ? '' : path}`;</span>
 <span class="cstat-no" title="statement not covered" >          window.history.replaceState(null, '', newPath);</span>
@@ -379,25 +394,37 @@ export const LanguageRedirect: React.FC&lt;LanguageRedirectProps&gt; = <span cla
 <span class="cstat-no" title="statement not covered" >        console.error('Error in LanguageRedirect:', error);</span>
       }
     } else {
-      // For native platforms, just use the device locale
-      const deviceLocale = <span class="cstat-no" title="statement not covered" >getDeviceLocale().split('-')[0];</span>
-      const detectedLang = <span class="cstat-no" title="statement not covered" >deviceLocale === 'es' ? 'es' : 'en';</span>
-      
+      // For native platforms, use the device locale with region detection
+      const deviceLocale = <span class="cstat-no" title="statement not covered" >getDeviceLocale();</span>
+      const langCode = <span class="cstat-no" title="statement not covered" >deviceLocale.split('-')[0].toLowerCase();</span>
+      const regionCode = <span class="cstat-no" title="statement not covered" >deviceLocale.split('-')[1]?.toUpperCase();</span>
+&nbsp;
+      let detectedLang: Language = <span class="cstat-no" title="statement not covered" >'en';</span>
+&nbsp;
+      // Handle Spanish variants
+<span class="cstat-no" title="statement not covered" >      if (langCode === 'es') {</span>
+<span class="cstat-no" title="statement not covered" >        if (regionCode === 'US') <span class="cstat-no" title="statement not covered" >detectedLang = 'es-US';</span></span>
+        else <span class="cstat-no" title="statement not covered" >if (regionCode === 'MX') <span class="cstat-no" title="statement not covered" >detectedLang = 'es-MX';</span></span>
+        else <span class="cstat-no" title="statement not covered" >if (regionCode === 'ES') <span class="cstat-no" title="statement not covered" >detectedLang = 'es-ES';</span></span>
+        else <span class="cstat-no" title="statement not covered" >detectedLang = 'es'; </span>// Default to generic Spanish
+      }
+&nbsp;
 <span class="cstat-no" title="statement not covered" >      if (detectedLang !== currentLanguage) {</span>
-<span class="cstat-no" title="statement not covered" >        setLanguage(detectedLang as Language);</span>
+<span class="cstat-no" title="statement not covered" >        setLanguage(detectedLang);</span>
       }
     }
   }, [currentLanguage, setLanguage]);
-  
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  return null;</span>
-};</pre></td></tr></table></pre>
+};
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-22T17:47:13.963Z
+                at 2025-05-18T22:24:13.811Z
             </div>
         <script src="../prettify.js"></script>
         <script>

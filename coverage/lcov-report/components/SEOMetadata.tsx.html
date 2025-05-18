@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -154,7 +154,30 @@
 <a name='L89'></a><a href='#L89'>89</a>
 <a name='L90'></a><a href='#L90'>90</a>
 <a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -231,6 +254,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -247,7 +277,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
 import { Platform, View } from 'react-native';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../atomic/organisms/i18n/I18nContext';
+import { seoConfig, Language } from '../config/seo';
+import {
+  getAbsoluteUrl,
+  getCanonicalUrl,
+  getImageUrl,
+  getLanguageUrl,
+  removeLanguageFromPath,
+} from '../utils/urlUtils';
 &nbsp;
 // Conditionally import Helmet only on web
 let Helmet: any = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >&lt;View /&gt;;</span></span>
@@ -270,10 +308,10 @@ interface SEOMetadataProps {
 &nbsp;
 /**
  * SEOMetadata component
- * 
+ *
  * This component handles SEO-related metadata for web platforms.
  * It adds title, description, canonical URL, Open Graph tags, Twitter card tags, and hreflang tags.
- * 
+ *
  * Note: This component only works on web platforms and has no effect on native apps.
  */
 export const SEOMetadata: React.FC&lt;SEOMetadataProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span></span>
@@ -284,36 +322,34 @@ export const SEOMetadata: React.FC&lt;SEOMetadataProps&gt; = <span class="cstat-
   keywords = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span>
 }) =&gt; {
   const { t, language } = <span class="cstat-no" title="statement not covered" >useI18n();</span>
-  
+&nbsp;
   // Only render on web platform
 <span class="cstat-no" title="statement not covered" >  if (Platform.OS !== 'web') {</span>
 <span class="cstat-no" title="statement not covered" >    return null;</span>
   }
-  
-  // Base URL for the website
-  const baseUrl = <span class="cstat-no" title="statement not covered" >'https://ai-sports-edge.com';</span>
-  
+&nbsp;
+  // Get the path without language prefix
+  const pathWithoutLang = <span class="cstat-no" title="statement not covered" >removeLanguageFromPath(path);</span>
+&nbsp;
   // Canonical URL for the current page
-  const canonicalUrl = <span class="cstat-no" title="statement not covered" >`${baseUrl}/${language}${path}`;</span>
-  
+  const canonicalUrl = <span class="cstat-no" title="statement not covered" >getLanguageUrl(pathWithoutLang, language as Language);</span>
+&nbsp;
   // Translated title and description
   const title = <span class="cstat-no" title="statement not covered" >t(titleKey);</span>
   const description = <span class="cstat-no" title="statement not covered" >t(descriptionKey);</span>
-  
+&nbsp;
   // Locale for Open Graph tags
   const locale = <span class="cstat-no" title="statement not covered" >language === 'en' ? 'en_US' : 'es_ES';</span>
-  
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Helmet&gt;
       {/* Basic metadata */}
       &lt;html lang={language} /&gt;
       &lt;title&gt;{title}&lt;/title&gt;
       &lt;meta name="description" content={description} /&gt;
-      {keywords.length &gt; 0 &amp;&amp; (
-        &lt;meta name="keywords" content={keywords.join(', ')} /&gt;
-      )}
+      {keywords.length &gt; 0 &amp;&amp; &lt;meta name="keywords" content={keywords.join(', ')} /&gt;}
       &lt;link rel="canonical" href={canonicalUrl} /&gt;
-      
+&nbsp;
       {/* Open Graph tags */}
       &lt;meta property="og:title" content={title} /&gt;
       &lt;meta property="og:description" content={description} /&gt;
@@ -321,29 +357,38 @@ export const SEOMetadata: React.FC&lt;SEOMetadataProps&gt; = <span class="cstat-
       {imageUrl &amp;&amp; &lt;meta property="og:image" content={imageUrl} /&gt;}
       &lt;meta property="og:type" content="website" /&gt;
       &lt;meta property="og:locale" content={locale} /&gt;
-      
+&nbsp;
       {/* Twitter card tags */}
       &lt;meta name="twitter:card" content="summary_large_image" /&gt;
       &lt;meta name="twitter:title" content={title} /&gt;
       &lt;meta name="twitter:description" content={description} /&gt;
       {imageUrl &amp;&amp; &lt;meta name="twitter:image" content={imageUrl} /&gt;}
-      
+&nbsp;
       {/* Hreflang tags for language alternatives */}
-      &lt;link rel="alternate" hrefLang="en" href={`${baseUrl}/en${path}`} /&gt;
-      &lt;link rel="alternate" hrefLang="es" href={`${baseUrl}/es${path}`} /&gt;
-      &lt;link rel="alternate" hrefLang="x-default" href={`${baseUrl}/en${path}`} /&gt;
+      {seoConfig.languages.map(<span class="fstat-no" title="function not covered" >la</span>ng =&gt; (
+<span class="cstat-no" title="statement not covered" >        &lt;link</span>
+          key={lang.code}
+          rel="alternate"
+          hrefLang={lang.hreflang}
+          href={getLanguageUrl(pathWithoutLang, lang.code)}
+        /&gt;
+      ))}
+&nbsp;
+      {/* x-default hreflang tag */}
+      &lt;link rel="alternate" hrefLang="x-default" href={getLanguageUrl(pathWithoutLang, 'en')} /&gt;
     &lt;/Helmet&gt;
   );
 };
 &nbsp;
-export default SEOMetadata;</pre></td></tr></table></pre>
+export default SEOMetadata;
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-22T17:47:13.963Z
+                at 2025-05-18T22:24:13.811Z
             </div>
         <script src="../prettify.js"></script>
         <script>
