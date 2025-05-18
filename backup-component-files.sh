@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Create a new backup directory with timestamp
+BACKUP_DIR="backups/atomic-imports-$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+echo "Backing up files to $BACKUP_DIR"
+
+# Create subdirectories in the backup directory
+mkdir -p "$BACKUP_DIR/components"
+mkdir -p "$BACKUP_DIR/screens"
+mkdir -p "$BACKUP_DIR/screens/Onboarding"
+
+# Backup ThemedText imports
+echo "Backing up files with ThemedText imports..."
+cp components/Collapsible.tsx "$BACKUP_DIR/components/" 2>/dev/null || echo "Failed to backup components/Collapsible.tsx"
+cp components/HelloWave.tsx "$BACKUP_DIR/components/" 2>/dev/null || echo "Failed to backup components/HelloWave.tsx"
+cp screens/AccessibilitySettingsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/AccessibilitySettingsScreen.tsx"
+cp screens/AdvancedPlayerStatsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/AdvancedPlayerStatsScreen.tsx"
+cp screens/AuthScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/AuthScreen.tsx"
+cp screens/BettingAnalyticsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/BettingAnalyticsScreen.tsx"
+cp screens/BettingHistoryScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/BettingHistoryScreen.tsx"
+cp screens/BettingSlipImportScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/BettingSlipImportScreen.tsx"
+cp screens/EnhancedAnalyticsDashboardScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/EnhancedAnalyticsDashboardScreen.tsx"
+cp screens/FeatureTourScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/FeatureTourScreen.tsx"
+cp screens/FightDetailScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/FightDetailScreen.tsx"
+cp screens/FraudAlertDetailsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/FraudAlertDetailsScreen.tsx"
+cp screens/FraudDetectionDashboardScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/FraudDetectionDashboardScreen.tsx"
+cp screens/GameDetailScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/GameDetailScreen.tsx"
+cp screens/GameDetailsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/GameDetailsScreen.tsx"
+cp screens/GamesScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/GamesScreen.tsx"
+cp screens/GiftSubscriptionScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/GiftSubscriptionScreen.tsx"
+cp screens/GroupSubscriptionScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/GroupSubscriptionScreen.tsx"
+cp screens/HomeScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/HomeScreen.tsx"
+cp screens/HorseRacingScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/HorseRacingScreen.tsx"
+cp screens/LanguageSettingsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/LanguageSettingsScreen.tsx"
+cp screens/LegalScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/LegalScreen.tsx"
+cp screens/LocalTeamOddsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/LocalTeamOddsScreen.tsx"
+cp screens/NcaaBasketballScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/NcaaBasketballScreen.tsx"
+cp screens/NearbyVenuesScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/NearbyVenuesScreen.tsx"
+cp screens/NotificationSettingsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/NotificationSettingsScreen.tsx"
+cp screens/OfflineSettingsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/OfflineSettingsScreen.tsx"
+cp screens/Onboarding/AgeVerificationScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/AgeVerificationScreen.tsx"
+cp screens/Onboarding/CookieConsentScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/CookieConsentScreen.tsx"
+cp screens/Onboarding/GDPRConsentScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/GDPRConsentScreen.tsx"
+cp screens/Onboarding/LiabilityWaiverScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/LiabilityWaiverScreen.tsx"
+cp screens/Onboarding/PreferencesScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/PreferencesScreen.tsx"
+cp screens/Onboarding/ProfileSetupScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/ProfileSetupScreen.tsx"
+cp screens/Onboarding/ResponsibleGamblingScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/ResponsibleGamblingScreen.tsx"
+cp screens/Onboarding/SelfExclusionScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/SelfExclusionScreen.tsx"
+cp screens/Onboarding/WelcomeScreen.tsx "$BACKUP_DIR/screens/Onboarding/" 2>/dev/null || echo "Failed to backup screens/Onboarding/WelcomeScreen.tsx"
+cp screens/PersonalizationScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/PersonalizationScreen.tsx"
+cp screens/PersonalizedHomeScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/PersonalizedHomeScreen.tsx"
+cp screens/PlayerHistoricalTrendsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/PlayerHistoricalTrendsScreen.tsx"
+cp screens/PlayerStatsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/PlayerStatsScreen.tsx"
+cp screens/ProfileScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/ProfileScreen.tsx"
+cp screens/PurchaseHistoryScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/PurchaseHistoryScreen.tsx"
+cp screens/RedeemGiftScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/RedeemGiftScreen.tsx"
+cp screens/SettingsScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/SettingsScreen.tsx"
+cp screens/UIUXDemoScreen.tsx "$BACKUP_DIR/screens/" 2>/dev/null || echo "Failed to backup screens/UIUXDemoScreen.tsx"
+
+# Backup ThemedView imports (many are already backed up from ThemedText)
+echo "Backing up files with ThemedView imports..."
+cp components/ParallaxScrollView.tsx "$BACKUP_DIR/components/" 2>/dev/null || echo "Failed to backup components/ParallaxScrollView.tsx"
+
+# Copy the component-imports-report.md to the backup directory
+cp component-imports-report.md "$BACKUP_DIR/" 2>/dev/null || echo "Failed to backup component-imports-report.md"
+
+echo "Backup completed successfully!"

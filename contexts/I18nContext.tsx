@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const LANGUAGE_STORAGE_KEY = 'app_language';
 
 // Import translations
-import en from '../translations/en.json';
+import en from 'atomic/atoms/translations/en.json';
 import es from '../translations/es.json';
 
 // Define supported languages

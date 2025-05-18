@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { LanguageProvider, useLanguage } from '../../contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from '../../../atomic/organisms/i18n/LanguageContext';
 import AuthScreen from '../../screens/AuthScreen';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { info, error as logError, LogCategory } from '../../services/loggingService';

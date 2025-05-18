@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { Platform } from 'react-native';
-import { I18nProvider } from '../../contexts/I18nContext';
+import { I18nProvider } from '../../../atomic/organisms/i18n/I18nContext';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import LanguageSelector from '../../components/LanguageSelector';
 import NeonLoginScreen from '../../screens/NeonLoginScreen';

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import CachedPlayerImage from './CachedPlayerImage';
 import { usePersonalization } from '../contexts/PersonalizationContext';
 

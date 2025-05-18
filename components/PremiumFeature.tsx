@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebase';
 import { hasActiveSubscription } from '../services/subscriptionService';
 import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 interface PremiumFeatureProps {
   children: React.ReactNode;

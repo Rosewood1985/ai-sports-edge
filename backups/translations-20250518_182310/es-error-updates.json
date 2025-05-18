@@ -1,0 +1,42 @@
+{
+  "auth": {
+    "invalid_credentials": "Credenciales inválidas. Por favor, verifique su correo electrónico y contraseña.",
+    "email_already_in_use": "Este correo electrónico ya está en uso. Por favor, utilice otro correo electrónico o inicie sesión.",
+    "weak_password": "La contraseña es demasiado débil. Debe tener al menos 8 caracteres e incluir letras y números.",
+    "invalid_email": "Correo electrónico inválido. Por favor, ingrese un correo electrónico válido.",
+    "authentication_failed": "Error de autenticación. Por favor, inténtelo de nuevo más tarde.",
+    "password_reset": "Restablecimiento de contraseña",
+    "password_reset_email_sent": "Se ha enviado un correo electrónico con instrucciones para restablecer su contraseña.",
+    "email_required": "Correo electrónico requerido",
+    "please_enter_email_for_reset": "Por favor, ingrese su correo electrónico para restablecer su contraseña.",
+    "password_reset_failed": "Error al restablecer la contraseña",
+    "password_reset_error": "Hubo un error al enviar el correo electrónico de restablecimiento de contraseña. Por favor, inténtelo de nuevo más tarde.",
+    "username": "Nombre de usuario",
+    "confirm_password": "Confirmar contraseña",
+    "passwords_dont_match": "Las contraseñas no coinciden"
+  },
+  "api": {
+    "network_error": "Error de red. Por favor, verifique su conexión a Internet e inténtelo de nuevo.",
+    "server_error": "Error del servidor. Por favor, inténtelo de nuevo más tarde.",
+    "authentication_error": "Error de autenticación. Por favor, inicie sesión de nuevo.",
+    "not_found": "Recurso no encontrado.",
+    "validation_error": "Error de validación. Por favor, verifique los datos ingresados.",
+    "unknown_error": "Error desconocido. Por favor, inténtelo de nuevo más tarde.",
+    "request_failed": "La solicitud falló. Por favor, inténtelo de nuevo más tarde.",
+    "retry_message": "Reintentando solicitud...",
+    "cache_error": "Error al acceder a la caché. Utilizando datos del servidor."
+  },
+  "error": {
+    "general_error": "Ha ocurrido un error. Por favor, inténtelo de nuevo más tarde.",
+    "network_unavailable": "Red no disponible. Por favor, verifique su conexión a Internet.",
+    "timeout": "La solicitud ha excedido el tiempo de espera. Por favor, inténtelo de nuevo.",
+    "unexpected_error": "Error inesperado. Por favor, inténtelo de nuevo más tarde.",
+    "retry": "Reintentar",
+    "cancel": "Cancelar"
+  },
+  "logging": {
+    "error_logged": "Error registrado",
+    "performance_issue_detected": "Problema de rendimiento detectado",
+    "warning": "Advertencia"
+  }
+}

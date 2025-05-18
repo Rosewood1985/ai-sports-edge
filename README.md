@@ -79,10 +79,20 @@ For more detailed information, see the [Environment Setup Documentation](docs/en
 ```
 ai-sports-edge/
 ├── assets/              # Static assets (images, fonts)
+├── atomic/              # Atomic architecture components
+│   ├── atoms/           # Basic building blocks
+│   ├── molecules/       # Combinations of atoms
+│   ├── organisms/       # Complex components
+│   ├── templates/       # Layout structures
+│   └── pages/           # Complete screens
 ├── components/          # Reusable UI components
 ├── config/              # Configuration files
 ├── contexts/            # React Context providers
 ├── docs/                # Documentation
+│   ├── core-concepts/   # Fundamental architectural concepts
+│   ├── implementation-guides/ # Practical implementation guides
+│   ├── api-reference/   # API documentation
+│   └── historical-context/ # Evolution and decision records
 ├── navigation/          # Navigation configuration
 ├── screens/             # App screens
 ├── services/            # API and business logic
@@ -91,6 +101,22 @@ ai-sports-edge/
 ├── App.tsx              # Main app component
 └── package.json         # Project dependencies
 ```
+
+## Documentation
+
+The project documentation is organized into a hierarchical structure to help you find the information you need quickly and efficiently. See the [Documentation README](docs/README.md) for a complete overview.
+
+### Core Concepts
+
+- [Atomic Architecture](docs/core-concepts/atomic-architecture.md) - Overview of the atomic design principles used in the project
+- [Internationalization](docs/core-concepts/internationalization.md) - Multi-language support implementation
+- [Firebase Integration](docs/core-concepts/firebase-integration.md) - Firebase services integration
+
+### Implementation Guides
+
+- [Developer Workflows](docs/implementation-guides/developer-workflows.md) - Common development workflows
+- [Component Guidelines](docs/implementation-guides/component-guidelines.md) - Guidelines for creating and using components
+- [Testing](docs/implementation-guides/testing.md) - Testing strategies and practices
 
 ## Key Features Documentation
 

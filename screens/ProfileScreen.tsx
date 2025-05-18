@@ -11,7 +11,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { getAuth, User, onAuthStateChanged, signOut } from 'firebase/auth'; // Import getAuth and necessary functions
 import { getUserSubscription, SubscriptionPlan } from '../services/firebaseSubscriptionService';
-import { ThemedText, ThemedView } from '../components/ThemedComponents';
+
+
+
+
+
+import { ThemedView } from '../atomic/atoms/ThemedView'
+import { ThemedText } from '../atomic/atoms/ThemedText';
 import { Colors } from '../constants/Colors'; // Import base Colors
 
 // Define subscription type (remains the same)

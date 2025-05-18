@@ -12,9 +12,13 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../../atomic/organisms/i18n/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-import { ThemedView, ThemedText } from '../../components/ThemedComponents';
+
+
+
+import { ThemedView } from '../atomic/atoms/ThemedView'
+import { ThemedText } from '../atomic/atoms/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';

@@ -11,7 +11,7 @@ import {
 import QuestionSubmissionForm from '../components/QuestionSubmissionForm';
 import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 import { Timestamp } from 'firebase/firestore';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 interface FAQItem {
   question: string;

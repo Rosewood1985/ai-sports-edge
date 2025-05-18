@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { NativeEventEmitter, NativeModules, Platform, AppState } from 'react-native';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 /**
  * LanguageChangeListener component

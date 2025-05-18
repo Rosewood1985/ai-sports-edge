@@ -1,7 +1,7 @@
 import { Game, AIPrediction, ConfidenceLevel, DailyInsight, GameResult } from '../types/odds';
 import { PropBetLine, PropBetPrediction, PropBetType } from '../types/playerProps';
 import { auth } from '../config/firebase';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import {
   hasPremiumAccess,
   hasUsedFreeDailyPick,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext'; // Keep for backward compatibility
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useUITheme } from './UIThemeProvider'; // Import the new theme hook
 import { ThemedText } from './ThemedText'; // Import ThemedText

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Animated, Linking, StyleSheet, ActivityIn
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import { Game, Bookmaker } from '../types/odds';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { auth } from '../config/firebase';

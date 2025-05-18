@@ -13,7 +13,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
 import { formatDate } from '../utils/dateUtils';
-import { ThemedText, ThemedView } from '../components/ThemedComponents';
+
+
+
+
+
+import { ThemedView } from '../atomic/atoms/ThemedView'
+import { ThemedText } from '../atomic/atoms/ThemedText';
 
 // Define the purchase history item type
 interface PurchaseHistoryItem {

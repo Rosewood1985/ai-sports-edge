@@ -10,11 +10,11 @@ import {
 import { StackScreenProps } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
 import { ufcService } from '../services/ufcService';
 import { UFCFight, RoundBettingOption, FightStatus } from '../types/ufc';
 import { Container } from '../components/ResponsiveLayout';
-import { ThemedText } from '../components/ThemedText';
+import {  ThemedText  } from '../atomic/atoms/ThemedText';
 import RoundBettingCard from '../components/RoundBettingCard';
 import LoadingIndicator from '../components/LoadingIndicator';
 import ErrorMessage from '../components/ErrorMessage';

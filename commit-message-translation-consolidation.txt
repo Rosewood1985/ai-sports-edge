@@ -1,0 +1,14 @@
+feat(i18n): Consolidate translation files into atomic structure
+
+- Created atomic/atoms/translations directory following atomic design principles
+- Moved all translation files from translations/ to atomic/atoms/translations/
+- Created atomic/atoms/translations/index.js for cleaner imports
+- Updated I18nContext and LanguageContext to use atomic translations
+- Created update-translation-imports.js script to update import paths
+- Updated progress.md with documentation of the consolidation
+
+This consolidation follows atomic design principles by organizing translations
+at the atoms level, as they are fundamental building blocks used across the
+application. The index.js file makes imports cleaner and more maintainable.
+All functionality is preserved while reducing code duplication and improving
+the overall architecture.

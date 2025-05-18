@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, OAuthProvider } from "firebase/auth";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useI18n } from "../../contexts/I18nContext";
+import { useI18n } from "../../../atomic/organisms/i18n/I18nContext";
 import { getAuth } from "firebase/auth";
 import ThemeToggle from "../../components/ThemeToggle";
 import { useTheme } from "../../screens/Onboarding/Context/ThemeContext";

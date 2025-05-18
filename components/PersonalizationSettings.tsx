@@ -14,7 +14,7 @@ import { usePersonalization } from '../contexts/PersonalizationContext';
 import { AVAILABLE_SPORTS } from './SportSelector';
 import { useTheme } from '../contexts/ThemeContext';
 import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 interface PersonalizationSettingsProps {
   onClose?: () => void;

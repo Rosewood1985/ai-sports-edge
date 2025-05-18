@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { I18nProvider, useI18n } from '../../contexts/I18nContext';
+import { I18nProvider, useI18n } from '../../../atomic/organisms/i18n/I18nContext';
 import LoginScreen from '../../screens/LoginScreen';
 import NeonLoginScreen from '../../screens/NeonLoginScreen';
 import HomeScreen from '../../screens/HomeScreen';

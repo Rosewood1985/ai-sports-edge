@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import ResponsiveSportIcon from './ResponsiveSportIcon';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 // Define available sports
 export const AVAILABLE_SPORTS = [

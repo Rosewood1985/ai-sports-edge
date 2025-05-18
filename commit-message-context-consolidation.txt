@@ -1,0 +1,13 @@
+refactor(i18n): consolidate context providers into atomic structure
+
+- Create atomic/organisms/i18n/I18nContext.tsx with enhanced type safety
+- Create atomic/organisms/i18n/LanguageContext.tsx with simplified implementation
+- Create atomic/molecules/language/LanguageSelector.tsx using atomic context
+- Create script to update import paths across the codebase
+- Update 27 files to use atomic context providers
+- Document changes in memory-bank/progress.md
+
+This consolidation follows atomic design principles by organizing context providers
+in the appropriate atomic structure. It reduces code duplication and improves
+maintainability by having a single source of truth for internationalization
+functionality.

@@ -12,12 +12,12 @@ import {
   Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import featureTourService, { FeatureTourStep } from '../services/featureTourService';
 import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
 import Header from '../components/Header';
-import { ThemedText } from '../components/ThemedText';
-import { ThemedView } from '../components/ThemedView';
+import {  ThemedText  } from '../atomic/atoms/ThemedText';
+import {  ThemedView  } from '../atomic/atoms/ThemedView';
 
 const { width, height } = Dimensions.get('window');
 

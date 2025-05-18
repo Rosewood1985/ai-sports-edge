@@ -1,41 +1,43 @@
 # AI Sports Edge Documentation
 
----
+Welcome to the AI Sports Edge documentation. This documentation is organized into a hierarchical structure to help you find the information you need quickly and efficiently.
 
-## Purpose
+## Documentation Structure
 
-This folder contains the core internal documentation for AI Sports Edge.  
-It supports operational management, product development, investor communications, and long-term project scaling.
+### Core Concepts
 
-✅ All critical documents are automatically monitored by the Docs Watchdog system.
+- [Atomic Architecture](core-concepts/atomic-architecture.md) - Overview of the atomic design principles used in the project
+- [Internationalization](core-concepts/internationalization.md) - Multi-language support implementation
+- [Firebase Integration](core-concepts/firebase-integration.md) - Firebase services integration
 
----
+### Implementation Guides
 
-## Contents
+- [Developer Workflows](implementation-guides/developer-workflows.md) - Common development workflows
+- [Component Guidelines](implementation-guides/component-guidelines.md) - Guidelines for creating and using components
+- [Testing](implementation-guides/testing.md) - Testing strategies and practices
 
-| File | Description |
-|:--|:--|
-| `INTERNAL_TEAM_STRUCTURE.md` | Defines core business and operational roles |
-| `PRIVATE_GPTS.md` | Defines autonomous Private GPT roles and tasks |
-| `GIT_HELPER_CHEATSHEET.md` | Daily Git workflow and best practices cheat sheet |
-| `FOUNDER_OVERVIEW_v1.0.md` | 6–8 page founder document outlining product, ML model, market, roadmap |
-| `README_WATCHDOG.md` | Explains Docs Watchdog automation system |
-| `README_GITHUB_LABELS.md` | GitHub issue/PR label standardization guide |
+### API Reference
 
----
+- [Component API](api-reference/component-api.md) - API documentation for UI components
+- [Service API](api-reference/service-api.md) - API documentation for services
+- [Utility Functions](api-reference/utility-functions.md) - API documentation for utility functions
 
-## Automation
+### Historical Context
 
-- The `/scripts/docs_watchdog.py` script monitors all critical documentation.
-- The `/scripts/schedule_docs_watchdog.sh` script schedules a daily 2 AM cron job to automatically run the watchdog.
-- Any missing documentation will be auto-created, Git staged, committed, and pushed.
+- [Architecture Evolution](historical-context/architecture-evolution.md) - How the architecture has evolved over time
+- [Implementation Alternatives](historical-context/implementation-alternatives.md) - Alternative approaches considered
+- [Decision Records](historical-context/decision-records.md) - Key architectural decisions and their rationale
 
-✅ Ensures continuous documentation integrity.  
-✅ Prevents accidental gaps during active development.
+## Navigation
 
----
+Each section of the documentation is designed to be self-contained, but cross-references are provided where relevant to help you navigate between related topics.
 
-## Last Updated
+## Contributing to Documentation
 
-**Version:** v1.0  
-**Date:** April 27, 2025
+When adding or updating documentation, please follow these guidelines:
+
+1. Place documentation in the appropriate section
+2. Use Markdown formatting for consistency
+3. Include code examples where appropriate
+4. Cross-reference related documentation
+5. Keep documentation up-to-date with code changes

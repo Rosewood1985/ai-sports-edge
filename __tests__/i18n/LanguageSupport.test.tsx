@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { I18nProvider, useI18n } from '../../contexts/I18nContext';
+import { I18nProvider, useI18n } from '../../../atomic/organisms/i18n/I18nContext';
 import LanguageSelector from '../../components/LanguageSelector';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

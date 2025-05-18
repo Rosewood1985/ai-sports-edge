@@ -9,7 +9,7 @@ import {
   WeatherPerformanceCorrelation
 } from '../services/weatherService';
 import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 interface WeatherInsightsProps {
   gameId: string;

@@ -13,7 +13,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 type RootStackParamList = {
   Payment: { planId: string };

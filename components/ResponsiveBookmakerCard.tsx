@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Platform, Dimensions, useWindowDimensions } from 'react-native';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import { useTheme } from '../contexts/ThemeContext';
 import ResponsiveBookmakerLogo from './ResponsiveBookmakerLogo';
 import { shouldEnableComplexAnimations } from '../utils/animationOptimizer';

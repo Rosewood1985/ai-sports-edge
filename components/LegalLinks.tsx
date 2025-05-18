@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
 import { ThemedText } from './ThemedComponents';
 
 interface LegalLinksProps {

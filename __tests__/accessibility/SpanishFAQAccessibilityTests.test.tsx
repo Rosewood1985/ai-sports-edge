@@ -3,7 +3,7 @@ import { render } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 import FAQScreen from '../../screens/FAQScreen';
 import QuestionSubmissionForm from '../../components/QuestionSubmissionForm';
-import { I18nProvider } from '../../contexts/I18nContext';
+import { I18nProvider } from '../../../atomic/organisms/i18n/I18nContext';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mock AccessibilityInfo

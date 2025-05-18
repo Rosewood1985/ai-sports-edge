@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
 import { RoundBettingOption, FightOutcome, UFCFighter } from '../types/ufc';
 import { ThemedText } from './ThemedText';
 

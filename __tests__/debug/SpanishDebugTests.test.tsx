@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { I18nProvider, useI18n } from '../../contexts/I18nContext';
+import { I18nProvider, useI18n } from '../../../atomic/organisms/i18n/I18nContext';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import en from '../../translations/en.json';
 import es from '../../translations/es.json';

@@ -2,7 +2,7 @@ import React, { useMemo, useState, useRef } from 'react';
 import { View, StyleSheet, Dimensions, Text, Pressable, AccessibilityInfo, findNodeHandle, Platform } from 'react-native';
 import { ContributionGraph } from 'react-native-chart-kit';
 import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import Colors from '../constants/Colors';
 import { ThemedText } from './ThemedText';
 

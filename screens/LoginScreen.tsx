@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 import { StackNavigationProp } from "@react-navigation/stack";
 import MobileAppDownload from "../components/MobileAppDownload";
 import { appDownloadService } from "../services/appDownloadService";
-import { useI18n } from "../contexts/I18nContext";
+import { useI18n } from "../../atomic/organisms/i18n/I18nContext";
 import ThemeToggle from "../components/ThemeToggle";
 
 // Define the navigation prop type

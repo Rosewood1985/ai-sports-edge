@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { submitQuestion } from '../services/faqService';
 import { auth } from '../config/firebase';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 interface QuestionSubmissionFormProps {
   onQuestionSubmitted?: () => void;

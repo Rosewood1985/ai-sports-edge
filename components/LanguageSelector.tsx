@@ -9,7 +9,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
 import { ThemedText, ThemedView } from './ThemedComponents';
 import { useTheme } from '@react-navigation/native';
 

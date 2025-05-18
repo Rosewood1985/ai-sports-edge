@@ -13,7 +13,7 @@ import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSub
 import { auth } from '../config/firebase';
 import ReferralProgramCard from '../components/ReferralProgramCard';
 import { analyticsService } from '../services';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import { AnalyticsEventType } from '../services/analyticsService';
 
 type RootStackParamList = {

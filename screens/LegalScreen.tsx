@@ -3,8 +3,14 @@ import { View, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } fro
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedText, ThemedView } from '../components/ThemedComponents';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
+
+
+
+
+
+import { ThemedView } from '../atomic/atoms/ThemedView'
+import { ThemedText } from '../atomic/atoms/ThemedText';
 
 // Define route params type
 type LegalScreenParams = {
