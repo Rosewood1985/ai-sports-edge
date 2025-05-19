@@ -523,6 +523,24 @@ Then proceed with high severity vulnerabilities, focusing on:
 
 PROGRESS UPDATE: Successfully enhanced the atomic components with accessibility features by creating new accessible versions of the core UI components. The new components (AccessibleThemedText and AccessibleThemedView) extend the functionality of ThemedText and ThemedView with accessibility features like screen reader support, high contrast mode, large text mode, bold text mode, and reduced motion mode. Comprehensive documentation was created to guide developers in using the new components and migrating existing code. The implementation follows best practices for accessibility in React Native and provides a clear migration path for existing components.
 
+## TouchableOpacity Accessibility Enhancement
+
+- [x] Created `atomic/atoms/AccessibleTouchableOpacity.tsx` component that extends TouchableOpacity with accessibility features
+  - [x] Added support for screen readers with proper accessibility attributes
+  - [x] Added support for focus states for better keyboard navigation
+  - [x] Added support for accessibility roles and states
+  - [x] Maintained backward compatibility with TouchableOpacity API
+- [x] Updated `atomic/atoms/index.js` to export the new component
+- [x] Updated `components/GameCard.tsx` to use AccessibleTouchableOpacity instead of TouchableOpacity
+  - [x] Added proper accessibility labels and hints
+  - [x] Added appropriate accessibility roles
+- [x] Updated `components/NeonGameCard.tsx` to use AccessibleTouchableOpacity instead of TouchableOpacity
+  - [x] Added proper accessibility labels and hints
+  - [x] Added appropriate accessibility roles
+- [x] Updated `.roo-todo.md` to mark completed tasks
+
+PROGRESS UPDATE: Successfully enhanced the TouchableOpacity components in the app with accessibility features by creating a new AccessibleTouchableOpacity component and updating the GameCard and NeonGameCard components to use it. The new component adds proper accessibility attributes for screen readers, focus states for keyboard navigation, and accessibility roles and states. This makes the app more accessible to users with disabilities and follows best practices for accessibility in React Native.
+
 ## SEO Base URL and Sitemap Generation Improvements
 
 - [x] Refactored `scripts/generateSitemap.js` to dynamically discover routes from the application's routing configuration
