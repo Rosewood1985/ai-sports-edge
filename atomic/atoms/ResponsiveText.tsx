@@ -1,6 +1,12 @@
 import React from 'react';
-import { Text, TextProps, StyleSheet, PixelRatio, Dimensions } from 'react-native';
+import { Text, TextProps, StyleSheet, PixelRatio, Dimensions, TextStyle } from 'react-native';
 import { ThemedText, ThemedTextProps } from './ThemedText';
+import {
+  responsiveFontSize,
+  useSystemFontScale,
+  DeviceType,
+  getDeviceType,
+} from '../../utils/responsiveUtils';
 
 /**
  * ResponsiveText component that automatically scales text based on screen size
@@ -10,19 +16,31 @@ import { ThemedText, ThemedTextProps } from './ThemedText';
  * more complex components in the atomic design system.
  */
 
-// Get the screen width
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Base width to scale from (iPhone 11 Pro width)
-const BASE_WIDTH = 375;
-
-// Scale factor based on screen width
-const scale = SCREEN_WIDTH / BASE_WIDTH;
-
 export type ResponsiveTextProps = ThemedTextProps & {
+  /**
+   * Minimum font size allowed (default: 10)
+   */
   minFontSize?: number;
+
+  /**
+   * Maximum font size allowed (default: 32)
+   */
   maxFontSize?: number;
+
+  /**
+   * Override the default scale factor calculation
+   */
   scaleFactorOverride?: number;
+
+  /**
+   * Whether to respect system font size settings (default: true)
+   */
+  respectSystemSettings?: boolean;
+
+  /**
+   * Base device type to scale from (default: DeviceType.PHONE)
+   */
+  baseDeviceType?: DeviceType;
 };
 
 export function ResponsiveText({
@@ -31,20 +49,29 @@ export function ResponsiveText({
   minFontSize = 10,
   maxFontSize = 32,
   scaleFactorOverride,
+  respectSystemSettings = true,
+  baseDeviceType = DeviceType.PHONE,
   ...props
 }: ResponsiveTextProps) {
+  // Get the system font scale
+  const systemFontScale = useSystemFontScale();
+
   // Calculate the normalized font size
   const calculateFontSize = (style: any) => {
     if (!style || !style.fontSize) return undefined;
 
-    // Use the provided scale factor or the default one
-    const scaleFactor = scaleFactorOverride !== undefined ? scaleFactorOverride : scale;
+    // Get the base font size from the style
+    const baseFontSize = style.fontSize;
 
-    // Calculate the scaled font size
-    const scaledSize = style.fontSize * scaleFactor;
+    // Calculate the responsive font size
+    const scaledSize = responsiveFontSize(baseFontSize, respectSystemSettings);
+
+    // Use the provided scale factor if available
+    const finalSize =
+      scaleFactorOverride !== undefined ? baseFontSize * scaleFactorOverride : scaledSize;
 
     // Ensure the font size is within the specified range
-    return Math.min(Math.max(scaledSize, minFontSize), maxFontSize);
+    return Math.min(Math.max(finalSize, minFontSize), maxFontSize);
   };
 
   // Process the style to apply responsive font sizing
@@ -73,9 +100,50 @@ export function ResponsiveText({
   // Get the responsive style
   const responsiveStyle = getResponsiveStyle();
 
+  // Apply additional styles based on system font scale if respecting system settings
+  const getSystemFontStyles = (): TextStyle | undefined => {
+    if (!respectSystemSettings) return undefined;
+
+    // Apply additional styles based on system font scale
+    if (systemFontScale >= 1.3) {
+      // For very large font sizes, adjust line height and letter spacing
+      return {
+        lineHeight: 1.4, // Increase line height for better readability
+        letterSpacing: 0.5, // Increase letter spacing
+      };
+    }
+
+    return undefined;
+  };
+
+  // Combine responsive style with system font styles
+  const combinedStyles = React.useMemo(() => {
+    const systemFontStyles = getSystemFontStyles();
+
+    if (!responsiveStyle && !systemFontStyles) {
+      return undefined;
+    }
+
+    if (!responsiveStyle) {
+      return systemFontStyles;
+    }
+
+    if (!systemFontStyles) {
+      return responsiveStyle;
+    }
+
+    // If responsiveStyle is an array, append systemFontStyles
+    if (Array.isArray(responsiveStyle)) {
+      return [...responsiveStyle, systemFontStyles];
+    }
+
+    // If responsiveStyle is an object, create an array
+    return [responsiveStyle, systemFontStyles];
+  }, [responsiveStyle, systemFontScale, respectSystemSettings]);
+
   // Render the ThemedText component with the responsive style
   return (
-    <ThemedText style={responsiveStyle} {...props}>
+    <ThemedText style={combinedStyles} {...props}>
       {children}
     </ThemedText>
   );
