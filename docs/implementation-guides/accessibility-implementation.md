@@ -180,7 +180,7 @@ useEffect(() => {
 
 ## Best Practices
 
-1. **Use Enhanced Components**: Prefer using `AccessibleThemedText` and `AccessibleThemedView` over `ThemedText` and `ThemedView` for all new components.
+1. **Use Enhanced Components**: Prefer using `AccessibleThemedText`, `AccessibleThemedView`, and `AccessibleTouchableOpacity` over their non-accessible counterparts for all new components.
 
 2. **Provide Accessibility Labels**: Always provide meaningful accessibility labels for interactive elements.
 
