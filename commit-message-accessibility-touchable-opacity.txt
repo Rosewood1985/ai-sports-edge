@@ -1,0 +1,15 @@
+feat(accessibility): Add AccessibleTouchableOpacity component
+
+This commit adds a new AccessibleTouchableOpacity component that extends React Native's TouchableOpacity with accessibility features. The component provides proper accessibility attributes for screen readers, supports focus states for better keyboard navigation, and handles accessibility roles and states.
+
+Changes:
+- Create atomic/atoms/AccessibleTouchableOpacity.tsx component
+- Update atomic/atoms/index.js to export the new component
+- Update components/GameCard.tsx to use AccessibleTouchableOpacity
+- Update components/NeonGameCard.tsx to use AccessibleTouchableOpacity
+- Update documentation in docs/implementation-guides/accessibility-implementation.md
+- Update API reference in docs/api-reference/component-api.md
+- Update .roo-todo.md to mark the task as completed
+- Update memory-bank/progress.md with implementation details
+
+This implementation improves the app's accessibility for users with disabilities by providing proper screen reader support, keyboard navigation, and other accessibility features for touchable components.
