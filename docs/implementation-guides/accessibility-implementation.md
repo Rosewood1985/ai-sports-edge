@@ -232,6 +232,29 @@ import { AccessibleThemedView } from '../atomic/atoms';
 </AccessibleThemedView>;
 ```
 
+### Migrating from TouchableOpacity to AccessibleTouchableOpacity
+
+```tsx
+// Before
+import { TouchableOpacity } from 'react-native';
+
+<TouchableOpacity onPress={() => console.log('Pressed')}>
+  <Text>Press Me</Text>
+</TouchableOpacity>;
+
+// After
+import { AccessibleTouchableOpacity } from '../atomic/atoms';
+
+<AccessibleTouchableOpacity
+  onPress={() => console.log('Pressed')}
+  accessibilityLabel="Press Me Button"
+  accessibilityHint="Performs an action when pressed"
+  accessibilityRole="button"
+>
+  <Text>Press Me</Text>
+</AccessibleTouchableOpacity>;
+```
+
 ## Conclusion
 
 By using these enhanced components and following the best practices outlined in this guide, you can ensure that the AI Sports Edge app is accessible to all users, including those with disabilities.
