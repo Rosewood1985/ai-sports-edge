@@ -26,3 +26,4 @@ export { ThemedView } from './ThemedView';
 export { ResponsiveText } from './ResponsiveText';
 export { AccessibleThemedText } from './AccessibleThemedText';
 export { AccessibleThemedView } from './AccessibleThemedView';
+export { default as AccessibleTouchableOpacity } from './AccessibleTouchableOpacity';

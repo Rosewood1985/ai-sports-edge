@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native'; // Keep View for specific layout needs if ThemedView isn't sufficient
+import { View, StyleSheet } from 'react-native'; // Keep View for specific layout needs if ThemedView isn't sufficient
 import { Game, ConfidenceLevel } from '../types/odds';
 import PremiumFeature from './PremiumFeature';
 import PropBetList from './PropBetList';
@@ -9,6 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useUITheme } from './UIThemeProvider'; // Import theme hook
 import { ThemedText } from './ThemedText'; // Import ThemedText
 import { ThemedView } from './ThemedView'; // Import ThemedView
+import { AccessibleTouchableOpacity } from '../atomic/atoms'; // Import AccessibleTouchableOpacity
 import { Colors } from '../constants/Colors'; // Import Colors for status
 
 // Define navigation type
@@ -70,9 +71,11 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
   const isGameActive = () => {
     // Ensure commence_time is valid before comparing
     try {
-      return game.live_updates || (game.commence_time && new Date(game.commence_time) <= new Date());
+      return (
+        game.live_updates || (game.commence_time && new Date(game.commence_time) <= new Date())
+      );
     } catch (e) {
-      console.error("Invalid date format for commence_time:", game.commence_time);
+      console.error('Invalid date format for commence_time:', game.commence_time);
       return !!game.live_updates; // Fallback based on live_updates only
     }
   };
@@ -81,7 +84,7 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
   const navigateToPlayerStats = () => {
     navigation.navigate('PlayerStats', {
       gameId: game.id,
-      gameTitle: `${game.home_team} vs ${game.away_team}`
+      gameTitle: `${game.home_team} vs ${game.away_team}`,
     });
   };
 
@@ -96,7 +99,7 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       // Border can be added if needed:
       // borderWidth: 1,
       // borderColor: theme.colors.borderSubtle,
-    }
+    },
   ];
 
   const localIndicatorStyle = [
@@ -107,7 +110,7 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       paddingVertical: 2, // Keep small vertical padding
       borderRadius: theme.borderRadius.xs,
       marginLeft: theme.spacing.sm,
-    }
+    },
   ];
 
   const liveScoreContainerStyle = [
@@ -117,7 +120,7 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       paddingHorizontal: theme.spacing.sm,
       paddingVertical: 2,
       borderRadius: theme.borderRadius.xs,
-    }
+    },
   ];
 
   const predictionContainerStyle = [
@@ -129,7 +132,7 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       borderRadius: theme.borderRadius.sm,
       borderLeftWidth: 3,
       borderLeftColor: theme.colors.primaryAction, // Use theme action color
-    }
+    },
   ];
 
   const confidenceIndicatorStyle = [
@@ -140,7 +143,7 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       paddingHorizontal: theme.spacing.xs,
       paddingVertical: 2,
       borderRadius: theme.borderRadius.xs,
-    }
+    },
   ];
 
   const statsButtonStyle = [
@@ -150,15 +153,17 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
       borderRadius: theme.borderRadius.sm,
       padding: theme.spacing.sm,
       marginTop: theme.spacing.md,
-    }
+    },
   ];
 
-
   return (
-    <TouchableOpacity
+    <AccessibleTouchableOpacity
       style={cardStyle} // Apply dynamic style here
       onPress={handlePress}
       activeOpacity={onPress ? 0.7 : 1}
+      accessibilityLabel={`Game: ${game.home_team} vs ${game.away_team}`}
+      accessibilityHint={`View details for ${game.home_team} vs ${game.away_team} game`}
+      accessibilityRole="button"
       // Wrap content in ThemedView for background
     >
       <ThemedView background="surface">
@@ -172,7 +177,9 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
 
             {isLocalGame && (
               <View style={localIndicatorStyle}>
-                <ThemedText type="small" color="primary" style={styles.localIndicatorText}>LOCAL</ThemedText>
+                <ThemedText type="small" color="primary" style={styles.localIndicatorText}>
+                  LOCAL
+                </ThemedText>
               </View>
             )}
           </View>
@@ -213,17 +220,25 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
               <View style={styles.oddsContainer}>
                 {game.bookmakers[0].markets[0].outcomes.map((outcome, idx) => (
                   <View key={idx} style={styles.outcomeRow}>
-                    <ThemedText type="bodyStd" style={styles.teamName}>{outcome.name}</ThemedText>
-                    <ThemedText type="bodyStd" style={styles.odds}>{outcome.price}</ThemedText>
+                    <ThemedText type="bodyStd" style={styles.teamName}>
+                      {outcome.name}
+                    </ThemedText>
+                    <ThemedText type="bodyStd" style={styles.odds}>
+                      {outcome.price}
+                    </ThemedText>
                   </View>
                 ))}
               </View>
             ) : (
-              <ThemedText type="small" color="tertiary" style={styles.noOdds}>No odds available</ThemedText>
+              <ThemedText type="small" color="tertiary" style={styles.noOdds}>
+                No odds available
+              </ThemedText>
             )}
           </View>
         ) : (
-          <ThemedText type="small" color="tertiary" style={styles.noOdds}>No bookmaker data available</ThemedText>
+          <ThemedText type="small" color="tertiary" style={styles.noOdds}>
+            No bookmaker data available
+          </ThemedText>
         )}
 
         {/* AI Prediction (Premium Feature) */}
@@ -231,7 +246,9 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
           <PremiumFeature>
             <View style={predictionContainerStyle}>
               <View style={styles.predictionHeader}>
-                <ThemedText type="label" color="action" style={styles.predictionTitle}>AI Prediction</ThemedText>
+                <ThemedText type="label" color="action" style={styles.predictionTitle}>
+                  AI Prediction
+                </ThemedText>
                 {/* Confidence indicator rendering logic remains the same */}
                 <View style={confidenceIndicatorStyle}>
                   <ThemedText type="small" color="primary" style={styles.confidenceText}>
@@ -241,17 +258,23 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
               </View>
 
               <ThemedText type="bodyStd" color="secondary" style={styles.predictionText}>
-                <ThemedText type="bodyStd" style={styles.bold}>Pick: </ThemedText>
+                <ThemedText type="bodyStd" style={styles.bold}>
+                  Pick:{' '}
+                </ThemedText>
                 {game.ai_prediction.predicted_winner}
               </ThemedText>
 
               <ThemedText type="bodyStd" color="secondary" style={styles.predictionText}>
-                <ThemedText type="bodyStd" style={styles.bold}>Reasoning: </ThemedText>
+                <ThemedText type="bodyStd" style={styles.bold}>
+                  Reasoning:{' '}
+                </ThemedText>
                 {game.ai_prediction.reasoning}
               </ThemedText>
 
               <ThemedText type="bodyStd" color="secondary" style={styles.predictionText}>
-                <ThemedText type="bodyStd" style={styles.bold}>Historical Accuracy: </ThemedText>
+                <ThemedText type="bodyStd" style={styles.bold}>
+                  Historical Accuracy:{' '}
+                </ThemedText>
                 {game.ai_prediction.historical_accuracy}%
               </ThemedText>
             </View>
@@ -263,16 +286,26 @@ const GameCard = memo(({ game, onPress, isLocalGame }: GameCardProps): JSX.Eleme
 
         {/* Player Stats Button - Only show for active games */}
         {isGameActive() && (
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             style={statsButtonStyle}
             onPress={navigateToPlayerStats}
+            accessibilityLabel="View Player Stats"
+            accessibilityHint="View detailed statistics for players in this game"
+            accessibilityRole="button"
           >
-            <Ionicons name="stats-chart" size={16} color={theme.colors.primaryText} style={styles.statsIcon} />
-            <ThemedText type="button" color="primary" style={styles.statsButtonText}>View Player Stats</ThemedText>
-          </TouchableOpacity>
+            <Ionicons
+              name="stats-chart"
+              size={16}
+              color={theme.colors.primaryText}
+              style={styles.statsIcon}
+            />
+            <ThemedText type="button" color="primary" style={styles.statsButtonText}>
+              View Player Stats
+            </ThemedText>
+          </AccessibleTouchableOpacity>
         )}
       </ThemedView>
-    </TouchableOpacity>
+    </AccessibleTouchableOpacity>
   );
 });
 
@@ -295,8 +328,8 @@ const styles = StyleSheet.create({
     marginRight: 8, // Use theme.spacing?
   },
   matchupText: {
-     // Font size/weight handled by ThemedText type='h3'
-     flexShrink: 1, // Allow text to shrink
+    // Font size/weight handled by ThemedText type='h3'
+    flexShrink: 1, // Allow text to shrink
   },
   localIndicator: {
     // Background/padding/radius applied dynamically
@@ -320,7 +353,7 @@ const styles = StyleSheet.create({
     // Background/padding/radius applied dynamically
   },
   liveScoreText: {
-     // Color/size handled by ThemedText
+    // Color/size handled by ThemedText
     fontWeight: 'bold',
     marginRight: 4, // Use theme.spacing?
   },
@@ -376,7 +409,7 @@ const styles = StyleSheet.create({
     // Background/padding/radius applied dynamically
   },
   confidenceText: {
-     // Color/size handled by ThemedText
+    // Color/size handled by ThemedText
     fontWeight: 'bold', // Keep specific weight
   },
   predictionText: {
@@ -397,9 +430,9 @@ const styles = StyleSheet.create({
     marginRight: 6, // Use theme.spacing?
   },
   statsButtonText: {
-     // Color/size handled by ThemedText
+    // Color/size handled by ThemedText
     fontWeight: 'bold', // Keep specific weight
-  }
+  },
 });
 
 export default GameCard;

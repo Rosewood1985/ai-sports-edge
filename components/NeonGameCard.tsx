@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Game, ConfidenceLevel } from '../types/odds';
 import PremiumFeature from './PremiumFeature';
 import PropBetList from './PropBetList';
@@ -13,6 +13,7 @@ import NeonButton from './ui/NeonButton';
 import theme from '../styles/theme'; // Import the full theme object
 import { Colors } from '../constants/Colors'; // Import base Colors for status
 import { LinearGradient } from 'expo-linear-gradient';
+import { AccessibleTouchableOpacity } from '../atomic/atoms'; // Import AccessibleTouchableOpacity
 
 // Define navigation type
 type RootStackParamList = {
@@ -43,26 +44,27 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
       // Use NeonCard with theme status colors
       <NeonCard borderColor={Colors.status.lowConfidence} glowColor={Colors.status.lowConfidence}>
         {/* Use NeonText, assuming it handles basic text styling */}
-        <NeonText type="body" color={Colors.status.lowConfidence}>Invalid game data</NeonText>
+        <NeonText type="body" color={Colors.status.lowConfidence}>
+          Invalid game data
+        </NeonText>
       </NeonCard>
     );
   }
 
   // Get confidence color based on level using theme status colors
   const getConfidenceColor = (level: ConfidenceLevel | 'unknown'): string => {
-     switch (level) {
-       case 'high':
-         return Colors.status.highConfidence;
-       case 'medium':
-         return Colors.status.mediumConfidence;
-       case 'low':
-         return Colors.status.lowConfidence;
-       case 'unknown':
-       default:
-         return theme.colors.tertiaryText; // Use theme color for default/unknown
-     }
-   };
-
+    switch (level) {
+      case 'high':
+        return Colors.status.highConfidence;
+      case 'medium':
+        return Colors.status.mediumConfidence;
+      case 'low':
+        return Colors.status.lowConfidence;
+      case 'unknown':
+      default:
+        return theme.colors.tertiaryText; // Use theme color for default/unknown
+    }
+  };
 
   const handlePress = () => {
     if (onPress) {
@@ -73,9 +75,11 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
   // Check if the game is live or has started
   const isGameActive = () => {
     try {
-      return game.live_updates || (game.commence_time && new Date(game.commence_time) <= new Date());
+      return (
+        game.live_updates || (game.commence_time && new Date(game.commence_time) <= new Date())
+      );
     } catch (e) {
-      console.error("Invalid date format for commence_time:", game.commence_time);
+      console.error('Invalid date format for commence_time:', game.commence_time);
       return !!game.live_updates;
     }
   };
@@ -84,7 +88,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
   const navigateToPlayerStats = () => {
     navigation.navigate('PlayerStats', {
       gameId: game.id,
-      gameTitle: `${game.home_team} vs ${game.away_team}`
+      gameTitle: `${game.home_team} vs ${game.away_team}`,
     });
   };
 
@@ -102,10 +106,13 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
       gradientColors={[theme.colors.surfaceBackground, theme.colors.primaryBackground]}
       style={styles.card} // Apply base margin from StyleSheet
     >
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         onPress={handlePress}
         activeOpacity={onPress ? 0.7 : 1}
         style={styles.cardContent} // Apply padding/layout from StyleSheet
+        accessibilityLabel={`Game: ${game.home_team} vs ${game.away_team}`}
+        accessibilityHint={`View details for ${game.home_team} vs ${game.away_team} game`}
+        accessibilityRole="button"
       >
         {/* Game header */}
         <View style={styles.header}>
@@ -117,9 +124,13 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
 
             {isLocalGame && (
               // Use theme colors for indicator
-              <View style={[styles.localIndicator, { backgroundColor: Colors.status.highConfidence }]}>
+              <View
+                style={[styles.localIndicator, { backgroundColor: Colors.status.highConfidence }]}
+              >
                 {/* Assuming NeonText type='caption' maps to theme.typography.small/label */}
-                <NeonText type="caption" color={theme.colors.primaryBackground}>LOCAL</NeonText>
+                <NeonText type="caption" color={theme.colors.primaryBackground}>
+                  LOCAL
+                </NeonText>
               </View>
             )}
           </View>
@@ -190,26 +201,33 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
         {/* AI Prediction */}
         {game.ai_prediction && (
           <PremiumFeature>
-            <View style={[
-              styles.predictionContainer,
-              // Use theme colors for border and background
-              { borderLeftColor: theme.colors.primaryAction,
-                backgroundColor: 'rgba(0, 229, 255, 0.05)' // Keep subtle background or use theme.colors.surfaceBackground
-              }
-            ]}>
+            <View
+              style={[
+                styles.predictionContainer,
+                // Use theme colors for border and background
+                {
+                  borderLeftColor: theme.colors.primaryAction,
+                  backgroundColor: 'rgba(0, 229, 255, 0.05)', // Keep subtle background or use theme.colors.surfaceBackground
+                },
+              ]}
+            >
               <View style={styles.predictionHeader}>
                 <NeonText type="subheading" color={theme.colors.primaryAction} glow={true}>
                   AI Prediction
                 </NeonText>
                 <View style={[styles.confidenceIndicator, { backgroundColor: confidenceColor }]}>
                   <NeonText type="caption" color={theme.colors.primaryBackground}>
-                    {(confidenceLevel).toUpperCase()}
+                    {confidenceLevel.toUpperCase()}
                   </NeonText>
                 </View>
               </View>
 
               <View style={styles.predictionRow}>
-                <NeonText type="body" color={theme.colors.primaryText} style={styles.predictionLabel}>
+                <NeonText
+                  type="body"
+                  color={theme.colors.primaryText}
+                  style={styles.predictionLabel}
+                >
                   Pick:
                 </NeonText>
                 {/* Use appropriate status color for winner */}
@@ -219,16 +237,28 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
               </View>
 
               <View style={styles.predictionRow}>
-                <NeonText type="body" color={theme.colors.primaryText} style={styles.predictionLabel}>
+                <NeonText
+                  type="body"
+                  color={theme.colors.primaryText}
+                  style={styles.predictionLabel}
+                >
                   Reasoning:
                 </NeonText>
-                <NeonText type="body" color={theme.colors.secondaryText} style={styles.predictionValue}>
+                <NeonText
+                  type="body"
+                  color={theme.colors.secondaryText}
+                  style={styles.predictionValue}
+                >
                   {game.ai_prediction.reasoning}
                 </NeonText>
               </View>
 
               <View style={styles.predictionRow}>
-                <NeonText type="body" color={theme.colors.primaryText} style={styles.predictionLabel}>
+                <NeonText
+                  type="body"
+                  color={theme.colors.primaryText}
+                  style={styles.predictionLabel}
+                >
                   Historical Accuracy:
                 </NeonText>
                 {/* Use accent color for accuracy */}
@@ -249,12 +279,19 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
             title="View Player Stats"
             onPress={navigateToPlayerStats}
             type="primary" // Assuming NeonButton uses theme internally for type='primary'
-            icon={<Ionicons name="stats-chart" size={16} color={theme.colors.primaryBackground} style={styles.statsIcon} />} // Use black/dark text on neon button
+            icon={
+              <Ionicons
+                name="stats-chart"
+                size={16}
+                color={theme.colors.primaryBackground}
+                style={styles.statsIcon}
+              />
+            } // Use black/dark text on neon button
             iconPosition="left"
             style={styles.statsButton} // Apply margin from StyleSheet
           />
         )}
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
     </NeonCard>
   );
 });
