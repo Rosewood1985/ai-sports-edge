@@ -21,6 +21,10 @@ This document provides detailed API documentation for UI components in the AI Sp
   - [AIPickCard](#aipickcard)
   - [GameCard](#gamecard)
   - [BettingAnalyticsChart](#bettinganalyticschart)
+- [Accessibility Components](#accessibility-components)
+  - [AccessibleThemedText](#accessiblethemedtext)
+  - [AccessibleThemedView](#accessiblethemedview)
+  - [AccessibleTouchableOpacity](#accessibletouchableopacity)
 
 ## Atoms
 
@@ -386,6 +390,86 @@ function AnalyticsScreen() {
     </View>
   );
 }
+```
+
+## Accessibility Components
+
+### AccessibleThemedText
+
+The `AccessibleThemedText` component extends the functionality of `ThemedText` with accessibility features.
+
+#### Props
+
+| Prop                 | Type                 | Default   | Description                          |
+| -------------------- | -------------------- | --------- | ------------------------------------ |
+| `accessibilityLabel` | string               | undefined | Label for screen readers             |
+| `accessibilityHint`  | string               | undefined | Hint for screen readers              |
+| `accessibilityRole`  | AccessibilityRole    | undefined | Role for screen readers              |
+| `accessibilityState` | AccessibilityState   | undefined | State for screen readers             |
+| `applyHighContrast`  | boolean              | true      | Whether to apply high contrast mode  |
+| `applyLargeText`     | boolean              | true      | Whether to apply large text mode     |
+| `applyBoldText`      | boolean              | true      | Whether to apply bold text mode      |
+| `highContrastStyle`  | StyleProp<TextStyle> | undefined | Style to apply in high contrast mode |
+| `largeTextStyle`     | StyleProp<TextStyle> | undefined | Style to apply in large text mode    |
+| `boldTextStyle`      | StyleProp<TextStyle> | undefined | Style to apply in bold text mode     |
+
+Plus all props from `ThemedText`.
+
+### AccessibleThemedView
+
+The `AccessibleThemedView` component extends the functionality of `ThemedView` with accessibility features.
+
+#### Props
+
+| Prop                 | Type                 | Default   | Description                           |
+| -------------------- | -------------------- | --------- | ------------------------------------- |
+| `accessibilityLabel` | string               | undefined | Label for screen readers              |
+| `accessibilityHint`  | string               | undefined | Hint for screen readers               |
+| `accessibilityRole`  | AccessibilityRole    | undefined | Role for screen readers               |
+| `accessibilityState` | AccessibilityState   | undefined | State for screen readers              |
+| `applyHighContrast`  | boolean              | true      | Whether to apply high contrast mode   |
+| `applyReducedMotion` | boolean              | true      | Whether to apply reduced motion mode  |
+| `highContrastStyle`  | StyleProp<ViewStyle> | undefined | Style to apply in high contrast mode  |
+| `reducedMotionStyle` | StyleProp<ViewStyle> | undefined | Style to apply in reduced motion mode |
+
+Plus all props from `ThemedView`.
+
+### AccessibleTouchableOpacity
+
+The `AccessibleTouchableOpacity` component extends the functionality of React Native's `TouchableOpacity` with accessibility features.
+
+#### Props
+
+| Prop                 | Type                 | Default   | Description                      |
+| -------------------- | -------------------- | --------- | -------------------------------- |
+| `accessibilityLabel` | string               | undefined | Label for screen readers         |
+| `accessibilityHint`  | string               | undefined | Hint for screen readers          |
+| `accessibilityRole`  | AccessibilityRole    | undefined | Role for screen readers          |
+| `accessibilityState` | AccessibilityState   | undefined | State for screen readers         |
+| `isFocused`          | boolean              | false     | Whether the component is focused |
+| `focusedStyle`       | StyleProp<ViewStyle> | undefined | Style to apply when focused      |
+
+Plus all props from React Native's `TouchableOpacity`.
+
+#### Example
+
+```jsx
+import { AccessibleTouchableOpacity } from 'atomic/atoms';
+
+// Basic usage
+<AccessibleTouchableOpacity onPress={() => console.log('Pressed')}>
+  <Text>Press Me</Text>
+</AccessibleTouchableOpacity>
+
+// With accessibility props
+<AccessibleTouchableOpacity
+  onPress={() => console.log('Pressed')}
+  accessibilityLabel="Submit Button"
+  accessibilityHint="Submits the form"
+  accessibilityRole="button"
+>
+  <Text>Submit</Text>
+</AccessibleTouchableOpacity>
 ```
 
 ## Cross-References
