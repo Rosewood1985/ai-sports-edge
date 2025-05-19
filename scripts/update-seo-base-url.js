@@ -1,8 +1,9 @@
 /**
  * Update SEO Base URL Script
  *
- * This script updates the SEO base URL in the configuration file and environment variables.
- * It's useful for updating the base URL when deploying to different environments.
+ * This script updates the SEO base URL in both TypeScript and JavaScript configuration files
+ * and environment variables. It's useful for updating the base URL when deploying to different
+ * environments.
  *
  * Usage:
  * node scripts/update-seo-base-url.js https://aisportsedge.app
@@ -14,22 +15,50 @@ const path = require('path');
 // Get the base URL from command line arguments or use default
 const baseUrl = process.argv[2] || 'https://aisportsedge.app';
 
-// Path to the SEO config file
-const seoConfigPath = path.join(__dirname, '../config/seo.ts');
+// Paths to the SEO config files
+const seoConfigTsPath = path.join(__dirname, '../config/seo.ts');
+const seoConfigJsPath = path.join(__dirname, '../config/seo.js');
 
-// Read the current SEO config file
-let seoConfig = fs.readFileSync(seoConfigPath, 'utf8');
+/**
+ * Update SEO base URL in a configuration file
+ * @param {string} filePath - Path to the configuration file
+ * @param {string} baseUrl - New base URL
+ * @returns {boolean} - Whether the update was successful
+ */
+function updateSeoConfigFile(filePath, baseUrl) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      console.warn(`Config file not found: ${filePath}`);
+      return false;
+    }
 
-// Replace the base URL
-seoConfig = seoConfig.replace(
-  /baseUrl: process\.env\.SEO_BASE_URL \|\| ['"].*?['"]/,
-  `baseUrl: process.env.SEO_BASE_URL || '${baseUrl}'`
-);
+    // Read the current SEO config file
+    let seoConfig = fs.readFileSync(filePath, 'utf8');
 
-// Write the updated SEO config file
-fs.writeFileSync(seoConfigPath, seoConfig);
+    // Replace the base URL
+    seoConfig = seoConfig.replace(
+      /baseUrl: (?:process\.env\.SEO_BASE_URL \|\| )?['"].*?['"]/,
+      `baseUrl: process.env.SEO_BASE_URL || '${baseUrl}'`
+    );
 
-console.log(`Updated SEO base URL to: ${baseUrl}`);
+    // Write the updated SEO config file
+    fs.writeFileSync(filePath, seoConfig);
+    console.log(`Updated SEO base URL in ${filePath} to: ${baseUrl}`);
+    return true;
+  } catch (error) {
+    console.error(`Error updating ${filePath}:`, error);
+    return false;
+  }
+}
+
+// Update both TypeScript and JavaScript config files
+const tsUpdated = updateSeoConfigFile(seoConfigTsPath, baseUrl);
+const jsUpdated = updateSeoConfigFile(seoConfigJsPath, baseUrl);
+
+if (!tsUpdated && !jsUpdated) {
+  console.error('Failed to update any SEO configuration files');
+  process.exit(1);
+}
 
 // Update environment variables in .env files
 const envFiles = ['.env', '.env.development', '.env.production'];
@@ -68,6 +97,26 @@ if (fs.existsSync(sitemapScriptPath)) {
 
   fs.writeFileSync(sitemapScriptPath, sitemapScript);
   console.log(`Updated sitemap script with base URL: ${baseUrl}`);
+}
+
+// Verify configuration consistency
+try {
+  if (tsUpdated && jsUpdated) {
+    const tsConfig = require('../config/seo.ts');
+    const jsConfig = require('../config/seo.js');
+
+    if (tsConfig.baseUrl !== jsConfig.baseUrl) {
+      console.warn(
+        'Warning: TypeScript and JavaScript SEO configurations have different base URLs'
+      );
+      console.warn(`TypeScript: ${tsConfig.baseUrl}`);
+      console.warn(`JavaScript: ${jsConfig.baseUrl}`);
+    } else {
+      console.log('TypeScript and JavaScript SEO configurations are consistent');
+    }
+  }
+} catch (error) {
+  console.warn('Could not verify configuration consistency:', error.message);
 }
 
 console.log('SEO base URL update completed successfully!');

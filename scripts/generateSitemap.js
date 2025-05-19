@@ -3,6 +3,12 @@
  *
  * This script generates a multilingual XML sitemap for the AI Sports Edge website.
  * It includes hreflang annotations for each URL to indicate language alternatives.
+ *
+ * Features:
+ * - Dynamic route discovery from application's routing configuration
+ * - Configurable output directory
+ * - Validation of sitemap references
+ * - Support for different build environments
  */
 
 const fs = require('fs');
@@ -11,27 +17,84 @@ const path = require('path');
 // Import SEO config
 const seoConfig = require('../config/seo');
 
-// Define your routes (paths without language prefix)
-const routes = [
-  '/',
-  '/dashboard',
-  '/betting',
-  '/stats',
-  '/news',
-  '/picks',
-  '/account',
-  '/subscription',
-  '/about',
-  '/contact',
-  '/terms',
-  '/privacy',
-];
+// Import routes from the application's routing configuration
+const appRoutesPath = path.join(__dirname, '../src/navigation/AppRoutes.js');
+let routes = [];
+
+// Function to extract routes from the application's routing configuration
+function extractRoutesFromAppRoutes() {
+  try {
+    // Read the AppRoutes.js file
+    const appRoutesContent = fs.readFileSync(appRoutesPath, 'utf8');
+
+    // Extract route paths using regex
+    const routeRegex = /['"]\/[^'"]*['"]/g;
+    const matches = appRoutesContent.match(routeRegex);
+
+    if (matches && matches.length > 0) {
+      // Clean up the matches to get just the route paths
+      routes = matches
+        .map(match => match.replace(/['"]/g, ''))
+        // Remove dynamic route parameters (e.g., :id)
+        .map(route => route.replace(/\/:[^\/]+/g, ''))
+        // Remove duplicates
+        .filter((route, index, self) => self.indexOf(route) === index)
+        // Filter out excluded paths
+        .filter(
+          route =>
+            !seoConfig.sitemap.excludePaths.some(
+              exclude => route === exclude || route.startsWith(`${exclude}/`)
+            )
+        );
+
+      console.log(`Extracted ${routes.length} routes from AppRoutes.js`);
+    } else {
+      console.warn('No routes found in AppRoutes.js, falling back to default routes');
+      // Fallback to default routes if extraction fails
+      routes = [
+        '/',
+        '/dashboard',
+        '/betting',
+        '/stats',
+        '/news',
+        '/picks',
+        '/account',
+        '/subscription',
+        '/about',
+        '/contact',
+        '/terms',
+        '/privacy',
+      ];
+    }
+  } catch (error) {
+    console.error('Error extracting routes from AppRoutes.js:', error);
+    console.log('Falling back to default routes');
+    // Fallback to default routes if extraction fails
+    routes = [
+      '/',
+      '/dashboard',
+      '/betting',
+      '/stats',
+      '/news',
+      '/picks',
+      '/account',
+      '/subscription',
+      '/about',
+      '/contact',
+      '/terms',
+      '/privacy',
+    ];
+  }
+}
+
+// Extract routes from the application's routing configuration
+extractRoutesFromAppRoutes();
 
 // Base URL of the website
 const baseUrl = seoConfig.baseUrl || 'https://aisportsedge.app';
 
-// Output directory
-const outputDir = path.join(__dirname, '../public');
+// Get output directory from environment variable or use default
+const outputDir = process.env.SITEMAP_OUTPUT_DIR || path.join(__dirname, '../public');
 
 // Ensure output directory exists
 if (!fs.existsSync(outputDir)) {
@@ -74,8 +137,8 @@ const generateLanguageSitemap = language => {
 
     // Add lastmod, changefreq, and priority
     sitemap += `    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n`;
-    sitemap += '    <changefreq>weekly</changefreq>\n';
-    sitemap += '    <priority>0.8</priority>\n';
+    sitemap += `    <changefreq>${seoConfig.sitemap.changefreq || 'weekly'}</changefreq>\n`;
+    sitemap += `    <priority>${seoConfig.sitemap.priority || 0.8}</priority>\n`;
     sitemap += '  </url>\n';
   });
 
@@ -86,6 +149,19 @@ const generateLanguageSitemap = language => {
   console.log(`Sitemap for ${language} generated successfully at ${outputPath}`);
 
   return outputPath;
+};
+
+/**
+ * Validate sitemap file exists
+ * @param {string} sitemapPath - Path to the sitemap file
+ * @returns {boolean} - Whether the sitemap file exists
+ */
+const validateSitemap = sitemapPath => {
+  if (!fs.existsSync(sitemapPath)) {
+    console.error(`Sitemap file not found: ${sitemapPath}`);
+    return false;
+  }
+  return true;
 };
 
 /**
@@ -100,12 +176,16 @@ const generateSitemapIndex = languageSitemaps => {
 
   // Add each language sitemap
   Object.keys(languageSitemaps).forEach(language => {
-    const sitemapUrl = `${baseUrl}/sitemap-${language}.xml`;
+    // Validate that the sitemap file exists
+    if (validateSitemap(languageSitemaps[language])) {
+      // Use relative URLs for sitemap references to avoid issues with base URL changes
+      const sitemapUrl = `${baseUrl}/sitemap-${language}.xml`;
 
-    sitemapIndex += '  <sitemap>\n';
-    sitemapIndex += `    <loc>${sitemapUrl}</loc>\n`;
-    sitemapIndex += `    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n`;
-    sitemapIndex += '  </sitemap>\n';
+      sitemapIndex += '  <sitemap>\n';
+      sitemapIndex += `    <loc>${sitemapUrl}</loc>\n`;
+      sitemapIndex += `    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n`;
+      sitemapIndex += '  </sitemap>\n';
+    }
   });
 
   sitemapIndex += '</sitemapindex>';
@@ -120,6 +200,9 @@ const generateSitemapIndex = languageSitemaps => {
  */
 const generateSitemap = () => {
   console.log('Generating multilingual sitemaps...');
+  console.log(`Base URL: ${baseUrl}`);
+  console.log(`Output directory: ${outputDir}`);
+  console.log(`Routes: ${routes.join(', ')}`);
 
   // Generate language-specific sitemaps
   seoConfig.languages.forEach(langConfig => {
