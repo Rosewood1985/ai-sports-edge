@@ -1,0 +1,19 @@
+feat(accessibility): Enhance atomic components with accessibility features
+
+This commit adds accessibility features to the atomic components:
+
+- Created AccessibleThemedText component that extends ThemedText with accessibility features
+- Created AccessibleThemedView component that extends ThemedView with accessibility features
+- Added comprehensive documentation for accessibility implementation
+- Updated index.js to export the new components
+- Updated .roo-todo.md to mark completed tasks
+
+These changes improve the app's accessibility for users with disabilities by:
+- Supporting screen readers with proper accessibility attributes
+- Adding high contrast mode for users with visual impairments
+- Supporting large text mode for users with visual impairments
+- Supporting bold text mode for users with visual impairments
+- Supporting reduced motion mode for users with vestibular disorders
+
+The implementation follows best practices for accessibility in React Native and
+provides a clear migration path for existing components.

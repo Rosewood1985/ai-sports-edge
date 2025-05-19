@@ -9,6 +9,8 @@ import { Colors } from '../../constants/Colors';
  *
  * This is an atomic component (atom) that serves as a building block for
  * more complex components in the atomic design system.
+ *
+ * @deprecated Consider using AccessibleThemedText instead for better accessibility support
  */
 export type ThemedTextProps = TextProps & {
   type?:

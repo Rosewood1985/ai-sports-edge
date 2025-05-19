@@ -1,0 +1,153 @@
+{
+  "timestamp": "2025-05-19T00:44:04.396Z",
+  "baseUrl": "https://aisportsedge.app",
+  "totalPages": 8,
+  "validPages": 0,
+  "invalidPages": 8,
+  "results": [
+    {
+      "url": "https://aisportsedge.app/en/",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/dashboard",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/betting",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/stats",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/news",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/picks",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/about",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    },
+    {
+      "url": "https://aisportsedge.app/en/contact",
+      "valid": false,
+      "missing": [
+        "en",
+        "es",
+        "es-US",
+        "es-MX",
+        "es-ES",
+        "x-default"
+      ],
+      "issues": [
+        "Missing self-referential hreflang tag for en",
+        "Missing x-default hreflang tag",
+        "Missing canonical URL"
+      ],
+      "hreflangTags": []
+    }
+  ]
+}

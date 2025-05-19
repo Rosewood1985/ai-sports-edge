@@ -1354,9 +1354,28 @@ After implementing the SEO base URL, sitemap, and multilingual SEO improvements,
    - Test URL parameter handling across language versions
 
 7. **Verify Performance Monitoring**:
+
    - Check that language-specific analytics tracking is working
    - Verify that performance metrics are being collected for each language
    - Test automated alerting for performance discrepancies
+
+8. **Automated Hreflang Validation**:
+
+   - Run the hreflang validation script to check all pages
+   - Verify that all required languages have proper hreflang tags
+   - Check bidirectional linking between language variants
+   - Ensure proper implementation of x-default tag
+   - Review the validation report for any issues
+
+   ```bash
+   # Run basic validation
+   npm run validate:hreflang
+
+   # Run in headless mode for CI/CD pipelines
+   npm run validate:hreflang:ci
+   ```
+
+   For more details on the hreflang validation implementation, see the [Hreflang Validation Guide](./hreflang-validation.md).
 
 ## Maintenance
 

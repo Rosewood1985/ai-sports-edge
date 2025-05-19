@@ -4,16 +4,34 @@
  * This script validates the hreflang implementation on the website to ensure that all pages
  * have proper hreflang tags for all supported languages.
  *
+ * Features:
+ * - Validates hreflang tags without requiring a browser
+ * - Checks bidirectional linking between language variants
+ * - Verifies URL format and structure
+ * - Provides detailed error reporting
+ * - Supports headless mode for CI/CD pipelines
+ *
  * Usage:
- * node scripts/validate-hreflang.js
+ * node scripts/validate-hreflang.js [--headless] [--verbose] [--output=<path>]
  */
 
-const puppeteer = require('puppeteer');
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const { parse } = require('node-html-parser');
+const { program } = require('commander');
 
 // Import SEO config
 const seoConfig = require('../config/seo');
+
+// Parse command line arguments
+program
+  .option('--headless', 'Run in headless mode (no console output, exit code only)')
+  .option('--verbose', 'Show detailed validation information')
+  .option('--output <path>', 'Output report to specified file path')
+  .parse(process.argv);
+
+const options = program.opts();
 
 // URLs to validate
 const pagesToValidate = [
@@ -28,30 +46,131 @@ const pagesToValidate = [
 ];
 
 /**
- * Validate hreflang tags on a page
- * @param {string} url - URL to validate
- * @returns {Promise<{url: string, valid: boolean, missing: string[], issues: string[]}>} - Validation result
+ * Custom logger that respects headless mode
  */
-async function validateHreflang(url) {
-  console.log(`Validating hreflang tags on ${url}...`);
+const logger = {
+  log: message => {
+    if (!options.headless) {
+      console.log(message);
+    }
+  },
+  error: message => {
+    if (!options.headless) {
+      console.error(message);
+    }
+  },
+  verbose: message => {
+    if (!options.headless && options.verbose) {
+      console.log(`  ${message}`);
+    }
+  },
+};
 
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+/**
+ * Fetch HTML content from a URL
+ * @param {string} url - URL to fetch
+ * @returns {Promise<string>} - HTML content
+ */
+async function fetchHtml(url) {
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'AI-Sports-Edge-Hreflang-Validator/1.0',
+        Accept: 'text/html',
+      },
+      timeout: 10000,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(`HTTP error ${error.response.status}: ${error.response.statusText}`);
+    } else if (error.request) {
+      throw new Error(`Network error: ${error.message}`);
+    } else {
+      throw new Error(`Error: ${error.message}`);
+    }
+  }
+}
 
-  const page = await browser.newPage();
+/**
+ * Extract hreflang tags from HTML content
+ * @param {string} html - HTML content
+ * @returns {Array<{hreflang: string, href: string}>} - Extracted hreflang tags
+ */
+function extractHreflangTags(html) {
+  const root = parse(html);
+  const hreflangElements = root.querySelectorAll('link[rel="alternate"][hreflang]');
+
+  return hreflangElements.map(element => ({
+    hreflang: element.getAttribute('hreflang'),
+    href: element.getAttribute('href'),
+  }));
+}
+
+/**
+ * Extract canonical URL from HTML content
+ * @param {string} html - HTML content
+ * @returns {string|null} - Canonical URL or null if not found
+ */
+function extractCanonicalUrl(html) {
+  const root = parse(html);
+  const canonicalElement = root.querySelector('link[rel="canonical"]');
+  return canonicalElement ? canonicalElement.getAttribute('href') : null;
+}
+
+/**
+ * Validate URL format
+ * @param {string} url - URL to validate
+ * @returns {{valid: boolean, issues: string[]}} - Validation result
+ */
+function validateUrlFormat(url) {
+  const issues = [];
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+    const parsedUrl = new URL(url);
+
+    // Check if URL has the correct base
+    if (!url.startsWith(seoConfig.baseUrl)) {
+      issues.push(`URL does not start with the configured base URL (${seoConfig.baseUrl})`);
+    }
+
+    // Check if URL has a language segment
+    const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
+    if (pathSegments.length === 0) {
+      issues.push('URL does not contain a language segment');
+    } else {
+      const langSegment = pathSegments[0];
+      const validLangs = seoConfig.languages.map(lang => lang.code);
+      if (!validLangs.includes(langSegment)) {
+        issues.push(`URL contains invalid language segment: ${langSegment}`);
+      }
+    }
+  } catch (error) {
+    issues.push(`Invalid URL format: ${error.message}`);
+  }
+
+  return {
+    valid: issues.length === 0,
+    issues,
+  };
+}
+
+/**
+ * Validate hreflang tags on a page
+ * @param {string} url - URL to validate
+ * @param {Map<string, Set<string>>} validatedLinks - Map of already validated links
+ * @returns {Promise<{url: string, valid: boolean, missing: string[], issues: string[], hreflangTags: Array}>} - Validation result
+ */
+async function validateHreflang(url, validatedLinks = new Map()) {
+  logger.log(`Validating hreflang tags on ${url}...`);
+
+  try {
+    // Fetch HTML content
+    const html = await fetchHtml(url);
 
     // Extract hreflang tags
-    const hreflangTags = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('link[rel="alternate"][hreflang]')).map(link => ({
-        hreflang: link.getAttribute('hreflang'),
-        href: link.getAttribute('href'),
-      }));
-    });
+    const hreflangTags = extractHreflangTags(html);
+    logger.verbose(`Found ${hreflangTags.length} hreflang tags`);
 
     // Get required languages from config
     const requiredLanguages = seoConfig.languages.map(lang => lang.hreflang);
@@ -61,6 +180,10 @@ async function validateHreflang(url) {
     const missingLanguages = requiredLanguages.filter(
       lang => !hreflangTags.some(tag => tag.hreflang === lang)
     );
+
+    if (missingLanguages.length > 0) {
+      logger.verbose(`Missing languages: ${missingLanguages.join(', ')}`);
+    }
 
     // Check for issues
     const issues = [];
@@ -77,10 +200,7 @@ async function validateHreflang(url) {
     }
 
     // Check for canonical URL
-    const canonicalUrl = await page.evaluate(() => {
-      const canonicalLink = document.querySelector('link[rel="canonical"]');
-      return canonicalLink ? canonicalLink.getAttribute('href') : null;
-    });
+    const canonicalUrl = extractCanonicalUrl(html);
 
     if (!canonicalUrl) {
       issues.push('Missing canonical URL');
@@ -88,27 +208,44 @@ async function validateHreflang(url) {
       issues.push(`Canonical URL (${canonicalUrl}) does not match current URL (${url})`);
     }
 
-    // Check for bidirectional linking
+    // Check URL format for all hreflang tags
     for (const tag of hreflangTags) {
-      if (tag.href !== url) {
-        try {
-          const otherPage = await browser.newPage();
-          await otherPage.goto(tag.href, { waitUntil: 'networkidle2', timeout: 30000 });
+      const urlValidation = validateUrlFormat(tag.href);
+      if (!urlValidation.valid) {
+        issues.push(
+          `Invalid URL format for hreflang=${tag.hreflang}: ${urlValidation.issues.join(', ')}`
+        );
+      }
+    }
 
-          const hasBackLink = await otherPage.evaluate(currentUrl => {
-            return !!document.querySelector(
-              `link[rel="alternate"][hreflang][href="${currentUrl}"]`
-            );
-          }, url);
+    // Check for bidirectional linking
+    // Store the current URL's hreflang tags for later validation
+    if (!validatedLinks.has(url)) {
+      validatedLinks.set(url, new Set(hreflangTags.map(tag => tag.href)));
+    }
 
-          if (!hasBackLink) {
-            issues.push(`No bidirectional link from ${tag.href} back to ${url}`);
-          }
+    // Check if we need to validate any of the alternate URLs
+    const alternateUrls = hreflangTags
+      .filter(tag => tag.href !== url)
+      .filter(tag => !validatedLinks.has(tag.href))
+      .map(tag => tag.href);
 
-          await otherPage.close();
-        } catch (error) {
-          issues.push(`Error checking bidirectional link for ${tag.href}: ${error.message}`);
+    // Validate bidirectional linking for alternate URLs that haven't been validated yet
+    for (const alternateUrl of alternateUrls) {
+      try {
+        logger.verbose(`Checking bidirectional link for ${alternateUrl}`);
+        const alternateHtml = await fetchHtml(alternateUrl);
+        const alternateHreflangTags = extractHreflangTags(alternateHtml);
+
+        // Store this URL's hreflang tags for later validation
+        validatedLinks.set(alternateUrl, new Set(alternateHreflangTags.map(tag => tag.href)));
+
+        // Check if the alternate URL links back to the current URL
+        if (!alternateHreflangTags.some(tag => tag.href === url)) {
+          issues.push(`No bidirectional link from ${alternateUrl} back to ${url}`);
         }
+      } catch (error) {
+        issues.push(`Error checking bidirectional link for ${alternateUrl}: ${error.message}`);
       }
     }
 
@@ -122,7 +259,7 @@ async function validateHreflang(url) {
       hreflangTags,
     };
   } catch (error) {
-    console.error(`Error validating ${url}:`, error);
+    logger.error(`Error validating ${url}: ${error.message}`);
     return {
       url,
       valid: false,
@@ -130,8 +267,6 @@ async function validateHreflang(url) {
       issues: [`Error: ${error.message}`],
       hreflangTags: [],
     };
-  } finally {
-    await browser.close();
   }
 }
 
@@ -139,27 +274,28 @@ async function validateHreflang(url) {
  * Validate all pages
  */
 async function validateAllPages() {
-  console.log('Validating hreflang implementation...');
+  logger.log('Validating hreflang implementation...');
 
   const results = [];
+  const validatedLinks = new Map();
 
   for (const url of pagesToValidate) {
-    const result = await validateHreflang(url);
+    const result = await validateHreflang(url, validatedLinks);
     results.push(result);
 
     // Log result
     if (result.valid) {
-      console.log(`✅ ${result.url} - Valid hreflang implementation`);
+      logger.log(`✅ ${result.url} - Valid hreflang implementation`);
     } else {
-      console.log(`❌ ${result.url} - Invalid hreflang implementation`);
+      logger.log(`❌ ${result.url} - Invalid hreflang implementation`);
 
       if (result.missing.length > 0) {
-        console.log(`  Missing languages: ${result.missing.join(', ')}`);
+        logger.log(`  Missing languages: ${result.missing.join(', ')}`);
       }
 
       if (result.issues.length > 0) {
-        console.log('  Issues:');
-        result.issues.forEach(issue => console.log(`  - ${issue}`));
+        logger.log('  Issues:');
+        result.issues.forEach(issue => logger.log(`  - ${issue}`));
       }
     }
   }
@@ -174,8 +310,13 @@ async function validateAllPages() {
     results,
   };
 
-  // Write report to file
-  const reportPath = path.join(__dirname, '../reports/hreflang-validation.json');
+  // Determine report path
+  let reportPath;
+  if (options.output) {
+    reportPath = options.output;
+  } else {
+    reportPath = path.join(__dirname, '../reports/hreflang-validation.json');
+  }
 
   // Create directory if it doesn't exist
   const reportDir = path.dirname(reportPath);
@@ -183,26 +324,27 @@ async function validateAllPages() {
     fs.mkdirSync(reportDir, { recursive: true });
   }
 
+  // Write report to file
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-  console.log(`Report generated at ${reportPath}`);
+  logger.log(`Report generated at ${reportPath}`);
 
   // Summary
-  console.log('\nSummary:');
-  console.log(`Total pages: ${report.totalPages}`);
-  console.log(`Valid pages: ${report.validPages}`);
-  console.log(`Invalid pages: ${report.invalidPages}`);
+  logger.log('\nSummary:');
+  logger.log(`Total pages: ${report.totalPages}`);
+  logger.log(`Valid pages: ${report.validPages}`);
+  logger.log(`Invalid pages: ${report.invalidPages}`);
 
   if (report.invalidPages > 0) {
-    console.log('\nFix the issues and run the validation again.');
+    logger.log('\nFix the issues and run the validation again.');
     process.exit(1);
   } else {
-    console.log('\nAll pages have valid hreflang implementation!');
+    logger.log('\nAll pages have valid hreflang implementation!');
     process.exit(0);
   }
 }
 
 // Run validation
 validateAllPages().catch(error => {
-  console.error('Error validating hreflang implementation:', error);
+  logger.error('Error validating hreflang implementation:', error);
   process.exit(1);
 });

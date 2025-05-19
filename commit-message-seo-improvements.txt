@@ -1,0 +1,12 @@
+feat(seo): Improve sitemap generation and SEO base URL update
+
+- Refactor generateSitemap.js to dynamically discover routes from AppRoutes.js
+- Add validation to ensure all referenced sitemaps exist
+- Make output directory configurable via environment variable
+- Add support for different build environments
+- Update update-seo-base-url.js to modify both TS and JS config files
+- Add verification of configuration consistency between TS and JS versions
+- Create comprehensive documentation in memory-bank/sitemap-generation-improvements.md
+- Update progress.md with implementation details
+
+This commit addresses the SEO base URL and sitemap generation issues identified in the todo list. It improves the maintainability and reliability of the SEO implementation by dynamically discovering routes, validating sitemap references, and ensuring consistency between configuration files.

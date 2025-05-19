@@ -2,40 +2,172 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://aisportsedge.app/en/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/forgot-password</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/forgot-password" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/forgot-password" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/forgot-password" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/forgot-password" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/forgot-password" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/forgot-password" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/dashboard</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/dashboard" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/dashboard" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/dashboard" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/dashboard" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/dashboard" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/dashboard" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/reset-password</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/reset-password" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/reset-password" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/reset-password" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/reset-password" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/reset-password" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/reset-password" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/betting</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/betting" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/betting" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/betting" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/betting" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/betting" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/betting" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/onboarding</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/profile</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/profile" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/profile" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/profile" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/profile" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/profile" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/profile" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/preferences</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/preferences" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/preferences" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/preferences" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/preferences" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/preferences" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/preferences" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/gdpr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/gdpr" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/gdpr" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/gdpr" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/gdpr" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/gdpr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/gdpr" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/cookie</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/cookie" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/cookie" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/cookie" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/cookie" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/cookie" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/cookie" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/age</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/age" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/age" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/age" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/age" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/age" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/age" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/self-exclusion</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/self-exclusion" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/self-exclusion" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/self-exclusion" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/self-exclusion" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/self-exclusion" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/self-exclusion" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/responsible-gambling</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/responsible-gambling" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/responsible-gambling" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/responsible-gambling" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/responsible-gambling" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/responsible-gambling" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/responsible-gambling" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/onboarding/liability</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/onboarding/liability" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/onboarding/liability" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/onboarding/liability" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/onboarding/liability" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/onboarding/liability" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/onboarding/liability" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/home</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/home" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/home" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/home" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/home" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/home" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/home" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/games</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/games" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/games" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/games" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/games" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/games" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/games" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/predictions</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/predictions" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/predictions" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/predictions" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/predictions" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/predictions" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/predictions" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://aisportsedge.app/en/stats</loc>
@@ -45,9 +177,9 @@
     <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/stats" />
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/stats" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/stats" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://aisportsedge.app/en/news</loc>
@@ -57,92 +189,200 @@
     <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/news" />
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/news" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/news" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/picks</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/picks" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/picks" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/picks" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/picks" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/picks" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/picks" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/profile</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/profile" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/profile" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/profile" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/profile" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/profile" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/profile" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/account</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/account" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/account" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/account" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/account" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/account" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/account" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/profile/settings</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/profile/settings" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/profile/settings" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/profile/settings" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/profile/settings" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/profile/settings" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/profile/settings" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/subscription</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/subscription" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/subscription" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/subscription" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/subscription" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/subscription" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/subscription" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/profile/subscription</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/profile/subscription" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/profile/subscription" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/profile/subscription" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/profile/subscription" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/profile/subscription" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/profile/subscription" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/about</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/about" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/about" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/about" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/about" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/about" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/about" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/profile/purchase-history</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/profile/purchase-history" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/profile/purchase-history" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/profile/purchase-history" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/profile/purchase-history" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/profile/purchase-history" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/profile/purchase-history" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/contact</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/contact" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/contact" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/contact" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/contact" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/contact" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/contact" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/profile/language</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/profile/language" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/profile/language" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/profile/language" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/profile/language" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/profile/language" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/profile/language" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/terms</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/terms" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/terms" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/terms" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/terms" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/terms" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/terms" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/help</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/help" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/help" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/help" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/help" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/help" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/help" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aisportsedge.app/en/privacy</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/privacy" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/privacy" />
-    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/privacy" />
-    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/privacy" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/privacy" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/privacy" />
-    <lastmod>2025-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://aisportsedge.app/en/help/faq</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/help/faq" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/help/faq" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/help/faq" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/help/faq" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/help/faq" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/help/faq" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/help/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/help/contact" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/help/contact" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/help/contact" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/help/contact" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/help/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/help/contact" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/help/feedback</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/help/feedback" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/help/feedback" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/help/feedback" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/help/feedback" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/help/feedback" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/help/feedback" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/help/bug-report</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/help/bug-report" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/help/bug-report" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/help/bug-report" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/help/bug-report" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/help/bug-report" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/help/bug-report" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/legal</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/legal" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/legal" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/legal" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/legal" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/legal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/legal" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/legal/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/legal/privacy" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/legal/privacy" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/legal/privacy" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/legal/privacy" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/legal/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/legal/privacy" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/legal/terms</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/legal/terms" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/legal/terms" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/legal/terms" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/legal/terms" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/legal/terms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/legal/terms" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/404</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/404" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/404" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/404" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/404" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/404" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/404" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/error</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/error" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/error" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/error" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/error" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/error" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/error" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/en/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/" />
+    <lastmod>2025-05-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
