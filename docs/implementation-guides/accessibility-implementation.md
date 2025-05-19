@@ -92,6 +92,50 @@ import { AccessibleThemedView } from '../atomic/atoms';
 </AccessibleThemedView>
 ```
 
+### AccessibleTouchableOpacity
+
+The `AccessibleTouchableOpacity` component extends the functionality of React Native's `TouchableOpacity` with accessibility features. It provides proper accessibility attributes for screen readers and supports focus states for better keyboard navigation.
+
+#### Usage
+
+```tsx
+import { AccessibleTouchableOpacity } from '../atomic/atoms';
+
+// Basic usage
+<AccessibleTouchableOpacity onPress={() => console.log('Pressed')}>
+  <Text>Press Me</Text>
+</AccessibleTouchableOpacity>
+
+// With accessibility props
+<AccessibleTouchableOpacity
+  onPress={() => console.log('Pressed')}
+  accessibilityLabel="Submit Button"
+  accessibilityHint="Submits the form"
+  accessibilityRole="button"
+>
+  <Text>Submit</Text>
+</AccessibleTouchableOpacity>
+
+// With accessibility state
+<AccessibleTouchableOpacity
+  onPress={() => console.log('Pressed')}
+  accessibilityLabel="Toggle Button"
+  accessibilityState={{ checked: isToggled }}
+  accessibilityRole="switch"
+>
+  <Text>Toggle</Text>
+</AccessibleTouchableOpacity>
+
+// With focus state
+<AccessibleTouchableOpacity
+  onPress={() => console.log('Pressed')}
+  isFocused={isFocused}
+  focusedStyle={{ borderWidth: 2, borderColor: '#39FF14' }}
+>
+  <Text>Focusable Button</Text>
+</AccessibleTouchableOpacity>
+```
+
 ## Accessibility Service
 
 The `accessibilityService` is a singleton service that manages accessibility preferences and provides utilities for working with accessibility features. It's used internally by the enhanced components, but you can also use it directly in your code.
