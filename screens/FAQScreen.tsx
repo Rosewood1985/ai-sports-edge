@@ -6,12 +6,18 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
+import { useNavigation, ParamListBase, NavigationProp } from '@react-navigation/native';
 import QuestionSubmissionForm from '../components/QuestionSubmissionForm';
 import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 import { Timestamp } from 'firebase/firestore';
-import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import { useLanguage } from '../contexts/LanguageContext';
+
+// Define navigation params for type safety
+type RootStackParamList = ParamListBase & {
+  LegalScreen: { type: 'privacy-policy' | 'terms-of-service' };
+};
 
 interface FAQItem {
   question: string;
@@ -23,7 +29,8 @@ interface FAQItem {
  * @returns {JSX.Element} - Rendered component
  */
 const FAQScreen = (): JSX.Element => {
-  const { t, language } = useI18n();
+  const { t, language } = useLanguage();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -33,96 +40,126 @@ const FAQScreen = (): JSX.Element => {
   const staticFaqItems: FAQItem[] = [
     {
       question: t('faq.items.general.confidenceIntervals.question'),
-      answer: t('faq.items.general.confidenceIntervals.answer')
+      answer: t('faq.items.general.confidenceIntervals.answer'),
     },
     {
       question: t('faq.items.general.oddsCalculation.question'),
-      answer: t('faq.items.general.oddsCalculation.answer')
+      answer: t('faq.items.general.oddsCalculation.answer'),
     },
     {
       question: t('faq.items.general.aiData.question'),
-      answer: t('faq.items.general.aiData.answer')
+      answer: t('faq.items.general.aiData.answer'),
     },
     {
       question: t('faq.items.general.aiAccuracy.question'),
-      answer: t('faq.items.general.aiAccuracy.answer')
+      answer: t('faq.items.general.aiAccuracy.answer'),
     },
     {
       question: t('faq.items.general.bettingStrategy.question'),
-      answer: t('faq.items.general.bettingStrategy.answer')
-    }
+      answer: t('faq.items.general.bettingStrategy.answer'),
+    },
   ];
 
   // Parlay-specific FAQ items
   const parlayFaqItems: FAQItem[] = [
     {
       question: t('faq.items.parlays.whatIs.question'),
-      answer: t('faq.items.parlays.whatIs.answer')
+      answer: t('faq.items.parlays.whatIs.answer'),
     },
     {
       question: t('faq.items.parlays.oddsCalculation.question'),
-      answer: t('faq.items.parlays.oddsCalculation.answer')
+      answer: t('faq.items.parlays.oddsCalculation.answer'),
     },
     {
       question: t('faq.items.parlays.teaserDifference.question'),
-      answer: t('faq.items.parlays.teaserDifference.answer')
+      answer: t('faq.items.parlays.teaserDifference.answer'),
     },
     {
       question: t('faq.items.parlays.aiGeneration.question'),
-      answer: t('faq.items.parlays.aiGeneration.answer')
+      answer: t('faq.items.parlays.aiGeneration.answer'),
     },
     {
       question: t('faq.items.parlays.strategies.question'),
-      answer: t('faq.items.parlays.strategies.answer')
-    }
+      answer: t('faq.items.parlays.strategies.answer'),
+    },
   ];
 
   // UFC-specific FAQ items
   const ufcFaqItems: FAQItem[] = [
     {
       question: t('faq.items.ufc.rankings.question'),
-      answer: t('faq.items.ufc.rankings.answer')
+      answer: t('faq.items.ufc.rankings.answer'),
     },
     {
       question: t('faq.items.ufc.scoring.question'),
-      answer: t('faq.items.ufc.scoring.answer')
+      answer: t('faq.items.ufc.scoring.answer'),
     },
     {
       question: t('faq.items.ufc.weightClasses.question'),
-      answer: t('faq.items.ufc.weightClasses.answer')
+      answer: t('faq.items.ufc.weightClasses.answer'),
     },
     {
       question: t('faq.items.ufc.betting.question'),
-      answer: t('faq.items.ufc.betting.answer')
+      answer: t('faq.items.ufc.betting.answer'),
     },
     {
       question: t('faq.items.ufc.aiStrategies.question'),
-      answer: t('faq.items.ufc.aiStrategies.answer')
-    }
+      answer: t('faq.items.ufc.aiStrategies.answer'),
+    },
+  ];
+
+  // Legal & Compliance FAQ items
+  const legalFaqItems: FAQItem[] = [
+    {
+      question: 'How is my personal data used?',
+      answer:
+        'AI Sports Edge collects and processes personal data in accordance with our Privacy Policy. We collect information such as your account details, device information, and usage patterns to provide and improve our services. We never sell your personal data to third parties. For complete details on data collection, usage, and your rights, please review our ' +
+        'Privacy Policy.',
+    },
+    {
+      question: 'Can I request deletion of my data?',
+      answer:
+        'Yes, you have the right to request deletion of your personal data. You can initiate this process through your account settings or by contacting our support team. Please note that some information may be retained for legal or operational purposes. For more information about your data rights, please refer to our Privacy Policy.',
+    },
+    {
+      question: 'What are the terms for using AI Sports Edge?',
+      answer:
+        'When using AI Sports Edge, you agree to our Terms of Service which outline your rights and responsibilities as a user. This includes eligibility requirements, account responsibilities, subscription terms, content restrictions, and intellectual property rights. For the complete terms governing your use of our app, please review our Terms of Service.',
+    },
+    {
+      question: 'How do I report terms violations?',
+      answer:
+        'If you believe someone is violating our Terms of Service, you can report it by contacting our support team at support@aisportsedge.app. Please provide specific details about the violation to help us investigate properly. We take all reports seriously and will address them according to our Terms of Service guidelines.',
+    },
+    {
+      question: 'What is your refund policy?',
+      answer:
+        'Our refund policy is outlined in our Terms of Service. Generally, subscription payments are non-refundable, but we may provide refunds in certain circumstances at our discretion. For specific questions about refunds, please contact our support team with your account details and the reason for your refund request.',
+    },
   ];
 
   // Player Prop Bet FAQ items
   const propBetFaqItems: FAQItem[] = [
     {
       question: t('faq.items.propBets.whatAre.question'),
-      answer: t('faq.items.propBets.whatAre.answer')
+      answer: t('faq.items.propBets.whatAre.answer'),
     },
     {
       question: t('faq.items.propBets.aiHelp.question'),
-      answer: t('faq.items.propBets.aiHelp.answer')
+      answer: t('faq.items.propBets.aiHelp.answer'),
     },
     {
       question: t('faq.items.propBets.types.question'),
-      answer: t('faq.items.propBets.types.answer')
+      answer: t('faq.items.propBets.types.answer'),
     },
     {
       question: t('faq.items.propBets.accuracy.question'),
-      answer: t('faq.items.propBets.accuracy.answer')
+      answer: t('faq.items.propBets.accuracy.answer'),
     },
     {
       question: t('faq.items.propBets.strategies.question'),
-      answer: t('faq.items.propBets.strategies.answer')
-    }
+      answer: t('faq.items.propBets.strategies.answer'),
+    },
   ];
 
   // Combine static and dynamic FAQ items
@@ -131,14 +168,95 @@ const FAQScreen = (): JSX.Element => {
     ...parlayFaqItems,
     ...ufcFaqItems,
     ...propBetFaqItems,
+    ...legalFaqItems,
     ...approvedQuestions.map(q => ({
       question: q.question,
-      answer: q.answer || ''
-    }))
+      answer: q.answer || '',
+    })),
   ];
 
   const toggleExpand = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  // Function to render answer text with clickable links
+  const renderAnswerWithLinks = (text: string) => {
+    const privacyPolicyRegex = /Privacy Policy/g;
+    const termsOfServiceRegex = /Terms of Service/g;
+
+    // Replace Privacy Policy with clickable link
+    let parts = text.split(privacyPolicyRegex);
+    let result: (string | JSX.Element)[] = [];
+
+    for (let i = 0; i < parts.length; i++) {
+      result.push(parts[i]);
+      if (i < parts.length - 1) {
+        result.push(
+          <Text
+            key={`privacy-${i}`}
+            style={styles.link}
+            onPress={() => navigation.navigate('LegalScreen', { type: 'privacy-policy' })}
+            accessible={true}
+            accessibilityRole="link"
+            accessibilityLabel={t('legal.privacy_policy')}
+            accessibilityHint={t('faq.accessibility.linkHint')}
+          >
+            Privacy Policy
+          </Text>
+        );
+      }
+    }
+
+    // Convert result to string for Terms of Service replacement
+    let combinedText = '';
+    result.forEach(item => {
+      if (typeof item === 'string') {
+        combinedText += item;
+      } else {
+        combinedText += 'Privacy Policy';
+      }
+    });
+
+    // Replace Terms of Service with clickable link
+    parts = combinedText.split(termsOfServiceRegex);
+    let finalResult: (string | JSX.Element)[] = [];
+
+    for (let i = 0; i < parts.length; i++) {
+      if (typeof parts[i] === 'string') {
+        // Process each part to replace Privacy Policy placeholders with the actual components
+        let subParts = parts[i].split('Privacy Policy');
+        for (let j = 0; j < subParts.length; j++) {
+          finalResult.push(subParts[j]);
+          if (j < subParts.length - 1) {
+            // Find the corresponding Privacy Policy component
+            let privacyIndex = result.findIndex(
+              (item, idx) => typeof item !== 'string' && idx > finalResult.length - 1
+            );
+            if (privacyIndex !== -1) {
+              finalResult.push(result[privacyIndex]);
+            }
+          }
+        }
+      }
+
+      if (i < parts.length - 1) {
+        finalResult.push(
+          <Text
+            key={`terms-${i}`}
+            style={styles.link}
+            onPress={() => navigation.navigate('LegalScreen', { type: 'terms-of-service' })}
+            accessible={true}
+            accessibilityRole="link"
+            accessibilityLabel={t('legal.terms_of_service')}
+            accessibilityHint={t('faq.accessibility.linkHint')}
+          >
+            Terms of Service
+          </Text>
+        );
+      }
+    }
+
+    return <>{finalResult}</>;
   };
 
   const loadApprovedQuestions = async () => {
@@ -171,17 +289,11 @@ const FAQScreen = (): JSX.Element => {
     <ScrollView
       style={styles.container}
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          colors={['#3498db']}
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#3498db']} />
       }
     >
       <Text style={styles.title}>{t('faq.title')}</Text>
-      <Text style={styles.subtitle}>
-        {t('faq.subtitle')}
-      </Text>
+      <Text style={styles.subtitle}>{t('faq.subtitle')}</Text>
 
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -203,11 +315,9 @@ const FAQScreen = (): JSX.Element => {
                 accessibilityState={{ expanded: expandedIndex === index }}
               >
                 <Text style={styles.question}>{item.question}</Text>
-                <Text style={styles.expandIcon}>
-                  {expandedIndex === index ? '−' : '+'}
-                </Text>
+                <Text style={styles.expandIcon}>{expandedIndex === index ? '−' : '+'}</Text>
               </TouchableOpacity>
-              
+
               {expandedIndex === index && (
                 <View
                   style={styles.answerContainer}
@@ -215,7 +325,12 @@ const FAQScreen = (): JSX.Element => {
                   accessibilityRole="text"
                   accessibilityLabel={`${t('faq.accessibility.answer')}: ${item.answer}`}
                 >
-                  <Text style={styles.answer}>{item.answer}</Text>
+                  <Text style={styles.answer}>
+                    {item.answer.includes('Privacy Policy') ||
+                    item.answer.includes('Terms of Service')
+                      ? renderAnswerWithLinks(item.answer)
+                      : item.answer}
+                  </Text>
                 </View>
               )}
             </View>
@@ -230,6 +345,11 @@ const FAQScreen = (): JSX.Element => {
 };
 
 const styles = StyleSheet.create({
+  link: {
+    color: '#3498db',
+    textDecorationLine: 'underline',
+    fontWeight: '500',
+  },
   container: {
     flex: 1,
     padding: 20,
