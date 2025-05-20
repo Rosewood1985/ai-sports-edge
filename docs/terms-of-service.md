@@ -1,6 +1,8 @@
 # AI Sports Edge Terms of Service
 
-**Effective Date: March 23, 2025**
+**Effective Date: May 20, 2025**
+
+**AI Sports Edge, Inkwell General Store, LLC**
 
 ## Introduction
 
@@ -8,9 +10,21 @@ Welcome to AI Sports Edge. These Terms of Service ("Terms") govern your use of t
 
 By downloading, accessing, or using our App, you agree to be bound by these Terms. If you disagree with any part of the Terms, you do not have permission to access the App.
 
+## Sports Predictions Disclaimer
+
+AI Sports Edge provides sports-related statistical predictions and analytics for **informational purposes only**. Our predictions and analytics:
+
+- Are NOT intended for gambling purposes
+- Are NOT guarantees of any outcome
+- Are based on statistical models with inherent limitations
+- Should NOT be the sole basis for any financial decisions
+- May not account for all variables that can affect sporting events
+
+We make no representations or warranties about the accuracy, completeness, or reliability of any predictions or analytics provided through the App. Users should exercise their own judgment when interpreting and using our predictions and analytics.
+
 ## Eligibility
 
-You must be at least 13 years old to use the App. By using the App, you represent and warrant that you are at least 13 years old and that your use of the App does not violate any applicable laws or regulations.
+You must be at least 18 years old to use the App. By using the App, you represent and warrant that you are at least 18 years old and that your use of the App does not violate any applicable laws or regulations. The age restriction is in place due to the nature of sports odds content provided in the App.
 
 ## Your Account
 
@@ -74,7 +88,7 @@ IN NO EVENT SHALL WE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENT
 
 ## Governing Law
 
-These Terms shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of law provisions.
+These Terms shall be governed by and construed in accordance with the laws of the State of Maryland, USA, without regard to its conflict of law provisions.
 
 ## Changes to Terms
 

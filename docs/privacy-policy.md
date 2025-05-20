@@ -1,6 +1,8 @@
 # AI Sports Edge Privacy Policy
 
-**Effective Date: March 23, 2025**
+**Effective Date: May 20, 2025**
+
+**AI Sports Edge, Inkwell General Store, LLC**
 
 ## Introduction
 
@@ -75,11 +77,11 @@ We retain your personal information for as long as necessary to fulfill the purp
 
 ## Children's Privacy
 
-Our App is not directed to children under the age of 13, and we do not knowingly collect personal information from children under 13. If we learn that we have collected personal information from a child under 13, we will promptly delete that information.
+Our App is not directed to children under the age of 18, and we do not knowingly collect personal information from children under 18. If we learn that we have collected personal information from a child under 18, we will promptly delete that information. The age restriction is in place due to the nature of sports odds content provided in the App.
 
 ## International Data Transfers
 
-Your information may be transferred to, and maintained on, computers located outside of your state, province, country, or other governmental jurisdiction where the data protection laws may differ from those in your jurisdiction. If you are located outside the United States and choose to provide information to us, please note that we transfer the information to the United States and process it there.
+Your information may be transferred to, and maintained on, computers located outside of your state, province, country, or other governmental jurisdiction where the data protection laws may differ from those in your jurisdiction. If you are located outside the United States and choose to provide information to us, please note that we transfer the information to the United States and process it there. Our primary place of business is in Maryland, USA.
 
 ## Changes to This Privacy Policy
 
@@ -89,8 +91,8 @@ We may update this Privacy Policy from time to time. The updated version will be
 
 If you have questions or concerns about this Privacy Policy, please contact us at:
 
-**Email**: privacy@aisportsedge.com  
-**Address**: AI Sports Edge, 123 Tech Lane, San Francisco, CA 94107
+**Email**: privacy@aisportsedge.com
+**Address**: AI Sports Edge, Inkwell General Store, LLC, 456 Innovation Drive, Baltimore, MD 21201
 
 ## Your California Privacy Rights
 
@@ -105,11 +107,13 @@ If you are located in the European Economic Area (EEA), United Kingdom, or Switz
 In accordance with Apple's App Store requirements, here is a summary of our data collection practices:
 
 ### Data Used to Track You
+
 - **Identifiers**: Device ID, User ID
 - **Usage Data**: Product interaction, Advertising data
 - **Diagnostics**: Crash data, Performance data
 
 ### Data Linked to You
+
 - **Contact Info**: Email address, Name
 - **Identifiers**: User ID, Device ID
 - **User Content**: Photos or videos, Customer support communications
@@ -119,21 +123,36 @@ In accordance with Apple's App Store requirements, here is a summary of our data
 - **Financial Info**: Purchase history (for in-app purchases)
 
 ### Data Not Linked to You
+
 - **Location**: Approximate location (when used for region-based content)
 - **Usage Data**: Analytics data
 
 ### Purpose of Data Collection
+
 - **App Functionality**: To provide core features of the app
 - **Analytics**: To improve our app and user experience
 - **Personalization**: To customize content based on your preferences
 - **Product Development**: To develop and test new features
 
 ### Required Permissions
+
 - **Location**: Used to provide location-based sports content and recommendations
 - **Notifications**: Used to send game alerts, score updates, and important information
 - **Photos**: Used only when you choose to upload a profile picture
 
 All data collection is necessary for the proper functioning of the app and to provide the sports analytics and prediction services you expect. We do not sell your personal data to third parties.
+
+## Data Backup and Security
+
+We implement automated backup systems for our databases, including user data, to ensure data integrity and availability. These backups:
+
+- Are performed daily and stored securely
+- Are retained for a limited period (typically 30 days)
+- Are encrypted and access-controlled
+- Are used only for data recovery purposes in case of system failures
+- Are part of our comprehensive data protection strategy
+
+This backup process is essential for maintaining service reliability and protecting your data. We apply the same privacy protections to our backups as we do to our primary data storage.
 
 ### Optional Data Collection
 

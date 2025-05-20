@@ -747,6 +747,25 @@ exports.syncSubscriptionStatus = functions.firestore
   });
 ```
 
+## Firestore Backup System
+
+The AI Sports Edge application includes an automated backup system for Firestore data. This system performs daily backups and stores them in Google Cloud Storage with a 30-day retention period.
+
+### Backup Schedule
+
+- Backups run daily at 3 AM UTC
+- Backups are stored in the `ai-sports-edge-firestore-backups` Google Cloud Storage bucket
+- Backups are retained for 30 days
+
+### Monitoring
+
+- Backup events are logged in the `system_logs/backups/events` collection in Firestore
+- Email notifications are sent to the development team in case of backup failures
+
+### Restoration
+
+For instructions on restoring from a backup, see the [Firestore Backup Restoration Guide](../firestore-backup-restoration-guide.md).
+
 ## Best Practices
 
 1. **Use the Firebase Service**: Always use the Firebase service from the atomic architecture instead of directly using Firebase
@@ -757,6 +776,7 @@ exports.syncSubscriptionStatus = functions.firestore
 6. **Transactions**: Use transactions for operations that need to be atomic
 7. **Indexing**: Create indexes for complex queries
 8. **Data Structure**: Design the data structure for efficient queries
+9. **Regular Backups**: Ensure the backup system is functioning properly
 
 ## Related Documentation
 

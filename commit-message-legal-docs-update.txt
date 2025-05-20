@@ -1,0 +1,12 @@
+docs: Update privacy policy and terms of service
+
+- Update company name to "AI Sports Edge, Inkwell General Store, LLC"
+- Change jurisdiction from California to Maryland
+- Update effective date to May 20, 2025
+- Add strong disclaimers about sports predictions being for informational purposes only
+- Emphasize that predictions are not guarantees and have inherent limitations
+- Change age restriction from 13+ to 18+ for sports odds content
+- Add section about data backup and security in privacy policy
+- Ensure clear separation between the service and gambling
+
+These updates align our legal documents with current business requirements and provide better protection for both users and the company.
