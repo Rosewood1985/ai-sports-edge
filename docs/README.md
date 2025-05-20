@@ -14,6 +14,7 @@ Welcome to the AI Sports Edge documentation. This documentation is organized int
 
 - [Developer Workflows](implementation-guides/developer-workflows.md) - Common development workflows
 - [Component Guidelines](implementation-guides/component-guidelines.md) - Guidelines for creating and using components
+- [Dependency Management](implementation-guides/dependency-management.md) - Guide for managing dependencies
 - [Internationalization Guide](implementation-guides/internationalization-guide.md) - Practical guide for implementing internationalization
 - [Testing](implementation-guides/testing.md) - Testing strategies and practices
 

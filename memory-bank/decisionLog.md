@@ -1,46 +1,107 @@
 # Decision Log
 
-## AI Pick of the Day Feature Implementation
+## Dependency Update Implementation (May 20, 2025)
 
-### ML Component Decisions
+### Decision: Implement Dependency Management System
 
-| Date | Decision | Rationale | Alternatives Considered |
-|------|----------|-----------|-------------------------|
-| 2025-04-17 | Use RandomForest classifier for initial model | Good performance with limited data, interpretable results, handles both numerical and categorical features | Neural networks (more complex, requires more data), Logistic regression (less powerful) |
-| 2025-04-17 | Implement confidence adjustment based on sport, league, and momentum | Different sports have different predictability levels, momentum is a strong indicator of confidence | Fixed confidence thresholds, no adjustments |
-| 2025-04-17 | Create separate Python scripts for training and inference | Separation of concerns, allows for easier maintenance and testing | Single script for both training and inference |
+**Context:**
 
-### Firebase Cloud Functions Decisions
+- The project had outdated dependencies that needed to be updated
+- There was no standardized process for updating dependencies
+- Security vulnerabilities needed to be addressed
+- The update process needed to be documented
 
-| Date | Decision | Rationale | Alternatives Considered |
-|------|----------|-----------|-------------------------|
-| 2025-04-17 | Use scheduled Cloud Functions for predictions | Automated, reliable, scalable, no need for manual intervention | Cron jobs on a separate server, client-side predictions |
-| 2025-04-17 | Run predictTodayGames at 10 AM daily | Ensures all game data is available, predictions are ready for users | Running at midnight (less data available), running multiple times per day (higher costs) |
-| 2025-04-17 | Run markAIPickOfDay at 9 AM daily | Ensures Pick of the Day is available when users check the app in the morning | Running immediately after predictions (less reliable) |
-| 2025-04-17 | Store prediction logs in a separate collection | Enables analysis of prediction accuracy over time, helps with debugging | Storing logs with game data (less organized) |
+**Decision:**
 
-### Frontend Component Decisions
+- Implement a comprehensive dependency management system
+- Create documentation for the dependency update process
+- Create scripts to automate the dependency update process
+- Establish a regular schedule for dependency updates
 
-| Date | Decision | Rationale | Alternatives Considered |
-|------|----------|-----------|-------------------------|
-| 2025-04-17 | Create dedicated AIPickCard component | Reusable across different screens, consistent UI for predictions | Inline card implementation (less reusable) |
-| 2025-04-17 | Implement separate screens for Pick of the Day and Leaderboard | Better organization, focused user experience for each feature | Combined screen (more cluttered) |
-| 2025-04-17 | Use bottom tab navigation for AI Picks section | Intuitive navigation, standard pattern in mobile apps | Drawer navigation (less visible), stack navigation (less accessible) |
-| 2025-04-17 | Implement client-side caching for predictions | Reduces Firestore reads, improves performance | No caching (higher costs, slower performance) |
+**Alternatives Considered:**
 
-### Data Structure Decisions
+1. **Manual Updates**: Manually update dependencies as needed
+   - Pros: Simple, no additional tooling required
+   - Cons: Error-prone, inconsistent, no documentation
+2. **Third-Party Tools**: Use tools like Dependabot or Renovate
+   - Pros: Automated, well-maintained
+   - Cons: External dependency, less control, potential security concerns
+3. **Custom Solution**: Create a custom dependency management system
+   - Pros: Full control, tailored to project needs, integrated with existing workflows
+   - Cons: Requires development and maintenance
 
-| Date | Decision | Rationale | Alternatives Considered |
-|------|----------|-----------|-------------------------|
-| 2025-04-17 | Store predictions with game data | Simplifies queries, reduces joins, better performance | Separate predictions collection (more complex queries) |
-| 2025-04-17 | Use isAIPickOfDay flag on game documents | Easy to query for Pick of the Day, simple to update | Separate Pick of the Day collection (more complex) |
-| 2025-04-17 | Store historical picks in aiPicksOfDay collection | Enables historical analysis, doesn't clutter game data | Storing historical data with game data (less organized) |
+**Rationale:**
 
-### Technical Debt and Future Considerations
+- A custom solution provides the most control and can be tailored to the project's specific needs
+- The existing update-dependencies.js script provided a good foundation
+- Documentation ensures consistency and knowledge transfer
+- Automation reduces the risk of errors and ensures regular updates
 
-| Issue | Impact | Plan |
-|-------|--------|------|
-| Limited ML model features | May affect prediction accuracy | Plan to add more features in future iterations |
-| No real-time updates | Predictions may become outdated | Implement real-time updates based on pre-game information |
-| Limited personalization | Same predictions for all users | Add personalization features in future iterations |
-| No A/B testing framework | Difficult to test different prediction strategies | Implement A/B testing framework in future iterations |
+**Implementation:**
+
+- Enhanced the existing update-dependencies.js script
+- Created a new run-dependency-update.sh script to automate the process
+- Created comprehensive documentation in docs/implementation-guides/dependency-management.md
+- Updated the memory bank with dependency update progress and decisions
+
+**Consequences:**
+
+- Positive: More consistent and reliable dependency updates
+- Positive: Better security through regular updates
+- Positive: Reduced risk of breaking changes
+- Positive: Better documentation and knowledge transfer
+- Negative: Additional maintenance overhead for the custom solution
+
+## Firebase Firestore Backup System Implementation (May 20, 2025)
+
+### Decision: Implement Firebase Firestore Backup System
+
+**Context:**
+
+- Firebase Firestore is used as the primary database for the application
+- There was no automated backup system in place
+- Data loss would be catastrophic for the business
+- Manual backups were inconsistent and error-prone
+
+**Decision:**
+
+- Implement an automated backup system for Firebase Firestore
+- Use Cloud Functions for scheduled backups
+- Store backups in Google Cloud Storage
+- Implement a retention policy for backups
+
+**Alternatives Considered:**
+
+1. **Manual Backups**: Manually export data from Firebase console
+   - Pros: Simple, no additional development required
+   - Cons: Error-prone, inconsistent, requires manual intervention
+2. **Third-Party Service**: Use a third-party backup service
+   - Pros: Managed solution, less development required
+   - Cons: Additional cost, potential security concerns, less control
+3. **Custom Solution**: Develop a custom backup system
+   - Pros: Full control, tailored to project needs, integrated with existing workflows
+   - Cons: Requires development and maintenance
+
+**Rationale:**
+
+- A custom solution provides the most control and can be tailored to the project's specific needs
+- Cloud Functions provide a reliable and scalable way to schedule backups
+- Google Cloud Storage is a cost-effective and secure storage solution
+- A retention policy ensures that storage costs don't grow unbounded
+
+**Implementation:**
+
+- Created atomic components for backup configuration and utilities
+- Created molecular components for export, storage, and monitoring
+- Created organism component for integrated backup service
+- Implemented Cloud Functions for scheduled and manual backups
+- Added comprehensive documentation
+
+**Consequences:**
+
+- Positive: Automated, reliable backups
+- Positive: Reduced risk of data loss
+- Positive: Better disaster recovery capabilities
+- Positive: Improved compliance with data protection regulations
+- Negative: Additional cost for Google Cloud Storage
+- Negative: Additional complexity in the codebase

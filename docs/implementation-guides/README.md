@@ -6,6 +6,7 @@ This section provides practical guides and best practices for implementing featu
 
 - [Developer Workflows](developer-workflows.md) - Common development workflows
 - [Component Guidelines](component-guidelines.md) - Guidelines for creating and using components
+- [Dependency Management](dependency-management.md) - Guide for managing dependencies
 - [Internationalization Guide](internationalization-guide.md) - Practical guide for implementing internationalization
 - [Firebase Guide](firebase-guide.md) - Guide for implementing Firebase services
 - [Security Features](security-features.md) - Guide for security features implementation

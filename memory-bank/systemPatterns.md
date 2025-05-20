@@ -1,220 +1,281 @@
-# System Patterns - 2025-04-17
+# System Patterns
 
-## Error Patterns
+## Dependency Management Patterns (May 20, 2025)
 
-### 500 Internal Server Error
+### Pattern: Automated Dependency Updates
 
-**Symptoms:**
-- Server responds with 500 Internal Server Error
-- No specific error message in browser
-- Resources fail to load
-- Browser console shows "Failed to load resource: the server responded with a status of 500 ()"
+**Description:**
+A pattern for automating the process of updating dependencies in the project. This pattern ensures that dependencies are kept up-to-date, secure, and compatible with the application.
 
-**Possible Causes:**
-1. Malformed `.htaccess` file with syntax errors
-2. Incompatible Apache directives for the hosting environment
-3. Server-side script errors (PHP, Node.js, etc.)
-4. File permission issues preventing execution
-5. Memory limits or timeout issues
-6. Missing required modules or dependencies
-7. Server configuration conflicts
+**Components:**
 
-**Diagnosis Approach:**
-1. Check server error logs for specific error messages
-2. Examine `.htaccess` file for syntax errors
-3. Temporarily rename `.htaccess` to disable it and see if error resolves
-4. Create a minimal test file to isolate the issue
-5. Check file permissions
-6. Contact hosting provider for server-specific information
+1. **Dependency Update Script**: A script that checks for outdated packages and updates them
+2. **Backup System**: A system for creating backups before updates
+3. **Testing Integration**: Integration with the testing system to verify updates
+4. **Documentation**: Documentation of the update process and decisions
 
-**Solutions:**
-1. Fix syntax errors in `.htaccess` file
-2. Use only compatible directives for the hosting environment
-3. Simplify `.htaccess` file to essential directives
-4. Set correct file permissions
-5. Increase memory limits or timeout settings if needed
-6. Install missing modules or dependencies
-7. Resolve server configuration conflicts
+**Implementation:**
 
-### Content Security Policy Blocking Scripts
+```javascript
+// Example implementation pattern for dependency updates
+function updateDependencies(options) {
+  // Create backup
+  const backupPath = createBackup();
 
-**Symptoms:**
-- Console errors about CSP violations
-- Scripts fail to load or execute
-- "X is not defined" errors
-- Specific error messages like "Refused to load the script X because it violates the following Content Security Policy directive: script-src 'self'"
+  try {
+    // Check for outdated packages
+    const outdatedPackages = checkOutdated();
 
-**Possible Causes:**
-1. Restrictive Content Security Policy
-2. Missing domains in CSP directives
-3. Missing 'unsafe-inline' or 'unsafe-eval' for scripts that require them
-4. Incorrect CSP syntax
-5. Multiple conflicting CSP definitions
-6. Server-level CSP overriding page-level CSP
-7. Third-party scripts requiring additional domains
+    // Apply updates based on strategy
+    if (options.strategy === 'patch') {
+      applyPatchUpdates(outdatedPackages);
+    } else if (options.strategy === 'minor') {
+      applyMinorUpdates(outdatedPackages);
+    } else if (options.strategy === 'major') {
+      applyMajorUpdates(outdatedPackages);
+    } else if (options.strategy === 'security') {
+      applySecurityUpdates();
+    }
 
-**Diagnosis Approach:**
-1. Examine browser console for specific CSP violation messages
-2. Check the CSP meta tag in HTML files
-3. Check for CSP headers in server response
-4. Identify which domains are being blocked
-5. Test with a more permissive CSP to isolate the issue
-6. Use browser developer tools to monitor network requests
+    // Run tests to verify updates
+    const testResult = runTests();
 
-**Solutions:**
-1. Update CSP to include all required domains
-2. Add 'unsafe-inline' and 'unsafe-eval' if required by scripts
-3. Expand connect-src directive to allow API connections
-4. Add frame-src entries for authentication services
-5. Ensure CSP syntax is correct
-6. Resolve conflicts between server-level and page-level CSP
-7. Consider using CSP reporting to identify blocked resources
+    if (!testResult.success) {
+      // Restore backup if tests fail
+      restoreBackup(backupPath);
+      return { success: false, error: testResult.error };
+    }
 
-### Firebase Authentication API Key Error
+    return { success: true };
+  } catch (error) {
+    // Restore backup if an error occurs
+    restoreBackup(backupPath);
+    return { success: false, error };
+  }
+}
+```
 
-**Symptoms:**
-- Error message: "Firebase: Error (auth/api-key-not-valid.-please-pass-a-valid-api-key.)"
-- Authentication methods fail (sign in, sign up, etc.)
-- Firebase initializes successfully but auth operations fail
-- No CSP violation errors in console
+**Usage:**
 
-**Possible Causes:**
-1. Invalid or incorrect API key in Firebase configuration
-2. Missing API key in Firebase configuration
-3. API key restrictions in Firebase console
-4. Domain not authorized in Firebase console
-5. CSP missing 'unsafe-eval' in script-src directive
-6. CSP missing required authentication domains (especially gstatic.com)
-7. Firebase SDK version incompatibility
-8. Project configuration mismatch between different environment files
-9. Incorrect project ID or auth domain in configuration
+```javascript
+// Example usage of the dependency update pattern
+const result = updateDependencies({
+  strategy: 'minor', // 'patch', 'minor', 'major', or 'security'
+});
 
-**Diagnosis Approach:**
-1. Verify API key in Firebase configuration
-2. Check API key in Firebase console
-3. Check authorized domains in Firebase console
-4. Examine CSP for 'unsafe-eval' in script-src directive
-5. Check CSP for authentication domains
-6. Test with a minimal Firebase configuration
-7. Add diagnostic logging to Firebase initialization
+if (result.success) {
+  console.log('Dependencies updated successfully');
+} else {
+  console.error('Error updating dependencies:', result.error);
+}
+```
 
-**Solutions:**
-1. Update API key if incorrect
-2. Add API key if missing
-3. Update API key restrictions in Firebase console
-4. Add domain to authorized domains in Firebase console
-5. Add 'unsafe-eval' to script-src directive in CSP
-6. Add authentication domains to CSP, especially gstatic.com
-7. Update Firebase SDK version if needed
-8. Ensure consistent project configuration across all environment files
-9. Verify project ID and auth domain match in all configuration files
+**Benefits:**
 
-## Debugging Approaches
+- Ensures dependencies are kept up-to-date
+- Reduces security vulnerabilities
+- Improves stability through testing
+- Provides a consistent process for updates
+- Reduces the risk of breaking changes
 
-### Systematic Debugging Process
+### Pattern: Dependency Group Management
 
-1. **Observe and Reproduce**
-   - Document exact error messages and symptoms
-   - Create a reliable reproduction case
-   - Identify patterns in when the error occurs
+**Description:**
+A pattern for managing groups of dependencies that should be kept in sync. This pattern ensures that related dependencies are updated together to maintain compatibility.
 
-2. **Isolate the Problem**
-   - Create minimal test cases
-   - Disable components one by one to identify the culprit
-   - Use binary search approach for complex systems
+**Components:**
 
-3. **Formulate Hypotheses**
-   - List 5-7 possible causes based on symptoms
-   - Rank hypotheses by likelihood
-   - Focus on the most likely 1-2 causes first
+1. **Dependency Groups**: Groups of related dependencies
+2. **Version Synchronization**: Logic for keeping versions in sync
+3. **Compatibility Checking**: Logic for checking compatibility between dependencies
 
-4. **Test Hypotheses**
-   - Add strategic logging to validate assumptions
-   - Make minimal changes to test each hypothesis
-   - Document results of each test
+**Implementation:**
 
-5. **Implement Solution**
-   - Create a comprehensive fix
-   - Ensure the fix addresses the root cause, not just symptoms
-   - Create automated tests to prevent regression
+```javascript
+// Example implementation pattern for dependency group management
+const dependencyGroups = [
+  {
+    name: 'React',
+    packages: ['react', 'react-dom', 'react-test-renderer'],
+    compatibility: {
+      react: {
+        '17.0.2': { 'react-dom': '17.0.2', 'react-test-renderer': '17.0.2' },
+        '18.0.0': { 'react-dom': '18.0.0', 'react-test-renderer': '18.0.0' },
+      },
+    },
+  },
+  {
+    name: 'React Navigation',
+    packages: [
+      '@react-navigation/native',
+      '@react-navigation/stack',
+      '@react-navigation/bottom-tabs',
+    ],
+    compatibility: {
+      '@react-navigation/native': {
+        '6.0.10': { '@react-navigation/stack': '6.2.1', '@react-navigation/bottom-tabs': '6.3.1' },
+      },
+    },
+  },
+];
 
-6. **Verify Solution**
-   - Test in multiple environments
-   - Verify all related functionality
-   - Monitor for any side effects
+function updateDependencyGroup(groupName, version) {
+  const group = dependencyGroups.find(g => g.name === groupName);
 
-7. **Document Findings**
-   - Record the root cause and solution
-   - Update system documentation
-   - Share knowledge with the team
+  if (!group) {
+    return { success: false, error: `Group ${groupName} not found` };
+  }
 
-### Web Hosting Debugging Patterns
+  const mainPackage = group.packages[0];
+  const compatibility = group.compatibility[mainPackage][version];
 
-1. **Server Configuration Issues**
-   - Check for `.htaccess` syntax errors
-   - Verify server module availability
-   - Test with minimal configuration
-   - Isolate custom directives
+  if (!compatibility) {
+    return { success: false, error: `Version ${version} not found for ${mainPackage}` };
+  }
 
-2. **Content Security Policy Debugging**
-   - Start with permissive CSP and gradually restrict
-   - Use CSP reporting to identify blocked resources
-   - Test each domain and directive individually
-   - Document required domains for third-party scripts
+  // Update all packages in the group
+  for (const pkg of group.packages) {
+    if (pkg === mainPackage) {
+      updatePackage(pkg, version);
+    } else {
+      updatePackage(pkg, compatibility[pkg]);
+    }
+  }
 
-3. **Cross-Origin Resource Sharing (CORS)**
-   - Check for CORS headers in server response
-   - Verify allowed origins match request origins
-   - Test with wildcard origin temporarily
-   - Check for preflight request handling
+  return { success: true };
+}
+```
 
-4. **Firebase-Specific Patterns**
-   - Verify Firebase SDK version compatibility
-   - Check for required CSP directives
-   - Ensure correct initialization order
-   - Test with minimal Firebase configuration
+**Usage:**
 
-### Firebase Authentication Debugging Patterns
+```javascript
+// Example usage of the dependency group management pattern
+const result = updateDependencyGroup('React', '18.0.0');
 
-1. **API Key Issues**
-   - Verify API key format (should start with "AIza")
-   - Check API key in Firebase console
-   - Test API key with curl or Postman
-   - Check for API key restrictions
+if (result.success) {
+  console.log('React dependencies updated successfully');
+} else {
+  console.error('Error updating React dependencies:', result.error);
+}
+```
 
-2. **CSP Requirements**
-   - Add 'unsafe-eval' to script-src directive
-   - Add authentication domains to connect-src
-   - Add accounts.google.com to frame-src
-   - Test with minimal CSP
+**Benefits:**
 
-3. **Authentication Flow**
-   - Test anonymous authentication first
-   - Check for auth state changes
-   - Monitor network requests during authentication
-   - Verify correct auth domain
+- Ensures related dependencies are kept in sync
+- Reduces compatibility issues
+- Simplifies the update process for related dependencies
+- Improves stability through consistent versioning
 
-4. **Misleading Error Messages**
-   - "auth/api-key-not-valid" often indicates CSP issues, not API key problems
-   - "auth/network-request-failed" can indicate CSP or CORS issues
-   - "auth/internal-error" often indicates script loading issues
+## Firebase Firestore Backup Patterns (May 20, 2025)
 
-### Mobile App Debugging Patterns
+### Pattern: Automated Database Backups
 
-1. **iOS-Web Compatibility Issues**
-   - Check for platform-specific API usage
-   - Verify Firebase configuration matches between platforms
-   - Test authentication flows on both platforms
-   - Ensure consistent data models
+**Description:**
+A pattern for automating the process of backing up Firebase Firestore data. This pattern ensures that data is regularly backed up and can be restored in case of data loss.
 
-2. **Firebase SDK Integration**
-   - Verify correct SDK versions
-   - Check initialization code
-   - Test each Firebase service individually
-   - Monitor network requests to Firebase endpoints
+**Components:**
 
-3. **UI/UX Consistency**
-   - Compare component behavior across platforms
-   - Test responsive layouts
-   - Verify consistent error handling
-   - Check accessibility features
+1. **Backup Scheduler**: A system for scheduling regular backups
+2. **Backup Exporter**: A system for exporting data from Firestore
+3. **Backup Storage**: A system for storing backups securely
+4. **Backup Restorer**: A system for restoring data from backups
+
+**Implementation:**
+
+```javascript
+// Example implementation pattern for automated database backups
+class FirestoreBackupService {
+  constructor(options) {
+    this.firestore = options.firestore;
+    this.storage = options.storage;
+    this.collections = options.collections || [];
+    this.retentionDays = options.retentionDays || 30;
+  }
+
+  async createBackup() {
+    const timestamp = new Date().toISOString();
+    const backupPath = `backups/${timestamp}`;
+
+    // Export data from Firestore
+    const data = await this.exportData();
+
+    // Store backup in Cloud Storage
+    await this.storage.upload(backupPath, data);
+
+    // Clean up old backups
+    await this.cleanupOldBackups();
+
+    return { success: true, path: backupPath };
+  }
+
+  async exportData() {
+    const data = {};
+
+    for (const collection of this.collections) {
+      const snapshot = await this.firestore.collection(collection).get();
+      data[collection] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        data: doc.data(),
+      }));
+    }
+
+    return data;
+  }
+
+  async cleanupOldBackups() {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - this.retentionDays);
+
+    const [files] = await this.storage.getFiles({ prefix: 'backups/' });
+
+    for (const file of files) {
+      const fileDate = new Date(file.name.split('/')[1]);
+
+      if (fileDate < cutoffDate) {
+        await file.delete();
+      }
+    }
+  }
+
+  async restoreBackup(backupPath) {
+    // Download backup from Cloud Storage
+    const [data] = await this.storage.file(backupPath).download();
+    const parsedData = JSON.parse(data.toString());
+
+    // Restore data to Firestore
+    for (const [collection, documents] of Object.entries(parsedData)) {
+      for (const doc of documents) {
+        await this.firestore.collection(collection).doc(doc.id).set(doc.data);
+      }
+    }
+
+    return { success: true };
+  }
+}
+```
+
+**Usage:**
+
+```javascript
+// Example usage of the automated database backup pattern
+const backupService = new FirestoreBackupService({
+  firestore: admin.firestore(),
+  storage: admin.storage().bucket(),
+  collections: ['users', 'posts', 'comments'],
+  retentionDays: 30,
+});
+
+// Create a backup
+const backup = await backupService.createBackup();
+
+// Restore a backup
+await backupService.restoreBackup(backup.path);
+```
+
+**Benefits:**
+
+- Ensures data is regularly backed up
+- Reduces the risk of data loss
+- Provides a consistent process for backups
+- Enables quick recovery in case of data loss
+- Manages storage costs through retention policies
