@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, View, TouchableOpacity, RefreshControl, Image } from 'react-native';
+import { StyleSheet, ScrollView, RefreshControl, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePersonalization } from '../contexts/PersonalizationContext';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import { colors } from '../styles/theme';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useTheme } from '../contexts/ThemeContext';
 import LoadingIndicator from '../components/LoadingIndicator';
 import BetNowButton from '../components/BetNowButton';
 import BetNowPopup from '../components/BetNowPopup';
@@ -17,24 +18,20 @@ import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
  */
 const PersonalizedHomeScreen = () => {
   const navigation = useNavigation();
-  const {
-    preferences,
-    userProfile,
-    personalizedContent,
-    refreshPersonalizedContent,
-    isLoading
-  } = usePersonalization();
+  const { preferences, userProfile, personalizedContent, refreshPersonalizedContent, isLoading } =
+    usePersonalization();
   const { showBetButton } = useBettingAffiliate();
-  
+  const { colors, isDark } = useTheme();
+
   const [refreshing, setRefreshing] = useState(false);
   const [greeting, setGreeting] = useState('');
   const [showBetPopup, setShowBetPopup] = useState(false);
-  
+
   // Set greeting based on time of day
   useEffect(() => {
     const hour = new Date().getHours();
     let newGreeting = '';
-    
+
     if (hour < 12) {
       newGreeting = 'Good Morning';
     } else if (hour < 18) {
@@ -42,76 +39,122 @@ const PersonalizedHomeScreen = () => {
     } else {
       newGreeting = 'Good Evening';
     }
-    
+
     if (userProfile?.displayName) {
       newGreeting += `, ${userProfile.displayName}`;
     }
-    
+
     setGreeting(newGreeting);
   }, [userProfile]);
-  
+
   // Handle refresh
   const handleRefresh = async () => {
     setRefreshing(true);
     await refreshPersonalizedContent();
     setRefreshing(false);
   };
-  
+
   // Render section header
   const renderSectionHeader = (title: string) => (
-    <View style={styles.sectionHeader}>
-      <ThemedText style={styles.sectionHeaderText}>{title}</ThemedText>
-      <TouchableOpacity>
-        <ThemedText style={styles.seeAllText}>See All</ThemedText>
-      </TouchableOpacity>
-    </View>
+    <AccessibleThemedView style={styles.sectionHeader} accessibilityLabel={`${title} section`}>
+      <AccessibleThemedText style={styles.sectionHeaderText} type="h2" accessibilityLabel={title}>
+        {title}
+      </AccessibleThemedText>
+      <AccessibleTouchableOpacity
+        accessibilityLabel={`See all ${title}`}
+        accessibilityRole="button"
+        accessibilityHint={`View all ${title.toLowerCase()}`}
+      >
+        <AccessibleThemedText style={styles.seeAllText}>See All</AccessibleThemedText>
+      </AccessibleTouchableOpacity>
+    </AccessibleThemedView>
   );
-  
+
   // Render recommended bet card
   const renderRecommendedBetCard = (bet: any, index: number) => (
-    <TouchableOpacity key={index} style={styles.recommendedBetCard}>
-      <View style={styles.recommendedBetHeader}>
-        <View style={styles.sportIconContainer}>
-          <Ionicons name="basketball-outline" size={24} color={colors.neon.blue} />
-        </View>
-        <View>
-          <ThemedText style={styles.sportText}>{bet.sport}</ThemedText>
-          <ThemedText style={styles.leagueText}>{bet.league}</ThemedText>
-        </View>
-        <View style={styles.confidenceContainer}>
-          <ThemedText style={styles.confidenceText}>{bet.confidence}%</ThemedText>
-          <ThemedText style={styles.confidenceLabel}>Confidence</ThemedText>
-        </View>
-      </View>
-      
-      <View style={styles.teamsContainer}>
-        <View style={styles.teamContainer}>
-          <Image source={{ uri: bet.team1.logo }} style={styles.teamLogo} />
-          <ThemedText style={styles.teamName}>{bet.team1.name}</ThemedText>
-        </View>
-        
-        <View style={styles.vsContainer}>
-          <ThemedText style={styles.vsText}>VS</ThemedText>
-        </View>
-        
-        <View style={styles.teamContainer}>
-          <Image source={{ uri: bet.team2.logo }} style={styles.teamLogo} />
-          <ThemedText style={styles.teamName}>{bet.team2.name}</ThemedText>
-        </View>
-      </View>
-      
-      <View style={styles.betInfoContainer}>
-        <View style={styles.betTypeContainer}>
-          <ThemedText style={styles.betTypeLabel}>Recommended Bet</ThemedText>
-          <ThemedText style={styles.betTypeValue}>{bet.recommendation}</ThemedText>
-        </View>
-        
-        <View style={styles.oddsContainer}>
-          <ThemedText style={styles.oddsLabel}>Odds</ThemedText>
-          <ThemedText style={styles.oddsValue}>{bet.odds}</ThemedText>
-        </View>
-      </View>
-      
+    <AccessibleTouchableOpacity
+      key={index}
+      style={styles.recommendedBetCard}
+      accessibilityLabel={`Recommended bet: ${bet.team1.name} vs ${bet.team2.name}`}
+      accessibilityRole="button"
+      accessibilityHint="View bet details"
+    >
+      <AccessibleThemedView style={styles.recommendedBetHeader} accessibilityLabel="Bet header">
+        <AccessibleThemedView
+          style={styles.sportIconContainer}
+          accessibilityLabel={`${bet.sport} icon`}
+        >
+          <Ionicons
+            name="basketball-outline"
+            size={24}
+            color={colors.primary}
+            accessibilityLabel={`${bet.sport} icon`}
+          />
+        </AccessibleThemedView>
+        <AccessibleThemedView accessibilityLabel={`${bet.sport} ${bet.league}`}>
+          <AccessibleThemedText style={styles.sportText}>{bet.sport}</AccessibleThemedText>
+          <AccessibleThemedText style={styles.leagueText}>{bet.league}</AccessibleThemedText>
+        </AccessibleThemedView>
+        <AccessibleThemedView
+          style={styles.confidenceContainer}
+          accessibilityLabel="Confidence rating"
+        >
+          <AccessibleThemedText
+            style={styles.confidenceText}
+            accessibilityLabel={`${bet.confidence}% confidence`}
+          >
+            {bet.confidence}%
+          </AccessibleThemedText>
+          <AccessibleThemedText style={styles.confidenceLabel}>Confidence</AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
+
+      <AccessibleThemedView style={styles.teamsContainer} accessibilityLabel="Teams matchup">
+        <AccessibleThemedView style={styles.teamContainer} accessibilityLabel={bet.team1.name}>
+          <Image
+            source={{ uri: bet.team1.logo }}
+            style={styles.teamLogo}
+            accessibilityLabel={`${bet.team1.name} logo`}
+          />
+          <AccessibleThemedText style={styles.teamName}>{bet.team1.name}</AccessibleThemedText>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.vsContainer} accessibilityLabel="versus">
+          <AccessibleThemedText style={styles.vsText}>VS</AccessibleThemedText>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.teamContainer} accessibilityLabel={bet.team2.name}>
+          <Image
+            source={{ uri: bet.team2.logo }}
+            style={styles.teamLogo}
+            accessibilityLabel={`${bet.team2.name} logo`}
+          />
+          <AccessibleThemedText style={styles.teamName}>{bet.team2.name}</AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
+
+      <AccessibleThemedView style={styles.betInfoContainer} accessibilityLabel="Bet information">
+        <AccessibleThemedView
+          style={styles.betTypeContainer}
+          accessibilityLabel="Recommended bet type"
+        >
+          <AccessibleThemedText style={styles.betTypeLabel}>Recommended Bet</AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.betTypeValue}
+            accessibilityLabel={`Recommendation: ${bet.recommendation}`}
+          >
+            {bet.recommendation}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.oddsContainer} accessibilityLabel="Odds information">
+          <AccessibleThemedText style={styles.oddsLabel}>Odds</AccessibleThemedText>
+          <AccessibleThemedText style={styles.oddsValue} accessibilityLabel={`Odds: ${bet.odds}`}>
+            {bet.odds}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
+
       {showBetButton('game') ? (
         <BetNowButton
           size="medium"
@@ -121,56 +164,105 @@ const PersonalizedHomeScreen = () => {
           style={styles.betNowButton}
         />
       ) : (
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           style={styles.placeBetButton}
           onPress={() => setShowBetPopup(true)}
+          accessibilityLabel="Place bet"
+          accessibilityRole="button"
+          accessibilityHint="Open betting options"
         >
-          <ThemedText style={styles.placeBetButtonText}>PLACE BET</ThemedText>
-        </TouchableOpacity>
+          <AccessibleThemedText style={styles.placeBetButtonText}>PLACE BET</AccessibleThemedText>
+        </AccessibleTouchableOpacity>
       )}
-    </TouchableOpacity>
+    </AccessibleTouchableOpacity>
   );
-  
+
   // Render upcoming game card
   const renderUpcomingGameCard = (game: any, index: number) => (
-    <TouchableOpacity key={index} style={styles.upcomingGameCard}>
-      <View style={styles.upcomingGameHeader}>
-        <ThemedText style={styles.upcomingGameLeague}>{game.league}</ThemedText>
-        <ThemedText style={styles.upcomingGameTime}>{game.time}</ThemedText>
-      </View>
-      
-      <View style={styles.teamsContainer}>
-        <View style={styles.teamContainer}>
-          <Image source={{ uri: game.team1.logo }} style={styles.teamLogo} />
-          <ThemedText style={styles.teamName}>{game.team1.name}</ThemedText>
-        </View>
-        
-        <View style={styles.vsContainer}>
-          <ThemedText style={styles.vsText}>VS</ThemedText>
-        </View>
-        
-        <View style={styles.teamContainer}>
-          <Image source={{ uri: game.team2.logo }} style={styles.teamLogo} />
-          <ThemedText style={styles.teamName}>{game.team2.name}</ThemedText>
-        </View>
-      </View>
-    </TouchableOpacity>
+    <AccessibleTouchableOpacity
+      key={index}
+      style={styles.upcomingGameCard}
+      accessibilityLabel={`Upcoming game: ${game.team1.name} vs ${game.team2.name}`}
+      accessibilityRole="button"
+      accessibilityHint="View game details"
+    >
+      <AccessibleThemedView style={styles.upcomingGameHeader} accessibilityLabel="Game information">
+        <AccessibleThemedText
+          style={styles.upcomingGameLeague}
+          accessibilityLabel={`League: ${game.league}`}
+        >
+          {game.league}
+        </AccessibleThemedText>
+        <AccessibleThemedText
+          style={styles.upcomingGameTime}
+          accessibilityLabel={`Game time: ${game.time}`}
+        >
+          {game.time}
+        </AccessibleThemedText>
+      </AccessibleThemedView>
+
+      <AccessibleThemedView style={styles.teamsContainer} accessibilityLabel="Teams matchup">
+        <AccessibleThemedView style={styles.teamContainer} accessibilityLabel={game.team1.name}>
+          <Image
+            source={{ uri: game.team1.logo }}
+            style={styles.teamLogo}
+            accessibilityLabel={`${game.team1.name} logo`}
+          />
+          <AccessibleThemedText style={styles.teamName}>{game.team1.name}</AccessibleThemedText>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.vsContainer} accessibilityLabel="versus">
+          <AccessibleThemedText style={styles.vsText}>VS</AccessibleThemedText>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.teamContainer} accessibilityLabel={game.team2.name}>
+          <Image
+            source={{ uri: game.team2.logo }}
+            style={styles.teamLogo}
+            accessibilityLabel={`${game.team2.name} logo`}
+          />
+          <AccessibleThemedText style={styles.teamName}>{game.team2.name}</AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
+    </AccessibleTouchableOpacity>
   );
-  
+
   // Render news item
   const renderNewsItem = (news: any, index: number) => (
-    <TouchableOpacity key={index} style={styles.newsItem}>
-      <Image source={{ uri: news.image }} style={styles.newsImage} />
-      <View style={styles.newsContent}>
-        <ThemedText style={styles.newsTitle}>{news.title}</ThemedText>
-        <View style={styles.newsMetaContainer}>
-          <ThemedText style={styles.newsSource}>{news.source}</ThemedText>
-          <ThemedText style={styles.newsTime}>{news.time}</ThemedText>
-        </View>
-      </View>
-    </TouchableOpacity>
+    <AccessibleTouchableOpacity
+      key={index}
+      style={styles.newsItem}
+      accessibilityLabel={`News: ${news.title}`}
+      accessibilityRole="button"
+      accessibilityHint="Read full news article"
+    >
+      <Image
+        source={{ uri: news.image }}
+        style={styles.newsImage}
+        accessibilityLabel={`Image for news: ${news.title}`}
+      />
+      <AccessibleThemedView style={styles.newsContent} accessibilityLabel="News content">
+        <AccessibleThemedText style={styles.newsTitle} accessibilityLabel={`Title: ${news.title}`}>
+          {news.title}
+        </AccessibleThemedText>
+        <AccessibleThemedView style={styles.newsMetaContainer} accessibilityLabel="News metadata">
+          <AccessibleThemedText
+            style={styles.newsSource}
+            accessibilityLabel={`Source: ${news.source}`}
+          >
+            {news.source}
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.newsTime}
+            accessibilityLabel={`Published: ${news.time}`}
+          >
+            {news.time}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
+    </AccessibleTouchableOpacity>
   );
-  
+
   // Mock data for demonstration
   const mockRecommendedBets = [
     {
@@ -189,7 +281,7 @@ const PersonalizedHomeScreen = () => {
       odds: '-110',
     },
   ];
-  
+
   const mockUpcomingGames = [
     {
       league: 'NFL',
@@ -216,7 +308,7 @@ const PersonalizedHomeScreen = () => {
       },
     },
   ];
-  
+
   const mockNews = [
     {
       title: 'Lakers sign new star player to 3-year contract',
@@ -226,57 +318,76 @@ const PersonalizedHomeScreen = () => {
     },
     {
       title: 'NFL announces new playoff format for upcoming season',
-      image: 'https://static.www.nfl.com/image/private/t_editorial_landscape_12_desktop/league/vmvmxjxe6xdtjwxeosa2',
+      image:
+        'https://static.www.nfl.com/image/private/t_editorial_landscape_12_desktop/league/vmvmxjxe6xdtjwxeosa2',
       source: 'NFL.com',
       time: '5 hours ago',
     },
   ];
-  
+
   if (isLoading) {
     return (
-      <ThemedView style={styles.loadingContainer}>
+      <AccessibleThemedView
+        style={styles.loadingContainer}
+        accessibilityLabel="Loading personalized content"
+      >
         <LoadingIndicator />
-      </ThemedView>
+      </AccessibleThemedView>
     );
   }
-  
+
   return (
-    <ThemedView style={styles.container}>
+    <AccessibleThemedView style={styles.container} accessibilityLabel="Personalized Home Screen">
       <ScrollView
         style={styles.scrollView}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor={colors.neon.blue}
+            tintColor={colors.primary}
+            accessibilityLabel="Pull to refresh content"
           />
         }
       >
         {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <ThemedText style={styles.greeting}>{greeting}</ThemedText>
-            <ThemedText style={styles.welcomeText}>
+        <AccessibleThemedView style={styles.header} accessibilityLabel="Dashboard header">
+          <AccessibleThemedView accessibilityLabel="Greeting section">
+            <AccessibleThemedText
+              style={styles.greeting}
+              type="h1"
+              accessibilityLabel={`Greeting: ${greeting}`}
+            >
+              {greeting}
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.welcomeText} accessibilityLabel="Welcome message">
               Here's your personalized dashboard
-            </ThemedText>
-          </View>
-          
-          <TouchableOpacity 
+            </AccessibleThemedText>
+          </AccessibleThemedView>
+
+          <AccessibleTouchableOpacity
             style={styles.settingsButton}
             onPress={() => navigation.navigate('Personalization' as never)}
+            accessibilityLabel="Personalization settings"
+            accessibilityRole="button"
+            accessibilityHint="Navigate to personalization settings"
           >
-            <Ionicons name="settings-outline" size={24} color={colors.neon.blue} />
-          </TouchableOpacity>
-        </View>
-        
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={colors.primary}
+              accessibilityLabel="Settings icon"
+            />
+          </AccessibleTouchableOpacity>
+        </AccessibleThemedView>
+
         {/* Recommended Bets */}
         {renderSectionHeader('RECOMMENDED BETS')}
         {mockRecommendedBets.map((bet, index) => renderRecommendedBetCard(bet, index))}
-        
+
         {/* Upcoming Games */}
         {renderSectionHeader('UPCOMING GAMES')}
         {mockUpcomingGames.map((game, index) => renderUpcomingGameCard(game, index))}
-        
+
         {/* News */}
         {renderSectionHeader('LATEST NEWS')}
         {mockNews.map((news, index) => renderNewsItem(news, index))}
@@ -286,9 +397,13 @@ const PersonalizedHomeScreen = () => {
         show={showBetPopup}
         onClose={() => setShowBetPopup(false)}
         message="Ready to place your bets? Use our exclusive FanDuel affiliate link for a special bonus!"
-        teamId={mockRecommendedBets[0]?.team1 ? `nba-${mockRecommendedBets[0].team1.name.toLowerCase()}` : undefined}
+        teamId={
+          mockRecommendedBets[0]?.team1
+            ? `nba-${mockRecommendedBets[0].team1.name.toLowerCase()}`
+            : undefined
+        }
       />
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 
@@ -318,13 +433,13 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 16,
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
   settingsButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(52, 152, 219, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -334,27 +449,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(52, 152, 219, 0.05)',
   },
   sectionHeaderText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: colors.neon.blue,
+    color: '#3498db',
     letterSpacing: 1,
   },
   seeAllText: {
     fontSize: 14,
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
   recommendedBetCard: {
     margin: 16,
     marginTop: 16,
     marginBottom: 8,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: colors.neon.blue,
+    borderLeftColor: '#3498db',
   },
   recommendedBetHeader: {
     flexDirection: 'row',
@@ -365,7 +480,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    backgroundColor: 'rgba(52, 152, 219, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -376,7 +491,7 @@ const styles = StyleSheet.create({
   },
   leagueText: {
     fontSize: 14,
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
   confidenceContainer: {
     marginLeft: 'auto',
@@ -385,11 +500,11 @@ const styles = StyleSheet.create({
   confidenceText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.neon.blue,
+    color: '#3498db',
   },
   confidenceLabel: {
     fontSize: 12,
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
   teamsContainer: {
     flexDirection: 'row',
@@ -418,7 +533,7 @@ const styles = StyleSheet.create({
   vsText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
   betInfoContainer: {
     flexDirection: 'row',
@@ -426,14 +541,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.border.default,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
   betTypeContainer: {
     flex: 1,
   },
   betTypeLabel: {
     fontSize: 12,
-    color: colors.text.secondary,
+    opacity: 0.7,
     marginBottom: 4,
   },
   betTypeValue: {
@@ -446,7 +561,7 @@ const styles = StyleSheet.create({
   },
   oddsLabel: {
     fontSize: 12,
-    color: colors.text.secondary,
+    opacity: 0.7,
     marginBottom: 4,
   },
   oddsValue: {
@@ -454,14 +569,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   placeBetButton: {
-    backgroundColor: colors.neon.blue,
+    backgroundColor: '#3498db',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   placeBetButtonText: {
-    color: colors.background.primary,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -473,7 +588,7 @@ const styles = StyleSheet.create({
     margin: 16,
     marginTop: 8,
     marginBottom: 8,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     padding: 16,
   },
@@ -488,14 +603,14 @@ const styles = StyleSheet.create({
   },
   upcomingGameTime: {
     fontSize: 14,
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
   newsItem: {
     flexDirection: 'row',
     margin: 16,
     marginTop: 8,
     marginBottom: 8,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -506,11 +621,10 @@ const styles = StyleSheet.create({
   newsContent: {
     flex: 1,
     padding: 12,
-    justifyContent: 'space-between',
   },
   newsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginBottom: 8,
   },
   newsMetaContainer: {
@@ -519,11 +633,12 @@ const styles = StyleSheet.create({
   },
   newsSource: {
     fontSize: 12,
-    color: colors.neon.blue,
+    fontWeight: '600',
+    color: '#3498db',
   },
   newsTime: {
     fontSize: 12,
-    color: colors.text.secondary,
+    opacity: 0.7,
   },
 });
 

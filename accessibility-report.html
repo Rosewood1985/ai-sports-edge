@@ -1,0 +1,3397 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Accessibility Test Report</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1, h2 { color: #333; }
+        .summary { margin-bottom: 30px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .issue { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .high { border-left: 5px solid #ff4d4d; }
+        .medium { border-left: 5px solid #ffcc00; }
+        .low { border-left: 5px solid #66cc66; }
+      </style>
+    </head>
+    <body>
+      <h1>Accessibility Test Report</h1>
+      <p>Generated on: 5/21/2025, 7:08:11 PM</p>
+      
+      <div class="summary">
+        <h2>Summary</h2>
+        <p>Total Files: 307</p>
+        <p>Files with Issues: 168</p>
+        <p>Total Issues: 419</p>
+        
+        <h3>Issues by Type</h3>
+        <table>
+          <tr>
+            <th>Type</th>
+            <th>Count</th>
+          </tr>
+          <tr><td>headingHierarchy</td><td>3</td></tr><tr><td>accessibilityProps</td><td>150</td></tr><tr><td>textAccessibility</td><td>142</td></tr><tr><td>touchableAccessibility</td><td>111</td></tr><tr><td>imageAccessibility</td><td>13</td></tr>
+        </table>
+      </div>
+      
+      <h2>Issues</h2>
+      
+      <div class="issue medium">
+        <h3>AccessibilitySettingsScreen.tsx (Line 139)</h3>
+        <p><strong>Type:</strong> headingHierarchy</p>
+        <p><strong>Description:</strong> Screen has h2 heading without h1</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Add an h1 heading as the main screen title</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AdvancedPlayerStatsScreen.tsx (Line 334)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AdvancedPlayerStatsScreen.tsx (Line 335)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AdvancedPlayerStatsScreen.tsx (Line 375)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AnalyticsDashboardScreen.tsx (Line 217)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AnalyticsDashboardScreen.tsx (Line 220)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AnalyticsDashboardScreen.tsx (Line 361)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ForgotPasswordScreen.tsx (Line 32)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ForgotPasswordScreen.tsx (Line 33)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ForgotPasswordScreen.tsx (Line 45)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LoginScreen.tsx (Line 31)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LoginScreen.tsx (Line 32)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LoginScreen.tsx (Line 52)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SignupScreen.tsx (Line 266)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SignupScreen.tsx (Line 267)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SignupScreen.tsx (Line 388)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BetComparisonScreen.tsx (Line 161)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BetComparisonScreen.tsx (Line 163)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BettingHistoryScreen.tsx (Line 34)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingHistoryScreen.tsx (Line 41)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingHistoryScreen.tsx (Line 35)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BettingSlipImportScreen.tsx (Line 251)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingSlipImportScreen.tsx (Line 349)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingSlipImportScreen.tsx (Line 255)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingSlipImportScreen.tsx (Line 328)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>EnhancedAnalyticsDashboardScreen.tsx (Line 269)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>EnhancedAnalyticsDashboardScreen.tsx (Line 270)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>FAQModerationScreen.tsx (Line 86)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FAQModerationScreen.tsx (Line 88)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>FeatureTourScreen.tsx (Line 172)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FeatureTourScreen.tsx (Line 173)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FeatureTourScreen.tsx (Line 200)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>FightDetailScreen.tsx (Line 215)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FightDetailScreen.tsx (Line 181)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FightDetailScreen.tsx (Line 177)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>Formula1Screen.tsx (Line 236)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Formula1Screen.tsx (Line 226)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Formula1Screen.tsx (Line 217)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>FraudAlertDetailsScreen.tsx (Line 167)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FraudAlertDetailsScreen.tsx (Line 169)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FraudAlertDetailsScreen.tsx (Line 182)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>FraudDetectionDashboardScreen.tsx (Line 170)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FraudDetectionDashboardScreen.tsx (Line 171)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FraudDetectionDashboardScreen.tsx (Line 180)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>GameDetailScreen.tsx (Line 166)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GameDetailScreen.tsx (Line 168)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GameDetailScreen.tsx (Line 178)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>GiftRedemptionScreen.tsx (Line 79)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GiftRedemptionScreen.tsx (Line 88)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GiftRedemptionScreen.tsx (Line 100)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>GiftSubscriptionScreen.tsx (Line 16)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GiftSubscriptionScreen.tsx (Line 28)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GiftSubscriptionScreen.tsx (Line 19)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>GroupSubscriptionScreen.tsx (Line 531)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>HorseRacingScreen.tsx (Line 259)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HorseRacingScreen.tsx (Line 242)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HorseRacingScreen.tsx (Line 232)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LanguageSettingsScreen.tsx (Line 78)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LanguageSettingsScreen.tsx (Line 79)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LanguageSettingsScreen.tsx (Line 70)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LeaderboardScreen.tsx (Line 173)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeaderboardScreen.tsx (Line 181)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeaderboardScreen.tsx (Line 174)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LeagueSelectionScreen.tsx (Line 141)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeagueSelectionScreen.tsx (Line 149)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LocalTeamOddsScreen.tsx (Line 18)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LocalTeamOddsScreen.tsx (Line 25)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LocalTeamOddsScreen.tsx (Line 19)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LocationNotificationSettings.js (Line 111)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LocationNotificationSettings.js (Line 112)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>MLSportsEdgeScreen.tsx (Line 69)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>MLSportsEdgeScreen.tsx (Line 70)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NcaaBasketballScreen.tsx (Line 130)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NcaaBasketballScreen.tsx (Line 131)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NcaaBasketballScreen.tsx (Line 135)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NearbyVenuesScreen.tsx (Line 18)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NearbyVenuesScreen.tsx (Line 25)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NearbyVenuesScreen.tsx (Line 19)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NeonOddsScreen.tsx (Line 216)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NeonOddsScreen.tsx (Line 257)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NotificationSettingsScreen.tsx (Line 156)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NotificationSettingsScreen.tsx (Line 139)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>OddsScreen.tsx (Line 221)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OddsScreen.tsx (Line 234)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OddsScreen.tsx (Line 229)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>OfflineSettingsScreen.tsx (Line 193)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OfflineSettingsScreen.tsx (Line 176)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OfflineSettingsScreen.tsx (Line 293)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ParlayOddsScreen.tsx (Line 226)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayOddsScreen.tsx (Line 227)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayOddsScreen.tsx (Line 218)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ParlayScreen.tsx (Line 206)</h3>
+        <p><strong>Type:</strong> headingHierarchy</p>
+        <p><strong>Description:</strong> Screen has h2 heading without h1</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Add an h1 heading as the main screen title</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PersonalizationScreen.tsx (Line 63)</h3>
+        <p><strong>Type:</strong> headingHierarchy</p>
+        <p><strong>Description:</strong> Screen has h2 heading without h1</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Add an h1 heading as the main screen title</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PersonalizedHomeScreen.tsx (Line 62)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PersonalizedHomeScreen.tsx (Line 63)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PersonalizedHomeScreen.tsx (Line 64)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PersonalizedHomeScreen.tsx (Line 89)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PlayerHistoricalTrendsScreen.tsx (Line 145)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerHistoricalTrendsScreen.tsx (Line 152)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerHistoricalTrendsScreen.tsx (Line 146)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PlayerStatsScreen.tsx (Line 129)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerStatsScreen.tsx (Line 130)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerStatsScreen.tsx (Line 161)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PurchaseHistoryScreen.tsx (Line 110)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PurchaseHistoryScreen.tsx (Line 128)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PurchaseHistoryScreen.tsx (Line 102)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>RedeemGiftScreen.tsx (Line 84)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RedeemGiftScreen.tsx (Line 85)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RedeemGiftScreen.tsx (Line 111)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralLeaderboardScreen.tsx (Line 126)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralLeaderboardScreen.tsx (Line 134)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralLeaderboardScreen.tsx (Line 127)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralNotificationsScreen.tsx (Line 70)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralNotificationsScreen.tsx (Line 78)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralNotificationsScreen.tsx (Line 71)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralRewardsScreen.tsx (Line 104)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralRewardsScreen.tsx (Line 112)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralRewardsScreen.tsx (Line 105)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>RefundPolicyScreen.tsx (Line 13)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RefundPolicyScreen.tsx (Line 11)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>RewardsScreen.tsx (Line 159)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RewardsScreen.tsx (Line 167)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RewardsScreen.tsx (Line 178)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SearchScreen.tsx (Line 74)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SportsNewsScreen.tsx (Line 279)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SportsNewsScreen.tsx (Line 235)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SportsNewsScreen.tsx (Line 231)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>StatsScreen.tsx (Line 121)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>StatsScreen.tsx (Line 129)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>StatsScreen.tsx (Line 122)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SubscriptionAnalyticsScreen.tsx (Line 84)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SubscriptionAnalyticsScreen.tsx (Line 89)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SubscriptionAnalyticsScreen.tsx (Line 85)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SubscriptionManagementScreen.tsx (Line 122)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SubscriptionManagementScreen.tsx (Line 124)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SubscriptionManagementScreen.tsx (Line 137)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SubscriptionScreen.tsx (Line 70)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SubscriptionScreen.tsx (Line 72)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SubscriptionScreen.tsx (Line 89)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>UFCScreen.tsx (Line 192)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>UFCScreen.tsx (Line 170)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>UFCScreen.tsx (Line 159)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>UFCScreen.tsx (Line 276)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>UIUXDemoScreen.tsx (Line 42)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>UIUXDemoScreen.tsx (Line 44)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>UIUXDemoScreen.tsx (Line 71)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AILeaderboard.tsx (Line 52)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AILeaderboard.tsx (Line 57)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AILeaderboard.tsx (Line 183)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AIPickCard.tsx (Line 68)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AIPickCard.tsx (Line 76)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AIPickCard.tsx (Line 176)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AchievementBadge.tsx (Line 31)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AchievementBadge.tsx (Line 48)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AchievementBadge.tsx (Line 18)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AchievementBadge.tsx (Line 40)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AdvancedPlayerMetricsCard.tsx (Line 101)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AdvancedPlayerMetricsCard.tsx (Line 102)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AdvancedPlayerMetricsCard.tsx (Line 96)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AnimatedTransition.tsx (Line 35)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>AutoResubscribeToggle.tsx (Line 86)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>AutoResubscribeToggle.tsx (Line 84)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BankrollManagementCard.tsx (Line 89)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BankrollManagementCard.tsx (Line 104)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BankrollManagementCard.tsx (Line 125)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BetNowButton.tsx (Line 247)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BetNowButton.tsx (Line 242)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BetNowPopup.tsx (Line 183)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BetNowPopup.tsx (Line 201)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BetNowPopup.tsx (Line 196)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BettingAnalytics.tsx (Line 200)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingAnalytics.tsx (Line 119)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingAnalytics.tsx (Line 132)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BettingAnalyticsChart.tsx (Line 71)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingAnalyticsChart.tsx (Line 72)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BettingHistoryChart.tsx (Line 329)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingHistoryChart.tsx (Line 341)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BlurredPrediction.tsx (Line 56)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BlurredPrediction.tsx (Line 58)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BlurredPrediction.tsx (Line 124)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BubbleChart.tsx (Line 143)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BubbleChart.tsx (Line 170)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ChartTransition.tsx (Line 24)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>Collapsible.tsx (Line 15)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Collapsible.tsx (Line 28)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Collapsible.tsx (Line 16)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>CommunityPolls.tsx (Line 68)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>CommunityPolls.tsx (Line 72)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>CommunityPolls.tsx (Line 90)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ComparativeAnalysis.tsx (Line 501)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ComparativeAnalysis.tsx (Line 502)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ComparativeAnalysis.tsx (Line 504)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ConflictResolutionModal.tsx (Line 129)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ConflictResolutionModal.tsx (Line 131)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ConflictResolutionModal.tsx (Line 139)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>DailyFreePick.tsx (Line 125)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>DailyFreePick.tsx (Line 127)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>DailyFreePick.tsx (Line 145)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>DateRangeSelector.tsx (Line 180)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>DateRangeSelector.tsx (Line 197)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>DateRangeSelector.tsx (Line 188)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>EmptyState.tsx (Line 32)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>EmptyState.tsx (Line 34)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>EnhancedPlayerComparison.tsx (Line 246)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>EnhancedPlayerComparison.tsx (Line 249)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>EnhancedPlayerComparison.tsx (Line 325)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ErrorBoundary.tsx (Line 79)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ErrorBoundary.tsx (Line 80)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ErrorMessage.tsx (Line 23)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>Formula1BlurredPrediction.tsx (Line 47)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Formula1BlurredPrediction.tsx (Line 48)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Formula1BlurredPrediction.tsx (Line 59)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>FreemiumFeature.tsx (Line 151)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FreemiumFeature.tsx (Line 170)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>FreemiumFeature.tsx (Line 174)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HelloWave.tsx (Line 29)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>HistoricalTrendsChart.tsx (Line 156)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HistoricalTrendsChart.tsx (Line 157)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HistoricalTrendsChart.tsx (Line 160)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LanguageSelector.tsx (Line 97)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LanguageSelector.tsx (Line 78)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LanguageSelector.tsx (Line 69)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeaderboardPositionChange.tsx (Line 110)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LeagueFilters.tsx (Line 74)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeagueFilters.tsx (Line 80)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeagueFilters.tsx (Line 83)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LeagueItem.tsx (Line 50)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeagueItem.tsx (Line 59)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LeagueItem.tsx (Line 37)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LegalLinks.tsx (Line 49)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LegalLinks.tsx (Line 51)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LegalLinks.tsx (Line 57)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LoadingIndicator.tsx (Line 32)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LoadingIndicator.tsx (Line 34)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LocalTeamOdds.tsx (Line 144)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LocalTeamOdds.tsx (Line 116)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LocalTeamOdds.tsx (Line 129)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LoyaltyBadge.tsx (Line 72)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LoyaltyBadge.tsx (Line 89)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>MilestoneAchievementAnimation.tsx (Line 174)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>MilestoneAchievementAnimation.tsx (Line 211)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>MobileAppDownload.tsx (Line 55)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>MobileAppDownload.tsx (Line 78)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>MobileAppDownload.tsx (Line 61)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NearbyVenues.tsx (Line 130)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NearbyVenues.tsx (Line 104)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NearbyVenues.tsx (Line 117)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NetworkStatusIndicator.tsx (Line 169)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NetworkStatusIndicator.tsx (Line 285)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NetworkStatusIndicator.tsx (Line 173)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NotificationManager.tsx (Line 298)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NotificationPermission.jsx (Line 53)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NotificationPermission.jsx (Line 56)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NotificationPermission.jsx (Line 65)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NotificationPermissionManager.tsx (Line 172)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NotificationPermissionManager.tsx (Line 175)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NotificationPermissionManager.tsx (Line 176)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OddsButton.tsx (Line 364)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OddsButton.tsx (Line 350)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>OddsMovementAlerts.tsx (Line 72)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OddsMovementAlerts.tsx (Line 73)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OddsMovementAlerts.tsx (Line 64)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>OfflineAwareView.tsx (Line 118)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OfflineAwareView.tsx (Line 140)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>OptimizedCardView.tsx (Line 78)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>OptimizedCardView.tsx (Line 73)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PageTransition.tsx (Line 47)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ParallaxScrollView.tsx (Line 48)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ParlayCard.tsx (Line 112)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayCard.tsx (Line 114)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayCard.tsx (Line 207)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ParlayIntegration.tsx (Line 180)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayIntegration.tsx (Line 176)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayIntegration.tsx (Line 163)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ParlayOddsCard.tsx (Line 89)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayOddsCard.tsx (Line 100)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ParlayOddsCard.tsx (Line 139)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PendingQuestionItem.tsx (Line 107)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PendingQuestionItem.tsx (Line 115)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PendingQuestionItem.tsx (Line 133)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PersonalizationSettings.tsx (Line 97)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PersonalizationSettings.tsx (Line 98)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PersonalizationSettings.tsx (Line 113)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PlayerComparisonView.tsx (Line 84)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerComparisonView.tsx (Line 86)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerComparisonView.tsx (Line 103)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PlayerPlusMinusCard.tsx (Line 48)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerPlusMinusCard.tsx (Line 49)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerPlusMinusCard.tsx (Line 43)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PlayerPlusMinusList.tsx (Line 70)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PlayerPlusMinusList.tsx (Line 71)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PropBetCard.tsx (Line 87)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PropBetCard.tsx (Line 88)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PropBetList.tsx (Line 108)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PropBetList.tsx (Line 110)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PropBetList.tsx (Line 180)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralBadge.tsx (Line 104)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralBadge.tsx (Line 114)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralBadge.tsx (Line 106)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralLeaderboard.tsx (Line 92)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralLeaderboard.tsx (Line 119)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralLeaderboard.tsx (Line 221)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralMilestoneProgress.tsx (Line 164)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralMilestoneProgress.tsx (Line 180)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralMilestoneProgress.tsx (Line 171)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralNotification.tsx (Line 126)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralNotification.tsx (Line 155)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralNotification.tsx (Line 139)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralNotificationList.tsx (Line 131)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralNotificationList.tsx (Line 142)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralNotificationList.tsx (Line 124)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralPrivacySettings.tsx (Line 92)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralPrivacySettings.tsx (Line 95)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralPrivacySettings.tsx (Line 99)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralProgramCard.tsx (Line 100)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralProgramCard.tsx (Line 112)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralProgramCard.tsx (Line 106)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralRewards.tsx (Line 72)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralRewards.tsx (Line 68)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralRewards.tsx (Line 138)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ReferralShareOptions.tsx (Line 137)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralShareOptions.tsx (Line 140)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ReferralShareOptions.tsx (Line 144)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ResponsiveGameInfo.tsx (Line 41)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ResponsiveGameInfo.tsx (Line 42)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ResponsiveImage.tsx (Line 56)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ResponsiveImage.tsx (Line 13)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ResponsiveLayout.tsx (Line 7)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ResponsiveLayout.tsx (Line 210)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ResponsiveSportIcon.tsx (Line 11)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>RichNotification.tsx (Line 234)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RichNotification.tsx (Line 242)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RichNotification.tsx (Line 247)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RichNotification.tsx (Line 264)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>RoundBettingCard.tsx (Line 52)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RoundBettingCard.tsx (Line 63)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>RoundBettingCard.tsx (Line 91)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SEOMetadata.tsx (Line 14)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>TabTransition.tsx (Line 19)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>TaxSummary.jsx (Line 28)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>TaxSummary.jsx (Line 29)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemeToggle.tsx (Line 10)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemeToggle.tsx (Line 9)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ThemeVerifier.js (Line 80)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemeVerifier.js (Line 81)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemeVerifier.js (Line 106)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ThemedComponents.tsx (Line 36)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemedComponents.tsx (Line 24)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemedComponents.tsx (Line 135)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemedText.tsx (Line 140)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ThemedView.tsx (Line 39)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>Toast.tsx (Line 109)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>Toast.tsx (Line 110)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>TrendingBets.tsx (Line 52)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>TrendingBets.tsx (Line 60)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>TrendingBets.tsx (Line 114)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>UIThemeProvider.tsx (Line 52)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>USOnlyPaymentForm.jsx (Line 151)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>USOnlyPaymentForm.jsx (Line 152)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>UpgradePrompt.tsx (Line 392)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ViewLimitIndicator.tsx (Line 77)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ThemedText-test.tsx (Line 7)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ModelPerformance.tsx (Line 69)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PredictionsTable.tsx (Line 67)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ValueBetsCard.tsx (Line 55)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ValueBetsCard.tsx (Line 56)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ValueBetsCard.tsx (Line 97)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SearchBar.tsx (Line 96)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SearchBar.tsx (Line 37)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SearchBar.tsx (Line 86)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SearchResults.tsx (Line 70)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SearchResults.tsx (Line 71)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SearchResults.tsx (Line 59)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SearchResults.tsx (Line 64)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>IconSymbol.ios.tsx (Line 14)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>IconSymbol.tsx (Line 39)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NeonButton.tsx (Line 26)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NeonButton.tsx (Line 27)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NeonButton.tsx (Line 202)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NeonCard.tsx (Line 27)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>NeonContainer.tsx (Line 17)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>NeonText.tsx (Line 11)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ResponsiveText.tsx (Line 146)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ThemedView.tsx (Line 45)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LanguageSelector.tsx (Line 93)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LanguageSelector.tsx (Line 76)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LanguageSelector.tsx (Line 67)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>PrivacySettingsScreen.tsx (Line 211)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PrivacySettingsScreen.tsx (Line 213)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>PrivacySettingsScreen.tsx (Line 288)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>StripeProvider.tsx (Line 65)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>StripeProvider.tsx (Line 66)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>BettingPage.js (Line 146)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingPage.js (Line 108)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingPage.js (Line 255)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>BettingPage.js (Line 106)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ForgotPasswordPage.js (Line 69)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ForgotPasswordPage.js (Line 47)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ForgotPasswordPage.js (Line 68)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ForgotPasswordPage.js (Line 88)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>HomePage.js (Line 61)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HomePage.js (Line 48)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HomePage.js (Line 83)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>HomePage.js (Line 68)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>LoginScreen.js (Line 88)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LoginScreen.js (Line 60)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>LoginScreen.js (Line 71)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>ProfilePage.js (Line 128)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ProfilePage.js (Line 84)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ProfilePage.js (Line 168)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>ProfilePage.js (Line 83)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SettingsPage.js (Line 160)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SettingsPage.js (Line 63)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SettingsPage.js (Line 121)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>SignupPage.js (Line 104)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SignupPage.js (Line 62)</h3>
+        <p><strong>Type:</strong> textAccessibility</p>
+        <p><strong>Description:</strong> Text component without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedText or add accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SignupPage.js (Line 103)</h3>
+        <p><strong>Type:</strong> touchableAccessibility</p>
+        <p><strong>Description:</strong> TouchableOpacity without accessibility props</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel</p>
+      </div>
+    
+      <div class="issue high">
+        <h3>SignupPage.js (Line 123)</h3>
+        <p><strong>Type:</strong> imageAccessibility</p>
+        <p><strong>Description:</strong> Image without accessibilityLabel</p>
+        <p><strong>Severity:</strong> high</p>
+        <p><strong>Suggestion:</strong> Add accessibilityLabel to describe the image</p>
+      </div>
+    
+      <div class="issue medium">
+        <h3>MainLayout.js (Line 46)</h3>
+        <p><strong>Type:</strong> accessibilityProps</p>
+        <p><strong>Description:</strong> View component without accessibility props</p>
+        <p><strong>Severity:</strong> medium</p>
+        <p><strong>Suggestion:</strong> Replace with AccessibleThemedView or add accessibilityLabel</p>
+      </div>
+    
+    </body>
+    </html>
+  

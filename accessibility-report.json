@@ -1,0 +1,3537 @@
+{
+  "summary": {
+    "totalFiles": 307,
+    "filesWithIssues": 168,
+    "totalIssues": 419,
+    "issuesByType": {
+      "headingHierarchy": 3,
+      "accessibilityProps": 150,
+      "textAccessibility": 142,
+      "touchableAccessibility": 111,
+      "imageAccessibility": 13
+    },
+    "issuesByComponent": {
+      "AccessibilitySettingsScreen.tsx": 1,
+      "AdvancedPlayerStatsScreen.tsx": 3,
+      "AnalyticsDashboardScreen.tsx": 3,
+      "ForgotPasswordScreen.tsx": 3,
+      "LoginScreen.tsx": 3,
+      "SignupScreen.tsx": 3,
+      "BetComparisonScreen.tsx": 2,
+      "BettingHistoryScreen.tsx": 3,
+      "BettingSlipImportScreen.tsx": 4,
+      "EnhancedAnalyticsDashboardScreen.tsx": 2,
+      "FAQModerationScreen.tsx": 2,
+      "FeatureTourScreen.tsx": 3,
+      "FightDetailScreen.tsx": 3,
+      "Formula1Screen.tsx": 3,
+      "FraudAlertDetailsScreen.tsx": 3,
+      "FraudDetectionDashboardScreen.tsx": 3,
+      "GameDetailScreen.tsx": 3,
+      "GiftRedemptionScreen.tsx": 3,
+      "GiftSubscriptionScreen.tsx": 3,
+      "GroupSubscriptionScreen.tsx": 1,
+      "HorseRacingScreen.tsx": 3,
+      "LanguageSettingsScreen.tsx": 3,
+      "LeaderboardScreen.tsx": 3,
+      "LeagueSelectionScreen.tsx": 2,
+      "LocalTeamOddsScreen.tsx": 3,
+      "LocationNotificationSettings.js": 2,
+      "MLSportsEdgeScreen.tsx": 2,
+      "NcaaBasketballScreen.tsx": 3,
+      "NearbyVenuesScreen.tsx": 3,
+      "NeonOddsScreen.tsx": 2,
+      "NotificationSettingsScreen.tsx": 2,
+      "OddsScreen.tsx": 3,
+      "OfflineSettingsScreen.tsx": 3,
+      "ParlayOddsScreen.tsx": 3,
+      "ParlayScreen.tsx": 1,
+      "PersonalizationScreen.tsx": 1,
+      "PersonalizedHomeScreen.tsx": 4,
+      "PlayerHistoricalTrendsScreen.tsx": 3,
+      "PlayerStatsScreen.tsx": 3,
+      "PurchaseHistoryScreen.tsx": 3,
+      "RedeemGiftScreen.tsx": 3,
+      "ReferralLeaderboardScreen.tsx": 3,
+      "ReferralNotificationsScreen.tsx": 3,
+      "ReferralRewardsScreen.tsx": 3,
+      "RefundPolicyScreen.tsx": 2,
+      "RewardsScreen.tsx": 3,
+      "SearchScreen.tsx": 1,
+      "SportsNewsScreen.tsx": 3,
+      "StatsScreen.tsx": 3,
+      "SubscriptionAnalyticsScreen.tsx": 3,
+      "SubscriptionManagementScreen.tsx": 3,
+      "SubscriptionScreen.tsx": 3,
+      "UFCScreen.tsx": 4,
+      "UIUXDemoScreen.tsx": 3,
+      "AILeaderboard.tsx": 3,
+      "AIPickCard.tsx": 3,
+      "AchievementBadge.tsx": 4,
+      "AdvancedPlayerMetricsCard.tsx": 3,
+      "AnimatedTransition.tsx": 1,
+      "AutoResubscribeToggle.tsx": 2,
+      "BankrollManagementCard.tsx": 3,
+      "BetNowButton.tsx": 2,
+      "BetNowPopup.tsx": 3,
+      "BettingAnalytics.tsx": 3,
+      "BettingAnalyticsChart.tsx": 2,
+      "BettingHistoryChart.tsx": 2,
+      "BlurredPrediction.tsx": 3,
+      "BubbleChart.tsx": 2,
+      "ChartTransition.tsx": 1,
+      "Collapsible.tsx": 3,
+      "CommunityPolls.tsx": 3,
+      "ComparativeAnalysis.tsx": 3,
+      "ConflictResolutionModal.tsx": 3,
+      "DailyFreePick.tsx": 3,
+      "DateRangeSelector.tsx": 3,
+      "EmptyState.tsx": 2,
+      "EnhancedPlayerComparison.tsx": 3,
+      "ErrorBoundary.tsx": 2,
+      "ErrorMessage.tsx": 1,
+      "Formula1BlurredPrediction.tsx": 3,
+      "FreemiumFeature.tsx": 3,
+      "HelloWave.tsx": 1,
+      "HistoricalTrendsChart.tsx": 3,
+      "LanguageSelector.tsx": 3,
+      "LeaderboardPositionChange.tsx": 1,
+      "LeagueFilters.tsx": 3,
+      "LeagueItem.tsx": 3,
+      "LegalLinks.tsx": 3,
+      "LoadingIndicator.tsx": 2,
+      "LocalTeamOdds.tsx": 3,
+      "LoyaltyBadge.tsx": 2,
+      "MilestoneAchievementAnimation.tsx": 2,
+      "MobileAppDownload.tsx": 3,
+      "NearbyVenues.tsx": 3,
+      "NetworkStatusIndicator.tsx": 3,
+      "NotificationManager.tsx": 1,
+      "NotificationPermission.jsx": 3,
+      "NotificationPermissionManager.tsx": 3,
+      "OddsButton.tsx": 2,
+      "OddsMovementAlerts.tsx": 3,
+      "OfflineAwareView.tsx": 2,
+      "OptimizedCardView.tsx": 2,
+      "PageTransition.tsx": 1,
+      "ParallaxScrollView.tsx": 1,
+      "ParlayCard.tsx": 3,
+      "ParlayIntegration.tsx": 3,
+      "ParlayOddsCard.tsx": 3,
+      "PendingQuestionItem.tsx": 3,
+      "PersonalizationSettings.tsx": 3,
+      "PlayerComparisonView.tsx": 3,
+      "PlayerPlusMinusCard.tsx": 3,
+      "PlayerPlusMinusList.tsx": 2,
+      "PropBetCard.tsx": 2,
+      "PropBetList.tsx": 3,
+      "ReferralBadge.tsx": 3,
+      "ReferralLeaderboard.tsx": 3,
+      "ReferralMilestoneProgress.tsx": 3,
+      "ReferralNotification.tsx": 3,
+      "ReferralNotificationList.tsx": 3,
+      "ReferralPrivacySettings.tsx": 3,
+      "ReferralProgramCard.tsx": 3,
+      "ReferralRewards.tsx": 3,
+      "ReferralShareOptions.tsx": 3,
+      "ResponsiveGameInfo.tsx": 2,
+      "ResponsiveImage.tsx": 2,
+      "ResponsiveLayout.tsx": 2,
+      "ResponsiveSportIcon.tsx": 1,
+      "RichNotification.tsx": 4,
+      "RoundBettingCard.tsx": 3,
+      "SEOMetadata.tsx": 1,
+      "TabTransition.tsx": 1,
+      "TaxSummary.jsx": 2,
+      "ThemeToggle.tsx": 2,
+      "ThemeVerifier.js": 3,
+      "ThemedComponents.tsx": 3,
+      "ThemedText.tsx": 1,
+      "ThemedView.tsx": 1,
+      "Toast.tsx": 2,
+      "TrendingBets.tsx": 3,
+      "UIThemeProvider.tsx": 1,
+      "USOnlyPaymentForm.jsx": 2,
+      "UpgradePrompt.tsx": 1,
+      "ViewLimitIndicator.tsx": 1,
+      "ThemedText-test.tsx": 1,
+      "ModelPerformance.tsx": 1,
+      "PredictionsTable.tsx": 1,
+      "ValueBetsCard.tsx": 3,
+      "SearchBar.tsx": 3,
+      "SearchResults.tsx": 4,
+      "IconSymbol.ios.tsx": 1,
+      "IconSymbol.tsx": 1,
+      "NeonButton.tsx": 3,
+      "NeonCard.tsx": 1,
+      "NeonContainer.tsx": 1,
+      "NeonText.tsx": 1,
+      "ResponsiveText.tsx": 1,
+      "PrivacySettingsScreen.tsx": 3,
+      "StripeProvider.tsx": 2,
+      "BettingPage.js": 4,
+      "ForgotPasswordPage.js": 4,
+      "HomePage.js": 4,
+      "LoginScreen.js": 3,
+      "ProfilePage.js": 4,
+      "SettingsPage.js": 3,
+      "SignupPage.js": 4,
+      "MainLayout.js": 1
+    }
+  },
+  "issues": [
+    {
+      "type": "headingHierarchy",
+      "component": "AccessibilitySettingsScreen.tsx",
+      "description": "Screen has h2 heading without h1",
+      "line": 139,
+      "severity": "medium",
+      "suggestion": "Add an h1 heading as the main screen title"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AdvancedPlayerStatsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 334,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AdvancedPlayerStatsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 335,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "AdvancedPlayerStatsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 375,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AnalyticsDashboardScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 217,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AnalyticsDashboardScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 220,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "AnalyticsDashboardScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 361,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ForgotPasswordScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 32,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ForgotPasswordScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 33,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ForgotPasswordScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 45,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LoginScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 31,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LoginScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 32,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LoginScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 52,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SignupScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 266,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SignupScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 267,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SignupScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 388,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BetComparisonScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 161,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BetComparisonScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 163,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BettingHistoryScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 34,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BettingHistoryScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 41,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BettingHistoryScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 35,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BettingSlipImportScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 251,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BettingSlipImportScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 349,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BettingSlipImportScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 255,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "BettingSlipImportScreen.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 328,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "EnhancedAnalyticsDashboardScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 269,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "EnhancedAnalyticsDashboardScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 270,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "FAQModerationScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 86,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "FAQModerationScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 88,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "FeatureTourScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 172,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "FeatureTourScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 173,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "FeatureTourScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 200,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "FightDetailScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 215,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "FightDetailScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 181,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "FightDetailScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 177,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "Formula1Screen.tsx",
+      "description": "View component without accessibility props",
+      "line": 236,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "Formula1Screen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 226,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "Formula1Screen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 217,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "FraudAlertDetailsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 167,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "FraudAlertDetailsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 169,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "FraudAlertDetailsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 182,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "FraudDetectionDashboardScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 170,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "FraudDetectionDashboardScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 171,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "FraudDetectionDashboardScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 180,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "GameDetailScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 166,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "GameDetailScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 168,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "GameDetailScreen.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 178,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "GiftRedemptionScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 79,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "GiftRedemptionScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 88,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "GiftRedemptionScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 100,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "GiftSubscriptionScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 16,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "GiftSubscriptionScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 28,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "GiftSubscriptionScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 19,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "GroupSubscriptionScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 531,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "HorseRacingScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 259,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "HorseRacingScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 242,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "HorseRacingScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 232,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LanguageSettingsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 78,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LanguageSettingsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 79,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LanguageSettingsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 70,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LeaderboardScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 173,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LeaderboardScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 181,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LeaderboardScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 174,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LeagueSelectionScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 141,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LeagueSelectionScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 149,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LocalTeamOddsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 18,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LocalTeamOddsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 25,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LocalTeamOddsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 19,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LocationNotificationSettings.js",
+      "description": "View component without accessibility props",
+      "line": 111,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LocationNotificationSettings.js",
+      "description": "Text component without accessibility props",
+      "line": 112,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "MLSportsEdgeScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 69,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "MLSportsEdgeScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 70,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NcaaBasketballScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 130,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NcaaBasketballScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 131,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NcaaBasketballScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 135,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NearbyVenuesScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 18,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NearbyVenuesScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 25,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NearbyVenuesScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 19,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NeonOddsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 216,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NeonOddsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 257,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NotificationSettingsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 156,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NotificationSettingsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 139,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "OddsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 221,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "OddsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 234,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "OddsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 229,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "OfflineSettingsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 193,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "OfflineSettingsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 176,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "OfflineSettingsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 293,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ParlayOddsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 226,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ParlayOddsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 227,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ParlayOddsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 218,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "headingHierarchy",
+      "component": "ParlayScreen.tsx",
+      "description": "Screen has h2 heading without h1",
+      "line": 206,
+      "severity": "medium",
+      "suggestion": "Add an h1 heading as the main screen title"
+    },
+    {
+      "type": "headingHierarchy",
+      "component": "PersonalizationScreen.tsx",
+      "description": "Screen has h2 heading without h1",
+      "line": 63,
+      "severity": "medium",
+      "suggestion": "Add an h1 heading as the main screen title"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PersonalizedHomeScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 62,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PersonalizedHomeScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 63,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PersonalizedHomeScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 64,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "PersonalizedHomeScreen.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 89,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PlayerHistoricalTrendsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 145,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PlayerHistoricalTrendsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 152,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PlayerHistoricalTrendsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 146,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PlayerStatsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 129,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PlayerStatsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 130,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PlayerStatsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 161,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PurchaseHistoryScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 110,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PurchaseHistoryScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 128,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PurchaseHistoryScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 102,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "RedeemGiftScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 84,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "RedeemGiftScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 85,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "RedeemGiftScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 111,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralLeaderboardScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 126,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralLeaderboardScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 134,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralLeaderboardScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 127,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralNotificationsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 70,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralNotificationsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 78,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralNotificationsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 71,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralRewardsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 104,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralRewardsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 112,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralRewardsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 105,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "RefundPolicyScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 13,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "RefundPolicyScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 11,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "RewardsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 159,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "RewardsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 167,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "RewardsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 178,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SearchScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 74,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SportsNewsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 279,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SportsNewsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 235,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SportsNewsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 231,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "StatsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 121,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "StatsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 129,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "StatsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 122,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SubscriptionAnalyticsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 84,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SubscriptionAnalyticsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 89,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SubscriptionAnalyticsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 85,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SubscriptionManagementScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 122,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SubscriptionManagementScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 124,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SubscriptionManagementScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 137,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SubscriptionScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 70,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SubscriptionScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 72,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SubscriptionScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 89,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "UFCScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 192,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "UFCScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 170,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "UFCScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 159,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "UFCScreen.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 276,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "UIUXDemoScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 42,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "UIUXDemoScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 44,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "UIUXDemoScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 71,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AILeaderboard.tsx",
+      "description": "View component without accessibility props",
+      "line": 52,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AILeaderboard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 57,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "AILeaderboard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 183,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AIPickCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 68,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AIPickCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 76,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "AIPickCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 176,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AchievementBadge.tsx",
+      "description": "View component without accessibility props",
+      "line": 31,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AchievementBadge.tsx",
+      "description": "Text component without accessibility props",
+      "line": 48,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "AchievementBadge.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 18,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "AchievementBadge.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 40,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AdvancedPlayerMetricsCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 101,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AdvancedPlayerMetricsCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 102,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "AdvancedPlayerMetricsCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 96,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AnimatedTransition.tsx",
+      "description": "View component without accessibility props",
+      "line": 35,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "AutoResubscribeToggle.tsx",
+      "description": "View component without accessibility props",
+      "line": 86,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "AutoResubscribeToggle.tsx",
+      "description": "Text component without accessibility props",
+      "line": 84,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BankrollManagementCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 89,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BankrollManagementCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 104,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BankrollManagementCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 125,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BetNowButton.tsx",
+      "description": "Text component without accessibility props",
+      "line": 247,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BetNowButton.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 242,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BetNowPopup.tsx",
+      "description": "View component without accessibility props",
+      "line": 183,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BetNowPopup.tsx",
+      "description": "Text component without accessibility props",
+      "line": 201,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BetNowPopup.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 196,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BettingAnalytics.tsx",
+      "description": "View component without accessibility props",
+      "line": 200,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BettingAnalytics.tsx",
+      "description": "Text component without accessibility props",
+      "line": 119,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BettingAnalytics.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 132,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BettingAnalyticsChart.tsx",
+      "description": "View component without accessibility props",
+      "line": 71,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BettingAnalyticsChart.tsx",
+      "description": "Text component without accessibility props",
+      "line": 72,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BettingHistoryChart.tsx",
+      "description": "View component without accessibility props",
+      "line": 329,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BettingHistoryChart.tsx",
+      "description": "Text component without accessibility props",
+      "line": 341,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BlurredPrediction.tsx",
+      "description": "View component without accessibility props",
+      "line": 56,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BlurredPrediction.tsx",
+      "description": "Text component without accessibility props",
+      "line": 58,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BlurredPrediction.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 124,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BubbleChart.tsx",
+      "description": "View component without accessibility props",
+      "line": 143,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BubbleChart.tsx",
+      "description": "Text component without accessibility props",
+      "line": 170,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ChartTransition.tsx",
+      "description": "View component without accessibility props",
+      "line": 24,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "Collapsible.tsx",
+      "description": "View component without accessibility props",
+      "line": 15,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "Collapsible.tsx",
+      "description": "Text component without accessibility props",
+      "line": 28,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "Collapsible.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 16,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "CommunityPolls.tsx",
+      "description": "View component without accessibility props",
+      "line": 68,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "CommunityPolls.tsx",
+      "description": "Text component without accessibility props",
+      "line": 72,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "CommunityPolls.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 90,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ComparativeAnalysis.tsx",
+      "description": "View component without accessibility props",
+      "line": 501,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ComparativeAnalysis.tsx",
+      "description": "Text component without accessibility props",
+      "line": 502,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ComparativeAnalysis.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 504,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ConflictResolutionModal.tsx",
+      "description": "View component without accessibility props",
+      "line": 129,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ConflictResolutionModal.tsx",
+      "description": "Text component without accessibility props",
+      "line": 131,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ConflictResolutionModal.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 139,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "DailyFreePick.tsx",
+      "description": "View component without accessibility props",
+      "line": 125,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "DailyFreePick.tsx",
+      "description": "Text component without accessibility props",
+      "line": 127,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "DailyFreePick.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 145,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "DateRangeSelector.tsx",
+      "description": "View component without accessibility props",
+      "line": 180,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "DateRangeSelector.tsx",
+      "description": "Text component without accessibility props",
+      "line": 197,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "DateRangeSelector.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 188,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "EmptyState.tsx",
+      "description": "View component without accessibility props",
+      "line": 32,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "EmptyState.tsx",
+      "description": "Text component without accessibility props",
+      "line": 34,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "EnhancedPlayerComparison.tsx",
+      "description": "View component without accessibility props",
+      "line": 246,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "EnhancedPlayerComparison.tsx",
+      "description": "Text component without accessibility props",
+      "line": 249,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "EnhancedPlayerComparison.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 325,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ErrorBoundary.tsx",
+      "description": "View component without accessibility props",
+      "line": 79,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ErrorBoundary.tsx",
+      "description": "Text component without accessibility props",
+      "line": 80,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ErrorMessage.tsx",
+      "description": "Text component without accessibility props",
+      "line": 23,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "Formula1BlurredPrediction.tsx",
+      "description": "View component without accessibility props",
+      "line": 47,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "Formula1BlurredPrediction.tsx",
+      "description": "Text component without accessibility props",
+      "line": 48,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "Formula1BlurredPrediction.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 59,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "FreemiumFeature.tsx",
+      "description": "View component without accessibility props",
+      "line": 151,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "FreemiumFeature.tsx",
+      "description": "Text component without accessibility props",
+      "line": 170,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "FreemiumFeature.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 174,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "HelloWave.tsx",
+      "description": "Text component without accessibility props",
+      "line": 29,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "HistoricalTrendsChart.tsx",
+      "description": "View component without accessibility props",
+      "line": 156,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "HistoricalTrendsChart.tsx",
+      "description": "Text component without accessibility props",
+      "line": 157,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "HistoricalTrendsChart.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 160,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LanguageSelector.tsx",
+      "description": "View component without accessibility props",
+      "line": 97,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LanguageSelector.tsx",
+      "description": "Text component without accessibility props",
+      "line": 78,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LanguageSelector.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 69,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LeaderboardPositionChange.tsx",
+      "description": "Text component without accessibility props",
+      "line": 110,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LeagueFilters.tsx",
+      "description": "View component without accessibility props",
+      "line": 74,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LeagueFilters.tsx",
+      "description": "Text component without accessibility props",
+      "line": 80,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LeagueFilters.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 83,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LeagueItem.tsx",
+      "description": "View component without accessibility props",
+      "line": 50,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LeagueItem.tsx",
+      "description": "Text component without accessibility props",
+      "line": 59,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LeagueItem.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 37,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LegalLinks.tsx",
+      "description": "View component without accessibility props",
+      "line": 49,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LegalLinks.tsx",
+      "description": "Text component without accessibility props",
+      "line": 51,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LegalLinks.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 57,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LoadingIndicator.tsx",
+      "description": "View component without accessibility props",
+      "line": 32,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LoadingIndicator.tsx",
+      "description": "Text component without accessibility props",
+      "line": 34,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LocalTeamOdds.tsx",
+      "description": "View component without accessibility props",
+      "line": 144,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LocalTeamOdds.tsx",
+      "description": "Text component without accessibility props",
+      "line": 116,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LocalTeamOdds.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 129,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LoyaltyBadge.tsx",
+      "description": "View component without accessibility props",
+      "line": 72,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LoyaltyBadge.tsx",
+      "description": "Text component without accessibility props",
+      "line": 89,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "MilestoneAchievementAnimation.tsx",
+      "description": "View component without accessibility props",
+      "line": 174,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "MilestoneAchievementAnimation.tsx",
+      "description": "Text component without accessibility props",
+      "line": 211,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "MobileAppDownload.tsx",
+      "description": "View component without accessibility props",
+      "line": 55,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "MobileAppDownload.tsx",
+      "description": "Text component without accessibility props",
+      "line": 78,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "MobileAppDownload.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 61,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NearbyVenues.tsx",
+      "description": "View component without accessibility props",
+      "line": 130,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NearbyVenues.tsx",
+      "description": "Text component without accessibility props",
+      "line": 104,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NearbyVenues.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 117,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NetworkStatusIndicator.tsx",
+      "description": "View component without accessibility props",
+      "line": 169,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NetworkStatusIndicator.tsx",
+      "description": "Text component without accessibility props",
+      "line": 285,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NetworkStatusIndicator.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 173,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NotificationManager.tsx",
+      "description": "View component without accessibility props",
+      "line": 298,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NotificationPermission.jsx",
+      "description": "View component without accessibility props",
+      "line": 53,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NotificationPermission.jsx",
+      "description": "Text component without accessibility props",
+      "line": 56,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NotificationPermission.jsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 65,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NotificationPermissionManager.tsx",
+      "description": "View component without accessibility props",
+      "line": 172,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NotificationPermissionManager.tsx",
+      "description": "Text component without accessibility props",
+      "line": 175,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NotificationPermissionManager.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 176,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "OddsButton.tsx",
+      "description": "Text component without accessibility props",
+      "line": 364,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "OddsButton.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 350,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "OddsMovementAlerts.tsx",
+      "description": "View component without accessibility props",
+      "line": 72,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "OddsMovementAlerts.tsx",
+      "description": "Text component without accessibility props",
+      "line": 73,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "OddsMovementAlerts.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 64,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "OfflineAwareView.tsx",
+      "description": "View component without accessibility props",
+      "line": 118,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "OfflineAwareView.tsx",
+      "description": "Text component without accessibility props",
+      "line": 140,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "OptimizedCardView.tsx",
+      "description": "View component without accessibility props",
+      "line": 78,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "OptimizedCardView.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 73,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PageTransition.tsx",
+      "description": "View component without accessibility props",
+      "line": 47,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ParallaxScrollView.tsx",
+      "description": "View component without accessibility props",
+      "line": 48,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ParlayCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 112,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ParlayCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 114,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ParlayCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 207,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ParlayIntegration.tsx",
+      "description": "View component without accessibility props",
+      "line": 180,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ParlayIntegration.tsx",
+      "description": "Text component without accessibility props",
+      "line": 176,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ParlayIntegration.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 163,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ParlayOddsCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 89,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ParlayOddsCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 100,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ParlayOddsCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 139,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PendingQuestionItem.tsx",
+      "description": "View component without accessibility props",
+      "line": 107,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PendingQuestionItem.tsx",
+      "description": "Text component without accessibility props",
+      "line": 115,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PendingQuestionItem.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 133,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PersonalizationSettings.tsx",
+      "description": "View component without accessibility props",
+      "line": 97,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PersonalizationSettings.tsx",
+      "description": "Text component without accessibility props",
+      "line": 98,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PersonalizationSettings.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 113,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PlayerComparisonView.tsx",
+      "description": "View component without accessibility props",
+      "line": 84,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PlayerComparisonView.tsx",
+      "description": "Text component without accessibility props",
+      "line": 86,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PlayerComparisonView.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 103,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PlayerPlusMinusCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 48,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PlayerPlusMinusCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 49,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PlayerPlusMinusCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 43,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PlayerPlusMinusList.tsx",
+      "description": "View component without accessibility props",
+      "line": 70,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PlayerPlusMinusList.tsx",
+      "description": "Text component without accessibility props",
+      "line": 71,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PropBetCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 87,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PropBetCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 88,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PropBetList.tsx",
+      "description": "View component without accessibility props",
+      "line": 108,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PropBetList.tsx",
+      "description": "Text component without accessibility props",
+      "line": 110,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PropBetList.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 180,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralBadge.tsx",
+      "description": "View component without accessibility props",
+      "line": 104,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralBadge.tsx",
+      "description": "Text component without accessibility props",
+      "line": 114,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralBadge.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 106,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralLeaderboard.tsx",
+      "description": "View component without accessibility props",
+      "line": 92,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralLeaderboard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 119,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralLeaderboard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 221,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralMilestoneProgress.tsx",
+      "description": "View component without accessibility props",
+      "line": 164,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralMilestoneProgress.tsx",
+      "description": "Text component without accessibility props",
+      "line": 180,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralMilestoneProgress.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 171,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralNotification.tsx",
+      "description": "View component without accessibility props",
+      "line": 126,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralNotification.tsx",
+      "description": "Text component without accessibility props",
+      "line": 155,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralNotification.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 139,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralNotificationList.tsx",
+      "description": "View component without accessibility props",
+      "line": 131,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralNotificationList.tsx",
+      "description": "Text component without accessibility props",
+      "line": 142,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralNotificationList.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 124,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralPrivacySettings.tsx",
+      "description": "View component without accessibility props",
+      "line": 92,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralPrivacySettings.tsx",
+      "description": "Text component without accessibility props",
+      "line": 95,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralPrivacySettings.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 99,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralProgramCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 100,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralProgramCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 112,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralProgramCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 106,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralRewards.tsx",
+      "description": "View component without accessibility props",
+      "line": 72,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralRewards.tsx",
+      "description": "Text component without accessibility props",
+      "line": 68,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralRewards.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 138,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ReferralShareOptions.tsx",
+      "description": "View component without accessibility props",
+      "line": 137,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ReferralShareOptions.tsx",
+      "description": "Text component without accessibility props",
+      "line": 140,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ReferralShareOptions.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 144,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ResponsiveGameInfo.tsx",
+      "description": "View component without accessibility props",
+      "line": 41,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ResponsiveGameInfo.tsx",
+      "description": "Text component without accessibility props",
+      "line": 42,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ResponsiveImage.tsx",
+      "description": "View component without accessibility props",
+      "line": 56,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "ResponsiveImage.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 13,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ResponsiveLayout.tsx",
+      "description": "View component without accessibility props",
+      "line": 7,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ResponsiveLayout.tsx",
+      "description": "Text component without accessibility props",
+      "line": 210,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ResponsiveSportIcon.tsx",
+      "description": "View component without accessibility props",
+      "line": 11,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "RichNotification.tsx",
+      "description": "View component without accessibility props",
+      "line": 234,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "RichNotification.tsx",
+      "description": "Text component without accessibility props",
+      "line": 242,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "RichNotification.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 247,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "RichNotification.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 264,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "RoundBettingCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 52,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "RoundBettingCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 63,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "RoundBettingCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 91,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SEOMetadata.tsx",
+      "description": "View component without accessibility props",
+      "line": 14,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "TabTransition.tsx",
+      "description": "View component without accessibility props",
+      "line": 19,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "TaxSummary.jsx",
+      "description": "View component without accessibility props",
+      "line": 28,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "TaxSummary.jsx",
+      "description": "Text component without accessibility props",
+      "line": 29,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ThemeToggle.tsx",
+      "description": "Text component without accessibility props",
+      "line": 10,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ThemeToggle.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 9,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ThemeVerifier.js",
+      "description": "View component without accessibility props",
+      "line": 80,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ThemeVerifier.js",
+      "description": "Text component without accessibility props",
+      "line": 81,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ThemeVerifier.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 106,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ThemedComponents.tsx",
+      "description": "View component without accessibility props",
+      "line": 36,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ThemedComponents.tsx",
+      "description": "Text component without accessibility props",
+      "line": 24,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ThemedComponents.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 135,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ThemedText.tsx",
+      "description": "Text component without accessibility props",
+      "line": 140,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ThemedView.tsx",
+      "description": "View component without accessibility props",
+      "line": 39,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "Toast.tsx",
+      "description": "View component without accessibility props",
+      "line": 109,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "Toast.tsx",
+      "description": "Text component without accessibility props",
+      "line": 110,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "TrendingBets.tsx",
+      "description": "View component without accessibility props",
+      "line": 52,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "TrendingBets.tsx",
+      "description": "Text component without accessibility props",
+      "line": 60,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "TrendingBets.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 114,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "UIThemeProvider.tsx",
+      "description": "View component without accessibility props",
+      "line": 52,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "USOnlyPaymentForm.jsx",
+      "description": "View component without accessibility props",
+      "line": 151,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "USOnlyPaymentForm.jsx",
+      "description": "Text component without accessibility props",
+      "line": 152,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "UpgradePrompt.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 392,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ViewLimitIndicator.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 77,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ThemedText-test.tsx",
+      "description": "Text component without accessibility props",
+      "line": 7,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ModelPerformance.tsx",
+      "description": "Text component without accessibility props",
+      "line": 69,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PredictionsTable.tsx",
+      "description": "Text component without accessibility props",
+      "line": 67,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ValueBetsCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 55,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ValueBetsCard.tsx",
+      "description": "Text component without accessibility props",
+      "line": 56,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ValueBetsCard.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 97,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SearchBar.tsx",
+      "description": "View component without accessibility props",
+      "line": 96,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SearchBar.tsx",
+      "description": "Text component without accessibility props",
+      "line": 37,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SearchBar.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 86,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SearchResults.tsx",
+      "description": "View component without accessibility props",
+      "line": 70,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SearchResults.tsx",
+      "description": "Text component without accessibility props",
+      "line": 71,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SearchResults.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 59,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "SearchResults.tsx",
+      "description": "Image without accessibilityLabel",
+      "line": 64,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "IconSymbol.ios.tsx",
+      "description": "View component without accessibility props",
+      "line": 14,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "IconSymbol.tsx",
+      "description": "View component without accessibility props",
+      "line": 39,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NeonButton.tsx",
+      "description": "View component without accessibility props",
+      "line": 26,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NeonButton.tsx",
+      "description": "Text component without accessibility props",
+      "line": 27,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "NeonButton.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 202,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NeonCard.tsx",
+      "description": "View component without accessibility props",
+      "line": 27,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "NeonContainer.tsx",
+      "description": "View component without accessibility props",
+      "line": 17,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "NeonText.tsx",
+      "description": "Text component without accessibility props",
+      "line": 11,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ResponsiveText.tsx",
+      "description": "Text component without accessibility props",
+      "line": 146,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ThemedView.tsx",
+      "description": "View component without accessibility props",
+      "line": 45,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LanguageSelector.tsx",
+      "description": "View component without accessibility props",
+      "line": 93,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LanguageSelector.tsx",
+      "description": "Text component without accessibility props",
+      "line": 76,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LanguageSelector.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 67,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "PrivacySettingsScreen.tsx",
+      "description": "View component without accessibility props",
+      "line": 211,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "PrivacySettingsScreen.tsx",
+      "description": "Text component without accessibility props",
+      "line": 213,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "PrivacySettingsScreen.tsx",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 288,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "StripeProvider.tsx",
+      "description": "View component without accessibility props",
+      "line": 65,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "StripeProvider.tsx",
+      "description": "Text component without accessibility props",
+      "line": 66,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "BettingPage.js",
+      "description": "View component without accessibility props",
+      "line": 146,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "BettingPage.js",
+      "description": "Text component without accessibility props",
+      "line": 108,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "BettingPage.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 255,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "BettingPage.js",
+      "description": "Image without accessibilityLabel",
+      "line": 106,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ForgotPasswordPage.js",
+      "description": "View component without accessibility props",
+      "line": 69,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ForgotPasswordPage.js",
+      "description": "Text component without accessibility props",
+      "line": 47,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ForgotPasswordPage.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 68,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "ForgotPasswordPage.js",
+      "description": "Image without accessibilityLabel",
+      "line": 88,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "HomePage.js",
+      "description": "View component without accessibility props",
+      "line": 61,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "HomePage.js",
+      "description": "Text component without accessibility props",
+      "line": 48,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "HomePage.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 83,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "HomePage.js",
+      "description": "Image without accessibilityLabel",
+      "line": 68,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "LoginScreen.js",
+      "description": "View component without accessibility props",
+      "line": 88,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "LoginScreen.js",
+      "description": "Text component without accessibility props",
+      "line": 60,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "LoginScreen.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 71,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "ProfilePage.js",
+      "description": "View component without accessibility props",
+      "line": 128,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "ProfilePage.js",
+      "description": "Text component without accessibility props",
+      "line": 84,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "ProfilePage.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 168,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "ProfilePage.js",
+      "description": "Image without accessibilityLabel",
+      "line": 83,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SettingsPage.js",
+      "description": "View component without accessibility props",
+      "line": 160,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SettingsPage.js",
+      "description": "Text component without accessibility props",
+      "line": 63,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SettingsPage.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 121,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "SignupPage.js",
+      "description": "View component without accessibility props",
+      "line": 104,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    },
+    {
+      "type": "textAccessibility",
+      "component": "SignupPage.js",
+      "description": "Text component without accessibility props",
+      "line": 62,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleThemedText or add accessibilityLabel"
+    },
+    {
+      "type": "touchableAccessibility",
+      "component": "SignupPage.js",
+      "description": "TouchableOpacity without accessibility props",
+      "line": 103,
+      "severity": "high",
+      "suggestion": "Replace with AccessibleTouchableOpacity or add accessibilityRole and accessibilityLabel"
+    },
+    {
+      "type": "imageAccessibility",
+      "component": "SignupPage.js",
+      "description": "Image without accessibilityLabel",
+      "line": 123,
+      "severity": "high",
+      "suggestion": "Add accessibilityLabel to describe the image"
+    },
+    {
+      "type": "accessibilityProps",
+      "component": "MainLayout.js",
+      "description": "View component without accessibility props",
+      "line": 46,
+      "severity": "medium",
+      "suggestion": "Replace with AccessibleThemedView or add accessibilityLabel"
+    }
+  ],
+  "timestamp": "2025-05-21T19:08:11.569Z"
+}

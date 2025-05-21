@@ -30,6 +30,7 @@
    - ✅ Updated `screens/LoginScreen.tsx` with accessible components
    - ✅ Updated `screens/ParlayScreen.tsx` with accessible components
    - ✅ Verified `screens/SettingsScreen.tsx` already has accessible components
+   - ✅ Updated `screens/PersonalizedHomeScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -147,6 +148,9 @@
      - ✅ OddsComparisonScreen.tsx
      - ✅ BettingAnalyticsScreen.tsx
      - ✅ ParlayScreen.tsx
+     - ✅ PersonalizedHomeScreen.tsx
+     - ✅ UFCScreen.tsx
+     - ⬜ BettingSlipImportScreen.tsx
      - ⬜ Focus on remaining screens with complex interactions and forms
 
 2. **Testing**

@@ -1,0 +1,14 @@
+feat(accessibility): Enhance LoginScreen with accessible components
+
+- Replaced Text components with AccessibleThemedText with proper semantic types
+- Replaced View components with AccessibleThemedView
+- Replaced Button components with AccessibleTouchableOpacity
+- Added proper heading hierarchy with screen title as h1
+- Added appropriate accessibility labels, roles, and hints for all elements
+- Enhanced TextInput components with proper accessibility attributes
+- Improved screen reader experience for form fields and buttons
+- Fixed TypeScript errors related to Firebase auth
+- Maintained existing functionality while improving accessibility
+- Ensured proper focus management for the authentication flow
+
+This commit is part of the ongoing accessibility implementation initiative to make the app more accessible to users with disabilities.

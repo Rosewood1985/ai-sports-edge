@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import {
-  View,
-  Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   Image,
   RefreshControl,
   ActivityIndicator,
   Alert,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { Container, Grid } from '../components/ResponsiveLayout';
 import { DeviceType, getDeviceType, responsiveSpacing } from '../utils/responsiveUtils';
@@ -19,13 +16,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { UFCEvent, UFCFighter, UFCFight } from '../types/ufc';
 import { ufcService } from '../services/ufcService';
-import { trackScreenView } from '../services/analyticsService';
+// import { analyticsService } from '../services/analyticsService';
 import LoadingIndicator from '../components/LoadingIndicator';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../config/firebase';
+// Cast auth to any to avoid type errors
+const firebaseAuth = auth as any;
 import { rewardsService } from '../services/rewardsService';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 // Key for storing favorite fighters
 const FAVORITE_FIGHTERS_KEY = 'favorite_fighters';
@@ -48,14 +50,15 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
 
   // Track screen view
   useEffect(() => {
-    trackScreenView('UFCScreen');
+    // trackScreenView('UFCScreen');
+    console.log('UFCScreen viewed');
   }, []);
 
   // Load favorite fighters
   useEffect(() => {
     const loadFavoriteFighters = async () => {
       try {
-        const userId = auth.currentUser?.uid;
+        const userId = firebaseAuth.currentUser?.uid;
         if (!userId) return;
 
         const key = `${FAVORITE_FIGHTERS_KEY}_${userId}`;
@@ -74,7 +77,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
   // Save favorite fighters
   const saveFavoriteFighters = async (favorites: string[]) => {
     try {
-      const userId = auth.currentUser?.uid;
+      const userId = firebaseAuth.currentUser?.uid;
       if (!userId) return;
 
       const key = `${FAVORITE_FIGHTERS_KEY}_${userId}`;
@@ -87,7 +90,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
   // Toggle favorite fighter
   const toggleFavoriteFighter = async (fighterId: string) => {
     try {
-      const userId = auth.currentUser?.uid;
+      const userId = firebaseAuth.currentUser?.uid;
       if (!userId) {
         Alert.alert('Sign In Required', 'Please sign in to favorite fighters');
         return;
@@ -98,7 +101,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
         newFavorites = favoriteFighters.filter(id => id !== fighterId);
       } else {
         newFavorites = [...favoriteFighters, fighterId];
-        
+
         // Record UFC bet for rewards if this is the first time favoriting a fighter
         if (favoriteFighters.length === 0) {
           try {
@@ -122,7 +125,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
       setError(null);
       const upcomingEvents = await ufcService.fetchUpcomingEvents();
       setEvents(upcomingEvents);
-      
+
       // Select the first event by default
       if (upcomingEvents.length > 0 && !selectedEvent) {
         setSelectedEvent(upcomingEvents[0]);
@@ -149,14 +152,8 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
   };
 
   // Render event item
-  const renderEventItem = ({
-    item,
-    width = 220
-  }: {
-    item: UFCEvent;
-    width?: number;
-  }) => (
-    <TouchableOpacity
+  const renderEventItem = ({ item, width = 220 }: { item: UFCEvent; width?: number }) => (
+    <AccessibleTouchableOpacity
       style={[
         styles.eventItem,
         {
@@ -166,17 +163,33 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
         },
       ]}
       onPress={() => setSelectedEvent(item)}
+      accessibilityLabel={`UFC event: ${item.name}`}
+      accessibilityRole="button"
+      accessibilityHint="Select this UFC event to view details"
+      accessibilityState={{ selected: selectedEvent?.id === item.id }}
     >
-      <Text style={[styles.eventName, { color: colors.text }]}>
+      <AccessibleThemedText
+        style={[styles.eventName, { color: colors.text }]}
+        type="h3"
+        accessibilityLabel={`Event name: ${item.name}`}
+      >
         {item.name}
-      </Text>
-      <Text style={[styles.eventDate, { color: colors.text }]}>
+      </AccessibleThemedText>
+      <AccessibleThemedText
+        style={[styles.eventDate, { color: colors.text }]}
+        accessibilityLabel={`Event date: ${new Date(item.date).toLocaleDateString()} at ${
+          item.time
+        }`}
+      >
         {new Date(item.date).toLocaleDateString()} • {item.time}
-      </Text>
-      <Text style={[styles.eventVenue, { color: isDark ? '#BBBBBB' : '#666666' }]}>
+      </AccessibleThemedText>
+      <AccessibleThemedText
+        style={[styles.eventVenue, { color: isDark ? '#BBBBBB' : '#666666' }]}
+        accessibilityLabel={`Event location: ${item.venue}, ${item.location}`}
+      >
         {item.venue}, {item.location}
-      </Text>
-    </TouchableOpacity>
+      </AccessibleThemedText>
+    </AccessibleTouchableOpacity>
   );
 
   // Navigate to fight detail screen
@@ -189,12 +202,19 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
     if (!fights || fights.length === 0) return null;
 
     return (
-      <View style={styles.fightCardContainer}>
-        <Text style={[styles.fightCardTitle, { color: colors.text }]}>
+      <AccessibleThemedView
+        style={styles.fightCardContainer}
+        accessibilityLabel={`${title} section`}
+      >
+        <AccessibleThemedText
+          style={[styles.fightCardTitle, { color: colors.text }]}
+          type="h2"
+          accessibilityLabel={title}
+        >
           {title}
-        </Text>
+        </AccessibleThemedText>
         {fights.map((fight, index) => (
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             key={fight.id || index}
             style={[
               styles.fightItem,
@@ -204,331 +224,478 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
               },
             ]}
             onPress={() => navigateToFightDetail(fight)}
+            accessibilityLabel={`Fight: ${fight.fighter1.name} versus ${fight.fighter2.name}`}
+            accessibilityRole="button"
+            accessibilityHint="View fight details"
           >
-            <View style={[
-              styles.fighterContainer,
-              { backgroundColor: isDark ? '#1A1A1A' : '#F8F8F8', borderRadius: 8 }
-            ]}>
-              <TouchableOpacity
+            <AccessibleThemedView
+              style={[
+                styles.fighterContainer,
+                { backgroundColor: isDark ? '#1A1A1A' : '#F8F8F8', borderRadius: 8 },
+              ]}
+              accessibilityLabel={`Fighter: ${fight.fighter1.name}`}
+            >
+              <AccessibleTouchableOpacity
                 style={[
                   styles.favoriteButton,
                   {
                     backgroundColor: favoriteFighters.includes(fight.fighter1.id)
                       ? 'rgba(255, 215, 0, 0.2)'
                       : 'transparent',
-                    borderRadius: 20
-                  }
+                    borderRadius: 20,
+                  },
                 ]}
                 onPress={() => toggleFavoriteFighter(fight.fighter1.id)}
+                accessibilityLabel={
+                  favoriteFighters.includes(fight.fighter1.id)
+                    ? `Remove ${fight.fighter1.name} from favorites`
+                    : `Add ${fight.fighter1.name} to favorites`
+                }
+                accessibilityRole="button"
+                accessibilityState={{ selected: favoriteFighters.includes(fight.fighter1.id) }}
               >
                 <Ionicons
                   name={favoriteFighters.includes(fight.fighter1.id) ? 'star' : 'star-outline'}
                   size={22}
                   color={favoriteFighters.includes(fight.fighter1.id) ? '#FFD700' : colors.primary}
-                />
-              </TouchableOpacity>
-              <View style={styles.fighterInfo}>
-                <Text style={[
-                  styles.fighterName,
-                  {
-                    color: colors.text,
-                    fontSize: 17,
-                    letterSpacing: 0.3
+                  accessibilityLabel={
+                    favoriteFighters.includes(fight.fighter1.id) ? 'Favorite' : 'Not favorite'
                   }
-                ]}>
+                />
+              </AccessibleTouchableOpacity>
+              <AccessibleThemedView
+                style={styles.fighterInfo}
+                accessibilityLabel="Fighter information"
+              >
+                <AccessibleThemedText
+                  style={[
+                    styles.fighterName,
+                    {
+                      color: colors.text,
+                      fontSize: 17,
+                      letterSpacing: 0.3,
+                    },
+                  ]}
+                  accessibilityLabel={`Name: ${fight.fighter1.name}`}
+                >
                   {fight.fighter1.name}
-                </Text>
+                </AccessibleThemedText>
                 {fight.fighter1.nickname && (
-                  <Text style={[
-                    styles.fighterNickname,
-                    {
-                      color: isDark ? '#D0D0D0' : '#505050',
-                      fontSize: 13
-                    }
-                  ]}>
+                  <AccessibleThemedText
+                    style={[
+                      styles.fighterNickname,
+                      {
+                        color: isDark ? '#D0D0D0' : '#505050',
+                        fontSize: 13,
+                      },
+                    ]}
+                    accessibilityLabel={`Nickname: ${fight.fighter1.nickname}`}
+                  >
                     "{fight.fighter1.nickname}"
-                  </Text>
+                  </AccessibleThemedText>
                 )}
-                <View style={styles.recordContainer}>
-                  <Text style={[
-                    styles.fighterRecord,
-                    {
-                      color: isDark ? '#FFFFFF' : '#000000',
-                      fontWeight: '600',
-                      backgroundColor: isDark ? 'rgba(52, 152, 219, 0.2)' : 'rgba(52, 152, 219, 0.1)',
-                      paddingHorizontal: 8,
-                      paddingVertical: 2,
-                      borderRadius: 4
-                    }
-                  ]}>
+                <AccessibleThemedView
+                  style={styles.recordContainer}
+                  accessibilityLabel="Fighter record"
+                >
+                  <AccessibleThemedText
+                    style={[
+                      styles.fighterRecord,
+                      {
+                        color: isDark ? '#FFFFFF' : '#000000',
+                        fontWeight: '600',
+                        backgroundColor: isDark
+                          ? 'rgba(52, 152, 219, 0.2)'
+                          : 'rgba(52, 152, 219, 0.1)',
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        borderRadius: 4,
+                      },
+                    ]}
+                    accessibilityLabel={`Record: ${fight.fighter1.record}`}
+                  >
                     {fight.fighter1.record}
-                  </Text>
-                </View>
-              </View>
-              <View style={[
-                styles.fighterImageContainer,
-                {
-                  borderWidth: 2,
-                  borderColor: isDark ? '#333333' : '#DDDDDD'
-                }
-              ]}>
+                  </AccessibleThemedText>
+                </AccessibleThemedView>
+              </AccessibleThemedView>
+              <AccessibleThemedView
+                style={[
+                  styles.fighterImageContainer,
+                  {
+                    borderWidth: 2,
+                    borderColor: isDark ? '#333333' : '#DDDDDD',
+                  },
+                ]}
+                accessibilityLabel="Fighter image"
+              >
                 {fight.fighter1.imageUrl ? (
                   <Image
                     source={{ uri: fight.fighter1.imageUrl }}
                     style={styles.fighterImage}
+                    accessibilityLabel={`Photo of ${fight.fighter1.name}`}
                   />
                 ) : (
-                  <View style={[
-                    styles.defaultFighterImage,
-                    {
-                      backgroundColor: isDark ? '#2C2C2C' : '#E8E8E8',
-                      borderWidth: 1,
-                      borderColor: isDark ? '#444444' : '#CCCCCC'
-                    }
-                  ]}>
-                    <Ionicons name="person" size={24} color={isDark ? '#888888' : '#666666'} />
-                    <Text style={[
-                      styles.defaultFighterInitial,
+                  <AccessibleThemedView
+                    style={[
+                      styles.defaultFighterImage,
                       {
-                        color: isDark ? '#FFFFFF' : '#333333',
-                        fontWeight: '700'
-                      }
-                    ]}>
+                        backgroundColor: isDark ? '#2C2C2C' : '#E8E8E8',
+                        borderWidth: 1,
+                        borderColor: isDark ? '#444444' : '#CCCCCC',
+                      },
+                    ]}
+                    accessibilityLabel={`Default image for ${fight.fighter1.name}`}
+                  >
+                    <Ionicons
+                      name="person"
+                      size={24}
+                      color={isDark ? '#888888' : '#666666'}
+                      accessibilityLabel="Person icon"
+                    />
+                    <AccessibleThemedText
+                      style={[
+                        styles.defaultFighterInitial,
+                        {
+                          color: isDark ? '#FFFFFF' : '#333333',
+                          fontWeight: '700',
+                        },
+                      ]}
+                      accessibilityLabel={`Initial: ${fight.fighter1.name.charAt(0)}`}
+                    >
                       {fight.fighter1.name.charAt(0)}
-                    </Text>
-                  </View>
+                    </AccessibleThemedText>
+                  </AccessibleThemedView>
                 )}
-              </View>
-            </View>
+              </AccessibleThemedView>
+            </AccessibleThemedView>
 
-            <View style={[
-              styles.vsContainer,
-              {
-                backgroundColor: isDark ? 'rgba(52, 152, 219, 0.1)' : 'rgba(52, 152, 219, 0.05)',
-                borderRadius: 8,
-                padding: 12,
-                marginVertical: 12
-              }
-            ]}>
-              <Text style={[
-                styles.vsText,
+            <AccessibleThemedView
+              style={[
+                styles.vsContainer,
                 {
-                  color: colors.primary,
-                  fontSize: 20,
-                  fontWeight: '800',
-                  letterSpacing: 1,
-                  textShadowColor: 'rgba(52, 152, 219, 0.3)',
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 2
-                }
-              ]}>VS</Text>
-              <View style={styles.fightDetails}>
-                <View style={[
-                  styles.weightClassContainer,
+                  backgroundColor: isDark ? 'rgba(52, 152, 219, 0.1)' : 'rgba(52, 152, 219, 0.05)',
+                  borderRadius: 8,
+                  padding: 12,
+                  marginVertical: 12,
+                },
+              ]}
+              accessibilityLabel="Versus section"
+            >
+              <AccessibleThemedText
+                style={[
+                  styles.vsText,
                   {
-                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-                    borderRadius: 4,
-                    paddingHorizontal: 10,
-                    paddingVertical: 3,
-                    marginTop: 8
-                  }
-                ]}>
-                  <Text style={[
-                    styles.weightClass,
+                    color: colors.primary,
+                    fontSize: 20,
+                    fontWeight: '800',
+                    letterSpacing: 1,
+                    textShadowColor: 'rgba(52, 152, 219, 0.3)',
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 2,
+                  },
+                ]}
+                accessibilityLabel="Versus"
+              >
+                VS
+              </AccessibleThemedText>
+              <AccessibleThemedView style={styles.fightDetails} accessibilityLabel="Fight details">
+                <AccessibleThemedView
+                  style={[
+                    styles.weightClassContainer,
                     {
-                      color: isDark ? '#E0E0E0' : '#333333',
-                      fontWeight: '600',
-                      fontSize: 14
-                    }
-                  ]}>
-                    {fight.weightClass}
-                  </Text>
-                </View>
-                {fight.isTitleFight && (
-                  <View style={[
-                    styles.titleFightBadge,
-                    {
-                      backgroundColor: isDark ? '#D4AF37' : '#FFD700',
-                      borderWidth: 1,
-                      borderColor: isDark ? '#B8860B' : '#DAA520',
-                      marginTop: 8,
-                      paddingHorizontal: 10,
-                      paddingVertical: 4,
+                      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
                       borderRadius: 4,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 1 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 1,
-                      elevation: 2
-                    }
-                  ]}>
-                    <Text style={[
-                      styles.titleFightText,
+                      paddingHorizontal: 10,
+                      paddingVertical: 3,
+                      marginTop: 8,
+                    },
+                  ]}
+                  accessibilityLabel="Weight class"
+                >
+                  <AccessibleThemedText
+                    style={[
+                      styles.weightClass,
                       {
-                        color: '#000000',
-                        fontSize: 12,
-                        fontWeight: '800',
-                        letterSpacing: 0.5
-                      }
-                    ]}>TITLE FIGHT</Text>
-                  </View>
+                        color: isDark ? '#E0E0E0' : '#333333',
+                        fontWeight: '600',
+                        fontSize: 14,
+                      },
+                    ]}
+                    accessibilityLabel={`Weight class: ${fight.weightClass}`}
+                  >
+                    {fight.weightClass}
+                  </AccessibleThemedText>
+                </AccessibleThemedView>
+                {fight.isTitleFight && (
+                  <AccessibleThemedView
+                    style={[
+                      styles.titleFightBadge,
+                      {
+                        backgroundColor: isDark ? '#D4AF37' : '#FFD700',
+                        borderWidth: 1,
+                        borderColor: isDark ? '#B8860B' : '#DAA520',
+                        marginTop: 8,
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 4,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1,
+                        elevation: 2,
+                      },
+                    ]}
+                    accessibilityLabel="Title fight badge"
+                  >
+                    <AccessibleThemedText
+                      style={[
+                        styles.titleFightText,
+                        {
+                          color: '#000000',
+                          fontSize: 12,
+                          fontWeight: '800',
+                          letterSpacing: 0.5,
+                        },
+                      ]}
+                      accessibilityLabel="Title fight"
+                    >
+                      TITLE FIGHT
+                    </AccessibleThemedText>
+                  </AccessibleThemedView>
                 )}
-              </View>
-            </View>
+              </AccessibleThemedView>
+            </AccessibleThemedView>
 
-            <View style={[
-              styles.fighterContainer,
-              { backgroundColor: isDark ? '#1A1A1A' : '#F8F8F8', borderRadius: 8 }
-            ]}>
-              <TouchableOpacity
+            <AccessibleThemedView
+              style={[
+                styles.fighterContainer,
+                { backgroundColor: isDark ? '#1A1A1A' : '#F8F8F8', borderRadius: 8 },
+              ]}
+              accessibilityLabel={`Fighter: ${fight.fighter2.name}`}
+            >
+              <AccessibleTouchableOpacity
                 style={[
                   styles.favoriteButton,
                   {
                     backgroundColor: favoriteFighters.includes(fight.fighter2.id)
                       ? 'rgba(255, 215, 0, 0.2)'
                       : 'transparent',
-                    borderRadius: 20
-                  }
+                    borderRadius: 20,
+                  },
                 ]}
                 onPress={() => toggleFavoriteFighter(fight.fighter2.id)}
+                accessibilityLabel={
+                  favoriteFighters.includes(fight.fighter2.id)
+                    ? `Remove ${fight.fighter2.name} from favorites`
+                    : `Add ${fight.fighter2.name} to favorites`
+                }
+                accessibilityRole="button"
+                accessibilityState={{ selected: favoriteFighters.includes(fight.fighter2.id) }}
               >
                 <Ionicons
                   name={favoriteFighters.includes(fight.fighter2.id) ? 'star' : 'star-outline'}
                   size={22}
                   color={favoriteFighters.includes(fight.fighter2.id) ? '#FFD700' : colors.primary}
-                />
-              </TouchableOpacity>
-              <View style={styles.fighterInfo}>
-                <Text style={[
-                  styles.fighterName,
-                  {
-                    color: colors.text,
-                    fontSize: 17,
-                    letterSpacing: 0.3
+                  accessibilityLabel={
+                    favoriteFighters.includes(fight.fighter2.id) ? 'Favorite' : 'Not favorite'
                   }
-                ]}>
+                />
+              </AccessibleTouchableOpacity>
+              <AccessibleThemedView
+                style={styles.fighterInfo}
+                accessibilityLabel="Fighter information"
+              >
+                <AccessibleThemedText
+                  style={[
+                    styles.fighterName,
+                    {
+                      color: colors.text,
+                      fontSize: 17,
+                      letterSpacing: 0.3,
+                    },
+                  ]}
+                  accessibilityLabel={`Name: ${fight.fighter2.name}`}
+                >
                   {fight.fighter2.name}
-                </Text>
+                </AccessibleThemedText>
                 {fight.fighter2.nickname && (
-                  <Text style={[
-                    styles.fighterNickname,
-                    {
-                      color: isDark ? '#D0D0D0' : '#505050',
-                      fontSize: 13
-                    }
-                  ]}>
+                  <AccessibleThemedText
+                    style={[
+                      styles.fighterNickname,
+                      {
+                        color: isDark ? '#D0D0D0' : '#505050',
+                        fontSize: 13,
+                      },
+                    ]}
+                    accessibilityLabel={`Nickname: ${fight.fighter2.nickname}`}
+                  >
                     "{fight.fighter2.nickname}"
-                  </Text>
+                  </AccessibleThemedText>
                 )}
-                <View style={styles.recordContainer}>
-                  <Text style={[
-                    styles.fighterRecord,
-                    {
-                      color: isDark ? '#FFFFFF' : '#000000',
-                      fontWeight: '600',
-                      backgroundColor: isDark ? 'rgba(52, 152, 219, 0.2)' : 'rgba(52, 152, 219, 0.1)',
-                      paddingHorizontal: 8,
-                      paddingVertical: 2,
-                      borderRadius: 4
-                    }
-                  ]}>
+                <AccessibleThemedView
+                  style={styles.recordContainer}
+                  accessibilityLabel="Fighter record"
+                >
+                  <AccessibleThemedText
+                    style={[
+                      styles.fighterRecord,
+                      {
+                        color: isDark ? '#FFFFFF' : '#000000',
+                        fontWeight: '600',
+                        backgroundColor: isDark
+                          ? 'rgba(52, 152, 219, 0.2)'
+                          : 'rgba(52, 152, 219, 0.1)',
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        borderRadius: 4,
+                      },
+                    ]}
+                    accessibilityLabel={`Record: ${fight.fighter2.record}`}
+                  >
                     {fight.fighter2.record}
-                  </Text>
-                </View>
-              </View>
-              <View style={[
-                styles.fighterImageContainer,
-                {
-                  borderWidth: 2,
-                  borderColor: isDark ? '#333333' : '#DDDDDD'
-                }
-              ]}>
+                  </AccessibleThemedText>
+                </AccessibleThemedView>
+              </AccessibleThemedView>
+              <AccessibleThemedView
+                style={[
+                  styles.fighterImageContainer,
+                  {
+                    borderWidth: 2,
+                    borderColor: isDark ? '#333333' : '#DDDDDD',
+                  },
+                ]}
+                accessibilityLabel="Fighter image"
+              >
                 {fight.fighter2.imageUrl ? (
                   <Image
                     source={{ uri: fight.fighter2.imageUrl }}
                     style={styles.fighterImage}
+                    accessibilityLabel={`Photo of ${fight.fighter2.name}`}
                   />
                 ) : (
-                  <View style={[
-                    styles.defaultFighterImage,
-                    {
-                      backgroundColor: isDark ? '#2C2C2C' : '#E8E8E8',
-                      borderWidth: 1,
-                      borderColor: isDark ? '#444444' : '#CCCCCC'
-                    }
-                  ]}>
-                    <Ionicons name="person" size={24} color={isDark ? '#888888' : '#666666'} />
-                    <Text style={[
-                      styles.defaultFighterInitial,
+                  <AccessibleThemedView
+                    style={[
+                      styles.defaultFighterImage,
                       {
-                        color: isDark ? '#FFFFFF' : '#333333',
-                        fontWeight: '700'
-                      }
-                    ]}>
+                        backgroundColor: isDark ? '#2C2C2C' : '#E8E8E8',
+                        borderWidth: 1,
+                        borderColor: isDark ? '#444444' : '#CCCCCC',
+                      },
+                    ]}
+                    accessibilityLabel={`Default image for ${fight.fighter2.name}`}
+                  >
+                    <Ionicons
+                      name="person"
+                      size={24}
+                      color={isDark ? '#888888' : '#666666'}
+                      accessibilityLabel="Person icon"
+                    />
+                    <AccessibleThemedText
+                      style={[
+                        styles.defaultFighterInitial,
+                        {
+                          color: isDark ? '#FFFFFF' : '#333333',
+                          fontWeight: '700',
+                        },
+                      ]}
+                      accessibilityLabel={`Initial: ${fight.fighter2.name.charAt(0)}`}
+                    >
                       {fight.fighter2.name.charAt(0)}
-                    </Text>
-                  </View>
+                    </AccessibleThemedText>
+                  </AccessibleThemedView>
                 )}
-              </View>
-            </View>
-          </TouchableOpacity>
+              </AccessibleThemedView>
+            </AccessibleThemedView>
+          </AccessibleTouchableOpacity>
         ))}
-        </View>
+      </AccessibleThemedView>
     );
   };
 
   // Render loading state
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <AccessibleThemedView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        accessibilityLabel="Loading UFC events"
+      >
         <LoadingIndicator message="Loading UFC events..." />
-      </View>
+      </AccessibleThemedView>
     );
   }
 
   // Render error state
   if (error) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.errorContainer}>
+      <AccessibleThemedView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        accessibilityLabel="Error loading UFC events"
+      >
+        <AccessibleThemedView style={styles.errorContainer} accessibilityLabel="Error message">
           <ErrorMessage message={error} />
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             style={[styles.retryButton, { backgroundColor: colors.primary }]}
             onPress={handleRefresh}
+            accessibilityLabel="Retry loading UFC events"
+            accessibilityRole="button"
+            accessibilityHint="Attempts to reload UFC events data"
           >
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <AccessibleThemedText style={styles.retryButtonText}>Retry</AccessibleThemedText>
+          </AccessibleTouchableOpacity>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
     );
   }
 
   // Render empty state
   if (events.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.emptyStateContainer}>
-          <Ionicons name="calendar-outline" size={64} color={colors.primary} />
-          <Text style={[styles.emptyStateTitle, { color: colors.text }]}>
+      <AccessibleThemedView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        accessibilityLabel="No UFC events available"
+      >
+        <AccessibleThemedView
+          style={styles.emptyStateContainer}
+          accessibilityLabel="Empty state message"
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={64}
+            color={colors.primary}
+            accessibilityLabel="Calendar icon"
+          />
+          <AccessibleThemedText
+            style={[styles.emptyStateTitle, { color: colors.text }]}
+            type="h2"
+            accessibilityLabel="No UFC Events"
+          >
             No UFC Events
-          </Text>
-          <Text style={[styles.emptyStateMessage, { color: isDark ? '#BBBBBB' : '#666666' }]}>
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={[styles.emptyStateMessage, { color: isDark ? '#BBBBBB' : '#666666' }]}
+            accessibilityLabel="There are no upcoming UFC events at this time"
+          >
             There are no upcoming UFC events at this time.
-          </Text>
-          <TouchableOpacity
+          </AccessibleThemedText>
+          <AccessibleTouchableOpacity
             style={[styles.refreshActionButton, { backgroundColor: colors.primary }]}
             onPress={handleRefresh}
+            accessibilityLabel="Refresh UFC events"
+            accessibilityRole="button"
+            accessibilityHint="Attempts to reload UFC events data"
           >
-            <Text style={styles.refreshActionButtonText}>Refresh</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <AccessibleThemedText style={styles.refreshActionButtonText}>
+              Refresh
+            </AccessibleThemedText>
+          </AccessibleTouchableOpacity>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
     );
   }
 
   // Get device type for responsive layout
   const isTablet = getDeviceType() === DeviceType.TABLET;
-  
+
   // Create responsive styles
   const responsiveStyles = useResponsiveStyles(({ isTablet }) => ({
     eventsList: {
@@ -538,7 +705,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
       width: isTablet ? 280 : 220,
     },
     fightCardsContainer: {
-      flexDirection: isTablet ? 'row' as const : 'column' as const,
+      flexDirection: isTablet ? ('row' as const) : ('column' as const),
     },
     mainCardContainer: {
       flex: isTablet ? 1 : undefined,
@@ -552,84 +719,139 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
 
   return (
     <Container style={{ backgroundColor: colors.background }}>
-      <View style={[
-        styles.backgroundGradient,
-        {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 200,
-          backgroundColor: isDark ? 'rgba(52, 152, 219, 0.1)' : 'rgba(52, 152, 219, 0.05)',
-          borderBottomLeftRadius: 30,
-          borderBottomRightRadius: 30,
-        }
-      ]} />
-      
-      <View style={styles.header}>
-        <Text style={[
-          styles.title,
-          {
-            color: isDark ? '#FFFFFF' : '#333333',
-          }
-        ]}>UFC Events</Text>
-        <TouchableOpacity
+      {/* First child with accessibilityLabel since Container doesn't support it */}
+      <AccessibleThemedView accessibilityLabel="UFC Events Screen" style={{ flex: 1 }}>
+        <AccessibleThemedView
           style={[
-            styles.refreshButton,
+            styles.backgroundGradient,
             {
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(52, 152, 219, 0.1)',
-            }
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 200,
+              backgroundColor: isDark ? 'rgba(52, 152, 219, 0.1)' : 'rgba(52, 152, 219, 0.05)',
+              borderBottomLeftRadius: 30,
+              borderBottomRightRadius: 30,
+            },
           ]}
-          onPress={handleRefresh}
-          disabled={refreshing}
-        >
-          {refreshing ? (
-            <ActivityIndicator size="small" color={colors.primary} />
-          ) : (
-            <Ionicons name="refresh" size={24} color={colors.primary} />
-          )}
-        </TouchableOpacity>
-      </View>
+          accessibilityLabel="Background decoration"
+        />
 
-      {/* Events horizontal list - adaptive width based on device */}
-      <FlatList
-        horizontal
-        data={events}
-        renderItem={({ item }) => renderEventItem({
-          item,
-          width: responsiveStyles.eventItem.width
-        })}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={[styles.eventsList, responsiveStyles.eventsList]}
-        showsHorizontalScrollIndicator={false}
-      />
-
-      {selectedEvent && (
-        <ScrollView style={styles.eventDetailsContainer}>
-          <Text style={[styles.eventDetailsTitle, { color: colors.text }]}>
-            {selectedEvent.name}
-          </Text>
-          <Text style={[styles.eventDetailsDate, { color: colors.text }]}>
-            {new Date(selectedEvent.date).toLocaleDateString()} • {selectedEvent.time}
-          </Text>
-          <Text style={[styles.eventDetailsVenue, { color: isDark ? '#BBBBBB' : '#666666' }]}>
-            {selectedEvent.venue}, {selectedEvent.location}
-          </Text>
-
-          {/* Responsive fight cards layout - row on tablet, column on phone */}
-          <View style={[styles.fightCardsContainer, responsiveStyles.fightCardsContainer]}>
-            <View style={responsiveStyles.mainCardContainer}>
-              {renderFightCard(selectedEvent.mainCard, 'Main Card')}
-            </View>
-            
-            {selectedEvent.prelimCard && selectedEvent.prelimCard.length > 0 && (
-              <View style={responsiveStyles.prelimCardContainer}>
-                {renderFightCard(selectedEvent.prelimCard, 'Preliminary Card')}
-              </View>
+        <AccessibleThemedView style={styles.header} accessibilityLabel="Screen header">
+          <AccessibleThemedText
+            style={[
+              styles.title,
+              {
+                color: isDark ? '#FFFFFF' : '#333333',
+              },
+            ]}
+            type="h1"
+            accessibilityLabel="UFC Events"
+          >
+            UFC Events
+          </AccessibleThemedText>
+          <AccessibleTouchableOpacity
+            style={[
+              styles.refreshButton,
+              {
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(52, 152, 219, 0.1)',
+              },
+            ]}
+            onPress={handleRefresh}
+            disabled={refreshing}
+            accessibilityLabel="Refresh UFC events"
+            accessibilityRole="button"
+            accessibilityHint="Reload UFC events data"
+            accessibilityState={{ disabled: refreshing }}
+          >
+            {refreshing ? (
+              <ActivityIndicator
+                size="small"
+                color={colors.primary}
+                accessibilityLabel="Loading indicator"
+              />
+            ) : (
+              <Ionicons
+                name="refresh"
+                size={24}
+                color={colors.primary}
+                accessibilityLabel="Refresh icon"
+              />
             )}
-          </View>
-        </ScrollView>
-      )}
+          </AccessibleTouchableOpacity>
+        </AccessibleThemedView>
+
+        {/* Events horizontal list - adaptive width based on device */}
+        <FlatList
+          horizontal
+          data={events}
+          renderItem={({ item }) =>
+            renderEventItem({
+              item,
+              width: responsiveStyles.eventItem.width,
+            })
+          }
+          keyExtractor={item => item.id}
+          contentContainerStyle={[styles.eventsList, responsiveStyles.eventsList]}
+          showsHorizontalScrollIndicator={false}
+          accessible={true}
+          accessibilityLabel="UFC events list"
+          accessibilityHint="Scroll horizontally to view all events"
+        />
+
+        {selectedEvent && (
+          <ScrollView
+            style={styles.eventDetailsContainer}
+            accessible={true}
+            accessibilityLabel="Event details"
+          >
+            <AccessibleThemedText
+              style={[styles.eventDetailsTitle, { color: colors.text }]}
+              type="h2"
+              accessibilityLabel={`Event: ${selectedEvent.name}`}
+            >
+              {selectedEvent.name}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={[styles.eventDetailsDate, { color: colors.text }]}
+              accessibilityLabel={`Date and time: ${new Date(
+                selectedEvent.date
+              ).toLocaleDateString()} at ${selectedEvent.time}`}
+            >
+              {new Date(selectedEvent.date).toLocaleDateString()} • {selectedEvent.time}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={[styles.eventDetailsVenue, { color: isDark ? '#BBBBBB' : '#666666' }]}
+              accessibilityLabel={`Venue: ${selectedEvent.venue}, ${selectedEvent.location}`}
+            >
+              {selectedEvent.venue}, {selectedEvent.location}
+            </AccessibleThemedText>
+
+            {/* Responsive fight cards layout - row on tablet, column on phone */}
+            <AccessibleThemedView
+              style={[styles.fightCardsContainer, responsiveStyles.fightCardsContainer]}
+              accessibilityLabel="Fight cards section"
+            >
+              <AccessibleThemedView
+                style={responsiveStyles.mainCardContainer}
+                accessibilityLabel="Main card section"
+              >
+                {renderFightCard(selectedEvent.mainCard, 'Main Card')}
+              </AccessibleThemedView>
+
+              {selectedEvent.prelimCard && selectedEvent.prelimCard.length > 0 && (
+                <AccessibleThemedView
+                  style={responsiveStyles.prelimCardContainer}
+                  accessibilityLabel="Preliminary card section"
+                >
+                  {renderFightCard(selectedEvent.prelimCard, 'Preliminary Card')}
+                </AccessibleThemedView>
+              )}
+            </AccessibleThemedView>
+          </ScrollView>
+        )}
+      </AccessibleThemedView>
     </Container>
   );
 };
