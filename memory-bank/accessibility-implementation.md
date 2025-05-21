@@ -97,6 +97,7 @@ Key features:
 - ✅ Updated `screens/HomeScreen.tsx`
 - ✅ Updated `screens/ProfileScreen.tsx`
 - ✅ Updated `screens/SettingsScreen.tsx`
+- ✅ Updated `screens/AuthScreen.tsx`
 
 ### Documentation
 
@@ -108,7 +109,6 @@ Key features:
 
 ### Screen Updates
 
-- ⬜ Update `screens/AuthScreen.tsx`
 - ⬜ Update other high-priority screens
 
 ### Testing

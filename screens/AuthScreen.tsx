@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
@@ -13,9 +12,10 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
-import { ThemedView } from '../atomic/atoms/ThemedView';
-import { ThemedText } from '../atomic/atoms/ThemedText';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import LegalLinks from '../components/LegalLinks';
 import {
   createUserWithEmailAndPassword,
@@ -320,7 +320,10 @@ const AuthScreen = () => {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <AccessibleThemedView
+      style={styles.container}
+      accessibilityLabel={isLogin ? t('auth.sign_in_screen') : t('auth.sign_up_screen')}
+    >
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -329,30 +332,57 @@ const AuthScreen = () => {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          accessibilityLabel={isLogin ? t('auth.sign_in_form') : t('auth.sign_up_form')}
         >
-          <View style={styles.logoContainer}>
-            <Ionicons name="basketball" size={64} color={colors.primary} />
-            <ThemedText style={styles.appName}>AI Sports Edge</ThemedText>
+          <View style={styles.logoContainer} accessibilityLabel={t('auth.app_logo')}>
+            <Ionicons
+              name="basketball"
+              size={64}
+              color={colors.primary}
+              accessibilityLabel={t('auth.basketball_icon')}
+            />
+            <AccessibleThemedText
+              style={styles.appName}
+              type="h1"
+              accessibilityLabel={t('auth.app_name')}
+            >
+              AI Sports Edge
+            </AccessibleThemedText>
           </View>
 
-          <View style={styles.formContainer}>
-            <ThemedText style={styles.title}>
+          <View
+            style={styles.formContainer}
+            accessibilityLabel={isLogin ? t('auth.login_form') : t('auth.signup_form')}
+          >
+            <AccessibleThemedText style={styles.title} type="h2" accessibilityRole="header">
               {isLogin ? t('auth.sign_in') : t('auth.sign_up')}
-            </ThemedText>
+            </AccessibleThemedText>
 
             {error && (
-              <View style={[styles.errorContainer, { backgroundColor: 'rgba(255, 0, 0, 0.1)' }]}>
-                <ThemedText style={[styles.errorText, { color: 'red' }]}>{error}</ThemedText>
+              <View
+                style={[styles.errorContainer, { backgroundColor: 'rgba(255, 0, 0, 0.1)' }]}
+                accessibilityLabel={t('auth.error_message')}
+              >
+                <AccessibleThemedText
+                  style={[styles.errorText, { color: 'red' }]}
+                  accessibilityRole="alert"
+                >
+                  {error}
+                </AccessibleThemedText>
               </View>
             )}
 
             {!isLogin && (
-              <View style={styles.inputContainer}>
+              <View
+                style={styles.inputContainer}
+                accessibilityLabel={t('auth.username_input_container')}
+              >
                 <Ionicons
                   name="person-outline"
                   size={20}
                   color={colors.text}
                   style={styles.inputIcon}
+                  accessibilityLabel={t('auth.person_icon')}
                 />
                 <TextInput
                   style={[
@@ -367,20 +397,29 @@ const AuthScreen = () => {
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
+                  accessible={true}
+                  accessibilityLabel={t('auth.username_input')}
+                  accessibilityHint={t('auth.username_input_hint')}
                 />
               </View>
             )}
 
             {validationErrors.username && (
-              <ThemedText style={styles.errorText}>{validationErrors.username}</ThemedText>
+              <AccessibleThemedText style={styles.errorText} accessibilityRole="alert">
+                {validationErrors.username}
+              </AccessibleThemedText>
             )}
 
-            <View style={styles.inputContainer}>
+            <View
+              style={styles.inputContainer}
+              accessibilityLabel={t('auth.email_input_container')}
+            >
               <Ionicons
                 name="mail-outline"
                 size={20}
                 color={colors.text}
                 style={styles.inputIcon}
+                accessibilityLabel={t('auth.mail_icon')}
               />
               <TextInput
                 style={[
@@ -396,19 +435,28 @@ const AuthScreen = () => {
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
+                accessible={true}
+                accessibilityLabel={t('auth.email_input')}
+                accessibilityHint={t('auth.email_input_hint')}
               />
             </View>
 
             {validationErrors.email && (
-              <ThemedText style={styles.errorText}>{validationErrors.email}</ThemedText>
+              <AccessibleThemedText style={styles.errorText} accessibilityRole="alert">
+                {validationErrors.email}
+              </AccessibleThemedText>
             )}
 
-            <View style={styles.inputContainer}>
+            <View
+              style={styles.inputContainer}
+              accessibilityLabel={t('auth.password_input_container')}
+            >
               <Ionicons
                 name="lock-closed-outline"
                 size={20}
                 color={colors.text}
                 style={styles.inputIcon}
+                accessibilityLabel={t('auth.lock_icon')}
               />
               <TextInput
                 style={[
@@ -423,11 +471,16 @@ const AuthScreen = () => {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
+                accessible={true}
+                accessibilityLabel={t('auth.password_input')}
+                accessibilityHint={t('auth.password_input_hint')}
               />
             </View>
 
             {validationErrors.password && (
-              <ThemedText style={styles.errorText}>{validationErrors.password}</ThemedText>
+              <AccessibleThemedText style={styles.errorText} accessibilityRole="alert">
+                {validationErrors.password}
+              </AccessibleThemedText>
             )}
 
             {!isLogin && password.length > 0 && (
@@ -438,9 +491,12 @@ const AuthScreen = () => {
                 <View style={styles.passwordInfoContainer}>
                   {' '}
                   {/* Corrected style name */}
-                  <ThemedText style={styles.passwordInfoLabel}>
+                  <AccessibleThemedText
+                    style={styles.passwordInfoLabel}
+                    accessibilityLabel={t('auth.password_strength_label')}
+                  >
                     {t('auth.password_strength')}:
-                  </ThemedText>{' '}
+                  </AccessibleThemedText>
                   {/* Corrected style name */}
                   <View style={styles.passwordStrengthMeter}>
                     <View
@@ -463,7 +519,7 @@ const AuthScreen = () => {
                       ]}
                     />
                   </View>
-                  <ThemedText
+                  <AccessibleThemedText
                     style={[
                       styles.passwordStrengthText,
                       {
@@ -475,25 +531,36 @@ const AuthScreen = () => {
                             : '#34C759',
                       },
                     ]}
+                    accessibilityLabel={
+                      passwordStrength === 'weak'
+                        ? t('auth.password_strength_weak')
+                        : passwordStrength === 'medium'
+                        ? t('auth.password_strength_medium')
+                        : t('auth.password_strength_strong')
+                    }
                   >
                     {passwordStrength === 'weak'
                       ? t('auth.weak')
                       : passwordStrength === 'medium'
                       ? t('auth.medium')
                       : t('auth.strong')}
-                  </ThemedText>
+                  </AccessibleThemedText>
                 </View>
               </>
             )}
 
             {!isLogin && (
               <>
-                <View style={styles.inputContainer}>
+                <View
+                  style={styles.inputContainer}
+                  accessibilityLabel={t('auth.confirm_password_input_container')}
+                >
                   <Ionicons
                     name="lock-closed-outline"
                     size={20}
                     color={colors.text}
                     style={styles.inputIcon}
+                    accessibilityLabel={t('auth.lock_icon')}
                   />
                   <TextInput
                     style={[
@@ -508,29 +575,42 @@ const AuthScreen = () => {
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry
+                    accessible={true}
+                    accessibilityLabel={t('auth.confirm_password_input')}
+                    accessibilityHint={t('auth.confirm_password_input_hint')}
                   />
                 </View>
 
                 {validationErrors.confirmPassword && (
-                  <ThemedText style={styles.errorText}>
+                  <AccessibleThemedText style={styles.errorText} accessibilityRole="alert">
                     {validationErrors.confirmPassword}
-                  </ThemedText>
+                  </AccessibleThemedText>
                 )}
 
                 {password.length > 0 && (
-                  <View style={styles.passwordRequirementsContainer}>
-                    <ThemedText style={styles.passwordRequirementsTitle}>
+                  <View
+                    style={styles.passwordRequirementsContainer}
+                    accessibilityLabel={t('auth.password_requirements_container')}
+                  >
+                    <AccessibleThemedText
+                      style={styles.passwordRequirementsTitle}
+                      type="h3"
+                      accessibilityLabel={t('auth.password_requirements_title')}
+                    >
                       {t('auth.password_requirements')}:
-                    </ThemedText>
+                    </AccessibleThemedText>
                     <View style={styles.passwordRequirementRow}>
                       <Ionicons
                         name={password.length >= 8 ? 'checkmark-circle' : 'ellipse-outline'}
                         size={16}
                         color={password.length >= 8 ? '#34C759' : colors.text}
                       />
-                      <ThemedText style={styles.passwordRequirementText}>
+                      <AccessibleThemedText
+                        style={styles.passwordRequirementText}
+                        accessibilityLabel={t('auth.min_8_chars')}
+                      >
                         {t('auth.min_8_chars')}
-                      </ThemedText>
+                      </AccessibleThemedText>
                     </View>
                     <View style={styles.passwordRequirementRow}>
                       <Ionicons
@@ -538,9 +618,12 @@ const AuthScreen = () => {
                         size={16}
                         color={/[A-Z]/.test(password) ? '#34C759' : colors.text}
                       />
-                      <ThemedText style={styles.passwordRequirementText}>
+                      <AccessibleThemedText
+                        style={styles.passwordRequirementText}
+                        accessibilityLabel={t('auth.uppercase_letter')}
+                      >
                         {t('auth.uppercase_letter')}
-                      </ThemedText>
+                      </AccessibleThemedText>
                     </View>
                     <View style={styles.passwordRequirementRow}>
                       <Ionicons
@@ -548,9 +631,12 @@ const AuthScreen = () => {
                         size={16}
                         color={/[a-z]/.test(password) ? '#34C759' : colors.text}
                       />
-                      <ThemedText style={styles.passwordRequirementText}>
+                      <AccessibleThemedText
+                        style={styles.passwordRequirementText}
+                        accessibilityLabel={t('auth.lowercase_letter')}
+                      >
                         {t('auth.lowercase_letter')}
-                      </ThemedText>
+                      </AccessibleThemedText>
                     </View>
                     <View style={styles.passwordRequirementRow}>
                       <Ionicons
@@ -558,9 +644,12 @@ const AuthScreen = () => {
                         size={16}
                         color={/[0-9]/.test(password) ? '#34C759' : colors.text}
                       />
-                      <ThemedText style={styles.passwordRequirementText}>
+                      <AccessibleThemedText
+                        style={styles.passwordRequirementText}
+                        accessibilityLabel={t('auth.number')}
+                      >
                         {t('auth.number')}
-                      </ThemedText>
+                      </AccessibleThemedText>
                     </View>
                     <View style={styles.passwordRequirementRow}>
                       <Ionicons
@@ -576,9 +665,12 @@ const AuthScreen = () => {
                             : colors.text
                         }
                       />
-                      <ThemedText style={styles.passwordRequirementText}>
+                      <AccessibleThemedText
+                        style={styles.passwordRequirementText}
+                        accessibilityLabel={t('auth.special_char')}
+                      >
                         {t('auth.special_char')}
-                      </ThemedText>
+                      </AccessibleThemedText>
                     </View>
                   </View>
                 )}
@@ -586,47 +678,72 @@ const AuthScreen = () => {
             )}
 
             {isLogin && (
-              <TouchableOpacity
+              <AccessibleTouchableOpacity
                 style={styles.forgotPasswordContainer}
                 onPress={handleForgotPassword}
+                accessibilityLabel={t('auth.forgot_password')}
+                accessibilityRole="button"
+                accessibilityHint={t('auth.forgot_password_hint')}
               >
-                <ThemedText style={[styles.forgotPasswordText, { color: colors.primary }]}>
+                <AccessibleThemedText
+                  style={[styles.forgotPasswordText, { color: colors.primary }]}
+                  type="button"
+                >
                   {t('auth.forgot_password')}
-                </ThemedText>
-              </TouchableOpacity>
+                </AccessibleThemedText>
+              </AccessibleTouchableOpacity>
             )}
 
-            <TouchableOpacity
+            <AccessibleTouchableOpacity
               style={[styles.authButton, { backgroundColor: colors.primary }]}
               onPress={handleAuth}
               disabled={loading}
+              accessibilityLabel={isLogin ? t('auth.sign_in_button') : t('auth.sign_up_button')}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: loading }}
+              accessibilityHint={isLogin ? t('auth.sign_in_hint') : t('auth.sign_up_hint')}
             >
               {loading ? (
-                <ActivityIndicator color="white" size="small" />
+                <ActivityIndicator
+                  color="white"
+                  size="small"
+                  accessibilityLabel={t('auth.loading')}
+                />
               ) : (
-                <ThemedText style={styles.authButtonText}>
+                <AccessibleThemedText style={styles.authButtonText} type="button">
                   {isLogin ? t('auth.sign_in') : t('auth.sign_up')}
-                </ThemedText>
+                </AccessibleThemedText>
               )}
-            </TouchableOpacity>
+            </AccessibleTouchableOpacity>
 
-            <TouchableOpacity style={styles.toggleContainer} onPress={() => setIsLogin(!isLogin)}>
-              <ThemedText style={styles.toggleText}>
+            <AccessibleTouchableOpacity
+              style={styles.toggleContainer}
+              onPress={() => setIsLogin(!isLogin)}
+              accessibilityLabel={isLogin ? t('auth.switch_to_signup') : t('auth.switch_to_signin')}
+              accessibilityRole="button"
+              accessibilityHint={
+                isLogin ? t('auth.switch_to_signup_hint') : t('auth.switch_to_signin_hint')
+              }
+            >
+              <AccessibleThemedText style={styles.toggleText}>
                 {isLogin ? t('auth.dont_have_account') : t('auth.already_have_account')}
-              </ThemedText>
-              <ThemedText style={[styles.toggleAction, { color: colors.primary }]}>
+              </AccessibleThemedText>
+              <AccessibleThemedText
+                style={[styles.toggleAction, { color: colors.primary }]}
+                type="button"
+              >
                 {isLogin ? t('auth.sign_up') : t('auth.sign_in')}
-              </ThemedText>
-            </TouchableOpacity>
+              </AccessibleThemedText>
+            </AccessibleTouchableOpacity>
 
             {/* Legal links - show title only on sign up screen */}
-            <View style={styles.legalLinksContainer}>
+            <View style={styles.legalLinksContainer} accessibilityLabel={t('auth.legal_links')}>
               <LegalLinks showTitle={!isLogin} horizontal={true} textSize="small" />
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 

@@ -21,6 +21,7 @@
    - ✅ Updated `screens/HomeScreen.tsx` with accessible components
    - ✅ Updated `screens/ProfileScreen.tsx` with accessible components
    - ✅ Updated `screens/SettingsScreen.tsx` with accessible components
+   - ✅ Updated `screens/AuthScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -121,8 +122,7 @@
 1. **Continue Screen Updates**
 
    - Update remaining high-priority screens with accessible components:
-     - AuthScreen.tsx
-   - Focus on screens with complex interactions and forms
+     - ⬜ Focus on screens with complex interactions and forms
 
 2. **Testing**
 
