@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 import { auth } from '../config/firebase';
-import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import { useI18n } from '../atomic/organisms/i18n/I18nContext';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -31,13 +26,13 @@ type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Paym
 const PaymentScreen = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [cardComplete, setCardComplete] = useState<boolean>(false);
-  const [selectedPlan, setSelectedPlan] = useState<typeof SUBSCRIPTION_PLANS[0] | null>(null);
-  
+  const [selectedPlan, setSelectedPlan] = useState<(typeof SUBSCRIPTION_PLANS)[0] | null>(null);
+
   const navigation = useNavigation<PaymentScreenNavigationProp>();
   const route = useRoute<PaymentScreenRouteProp>();
   const { createPaymentMethod } = useStripe();
   const { t } = useI18n();
-  
+
   const { planId } = route.params;
 
   useEffect(() => {
@@ -82,16 +77,12 @@ const PaymentScreen = (): JSX.Element => {
       await createSubscription(userId, paymentMethod.id, planId);
 
       // Show success message
-      Alert.alert(
-        t('payment.success.title'),
-        t('payment.success.message'),
-        [
-          {
-            text: t('common.ok'),
-            onPress: () => navigation.navigate('Main'),
-          },
-        ]
-      );
+      Alert.alert(t('payment.success.title'), t('payment.success.message'), [
+        {
+          text: t('common.ok'),
+          onPress: () => navigation.navigate('Main'),
+        },
+      ]);
     } catch (error: any) {
       Alert.alert(t('common.error'), error.message || t('payment.errors.generic'));
     } finally {
@@ -101,74 +92,137 @@ const PaymentScreen = (): JSX.Element => {
 
   if (!selectedPlan) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3498db" />
-      </View>
+      <AccessibleThemedView
+        style={styles.loadingContainer}
+        accessibilityLabel={t('payment.loading')}
+        accessibilityRole="progressbar"
+      >
+        <ActivityIndicator
+          size="large"
+          color="#3498db"
+          accessibilityLabel={t('payment.loadingPlan')}
+        />
+      </AccessibleThemedView>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>{t('payment.title')}</Text>
-      <Text style={styles.subtitle}>
+    <ScrollView style={styles.container} accessibilityLabel={t('payment.screenTitle')}>
+      <AccessibleThemedText style={styles.title} type="h1" accessibilityRole="header">
+        {t('payment.title')}
+      </AccessibleThemedText>
+
+      <AccessibleThemedText
+        style={styles.subtitle}
+        type="bodyStd"
+        accessibilityLabel={t('payment.subtitleAccessibility', { planName: selectedPlan.name })}
+      >
         {t('payment.subtitle', { planName: selectedPlan.name })}
-      </Text>
+      </AccessibleThemedText>
 
-      <View style={styles.planSummary}>
-        <Text style={styles.planSummaryTitle}>{t('payment.planSummary.title')}</Text>
-        <View style={styles.planSummaryRow}>
-          <Text style={styles.planSummaryLabel}>{t('payment.planSummary.plan')}:</Text>
-          <Text style={styles.planSummaryValue}>{selectedPlan.name}</Text>
-        </View>
-        <View style={styles.planSummaryRow}>
-          <Text style={styles.planSummaryLabel}>{t('payment.planSummary.price')}:</Text>
-          <Text style={styles.planSummaryValue}>
-            ${(selectedPlan.amount || selectedPlan.price * 100) / 100}
-            /{t(`payment.interval.${selectedPlan.interval}`)}
-          </Text>
-        </View>
-      </View>
+      <AccessibleThemedView
+        style={styles.planSummary}
+        accessibilityLabel={t('payment.planSummary.accessibilityLabel')}
+      >
+        <AccessibleThemedText style={styles.planSummaryTitle} type="h2" accessibilityRole="header">
+          {t('payment.planSummary.title')}
+        </AccessibleThemedText>
 
-      <View style={styles.cardContainer}>
-        <Text style={styles.cardLabel}>{t('payment.cardInformation')}</Text>
+        <AccessibleThemedView style={styles.planSummaryRow}>
+          <AccessibleThemedText style={styles.planSummaryLabel} type="label">
+            {t('payment.planSummary.plan')}:
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.planSummaryValue}
+            type="bodyStd"
+            accessibilityLabel={`${t('payment.planSummary.plan')}: ${selectedPlan.name}`}
+          >
+            {selectedPlan.name}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.planSummaryRow}>
+          <AccessibleThemedText style={styles.planSummaryLabel} type="label">
+            {t('payment.planSummary.price')}:
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.planSummaryValue}
+            type="bodyStd"
+            accessibilityLabel={`${t('payment.planSummary.price')}: $${
+              (selectedPlan.amount || selectedPlan.price * 100) / 100
+            } ${t(`payment.interval.${selectedPlan.interval}`)}`}
+          >
+            ${(selectedPlan.amount || selectedPlan.price * 100) / 100}/
+            {t(`payment.interval.${selectedPlan.interval}`)}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
+
+      <AccessibleThemedView
+        style={styles.cardContainer}
+        accessibilityLabel={t('payment.cardContainerAccessibility')}
+      >
+        <AccessibleThemedText style={styles.cardLabel} type="h2" accessibilityRole="header">
+          {t('payment.cardInformation')}
+        </AccessibleThemedText>
+
         <CardField
           postalCodeEnabled={true}
           placeholders={{
             number: '4242 4242 4242 4242',
           }}
           style={styles.cardField}
-          onCardChange={(cardDetails) => {
+          onCardChange={(cardDetails: { complete: boolean }) => {
             setCardComplete(cardDetails.complete);
           }}
+          accessibilityLabel={t('payment.cardFieldAccessibility')}
+          accessibilityHint={t('payment.cardFieldHint')}
         />
-      </View>
+      </AccessibleThemedView>
 
-      <TouchableOpacity
-        style={[
-          styles.payButton,
-          (!cardComplete || loading) && styles.payButtonDisabled,
-        ]}
+      <AccessibleTouchableOpacity
+        style={[styles.payButton, (!cardComplete || loading) && styles.payButtonDisabled]}
         onPress={handlePayment}
         disabled={!cardComplete || loading}
+        accessibilityLabel={t('payment.subscribeNowAccessibility')}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !cardComplete || loading }}
+        accessibilityHint={t('payment.subscribeButtonHint')}
       >
         {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
+          <ActivityIndicator
+            size="small"
+            color="#fff"
+            accessibilityLabel={t('payment.processingPayment')}
+          />
         ) : (
-          <Text style={styles.payButtonText}>{t('payment.subscribeNow')}</Text>
+          <AccessibleThemedText style={styles.payButtonText} type="button">
+            {t('payment.subscribeNow')}
+          </AccessibleThemedText>
         )}
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
 
-      <Text style={styles.secureText}>
+      <AccessibleThemedText
+        style={styles.secureText}
+        type="small"
+        accessibilityLabel={t('payment.secureInfoAccessibility')}
+      >
         🔒 {t('payment.secureInfo')}
-      </Text>
+      </AccessibleThemedText>
 
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         style={styles.cancelButton}
         onPress={() => navigation.goBack()}
         disabled={loading}
+        accessibilityLabel={t('common.cancelAccessibility')}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: loading }}
+        accessibilityHint={t('payment.cancelButtonHint')}
       >
-        <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-      </TouchableOpacity>
+        <AccessibleThemedText style={styles.cancelButtonText} type="button">
+          {t('common.cancel')}
+        </AccessibleThemedText>
+      </AccessibleTouchableOpacity>
     </ScrollView>
   );
 };

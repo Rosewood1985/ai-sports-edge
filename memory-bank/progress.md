@@ -25,6 +25,7 @@
    - ✅ Updated `screens/PersonalizationScreen.tsx` with accessible components
    - ✅ Updated `screens/AccessibilitySettingsScreen.tsx` with accessible components
    - ✅ Updated `screens/GamesScreen.tsx` with accessible components
+   - ✅ Updated `screens/PaymentScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -119,6 +120,18 @@
 - Replaced ThemedView with AccessibleThemedView
 - Added appropriate accessibility labels, hints, and roles
 - Enhanced screen reader experience for settings options, switches, and menu items
+
+11. `feat(accessibility): Enhance PaymentScreen with accessible components`
+
+- Replaced Text components with AccessibleThemedText with proper semantic types
+- Replaced View components with AccessibleThemedView
+- Replaced TouchableOpacity with AccessibleTouchableOpacity
+- Added proper heading hierarchy (h1 for title, h2 for sections)
+- Added appropriate accessibility labels, roles, and hints for all elements
+- Enhanced screen reader experience for payment form and card input
+- Added accessibility properties to the Stripe CardField component
+- Improved focus order through the payment flow
+- Made validation errors and loading states accessible to screen readers
 
 ### Next Steps
 

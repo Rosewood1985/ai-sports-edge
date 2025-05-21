@@ -7,11 +7,13 @@ This document outlines the accessibility features implemented in AI Sports Edge 
 The accessibility system consists of the following components:
 
 1. **Accessibility Service**
+
    - `accessibilityService.ts`: Core service for managing accessibility preferences
    - Integration with system accessibility settings
    - Custom accessibility preferences
 
 2. **Accessibility Components**
+
    - `AccessibleView.tsx`: Component for creating accessible views
    - `AccessibilitySettingsScreen.tsx`: Screen for configuring accessibility preferences
 
@@ -138,19 +140,39 @@ The app implements the following accessibility guidelines:
 
 ## Implementation Details
 
+### Screen-Specific Implementations
+
+#### Payment Screen
+
+The `PaymentScreen.tsx` has been enhanced with accessibility features:
+
+- **Semantic Structure**: Proper heading hierarchy with h1 for the title and h2 for sections
+- **Accessible Components**:
+  - Replaced Text with AccessibleThemedText
+  - Replaced View with AccessibleThemedView
+  - Replaced TouchableOpacity with AccessibleTouchableOpacity
+- **Payment Form Accessibility**:
+  - Added accessibility properties to the Stripe CardField component
+  - Enhanced screen reader experience for payment form elements
+  - Made validation errors and loading states accessible
+- **Interactive Elements**:
+  - Added appropriate accessibility labels, roles, and hints
+  - Ensured proper focus order through the payment flow
+  - Added accessibility states for disabled buttons
+- **Loading States**:
+  - Made loading indicators accessible to screen readers
+  - Added appropriate accessibility roles for progress indicators
+
 ### Accessibility Service Implementation
 
 The accessibility service uses React Native's AccessibilityInfo API:
 
 ```typescript
 // Subscribe to screen reader changes
-AccessibilityInfo.addEventListener(
-  'screenReaderChanged',
-  (isEnabled) => {
-    this.isScreenReaderEnabled = isEnabled;
-    this.notifyListeners();
-  }
-);
+AccessibilityInfo.addEventListener('screenReaderChanged', isEnabled => {
+  this.isScreenReaderEnabled = isEnabled;
+  this.notifyListeners();
+});
 ```
 
 ### Accessible Text Implementation
@@ -160,22 +182,23 @@ The accessible text implementation adapts to user preferences:
 ```typescript
 export const getAccessibleTextStyle = (props: AccessibleTextStyleProps): StyleProp<TextStyle> => {
   const { style, highContrastStyle, largeTextStyle, boldTextStyle } = props;
-  
+
   // Get preferences
-  const isHighContrast = accessibilityService.isHighContrastActive() || 
+  const isHighContrast =
+    accessibilityService.isHighContrastActive() ||
     accessibilityService.getPreferences().highContrast;
-  
+
   const isLargeText = accessibilityService.getPreferences().largeText;
-  
-  const isBoldText = accessibilityService.isBoldTextActive() || 
-    accessibilityService.getPreferences().boldText;
-  
+
+  const isBoldText =
+    accessibilityService.isBoldTextActive() || accessibilityService.getPreferences().boldText;
+
   // Apply styles based on preferences
   return [
     style,
     isHighContrast && [styles.highContrastText, highContrastStyle],
     isLargeText && [styles.largeText, largeTextStyle],
-    isBoldText && [styles.boldText, boldTextStyle]
+    isBoldText && [styles.boldText, boldTextStyle],
   ];
 };
 ```
@@ -186,9 +209,10 @@ Animations adapt to the reduce motion preference:
 
 ```typescript
 export const getAccessibleAnimationConfig = (defaultConfig: any): any => {
-  const isReduceMotion = accessibilityService.isReduceMotionActive() || 
+  const isReduceMotion =
+    accessibilityService.isReduceMotionActive() ||
     accessibilityService.getPreferences().reduceMotion;
-  
+
   if (isReduceMotion) {
     // Reduce animation duration or disable animation
     return {
@@ -196,7 +220,7 @@ export const getAccessibleAnimationConfig = (defaultConfig: any): any => {
       duration: 0, // Disable animation
     };
   }
-  
+
   return defaultConfig;
 };
 ```
