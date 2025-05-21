@@ -272,13 +272,13 @@ The following screens have been updated with accessible components:
 11. PaymentScreen.tsx
 12. LegalScreen.tsx
 13. LoginScreen.tsx
+14. OddsComparisonScreen.tsx
 
 Next screens to be updated:
 
-1. SubscriptionScreen.tsx
-2. OddsComparisonScreen.tsx
-3. BettingAnalyticsScreen.tsx
-4. ParlayScreen.tsx
+1. SubscriptionScreen.tsx (on hold - subscription tiers and pricing need to be finalized)
+2. BettingAnalyticsScreen.tsx
+3. ParlayScreen.tsx
 
 ## Conclusion
 

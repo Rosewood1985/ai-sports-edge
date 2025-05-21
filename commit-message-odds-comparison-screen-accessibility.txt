@@ -1,0 +1,11 @@
+feat(accessibility): Enhance OddsComparisonScreen with accessible components
+
+- Replaced standard components with accessible atomic components
+- Used AccessibleThemedView for container elements
+- Used AccessibleThemedText with proper semantic types
+- Added appropriate accessibility labels, roles, and hints
+- Enhanced screen reader experience for odds comparison data
+- Fixed TypeScript errors related to accessibility props
+- Maintained existing functionality while improving accessibility
+
+This commit continues our systematic accessibility implementation across the app, making the odds comparison feature more accessible to users with disabilities.
