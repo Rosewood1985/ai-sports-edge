@@ -1,0 +1,32 @@
+feat(privacy): Implement privacy dashboard UI for GDPR/CCPA
+
+This commit adds the privacy dashboard UI for GDPR/CCPA compliance:
+
+- Create PrivacyDashboardScreen.tsx with tabbed interface
+  - Requests tab for managing data access and deletion requests
+  - Consent tab for managing privacy preferences
+  - Settings tab for accessing privacy policy documents
+
+- Implement data access request functionality
+  - Add request creation with format selection (JSON, CSV, XML)
+  - Display request history with status indicators
+  - Add download functionality for completed requests
+
+- Implement data deletion request functionality
+  - Add full account deletion and partial data deletion options
+  - Display deletion request history with status indicators
+  - Add cancellation functionality for pending requests
+
+- Implement consent management UI
+  - Add toggles for marketing communications, data analytics, third-party sharing, and profiling
+  - Implement real-time consent preference updates
+  - Add descriptive text explaining each consent type
+
+- Ensure full accessibility support
+  - Use AccessibleThemedText, AccessibleThemedView, and AccessibleTouchableOpacity components
+  - Add proper accessibility labels, roles, and states
+  - Implement proper heading hierarchy and focus management
+
+This implementation provides a user-friendly interface for users to exercise their privacy rights under GDPR and CCPA regulations, including managing data access and deletion requests, and controlling consent preferences.
+
+Related task: [🔄] Ensure GDPR/CCPA compliance for user data

@@ -1,0 +1,23 @@
+docs(privacy): Add testing and documentation for GDPR/CCPA compliance
+
+This commit adds testing and documentation for the GDPR/CCPA compliance implementation:
+
+- Add test files for privacy components
+  - Create DataAccessManager.test.ts with comprehensive test cases
+  - Add mocks for Firebase Firestore and Storage
+  - Test request creation, retrieval, and download functionality
+
+- Create comprehensive implementation guide
+  - Add gdpr-ccpa-compliance.md with detailed documentation
+  - Document all components and their functionality
+  - Provide example usage for all components
+  - Include best practices for extending the implementation
+
+- Document integration points
+  - Explain how to add new data categories
+  - Document how to add new consent types
+  - Provide guidance for supporting new regions
+
+This documentation and testing completes the GDPR/CCPA compliance implementation, providing developers with the knowledge and tools needed to maintain and extend the privacy features.
+
+Related task: [✅] Ensure GDPR/CCPA compliance for user data
