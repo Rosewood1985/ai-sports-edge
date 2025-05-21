@@ -139,7 +139,12 @@
 1. **Continue Screen Updates**
 
    - Update remaining high-priority screens with accessible components:
-     - ⬜ Focus on screens with complex interactions and forms
+     - ⬜ LoginScreen.tsx (NEXT PRIORITY)
+     - ⬜ SubscriptionScreen.tsx
+     - ⬜ OddsComparisonScreen.tsx
+     - ⬜ BettingAnalyticsScreen.tsx
+     - ⬜ ParlayScreen.tsx
+     - ⬜ Focus on remaining screens with complex interactions and forms
 
 2. **Testing**
 
