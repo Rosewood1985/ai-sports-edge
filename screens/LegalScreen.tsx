@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 // Define route params type
 type LegalScreenParams = {
@@ -314,33 +315,55 @@ By using AI Sports Edge, you acknowledge that you have read and understood these
   }, [type]);
 
   return (
-    <AccessibleThemedView style={styles.container} accessibilityLabel={t('legal.screen_title')}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
+    <AccessibleThemedView
+      style={styles.container}
+      accessibilityLabel={t('legal.screen_title')}
+      accessibilityRole="none"
+    >
+      <AccessibleThemedView
+        style={[styles.header, { borderBottomColor: colors.border }]}
+        accessibilityRole="none"
+        accessibilityLabel={t('legal.header_section')}
+      >
+        <AccessibleTouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
           accessibilityLabel={t('common.back')}
           accessibilityRole="button"
+          accessibilityHint={t('common.back_to_previous_screen')}
         >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <AccessibleThemedText style={styles.headerTitle} type="h1" accessibilityLabel={title}>
+        </AccessibleTouchableOpacity>
+        <AccessibleThemedText
+          style={styles.headerTitle}
+          type="h1"
+          accessibilityLabel={title}
+          accessibilityRole="header"
+        >
           {title}
         </AccessibleThemedText>
-        <View style={styles.headerRight} />
-      </View>
+        <AccessibleThemedView style={styles.headerRight} />
+      </AccessibleThemedView>
 
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+        <AccessibleThemedView
+          style={styles.loadingContainer}
+          accessibilityLabel={t('common.loading_section')}
+        >
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            accessibilityLabel={t('common.loading')}
+          />
           <AccessibleThemedText
             style={styles.loadingText}
             type="bodyStd"
             accessibilityLabel={t('common.loading')}
+            accessibilityRole="text"
           >
             {t('common.loading')}
           </AccessibleThemedText>
-        </View>
+        </AccessibleThemedView>
       ) : (
         <ScrollView
           style={styles.scrollView}
@@ -350,6 +373,8 @@ By using AI Sports Edge, you acknowledge that you have read and understood these
               ? t('legal.privacy_policy_content')
               : t('legal.terms_of_service_content')
           }
+          accessibilityRole="none"
+          accessibilityHint={t('legal.scroll_to_read_content')}
         >
           <AccessibleThemedText
             style={styles.markdownContent}
@@ -359,6 +384,7 @@ By using AI Sports Edge, you acknowledge that you have read and understood these
                 ? t('legal.privacy_policy_content')
                 : t('legal.terms_of_service_content')
             }
+            accessibilityRole="text"
           >
             {content}
           </AccessibleThemedText>

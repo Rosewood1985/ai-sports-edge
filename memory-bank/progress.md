@@ -26,6 +26,7 @@
    - ✅ Updated `screens/AccessibilitySettingsScreen.tsx` with accessible components
    - ✅ Updated `screens/GamesScreen.tsx` with accessible components
    - ✅ Updated `screens/PaymentScreen.tsx` with accessible components
+   - ✅ Updated `screens/LegalScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**

@@ -101,6 +101,7 @@ Key features:
 - ✅ Updated `screens/PersonalizationScreen.tsx`
 - ✅ Updated `screens/AccessibilitySettingsScreen.tsx`
 - ✅ Updated `screens/GamesScreen.tsx`
+- ✅ Updated `screens/LegalScreen.tsx`
 
 ### Documentation
 
