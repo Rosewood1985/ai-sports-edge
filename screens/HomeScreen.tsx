@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   FlatList,
   Image,
   ActivityIndicator,
@@ -14,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import LanguageSelector from '../components/LanguageSelector';
 import { Colors } from '../constants/Colors'; // Import base Colors
 
@@ -136,12 +136,17 @@ const HomeScreen = () => {
   // Render featured game item
   const renderFeaturedGameItem = ({ item }: { item: (typeof FEATURED_GAMES)[0] }) => {
     return (
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         style={[styles.cardBase, styles.gameCard, { backgroundColor: colors.card }]} // Use theme card color
         onPress={() => {
           // @ts-ignore - Navigation typing issue
           navigation.navigate('GameDetails', { gameId: item.id });
         }}
+        accessibilityLabel={`${t('game.game_card')}: ${item.homeTeam.name} vs ${
+          item.awayTeam.name
+        }`}
+        accessibilityHint={t('game.tap_to_view_details')}
+        accessibilityRole="button"
       >
         <View style={styles.gameHeader}>
           <AccessibleThemedText
@@ -251,18 +256,21 @@ const HomeScreen = () => {
             </AccessibleThemedText>
           </View>
         </View>
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
     );
   };
 
   // Render trending topic item
   const renderTrendingTopicItem = ({ item }: { item: (typeof TRENDING_TOPICS)[0] }) => {
     return (
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         style={[styles.cardBase, styles.trendingCard, { backgroundColor: colors.card }]} // Use theme card color
         onPress={() => {
           console.log('Navigate to trending topic:', item.id);
         }}
+        accessibilityLabel={`${t('trending.trending_topic')}: ${item.title}`}
+        accessibilityHint={t('trending.tap_to_view_topic')}
+        accessibilityRole="button"
       >
         <AccessibleThemedText
           style={styles.trendingEmoji}
@@ -290,7 +298,7 @@ const HomeScreen = () => {
             {item.category.toUpperCase()}
           </AccessibleThemedText>
         </View>
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
     );
   };
 
@@ -358,11 +366,14 @@ const HomeScreen = () => {
             >
               {t('home.featured_games')}
             </AccessibleThemedText>
-            <TouchableOpacity
+            <AccessibleTouchableOpacity
               onPress={() => {
                 // @ts-ignore - Navigation typing issue
                 navigation.navigate('Games');
               }}
+              accessibilityLabel={t('home.view_all')}
+              accessibilityHint={t('home.view_all_games_hint')}
+              accessibilityRole="button"
             >
               <AccessibleThemedText
                 style={[styles.viewAllText, { color: colors.primary }]}
@@ -372,7 +383,7 @@ const HomeScreen = () => {
               >
                 {t('home.view_all')}
               </AccessibleThemedText>
-            </TouchableOpacity>
+            </AccessibleTouchableOpacity>
           </View>
           <FlatList
             data={featuredGames}
