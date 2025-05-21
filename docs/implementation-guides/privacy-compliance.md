@@ -1,312 +1,160 @@
 # Privacy Compliance Implementation Guide
 
-This guide explains how to implement GDPR and CCPA compliance features in the AI Sports Edge application using the privacy components.
+This guide provides an overview of the privacy compliance features implemented in AI Sports Edge to meet GDPR and CCPA requirements.
 
 ## Overview
 
-The privacy compliance framework provides components for implementing GDPR (General Data Protection Regulation) and CCPA (California Consumer Privacy Act) compliance features. These components follow our atomic architecture pattern and provide a consistent approach to handling privacy-related functionality.
+The privacy compliance system is designed following the atomic design pattern, with clear separation of concerns:
 
-## Components
+- **Data Layer (Atoms)**: Defines data types and categories
+- **Business Logic Layer (Molecules)**: Implements data access and deletion functionality
+- **UI Layer (Organisms)**: Provides user interface for managing privacy settings
 
-### Atom Components
+## Architecture
 
-The following atom components provide the building blocks for privacy compliance:
+### Data Layer (Atoms)
 
-#### `gdprConfig.ts`
+Located in `atomic/atoms/privacy/`:
 
-This component provides configuration settings for GDPR/CCPA compliance, including:
+- **privacyTypes.ts**: Defines TypeScript interfaces for privacy-related data structures
+- **gdprConfig.ts**: Contains configuration for privacy request types and statuses
+- **dataCategories.ts**: Defines data categories and their properties, including whether they can be deleted
+- **storageUtils.ts**: Provides utilities for encrypting and anonymizing data
 
-- Enums for privacy regulations, regions, consent types, etc.
-- Feature flags for different compliance features
-- Regional settings for different jurisdictions
-- Configuration for consent collection, data retention, and privacy requests
-- Utility functions for checking feature availability and requirements
+### Business Logic Layer (Molecules)
+
+Located in `atomic/molecules/privacy/`:
+
+- **DataAccessManager.ts**: Handles data access requests, including collecting and formatting user data
+- **DataDeletionManager.ts**: Handles data deletion requests, including selective and full account deletion
+- **PrivacyManager.ts**: Main entry point for privacy-related functionality
+- **index.js**: Exports all privacy-related functionality
+
+### UI Layer (Organisms)
+
+Located in `atomic/organisms/privacy/`:
+
+- **PrivacySettingsScreen.tsx**: User interface for managing privacy settings and requests
+- **index.js**: Exports the privacy settings screen
+
+## Key Features
+
+### Data Access Requests
+
+Users can request access to their personal data, which is collected from various sources in the app and formatted according to their preferences.
 
 ```typescript
-import {
-  PrivacyRegion,
-  ConsentType,
-  isFeatureEnabledForRegion,
-} from 'atomic/atoms/privacy/gdprConfig';
+import { createDataAccessRequest } from 'atomic/molecules/privacy';
 
-// Check if a feature is enabled for a specific region
-const canAccessFeature = isFeatureEnabledForRegion('dataPortability', PrivacyRegion.EU);
+// Create a data access request for all data categories
+const request = await createDataAccessRequest(userId);
 
-// Get required consent types for a feature
-const requiredConsent = getRequiredConsentForFeature('marketingCommunications');
+// Create a data access request for specific data categories
+const request = await createDataAccessRequest(userId, ['profileData', 'usageData'], 'json');
 ```
 
-#### `privacyTypes.ts`
+### Data Deletion Requests
 
-This component defines TypeScript interfaces and types for privacy-related data structures, including:
-
-- Consent record types
-- User privacy preferences
-- Data retention settings
-- Privacy request types
-- Data categories
-- Audit log entries
+Users can request deletion of specific data categories or their entire account.
 
 ```typescript
-import {
-  ConsentRecord,
-  PrivacyPreferences,
-  DataRetentionSettings,
-} from 'atomic/atoms/privacy/privacyTypes';
+import { createDataDeletionRequest } from 'atomic/molecules/privacy';
 
-// Create a consent record
-const consentRecord: ConsentRecord = {
-  id: 'consent-123',
-  userId: 'user-456',
-  consentType: ConsentType.MARKETING,
+// Create a data deletion request for specific data categories
+const request = await createDataDeletionRequest(userId, ['profileData', 'usageData']);
+
+// Create a full account deletion request
+const request = await createDataDeletionRequest(userId, undefined, true);
+```
+
+### Privacy Preferences Management
+
+Users can update their privacy preferences, including consent for marketing communications, data analytics, third-party sharing, and profiling.
+
+```typescript
+import { updatePrivacyPreferences } from 'atomic/molecules/privacy';
+
+// Update privacy preferences
+const preferences = await updatePrivacyPreferences(userId, {
+  marketingCommunications: true,
+  dataAnalytics: true,
+  thirdPartySharing: false,
+  profiling: false,
+});
+```
+
+### Consent Management
+
+The system provides functionality for recording and checking user consent for various purposes.
+
+```typescript
+import { recordConsent, hasConsent } from 'atomic/molecules/privacy';
+
+// Record user consent
+const consent = await recordConsent(userId, {
+  id: 'consent_123',
+  userId,
+  consentType: 'marketing',
   given: true,
   timestamp: new Date(),
-  method: ConsentMethod.EXPLICIT,
-  policyVersion: '1.0.0',
-  policyText: 'I agree to receive marketing communications',
-};
+  method: 'explicit',
+  policyVersion: '1.0',
+  policyText: 'I agree to receive marketing communications...',
+});
+
+// Check if user has given consent
+const hasMarketingConsent = await hasConsent(userId, 'marketing');
 ```
 
-#### `dataCategories.ts`
+## Data Categories
 
-This component defines the different categories of personal data collected by the application, including:
+The system defines the following data categories:
 
-- Data category definitions
-- Legal basis for processing
-- Purposes for processing
-- Retention periods
-- Mapping of database fields to data categories
+| Category          | Description                                                     | Can Delete | Retention Period |
+| ----------------- | --------------------------------------------------------------- | ---------- | ---------------- |
+| accountData       | Information required to create and manage your account          | No         | 2 years          |
+| profileData       | Information you provide to personalize your profile             | Yes        | 2 years          |
+| contactData       | Information used to contact you                                 | Yes        | 2 years          |
+| paymentData       | Information related to payments and subscriptions               | No         | 7 years          |
+| usageData         | Information about how you use the application                   | Yes        | 1 year           |
+| deviceData        | Information about the devices you use to access the application | Yes        | 1 year           |
+| locationData      | Information about your geographic location                      | Yes        | 3 months         |
+| communicationData | Records of communications between you and the application       | Yes        | 1 year           |
+| marketingData     | Information used for marketing purposes                         | Yes        | 1 year           |
+| thirdPartyData    | Information received from third parties                         | Yes        | 1 year           |
+
+## Integration with UI
+
+To integrate the privacy settings screen into your app, add it to your navigation stack:
 
 ```typescript
-import {
-  dataCategories,
-  getDataCategory,
-  getFieldsForCategory,
-} from 'atomic/atoms/privacy/dataCategories';
+import { PrivacySettingsScreen } from 'atomic/organisms/privacy';
 
-// Get a specific data category
-const profileData = getDataCategory('profileData');
+// In your navigation configuration
+const Stack = createStackNavigator();
 
-// Get all fields for a category
-const profileFields = getFieldsForCategory('profileData');
+function AppNavigator() {
+  return (
+    <Stack.Navigator>
+      {/* Other screens */}
+      <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
+    </Stack.Navigator>
+  );
+}
 ```
-
-#### `storageUtils.ts`
-
-This component provides utilities for secure data storage, including:
-
-- Encryption/decryption helpers
-- Secure storage functions
-- Data anonymization utilities
-- Sensitive data masking and hashing
-
-```typescript
-import {
-  encryptData,
-  decryptData,
-  storePrivacyData,
-  retrievePrivacyData,
-} from 'atomic/atoms/privacy/storageUtils';
-
-// Store privacy data securely
-await storePrivacyData('userConsent', consentRecord);
-
-// Retrieve privacy data
-const storedConsent = await retrievePrivacyData('userConsent');
-
-// Anonymize data
-const anonymizedData = anonymizeData(userData, ['email', 'phoneNumber']);
-```
-
-## Implementation Guidelines
-
-### User Consent Management
-
-1. **Collecting Consent**
-
-   When collecting user consent, use the `ConsentType` enum to specify the type of consent being collected:
-
-   ```typescript
-   import { ConsentType, ConsentMethod } from 'atomic/atoms/privacy/gdprConfig';
-   import { storePrivacyData } from 'atomic/atoms/privacy/storageUtils';
-
-   // When user gives consent
-   const consentRecord = {
-     id: generateId(),
-     userId: currentUser.id,
-     consentType: ConsentType.MARKETING,
-     given: true,
-     timestamp: new Date(),
-     method: ConsentMethod.EXPLICIT,
-     policyVersion: '1.0.0',
-     policyText: 'I agree to receive marketing communications',
-   };
-
-   // Store the consent record
-   await storePrivacyData(`consent_${ConsentType.MARKETING}`, consentRecord);
-
-   // Also update the user document in Firestore
-   await updateUserConsentRecord(currentUser.id, ConsentType.MARKETING, true);
-   ```
-
-2. **Checking Consent**
-
-   Before performing operations that require consent, check if the user has given consent:
-
-   ```typescript
-   import { ConsentType } from 'atomic/atoms/privacy/gdprConfig';
-   import { retrievePrivacyData } from 'atomic/atoms/privacy/storageUtils';
-
-   // Check if user has given marketing consent
-   const consentRecord = await retrievePrivacyData(`consent_${ConsentType.MARKETING}`);
-
-   if (consentRecord && consentRecord.given) {
-     // User has given consent, proceed with operation
-     sendMarketingEmail(user.email);
-   } else {
-     // User has not given consent, do not proceed
-     console.log('User has not given marketing consent');
-   }
-   ```
-
-### Data Access and Portability
-
-1. **Handling Data Access Requests**
-
-   When a user requests access to their data, use the data categories to collect all relevant data:
-
-   ```typescript
-   import { getAllDataCategories } from 'atomic/atoms/privacy/dataCategories';
-   import { encryptData } from 'atomic/atoms/privacy/storageUtils';
-
-   // Collect all user data
-   async function handleDataAccessRequest(userId) {
-     const userData = {};
-     const categories = getAllDataCategories();
-
-     // Collect data for each category
-     for (const category of categories) {
-       userData[category.id] = await collectUserDataForCategory(userId, category.id);
-     }
-
-     // Encrypt the data for secure download
-     const encryptedData = await encryptData(userData);
-
-     // Create a download link
-     const downloadUrl = await createDownloadLink(encryptedData);
-
-     return downloadUrl;
-   }
-   ```
-
-2. **Data Portability**
-
-   For data portability, export the data in a machine-readable format:
-
-   ```typescript
-   function exportDataForPortability(userData) {
-     // Convert to JSON format
-     const jsonData = JSON.stringify(userData, null, 2);
-
-     // Create a Blob for download
-     const blob = new Blob([jsonData], { type: 'application/json' });
-     const url = URL.createObjectURL(blob);
-
-     return url;
-   }
-   ```
-
-### Data Deletion
-
-1. **Handling Deletion Requests**
-
-   When a user requests deletion of their data, use the data categories to ensure complete deletion:
-
-   ```typescript
-   import { getAllDataCategories } from 'atomic/atoms/privacy/dataCategories';
-
-   async function handleDeletionRequest(userId, fullDeletion = true, specificCategories = []) {
-     const categoriesToDelete = fullDeletion
-       ? getAllDataCategories().map(c => c.id)
-       : specificCategories;
-
-     // Delete data for each category
-     for (const categoryId of categoriesToDelete) {
-       await deleteUserDataForCategory(userId, categoryId);
-     }
-
-     // If full deletion, also schedule account deletion
-     if (fullDeletion) {
-       await scheduleAccountDeletion(userId);
-     }
-
-     return { success: true, deletedCategories: categoriesToDelete };
-   }
-   ```
-
-2. **Data Anonymization**
-
-   For data that cannot be deleted (e.g., for legal reasons), use anonymization:
-
-   ```typescript
-   import { anonymizeData } from 'atomic/atoms/privacy/storageUtils';
-
-   async function anonymizeUserData(userId, fieldsToAnonymize) {
-     // Get the user data
-     const userData = await getUserData(userId);
-
-     // Anonymize the specified fields
-     const anonymizedData = anonymizeData(userData, fieldsToAnonymize);
-
-     // Update the user data
-     await updateUserData(userId, anonymizedData);
-
-     return { success: true };
-   }
-   ```
-
-### Privacy Dashboard
-
-Create a privacy dashboard screen that allows users to:
-
-1. View and update their privacy preferences
-2. Submit data access, portability, and deletion requests
-3. View their consent history
-4. Manage marketing preferences
-
-This screen should use the privacy components to provide a consistent user experience.
 
 ## Best Practices
 
-1. **Always Check Consent**
+1. **Data Minimization**: Only collect and store data that is necessary for the app's functionality.
+2. **Purpose Limitation**: Only use data for the purposes for which it was collected.
+3. **Storage Limitation**: Delete or anonymize data when it is no longer needed.
+4. **Transparency**: Clearly inform users about what data is collected and how it is used.
+5. **User Control**: Provide users with easy-to-use controls for managing their privacy preferences.
 
-   Before performing operations that require consent, always check if the user has given consent.
+## Future Enhancements
 
-2. **Secure Storage**
-
-   Use the `storageUtils.ts` functions to securely store privacy-related data.
-
-3. **Data Minimization**
-
-   Only collect and store the minimum amount of personal data necessary for the application to function.
-
-4. **Purpose Limitation**
-
-   Only use personal data for the purposes for which it was collected.
-
-5. **Storage Limitation**
-
-   Delete or anonymize personal data when it is no longer needed.
-
-6. **Documentation**
-
-   Document all privacy-related operations and decisions to demonstrate compliance.
-
-## Conclusion
-
-By using the privacy components provided in this framework, you can implement GDPR and CCPA compliance features in a consistent and maintainable way. These components provide the building blocks for implementing user consent management, data access and portability, and data deletion features.
-
-For more information on GDPR and CCPA requirements, see the following resources:
-
-- [GDPR Official Website](https://gdpr.eu/)
-- [CCPA Official Website](https://oag.ca.gov/privacy/ccpa)
+1. **Automated Data Retention**: Implement a system to automatically delete or anonymize data after its retention period.
+2. **Enhanced Consent Management**: Add more granular consent options and improve the consent flow.
+3. **Privacy Impact Assessments**: Implement tools for conducting privacy impact assessments for new features.
+4. **Data Portability**: Enhance data export formats to improve interoperability with other systems.
+5. **Audit Logging**: Implement comprehensive audit logging for all privacy-related actions.
