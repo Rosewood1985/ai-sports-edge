@@ -27,6 +27,7 @@
    - ✅ Updated `screens/GamesScreen.tsx` with accessible components
    - ✅ Updated `screens/PaymentScreen.tsx` with accessible components
    - ✅ Updated `screens/LegalScreen.tsx` with accessible components
+   - ✅ Updated `screens/LoginScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -139,8 +140,8 @@
 1. **Continue Screen Updates**
 
    - Update remaining high-priority screens with accessible components:
-     - ⬜ LoginScreen.tsx (NEXT PRIORITY)
-     - ⬜ SubscriptionScreen.tsx
+     - ✅ LoginScreen.tsx
+     - ⬜ SubscriptionScreen.tsx (NEXT PRIORITY)
      - ⬜ OddsComparisonScreen.tsx
      - ⬜ BettingAnalyticsScreen.tsx
      - ⬜ ParlayScreen.tsx
