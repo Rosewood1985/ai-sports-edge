@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-import { ThemedView } from '../atomic/atoms/ThemedView';
-import { ThemedText } from '../atomic/atoms/ThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { useTheme } from '@react-navigation/native';
 import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
@@ -42,154 +43,306 @@ const SettingsScreen = () => {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <ThemedText style={styles.headerTitle}>{t('settings.app_settings')}</ThemedText>
+    <AccessibleThemedView style={styles.container} accessibilityLabel={t('settings.app_settings')}>
+      <View
+        style={[styles.header, { borderBottomColor: colors.border }]}
+        accessibilityLabel={t('settings.app_settings_header')}
+      >
+        <AccessibleThemedText style={styles.headerTitle} accessibilityRole="header">
+          {t('settings.app_settings')}
+        </AccessibleThemedText>
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} accessibilityLabel={t('settings.settings_list')}>
         {/* Appearance Section */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.theme_settings')}</ThemedText>
+        <View style={styles.section} accessibilityLabel={t('settings.theme_settings')}>
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            {t('settings.theme_settings')}
+          </AccessibleThemedText>
 
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <View
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.dark_mode_setting')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="moon-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>{t('settings.dark_mode')}</ThemedText>
+              <Ionicons
+                name="moon-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.dark_mode_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
+                {t('settings.dark_mode')}
+              </AccessibleThemedText>
             </View>
             <ThemeToggle variant="switch" />
           </View>
         </View>
 
         {/* Language Section */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.language_settings')}</ThemedText>
+        <View style={styles.section} accessibilityLabel={t('settings.language_settings')}>
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            {t('settings.language_settings')}
+          </AccessibleThemedText>
 
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('LanguageSettings' as never)}
+            accessibilityLabel={t('settings.language')}
+            accessibilityRole="button"
+            accessibilityHint={t('settings.language_settings_hint')}
           >
             <View style={styles.settingInfo}>
-              <Ionicons name="language" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>{t('settings.language')}</ThemedText>
+              <Ionicons
+                name="language"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.language_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
+                {t('settings.language')}
+              </AccessibleThemedText>
             </View>
             <View style={styles.settingAction}>
               <LanguageSelector showLabel={false} />
-              <Ionicons name="chevron-forward" size={24} color={colors.text} />
+              <Ionicons
+                name="chevron-forward"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.navigate_forward')}
+              />
             </View>
-          </TouchableOpacity>
+          </AccessibleTouchableOpacity>
         </View>
 
         {/* Notifications Section */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.notification_settings')}</ThemedText>
+        <View style={styles.section} accessibilityLabel={t('settings.notification_settings')}>
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            {t('settings.notification_settings')}
+          </AccessibleThemedText>
 
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <View
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.push_notifications')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="notifications-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.notifications_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.push_notifications')}
-              </ThemedText>
+              </AccessibleThemedText>
             </View>
             <Switch
               value={pushNotifications}
               onValueChange={setPushNotifications}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
+              accessible={true}
+              accessibilityLabel={t('settings.push_notifications')}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: pushNotifications }}
+              accessibilityHint={t('settings.toggle_push_notifications')}
             />
           </View>
 
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <View
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.email_notifications')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="mail-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>
+              <Ionicons
+                name="mail-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.email_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.email_notifications')}
-              </ThemedText>
+              </AccessibleThemedText>
             </View>
             <Switch
               value={emailNotifications}
               onValueChange={setEmailNotifications}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
+              accessible={true}
+              accessibilityLabel={t('settings.email_notifications')}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: emailNotifications }}
+              accessibilityHint={t('settings.toggle_email_notifications')}
             />
           </View>
         </View>
 
         {/* Data Usage Section */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.data_settings')}</ThemedText>
+        <View style={styles.section} accessibilityLabel={t('settings.data_settings')}>
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            {t('settings.data_settings')}
+          </AccessibleThemedText>
 
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <View
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.download_over_wifi')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="wifi-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>
+              <Ionicons
+                name="wifi-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.wifi_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.download_over_wifi')}
-              </ThemedText>
+              </AccessibleThemedText>
             </View>
             <Switch
               value={downloadOverWifi}
               onValueChange={setDownloadOverWifi}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
+              accessible={true}
+              accessibilityLabel={t('settings.download_over_wifi')}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: downloadOverWifi }}
+              accessibilityHint={t('settings.toggle_download_over_wifi')}
             />
           </View>
 
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <View
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.auto_play_videos')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="play-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>{t('settings.auto_play_videos')}</ThemedText>
+              <Ionicons
+                name="play-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.play_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
+                {t('settings.auto_play_videos')}
+              </AccessibleThemedText>
             </View>
             <Switch
               value={autoPlayVideos}
               onValueChange={setAutoPlayVideos}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
+              accessible={true}
+              accessibilityLabel={t('settings.auto_play_videos')}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: autoPlayVideos }}
+              accessibilityHint={t('settings.toggle_auto_play_videos')}
             />
           </View>
 
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             onPress={handleClearCache}
+            accessibilityLabel={t('settings.clear_cache')}
+            accessibilityRole="button"
+            accessibilityHint={t('settings.clear_cache_hint')}
           >
             <View style={styles.settingInfo}>
-              <Ionicons name="trash-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>{t('settings.clear_cache')}</ThemedText>
+              <Ionicons
+                name="trash-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.trash_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
+                {t('settings.clear_cache')}
+              </AccessibleThemedText>
             </View>
-            <Ionicons name="chevron-forward" size={24} color={colors.text} />
-          </TouchableOpacity>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={colors.text}
+              accessibilityLabel={t('settings.navigate_forward')}
+            />
+          </AccessibleTouchableOpacity>
         </View>
 
         {/* About Section */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.about')}</ThemedText>
+        <View style={styles.section} accessibilityLabel={t('settings.about')}>
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            {t('settings.about')}
+          </AccessibleThemedText>
 
-          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <AccessibleTouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.version', { version: '1.0.0' })}
+            accessibilityRole="button"
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="information-circle-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>
+              <Ionicons
+                name="information-circle-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.info_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.version', { version: '1.0.0' })}
-              </ThemedText>
+              </AccessibleThemedText>
             </View>
-          </TouchableOpacity>
+          </AccessibleTouchableOpacity>
 
-          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <AccessibleTouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.terms')}
+            accessibilityRole="button"
+            accessibilityHint={t('settings.view_terms_hint')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="document-text-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>{t('settings.terms')}</ThemedText>
+              <Ionicons
+                name="document-text-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.document_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
+                {t('settings.terms')}
+              </AccessibleThemedText>
             </View>
-            <Ionicons name="chevron-forward" size={24} color={colors.text} />
-          </TouchableOpacity>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={colors.text}
+              accessibilityLabel={t('settings.navigate_forward')}
+            />
+          </AccessibleTouchableOpacity>
 
-          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <AccessibleTouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            accessibilityLabel={t('settings.privacy')}
+            accessibilityRole="button"
+            accessibilityHint={t('settings.view_privacy_hint')}
+          >
             <View style={styles.settingInfo}>
-              <Ionicons name="shield-outline" size={24} color={colors.text} />
-              <ThemedText style={styles.settingLabel}>{t('settings.privacy')}</ThemedText>
+              <Ionicons
+                name="shield-outline"
+                size={24}
+                color={colors.text}
+                accessibilityLabel={t('settings.shield_icon')}
+              />
+              <AccessibleThemedText style={styles.settingLabel}>
+                {t('settings.privacy')}
+              </AccessibleThemedText>
             </View>
-            <Ionicons name="chevron-forward" size={24} color={colors.text} />
-          </TouchableOpacity>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={colors.text}
+              accessibilityLabel={t('settings.navigate_forward')}
+            />
+          </AccessibleTouchableOpacity>
         </View>
       </ScrollView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 

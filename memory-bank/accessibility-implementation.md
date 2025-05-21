@@ -93,6 +93,10 @@ Key features:
 
 - ✅ Updated `screens/GameDetailsScreen.tsx`
 - ✅ Updated `screens/Onboarding/GDPRConsentScreen.tsx`
+- ✅ Updated `screens/FAQScreen.tsx`
+- ✅ Updated `screens/HomeScreen.tsx`
+- ✅ Updated `screens/ProfileScreen.tsx`
+- ✅ Updated `screens/SettingsScreen.tsx`
 
 ### Documentation
 
@@ -104,10 +108,6 @@ Key features:
 
 ### Screen Updates
 
-- ⬜ Update `screens/FAQScreen.tsx`
-- ⬜ Update `screens/ProfileScreen.tsx`
-- ⬜ Update `screens/SettingsScreen.tsx`
-- ⬜ Update `screens/HomeScreen.tsx`
 - ⬜ Update `screens/AuthScreen.tsx`
 - ⬜ Update other high-priority screens
 

@@ -96,7 +96,7 @@ We are following our atomic architecture pattern for both implementations:
 - **Implementation Guide**: `docs/implementation-guides/accessibility-implementation-guide.md`
 - **Accessibility Patterns**: `docs/implementation-guides/accessibility-patterns.md`
 - **Progress Report**: `memory-bank/progress.md`
-- **Commit Messages**: `commit-message-accessibility-enhancements.txt`, `commit-message-gdpr-consent-screen-accessibility.txt`, `commit-message-faq-screen-accessibility.txt`
+- **Commit Messages**: `commit-message-accessibility-enhancements.txt`, `commit-message-gdpr-consent-screen-accessibility.txt`, `commit-message-faq-screen-accessibility.txt`, `commit-message-home-screen-accessibility.txt`, `commit-message-profile-screen-accessibility.txt`, `commit-message-settings-screen-accessibility.txt`
 - **Translation Files**: `translations/en.json`, `translations/es.json` (accessibility section)
 - **CI/CD Configuration**: `.github/workflows/accessibility.yml`
 - **PR Template**: `.github/pull_request_template.md` (includes accessibility checklist)
@@ -117,9 +117,9 @@ We are following our atomic architecture pattern for both implementations:
 3. ✅ Update translation files with accessibility strings
 4. ✅ Create PR template with accessibility checklist
 5. Continue updating high-priority screens with accessible components:
-   - HomeScreen.tsx
-   - ProfileScreen.tsx
-   - SettingsScreen.tsx
+   - ✅ HomeScreen.tsx
+   - ✅ ProfileScreen.tsx
+   - ✅ SettingsScreen.tsx
    - AuthScreen.tsx
 6. Create accessibility unit tests for accessible components
 7. Implement color contrast testing in the accessibility testing script

@@ -20,6 +20,7 @@
    - ✅ Updated `screens/FAQScreen.tsx` with accessible components
    - ✅ Updated `screens/HomeScreen.tsx` with accessible components
    - ✅ Updated `screens/ProfileScreen.tsx` with accessible components
+   - ✅ Updated `screens/SettingsScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -107,12 +108,19 @@
    - Added appropriate accessibility labels, hints, and roles
    - Enhanced screen reader experience for profile information, subscription details, and menu items
 
+10. `feat(accessibility): Enhance SettingsScreen with accessible components`
+
+- Replaced TouchableOpacity with AccessibleTouchableOpacity
+- Replaced ThemedText with AccessibleThemedText
+- Replaced ThemedView with AccessibleThemedView
+- Added appropriate accessibility labels, hints, and roles
+- Enhanced screen reader experience for settings options, switches, and menu items
+
 ### Next Steps
 
 1. **Continue Screen Updates**
 
    - Update remaining high-priority screens with accessible components:
-     - SettingsScreen.tsx
      - AuthScreen.tsx
    - Focus on screens with complex interactions and forms
 
