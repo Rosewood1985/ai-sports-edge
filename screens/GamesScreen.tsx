@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  RefreshControl
-} from 'react-native';
+import { View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 
-
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 // Mock data for games
 const MOCK_GAMES = [
@@ -27,17 +17,17 @@ const MOCK_GAMES = [
       id: 'team1',
       name: 'Lakers',
       logo: '🏀',
-      score: 105
+      score: 105,
     },
     awayTeam: {
       id: 'team2',
       name: 'Warriors',
       logo: '🏀',
-      score: 98
+      score: 98,
     },
     status: 'completed',
     date: new Date(2025, 2, 20, 19, 30),
-    venue: 'Staples Center'
+    venue: 'Staples Center',
   },
   {
     id: 'game2',
@@ -45,17 +35,17 @@ const MOCK_GAMES = [
       id: 'team3',
       name: 'Celtics',
       logo: '🏀',
-      score: 0
+      score: 0,
     },
     awayTeam: {
       id: 'team4',
       name: 'Nets',
       logo: '🏀',
-      score: 0
+      score: 0,
     },
     status: 'upcoming',
     date: new Date(2025, 3, 25, 20, 0),
-    venue: 'TD Garden'
+    venue: 'TD Garden',
   },
   {
     id: 'game3',
@@ -63,20 +53,20 @@ const MOCK_GAMES = [
       id: 'team5',
       name: 'Heat',
       logo: '🏀',
-      score: 87
+      score: 87,
     },
     awayTeam: {
       id: 'team6',
       name: 'Bulls',
       logo: '🏀',
-      score: 92
+      score: 92,
     },
     status: 'live',
     date: new Date(),
     venue: 'American Airlines Arena',
     quarter: 4,
-    timeRemaining: '3:45'
-  }
+    timeRemaining: '3:45',
+  },
 ];
 
 const GamesScreen = () => {
@@ -92,14 +82,14 @@ const GamesScreen = () => {
   const loadGames = async (tab = activeTab) => {
     try {
       setLoading(true);
-      
+
       // In a real app, this would be an API call
       // const response = await gamesService.getGames(tab);
       // setGames(response.data);
-      
+
       // For now, we'll just filter the mock data
       let filteredGames = [...MOCK_GAMES];
-      
+
       if (tab === 'live') {
         filteredGames = MOCK_GAMES.filter(game => game.status === 'live');
       } else if (tab === 'upcoming') {
@@ -107,7 +97,7 @@ const GamesScreen = () => {
       } else if (tab === 'completed') {
         filteredGames = MOCK_GAMES.filter(game => game.status === 'completed');
       }
-      
+
       setGames(filteredGames);
     } catch (error) {
       console.error('Error loading games:', error);
@@ -141,194 +131,301 @@ const GamesScreen = () => {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // Render game item
-  const renderGameItem = ({ item }: { item: typeof MOCK_GAMES[0] }) => {
+  const renderGameItem = ({ item }: { item: (typeof MOCK_GAMES)[0] }) => {
+    const gameStatusText =
+      item.status === 'live'
+        ? 'Live game'
+        : item.status === 'upcoming'
+        ? 'Upcoming game'
+        : 'Completed game';
+    const gameDescription = `${item.homeTeam.name} versus ${item.awayTeam.name} at ${item.venue}`;
+
     return (
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         style={[styles.gameCard, { backgroundColor: colors.card }]}
         onPress={() => {
           // @ts-ignore - Navigation typing issue
           navigation.navigate('GameDetails', { gameId: item.id });
         }}
+        accessibilityLabel={`${gameStatusText}: ${gameDescription}`}
+        accessibilityRole="button"
+        accessibilityHint="View game details"
       >
-        <View style={styles.gameHeader}>
-          <ThemedText style={styles.gameVenue}>{item.venue}</ThemedText>
-          
+        <View style={styles.gameHeader} accessibilityLabel={`Game venue: ${item.venue}`}>
+          <AccessibleThemedText style={styles.gameVenue}>{item.venue}</AccessibleThemedText>
+
           {item.status === 'live' && (
-            <View style={[styles.liveIndicator, { backgroundColor: '#FF3B30' }]}>
-              <ThemedText style={styles.liveText}>LIVE</ThemedText>
+            <View
+              style={[styles.liveIndicator, { backgroundColor: '#FF3B30' }]}
+              accessibilityLabel="Live game indicator"
+            >
+              <AccessibleThemedText style={styles.liveText}>LIVE</AccessibleThemedText>
             </View>
           )}
         </View>
-        
-        <View style={styles.teamsContainer}>
-          <View style={styles.teamContainer}>
-            <ThemedText style={styles.teamLogo}>{item.homeTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName}>{item.homeTeam.name}</ThemedText>
-            <ThemedText style={styles.teamScore}>
+
+        <View style={styles.teamsContainer} accessibilityLabel="Teams information">
+          <View
+            style={styles.teamContainer}
+            accessibilityLabel={`Home team: ${item.homeTeam.name}, Score: ${
+              item.status !== 'upcoming' ? item.homeTeam.score : 'not started'
+            }`}
+          >
+            <AccessibleThemedText style={styles.teamLogo}>
+              {item.homeTeam.logo}
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.teamName}>
+              {item.homeTeam.name}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamScore}
+              accessibilityLabel={`Score: ${
+                item.status !== 'upcoming' ? item.homeTeam.score : 'not started'
+              }`}
+            >
               {item.status !== 'upcoming' ? item.homeTeam.score : '-'}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
-          
+
           <View style={styles.gameInfo}>
             {item.status === 'live' ? (
-              <View style={styles.liveInfo}>
-                <ThemedText style={styles.quarter}>Q{item.quarter}</ThemedText>
-                <ThemedText style={styles.timeRemaining}>{item.timeRemaining}</ThemedText>
+              <View
+                style={styles.liveInfo}
+                accessibilityLabel={`Quarter ${item.quarter}, ${item.timeRemaining} remaining`}
+              >
+                <AccessibleThemedText style={styles.quarter}>Q{item.quarter}</AccessibleThemedText>
+                <AccessibleThemedText style={styles.timeRemaining}>
+                  {item.timeRemaining}
+                </AccessibleThemedText>
               </View>
             ) : (
-              <ThemedText style={styles.gameDate}>
+              <AccessibleThemedText
+                style={styles.gameDate}
+                accessibilityLabel={`Game scheduled for ${formatDate(item.date)}`}
+              >
                 {formatDate(item.date)}
-              </ThemedText>
+              </AccessibleThemedText>
             )}
           </View>
-          
-          <View style={styles.teamContainer}>
-            <ThemedText style={styles.teamLogo}>{item.awayTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName}>{item.awayTeam.name}</ThemedText>
-            <ThemedText style={styles.teamScore}>
+
+          <View
+            style={styles.teamContainer}
+            accessibilityLabel={`Away team: ${item.awayTeam.name}, Score: ${
+              item.status !== 'upcoming' ? item.awayTeam.score : 'not started'
+            }`}
+          >
+            <AccessibleThemedText style={styles.teamLogo}>
+              {item.awayTeam.logo}
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.teamName}>
+              {item.awayTeam.name}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamScore}
+              accessibilityLabel={`Score: ${
+                item.status !== 'upcoming' ? item.awayTeam.score : 'not started'
+              }`}
+            >
               {item.status !== 'upcoming' ? item.awayTeam.score : '-'}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
         </View>
-        
-        <View style={styles.gameFooter}>
-          <TouchableOpacity style={styles.actionButton}>
+
+        <View style={styles.gameFooter} accessibilityLabel="Game actions">
+          <AccessibleTouchableOpacity
+            style={styles.actionButton}
+            accessibilityLabel={t('games.stats')}
+            accessibilityRole="button"
+            accessibilityHint="View game statistics"
+          >
             <Ionicons name="stats-chart-outline" size={16} color={colors.text} />
-            <ThemedText style={styles.actionText}>{t('games.stats')}</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.actionButton}>
+            <AccessibleThemedText style={styles.actionText}>
+              {t('games.stats')}
+            </AccessibleThemedText>
+          </AccessibleTouchableOpacity>
+
+          <AccessibleTouchableOpacity
+            style={styles.actionButton}
+            accessibilityLabel={t('games.odds')}
+            accessibilityRole="button"
+            accessibilityHint="View betting odds"
+          >
             <Ionicons name="podium-outline" size={16} color={colors.text} />
-            <ThemedText style={styles.actionText}>{t('games.odds')}</ThemedText>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.actionButton}>
+            <AccessibleThemedText style={styles.actionText}>{t('games.odds')}</AccessibleThemedText>
+          </AccessibleTouchableOpacity>
+
+          <AccessibleTouchableOpacity
+            style={styles.actionButton}
+            accessibilityLabel={t('games.predictions')}
+            accessibilityRole="button"
+            accessibilityHint="View game predictions"
+          >
             <Ionicons name="analytics-outline" size={16} color={colors.text} />
-            <ThemedText style={styles.actionText}>{t('games.predictions')}</ThemedText>
-          </TouchableOpacity>
+            <AccessibleThemedText style={styles.actionText}>
+              {t('games.predictions')}
+            </AccessibleThemedText>
+          </AccessibleTouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
     );
   };
 
   // Render empty state
   const renderEmptyState = () => {
     if (loading) return null;
-    
+
     return (
-      <View style={styles.emptyState}>
-        <Ionicons name="basketball-outline" size={64} color={colors.text} style={{ opacity: 0.5 }} />
-        <ThemedText style={styles.emptyStateText}>
+      <View style={styles.emptyState} accessibilityLabel="No games found">
+        <Ionicons
+          name="basketball-outline"
+          size={64}
+          color={colors.text}
+          style={{ opacity: 0.5 }}
+        />
+        <AccessibleThemedText style={styles.emptyStateText} accessibilityRole="text">
           {t('games.no_games_found')}
-        </ThemedText>
+        </AccessibleThemedText>
       </View>
     );
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText style={styles.headerTitle}>{t('games.all_games')}</ThemedText>
+    <AccessibleThemedView style={styles.container} accessibilityLabel="Games Screen">
+      <View style={styles.header} accessibilityRole="header">
+        <AccessibleThemedText style={styles.headerTitle} accessibilityRole="header">
+          {t('games.all_games')}
+        </AccessibleThemedText>
       </View>
-      
-      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
+
+      <View
+        style={[styles.tabs, { borderBottomColor: colors.border }]}
+        accessibilityLabel="Game filter tabs"
+        accessibilityRole="tablist"
+      >
+        <AccessibleTouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'all' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'all' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => handleTabChange('all')}
+          accessibilityLabel={t('games.all_games')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'all' }}
+          accessibilityHint="Show all games"
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
-              activeTab === 'all' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'all' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.all_games')}
-          </ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
+          </AccessibleThemedText>
+        </AccessibleTouchableOpacity>
+
+        <AccessibleTouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'live' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'live' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => handleTabChange('live')}
+          accessibilityLabel={t('games.live_games')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'live' }}
+          accessibilityHint="Show only live games"
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
-              activeTab === 'live' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'live' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.live_games')}
-          </ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
+          </AccessibleThemedText>
+        </AccessibleTouchableOpacity>
+
+        <AccessibleTouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'upcoming' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'upcoming' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => handleTabChange('upcoming')}
+          accessibilityLabel={t('games.upcoming_games')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'upcoming' }}
+          accessibilityHint="Show only upcoming games"
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
-              activeTab === 'upcoming' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'upcoming' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.upcoming_games')}
-          </ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
+          </AccessibleThemedText>
+        </AccessibleTouchableOpacity>
+
+        <AccessibleTouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'completed' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'completed' && {
+              borderBottomColor: colors.primary,
+              borderBottomWidth: 2,
+            },
           ]}
           onPress={() => handleTabChange('completed')}
+          accessibilityLabel={t('games.completed_games')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'completed' }}
+          accessibilityHint="Show only completed games"
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
-              activeTab === 'completed' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'completed' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.completed_games')}
-          </ThemedText>
-        </TouchableOpacity>
+          </AccessibleThemedText>
+        </AccessibleTouchableOpacity>
       </View>
-      
+
       {loading && !refreshing ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <ThemedText style={styles.loadingText}>{t('common.loading')}</ThemedText>
+        <View style={styles.loadingContainer} accessibilityLabel={`${t('common.loading')} games`}>
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            accessibilityLabel="Loading indicator"
+          />
+          <AccessibleThemedText style={styles.loadingText}>
+            {t('common.loading')}
+          </AccessibleThemedText>
         </View>
       ) : (
         <FlatList
           data={games}
           renderItem={renderGameItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={renderEmptyState}
+          accessibilityLabel={`Games list, ${games.length} games found`}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
               colors={[colors.primary]}
               tintColor={colors.primary}
+              accessibilityLabel="Pull to refresh games"
             />
           }
         />
       )}
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 

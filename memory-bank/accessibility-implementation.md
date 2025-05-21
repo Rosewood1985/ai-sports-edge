@@ -100,6 +100,7 @@ Key features:
 - ✅ Updated `screens/AuthScreen.tsx`
 - ✅ Updated `screens/PersonalizationScreen.tsx`
 - ✅ Updated `screens/AccessibilitySettingsScreen.tsx`
+- ✅ Updated `screens/GamesScreen.tsx`
 
 ### Documentation
 
