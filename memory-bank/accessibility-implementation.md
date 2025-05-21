@@ -98,6 +98,7 @@ Key features:
 - ✅ Updated `screens/ProfileScreen.tsx`
 - ✅ Updated `screens/SettingsScreen.tsx`
 - ✅ Updated `screens/AuthScreen.tsx`
+- ✅ Updated `screens/PersonalizationScreen.tsx`
 
 ### Documentation
 

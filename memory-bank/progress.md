@@ -22,6 +22,7 @@
    - ✅ Updated `screens/ProfileScreen.tsx` with accessible components
    - ✅ Updated `screens/SettingsScreen.tsx` with accessible components
    - ✅ Updated `screens/AuthScreen.tsx` with accessible components
+   - ✅ Updated `screens/PersonalizationScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**

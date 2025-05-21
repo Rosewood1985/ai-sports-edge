@@ -1,0 +1,10 @@
+feat(accessibility): Enhance PersonalizationScreen with accessible components
+
+- Replaced TouchableOpacity with AccessibleTouchableOpacity
+- Replaced ThemedText with AccessibleThemedText
+- Replaced ThemedView with AccessibleThemedView
+- Added appropriate accessibility labels, hints, and roles
+- Enhanced screen reader experience for personalization options
+- Fixed color references to use the updated theme structure
+- Ensured proper semantic structure with appropriate text types
+- Improved toggle options with proper accessibility states

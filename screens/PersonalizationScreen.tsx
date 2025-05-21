@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, View, Switch, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, ScrollView, View, Switch, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePersonalization } from '../contexts/PersonalizationContext';
-import { ThemedView } from '../atomic/atoms/ThemedView';
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { colors } from '../styles/theme';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { Colors } from '../constants/Colors';
 import { ThemeToggle } from 'atomic/molecules/theme';
+
+// Use the dark theme colors
+const colors = Colors.dark;
 
 /**
  * Personalization Screen
@@ -14,10 +18,23 @@ import { ThemeToggle } from 'atomic/molecules/theme';
  */
 const PersonalizationScreen = () => {
   const navigation = useNavigation();
-  const { preferences, updatePreferences, userProfile } = usePersonalization();
+  const { preferences, updatePreferences } = usePersonalization();
 
   // Local state for form values
-  const [localPreferences, setLocalPreferences] = useState({ ...preferences });
+  const [localPreferences, setLocalPreferences] = useState({
+    enablePushNotifications: true,
+    notifyBeforeGames: true,
+    notifyForFavoriteTeams: true,
+    notifyForBettingOpportunities: false,
+    showLiveScores: true,
+    showPredictionConfidence: true,
+    showBettingHistory: true,
+    shareDataForBetterPredictions: true,
+    anonymousUsageStats: true,
+    riskTolerance: 'medium',
+    preferredOddsFormat: 'american',
+    ...preferences,
+  });
 
   // Handle toggle change
   const handleToggle = (key: string, value: boolean) => {
@@ -40,9 +57,15 @@ const PersonalizationScreen = () => {
 
   // Render section header
   const renderSectionHeader = (title: string) => (
-    <View style={styles.sectionHeader}>
-      <ThemedText style={styles.sectionHeaderText}>{title}</ThemedText>
-    </View>
+    <AccessibleThemedView style={styles.sectionHeader} accessibilityRole="header">
+      <AccessibleThemedText
+        style={styles.sectionHeaderText}
+        type="h2"
+        accessibilityLabel={`${title} section`}
+      >
+        {title}
+      </AccessibleThemedText>
+    </AccessibleThemedView>
   );
 
   // Render toggle option
@@ -53,78 +76,116 @@ const PersonalizationScreen = () => {
     value: boolean,
     isPremium: boolean = false
   ) => (
-    <View style={styles.optionContainer}>
+    <AccessibleThemedView
+      style={styles.optionContainer}
+      accessibilityState={{
+        checked: isPremium
+          ? false
+          : (localPreferences[key as keyof typeof localPreferences] as boolean),
+        disabled: isPremium,
+      }}
+      accessibilityLabel={title}
+      accessibilityHint={description}
+    >
       <View style={styles.optionTextContainer}>
         <View style={styles.optionTitleContainer}>
-          <ThemedText style={styles.optionTitle}>{title}</ThemedText>
-          {isPremium && userProfile?.subscriptionTier !== 'elite' && (
-            <View style={styles.premiumBadge}>
-              <ThemedText style={styles.premiumBadgeText}>ELITE</ThemedText>
-            </View>
+          <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
+            {title}
+          </AccessibleThemedText>
+          {isPremium && (
+            <AccessibleThemedView style={styles.premiumBadge} accessibilityLabel="Elite feature">
+              <AccessibleThemedText style={styles.premiumBadgeText} type="small">
+                ELITE
+              </AccessibleThemedText>
+            </AccessibleThemedView>
           )}
         </View>
-        <ThemedText style={styles.optionDescription}>{description}</ThemedText>
+        <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
+          {description}
+        </AccessibleThemedText>
       </View>
       <Switch
         value={
-          isPremium && userProfile?.subscriptionTier !== 'elite'
-            ? false
-            : (localPreferences[key as keyof typeof localPreferences] as boolean)
+          isPremium ? false : (localPreferences[key as keyof typeof localPreferences] as boolean)
         }
         onValueChange={value => handleToggle(key, value)}
-        trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
-        thumbColor={colors.background.primary}
-        disabled={isPremium && userProfile?.subscriptionTier !== 'elite'}
+        trackColor={{ false: colors.surfaceBackground, true: colors.primaryAction }}
+        thumbColor={colors.primaryBackground}
+        disabled={isPremium}
+        accessibilityLabel={title}
+        accessibilityHint={`Toggle ${description.toLowerCase()}`}
       />
-    </View>
+    </AccessibleThemedView>
   );
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+    <AccessibleThemedView style={styles.container} accessibilityLabel="Personalization Screen">
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        accessibilityLabel="Personalization options"
+        accessibilityHint="Scroll to view all personalization options"
+      >
         {/* Theme Preferences */}
         {renderSectionHeader('APPEARANCE')}
 
         {/* Use the new ThemeToggle component for dark mode */}
-        <View style={styles.optionContainer}>
+        <AccessibleThemedView
+          style={styles.optionContainer}
+          accessibilityRole="switch"
+          accessibilityLabel="Dark Mode"
+          accessibilityHint="Toggle dark theme throughout the app"
+        >
           <View style={styles.optionTextContainer}>
             <View style={styles.optionTitleContainer}>
-              <ThemedText style={styles.optionTitle}>Dark Mode</ThemedText>
+              <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
+                Dark Mode
+              </AccessibleThemedText>
             </View>
-            <ThemedText style={styles.optionDescription}>
+            <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Use dark theme throughout the app
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
           <ThemeToggle variant="switch" />
-        </View>
+        </AccessibleThemedView>
 
         {/* Content Preferences */}
         {renderSectionHeader('CONTENT')}
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('FavoriteSports' as never)}
+          accessibilityRole="button"
+          accessibilityLabel="Favorite Sports"
+          accessibilityHint="Customize which sports appear in your feed"
         >
           <View style={styles.optionTextContainer}>
-            <ThemedText style={styles.optionTitle}>Favorite Sports</ThemedText>
-            <ThemedText style={styles.optionDescription}>
+            <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
+              Favorite Sports
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Customize which sports appear in your feed
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
-          <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
-        </TouchableOpacity>
+          <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
+        </AccessibleTouchableOpacity>
 
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('FavoriteTeams' as never)}
+          accessibilityRole="button"
+          accessibilityLabel="Favorite Teams"
+          accessibilityHint="Select teams to follow for updates and predictions"
         >
           <View style={styles.optionTextContainer}>
-            <ThemedText style={styles.optionTitle}>Favorite Teams</ThemedText>
-            <ThemedText style={styles.optionDescription}>
+            <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
+              Favorite Teams
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Select teams to follow for updates and predictions
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
-          <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
-        </TouchableOpacity>
+          <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
+        </AccessibleTouchableOpacity>
 
         {/* Notification Preferences */}
         {renderSectionHeader('NOTIFICATIONS')}
@@ -159,43 +220,53 @@ const PersonalizationScreen = () => {
 
         {/* Betting Preferences */}
         {renderSectionHeader('BETTING PREFERENCES')}
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('RiskToleranceSettings' as never)}
+          accessibilityRole="button"
+          accessibilityLabel="Risk Tolerance"
+          accessibilityHint="Set your preferred level of risk for betting recommendations"
         >
           <View style={styles.optionTextContainer}>
-            <ThemedText style={styles.optionTitle}>Risk Tolerance</ThemedText>
-            <ThemedText style={styles.optionDescription}>
+            <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
+              Risk Tolerance
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Set your preferred level of risk for betting recommendations
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
           <View style={styles.valueContainer}>
-            <ThemedText style={styles.valueText}>
+            <AccessibleThemedText style={styles.valueText} type="bodySmall">
               {localPreferences.riskTolerance.charAt(0).toUpperCase() +
                 localPreferences.riskTolerance.slice(1)}
-            </ThemedText>
-            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
+            </AccessibleThemedText>
+            <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
           </View>
-        </TouchableOpacity>
+        </AccessibleTouchableOpacity>
 
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('OddsFormatSettings' as never)}
+          accessibilityRole="button"
+          accessibilityLabel="Odds Format"
+          accessibilityHint="Choose how odds are displayed throughout the app"
         >
           <View style={styles.optionTextContainer}>
-            <ThemedText style={styles.optionTitle}>Odds Format</ThemedText>
-            <ThemedText style={styles.optionDescription}>
+            <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
+              Odds Format
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Choose how odds are displayed throughout the app
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
           <View style={styles.valueContainer}>
-            <ThemedText style={styles.valueText}>
+            <AccessibleThemedText style={styles.valueText} type="bodySmall">
               {localPreferences.preferredOddsFormat.charAt(0).toUpperCase() +
                 localPreferences.preferredOddsFormat.slice(1)}
-            </ThemedText>
-            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
+            </AccessibleThemedText>
+            <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
           </View>
-        </TouchableOpacity>
+        </AccessibleTouchableOpacity>
 
         {/* Display Preferences */}
         {renderSectionHeader('DISPLAY')}
@@ -237,11 +308,19 @@ const PersonalizationScreen = () => {
         )}
 
         {/* Save Button */}
-        <TouchableOpacity style={styles.saveButton} onPress={handleSavePreferences}>
-          <ThemedText style={styles.saveButtonText}>SAVE PREFERENCES</ThemedText>
-        </TouchableOpacity>
+        <AccessibleTouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSavePreferences}
+          accessibilityRole="button"
+          accessibilityLabel="Save Preferences"
+          accessibilityHint="Save all your personalization preferences"
+        >
+          <AccessibleThemedText style={styles.saveButtonText} type="button">
+            SAVE PREFERENCES
+          </AccessibleThemedText>
+        </AccessibleTouchableOpacity>
       </ScrollView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 
@@ -255,14 +334,14 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.surfaceBackground,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
+    borderBottomColor: colors.tertiaryText,
   },
   sectionHeaderText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: colors.neon.blue,
+    color: colors.primaryAction,
     letterSpacing: 1,
   },
   optionContainer: {
@@ -272,7 +351,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
+    borderBottomColor: colors.tertiaryText,
   },
   optionTextContainer: {
     flex: 1,
@@ -289,10 +368,10 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: colors.secondaryText,
   },
   premiumBadge: {
-    backgroundColor: colors.neon.yellow,
+    backgroundColor: Colors.status.mediumConfidence,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -301,7 +380,7 @@ const styles = StyleSheet.create({
   premiumBadgeText: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: colors.background.primary,
+    color: colors.primaryBackground,
   },
   valueContainer: {
     flexDirection: 'row',
@@ -309,11 +388,11 @@ const styles = StyleSheet.create({
   },
   valueText: {
     fontSize: 16,
-    color: colors.text.secondary,
+    color: colors.secondaryText,
     marginRight: 8,
   },
   saveButton: {
-    backgroundColor: colors.neon.blue,
+    backgroundColor: colors.primaryAction,
     marginHorizontal: 16,
     marginVertical: 24,
     paddingVertical: 16,
@@ -322,7 +401,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   saveButtonText: {
-    color: colors.background.primary,
+    color: colors.primaryBackground,
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,
