@@ -432,5 +432,104 @@
         "linkHint": "Abre el documento legal"
       }
     }
+  },
+  "knowledgeEdge": {
+    "title": "Knowledge Edge",
+    "minRead": "min de lectura",
+    "categories": {
+      "all": "Todos",
+      "guides": "Guías",
+      "glossary": "Glosario",
+      "strategies": "Estrategias",
+      "faq": "Preguntas frecuentes"
+    },
+    "assistant": {
+      "title": "Preguntar al Asistente Edge",
+      "description": "Obtenga respuestas personalizadas sobre predicciones, estrategias y más",
+      "chatButton": "Chatear ahora"
+    },
+    "sections": {
+      "featuredGuides": "Guías destacadas",
+      "glossary": "Glosario de análisis deportivos",
+      "strategyArticles": "Artículos de estrategia analítica",
+      "faq": "Preguntas frecuentes"
+    },
+    "viewFullGlossary": "Ver glosario completo",
+    "loadMoreArticles": "Cargar más artículos",
+    "viewAllFaqs": "Ver todas las preguntas frecuentes",
+    "accessibility": {
+      "search": "Buscar en Knowledge Edge",
+      "openArticle": "Abrir artículo",
+      "articleImage": "Imagen del artículo",
+      "expandTerm": "Expandir para ver definición",
+      "expandFaq": "Expandir para ver respuesta",
+      "openAssistant": "Abrir chat con Asistente Edge"
+    },
+    "articles": {
+      "marketInefficiencies": {
+        "title": "Explotando Ineficiencias del Mercado: Dónde Fallan las Casas de Apuestas",
+        "description": "Aprenda a identificar y capitalizar errores de precios y sesgos del mercado en las apuestas deportivas."
+      },
+      "liveBetting": {
+        "title": "Apuestas En Vivo: Estrategias Avanzadas para Apostar Durante el Juego",
+        "description": "Domine el arte de las apuestas durante el juego con análisis en tiempo real y enfoques estratégicos."
+      },
+      "cognitiveBiases": {
+        "title": "Sesgos Cognitivos en Apuestas Deportivas: Cómo Tu Cerebro Te Sabotea",
+        "description": "Comprenda las trampas psicológicas que conducen a decisiones deficientes de apuestas y cómo evitarlas."
+      },
+      "parlayStrategies": {
+        "title": "Apuestas Combinadas: Maximizando Ganancias con Estrategia",
+        "description": "Aprenda cuándo las apuestas combinadas tienen sentido matemático y cómo construirlas efectivamente."
+      },
+      "valueBetting": {
+        "title": "Conceptos Básicos de Apuestas Deportivas: Guía para Principiantes",
+        "description": "Domine el concepto fundamental que separa a los apostadores ganadores de los perdedores."
+      },
+      "advancedConcepts": {
+        "title": "Gestión Profesional del Bankroll: La Clave del Éxito a Largo Plazo",
+        "description": "Explore por qué el valor de línea de cierre importa y cómo predice el éxito de apuestas a largo plazo."
+      }
+    },
+    "glossary": {
+      "expectedValue": {
+        "term": "Valor Esperado (EV)",
+        "definition": "El resultado promedio anticipado de una predicción a lo largo del tiempo, considerando tanto la probabilidad como el pago."
+      },
+      "closingLineValue": {
+        "term": "Valor de Línea de Cierre (CLV)",
+        "definition": "La diferencia entre las cuotas a las que apostó y las cuotas de cierre, indicando si capturó valor."
+      },
+      "vigorish": {
+        "term": "Margen / Vigorish",
+        "definition": "La comisión del corredor de apuestas incorporada en las cuotas, asegurando ganancias independientemente del resultado."
+      },
+      "arbitrage": {
+        "term": "Oportunidad de Arbitraje",
+        "definition": "Cuando las diferencias de cuotas entre casas de apuestas permiten una ganancia garantizada apostando a todos los resultados."
+      },
+      "regression": {
+        "term": "Regresión a la Media",
+        "definition": "La tendencia estadística de que los rendimientos extremos se acerquen al promedio con el tiempo."
+      }
+    },
+    "faq": {
+      "aiProbabilities": {
+        "question": "¿Cómo calcula la IA las probabilidades de victoria?",
+        "answer": "Nuestro modelo de IA analiza datos históricos, estadísticas de equipos, rendimiento de jugadores y movimientos del mercado para generar probabilidades de victoria. Utiliza algoritmos de aprendizaje automático que han sido entrenados con millones de eventos deportivos pasados y resultados de apuestas."
+      },
+      "sharpPublic": {
+        "question": "¿Cuál es la diferencia entre el dinero sharp y el dinero público?",
+        "answer": "El dinero público representa apuestas de apostadores casuales que típicamente apuestan basándose en favoritos, equipos locales o franquicias populares. El dinero sharp proviene de apostadores profesionales que utilizan modelos sofisticados y grandes bankrolls, a menudo moviendo líneas significativamente a pesar de un volumen de apuestas menor."
+      },
+      "mlUpdates": {
+        "question": "¿Con qué frecuencia se actualiza el modelo de ML?",
+        "answer": "Nuestros modelos de aprendizaje automático se actualizan diariamente con nuevos resultados de partidos, estadísticas de jugadores y datos del mercado de apuestas. Las mejoras importantes del algoritmo se implementan trimestralmente basadas en análisis de rendimiento."
+      },
+      "highConfidence": {
+        "question": "¿Qué significa una predicción de \"alta confianza\"?",
+        "answer": "Una predicción de alta confianza indica que nuestro modelo ha identificado una ventaja significativa basada en múltiples factores alineados a favor de un resultado particular. Estas predicciones históricamente tienen mejor rendimiento que las predicciones estándar, aunque todas las apuestas conllevan un riesgo inherente."
+      }
+    }
   }
 }

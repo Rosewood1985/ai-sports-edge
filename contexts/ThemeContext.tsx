@@ -17,6 +17,12 @@ export interface ThemeColors {
   error: string;
   success: string;
   warning: string;
+  // Additional colors for enhanced UI
+  primaryAction: string;
+  primaryActionLight: string;
+  primaryBackground: string;
+  secondaryText: string;
+  surfaceBackground: string;
 }
 
 // Define light theme colors
@@ -72,22 +78,21 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Get device color scheme
   const deviceColorScheme = useColorScheme();
-  
+
   // Initialize theme state
   const [theme, setThemeState] = useState<ThemeType>('system');
-  
+
   // Use useMemo to prevent recalculations on every render
   const themeData = React.useMemo(() => {
     // Determine if dark mode is active
-    const isDark =
-      theme === 'dark' || (theme === 'system' && deviceColorScheme === 'dark');
-    
+    const isDark = theme === 'dark' || (theme === 'system' && deviceColorScheme === 'dark');
+
     // Get current theme colors
     const colors = isDark ? darkColors : lightColors;
-    
+
     return { isDark, colors };
   }, [theme, deviceColorScheme]);
-  
+
   // Load saved theme from storage
   useEffect(() => {
     const loadTheme = async () => {
@@ -100,10 +105,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         console.error('Error loading theme:', error);
       }
     };
-    
+
     loadTheme();
   }, []);
-  
+
   // Set theme and save to storage
   const setTheme = async (newTheme: ThemeType) => {
     try {
@@ -113,14 +118,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       console.error('Error saving theme:', error);
     }
   };
-  
+
   return (
-    <ThemeContext.Provider value={{
-      theme,
-      colors: themeData.colors,
-      isDark: themeData.isDark,
-      setTheme
-    }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        colors: themeData.colors,
+        isDark: themeData.isDark,
+        setTheme,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

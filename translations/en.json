@@ -346,5 +346,104 @@
         "linkHint": "Opens the legal document"
       }
     }
+  },
+  "knowledgeEdge": {
+    "title": "Knowledge Edge",
+    "minRead": "min read",
+    "categories": {
+      "all": "All",
+      "guides": "Guides",
+      "glossary": "Glossary",
+      "strategies": "Strategies",
+      "faq": "FAQ"
+    },
+    "assistant": {
+      "title": "Ask Edge Assistant",
+      "description": "Get personalized answers about predictions, strategies, and more",
+      "chatButton": "Chat Now"
+    },
+    "sections": {
+      "featuredGuides": "Featured Guides",
+      "glossary": "Sports Analytics Glossary",
+      "strategyArticles": "Analytics Strategy Articles",
+      "faq": "Frequently Asked Questions"
+    },
+    "viewFullGlossary": "View Full Glossary",
+    "loadMoreArticles": "Load More Articles",
+    "viewAllFaqs": "View All FAQs",
+    "accessibility": {
+      "search": "Search Knowledge Edge",
+      "openArticle": "Open article",
+      "articleImage": "Article image",
+      "expandTerm": "Expand to see definition",
+      "expandFaq": "Expand to see answer",
+      "openAssistant": "Open Edge Assistant chat"
+    },
+    "articles": {
+      "marketInefficiencies": {
+        "title": "Exploiting Market Inefficiencies: Where Sportsbooks Get it Wrong",
+        "description": "Learn how to identify and capitalize on pricing errors and market biases in sports betting."
+      },
+      "liveBetting": {
+        "title": "In-Play Betting: Advanced Strategies for Live Wagering",
+        "description": "Master the art of in-game betting with real-time analysis and strategic approaches."
+      },
+      "cognitiveBiases": {
+        "title": "Cognitive Biases in Sports Betting: How Your Brain Works Against You",
+        "description": "Understand the psychological traps that lead to poor betting decisions and how to avoid them."
+      },
+      "parlayStrategies": {
+        "title": "Understanding Parlays: Maximizing Your Edge",
+        "description": "Learn when parlays make mathematical sense and how to build them effectively."
+      },
+      "valueBetting": {
+        "title": "Understanding Implied Probability and Value Betting",
+        "description": "Master the fundamental concept that separates winning bettors from losing ones."
+      },
+      "advancedConcepts": {
+        "title": "Market Efficiency and Closing Line Value: The Misunderstood Metric",
+        "description": "Explore why CLV matters and how it predicts long-term betting success."
+      }
+    },
+    "glossary": {
+      "expectedValue": {
+        "term": "Expected Value (EV)",
+        "definition": "The anticipated average outcome of a prediction over time, considering both probability and payoff."
+      },
+      "closingLineValue": {
+        "term": "Closing Line Value (CLV)",
+        "definition": "The difference between the odds you bet at and the closing odds, indicating whether you captured value."
+      },
+      "vigorish": {
+        "term": "Over-Round / Vigorish",
+        "definition": "The bookmaker's commission built into odds, ensuring profit regardless of outcome."
+      },
+      "arbitrage": {
+        "term": "Arbitrage Opportunity",
+        "definition": "When odds differences between bookmakers allow for guaranteed profit by betting all outcomes."
+      },
+      "regression": {
+        "term": "Regression to the Mean",
+        "definition": "The statistical tendency for extreme performances to move closer to average over time."
+      }
+    },
+    "faq": {
+      "aiProbabilities": {
+        "question": "How does the AI calculate win probabilities?",
+        "answer": "Our AI model analyzes historical data, team statistics, player performance, and market movements to generate win probabilities. It uses machine learning algorithms that have been trained on millions of past sporting events and betting outcomes."
+      },
+      "sharpPublic": {
+        "question": "What is the difference between sharp and public money?",
+        "answer": "Public money represents wagers from casual bettors who typically bet based on favorites, home teams, or popular franchises. Sharp money comes from professional bettors who use sophisticated models and large bankrolls, often moving lines significantly despite smaller betting volume."
+      },
+      "mlUpdates": {
+        "question": "How often is the ML model updated?",
+        "answer": "Our machine learning models are updated daily with new game results, player statistics, and betting market data. Major algorithm improvements are implemented quarterly based on performance analysis."
+      },
+      "highConfidence": {
+        "question": "What does a \"high confidence\" prediction mean?",
+        "answer": "A high confidence prediction indicates that our model has identified a significant edge based on multiple factors aligning in favor of a particular outcome. These predictions historically perform better than standard predictions, though all betting carries inherent risk."
+      }
+    }
   }
 }

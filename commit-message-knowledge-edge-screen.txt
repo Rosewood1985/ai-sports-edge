@@ -1,0 +1,8 @@
+feat: Implement Knowledge Edge screen with accessibility features
+
+- Created KnowledgeEdgeScreen.tsx with proper accessibility support
+- Added translations for Knowledge Edge content in English and Spanish
+- Created useTranslation hook to bridge i18n functionality
+- Added article placeholders for betting strategy content
+- Implemented responsive UI with proper accessibility attributes
+- Organized content into categories: guides, glossary, strategies, and FAQ
