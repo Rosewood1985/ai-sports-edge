@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  TouchableOpacity,
   Text,
   StyleSheet,
   Animated,
@@ -13,8 +12,9 @@ import {
   Linking,
   Platform,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
+import { AccessibleTouchableOpacity } from '../atomic/atoms';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 import { useUITheme } from './UIThemeProvider'; // Use the hook inside the component
 import themeObject from '../styles/theme'; // Import the theme object directly for StyleSheet
@@ -41,7 +41,7 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
   userId,
   gameId,
   style,
-  textStyle
+  textStyle,
 }) => {
   const { theme } = useUITheme(); // Use the hook to get theme for dynamic styles
   const pulseAnim = new Animated.Value(1);
@@ -80,7 +80,7 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
-        })
+        }),
       ])
     );
 
@@ -102,10 +102,13 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     };
   }, [buttonSettings.animation, pulseAnim]);
 
-
   const handlePress = async () => {
     trackButtonClick(position, teamId, userId, gameId);
-    microtransactionService.trackInteraction('click', { type: 'bet_now', contentType, teamId, gameId, cookieEnabled: true }, { id: userId });
+    microtransactionService.trackInteraction(
+      'click',
+      { type: 'bet_now', contentType, teamId, gameId, cookieEnabled: true },
+      { id: userId }
+    );
 
     let isPurchased = false;
     if (gameId) {
@@ -117,7 +120,12 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
       }
     }
 
-    await fanduelCookieService.trackInteraction('bet_button_click', { teamId, gameId, position, isPurchased });
+    await fanduelCookieService.trackInteraction('bet_button_click', {
+      teamId,
+      gameId,
+      position,
+      isPurchased,
+    });
 
     let affiliateUrl;
     const baseUrl = 'https://fanduel.com/';
@@ -126,26 +134,48 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     if (cookieData) {
       affiliateUrl = await fanduelCookieService.generateUrlWithCookies(baseUrl);
     } else {
-      await fanduelCookieService.initializeCookies(userId || 'anonymous', gameId || 'unknown', teamId || 'unknown');
-      affiliateUrl = await bettingAffiliateService.generateAffiliateLink(baseUrl, affiliateCode, teamId, userId, gameId);
+      await fanduelCookieService.initializeCookies(
+        userId || 'anonymous',
+        gameId || 'unknown',
+        teamId || 'unknown'
+      );
+      affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
+        baseUrl,
+        affiliateCode,
+        teamId,
+        userId,
+        gameId
+      );
     }
 
     if (isPurchased) {
       bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
-      microtransactionService.trackInteraction('conversion', { type: 'bet_now', contentType, teamId, gameId, cookieEnabled: true }, { id: userId });
+      microtransactionService.trackInteraction(
+        'conversion',
+        { type: 'bet_now', contentType, teamId, gameId, cookieEnabled: true },
+        { id: userId }
+      );
     }
 
     try {
       // Ensure affiliateUrl is defined before opening
       if (affiliateUrl) {
         await Linking.openURL(affiliateUrl);
-        await fanduelCookieService.trackInteraction('redirect_success', { teamId, gameId, url: affiliateUrl });
+        await fanduelCookieService.trackInteraction('redirect_success', {
+          teamId,
+          gameId,
+          url: affiliateUrl,
+        });
       } else {
-         throw new Error("Affiliate URL could not be generated.");
+        throw new Error('Affiliate URL could not be generated.');
       }
     } catch (error) {
       console.error('Error opening URL:', error);
-      await fanduelCookieService.trackInteraction('redirect_failed', { teamId, gameId, error: error instanceof Error ? error.message : 'Unknown error' });
+      await fanduelCookieService.trackInteraction('redirect_failed', {
+        teamId,
+        gameId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   };
 
@@ -154,13 +184,25 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
     let sizeStyles: ViewStyle;
     switch (size) {
       case 'small':
-        sizeStyles = { paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs, minWidth: 100 };
+        sizeStyles = {
+          paddingHorizontal: theme.spacing.sm,
+          paddingVertical: theme.spacing.xs,
+          minWidth: 100,
+        };
         break;
       case 'large':
-        sizeStyles = { paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm, minWidth: 150 };
+        sizeStyles = {
+          paddingHorizontal: theme.spacing.md,
+          paddingVertical: theme.spacing.sm,
+          minWidth: 150,
+        };
         break;
       default: // medium
-        sizeStyles = { paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm, minWidth: 120 };
+        sizeStyles = {
+          paddingHorizontal: theme.spacing.md,
+          paddingVertical: theme.spacing.sm,
+          minWidth: 120,
+        };
         break;
     }
 
@@ -239,13 +281,16 @@ const BetNowButton: React.FC<BetNowButtonProps> = ({
         },
       ]}
     >
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         onPress={handlePress}
         style={styles.touchable}
         activeOpacity={0.8}
+        accessibilityLabel="Bet Now"
+        accessibilityRole="button"
+        accessibilityHint="Opens FanDuel to place a bet"
       >
         <Text style={[getTextStyles(), textStyle]}>BET NOW</Text>
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
     </Animated.View>
   );
 };

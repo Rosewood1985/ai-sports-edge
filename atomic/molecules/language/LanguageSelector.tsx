@@ -1,18 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, StyleSheet, Modal, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../organisms/i18n/LanguageContext';
 import { ThemedText } from '../../atoms/ThemedText';
 import { ThemedView } from '../../atoms/ThemedView';
 import { useTheme } from '@react-navigation/native';
+import AccessibleTouchableOpacity from '../../atoms/AccessibleTouchableOpacity';
 
 interface LanguageOption {
   code: string;
@@ -64,7 +57,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
     const isSelected = item.code === language;
 
     return (
-      <TouchableOpacity
+      <AccessibleTouchableOpacity
         style={[
           styles.languageOption,
           isSelected && { backgroundColor: colors.primary + '20' },
@@ -72,6 +65,10 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
         ]}
         onPress={() => handleLanguageChange(item.code)}
         disabled={loading !== null}
+        accessibilityLabel={`${item.name} ${isSelected ? t('language.currently_selected') : ''}`}
+        accessibilityHint={isSelected ? undefined : t('language.tap_to_select')}
+        accessibilityRole="radio"
+        accessibilityState={{ checked: isSelected }}
       >
         <ThemedText
           style={[
@@ -85,19 +82,25 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
         {isSelected && <Ionicons name="checkmark" size={24} color={colors.primary} />}
 
         {loading === item.code && <ActivityIndicator size="small" color={colors.primary} />}
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
     );
   };
 
   return (
     <View style={[styles.container, style]}>
-      <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true)}>
+      <AccessibleTouchableOpacity
+        style={styles.selectorButton}
+        onPress={() => setModalVisible(true)}
+        accessibilityLabel={t('language.select_language')}
+        accessibilityHint={t('language.tap_to_open_language_selector')}
+        accessibilityRole="button"
+      >
         <Ionicons name="language" size={24} color={colors.text} />
 
         {showLabel && <ThemedText style={styles.currentLanguage}>{currentLanguageName}</ThemedText>}
 
         <Ionicons name="chevron-down" size={16} color={colors.text} />
-      </TouchableOpacity>
+      </AccessibleTouchableOpacity>
 
       <Modal
         visible={modalVisible}
@@ -110,9 +113,15 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
             <View style={styles.modalHeader}>
               <ThemedText style={styles.modalTitle}>{t('language.select_language')}</ThemedText>
 
-              <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <AccessibleTouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+                accessibilityLabel={t('common.close')}
+                accessibilityHint={t('language.close_language_selector')}
+                accessibilityRole="button"
+              >
                 <Ionicons name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
+              </AccessibleTouchableOpacity>
             </View>
 
             <FlatList

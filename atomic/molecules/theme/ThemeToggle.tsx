@@ -6,8 +6,9 @@
  */
 
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, View, Switch } from 'react-native';
+import { Text, StyleSheet, View, Switch } from 'react-native';
 import { useTheme } from '../../molecules/themeContext';
+import AccessibleTouchableOpacity from '../../atoms/AccessibleTouchableOpacity';
 
 /**
  * ThemeToggle Props
@@ -93,29 +94,31 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
 
     case 'icon':
       return (
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           onPress={handleToggle}
           style={[styles.iconButton, style]}
           accessibilityLabel={getLabelText()}
           accessibilityRole="button"
+          accessibilityHint="Toggles between light and dark theme"
         >
           <Text style={[styles.iconText, textStyle]}>
             {effectiveTheme === 'dark' ? '☀️' : '🌙'}
           </Text>
-        </TouchableOpacity>
+        </AccessibleTouchableOpacity>
       );
 
     case 'button':
     default:
       return (
-        <TouchableOpacity
+        <AccessibleTouchableOpacity
           onPress={handleToggle}
           style={[styles.button, style]}
           accessibilityLabel={getLabelText()}
           accessibilityRole="button"
+          accessibilityHint="Toggles between light and dark theme"
         >
           <Text style={[styles.buttonText, textStyle]}>{getLabelText()}</Text>
-        </TouchableOpacity>
+        </AccessibleTouchableOpacity>
       );
   }
 };
