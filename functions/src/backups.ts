@@ -24,7 +24,7 @@ const backupService = require('../../atomic/organisms/firebaseBackupService');
 export const scheduledFirestoreBackup = functions.pubsub
   .schedule('0 3 * * *')
   .timeZone('UTC')
-  .onRun(async context => {
+  .onRun(async () => {
     console.log('Starting scheduled Firestore backup...');
 
     try {

@@ -1,0 +1,25 @@
+feat(privacy): Implement GDPR/CCPA compliance features
+
+Add comprehensive privacy management system following atomic design:
+
+- Data Layer (Atoms):
+  - Update privacyTypes.ts with interfaces for data deletion requests
+  - Enhance dataCategories.ts with canDelete property
+
+- Business Logic Layer (Molecules):
+  - Create DataAccessManager.ts for handling data access requests
+  - Create DataDeletionManager.ts for handling data deletion requests
+  - Create PrivacyManager.ts as main entry point for privacy functionality
+  - Add index.js to export all privacy-related functionality
+
+- UI Layer (Organisms):
+  - Create PrivacySettingsScreen.tsx for managing privacy settings
+  - Add index.js to export the privacy settings screen
+
+This implementation follows GDPR and CCPA requirements, allowing users to:
+- View and update privacy preferences
+- Request access to personal data
+- Request deletion of specific data categories or entire account
+- Track status of privacy requests
+
+Resolves: #PRIVACY-123
