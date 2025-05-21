@@ -251,7 +251,6 @@
     "select_language": "Select Language",
     "english": "English",
     "spanish": "Spanish",
-    "french": "French",
     "current_language": "Current Language: {{language}}",
     "change_language": "Change Language",
     "language_changed": "Language Changed",

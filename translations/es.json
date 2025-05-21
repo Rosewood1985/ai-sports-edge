@@ -297,7 +297,6 @@
     "select_language": "Seleccionar Idioma",
     "english": "Inglés",
     "spanish": "Español",
-    "french": "Francés",
     "current_language": "Idioma Actual: {{language}}",
     "change_language": "Cambiar Idioma",
     "language_changed": "Idioma Cambiado",

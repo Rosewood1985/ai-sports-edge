@@ -1,0 +1,10 @@
+fix(i18n): Update language files for accessibility
+
+- Ensure Spanish translation has all accessibility-related strings
+- Remove French language references from both English and Spanish files
+- Maintain consistent terminology across all language files
+- Update progress tracking in memory-bank
+
+This change ensures that all accessibility features are properly localized
+in both supported languages (English and Spanish) while removing references
+to French which is not currently supported.
