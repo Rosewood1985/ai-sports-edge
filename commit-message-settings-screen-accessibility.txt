@@ -1,9 +1,13 @@
-feat(accessibility): Enhance SettingsScreen with accessible components
+feat(accessibility): Enhance SettingsScreen with accessibility features
 
-- Replace TouchableOpacity with AccessibleTouchableOpacity
-- Replace ThemedText with AccessibleThemedText
-- Replace ThemedView with AccessibleThemedView
-- Add appropriate accessibility labels, hints, and roles
-- Enhance screen reader experience for settings options, switches, and menu items
+- Replace standard View components with AccessibleThemedView
+- Replace standard Text components with AccessibleThemedText
+- Ensure all interactive elements use AccessibleTouchableOpacity
+- Add proper accessibility attributes (labels, roles, hints)
+- Update progress tracking in memory-bank
 
-This commit continues the systematic implementation of accessibility features across the app, following the patterns established in ProfileScreen.tsx. All interactive elements now have proper accessibility attributes, improving the experience for users with screen readers and other assistive technologies.
+This commit continues the systematic implementation of accessibility features
+across the app, following the pattern established in ProfileScreen (commit 9089eee).
+These changes improve screen reader compatibility and keyboard navigation.
+
+Related: #accessibility #a11y

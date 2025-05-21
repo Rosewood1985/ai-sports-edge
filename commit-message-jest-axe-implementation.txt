@@ -1,0 +1,14 @@
+feat(accessibility): Implement automated accessibility testing with jest-axe
+
+This commit adds automated accessibility testing using jest-axe to ensure our components meet WCAG accessibility guidelines:
+
+- Added jest-axe and related dependencies to package.json
+- Created axe test utilities in atomic/atoms/axeTestUtils.ts
+- Set up jest-axe configuration in jest-setup-axe.ts
+- Updated jest.config.js to include jest-axe setup
+- Created sample accessibility test in __tests__/accessibility/axe-accessibility.test.tsx
+- Added comprehensive documentation in docs/implementation-guides/accessibility-testing.md
+
+These changes enable automated testing of components against accessibility standards, helping us identify and fix accessibility issues early in the development process. The implementation follows atomic architecture principles and integrates with our existing testing framework.
+
+Related task: [✅] Implement automated accessibility testing using jest-axe

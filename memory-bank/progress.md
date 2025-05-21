@@ -1,8 +1,10 @@
 # Implementation Progress
 
-## Focus States Implementation (May 21, 2025)
+## Accessibility Implementation (May 21, 2025)
 
-### Completed
+### Focus States Implementation
+
+#### Completed
 
 - ✅ Enhanced `AccessibleTouchableOpacity` component with focus state handling
 - ✅ Created `focusStateUtils.ts` with focus state utilities and hooks
@@ -12,6 +14,32 @@
 - ✅ Added tests for `AccessibleTouchableOpacity` component
 - ✅ Created comprehensive documentation for focus state implementation
 - ✅ Updated memory bank with focus state implementation details
+
+### Screen Accessibility Implementation
+
+#### Completed
+
+- ✅ ProfileScreen - Replaced standard components with accessible versions
+- ✅ SettingsScreen - Replaced standard components with accessible versions
+- ✅ HomeScreen - Replaced standard components with accessible versions
+- ✅ GameDetailsScreen - Replaced standard components with accessible versions
+- ✅ FAQScreen - Replaced standard components with accessible versions
+- ✅ LegalScreen - Replaced standard components with accessible versions
+- ✅ GDPRConsentScreen - Replaced standard components with accessible versions
+
+### Automated Accessibility Testing
+
+#### Completed
+
+- ✅ Implemented jest-axe for automated accessibility testing
+  - ✅ Added jest-axe and related dependencies to package.json
+  - ✅ Created axe test utilities in atomic/atoms/axeTestUtils.ts
+  - ✅ Set up jest-axe configuration in jest-setup-axe.ts
+  - ✅ Updated jest.config.js to include jest-axe setup
+  - ✅ Created sample accessibility test in **tests**/accessibility/axe-accessibility.test.tsx
+  - ✅ Created comprehensive documentation in docs/implementation-guides/accessibility-testing.md
+
+#### In Progress
 
 ### In Progress
 

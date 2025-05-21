@@ -44,27 +44,30 @@ const SettingsScreen = () => {
 
   return (
     <AccessibleThemedView style={styles.container} accessibilityLabel={t('settings.app_settings')}>
-      <View
+      <AccessibleThemedView
         style={[styles.header, { borderBottomColor: colors.border }]}
         accessibilityLabel={t('settings.app_settings_header')}
       >
         <AccessibleThemedText style={styles.headerTitle} accessibilityRole="header">
           {t('settings.app_settings')}
         </AccessibleThemedText>
-      </View>
+      </AccessibleThemedView>
 
       <ScrollView style={styles.scrollView} accessibilityLabel={t('settings.settings_list')}>
         {/* Appearance Section */}
-        <View style={styles.section} accessibilityLabel={t('settings.theme_settings')}>
+        <AccessibleThemedView
+          style={styles.section}
+          accessibilityLabel={t('settings.theme_settings')}
+        >
           <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
             {t('settings.theme_settings')}
           </AccessibleThemedText>
 
-          <View
+          <AccessibleThemedView
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             accessibilityLabel={t('settings.dark_mode_setting')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="moon-outline"
                 size={24}
@@ -74,13 +77,16 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.dark_mode')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <ThemeToggle variant="switch" />
-          </View>
-        </View>
+          </AccessibleThemedView>
+        </AccessibleThemedView>
 
         {/* Language Section */}
-        <View style={styles.section} accessibilityLabel={t('settings.language_settings')}>
+        <AccessibleThemedView
+          style={styles.section}
+          accessibilityLabel={t('settings.language_settings')}
+        >
           <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
             {t('settings.language_settings')}
           </AccessibleThemedText>
@@ -92,7 +98,7 @@ const SettingsScreen = () => {
             accessibilityRole="button"
             accessibilityHint={t('settings.language_settings_hint')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="language"
                 size={24}
@@ -102,8 +108,8 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.language')}
               </AccessibleThemedText>
-            </View>
-            <View style={styles.settingAction}>
+            </AccessibleThemedView>
+            <AccessibleThemedView style={styles.settingAction}>
               <LanguageSelector showLabel={false} />
               <Ionicons
                 name="chevron-forward"
@@ -111,21 +117,24 @@ const SettingsScreen = () => {
                 color={colors.text}
                 accessibilityLabel={t('settings.navigate_forward')}
               />
-            </View>
+            </AccessibleThemedView>
           </AccessibleTouchableOpacity>
-        </View>
+        </AccessibleThemedView>
 
         {/* Notifications Section */}
-        <View style={styles.section} accessibilityLabel={t('settings.notification_settings')}>
+        <AccessibleThemedView
+          style={styles.section}
+          accessibilityLabel={t('settings.notification_settings')}
+        >
           <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
             {t('settings.notification_settings')}
           </AccessibleThemedText>
 
-          <View
+          <AccessibleThemedView
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             accessibilityLabel={t('settings.push_notifications')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="notifications-outline"
                 size={24}
@@ -135,7 +144,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.push_notifications')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Switch
               value={pushNotifications}
               onValueChange={setPushNotifications}
@@ -147,13 +156,13 @@ const SettingsScreen = () => {
               accessibilityState={{ checked: pushNotifications }}
               accessibilityHint={t('settings.toggle_push_notifications')}
             />
-          </View>
+          </AccessibleThemedView>
 
-          <View
+          <AccessibleThemedView
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             accessibilityLabel={t('settings.email_notifications')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="mail-outline"
                 size={24}
@@ -163,7 +172,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.email_notifications')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Switch
               value={emailNotifications}
               onValueChange={setEmailNotifications}
@@ -175,20 +184,23 @@ const SettingsScreen = () => {
               accessibilityState={{ checked: emailNotifications }}
               accessibilityHint={t('settings.toggle_email_notifications')}
             />
-          </View>
-        </View>
+          </AccessibleThemedView>
+        </AccessibleThemedView>
 
         {/* Data Usage Section */}
-        <View style={styles.section} accessibilityLabel={t('settings.data_settings')}>
+        <AccessibleThemedView
+          style={styles.section}
+          accessibilityLabel={t('settings.data_settings')}
+        >
           <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
             {t('settings.data_settings')}
           </AccessibleThemedText>
 
-          <View
+          <AccessibleThemedView
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             accessibilityLabel={t('settings.download_over_wifi')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="wifi-outline"
                 size={24}
@@ -198,7 +210,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.download_over_wifi')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Switch
               value={downloadOverWifi}
               onValueChange={setDownloadOverWifi}
@@ -210,13 +222,13 @@ const SettingsScreen = () => {
               accessibilityState={{ checked: downloadOverWifi }}
               accessibilityHint={t('settings.toggle_download_over_wifi')}
             />
-          </View>
+          </AccessibleThemedView>
 
-          <View
+          <AccessibleThemedView
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             accessibilityLabel={t('settings.auto_play_videos')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="play-outline"
                 size={24}
@@ -226,7 +238,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.auto_play_videos')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Switch
               value={autoPlayVideos}
               onValueChange={setAutoPlayVideos}
@@ -238,7 +250,7 @@ const SettingsScreen = () => {
               accessibilityState={{ checked: autoPlayVideos }}
               accessibilityHint={t('settings.toggle_auto_play_videos')}
             />
-          </View>
+          </AccessibleThemedView>
 
           <AccessibleTouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
@@ -247,7 +259,7 @@ const SettingsScreen = () => {
             accessibilityRole="button"
             accessibilityHint={t('settings.clear_cache_hint')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="trash-outline"
                 size={24}
@@ -257,7 +269,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.clear_cache')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Ionicons
               name="chevron-forward"
               size={24}
@@ -265,10 +277,10 @@ const SettingsScreen = () => {
               accessibilityLabel={t('settings.navigate_forward')}
             />
           </AccessibleTouchableOpacity>
-        </View>
+        </AccessibleThemedView>
 
         {/* About Section */}
-        <View style={styles.section} accessibilityLabel={t('settings.about')}>
+        <AccessibleThemedView style={styles.section} accessibilityLabel={t('settings.about')}>
           <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
             {t('settings.about')}
           </AccessibleThemedText>
@@ -278,7 +290,7 @@ const SettingsScreen = () => {
             accessibilityLabel={t('settings.version', { version: '1.0.0' })}
             accessibilityRole="button"
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="information-circle-outline"
                 size={24}
@@ -288,7 +300,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.version', { version: '1.0.0' })}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
           </AccessibleTouchableOpacity>
 
           <AccessibleTouchableOpacity
@@ -297,7 +309,7 @@ const SettingsScreen = () => {
             accessibilityRole="button"
             accessibilityHint={t('settings.view_terms_hint')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="document-text-outline"
                 size={24}
@@ -307,7 +319,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.terms')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Ionicons
               name="chevron-forward"
               size={24}
@@ -322,7 +334,7 @@ const SettingsScreen = () => {
             accessibilityRole="button"
             accessibilityHint={t('settings.view_privacy_hint')}
           >
-            <View style={styles.settingInfo}>
+            <AccessibleThemedView style={styles.settingInfo}>
               <Ionicons
                 name="shield-outline"
                 size={24}
@@ -332,7 +344,7 @@ const SettingsScreen = () => {
               <AccessibleThemedText style={styles.settingLabel}>
                 {t('settings.privacy')}
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <Ionicons
               name="chevron-forward"
               size={24}
@@ -340,7 +352,7 @@ const SettingsScreen = () => {
               accessibilityLabel={t('settings.navigate_forward')}
             />
           </AccessibleTouchableOpacity>
-        </View>
+        </AccessibleThemedView>
       </ScrollView>
     </AccessibleThemedView>
   );
