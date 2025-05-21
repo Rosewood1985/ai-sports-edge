@@ -1,51 +1,71 @@
-# Active Context: Dependency Update Implementation
+# Active Context: GDPR/CCPA Compliance Implementation
 
-## Current Implementation Focus
+## Current Focus
 
-We are updating the dependencies for the AI Sports Edge application to ensure they are up-to-date, secure, and compatible with the application. This includes checking for security vulnerabilities, applying necessary updates, and testing the application to ensure everything works correctly.
+We are currently focused on implementing GDPR (General Data Protection Regulation) and CCPA (California Consumer Privacy Act) compliance for AI Sports Edge. This is a critical pre-launch task that addresses legal requirements for handling user data.
 
-## Components Implemented
+## Key Components
 
-1. **Dependency Update Script**:
+1. **Data Inventory and Mapping**
 
-   - Verified `scripts/update-dependencies.js` is working correctly
-   - Made the script executable
-   - Ran the script to check for outdated packages and security vulnerabilities
+   - Identifying all personal data collected
+   - Documenting data flows and storage locations
+   - Determining legal basis for processing
 
-2. **Documentation**:
-   - Created `memory-bank/dependency-update-process.md` to document the update process
-   - Documented the update strategy and considerations
+2. **User Rights Implementation**
 
-## Current Status
+   - Right to access personal data
+   - Right to deletion ("right to be forgotten")
+   - Right to data portability
+   - Right to restrict processing
 
-- Checking for security vulnerabilities
-- Lockfile age is 1 day, which is within the acceptable range (less than 30 days)
-- No outdated packages found (or error occurred during check)
+3. **Consent Management**
+
+   - Explicit consent collection
+   - Consent record storage
+   - Consent withdrawal mechanisms
+
+4. **Privacy Dashboard**
+
+   - User interface for exercising privacy rights
+   - Privacy preference management
+   - Data access and deletion request submission
+
+5. **Documentation and Accountability**
+   - Records of processing activities
+   - Data protection impact assessments
+   - Breach notification procedures
+
+## Implementation Approach
+
+We are following our atomic architecture pattern for this implementation:
+
+- **Atoms**: Basic configuration, types, and utilities
+- **Molecules**: Functional components for specific privacy operations
+- **Organisms**: Complex components that coordinate privacy functions
+- **Templates**: Page layouts for privacy-related screens
+- **Pages**: Complete screen implementations
+
+## Timeline
+
+The implementation is planned in phases:
+
+1. **Phase 1**: Core Infrastructure (May 21-28, 2025)
+2. **Phase 2**: User Rights Implementation (May 29-June 5, 2025)
+3. **Phase 3**: Consent Management (June 6-13, 2025)
+4. **Phase 4**: User Interface (June 14-21, 2025)
+5. **Phase 5**: Testing and Documentation (June 22-29, 2025)
+
+## Related Files
+
+- **Implementation Plan**: `memory-bank/gdpr-ccpa-compliance-plan.md`
+- **Decision Log**: `memory-bank/decisionLog.md`
+- **Progress Report**: `memory-bank/progress.md`
+- **Todo List**: `.roo-todo.md`
 
 ## Next Steps
 
-1. **Security Updates**:
-
-   - Apply security-focused updates if vulnerabilities are found
-   - Verify that security updates don't break existing functionality
-
-2. **Dependency Updates**:
-
-   - Apply patch and minor updates
-   - Test the application thoroughly after updates
-
-3. **Documentation**:
-
-   - Document any breaking changes or required adjustments
-   - Update the todo list to mark the dependency update task as completed
-
-4. **Testing**:
-   - Run comprehensive tests to ensure the application works correctly with updated dependencies
-   - Test on different platforms (iOS, Android, web)
-
-## Considerations
-
-- React Native and Expo compatibility
-- Native modules that may require additional configuration
-- Breaking changes in major version updates
-- Peer dependency issues
+1. Switch to Code mode to begin implementing the core infrastructure components
+2. Create the atomic components for GDPR/CCPA compliance
+3. Implement the database schema updates
+4. Develop the API endpoints for privacy-related operations

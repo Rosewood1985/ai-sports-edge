@@ -27,3 +27,8 @@ export { ResponsiveText } from './ResponsiveText';
 export { AccessibleThemedText } from './AccessibleThemedText';
 export { AccessibleThemedView } from './AccessibleThemedView';
 export { default as AccessibleTouchableOpacity } from './AccessibleTouchableOpacity';
+
+// Privacy atoms
+export { default as privacyConfig } from './privacy/gdprConfig';
+export { default as privacyCategories } from './privacy/dataCategories';
+export { default as privacyStorage } from './privacy/storageUtils';

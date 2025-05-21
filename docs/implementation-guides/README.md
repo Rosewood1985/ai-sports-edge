@@ -10,6 +10,7 @@ This section provides practical guides and best practices for implementing featu
 - [Internationalization Guide](internationalization-guide.md) - Practical guide for implementing internationalization
 - [Firebase Guide](firebase-guide.md) - Guide for implementing Firebase services
 - [Security Features](security-features.md) - Guide for security features implementation
+- [Privacy Compliance](privacy-compliance.md) - Guide for implementing GDPR/CCPA compliance
 - [API Connection Verification](api-connection-verification.md) - Guide for verifying API connections
 - [API Architecture Improvements](api-architecture-improvements.md) - Comprehensive plan for improving API architecture
 - [Testing](testing.md) - Testing strategies and practices
