@@ -5,8 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { useLanguage } from '../contexts/LanguageContext';
 
-import { ThemedView } from '../atomic/atoms/ThemedView';
-import { ThemedText } from '../atomic/atoms/ThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 
 // Define route params type
 type LegalScreenParams = {
@@ -314,26 +314,57 @@ By using AI Sports Edge, you acknowledge that you have read and understood these
   }, [type]);
 
   return (
-    <ThemedView style={styles.container}>
+    <AccessibleThemedView style={styles.container} accessibilityLabel={t('legal.screen_title')}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel={t('common.back')}
+          accessibilityRole="button"
+        >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>{title}</ThemedText>
+        <AccessibleThemedText style={styles.headerTitle} type="h1" accessibilityLabel={title}>
+          {title}
+        </AccessibleThemedText>
         <View style={styles.headerRight} />
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <ThemedText style={styles.loadingText}>{t('common.loading')}</ThemedText>
+          <AccessibleThemedText
+            style={styles.loadingText}
+            type="bodyStd"
+            accessibilityLabel={t('common.loading')}
+          >
+            {t('common.loading')}
+          </AccessibleThemedText>
         </View>
       ) : (
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-          <ThemedText style={styles.markdownContent}>{content}</ThemedText>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+          accessibilityLabel={
+            type === 'privacy-policy'
+              ? t('legal.privacy_policy_content')
+              : t('legal.terms_of_service_content')
+          }
+        >
+          <AccessibleThemedText
+            style={styles.markdownContent}
+            type="bodyStd"
+            accessibilityLabel={
+              type === 'privacy-policy'
+                ? t('legal.privacy_policy_content')
+                : t('legal.terms_of_service_content')
+            }
+          >
+            {content}
+          </AccessibleThemedText>
         </ScrollView>
       )}
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 
