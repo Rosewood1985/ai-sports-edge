@@ -3,9 +3,10 @@ import { StyleSheet, ScrollView, View, Switch, TouchableOpacity, Alert } from 'r
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePersonalization } from '../contexts/PersonalizationContext';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { ThemedText } from '../atomic/atoms/ThemedText';
 import { colors } from '../styles/theme';
+import { ThemeToggle } from 'atomic/molecules/theme';
 
 /**
  * Personalization Screen
@@ -14,10 +15,10 @@ import { colors } from '../styles/theme';
 const PersonalizationScreen = () => {
   const navigation = useNavigation();
   const { preferences, updatePreferences, userProfile } = usePersonalization();
-  
+
   // Local state for form values
   const [localPreferences, setLocalPreferences] = useState({ ...preferences });
-  
+
   // Handle toggle change
   const handleToggle = (key: string, value: boolean) => {
     setLocalPreferences({
@@ -25,7 +26,7 @@ const PersonalizationScreen = () => {
       [key]: value,
     });
   };
-  
+
   // Handle save preferences
   const handleSavePreferences = async () => {
     try {
@@ -36,14 +37,14 @@ const PersonalizationScreen = () => {
       Alert.alert('Error', 'Failed to save preferences. Please try again.');
     }
   };
-  
+
   // Render section header
   const renderSectionHeader = (title: string) => (
     <View style={styles.sectionHeader}>
       <ThemedText style={styles.sectionHeaderText}>{title}</ThemedText>
     </View>
   );
-  
+
   // Render toggle option
   const renderToggleOption = (
     key: string,
@@ -65,30 +66,41 @@ const PersonalizationScreen = () => {
         <ThemedText style={styles.optionDescription}>{description}</ThemedText>
       </View>
       <Switch
-        value={isPremium && userProfile?.subscriptionTier !== 'elite' ? false : localPreferences[key as keyof typeof localPreferences] as boolean}
-        onValueChange={(value) => handleToggle(key, value)}
+        value={
+          isPremium && userProfile?.subscriptionTier !== 'elite'
+            ? false
+            : (localPreferences[key as keyof typeof localPreferences] as boolean)
+        }
+        onValueChange={value => handleToggle(key, value)}
         trackColor={{ false: colors.background.secondary, true: colors.neon.blue }}
         thumbColor={colors.background.primary}
         disabled={isPremium && userProfile?.subscriptionTier !== 'elite'}
       />
     </View>
   );
-  
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         {/* Theme Preferences */}
         {renderSectionHeader('APPEARANCE')}
-        {renderToggleOption(
-          'darkMode',
-          'Dark Mode',
-          'Use dark theme throughout the app',
-          localPreferences.darkMode
-        )}
-        
+
+        {/* Use the new ThemeToggle component for dark mode */}
+        <View style={styles.optionContainer}>
+          <View style={styles.optionTextContainer}>
+            <View style={styles.optionTitleContainer}>
+              <ThemedText style={styles.optionTitle}>Dark Mode</ThemedText>
+            </View>
+            <ThemedText style={styles.optionDescription}>
+              Use dark theme throughout the app
+            </ThemedText>
+          </View>
+          <ThemeToggle variant="switch" />
+        </View>
+
         {/* Content Preferences */}
         {renderSectionHeader('CONTENT')}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('FavoriteSports' as never)}
         >
@@ -100,8 +112,8 @@ const PersonalizationScreen = () => {
           </View>
           <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('FavoriteTeams' as never)}
         >
@@ -113,7 +125,7 @@ const PersonalizationScreen = () => {
           </View>
           <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
         </TouchableOpacity>
-        
+
         {/* Notification Preferences */}
         {renderSectionHeader('NOTIFICATIONS')}
         {renderToggleOption(
@@ -122,21 +134,21 @@ const PersonalizationScreen = () => {
           'Receive notifications on your device',
           localPreferences.enablePushNotifications
         )}
-        
+
         {renderToggleOption(
           'notifyBeforeGames',
           'Game Reminders',
           'Get notified before games start',
           localPreferences.notifyBeforeGames
         )}
-        
+
         {renderToggleOption(
           'notifyForFavoriteTeams',
           'Favorite Team Updates',
           'Get notified about your favorite teams',
           localPreferences.notifyForFavoriteTeams
         )}
-        
+
         {renderToggleOption(
           'notifyForBettingOpportunities',
           'Betting Opportunities',
@@ -144,10 +156,10 @@ const PersonalizationScreen = () => {
           localPreferences.notifyForBettingOpportunities,
           true
         )}
-        
+
         {/* Betting Preferences */}
         {renderSectionHeader('BETTING PREFERENCES')}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('RiskToleranceSettings' as never)}
         >
@@ -159,13 +171,14 @@ const PersonalizationScreen = () => {
           </View>
           <View style={styles.valueContainer}>
             <ThemedText style={styles.valueText}>
-              {localPreferences.riskTolerance.charAt(0).toUpperCase() + localPreferences.riskTolerance.slice(1)}
+              {localPreferences.riskTolerance.charAt(0).toUpperCase() +
+                localPreferences.riskTolerance.slice(1)}
             </ThemedText>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </View>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate('OddsFormatSettings' as never)}
         >
@@ -177,12 +190,13 @@ const PersonalizationScreen = () => {
           </View>
           <View style={styles.valueContainer}>
             <ThemedText style={styles.valueText}>
-              {localPreferences.preferredOddsFormat.charAt(0).toUpperCase() + localPreferences.preferredOddsFormat.slice(1)}
+              {localPreferences.preferredOddsFormat.charAt(0).toUpperCase() +
+                localPreferences.preferredOddsFormat.slice(1)}
             </ThemedText>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </View>
         </TouchableOpacity>
-        
+
         {/* Display Preferences */}
         {renderSectionHeader('DISPLAY')}
         {renderToggleOption(
@@ -191,21 +205,21 @@ const PersonalizationScreen = () => {
           'Show live scores on the home screen',
           localPreferences.showLiveScores
         )}
-        
+
         {renderToggleOption(
           'showPredictionConfidence',
           'Prediction Confidence',
           'Show confidence level for AI predictions',
           localPreferences.showPredictionConfidence
         )}
-        
+
         {renderToggleOption(
           'showBettingHistory',
           'Betting History',
           'Show your betting history on the profile screen',
           localPreferences.showBettingHistory
         )}
-        
+
         {/* Privacy Preferences */}
         {renderSectionHeader('PRIVACY')}
         {renderToggleOption(
@@ -214,19 +228,16 @@ const PersonalizationScreen = () => {
           'Allow us to use your betting history to improve predictions',
           localPreferences.shareDataForBetterPredictions
         )}
-        
+
         {renderToggleOption(
           'anonymousUsageStats',
           'Anonymous Usage Statistics',
           'Help us improve by sharing anonymous usage data',
           localPreferences.anonymousUsageStats
         )}
-        
+
         {/* Save Button */}
-        <TouchableOpacity 
-          style={styles.saveButton}
-          onPress={handleSavePreferences}
-        >
+        <TouchableOpacity style={styles.saveButton} onPress={handleSavePreferences}>
           <ThemedText style={styles.saveButtonText}>SAVE PREFERENCES</ThemedText>
         </TouchableOpacity>
       </ScrollView>
