@@ -1,14 +1,11 @@
-feat(accessibility): Integrate AccessibleThemedText and AccessibleThemedView in LegalScreen
+feat(accessibility): Enhance LegalScreen with accessible components
 
-This commit enhances the accessibility of the LegalScreen by:
-
-- Replacing all ThemedText components with AccessibleThemedText
-- Replacing all ThemedView components with AccessibleThemedView
-- Adding appropriate accessibility labels for screen readers
-- Using semantic type props (h1, bodyStd, etc.) for proper heading hierarchy
-- Adding accessibility labels to the ScrollView for legal content
-- Maintaining consistent styling while improving accessibility
-
-These changes improve the app's accessibility compliance and provide a better
-experience for users with disabilities, particularly those using screen readers
-when viewing legal content such as Privacy Policy and Terms of Service.
+- Replaced TouchableOpacity with AccessibleTouchableOpacity
+- Replaced View components with AccessibleThemedView
+- Added appropriate accessibility labels, hints, and roles
+- Enhanced screen reader experience for legal content
+- Improved focus order and navigation
+- Added proper semantic structure with heading hierarchy
+- Ensured accessibility for both Privacy Policy and Terms of Service content
+- Added descriptive accessibility labels for interactive elements
+- Maintained existing functionality while improving accessibility

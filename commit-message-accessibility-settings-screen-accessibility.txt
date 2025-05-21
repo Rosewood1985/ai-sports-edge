@@ -1,0 +1,10 @@
+feat(accessibility): Enhance AccessibilitySettingsScreen with accessible components
+
+- Replaced ThemedText with AccessibleThemedText
+- Replaced ThemedView with AccessibleThemedView
+- Replaced standard View components with AccessibleThemedView
+- Added proper accessibility attributes (accessibilityLabel, accessibilityRole, accessibilityHint, accessibilityState)
+- Enhanced screen reader experience for accessibility settings options
+- Improved semantic structure with proper heading hierarchy
+- Added appropriate accessibility states to switches
+- Fixed TypeScript errors related to analytics and theme color usage

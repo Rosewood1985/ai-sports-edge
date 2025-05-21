@@ -1,0 +1,24 @@
+feat(accessibility): Enhance AuthScreen with accessible components
+
+- Replaced standard components with accessible counterparts:
+  - Replaced ThemedText with AccessibleThemedText
+  - Replaced ThemedView with AccessibleThemedView
+  - Replaced TouchableOpacity with AccessibleTouchableOpacity
+  
+- Added proper accessibility attributes:
+  - Added accessibilityLabel to provide descriptions for screen readers
+  - Added accessibilityRole to define the role of elements
+  - Added accessibilityHint to provide additional context
+  - Added accessibilityState for elements with states
+  
+- Enhanced form inputs with accessibility attributes:
+  - Added accessibility properties to TextInput components
+  - Added accessibility labels to icons
+  - Added proper semantic structure with heading hierarchy
+  
+- Improved screen reader experience for:
+  - Form inputs and validation messages
+  - Password strength meter and requirements
+  - Authentication buttons and toggles
+  
+This implementation follows the same patterns used in ProfileScreen and SettingsScreen, ensuring consistency across the app. The changes maintain the existing functionality and visual appearance while improving accessibility for users with disabilities.

@@ -1,0 +1,14 @@
+feat(accessibility): Enhance PaymentScreen with accessible components
+
+- Replaced Text components with AccessibleThemedText with proper semantic types
+- Replaced View components with AccessibleThemedView
+- Replaced TouchableOpacity with AccessibleTouchableOpacity
+- Added proper heading hierarchy (h1 for title, h2 for sections)
+- Added appropriate accessibility labels, roles, and hints for all elements
+- Enhanced screen reader experience for payment form and card input
+- Added accessibility properties to the Stripe CardField component
+- Improved focus order through the payment flow
+- Made validation errors and loading states accessible to screen readers
+- Ensured all interactive elements have proper accessibility states
+
+This commit continues our systematic implementation of accessibility features across the app, following the same patterns used in previously updated screens. The payment screen is now fully accessible to users with disabilities, including those using screen readers.

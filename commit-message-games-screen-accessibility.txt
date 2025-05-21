@@ -1,0 +1,13 @@
+feat(accessibility): Enhance GamesScreen with accessible components
+
+- Replaced TouchableOpacity with AccessibleTouchableOpacity
+- Replaced ThemedText with AccessibleThemedText
+- Replaced ThemedView with AccessibleThemedView
+- Added appropriate accessibility labels, hints, and roles
+- Enhanced screen reader experience for game cards, tabs, and interactive elements
+- Implemented proper heading hierarchy
+- Added proper state announcements for game status (live, upcoming, completed)
+- Ensured logical tab/focus order for interactive elements
+- Fixed import path for LanguageContext
+
+This commit continues our systematic accessibility implementation across the app, making the GamesScreen fully accessible to users with disabilities, particularly those using screen readers.
