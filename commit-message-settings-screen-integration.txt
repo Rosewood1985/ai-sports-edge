@@ -1,0 +1,9 @@
+feat(ui): Add ThemeToggle to SettingsScreen
+
+This commit integrates the ThemeToggle component from the atomic architecture into the SettingsScreen:
+
+- Add variant="switch" prop to ThemeToggle component
+- Maintain consistent UI with other toggle components
+- Improve user experience for theme switching
+
+This integration enhances the app's theme management capabilities and provides a more consistent user interface.

@@ -1,0 +1,11 @@
+refactor(api): Integrate enhanced API service with OddsService
+
+This commit integrates the enhanced API service with caching into the OddsService class:
+
+- Replace direct axios calls with apiService.makeRequest
+- Leverage the apiService's built-in caching mechanism
+- Remove redundant caching logic from OddsService
+- Update clearCache method to use apiService.clearCache
+- Maintain the same API interface for backward compatibility
+
+This integration improves performance by using a consistent caching strategy across the application and reduces code duplication.
