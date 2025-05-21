@@ -33,6 +33,9 @@ export enum ConsentType {
   MARKETING = 'marketing',
   THIRD_PARTY = 'thirdParty',
   PROFILING = 'profiling',
+  PRIVACY_POLICY = 'privacyPolicy',
+  TERMS_OF_SERVICE = 'termsOfService',
+  COOKIE_POLICY = 'cookiePolicy',
 }
 
 /**
@@ -44,6 +47,7 @@ export enum ConsentMethod {
   FORM = 'form',
   COOKIE = 'cookie',
   API = 'api',
+  SETTINGS = 'settings',
 }
 
 /**
@@ -65,6 +69,7 @@ export enum PrivacyRequestStatus {
   PROCESSING = 'processing',
   COMPLETED = 'completed',
   DENIED = 'denied',
+  FAILED = 'failed',
 }
 
 /**

@@ -1,0 +1,18 @@
+ci(accessibility): Add Jest testing dependencies and CI/CD integration
+
+- Add script to install Jest testing dependencies for TypeScript
+- Update Jest configuration to properly support TypeScript testing
+- Create GitHub Actions workflow for accessibility testing
+- Implement color contrast testing with WCAG 2.1 validation
+- Add Axe accessibility testing for web version
+- Make all testing scripts executable
+
+This change adds comprehensive accessibility testing to the CI/CD pipeline,
+ensuring that accessibility issues are caught early in the development process.
+The tests verify:
+1. Component accessibility through unit tests
+2. Color contrast compliance with WCAG 2.1 standards
+3. Web accessibility using Axe for automated testing
+
+These tools will help maintain accessibility standards across the app and
+prevent regressions as new features are added.

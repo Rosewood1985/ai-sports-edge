@@ -1,225 +1,215 @@
 /**
  * Data Retention Policies
  *
- * This module defines data retention policies and provides utilities for
- * automatically enforcing these policies.
+ * This file defines data retention policies for different data categories.
+ * It includes configuration for retention periods, automatic deletion, and
+ * retention exceptions based on legal requirements.
  */
 
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  writeBatch,
-  DocumentData,
-  QueryDocumentSnapshot,
-  deleteDoc,
-  updateDoc,
-  doc,
-} from 'firebase/firestore';
-import { getDataCategory } from './dataCategories';
-
-// Define the data categories
-export type DataCategory =
-  | 'personalInfo'
-  | 'paymentInfo'
-  | 'activityData'
-  | 'analyticsData'
-  | 'marketingPreferences'
-  | 'deviceInfo'
-  | 'locationData'
-  | 'communicationHistory'
-  | 'userContent'
-  | 'thirdPartyData';
+import { DataCategoryDefinition } from './dataCategories';
 
 /**
  * Retention period in days for different data categories
  */
-export const retentionPeriods: Record<DataCategory, number> = {
-  personalInfo: 365 * 2, // 2 years
-  paymentInfo: 365 * 5, // 5 years (legal requirement)
-  activityData: 180, // 6 months
+export const retentionPeriods: Record<string, number> = {
+  // User account data
+  personalInfo: 365 * 2, // 2 years after account deletion
+  accountActivity: 365, // 1 year
+
+  // Analytics and usage data
   analyticsData: 90, // 3 months
-  marketingPreferences: 365 * 2, // 2 years
-  deviceInfo: 30, // 1 month
+  usageStatistics: 180, // 6 months
+
+  // Marketing data
+  marketingData: 365, // 1 year
+  communicationPreferences: 365 * 2, // 2 years
+
+  // Betting-related data
+  bettingHistory: 365 * 5, // 5 years (legal requirement)
+  transactionHistory: 365 * 7, // 7 years (tax requirements)
+
+  // App usage data
+  appUsageData: 90, // 3 months
+  deviceInfo: 180, // 6 months
+
+  // Location data
   locationData: 30, // 1 month
-  communicationHistory: 365, // 1 year
-  userContent: 365 * 2, // 2 years
-  thirdPartyData: 90, // 3 months
+
+  // Temporary data
+  temporaryData: 7, // 1 week
+  cacheData: 1, // 1 day
 };
 
 /**
- * Interface for data retention policy
+ * Default retention policies for data categories
  */
-export interface DataRetentionPolicy {
-  category: DataCategory;
-  retentionPeriod: number; // in days
-  archiveAfterExpiry?: boolean;
-  anonymizeAfterExpiry?: boolean;
-  deleteAfterExpiry?: boolean;
+export const defaultRetentionPolicies: Record<
+  string,
+  {
+    retentionPeriod: number;
+    autoDelete: boolean;
+    retentionExceptions?: string[];
+  }
+> = {
+  personalInfo: {
+    retentionPeriod: retentionPeriods.personalInfo,
+    autoDelete: true,
+    retentionExceptions: ['legalRequirement', 'ongoingDispute'],
+  },
+  accountActivity: {
+    retentionPeriod: retentionPeriods.accountActivity,
+    autoDelete: true,
+  },
+  analyticsData: {
+    retentionPeriod: retentionPeriods.analyticsData,
+    autoDelete: true,
+  },
+  usageStatistics: {
+    retentionPeriod: retentionPeriods.usageStatistics,
+    autoDelete: true,
+  },
+  marketingData: {
+    retentionPeriod: retentionPeriods.marketingData,
+    autoDelete: true,
+  },
+  communicationPreferences: {
+    retentionPeriod: retentionPeriods.communicationPreferences,
+    autoDelete: false,
+  },
+  bettingHistory: {
+    retentionPeriod: retentionPeriods.bettingHistory,
+    autoDelete: false,
+    retentionExceptions: ['legalRequirement', 'taxRequirement'],
+  },
+  transactionHistory: {
+    retentionPeriod: retentionPeriods.transactionHistory,
+    autoDelete: false,
+    retentionExceptions: ['legalRequirement', 'taxRequirement'],
+  },
+  appUsageData: {
+    retentionPeriod: retentionPeriods.appUsageData,
+    autoDelete: true,
+  },
+  deviceInfo: {
+    retentionPeriod: retentionPeriods.deviceInfo,
+    autoDelete: true,
+  },
+  locationData: {
+    retentionPeriod: retentionPeriods.locationData,
+    autoDelete: true,
+  },
+  temporaryData: {
+    retentionPeriod: retentionPeriods.temporaryData,
+    autoDelete: true,
+  },
+  cacheData: {
+    retentionPeriod: retentionPeriods.cacheData,
+    autoDelete: true,
+  },
+};
+
+/**
+ * Data retention configuration
+ */
+export const dataRetentionConfig = {
+  // Whether to enable automatic data retention
+  enableAutoRetention: true,
+
+  // How often to run the data retention job (in days)
+  retentionJobFrequency: 1,
+
+  // Whether to keep audit logs of deleted data
+  keepDeletionLogs: true,
+
+  // How long to keep deletion logs (in days)
+  deletionLogRetention: 365 * 2, // 2 years
+
+  // Whether to anonymize data instead of deleting it
+  anonymizeInsteadOfDelete: {
+    analyticsData: true,
+    usageStatistics: true,
+    appUsageData: true,
+  },
+};
+
+/**
+ * Get the retention period for a data category
+ * @param category The data category
+ * @returns The retention period in days
+ */
+export function getRetentionPeriod(category: string): number {
+  return retentionPeriods[category] || 365; // Default to 1 year
 }
 
 /**
- * Default data retention policies
- */
-export const defaultRetentionPolicies: DataRetentionPolicy[] = Object.entries(retentionPeriods).map(
-  ([category, period]) => ({
-    category: category as DataCategory,
-    retentionPeriod: period,
-    anonymizeAfterExpiry: true,
-    deleteAfterExpiry: false,
-  })
-);
-
-/**
- * Checks if a data item has expired based on its creation date and retention policy
- *
- * @param creationDate The date when the data was created
- * @param retentionPeriod The retention period in days
- * @returns True if the data has expired, false otherwise
- */
-export const isDataExpired = (creationDate: Date, retentionPeriod: number): boolean => {
-  const expiryDate = new Date(creationDate);
-  expiryDate.setDate(expiryDate.getDate() + retentionPeriod);
-  return new Date() > expiryDate;
-};
-
-/**
- * Applies data retention policies to a Firestore collection
- *
- * @param collectionPath The path to the Firestore collection
- * @param dateField The field containing the creation date
- * @param categoryField The field containing the data category
- * @param policies The data retention policies to apply
- */
-export const applyRetentionPolicies = async (
-  collectionPath: string,
-  dateField: string = 'createdAt',
-  categoryField: string = 'category',
-  policies: DataRetentionPolicy[] = defaultRetentionPolicies
-): Promise<void> => {
-  const db = getFirestore();
-  const batch = writeBatch(db);
-  let batchCount = 0;
-  const batchLimit = 500; // Firestore batch limit
-
-  for (const policy of policies) {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - policy.retentionPeriod);
-
-    const q = query(
-      collection(db, collectionPath),
-      where(categoryField, '==', policy.category),
-      where(dateField, '<', cutoffDate)
-    );
-
-    const snapshot = await getDocs(q);
-
-    snapshot.forEach((document: QueryDocumentSnapshot<DocumentData>) => {
-      const data = document.data();
-
-      if (policy.deleteAfterExpiry) {
-        // Delete the document
-        batch.delete(document.ref);
-      } else if (policy.anonymizeAfterExpiry) {
-        // Anonymize the data by removing personal identifiers
-        const anonymizedData = anonymizeData(data, policy.category);
-        batch.update(document.ref, anonymizedData);
-      } else if (policy.archiveAfterExpiry) {
-        // Mark as archived
-        batch.update(document.ref, { archived: true });
-      }
-
-      batchCount++;
-
-      // Commit batch if it reaches the limit
-      if (batchCount >= batchLimit) {
-        batch.commit();
-        batchCount = 0;
-      }
-    });
-  }
-
-  // Commit any remaining operations
-  if (batchCount > 0) {
-    await batch.commit();
-  }
-};
-
-/**
- * Anonymizes data based on its category
- *
- * @param data The data to anonymize
+ * Check if a data category should be automatically deleted
  * @param category The data category
- * @returns Anonymized data
+ * @returns True if the category should be automatically deleted
  */
-export const anonymizeData = (data: any, category: DataCategory): any => {
-  const anonymizedData = { ...data };
+export function shouldAutoDelete(category: string): boolean {
+  const policy = defaultRetentionPolicies[category];
+  return policy?.autoDelete || false;
+}
 
-  switch (category) {
-    case 'personalInfo':
-      delete anonymizedData.name;
-      delete anonymizedData.email;
-      delete anonymizedData.phone;
-      delete anonymizedData.address;
-      anonymizedData.anonymized = true;
-      break;
-    case 'locationData':
-      delete anonymizedData.latitude;
-      delete anonymizedData.longitude;
-      delete anonymizedData.address;
-      anonymizedData.anonymized = true;
-      break;
-    case 'deviceInfo':
-      delete anonymizedData.deviceId;
-      delete anonymizedData.ipAddress;
-      anonymizedData.anonymized = true;
-      break;
-    // Add more cases for other categories
-    default:
-      // For other categories, just mark as anonymized
-      anonymizedData.anonymized = true;
+/**
+ * Check if a data category should be anonymized instead of deleted
+ * @param category The data category
+ * @returns True if the category should be anonymized
+ */
+export function shouldAnonymize(category: string): boolean {
+  return (
+    (dataRetentionConfig.anonymizeInsteadOfDelete as Record<string, boolean>)[category] || false
+  );
+}
+
+/**
+ * Get retention exceptions for a data category
+ * @param category The data category
+ * @returns Array of retention exceptions, or empty array if none
+ */
+export function getRetentionExceptions(category: string): string[] {
+  const policy = defaultRetentionPolicies[category];
+  return policy?.retentionExceptions || [];
+}
+
+/**
+ * Calculate the deletion date for a data item
+ * @param category The data category
+ * @param creationDate The creation date of the data
+ * @returns The date when the data should be deleted
+ */
+export function calculateDeletionDate(category: string, creationDate: Date): Date {
+  const retentionPeriod = getRetentionPeriod(category);
+  const deletionDate = new Date(creationDate);
+  deletionDate.setDate(deletionDate.getDate() + retentionPeriod);
+  return deletionDate;
+}
+
+/**
+ * Check if a data item should be deleted based on its age
+ * @param category The data category
+ * @param creationDate The creation date of the data
+ * @returns True if the data should be deleted
+ */
+export function shouldDeleteData(category: string, creationDate: Date): boolean {
+  if (!shouldAutoDelete(category)) {
+    return false;
   }
 
-  return anonymizedData;
-};
+  const deletionDate = calculateDeletionDate(category, creationDate);
+  const now = new Date();
 
-/**
- * Schedules a data retention job to run periodically
- *
- * @param collectionPaths Array of collection paths to apply retention policies to
- * @param intervalInDays How often to run the job (in days)
- * @param policies The data retention policies to apply
- */
-export const scheduleDataRetentionJob = (
-  collectionPaths: string[],
-  intervalInDays: number = 1,
-  policies: DataRetentionPolicy[] = defaultRetentionPolicies
-): NodeJS.Timeout => {
-  const intervalMs = intervalInDays * 24 * 60 * 60 * 1000;
+  return now >= deletionDate;
+}
 
-  const job = async () => {
-    try {
-      for (const path of collectionPaths) {
-        await applyRetentionPolicies(path, 'createdAt', 'category', policies);
-      }
-      console.log(`Data retention job completed successfully at ${new Date().toISOString()}`);
-    } catch (error) {
-      console.error('Error in data retention job:', error);
-    }
-  };
-
-  // Run immediately and then schedule
-  job();
-  return setInterval(job, intervalMs);
-};
-
-/**
- * Stops a scheduled data retention job
- *
- * @param jobId The job ID returned by scheduleDataRetentionJob
- */
-export const stopDataRetentionJob = (jobId: NodeJS.Timeout): void => {
-  clearInterval(jobId);
+export default {
+  retentionPeriods,
+  defaultRetentionPolicies,
+  dataRetentionConfig,
+  getRetentionPeriod,
+  shouldAutoDelete,
+  shouldAnonymize,
+  getRetentionExceptions,
+  calculateDeletionDate,
+  shouldDeleteData,
 };

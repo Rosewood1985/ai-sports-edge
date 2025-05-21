@@ -115,12 +115,13 @@ export interface PrivacyRequest {
  */
 export interface DataAccessRequest extends PrivacyRequest {
   type: PrivacyRequestType.ACCESS;
-  requestData: {
-    dataCategories?: string[]; // Specific categories of data requested
-    format?: 'json' | 'csv' | 'pdf'; // Requested format
+  dataCategories: string[]; // Specific categories of data requested
+  format: DataFormat; // Requested format
+  downloadUrl?: string; // URL to download the data
+  requestData?: {
+    additionalInfo?: string; // Any additional information provided by the user
   };
   responseData?: {
-    downloadUrl?: string; // URL to download the data
     expiresAt?: Date; // When the download URL expires
     size?: number; // Size of the data in bytes
   };
@@ -143,6 +144,11 @@ export interface DataDeletionRequest extends PrivacyRequest {
     accountDeleted?: boolean; // Whether the account was deleted
   };
 }
+
+/**
+ * Data format for exports
+ */
+export type DataFormat = 'json' | 'csv' | 'xml' | 'pdf';
 
 /**
  * Represents a data portability request

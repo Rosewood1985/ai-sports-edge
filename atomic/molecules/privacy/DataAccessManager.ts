@@ -1,201 +1,423 @@
 /**
  * Data Access Manager
  *
- * This class manages data access requests from users.
+ * This class manages data access requests, allowing users to request access to their personal data.
+ * It handles the creation, processing, and completion of data access requests, as well as
+ * generating data exports in various formats.
  */
 
 import {
   getFirestore,
-  doc,
-  getDoc,
-  setDoc,
   collection,
+  doc,
+  addDoc,
+  getDoc,
+  getDocs,
   query,
   where,
-  getDocs,
+  updateDoc,
   Timestamp,
 } from 'firebase/firestore';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { getDataCategory } from '../../atoms/privacy/dataCategories';
+import { DataAccessRequest, DataFormat } from '../../atoms/privacy/privacyTypes';
+import { PrivacyRequestStatus, PrivacyRequestType } from '../../atoms/privacy/gdprConfig';
 
 /**
- * Request status enum
+ * Class for managing data access requests
  */
-export enum RequestStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  REJECTED = 'rejected',
-}
-
-/**
- * Data format enum
- */
-export enum DataFormat {
-  JSON = 'json',
-  CSV = 'csv',
-  PDF = 'pdf',
-}
-
-/**
- * Data access request interface
- */
-export interface DataAccessRequest {
-  id: string;
-  userId: string;
-  categories: string[];
-  format: DataFormat;
-  status: RequestStatus;
-  requestedAt: Date;
-  completedAt?: Date;
-  downloadUrl?: string;
-  expiresAt?: Date;
-}
-
-/**
- * Data Access Manager class
- */
-class DataAccessManager {
+export class DataAccessManager {
   private db = getFirestore();
-  private collectionPath = 'dataAccessRequests';
+  private storage = getStorage();
+  private requestsCollection = 'privacyRequests';
 
   /**
-   * Request data access
+   * Create a data access request
    * @param userId The user ID
-   * @param categories The data categories to include in the request
-   * @param format The format of the data (e.g., 'json', 'csv')
-   * @returns A promise that resolves when the request is submitted
+   * @param dataCategories The data categories to include in the request
+   * @param format The format to export the data in
+   * @returns The ID of the created request
    */
-  async requestDataAccess(userId: string, categories: string[], format: string): Promise<void> {
+  async createDataAccessRequest(
+    userId: string,
+    dataCategories: string[],
+    format: DataFormat = 'json'
+  ): Promise<string> {
     try {
-      // Validate format
-      if (!Object.values(DataFormat).includes(format as DataFormat)) {
-        throw new Error(`Invalid format: ${format}`);
-      }
-
-      // Create request ID
-      const requestId = `${userId}_${Date.now()}`;
-      const docRef = doc(this.db, this.collectionPath, requestId);
-
-      // Create request
-      const request: DataAccessRequest = {
-        id: requestId,
+      // Create the request
+      const request: Omit<DataAccessRequest, 'id'> = {
         userId,
-        categories,
-        format: format as DataFormat,
-        status: RequestStatus.PENDING,
-        requestedAt: new Date(),
+        type: PrivacyRequestType.ACCESS,
+        status: PrivacyRequestStatus.PENDING,
+        dataCategories,
+        format,
+        createdAt: Timestamp.now() as any,
+        updatedAt: Timestamp.now() as any,
+        completedAt: undefined,
+        downloadUrl: undefined,
+        verificationStatus: 'pending',
       };
 
-      // Save request
-      await setDoc(docRef, request);
+      // Add the request to Firestore
+      const docRef = await addDoc(collection(this.db, this.requestsCollection), request);
 
-      // Trigger background job to process request
-      // This would typically be done with a Cloud Function
-      console.log(`Data access request submitted: ${requestId}`);
+      console.log(`Created data access request ${docRef.id} for user ${userId}`);
+
+      // Start processing the request asynchronously
+      this.processDataAccessRequest(docRef.id).catch(error => {
+        console.error(`Error processing data access request ${docRef.id}:`, error);
+      });
+
+      return docRef.id;
     } catch (error) {
-      console.error('Error requesting data access:', error);
+      console.error('Error creating data access request:', error);
       throw error;
     }
   }
 
   /**
-   * Get request status
+   * Get a data access request by ID
    * @param requestId The request ID
-   * @returns The status of the request
+   * @returns The data access request, or null if not found
    */
-  async getRequestStatus(requestId: string): Promise<string> {
+  async getDataAccessRequest(requestId: string): Promise<DataAccessRequest | null> {
     try {
-      const docRef = doc(this.db, this.collectionPath, requestId);
+      const docRef = doc(this.db, this.requestsCollection, requestId);
       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return data.status;
-      } else {
-        throw new Error(`Request not found: ${requestId}`);
+      if (!docSnap.exists()) {
+        return null;
       }
+
+      const data = docSnap.data() as Omit<DataAccessRequest, 'id'>;
+
+      // Verify that this is a data access request
+      if (data.type !== PrivacyRequestType.ACCESS) {
+        return null;
+      }
+
+      return {
+        id: docSnap.id,
+        ...data,
+      };
     } catch (error) {
-      console.error('Error getting request status:', error);
+      console.error(`Error getting data access request ${requestId}:`, error);
       throw error;
     }
   }
 
   /**
-   * Get user requests
+   * Get all data access requests for a user
    * @param userId The user ID
-   * @returns The user's data access requests
+   * @returns Array of data access requests
    */
-  async getUserRequests(userId: string): Promise<DataAccessRequest[]> {
+  async getUserDataAccessRequests(userId: string): Promise<DataAccessRequest[]> {
     try {
-      const q = query(collection(this.db, this.collectionPath), where('userId', '==', userId));
+      const q = query(
+        collection(this.db, this.requestsCollection),
+        where('userId', '==', userId),
+        where('type', '==', PrivacyRequestType.ACCESS)
+      );
+
       const querySnapshot = await getDocs(q);
-
       const requests: DataAccessRequest[] = [];
+
       querySnapshot.forEach(doc => {
-        const data = doc.data();
-
-        // Convert Firestore timestamps to Date objects
-        const request: DataAccessRequest = {
+        const data = doc.data() as Omit<DataAccessRequest, 'id'>;
+        requests.push({
+          id: doc.id,
           ...data,
-          requestedAt: this.convertTimestampToDate(data.requestedAt),
-          completedAt: this.convertTimestampToDate(data.completedAt),
-          expiresAt: this.convertTimestampToDate(data.expiresAt),
-        } as DataAccessRequest;
-
-        requests.push(request);
+        });
       });
 
       return requests;
     } catch (error) {
-      console.error('Error getting user requests:', error);
+      console.error(`Error getting data access requests for user ${userId}:`, error);
       throw error;
     }
   }
 
   /**
-   * Convert Firestore timestamp to Date
-   * @param timestamp The timestamp to convert
-   * @returns The converted Date or undefined if the timestamp is undefined
+   * Process a data access request
+   * @param requestId The request ID
    */
-  private convertTimestampToDate(timestamp: any): Date | undefined {
-    if (!timestamp) return undefined;
+  async processDataAccessRequest(requestId: string): Promise<void> {
+    try {
+      // Get the request
+      const request = await this.getDataAccessRequest(requestId);
+      if (!request) {
+        throw new Error(`Data access request ${requestId} not found`);
+      }
 
-    if (timestamp && typeof timestamp.toDate === 'function') {
-      return timestamp.toDate();
-    } else if (timestamp) {
-      return new Date(timestamp);
+      // Update the request status to processing
+      await updateDoc(doc(this.db, this.requestsCollection, requestId), {
+        status: PrivacyRequestStatus.PROCESSING,
+        updatedAt: Timestamp.now(),
+      });
+
+      // Collect the user's data
+      const userData = await this.collectUserData(request.userId, request.dataCategories);
+
+      // Generate the data export
+      const exportData = await this.generateDataExport(userData, request.format);
+
+      // Upload the export to Firebase Storage
+      const downloadUrl = await this.uploadDataExport(requestId, exportData, request.format);
+
+      // Update the request status to completed
+      await updateDoc(doc(this.db, this.requestsCollection, requestId), {
+        status: PrivacyRequestStatus.COMPLETED,
+        updatedAt: Timestamp.now(),
+        completedAt: Timestamp.now(),
+        downloadUrl,
+      });
+
+      console.log(`Completed data access request ${requestId}`);
+    } catch (error) {
+      console.error(`Error processing data access request ${requestId}:`, error);
+
+      // Update the request status to failed
+      await updateDoc(doc(this.db, this.requestsCollection, requestId), {
+        status: PrivacyRequestStatus.FAILED,
+        updatedAt: Timestamp.now(),
+      });
     }
-
-    return undefined;
   }
 
   /**
-   * Get download URL for a completed request
-   * @param requestId The request ID
-   * @returns The download URL
+   * Collect user data for a data access request
+   * @param userId The user ID
+   * @param dataCategories The data categories to collect
+   * @returns The collected user data
    */
-  async getDownloadUrl(requestId: string): Promise<string> {
+  private async collectUserData(userId: string, dataCategories: string[]): Promise<any> {
+    const userData: Record<string, any> = {};
+
     try {
-      const docRef = doc(this.db, this.collectionPath, requestId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-
-        if (data.status !== RequestStatus.COMPLETED) {
-          throw new Error(`Request not completed: ${requestId}`);
+      // Get user profile data
+      if (dataCategories.includes('accountData') || dataCategories.includes('profileData')) {
+        const userDoc = await getDoc(doc(this.db, 'users', userId));
+        if (userDoc.exists()) {
+          userData.profile = userDoc.data();
         }
+      }
 
-        if (!data.downloadUrl) {
-          throw new Error(`Download URL not available: ${requestId}`);
-        }
+      // Get user activity data
+      if (dataCategories.includes('usageData')) {
+        const activityQuery = query(collection(this.db, 'activity'), where('userId', '==', userId));
+        const activitySnapshot = await getDocs(activityQuery);
+        userData.activity = [];
+        activitySnapshot.forEach(doc => {
+          userData.activity.push(doc.data());
+        });
+      }
 
-        return data.downloadUrl;
-      } else {
-        throw new Error(`Request not found: ${requestId}`);
+      // Get user analytics data
+      if (dataCategories.includes('analyticsData')) {
+        const analyticsQuery = query(
+          collection(this.db, 'analytics'),
+          where('userId', '==', userId)
+        );
+        const analyticsSnapshot = await getDocs(analyticsQuery);
+        userData.analytics = [];
+        analyticsSnapshot.forEach(doc => {
+          userData.analytics.push(doc.data());
+        });
+      }
+
+      // Get user marketing data
+      if (dataCategories.includes('marketingData')) {
+        const marketingQuery = query(
+          collection(this.db, 'marketing'),
+          where('userId', '==', userId)
+        );
+        const marketingSnapshot = await getDocs(marketingQuery);
+        userData.marketing = [];
+        marketingSnapshot.forEach(doc => {
+          userData.marketing.push(doc.data());
+        });
+      }
+
+      // Get user payment data
+      if (dataCategories.includes('paymentData')) {
+        const paymentsQuery = query(collection(this.db, 'payments'), where('userId', '==', userId));
+        const paymentsSnapshot = await getDocs(paymentsQuery);
+        userData.payments = [];
+        paymentsSnapshot.forEach(doc => {
+          userData.payments.push(doc.data());
+        });
+      }
+
+      // Get user communication data
+      if (dataCategories.includes('communicationData')) {
+        const communicationsQuery = query(
+          collection(this.db, 'communications'),
+          where('userId', '==', userId)
+        );
+        const communicationsSnapshot = await getDocs(communicationsQuery);
+        userData.communications = [];
+        communicationsSnapshot.forEach(doc => {
+          userData.communications.push(doc.data());
+        });
+      }
+
+      return userData;
+    } catch (error) {
+      console.error(`Error collecting user data for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate a data export in the specified format
+   * @param data The data to export
+   * @param format The format to export the data in
+   * @returns The exported data as a string
+   */
+  private async generateDataExport(data: any, format: DataFormat): Promise<string> {
+    try {
+      switch (format) {
+        case 'json':
+          return JSON.stringify(data, null, 2);
+        case 'csv':
+          return this.convertToCSV(data);
+        case 'xml':
+          return this.convertToXML(data);
+        default:
+          return JSON.stringify(data, null, 2);
       }
     } catch (error) {
-      console.error('Error getting download URL:', error);
+      console.error(`Error generating data export in ${format} format:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Convert data to CSV format
+   * @param data The data to convert
+   * @returns The data in CSV format
+   */
+  private convertToCSV(data: any): string {
+    // This is a simplified implementation
+    // In a real application, you would use a library like json2csv
+    let csv = '';
+
+    // Process each section of the data
+    for (const [section, items] of Object.entries(data)) {
+      csv += `\n\n${section.toUpperCase()}\n`;
+
+      if (Array.isArray(items)) {
+        // If the section is an array of objects
+        if (items.length > 0) {
+          // Get the headers from the first item
+          const headers = Object.keys(items[0]);
+          csv += headers.join(',') + '\n';
+
+          // Add each item as a row
+          for (const item of items) {
+            const row = headers.map(header => {
+              const value = item[header];
+              return typeof value === 'object' ? JSON.stringify(value) : String(value);
+            });
+            csv += row.join(',') + '\n';
+          }
+        }
+      } else if (typeof items === 'object' && items !== null) {
+        // If the section is a single object
+        for (const [key, value] of Object.entries(items)) {
+          csv += `${key},${typeof value === 'object' ? JSON.stringify(value) : String(value)}\n`;
+        }
+      }
+    }
+
+    return csv;
+  }
+
+  /**
+   * Convert data to XML format
+   * @param data The data to convert
+   * @returns The data in XML format
+   */
+  private convertToXML(data: any): string {
+    // This is a simplified implementation
+    // In a real application, you would use a library like js2xmlparser
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<userData>\n';
+
+    // Process each section of the data
+    for (const [section, items] of Object.entries(data)) {
+      xml += `  <${section}>\n`;
+
+      if (Array.isArray(items)) {
+        // If the section is an array of objects
+        for (const item of items) {
+          xml += '    <item>\n';
+          for (const [key, value] of Object.entries(item)) {
+            xml += `      <${key}>${
+              typeof value === 'object' ? JSON.stringify(value) : String(value)
+            }</${key}>\n`;
+          }
+          xml += '    </item>\n';
+        }
+      } else if (typeof items === 'object' && items !== null) {
+        // If the section is a single object
+        for (const [key, value] of Object.entries(items)) {
+          xml += `    <${key}>${
+            typeof value === 'object' ? JSON.stringify(value) : String(value)
+          }</${key}>\n`;
+        }
+      }
+
+      xml += `  </${section}>\n`;
+    }
+
+    xml += '</userData>';
+    return xml;
+  }
+
+  /**
+   * Upload a data export to Firebase Storage
+   * @param requestId The request ID
+   * @param data The data to upload
+   * @param format The format of the data
+   * @returns The download URL for the uploaded data
+   */
+  private async uploadDataExport(
+    requestId: string,
+    data: string,
+    format: DataFormat
+  ): Promise<string> {
+    try {
+      const storageRef = ref(this.storage, `data-exports/${requestId}.${format}`);
+
+      // Upload the data
+      await uploadString(storageRef, data);
+
+      // Get the download URL
+      const downloadUrl = await getDownloadURL(storageRef);
+
+      return downloadUrl;
+    } catch (error) {
+      console.error(`Error uploading data export for request ${requestId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the download URL for a completed data access request
+   * @param requestId The request ID
+   * @returns The download URL, or null if the request is not completed
+   */
+  async getDownloadUrl(requestId: string): Promise<string | null> {
+    try {
+      const request = await this.getDataAccessRequest(requestId);
+
+      if (!request || request.status !== PrivacyRequestStatus.COMPLETED) {
+        return null;
+      }
+
+      return request.downloadUrl || null;
+    } catch (error) {
+      console.error(`Error getting download URL for request ${requestId}:`, error);
       throw error;
     }
   }

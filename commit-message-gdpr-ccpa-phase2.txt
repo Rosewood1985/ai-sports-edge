@@ -1,0 +1,33 @@
+feat(privacy): Implement user rights and consent management for GDPR/CCPA
+
+This commit adds the user rights implementation and consent management system for GDPR/CCPA compliance:
+
+- Add DataAccessManager for handling data access requests
+  - Implement request creation, processing, and completion workflows
+  - Add data export functionality in various formats (JSON, CSV, XML)
+  - Support for retrieving and tracking request status
+
+- Add DataDeletionManager for handling data deletion requests
+  - Implement request creation, processing, and completion workflows
+  - Support for full account deletion or specific data categories
+  - Add data anonymization for legally required records
+
+- Add ConsentManager for handling user consent
+  - Implement consent record creation and retrieval
+  - Add consent verification functionality
+  - Support for privacy preferences management
+  - Add region-specific compliance handling
+
+- Add personalized RSS feed structure and subscription-tier allocation
+  - Include Core Feeds Package with women's sports integration in all tiers
+  - Introduce curated RSS "bundles" (e.g., Basketball, Women's Sports, Regional, College, International)
+  - Allow bundle selection based on subscription tier:
+    - Insight Plan: Access to Core Feeds only
+    - Analytics Plan: Access to Core + choice of 1 RSS bundle
+    - Edge Collective: Access to all RSS bundles shared among group
+  - Personalization filters (favorite sports/teams/players) enhance RSS relevance
+  - RSS engine respects tier limits and user preferences dynamically
+
+These implementations provide the core functionality needed for users to exercise their privacy rights under GDPR and CCPA regulations, including the right to access, delete, and control the use of their personal data.
+
+Related task: [🔄] Ensure GDPR/CCPA compliance for user data

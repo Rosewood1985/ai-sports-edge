@@ -1,14 +1,32 @@
-name: Accessibility Tests
+name: Accessibility Testing
 
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'components/**'
+      - 'screens/**'
+      - 'styles/**'
+      - 'atomic/**'
+      - 'constants/Colors.ts'
+      - 'contexts/ThemeContext.tsx'
   pull_request:
     branches: [main, develop]
+    paths:
+      - 'components/**'
+      - 'screens/**'
+      - 'styles/**'
+      - 'atomic/**'
+      - 'constants/Colors.ts'
+      - 'contexts/ThemeContext.tsx'
+  # Allow manual triggering
+  workflow_dispatch:
 
 jobs:
-  accessibility:
+  accessibility-tests:
+    name: Run Accessibility Tests
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,92 +40,56 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Make accessibility test script executable
-        run: chmod +x scripts/accessibility-test.js
+      - name: Install Jest dependencies
+        run: bash scripts/install-jest-dependencies.sh
 
-      - name: Run accessibility tests
-        run: node scripts/accessibility-test.js --report=accessibility-report.json
+      - name: Run Jest tests for accessibility components
+        run: npm test -- --testPathPattern=__tests__/accessibility
 
-      - name: Upload accessibility report JSON
+      - name: Run color contrast tests
+        run: node scripts/run-color-contrast-tests.js
+
+      - name: Upload test results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
-          name: accessibility-report-json
-          path: accessibility-report.json
-          if-no-files-found: error
+          name: accessibility-test-results
+          path: |
+            test-results
+            coverage
+            accessibility-report.json
 
-      - name: Upload accessibility report HTML
-        uses: actions/upload-artifact@v3
-        with:
-          name: accessibility-report-html
-          path: accessibility-report.html
-          if-no-files-found: error
-
-      - name: Check for accessibility issues
-        run: |
-          ISSUES=$(node -e "const report = require('./accessibility-report.json'); console.log(report.summary.totalIssues);")
-          if [ "$ISSUES" -gt "0" ]; then
-            echo "::warning::Found $ISSUES accessibility issues. See the report for details."
-            # Don't fail the build yet, just warn
-            # exit 1
-          else
-            echo "No accessibility issues found!"
-          fi
-
-  accessibility-pr-comment:
+  # Add a job to check for accessibility issues in the UI
+  axe-test:
+    name: Run Axe Accessibility Tests
     runs-on: ubuntu-latest
-    needs: accessibility
-    if: github.event_name == 'pull_request'
+    needs: accessibility-tests
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download accessibility report
-        uses: actions/download-artifact@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          name: accessibility-report-json
-          path: ./
+          node-version: '18'
+          cache: 'npm'
 
-      - name: Generate PR comment
-        id: generate-comment
-        run: |
-          REPORT=$(cat accessibility-report.json)
-          TOTAL_FILES=$(echo $REPORT | jq '.summary.totalFiles')
-          FILES_WITH_ISSUES=$(echo $REPORT | jq '.summary.filesWithIssues')
-          TOTAL_ISSUES=$(echo $REPORT | jq '.summary.totalIssues')
+      - name: Install dependencies
+        run: npm ci
 
-          echo "comment<<EOF" >> $GITHUB_ENV
-          echo "## Accessibility Test Results" >> $GITHUB_ENV
-          echo "" >> $GITHUB_ENV
-          echo "- Total Files: $TOTAL_FILES" >> $GITHUB_ENV
-          echo "- Files with Issues: $FILES_WITH_ISSUES" >> $GITHUB_ENV
-          echo "- Total Issues: $TOTAL_ISSUES" >> $GITHUB_ENV
-          echo "" >> $GITHUB_ENV
+      - name: Install Puppeteer
+        run: npm install --save-dev puppeteer @axe-core/puppeteer
 
-          if [ "$TOTAL_ISSUES" -gt "0" ]; then
-            echo "### Issues by Type" >> $GITHUB_ENV
-            echo "" >> $GITHUB_ENV
-            echo "| Type | Count |" >> $GITHUB_ENV
-            echo "| ---- | ----- |" >> $GITHUB_ENV
-            
-            ISSUES_BY_TYPE=$(echo $REPORT | jq -r '.summary.issuesByType | to_entries | .[] | "| \(.key) | \(.value) |"')
-            echo "$ISSUES_BY_TYPE" >> $GITHUB_ENV
-            
-            echo "" >> $GITHUB_ENV
-            echo "Please check the accessibility report artifact for details." >> $GITHUB_ENV
-          else
-            echo "✅ No accessibility issues found!" >> $GITHUB_ENV
-          fi
-          echo "EOF" >> $GITHUB_ENV
+      - name: Start web server
+        run: npm run web & npx wait-on http://localhost:19006
 
-      - name: Comment on PR
-        uses: actions/github-script@v6
+      - name: Run Axe accessibility tests
+        run: node scripts/run-axe-tests.js
+
+      - name: Upload axe results
+        uses: actions/upload-artifact@v3
+        if: always()
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { issue: { number: issue_number }, repo: { owner, repo } } = context;
-            github.rest.issues.createComment({
-              issue_number,
-              owner,
-              repo,
-              body: process.env.comment
-            });
+          name: axe-test-results
+          path: axe-results.json

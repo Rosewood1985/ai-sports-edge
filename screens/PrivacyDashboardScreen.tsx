@@ -1,0 +1,13 @@
+import React, { useState, useEffect } from 'react';
+import { ScrollView, StyleSheet, View, ActivityIndicator, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
+import AccessibleThemedView from '../atomic/atoms/AccessibleThemedView';
+import AccessibleThemedText from '../atomic/atoms/AccessibleThemedText';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { DataAccessManager } from '../atomic/molecules/privacy/DataAccessManager';
+import { DataDeletionManager } from '../atomic/molecules/privacy/DataDeletionManager';
+import { ConsentManager } from '../atomic/molecules/privacy/ConsentManager';
