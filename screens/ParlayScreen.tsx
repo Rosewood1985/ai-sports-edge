@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
+import { StyleSheet, ScrollView, RefreshControl, ActivityIndicator, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
@@ -16,9 +9,11 @@ import useOddsData from '../hooks/useOddsData';
 import ParlayCard from '../components/ParlayCard';
 import Header from '../components/Header';
 import EmptyState from '../components/EmptyState';
-import { trackScreenView } from '../services/analyticsService';
-import { auth } from '../config/firebase';
-import { hasPremiumAccess } from '../services/subscriptionService';
+import { trackEvent } from '../services/analyticsService';
+import { hasActiveSubscription } from '../services/subscriptionService';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 type ParlayScreenProps = {
   navigation: StackNavigationProp<any, 'Parlays'>;
@@ -35,32 +30,38 @@ const ParlayScreen: React.FC<ParlayScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
   const { colors, isDark } = useTheme();
-  
+
   // Use our custom hook to get odds data
   const { data: odds, loading: oddsLoading, error: oddsError } = useOddsData();
-  
+
   // Track screen view
   useEffect(() => {
-    trackScreenView('ParlayScreen');
+    trackEvent('screen_view', { screen_name: 'ParlayScreen' });
   }, []);
-  
+
   // Check if user has premium access
   useEffect(() => {
     const checkPremiumAccess = async () => {
-      const userId = auth.currentUser?.uid;
-      if (userId) {
-        const premium = await hasPremiumAccess(userId);
-        setHasPremium(premium);
+      try {
+        // Get current user ID from AsyncStorage
+        // This is a simplified approach to avoid auth dependency issues
+        const userId = (await AsyncStorage.getItem('userId')) || '';
+        if (userId) {
+          const premium = await hasActiveSubscription(userId);
+          setHasPremium(premium);
+        }
+      } catch (error) {
+        console.error('Error checking premium access:', error);
       }
     };
-    
+
     checkPremiumAccess();
   }, []);
-  
+
   // Load parlay suggestions
   const loadParlays = useCallback(async () => {
     if (odds.length === 0) return;
-    
+
     try {
       setLoading(true);
       const trendingParlays = await getTrendingParlays(odds);
@@ -72,71 +73,85 @@ const ParlayScreen: React.FC<ParlayScreenProps> = ({ navigation }) => {
       setLoading(false);
     }
   }, [odds]);
-  
+
   // Load parlays when odds data is available
   useEffect(() => {
     if (!oddsLoading && odds.length > 0) {
       loadParlays();
     }
   }, [oddsLoading, odds, loadParlays]);
-  
+
   // Handle refresh
   const handleRefresh = async () => {
     setRefreshing(true);
     await loadParlays();
     setRefreshing(false);
   };
-  
+
   // Handle parlay purchase completion
   const handlePurchaseComplete = () => {
     // Reload parlays to update purchased status
     loadParlays();
   };
-  
+
   // Render loading state
   if (loading || oddsLoading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header
-          title="AI Parlay Suggestions"
-          onRefresh={() => {}}
-          isLoading={loading}
-        />
-        <View style={styles.loadingContainer}>
+      <AccessibleThemedView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        accessibilityLabel="Loading AI parlay suggestions"
+        accessibilityRole="none"
+      >
+        <Header title="AI Parlay Suggestions" onRefresh={() => {}} isLoading={loading} />
+        <AccessibleThemedView style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
+          <AccessibleThemedText
+            type="bodyStd"
+            style={[styles.loadingText, { color: colors.text }]}
+            accessibilityRole="text"
+          >
             Generating AI parlay suggestions...
-          </Text>
-        </View>
-      </View>
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+      </AccessibleThemedView>
     );
   }
-  
+
   // Render error state
   if (oddsError) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <AccessibleThemedView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        accessibilityLabel="Error loading odds data"
+        accessibilityRole="none"
+      >
         <Header
           title="AI Parlay Suggestions"
           onRefresh={handleRefresh}
           isLoading={false}
+          accessibilityHint="Refresh to try loading odds data again"
         />
         <EmptyState
           message="Error loading odds data. Please try refreshing."
           icon={<Ionicons name="alert-circle" size={40} color={colors.primary} />}
         />
-      </View>
+      </AccessibleThemedView>
     );
   }
-  
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <AccessibleThemedView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      accessibilityLabel="AI Parlay Suggestions Screen"
+      accessibilityRole="none"
+    >
       <Header
         title="AI Parlay Suggestions"
         onRefresh={handleRefresh}
         isLoading={refreshing}
+        accessibilityHint="Refresh to update parlay suggestions"
       />
-      
+
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -144,30 +159,41 @@ const ParlayScreen: React.FC<ParlayScreenProps> = ({ navigation }) => {
             refreshing={refreshing}
             onRefresh={handleRefresh}
             colors={[colors.primary]}
+            accessibilityLabel="Refresh parlay suggestions"
           />
         }
+        accessible={true}
+        accessibilityLabel="Parlay suggestions list"
       >
         {/* Premium User Banner */}
         {hasPremium && (
-          <View style={[styles.premiumBanner, { backgroundColor: colors.primary }]}>
+          <AccessibleThemedView
+            style={[styles.premiumBanner, { backgroundColor: colors.primary }]}
+            accessibilityRole="text"
+            accessibilityLabel="Premium member discount"
+          >
             <Ionicons name="star" size={18} color="#fff" />
-            <Text style={styles.premiumBannerText}>
+            <AccessibleThemedText type="bodyStd" style={styles.premiumBannerText}>
               Premium members get 30% off all parlay purchases!
-            </Text>
-          </View>
+            </AccessibleThemedText>
+          </AccessibleThemedView>
         )}
-        
+
         {/* Info Banner */}
-        <View style={[
-          styles.infoBanner,
-          { backgroundColor: isDark ? '#1e1e1e' : '#f0f8ff' }
-        ]}>
+        <AccessibleThemedView
+          style={[styles.infoBanner, { backgroundColor: isDark ? '#1e1e1e' : '#f0f8ff' }]}
+          accessibilityRole="text"
+          accessibilityLabel="Information about parlay suggestions"
+        >
           <Ionicons name="information-circle" size={20} color={colors.primary} />
-          <Text style={[styles.infoBannerText, { color: colors.text }]}>
+          <AccessibleThemedText
+            type="bodyStd"
+            style={[styles.infoBannerText, { color: colors.text }]}
+          >
             AI-generated parlay suggestions based on real-time trends and historical data
-          </Text>
-        </View>
-        
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+
         {/* Parlays */}
         {parlays.length === 0 ? (
           <EmptyState
@@ -176,11 +202,15 @@ const ParlayScreen: React.FC<ParlayScreenProps> = ({ navigation }) => {
           />
         ) : (
           <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            <AccessibleThemedText
+              type="h2"
+              style={[styles.sectionTitle, { color: colors.text }]}
+              accessibilityRole="header"
+            >
               Trending Parlays
-            </Text>
-            
-            {parlays.map((parlay) => (
+            </AccessibleThemedText>
+
+            {parlays.map(parlay => (
               <ParlayCard
                 key={parlay.id}
                 parlay={parlay}
@@ -190,7 +220,7 @@ const ParlayScreen: React.FC<ParlayScreenProps> = ({ navigation }) => {
           </>
         )}
       </ScrollView>
-    </View>
+    </AccessibleThemedView>
   );
 };
 

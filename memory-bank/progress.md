@@ -28,6 +28,7 @@
    - ✅ Updated `screens/PaymentScreen.tsx` with accessible components
    - ✅ Updated `screens/LegalScreen.tsx` with accessible components
    - ✅ Updated `screens/LoginScreen.tsx` with accessible components
+   - ✅ Updated `screens/ParlayScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -144,7 +145,7 @@
      - ⬜ SubscriptionScreen.tsx (ON HOLD - subscription tiers and pricing need to be finalized)
      - ✅ OddsComparisonScreen.tsx
      - ✅ BettingAnalyticsScreen.tsx
-     - ⬜ ParlayScreen.tsx (NEXT PRIORITY)
+     - ✅ ParlayScreen.tsx
      - ⬜ Focus on remaining screens with complex interactions and forms
 
 2. **Testing**

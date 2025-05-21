@@ -1,0 +1,11 @@
+feat(accessibility): Enhance ParlayScreen with accessible components
+
+- Replaced standard components with AccessibleThemedText, AccessibleThemedView, and AccessibleTouchableOpacity
+- Added proper accessibility attributes to all elements
+- Implemented proper heading hierarchy with h2 for section titles
+- Enhanced screen reader experience for parlay suggestions
+- Added appropriate accessibility labels, roles, and hints
+- Improved focus order and navigation
+- Fixed TypeScript errors related to auth and localStorage
+- Updated ParlayCard component to use AsyncStorage instead of direct auth references
+- Maintained existing functionality while improving accessibility

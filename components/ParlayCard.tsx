@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { ParlayPackage, ParlayPick, purchaseParlay } from '../services/parlayService';
-import { auth } from '../config/firebase';
-import { hasPremiumAccess } from '../services/subscriptionService';
 import { useTheme } from '../contexts/ThemeContext';
 import { trackEvent } from '../services/analyticsService';
+import { hasActiveSubscription } from '../services/subscriptionService';
 
 interface ParlayCardProps {
   parlay: ParlayPackage;
@@ -26,13 +26,18 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
   // Check if user has premium access
   React.useEffect(() => {
     const checkPremiumAccess = async () => {
-      const userId = auth.currentUser?.uid;
-      if (userId) {
-        const premium = await hasPremiumAccess(userId);
-        setHasPremium(premium);
+      try {
+        // Get user ID from AsyncStorage
+        const userId = (await AsyncStorage.getItem('userId')) || '';
+        if (userId) {
+          const premium = await hasActiveSubscription(userId);
+          setHasPremium(premium);
+        }
+      } catch (error) {
+        console.error('Error checking premium access:', error);
       }
     };
-    
+
     checkPremiumAccess();
   }, []);
 
@@ -52,37 +57,41 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
 
   // Handle purchase button press
   const handlePurchase = async () => {
-    const userId = auth.currentUser?.uid;
-    
-    if (!userId) {
-      Alert.alert('Sign In Required', 'Please sign in to purchase this parlay suggestion.');
-      return;
-    }
-    
-    setPurchasing(true);
-    
     try {
+      // Get user ID from AsyncStorage
+      const userId = (await AsyncStorage.getItem('userId')) || '';
+
+      if (!userId) {
+        Alert.alert('Sign In Required', 'Please sign in to purchase this parlay suggestion.');
+        return;
+      }
+
+      setPurchasing(true);
+
       const success = await purchaseParlay(userId, parlay.id, parlay);
-      
+
       if (success) {
         // Track purchase event
         trackEvent('parlay_purchased' as any, {
           parlay_id: parlay.id,
           picks_count: parlay.picks.length,
-          confidence: parlay.confidence
+          confidence: parlay.confidence,
         });
-        
+
         Alert.alert(
           'Purchase Successful',
           'You now have access to this parlay suggestion. Good luck!'
         );
-        
+
         // Notify parent component
         if (onPurchaseComplete) {
           onPurchaseComplete();
         }
       } else {
-        Alert.alert('Purchase Failed', 'There was an error processing your purchase. Please try again.');
+        Alert.alert(
+          'Purchase Failed',
+          'There was an error processing your purchase. Please try again.'
+        );
       }
     } catch (error) {
       console.error('Error purchasing parlay:', error);
@@ -98,7 +107,7 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
     if (!parlay.purchased && !expanded && index > 0) {
       return null;
     }
-    
+
     return (
       <View key={index} style={styles.pickContainer}>
         <View style={styles.pickHeader}>
@@ -106,31 +115,24 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
             {pick.homeTeam} vs {pick.awayTeam}
           </Text>
           <View
-            style={[
-              styles.confidenceTag,
-              { backgroundColor: getConfidenceColor(pick.confidence) }
-            ]}
+            style={[styles.confidenceTag, { backgroundColor: getConfidenceColor(pick.confidence) }]}
           >
-            <Text style={styles.confidenceTagText}>
-              {pick.confidence.toUpperCase()}
-            </Text>
+            <Text style={styles.confidenceTagText}>{pick.confidence.toUpperCase()}</Text>
           </View>
         </View>
-        
+
         <View style={styles.pickDetails}>
           <Text style={styles.pickText}>
-            <Text style={styles.bold}>Pick: </Text>{pick.pick}
+            <Text style={styles.bold}>Pick: </Text>
+            {pick.pick}
           </Text>
           <Text style={styles.oddsText}>
-            <Text style={styles.bold}>Odds: </Text>{pick.odds}
+            <Text style={styles.bold}>Odds: </Text>
+            {pick.odds}
           </Text>
         </View>
-        
-        {(parlay.purchased || expanded) && (
-          <Text style={styles.reasoning}>
-            {pick.reasoning}
-          </Text>
-        )}
+
+        {(parlay.purchased || expanded) && <Text style={styles.reasoning}>{pick.reasoning}</Text>}
       </View>
     );
   };
@@ -143,37 +145,27 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
   };
 
   return (
-    <View style={[
-      styles.card,
-      { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }
-    ]}>
+    <View style={[styles.card, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
       {/* Parlay Header */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {parlay.title}
-          </Text>
-          <View style={[
-            styles.trendBadge,
-            { backgroundColor: colors.primary }
-          ]}>
+          <Text style={[styles.title, { color: colors.text }]}>{parlay.title}</Text>
+          <View style={[styles.trendBadge, { backgroundColor: colors.primary }]}>
             <Ionicons name="trending-up" size={12} color="#fff" />
-            <Text style={styles.trendText}>
-              TRENDING
-            </Text>
+            <Text style={styles.trendText}>TRENDING</Text>
           </View>
         </View>
-        
-        <View style={[
-          styles.confidenceIndicator,
-          { backgroundColor: getConfidenceColor(parlay.confidence) }
-        ]}>
-          <Text style={styles.confidenceText}>
-            {parlay.confidence.toUpperCase()} CONFIDENCE
-          </Text>
+
+        <View
+          style={[
+            styles.confidenceIndicator,
+            { backgroundColor: getConfidenceColor(parlay.confidence) },
+          ]}
+        >
+          <Text style={styles.confidenceText}>{parlay.confidence.toUpperCase()} CONFIDENCE</Text>
         </View>
       </View>
-      
+
       {/* Parlay Details */}
       <View style={styles.detailsContainer}>
         <View style={styles.detailRow}>
@@ -181,20 +173,16 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
             <Text style={[styles.detailLabel, { color: isDark ? '#aaa' : '#666' }]}>
               Total Odds
             </Text>
-            <Text style={[styles.detailValue, { color: colors.text }]}>
-              {parlay.totalOdds}
-            </Text>
+            <Text style={[styles.detailValue, { color: colors.text }]}>{parlay.totalOdds}</Text>
           </View>
-          
+
           <View style={styles.detailItem}>
-            <Text style={[styles.detailLabel, { color: isDark ? '#aaa' : '#666' }]}>
-              Stake
-            </Text>
+            <Text style={[styles.detailLabel, { color: isDark ? '#aaa' : '#666' }]}>Stake</Text>
             <Text style={[styles.detailValue, { color: colors.text }]}>
               ${parlay.stakeAmount.toFixed(2)}
             </Text>
           </View>
-          
+
           <View style={styles.detailItem}>
             <Text style={[styles.detailLabel, { color: isDark ? '#aaa' : '#666' }]}>
               Potential Return
@@ -205,21 +193,18 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
           </View>
         </View>
       </View>
-      
+
       {/* Picks */}
       <View style={styles.picksContainer}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           {parlay.picks.length}-Pick Parlay
         </Text>
-        
+
         {parlay.picks.map((pick, index) => renderPick(pick, index))}
-        
+
         {/* Show More/Less Button */}
         {!parlay.purchased && parlay.picks.length > 1 && (
-          <TouchableOpacity
-            style={styles.expandButton}
-            onPress={() => setExpanded(!expanded)}
-          >
+          <TouchableOpacity style={styles.expandButton} onPress={() => setExpanded(!expanded)}>
             <Text style={[styles.expandButtonText, { color: colors.primary }]}>
               {expanded ? 'Show Less' : `Show All ${parlay.picks.length} Picks`}
             </Text>
@@ -231,14 +216,11 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
           </TouchableOpacity>
         )}
       </View>
-      
+
       {/* Purchase Button or Purchased Indicator */}
       {!parlay.purchased ? (
         <TouchableOpacity
-          style={[
-            styles.purchaseButton,
-            { backgroundColor: colors.primary }
-          ]}
+          style={[styles.purchaseButton, { backgroundColor: colors.primary }]}
           onPress={handlePurchase}
           disabled={purchasing}
         >
@@ -246,9 +228,7 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
             <ActivityIndicator size="small" color="#fff" />
           ) : (
             <>
-              <Text style={styles.purchaseButtonText}>
-                Purchase for ${getPrice()}
-              </Text>
+              <Text style={styles.purchaseButtonText}>Purchase for ${getPrice()}</Text>
               {hasPremium && (
                 <View style={styles.discountBadge}>
                   <Text style={styles.discountText}>30% OFF</Text>
@@ -263,7 +243,7 @@ const ParlayCard: React.FC<ParlayCardProps> = ({ parlay, onPurchaseComplete }) =
           <Text style={styles.purchasedText}>Purchased</Text>
         </View>
       )}
-      
+
       {/* Expiration Notice */}
       <Text style={[styles.expirationText, { color: isDark ? '#aaa' : '#666' }]}>
         Expires in {Math.ceil((parlay.expiresAt - Date.now()) / (1000 * 60 * 60))} hours

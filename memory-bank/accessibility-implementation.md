@@ -106,6 +106,7 @@ Key features:
 - ✅ Updated `screens/LoginScreen.tsx`
 - ✅ Updated `screens/OddsComparisonScreen.tsx`
 - ✅ Updated `screens/BettingAnalyticsScreen.tsx`
+- ✅ Updated `screens/ParlayScreen.tsx`
 
 ### Documentation
 
