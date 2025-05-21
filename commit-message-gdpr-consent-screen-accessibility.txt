@@ -1,0 +1,12 @@
+feat(accessibility): Integrate AccessibleThemedText and AccessibleThemedView in GDPRConsentScreen
+
+- Replace all ThemedText components with AccessibleThemedText
+- Replace ThemedView with AccessibleThemedView
+- Add appropriate accessibility labels and hints for screen readers
+- Use semantic type props (h1, h2, bodyStd) for proper heading hierarchy
+- Add accessibilityRole properties to interactive elements
+- Enhance checkbox components with proper accessibility states
+- Improve legal links with proper accessibility roles
+- Ensure proper nesting of accessibility elements
+
+This change improves the app's accessibility compliance, particularly for users with screen readers, while maintaining the existing visual design and functionality.

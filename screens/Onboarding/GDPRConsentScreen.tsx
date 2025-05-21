@@ -6,8 +6,8 @@ import { useTheme } from '@react-navigation/native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
 
-import { ThemedView } from '../../atomic/atoms/ThemedView';
-import { ThemedText } from '../../atomic/atoms/ThemedText';
+import { AccessibleThemedView } from '../../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../../atomic/atoms/AccessibleThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
@@ -59,17 +59,31 @@ const GDPRConsentScreen = () => {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+    <AccessibleThemedView style={styles.container} accessibilityLabel={t('gdpr.screen_title')}>
+      <ScrollView style={styles.scrollView} accessibilityLabel={t('gdpr.consent_options')}>
         <View style={styles.content}>
-          <ThemedText style={styles.title}>{t('gdpr.title')}</ThemedText>
+          <AccessibleThemedText style={styles.title} type="h1" accessibilityLabel={t('gdpr.title')}>
+            {t('gdpr.title')}
+          </AccessibleThemedText>
 
-          <ThemedText style={styles.description}>{t('gdpr.description')}</ThemedText>
+          <AccessibleThemedText
+            style={styles.description}
+            type="bodyStd"
+            accessibilityLabel={t('gdpr.description')}
+          >
+            {t('gdpr.description')}
+          </AccessibleThemedText>
 
           {/* Essential Data - Always required */}
-          <View style={styles.consentSection}>
+          <View style={styles.consentSection} accessibilityLabel={t('gdpr.essential_section')}>
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>{t('gdpr.essential_title')}</ThemedText>
+              <AccessibleThemedText
+                style={styles.consentTitle}
+                type="h2"
+                accessibilityLabel={t('gdpr.essential_title')}
+              >
+                {t('gdpr.essential_title')}
+              </AccessibleThemedText>
               <View
                 style={[
                   styles.checkbox,
@@ -78,14 +92,19 @@ const GDPRConsentScreen = () => {
                     borderColor: colors.primary,
                   },
                 ]}
+                accessibilityLabel={t('gdpr.required')}
               >
                 <Ionicons name="checkmark" size={18} color="white" />
               </View>
             </View>
 
-            <ThemedText style={styles.consentDescription}>
+            <AccessibleThemedText
+              style={styles.consentDescription}
+              type="bodyStd"
+              accessibilityLabel={t('gdpr.essential_description')}
+            >
               {t('gdpr.essential_description')}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
 
           {/* Analytics Data */}
@@ -96,9 +115,16 @@ const GDPRConsentScreen = () => {
             accessibilityLabel={t('gdpr.analytics_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: analyticsConsent }}
+            accessibilityHint={t('gdpr.toggle_consent')}
           >
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>{t('gdpr.analytics_title')}</ThemedText>
+              <AccessibleThemedText
+                style={styles.consentTitle}
+                type="h2"
+                accessibilityLabel={t('gdpr.analytics_title')}
+              >
+                {t('gdpr.analytics_title')}
+              </AccessibleThemedText>
               <View
                 style={[
                   styles.checkbox,
@@ -107,14 +133,19 @@ const GDPRConsentScreen = () => {
                     borderColor: colors.primary,
                   },
                 ]}
+                accessibilityLabel={analyticsConsent ? t('gdpr.checked') : t('gdpr.unchecked')}
               >
                 {analyticsConsent && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
 
-            <ThemedText style={styles.consentDescription}>
+            <AccessibleThemedText
+              style={styles.consentDescription}
+              type="bodyStd"
+              accessibilityLabel={t('gdpr.analytics_description')}
+            >
               {t('gdpr.analytics_description')}
-            </ThemedText>
+            </AccessibleThemedText>
           </TouchableOpacity>
 
           {/* Marketing Data */}
@@ -125,9 +156,16 @@ const GDPRConsentScreen = () => {
             accessibilityLabel={t('gdpr.marketing_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: marketingConsent }}
+            accessibilityHint={t('gdpr.toggle_consent')}
           >
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>{t('gdpr.marketing_title')}</ThemedText>
+              <AccessibleThemedText
+                style={styles.consentTitle}
+                type="h2"
+                accessibilityLabel={t('gdpr.marketing_title')}
+              >
+                {t('gdpr.marketing_title')}
+              </AccessibleThemedText>
               <View
                 style={[
                   styles.checkbox,
@@ -136,14 +174,19 @@ const GDPRConsentScreen = () => {
                     borderColor: colors.primary,
                   },
                 ]}
+                accessibilityLabel={marketingConsent ? t('gdpr.checked') : t('gdpr.unchecked')}
               >
                 {marketingConsent && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
 
-            <ThemedText style={styles.consentDescription}>
+            <AccessibleThemedText
+              style={styles.consentDescription}
+              type="bodyStd"
+              accessibilityLabel={t('gdpr.marketing_description')}
+            >
               {t('gdpr.marketing_description')}
-            </ThemedText>
+            </AccessibleThemedText>
           </TouchableOpacity>
 
           {/* Third-Party Data */}
@@ -154,9 +197,16 @@ const GDPRConsentScreen = () => {
             accessibilityLabel={t('gdpr.third_party_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: thirdPartyConsent }}
+            accessibilityHint={t('gdpr.toggle_consent')}
           >
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>{t('gdpr.third_party_title')}</ThemedText>
+              <AccessibleThemedText
+                style={styles.consentTitle}
+                type="h2"
+                accessibilityLabel={t('gdpr.third_party_title')}
+              >
+                {t('gdpr.third_party_title')}
+              </AccessibleThemedText>
               <View
                 style={[
                   styles.checkbox,
@@ -165,17 +215,28 @@ const GDPRConsentScreen = () => {
                     borderColor: colors.primary,
                   },
                 ]}
+                accessibilityLabel={thirdPartyConsent ? t('gdpr.checked') : t('gdpr.unchecked')}
               >
                 {thirdPartyConsent && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
 
-            <ThemedText style={styles.consentDescription}>
+            <AccessibleThemedText
+              style={styles.consentDescription}
+              type="bodyStd"
+              accessibilityLabel={t('gdpr.third_party_description')}
+            >
               {t('gdpr.third_party_description')}
-            </ThemedText>
+            </AccessibleThemedText>
           </TouchableOpacity>
 
-          <ThemedText style={styles.privacyNote}>{t('gdpr.privacy_note')}</ThemedText>
+          <AccessibleThemedText
+            style={styles.privacyNote}
+            type="bodyStd"
+            accessibilityLabel={t('gdpr.privacy_note')}
+          >
+            {t('gdpr.privacy_note')}
+          </AccessibleThemedText>
 
           {/* Terms of Service Checkbox */}
           <TouchableOpacity
@@ -197,9 +258,13 @@ const GDPRConsentScreen = () => {
             >
               {termsAccepted && <Ionicons name="checkmark" size={18} color="white" />}
             </View>
-            <ThemedText style={styles.termsCheckboxText}>
+            <AccessibleThemedText
+              style={styles.termsCheckboxText}
+              type="bodyStd"
+              accessibilityLabel={t('gdpr.terms_checkbox_label')}
+            >
               {t('gdpr.terms_checkbox_label')}
-            </ThemedText>
+            </AccessibleThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -223,9 +288,14 @@ const GDPRConsentScreen = () => {
               accessibilityLabel={t('gdpr.view_privacy_policy')}
               accessibilityRole="link"
             >
-              <ThemedText style={[styles.legalLinkText, { color: colors.primary }]}>
+              <AccessibleThemedText
+                style={[styles.legalLinkText, { color: colors.primary }]}
+                type="bodyStd"
+                accessibilityLabel={t('gdpr.view_privacy_policy')}
+                accessibilityRole="link"
+              >
                 {t('gdpr.view_privacy_policy')}
-              </ThemedText>
+              </AccessibleThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -238,14 +308,19 @@ const GDPRConsentScreen = () => {
               accessibilityLabel={t('gdpr.view_terms')}
               accessibilityRole="link"
             >
-              <ThemedText style={[styles.legalLinkText, { color: colors.primary }]}>
+              <AccessibleThemedText
+                style={[styles.legalLinkText, { color: colors.primary }]}
+                type="bodyStd"
+                accessibilityLabel={t('gdpr.view_terms')}
+                accessibilityRole="link"
+              >
                 {t('gdpr.view_terms')}
-              </ThemedText>
+              </AccessibleThemedText>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 

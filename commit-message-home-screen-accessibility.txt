@@ -1,0 +1,12 @@
+feat(accessibility): Integrate AccessibleThemedText and AccessibleThemedView in HomeScreen
+
+This commit enhances the accessibility of the HomeScreen by:
+
+- Replacing all ThemedText components with AccessibleThemedText
+- Replacing all ThemedView components with AccessibleThemedView
+- Adding appropriate accessibility labels and hints for screen readers
+- Using semantic type props (h1, h2, h3, bodyStd, etc.) for proper heading hierarchy
+- Maintaining consistent styling while improving accessibility
+
+These changes improve the app's accessibility compliance and provide a better
+experience for users with disabilities, particularly those using screen readers.

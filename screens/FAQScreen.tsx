@@ -13,6 +13,9 @@ import QuestionSubmissionForm from '../components/QuestionSubmissionForm';
 import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 import { Timestamp } from 'firebase/firestore';
 import { useLanguage } from '../contexts/LanguageContext';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleTouchableOpacity } from '../atomic/atoms/AccessibleTouchableOpacity';
 
 // Define navigation params for type safety
 type RootStackParamList = ParamListBase & {
@@ -192,9 +195,10 @@ const FAQScreen = (): JSX.Element => {
       result.push(parts[i]);
       if (i < parts.length - 1) {
         result.push(
-          <Text
+          <AccessibleThemedText
             key={`privacy-${i}`}
             style={styles.link}
+            type="bodyStd"
             onPress={() => navigation.navigate('LegalScreen', { type: 'privacy-policy' })}
             accessible={true}
             accessibilityRole="link"
@@ -202,7 +206,7 @@ const FAQScreen = (): JSX.Element => {
             accessibilityHint={t('faq.accessibility.linkHint')}
           >
             Privacy Policy
-          </Text>
+          </AccessibleThemedText>
         );
       }
     }
@@ -241,9 +245,10 @@ const FAQScreen = (): JSX.Element => {
 
       if (i < parts.length - 1) {
         finalResult.push(
-          <Text
+          <AccessibleThemedText
             key={`terms-${i}`}
             style={styles.link}
+            type="bodyStd"
             onPress={() => navigation.navigate('LegalScreen', { type: 'terms-of-service' })}
             accessible={true}
             accessibilityRole="link"
@@ -251,7 +256,7 @@ const FAQScreen = (): JSX.Element => {
             accessibilityHint={t('faq.accessibility.linkHint')}
           >
             Terms of Service
-          </Text>
+          </AccessibleThemedText>
         );
       }
     }
@@ -286,61 +291,103 @@ const FAQScreen = (): JSX.Element => {
   }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#3498db']} />
-      }
-    >
-      <Text style={styles.title}>{t('faq.title')}</Text>
-      <Text style={styles.subtitle}>{t('faq.subtitle')}</Text>
+    <AccessibleThemedView style={styles.container} accessibilityLabel={t('faq.screen_title')}>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#3498db']} />
+        }
+        accessibilityLabel={t('faq.scroll_container')}
+      >
+        <AccessibleThemedText style={styles.title} type="h1" accessibilityLabel={t('faq.title')}>
+          {t('faq.title')}
+        </AccessibleThemedText>
+        <AccessibleThemedText
+          style={styles.subtitle}
+          type="bodyStd"
+          accessibilityLabel={t('faq.subtitle')}
+        >
+          {t('faq.subtitle')}
+        </AccessibleThemedText>
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3498db" />
-          <Text style={styles.loadingText}>{t('faq.loading')}</Text>
-        </View>
-      ) : (
-        <>
-          {allFaqItems.map((item, index) => (
-            <View key={index} style={styles.faqItem}>
-              <TouchableOpacity
-                style={styles.questionContainer}
-                onPress={() => toggleExpand(index)}
-                activeOpacity={0.7}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel={item.question}
-                accessibilityHint={t('faq.accessibility.questionHint')}
-                accessibilityState={{ expanded: expandedIndex === index }}
+        {loading ? (
+          <AccessibleThemedView
+            style={styles.loadingContainer}
+            accessibilityLabel={t('faq.loading_container')}
+          >
+            <ActivityIndicator size="large" color="#3498db" />
+            <AccessibleThemedText
+              style={styles.loadingText}
+              type="bodyStd"
+              accessibilityLabel={t('faq.loading')}
+            >
+              {t('faq.loading')}
+            </AccessibleThemedText>
+          </AccessibleThemedView>
+        ) : (
+          <>
+            {allFaqItems.map((item, index) => (
+              <AccessibleThemedView
+                key={index}
+                style={styles.faqItem}
+                accessibilityLabel={`${t('faq.accessibility.faq_item')}: ${item.question}`}
               >
-                <Text style={styles.question}>{item.question}</Text>
-                <Text style={styles.expandIcon}>{expandedIndex === index ? '−' : '+'}</Text>
-              </TouchableOpacity>
-
-              {expandedIndex === index && (
-                <View
-                  style={styles.answerContainer}
-                  accessible={true}
-                  accessibilityRole="text"
-                  accessibilityLabel={`${t('faq.accessibility.answer')}: ${item.answer}`}
+                <AccessibleTouchableOpacity
+                  style={styles.questionContainer}
+                  onPress={() => toggleExpand(index)}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.question}
+                  accessibilityHint={t('faq.accessibility.questionHint')}
+                  accessibilityState={{ expanded: expandedIndex === index }}
                 >
-                  <Text style={styles.answer}>
-                    {item.answer.includes('Privacy Policy') ||
-                    item.answer.includes('Terms of Service')
-                      ? renderAnswerWithLinks(item.answer)
-                      : item.answer}
-                  </Text>
-                </View>
-              )}
-            </View>
-          ))}
-        </>
-      )}
+                  <AccessibleThemedText
+                    style={styles.question}
+                    type="h2"
+                    accessibilityLabel={item.question}
+                  >
+                    {item.question}
+                  </AccessibleThemedText>
+                  <AccessibleThemedText
+                    style={styles.expandIcon}
+                    type="bodyStd"
+                    accessibilityLabel={
+                      expandedIndex === index
+                        ? t('faq.accessibility.collapse')
+                        : t('faq.accessibility.expand')
+                    }
+                  >
+                    {expandedIndex === index ? '−' : '+'}
+                  </AccessibleThemedText>
+                </AccessibleTouchableOpacity>
 
-      {/* Question submission form */}
-      <QuestionSubmissionForm onQuestionSubmitted={handleQuestionSubmitted} />
-    </ScrollView>
+                {expandedIndex === index && (
+                  <AccessibleThemedView
+                    style={styles.answerContainer}
+                    accessibilityRole="text"
+                    accessibilityLabel={`${t('faq.accessibility.answer')}: ${item.answer}`}
+                  >
+                    <AccessibleThemedText
+                      style={styles.answer}
+                      type="bodyStd"
+                      accessibilityLabel={item.answer}
+                    >
+                      {item.answer.includes('Privacy Policy') ||
+                      item.answer.includes('Terms of Service')
+                        ? renderAnswerWithLinks(item.answer)
+                        : item.answer}
+                    </AccessibleThemedText>
+                  </AccessibleThemedView>
+                )}
+              </AccessibleThemedView>
+            ))}
+          </>
+        )}
+
+        {/* Question submission form */}
+        <QuestionSubmissionForm onQuestionSubmitted={handleQuestionSubmitted} />
+      </ScrollView>
+    </AccessibleThemedView>
   );
 };
 
@@ -352,8 +399,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f8f9fa',
+  },
+  scrollView: {
+    flex: 1,
+    padding: 20,
   },
   title: {
     fontSize: 24,

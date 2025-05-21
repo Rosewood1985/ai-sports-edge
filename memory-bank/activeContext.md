@@ -1,10 +1,37 @@
-# Active Context: GDPR/CCPA Compliance Implementation
+# Active Context: Accessibility Implementation and GDPR/CCPA Compliance
 
 ## Current Focus
 
-We are currently focused on implementing GDPR (General Data Protection Regulation) and CCPA (California Consumer Privacy Act) compliance for AI Sports Edge. This is a critical pre-launch task that addresses legal requirements for handling user data.
+We are currently working on two major initiatives:
 
-## Key Components
+### 1. Accessibility Implementation
+
+We are enhancing the accessibility of the AI Sports Edge application by implementing accessible atomic components and updating screens to use these components. This work is critical for ensuring the app is usable by people with disabilities and complies with accessibility guidelines.
+
+#### Key Components
+
+1. **Accessible Atomic Components**
+
+   - AccessibleThemedText with semantic type props
+   - AccessibleThemedView with enhanced accessibility props
+   - AccessibleTouchableOpacity with proper interaction states
+
+2. **Screen Updates**
+
+   - Updating existing screens to use accessible components
+   - Adding proper accessibility labels, roles, and states
+   - Ensuring proper heading hierarchy
+
+3. **Documentation**
+   - Comprehensive accessibility patterns guide
+   - Best practices for different component types
+   - Testing procedures for accessibility compliance
+
+### 2. GDPR/CCPA Compliance Implementation
+
+We are implementing GDPR (General Data Protection Regulation) and CCPA (California Consumer Privacy Act) compliance for AI Sports Edge. This is a critical pre-launch task that addresses legal requirements for handling user data.
+
+#### Key Components
 
 1. **Data Inventory and Mapping**
 
@@ -38,17 +65,23 @@ We are currently focused on implementing GDPR (General Data Protection Regulatio
 
 ## Implementation Approach
 
-We are following our atomic architecture pattern for this implementation:
+We are following our atomic architecture pattern for both implementations:
 
-- **Atoms**: Basic configuration, types, and utilities
-- **Molecules**: Functional components for specific privacy operations
-- **Organisms**: Complex components that coordinate privacy functions
-- **Templates**: Page layouts for privacy-related screens
+- **Atoms**: Basic components, configuration, types, and utilities
+- **Molecules**: Functional components for specific operations
+- **Organisms**: Complex components that coordinate functions
+- **Templates**: Page layouts for screens
 - **Pages**: Complete screen implementations
 
 ## Timeline
 
-The implementation is planned in phases:
+### Accessibility Implementation
+
+1. **Phase 1**: Core Accessible Components (May 21-28, 2025)
+2. **Phase 2**: Screen Updates (May 29-June 12, 2025)
+3. **Phase 3**: Testing and Documentation (June 13-20, 2025)
+
+### GDPR/CCPA Compliance
 
 1. **Phase 1**: Core Infrastructure (May 21-28, 2025)
 2. **Phase 2**: User Rights Implementation (May 29-June 5, 2025)
@@ -58,6 +91,14 @@ The implementation is planned in phases:
 
 ## Related Files
 
+### Accessibility Implementation
+
+- **Implementation Guide**: `docs/implementation-guides/accessibility-patterns.md`
+- **Progress Report**: `memory-bank/progress.md`
+- **Commit Messages**: `commit-message-accessibility-enhancements.txt`, `commit-message-gdpr-consent-screen-accessibility.txt`
+
+### GDPR/CCPA Compliance
+
 - **Implementation Plan**: `memory-bank/gdpr-ccpa-compliance-plan.md`
 - **Decision Log**: `memory-bank/decisionLog.md`
 - **Progress Report**: `memory-bank/progress.md`
@@ -65,7 +106,15 @@ The implementation is planned in phases:
 
 ## Next Steps
 
-1. Switch to Code mode to begin implementing the core infrastructure components
-2. Create the atomic components for GDPR/CCPA compliance
-3. Implement the database schema updates
-4. Develop the API endpoints for privacy-related operations
+### Accessibility Implementation
+
+1. Continue updating high-priority screens with accessible components
+2. Implement accessibility testing in CI/CD pipeline
+3. Create developer guidelines for accessibility implementation
+
+### GDPR/CCPA Compliance
+
+1. Implement the core infrastructure components
+2. Develop user rights implementation
+3. Create consent management system
+4. Build privacy dashboard UI

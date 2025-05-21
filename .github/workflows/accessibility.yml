@@ -1,0 +1,113 @@
+name: Accessibility Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Make accessibility test script executable
+        run: chmod +x scripts/accessibility-test.js
+
+      - name: Run accessibility tests
+        run: node scripts/accessibility-test.js --report=accessibility-report.json
+
+      - name: Upload accessibility report JSON
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-report-json
+          path: accessibility-report.json
+          if-no-files-found: error
+
+      - name: Upload accessibility report HTML
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-report-html
+          path: accessibility-report.html
+          if-no-files-found: error
+
+      - name: Check for accessibility issues
+        run: |
+          ISSUES=$(node -e "const report = require('./accessibility-report.json'); console.log(report.summary.totalIssues);")
+          if [ "$ISSUES" -gt "0" ]; then
+            echo "::warning::Found $ISSUES accessibility issues. See the report for details."
+            # Don't fail the build yet, just warn
+            # exit 1
+          else
+            echo "No accessibility issues found!"
+          fi
+
+  accessibility-pr-comment:
+    runs-on: ubuntu-latest
+    needs: accessibility
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download accessibility report
+        uses: actions/download-artifact@v3
+        with:
+          name: accessibility-report-json
+          path: ./
+
+      - name: Generate PR comment
+        id: generate-comment
+        run: |
+          REPORT=$(cat accessibility-report.json)
+          TOTAL_FILES=$(echo $REPORT | jq '.summary.totalFiles')
+          FILES_WITH_ISSUES=$(echo $REPORT | jq '.summary.filesWithIssues')
+          TOTAL_ISSUES=$(echo $REPORT | jq '.summary.totalIssues')
+
+          echo "comment<<EOF" >> $GITHUB_ENV
+          echo "## Accessibility Test Results" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "- Total Files: $TOTAL_FILES" >> $GITHUB_ENV
+          echo "- Files with Issues: $FILES_WITH_ISSUES" >> $GITHUB_ENV
+          echo "- Total Issues: $TOTAL_ISSUES" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+
+          if [ "$TOTAL_ISSUES" -gt "0" ]; then
+            echo "### Issues by Type" >> $GITHUB_ENV
+            echo "" >> $GITHUB_ENV
+            echo "| Type | Count |" >> $GITHUB_ENV
+            echo "| ---- | ----- |" >> $GITHUB_ENV
+            
+            ISSUES_BY_TYPE=$(echo $REPORT | jq -r '.summary.issuesByType | to_entries | .[] | "| \(.key) | \(.value) |"')
+            echo "$ISSUES_BY_TYPE" >> $GITHUB_ENV
+            
+            echo "" >> $GITHUB_ENV
+            echo "Please check the accessibility report artifact for details." >> $GITHUB_ENV
+          else
+            echo "✅ No accessibility issues found!" >> $GITHUB_ENV
+          fi
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo } } = context;
+            github.rest.issues.createComment({
+              issue_number,
+              owner,
+              repo,
+              body: process.env.comment
+            });

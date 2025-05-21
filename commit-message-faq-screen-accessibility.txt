@@ -1,0 +1,11 @@
+feat(accessibility): Enhance FAQScreen with accessible components
+
+- Replace standard Text components with AccessibleThemedText
+- Replace View components with AccessibleThemedView
+- Replace TouchableOpacity with AccessibleTouchableOpacity
+- Add proper semantic structure with heading hierarchy (h1, h2)
+- Add appropriate accessibility labels, roles, and states
+- Improve screen reader experience for FAQ items
+- Enhance link components with proper accessibility attributes
+
+This change improves the app's accessibility compliance, particularly for users with screen readers, while maintaining the existing visual design and functionality.

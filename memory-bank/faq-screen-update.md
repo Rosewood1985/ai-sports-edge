@@ -1,76 +1,146 @@
-# FAQ Screen Update Documentation
-
-**Date:** May 19, 2025  
-**Author:** Roo  
-**Component:** FAQScreen.tsx
+# FAQ Screen Accessibility Update
 
 ## Overview
 
-This document records the updates made to the FAQScreen.tsx component to add a new "Legal & Compliance" category with FAQ items related to Privacy Policy and Terms of Service.
+This document outlines the accessibility enhancements made to the FAQ Screen in the AI Sports Edge application. The goal was to make the screen more accessible to users with disabilities, particularly those using screen readers, and to comply with accessibility guidelines.
 
 ## Changes Made
 
-1. **Added Legal & Compliance FAQ Items**
+### Component Replacements
 
-   - Added a new `legalFaqItems` array with 5 FAQ items related to legal and compliance topics:
-     - "How is my personal data used?"
-     - "Can I request deletion of my data?"
-     - "What are the terms for using AI Sports Edge?"
-     - "How do I report terms violations?"
-     - "What is your refund policy?"
-   - Each answer includes references to either the Privacy Policy or Terms of Service documents
+1. **Text Components**
 
-2. **Added Interactive Links to Legal Documents**
+   - Replaced standard `Text` components with `AccessibleThemedText`
+   - Added semantic type props (h1, h2, bodyStd) for proper heading hierarchy
+   - Added appropriate accessibility labels for screen readers
 
-   - Implemented a `renderAnswerWithLinks` function that parses FAQ answers and converts references to "Privacy Policy" and "Terms of Service" into clickable links
-   - These links navigate to the LegalScreen with the appropriate parameter ('privacy-policy' or 'terms-of-service')
-   - Added proper accessibility attributes to ensure the links are accessible to screen readers
+2. **View Components**
 
-3. **Fixed TypeScript Type Issues**
+   - Replaced standard `View` components with `AccessibleThemedView`
+   - Added appropriate accessibility labels for screen readers
 
-   - Updated the import for the language context from `useI18n` to `useLanguage`
-   - Added proper typing for the navigation object and navigation parameters
-   - Added type annotations for arrays in the link rendering function
+3. **TouchableOpacity Components**
+   - Replaced standard `TouchableOpacity` components with `AccessibleTouchableOpacity`
+   - Added appropriate accessibility roles, labels, hints, and states
 
-4. **Integrated with Existing Categories**
+### Accessibility Enhancements
 
-   - Added the new legal FAQ items to the `allFaqItems` array, placing them after the existing categories but before user-submitted questions
-   - Maintained the existing UI style and accessibility features
+1. **Semantic Structure**
+
+   - Used `type="h1"` for the main title
+   - Used `type="h2"` for FAQ questions
+   - Used `type="bodyStd"` for regular text content
+
+2. **Screen Reader Support**
+
+   - Added `accessibilityLabel` props to all components
+   - Added `accessibilityRole` props to interactive elements
+   - Added `accessibilityState` props to indicate expanded/collapsed state
+   - Added `accessibilityHint` props to provide additional context
+
+3. **Link Enhancements**
+   - Improved accessibility of links to Privacy Policy and Terms of Service
+   - Added appropriate accessibility roles and labels for links
 
 ## Implementation Details
 
-The implementation follows best practices for accessibility and user experience:
+### FAQ Item Structure
 
-1. **Accessibility Considerations**
+Each FAQ item was enhanced with the following structure:
 
-   - All links have proper accessibility attributes including roles, labels, and hints
-   - The existing accessibility structure for FAQ items was preserved
+```tsx
+<AccessibleThemedView
+  key={index}
+  style={styles.faqItem}
+  accessibilityLabel={`${t('faq.accessibility.faq_item')}: ${item.question}`}
+>
+  <AccessibleTouchableOpacity
+    style={styles.questionContainer}
+    onPress={() => toggleExpand(index)}
+    accessibilityRole="button"
+    accessibilityLabel={item.question}
+    accessibilityHint={t('faq.accessibility.questionHint')}
+    accessibilityState={{ expanded: expandedIndex === index }}
+  >
+    <AccessibleThemedText style={styles.question} type="h2" accessibilityLabel={item.question}>
+      {item.question}
+    </AccessibleThemedText>
+    <AccessibleThemedText
+      style={styles.expandIcon}
+      type="bodyStd"
+      accessibilityLabel={
+        expandedIndex === index ? t('faq.accessibility.collapse') : t('faq.accessibility.expand')
+      }
+    >
+      {expandedIndex === index ? '−' : '+'}
+    </AccessibleThemedText>
+  </AccessibleTouchableOpacity>
 
-2. **User Experience**
+  {expandedIndex === index && (
+    <AccessibleThemedView
+      style={styles.answerContainer}
+      accessibilityRole="text"
+      accessibilityLabel={`${t('faq.accessibility.answer')}: ${item.answer}`}
+    >
+      <AccessibleThemedText style={styles.answer} type="bodyStd" accessibilityLabel={item.answer}>
+        {item.answer}
+      </AccessibleThemedText>
+    </AccessibleThemedView>
+  )}
+</AccessibleThemedView>
+```
 
-   - Legal information is presented in a clear, question-and-answer format consistent with other FAQ categories
-   - Links to legal documents are visually distinct and interactive
+### Link Rendering
 
-3. **Code Organization**
-   - The new FAQ category follows the same pattern as existing categories
-   - The link rendering function is implemented efficiently to handle both Privacy Policy and Terms of Service references
+The link rendering function was updated to use `AccessibleThemedText` with appropriate accessibility attributes:
 
-## Related Components
+```tsx
+<AccessibleThemedText
+  key={`privacy-${i}`}
+  style={styles.link}
+  type="bodyStd"
+  onPress={() => navigation.navigate('LegalScreen', { type: 'privacy-policy' })}
+  accessible={true}
+  accessibilityRole="link"
+  accessibilityLabel={t('legal.privacy_policy')}
+  accessibilityHint={t('faq.accessibility.linkHint')}
+>
+  Privacy Policy
+</AccessibleThemedText>
+```
 
-- **LegalScreen.tsx** - Displays the Privacy Policy and Terms of Service content
-- **LanguageContext.tsx** - Provides translation functionality used in the FAQ screen
+## Testing Considerations
 
-## Future Considerations
+The enhanced FAQ screen should be tested with:
 
-1. **Localization**
+1. **Screen Readers**
 
-   - The new FAQ items should be added to the translation files for proper localization
-   - Consider translating the legal content to Spanish to align with the app's language support
+   - VoiceOver on iOS
+   - TalkBack on Android
 
-2. **Content Updates**
+2. **Accessibility Features**
 
-   - Legal FAQ content should be reviewed periodically to ensure it remains accurate and up-to-date
-   - Consider adding more FAQ items related to legal topics as needed
+   - Large text
+   - High contrast
+   - Bold text
 
-3. **User Feedback**
-   - Monitor user engagement with the legal FAQ items to determine if additional items or clarifications are needed
+3. **User Interactions**
+   - Expanding/collapsing FAQ items
+   - Navigating between items
+   - Following links to legal screens
+
+## Next Steps
+
+1. **Translation Updates**
+
+   - Ensure all new accessibility labels and hints are properly translated
+   - Add new translation keys for accessibility-specific text
+
+2. **Automated Testing**
+
+   - Add accessibility tests for the FAQ screen
+   - Verify proper heading hierarchy
+
+3. **Documentation**
+   - Update component documentation to reflect accessibility enhancements
+   - Add examples of accessible FAQ items to the component library
