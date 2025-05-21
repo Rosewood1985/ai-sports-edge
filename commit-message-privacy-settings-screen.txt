@@ -1,0 +1,12 @@
+feat(privacy): Update PrivacySettingsScreen to use privacyService
+
+This commit updates the PrivacySettingsScreen component to use the new privacyService instead of directly using the privacy molecules. The changes include:
+
+- Updated imports to use the privacyService from the atomic/organisms/privacy directory
+- Modified data access and deletion request handlers to use the privacyService methods
+- Updated the refresh logic to load both access and deletion requests
+- Added PrivacySettingsScreen export to atomic/organisms/privacy/index.ts
+- Added privacyService export to atomic/organisms/index.js
+- Updated screens/PrivacySettingsScreen.tsx to import from the atomic/organisms/privacy directory
+
+These changes improve the code organization by following the atomic architecture pattern and make the privacy features more maintainable by centralizing the privacy-related functionality in the privacyService.

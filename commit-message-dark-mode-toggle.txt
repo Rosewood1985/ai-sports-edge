@@ -1,0 +1,11 @@
+feat(theme): Implement standardized dark mode toggle component
+
+This commit implements a standardized dark mode toggle component following the atomic architecture pattern. The implementation includes:
+
+- New ThemeToggle molecule with multiple variants (button, switch, icon)
+- Support for custom styling and labels
+- Accessibility features for screen readers
+- TypeScript type definitions for better developer experience
+- Comprehensive example demonstrating all variants and usage patterns
+
+This implementation provides a consistent way to toggle between light and dark themes across the application, improving user experience and accessibility.

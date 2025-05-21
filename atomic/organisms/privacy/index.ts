@@ -5,6 +5,7 @@
  */
 
 import privacyService from './PrivacyService';
+import PrivacySettingsScreen from './PrivacySettingsScreen';
 
-export { privacyService };
+export { privacyService, PrivacySettingsScreen };
 export default privacyService;

@@ -9,11 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import PrivacyManager, {
-  updatePrivacyPreferences,
-  createPrivacyRequest,
-  getUserPrivacyRequests,
-} from '../../molecules/privacy';
+import { privacyService } from './index';
 import {
   PrivacyPreferences,
   PrivacyRequestUnion,
@@ -68,8 +64,9 @@ const PrivacySettingsScreen: React.FC = () => {
         // }
 
         // Load the user's privacy requests
-        const userRequests = await getUserPrivacyRequests(user.uid);
-        setRequests(userRequests);
+        const userRequests = await privacyService.getUserDataAccessRequests(user.uid);
+        const deletionRequests = await privacyService.getUserDataDeletionRequests(user.uid);
+        setRequests([...userRequests, ...deletionRequests]);
       } catch (error) {
         console.error('Error loading privacy data:', error);
         Alert.alert(t('privacy.error.loading'), t('privacy.error.tryAgain'));
@@ -95,7 +92,7 @@ const PrivacySettingsScreen: React.FC = () => {
 
     try {
       setSaving(true);
-      await updatePrivacyPreferences(user.uid, preferences);
+      await privacyService.updatePrivacyPreferences(user.uid, preferences);
       Alert.alert(t('privacy.success'), t('privacy.preferencesUpdated'));
     } catch (error) {
       console.error('Error saving privacy preferences:', error);
@@ -110,11 +107,12 @@ const PrivacySettingsScreen: React.FC = () => {
     if (!user) return;
 
     try {
-      const request = await createPrivacyRequest(user.uid, PrivacyRequestType.ACCESS, {
-        format: 'json',
-      });
+      await privacyService.requestDataAccess(user.uid, ['personalInfo', 'activityData'], 'json');
 
-      setRequests(prev => [...prev, request]);
+      // Refresh the requests list after creating a new request
+      const accessRequests = await privacyService.getUserDataAccessRequests(user.uid);
+      const deletionRequests = await privacyService.getUserDataDeletionRequests(user.uid);
+      setRequests([...accessRequests, ...deletionRequests]);
       Alert.alert(t('privacy.requestSubmitted'), t('privacy.accessRequestDetails'));
     } catch (error) {
       console.error('Error creating data access request:', error);
@@ -136,11 +134,12 @@ const PrivacySettingsScreen: React.FC = () => {
         text: t('privacy.deleteSelected'),
         onPress: async () => {
           try {
-            const request = await createPrivacyRequest(user.uid, PrivacyRequestType.DELETION, {
-              fullDeletion: false,
-            });
+            await privacyService.requestDataDeletion(user.uid, ['analyticsData', 'marketingData']);
 
-            setRequests(prev => [...prev, request]);
+            // Refresh the requests list after creating a new request
+            const accessRequests = await privacyService.getUserDataAccessRequests(user.uid);
+            const deletionRequests = await privacyService.getUserDataDeletionRequests(user.uid);
+            setRequests([...accessRequests, ...deletionRequests]);
             Alert.alert(t('privacy.requestSubmitted'), t('privacy.deletionRequestDetails'));
           } catch (error) {
             console.error('Error creating data deletion request:', error);
@@ -153,11 +152,12 @@ const PrivacySettingsScreen: React.FC = () => {
         style: 'destructive',
         onPress: async () => {
           try {
-            const request = await createPrivacyRequest(user.uid, PrivacyRequestType.DELETION, {
-              fullDeletion: true,
-            });
+            await privacyService.requestAccountDeletion(user.uid);
 
-            setRequests(prev => [...prev, request]);
+            // Refresh the requests list after creating a new request
+            const accessRequests = await privacyService.getUserDataAccessRequests(user.uid);
+            const deletionRequests = await privacyService.getUserDataDeletionRequests(user.uid);
+            setRequests([...accessRequests, ...deletionRequests]);
             Alert.alert(t('privacy.requestSubmitted'), t('privacy.accountDeletionDetails'));
           } catch (error) {
             console.error('Error creating account deletion request:', error);

@@ -1,0 +1,13 @@
+feat(api): Implement enhanced API caching mechanism
+
+This commit implements an enhanced API caching mechanism that provides a consistent caching solution for all API calls. The implementation follows the atomic architecture pattern and includes:
+
+- New apiCache molecule for generic caching of API responses
+- Enhanced apiService organism that uses the apiCache molecule
+- Configurable cache TTL for different endpoints
+- Memory and storage caching for optimal performance
+- Automatic and manual cache invalidation
+- Cache control for API calls
+- Comprehensive documentation
+
+This implementation improves app performance by reducing network requests and provides a better user experience, especially in scenarios with poor network connectivity.

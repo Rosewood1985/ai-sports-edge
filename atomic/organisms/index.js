@@ -15,3 +15,5 @@ export { default as environmentBootstrap } from './environmentBootstrap';
 export { default as firebaseService } from './firebaseService';
 export { default as monitoringService } from './monitoringService';
 export { default as themeProvider } from './themeProvider';
+export { default as privacyService } from './privacy';
+export { default as apiService } from './api';
