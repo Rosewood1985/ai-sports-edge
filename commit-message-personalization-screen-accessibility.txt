@@ -1,10 +1,12 @@
-feat(accessibility): Enhance PersonalizationScreen with accessible components
+feat(accessibility): Enhance PersonalizationScreen with accessibility features
 
-- Replaced TouchableOpacity with AccessibleTouchableOpacity
-- Replaced ThemedText with AccessibleThemedText
-- Replaced ThemedView with AccessibleThemedView
-- Added appropriate accessibility labels, hints, and roles
-- Enhanced screen reader experience for personalization options
-- Fixed color references to use the updated theme structure
-- Ensured proper semantic structure with appropriate text types
-- Improved toggle options with proper accessibility states
+- Replace standard View components with AccessibleThemedView
+- Ensure all interactive elements use AccessibleTouchableOpacity
+- Add proper accessibility attributes (labels, roles, hints)
+- Update progress tracking in memory-bank
+
+This commit continues the systematic implementation of accessibility features
+across the app, following the pattern established in ProfileScreen (commit 9089eee).
+These changes improve screen reader compatibility and keyboard navigation.
+
+Related: #accessibility #a11y

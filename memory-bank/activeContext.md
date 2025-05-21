@@ -37,8 +37,14 @@ Implementing automated accessibility testing using jest-axe and continuing to en
    - Improved screen reader support
 
 6. **SettingsScreen** (screens/SettingsScreen.tsx)
+
    - Replaced standard View components with AccessibleThemedView
    - Replaced standard Text components with AccessibleThemedText
+   - Ensured all interactive elements use AccessibleTouchableOpacity
+   - Added proper accessibility attributes (labels, roles, hints)
+
+7. **PersonalizationScreen** (screens/PersonalizationScreen.tsx)
+   - Replaced standard View components with AccessibleThemedView
    - Ensured all interactive elements use AccessibleTouchableOpacity
    - Added proper accessibility attributes (labels, roles, hints)
 

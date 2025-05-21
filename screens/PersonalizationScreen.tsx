@@ -87,8 +87,8 @@ const PersonalizationScreen = () => {
       accessibilityLabel={title}
       accessibilityHint={description}
     >
-      <View style={styles.optionTextContainer}>
-        <View style={styles.optionTitleContainer}>
+      <AccessibleThemedView style={styles.optionTextContainer}>
+        <AccessibleThemedView style={styles.optionTitleContainer}>
           <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
             {title}
           </AccessibleThemedText>
@@ -99,11 +99,11 @@ const PersonalizationScreen = () => {
               </AccessibleThemedText>
             </AccessibleThemedView>
           )}
-        </View>
+        </AccessibleThemedView>
         <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
           {description}
         </AccessibleThemedText>
-      </View>
+      </AccessibleThemedView>
       <Switch
         value={
           isPremium ? false : (localPreferences[key as keyof typeof localPreferences] as boolean)
@@ -136,16 +136,16 @@ const PersonalizationScreen = () => {
           accessibilityLabel="Dark Mode"
           accessibilityHint="Toggle dark theme throughout the app"
         >
-          <View style={styles.optionTextContainer}>
-            <View style={styles.optionTitleContainer}>
+          <AccessibleThemedView style={styles.optionTextContainer}>
+            <AccessibleThemedView style={styles.optionTitleContainer}>
               <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
                 Dark Mode
               </AccessibleThemedText>
-            </View>
+            </AccessibleThemedView>
             <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Use dark theme throughout the app
             </AccessibleThemedText>
-          </View>
+          </AccessibleThemedView>
           <ThemeToggle variant="switch" />
         </AccessibleThemedView>
 
@@ -158,14 +158,14 @@ const PersonalizationScreen = () => {
           accessibilityLabel="Favorite Sports"
           accessibilityHint="Customize which sports appear in your feed"
         >
-          <View style={styles.optionTextContainer}>
+          <AccessibleThemedView style={styles.optionTextContainer}>
             <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
               Favorite Sports
             </AccessibleThemedText>
             <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Customize which sports appear in your feed
             </AccessibleThemedText>
-          </View>
+          </AccessibleThemedView>
           <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
         </AccessibleTouchableOpacity>
 
@@ -176,14 +176,14 @@ const PersonalizationScreen = () => {
           accessibilityLabel="Favorite Teams"
           accessibilityHint="Select teams to follow for updates and predictions"
         >
-          <View style={styles.optionTextContainer}>
+          <AccessibleThemedView style={styles.optionTextContainer}>
             <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
               Favorite Teams
             </AccessibleThemedText>
             <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Select teams to follow for updates and predictions
             </AccessibleThemedText>
-          </View>
+          </AccessibleThemedView>
           <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
         </AccessibleTouchableOpacity>
 
@@ -227,21 +227,21 @@ const PersonalizationScreen = () => {
           accessibilityLabel="Risk Tolerance"
           accessibilityHint="Set your preferred level of risk for betting recommendations"
         >
-          <View style={styles.optionTextContainer}>
+          <AccessibleThemedView style={styles.optionTextContainer}>
             <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
               Risk Tolerance
             </AccessibleThemedText>
             <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Set your preferred level of risk for betting recommendations
             </AccessibleThemedText>
-          </View>
-          <View style={styles.valueContainer}>
+          </AccessibleThemedView>
+          <AccessibleThemedView style={styles.valueContainer}>
             <AccessibleThemedText style={styles.valueText} type="bodySmall">
               {localPreferences.riskTolerance.charAt(0).toUpperCase() +
                 localPreferences.riskTolerance.slice(1)}
             </AccessibleThemedText>
             <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
-          </View>
+          </AccessibleThemedView>
         </AccessibleTouchableOpacity>
 
         <AccessibleTouchableOpacity
@@ -251,21 +251,21 @@ const PersonalizationScreen = () => {
           accessibilityLabel="Odds Format"
           accessibilityHint="Choose how odds are displayed throughout the app"
         >
-          <View style={styles.optionTextContainer}>
+          <AccessibleThemedView style={styles.optionTextContainer}>
             <AccessibleThemedText style={styles.optionTitle} type="bodyStd">
               Odds Format
             </AccessibleThemedText>
             <AccessibleThemedText style={styles.optionDescription} type="bodySmall">
               Choose how odds are displayed throughout the app
             </AccessibleThemedText>
-          </View>
-          <View style={styles.valueContainer}>
+          </AccessibleThemedView>
+          <AccessibleThemedView style={styles.valueContainer}>
             <AccessibleThemedText style={styles.valueText} type="bodySmall">
               {localPreferences.preferredOddsFormat.charAt(0).toUpperCase() +
                 localPreferences.preferredOddsFormat.slice(1)}
             </AccessibleThemedText>
             <Ionicons name="chevron-forward" size={24} color={colors.secondaryText} />
-          </View>
+          </AccessibleThemedView>
         </AccessibleTouchableOpacity>
 
         {/* Display Preferences */}

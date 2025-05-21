@@ -21,6 +21,7 @@
 
 - ✅ ProfileScreen - Replaced standard components with accessible versions
 - ✅ SettingsScreen - Replaced standard components with accessible versions
+- ✅ PersonalizationScreen - Replaced standard components with accessible versions
 - ✅ HomeScreen - Replaced standard components with accessible versions
 - ✅ GameDetailsScreen - Replaced standard components with accessible versions
 - ✅ FAQScreen - Replaced standard components with accessible versions
