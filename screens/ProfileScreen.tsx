@@ -1,24 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  ActivityIndicator
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { getAuth, User, onAuthStateChanged, signOut } from 'firebase/auth'; // Import getAuth and necessary functions
 import { getUserSubscription, SubscriptionPlan } from '../services/firebaseSubscriptionService';
 
-
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { Colors } from '../constants/Colors'; // Import base Colors
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 // Define subscription type (remains the same)
 interface Subscription {
@@ -41,7 +31,8 @@ const ProfileScreen = () => {
 
   // Auth listener and subscription loading
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => { // Use imported onAuthStateChanged
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      // Use imported onAuthStateChanged
       setUser(user);
       if (user) {
         loadSubscription(user.uid);
@@ -80,93 +71,150 @@ const ProfileScreen = () => {
     if (!user) return null;
 
     const getInitial = () => {
-      if (user.displayName && user.displayName.length > 0) return user.displayName.charAt(0).toUpperCase();
+      if (user.displayName && user.displayName.length > 0)
+        return user.displayName.charAt(0).toUpperCase();
       if (user.email && user.email.length > 0) return user.email.charAt(0).toUpperCase();
       return '?';
     };
     const displayName = user.displayName || user.email || 'User';
 
     return (
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        accessibilityLabel="Profile information"
+      >
         {/* Profile Header */}
-        <View style={[styles.profileHeader, { borderBottomColor: colors.border }]}>
-          <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '33' }]}> {/* Use primary accent with opacity */}
-            <ThemedText style={[styles.avatarText, { color: colors.primary }]}>
+        <View
+          style={[styles.profileHeader, { borderBottomColor: colors.border }]}
+          accessibilityLabel="Profile header"
+        >
+          <View
+            style={[styles.avatarContainer, { backgroundColor: colors.primary + '33' }]}
+            accessibilityLabel={`User avatar with initial ${getInitial()}`}
+          >
+            <AccessibleThemedText style={[styles.avatarText, { color: colors.primary }]}>
               {getInitial()}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
-          <ThemedText style={styles.userName}>
+          <AccessibleThemedText style={styles.userName} accessibilityRole="header">
             {displayName}
-          </ThemedText>
-          <ThemedText style={styles.userEmail}>
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.userEmail}
+            accessibilityLabel={`Email: ${user.email || 'No email provided'}`}
+          >
             {user.email || 'No email provided'}
-          </ThemedText>
+          </AccessibleThemedText>
         </View>
 
         {/* Subscription Section */}
-        <View style={[styles.sectionContainer, { borderBottomColor: colors.border }]}>
-          <ThemedText style={styles.sectionTitle}>Subscription</ThemedText>
+        <View
+          style={[styles.sectionContainer, { borderBottomColor: colors.border }]}
+          accessibilityLabel="Subscription information"
+        >
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            Subscription
+          </AccessibleThemedText>
           {loading ? (
-            <ActivityIndicator size="small" color={colors.primary} style={styles.loadingIndicator} />
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              style={styles.loadingIndicator}
+              accessibilityLabel="Loading subscription information"
+            />
           ) : subscription ? (
-            <View style={styles.subscriptionInfo}>
-              <ThemedText style={styles.planName}>
+            <View style={styles.subscriptionInfo} accessibilityLabel="Active subscription details">
+              <AccessibleThemedText style={styles.planName}>
                 {subscription.plan?.name || 'Unknown Plan'}
-              </ThemedText>
-              <ThemedText style={styles.planStatus}>
+              </AccessibleThemedText>
+              <AccessibleThemedText style={styles.planStatus}>
                 Status: {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-              </ThemedText>
-              <TouchableOpacity
+              </AccessibleThemedText>
+              <AccessibleTouchableOpacity
                 style={[styles.button, { backgroundColor: colors.primary }]}
                 onPress={() => navigation.navigate('Subscription' as never)}
+                accessibilityLabel="Manage Subscription"
+                accessibilityRole="button"
+                accessibilityHint="Navigate to subscription management screen"
               >
-                <ThemedText style={styles.buttonText}>Manage Subscription</ThemedText>
-              </TouchableOpacity>
+                <AccessibleThemedText style={styles.buttonText}>
+                  Manage Subscription
+                </AccessibleThemedText>
+              </AccessibleTouchableOpacity>
             </View>
           ) : (
-            <View style={styles.subscriptionInfo}>
-              <ThemedText style={styles.noSubscription}>
+            <View style={styles.subscriptionInfo} accessibilityLabel="No active subscription">
+              <AccessibleThemedText style={styles.noSubscription}>
                 You don't have an active subscription
-              </ThemedText>
-              <TouchableOpacity
+              </AccessibleThemedText>
+              <AccessibleTouchableOpacity
                 style={[styles.button, { backgroundColor: colors.primary }]}
                 onPress={() => navigation.navigate('Subscription' as never)}
+                accessibilityLabel="View Plans"
+                accessibilityRole="button"
+                accessibilityHint="Navigate to subscription plans screen"
               >
-                <ThemedText style={styles.buttonText}>View Plans</ThemedText>
-              </TouchableOpacity>
+                <AccessibleThemedText style={styles.buttonText}>View Plans</AccessibleThemedText>
+              </AccessibleTouchableOpacity>
             </View>
           )}
         </View>
 
         {/* Menu Section */}
-        <View style={styles.sectionContainer}>
-          <ThemedText style={styles.sectionTitle}>Account</ThemedText>
-          <TouchableOpacity
+        <View style={styles.sectionContainer} accessibilityLabel="Account menu">
+          <AccessibleThemedText style={styles.sectionTitle} accessibilityRole="header">
+            Account
+          </AccessibleThemedText>
+          <AccessibleTouchableOpacity
             style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('PurchaseHistory' as never)}
+            accessibilityLabel="Purchase History"
+            accessibilityRole="button"
+            accessibilityHint="View your purchase history"
           >
             <Ionicons name="cart-outline" size={22} color={colors.text} style={styles.menuIcon} />
-            <ThemedText style={styles.menuItemText}>Purchase History</ThemedText>
-            <Ionicons name="chevron-forward" size={22} color={colors.icon} />
-          </TouchableOpacity>
+            <AccessibleThemedText style={styles.menuItemText}>
+              Purchase History
+            </AccessibleThemedText>
+            <Ionicons name="chevron-forward" size={22} color={colors.text} />
+          </AccessibleTouchableOpacity>
 
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('Settings' as never)}
+            accessibilityLabel="Settings"
+            accessibilityRole="button"
+            accessibilityHint="Navigate to app settings"
           >
-            <Ionicons name="settings-outline" size={22} color={colors.text} style={styles.menuIcon} />
-            <ThemedText style={styles.menuItemText}>Settings</ThemedText>
-            <Ionicons name="chevron-forward" size={22} color={colors.icon} />
-          </TouchableOpacity>
+            <Ionicons
+              name="settings-outline"
+              size={22}
+              color={colors.text}
+              style={styles.menuIcon}
+            />
+            <AccessibleThemedText style={styles.menuItemText}>Settings</AccessibleThemedText>
+            <Ionicons name="chevron-forward" size={22} color={colors.text} />
+          </AccessibleTouchableOpacity>
 
-          <TouchableOpacity
+          <AccessibleTouchableOpacity
             style={[styles.menuItem, { borderBottomWidth: 0 }]} // No border on last item
             onPress={handleSignOut}
+            accessibilityLabel="Sign Out"
+            accessibilityRole="button"
+            accessibilityHint="Sign out of your account"
           >
-            <Ionicons name="log-out-outline" size={22} color={colors.notification} style={styles.menuIcon} /> {/* Use notification color for sign out */}
-            <ThemedText style={[styles.menuItemText, { color: colors.notification }]}>Sign Out</ThemedText>
-            <Ionicons name="chevron-forward" size={22} color={colors.icon} />
-          </TouchableOpacity>
+            <Ionicons
+              name="log-out-outline"
+              size={22}
+              color={colors.notification}
+              style={styles.menuIcon}
+            />
+            <AccessibleThemedText style={[styles.menuItemText, { color: colors.notification }]}>
+              Sign Out
+            </AccessibleThemedText>
+            <Ionicons name="chevron-forward" size={22} color={colors.text} />
+          </AccessibleTouchableOpacity>
         </View>
       </ScrollView>
     );
@@ -175,28 +223,31 @@ const ProfileScreen = () => {
   // --- Render Unauthenticated Content ---
   const renderUnauthenticatedContent = () => {
     return (
-      <View style={styles.unauthenticatedContainer}>
-        <Ionicons name="person-circle-outline" size={80} color={colors.icon} /> {/* Use icon color */}
-        <ThemedText style={styles.unauthenticatedTitle}>
+      <View style={styles.unauthenticatedContainer} accessibilityLabel="Sign in prompt">
+        <Ionicons name="person-circle-outline" size={80} color={colors.text} />
+        <AccessibleThemedText style={styles.unauthenticatedTitle} accessibilityRole="header">
           Sign in to access your profile
-        </ThemedText>
-        <ThemedText style={styles.unauthenticatedSubtitle}>
+        </AccessibleThemedText>
+        <AccessibleThemedText style={styles.unauthenticatedSubtitle}>
           Create an account to track your predictions, access premium features, and more.
-        </ThemedText>
-        <TouchableOpacity
+        </AccessibleThemedText>
+        <AccessibleTouchableOpacity
           style={[styles.button, styles.signInButton, { backgroundColor: colors.primary }]}
           onPress={() => navigation.navigate('Auth' as never)}
+          accessibilityLabel="Sign In or Sign Up"
+          accessibilityRole="button"
+          accessibilityHint="Navigate to authentication screen"
         >
-          <ThemedText style={styles.buttonText}>Sign In / Sign Up</ThemedText>
-        </TouchableOpacity>
+          <AccessibleThemedText style={styles.buttonText}>Sign In / Sign Up</AccessibleThemedText>
+        </AccessibleTouchableOpacity>
       </View>
     );
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <AccessibleThemedView style={styles.container} accessibilityLabel="Profile Screen">
       {user ? renderAuthenticatedContent() : renderUnauthenticatedContent()}
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 

@@ -19,6 +19,7 @@
    - ✅ Updated `screens/Onboarding/GDPRConsentScreen.tsx` with accessible components
    - ✅ Updated `screens/FAQScreen.tsx` with accessible components
    - ✅ Updated `screens/HomeScreen.tsx` with accessible components
+   - ✅ Updated `screens/ProfileScreen.tsx` with accessible components
    - ⬜ Update remaining screens with accessible components
 
 3. **Documentation**
@@ -90,12 +91,27 @@
    - Added appropriate accessibility labels, hints, and roles
    - Enhanced screen reader experience for game cards and trending topics
 
+8. `feat(accessibility): Enhance ProfileScreen with accessible components`
+
+   - Replaced TouchableOpacity with AccessibleTouchableOpacity
+   - Replaced ThemedText with AccessibleThemedText
+   - Replaced ThemedView with AccessibleThemedView
+   - Added appropriate accessibility labels, hints, and roles
+   - Enhanced screen reader experience for profile information, subscription details, and menu items
+
+9. `feat(accessibility): Enhance ProfileScreen with accessible components`
+
+   - Replaced TouchableOpacity with AccessibleTouchableOpacity
+   - Replaced ThemedText with AccessibleThemedText
+   - Replaced ThemedView with AccessibleThemedView
+   - Added appropriate accessibility labels, hints, and roles
+   - Enhanced screen reader experience for profile information, subscription details, and menu items
+
 ### Next Steps
 
 1. **Continue Screen Updates**
 
    - Update remaining high-priority screens with accessible components:
-     - ProfileScreen.tsx
      - SettingsScreen.tsx
      - AuthScreen.tsx
    - Focus on screens with complex interactions and forms
