@@ -11,9 +11,9 @@ import {
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { ThemedView } from '../atomic/atoms/ThemedView';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import LanguageSelector from '../components/LanguageSelector';
 import { Colors } from '../constants/Colors'; // Import base Colors
 
@@ -144,10 +144,22 @@ const HomeScreen = () => {
         }}
       >
         <View style={styles.gameHeader}>
-          <ThemedText style={styles.gameVenueText}>{item.venue}</ThemedText>
+          <AccessibleThemedText
+            style={styles.gameVenueText}
+            type="small"
+            accessibilityLabel={`${t('game.venue')}: ${item.venue}`}
+          >
+            {item.venue}
+          </AccessibleThemedText>
           {item.status === 'live' && (
             <View style={[styles.liveIndicator, { backgroundColor: colors.notification }]}>
-              <ThemedText style={styles.liveText}>LIVE</ThemedText>
+              <AccessibleThemedText
+                style={styles.liveText}
+                type="small"
+                accessibilityLabel={t('game.live_status')}
+              >
+                LIVE
+              </AccessibleThemedText>
             </View>
           )}
         </View>
@@ -155,36 +167,88 @@ const HomeScreen = () => {
         <View style={styles.teamsContainer}>
           {/* Home Team */}
           <View style={styles.teamContainer}>
-            <ThemedText style={styles.teamLogo}>{item.homeTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName} numberOfLines={1}>
+            <AccessibleThemedText
+              style={styles.teamLogo}
+              type="h2"
+              accessibilityLabel={`${t('game.home_team_logo')}`}
+            >
+              {item.homeTeam.logo}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamName}
+              type="bodySmall"
+              numberOfLines={1}
+              accessibilityLabel={`${t('game.home_team')}: ${item.homeTeam.name}`}
+            >
               {item.homeTeam.name}
-            </ThemedText>
-            <ThemedText style={styles.teamScore}>
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamScore}
+              type="h3"
+              accessibilityLabel={`${t('game.home_team_score')}: ${
+                item.status !== 'upcoming' ? item.homeTeam.score : t('game.not_started')
+              }`}
+            >
               {item.status !== 'upcoming' ? item.homeTeam.score : '-'}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
 
           {/* Game Info */}
           <View style={styles.gameInfo}>
             {item.status === 'live' ? (
               <View style={styles.liveInfo}>
-                <ThemedText style={styles.quarterText}>Q{item.quarter}</ThemedText>
-                <ThemedText style={styles.timeRemainingText}>{item.timeRemaining}</ThemedText>
+                <AccessibleThemedText
+                  style={styles.quarterText}
+                  type="bodySmall"
+                  accessibilityLabel={`${t('game.quarter')} ${item.quarter}`}
+                >
+                  Q{item.quarter}
+                </AccessibleThemedText>
+                <AccessibleThemedText
+                  style={styles.timeRemainingText}
+                  type="small"
+                  accessibilityLabel={`${t('game.time_remaining')}: ${item.timeRemaining}`}
+                >
+                  {item.timeRemaining}
+                </AccessibleThemedText>
               </View>
             ) : (
-              <ThemedText style={styles.gameDateText}>{formatDate(item.date)}</ThemedText>
+              <AccessibleThemedText
+                style={styles.gameDateText}
+                type="small"
+                accessibilityLabel={`${t('game.date')}: ${formatDate(item.date)}`}
+              >
+                {formatDate(item.date)}
+              </AccessibleThemedText>
             )}
           </View>
 
           {/* Away Team */}
           <View style={styles.teamContainer}>
-            <ThemedText style={styles.teamLogo}>{item.awayTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName} numberOfLines={1}>
+            <AccessibleThemedText
+              style={styles.teamLogo}
+              type="h2"
+              accessibilityLabel={`${t('game.away_team_logo')}`}
+            >
+              {item.awayTeam.logo}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamName}
+              type="bodySmall"
+              numberOfLines={1}
+              accessibilityLabel={`${t('game.away_team')}: ${item.awayTeam.name}`}
+            >
               {item.awayTeam.name}
-            </ThemedText>
-            <ThemedText style={styles.teamScore}>
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamScore}
+              type="h3"
+              accessibilityLabel={`${t('game.away_team_score')}: ${
+                item.status !== 'upcoming' ? item.awayTeam.score : t('game.not_started')
+              }`}
+            >
               {item.status !== 'upcoming' ? item.awayTeam.score : '-'}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
         </View>
       </TouchableOpacity>
@@ -200,16 +264,31 @@ const HomeScreen = () => {
           console.log('Navigate to trending topic:', item.id);
         }}
       >
-        <ThemedText style={styles.trendingEmoji}>{item.image}</ThemedText>
-        <ThemedText style={styles.trendingTitle} numberOfLines={2}>
+        <AccessibleThemedText
+          style={styles.trendingEmoji}
+          type="h2"
+          accessibilityLabel={`${t('trending.emoji')}: ${item.image}`}
+        >
+          {item.image}
+        </AccessibleThemedText>
+        <AccessibleThemedText
+          style={styles.trendingTitle}
+          type="h4"
+          numberOfLines={2}
+          accessibilityLabel={`${t('trending.title')}: ${item.title}`}
+        >
           {item.title}
-        </ThemedText>
+        </AccessibleThemedText>
         <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '33' }]}>
           {' '}
           {/* Use primary accent with opacity */}
-          <ThemedText style={[styles.categoryText, { color: colors.primary }]}>
+          <AccessibleThemedText
+            style={[styles.categoryText, { color: colors.primary }]}
+            type="small"
+            accessibilityLabel={`${t('trending.category')}: ${item.category}`}
+          >
             {item.category.toUpperCase()}
-          </ThemedText>
+          </AccessibleThemedText>
         </View>
       </TouchableOpacity>
     );
@@ -218,19 +297,39 @@ const HomeScreen = () => {
   // Render loading state
   if (loading) {
     return (
-      <ThemedView style={styles.loadingContainer}>
+      <AccessibleThemedView
+        style={styles.loadingContainer}
+        background="primary"
+        accessibilityLabel={t('common.loading_screen')}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
-        <ThemedText style={styles.loadingText}>{t('common.loading')}</ThemedText>
-      </ThemedView>
+        <AccessibleThemedText
+          style={styles.loadingText}
+          type="bodyStd"
+          accessibilityLabel={t('common.loading')}
+        >
+          {t('common.loading')}
+        </AccessibleThemedText>
+      </AccessibleThemedView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <AccessibleThemedView
+      style={styles.container}
+      background="primary"
+      accessibilityLabel={t('home.screen_title')}
+    >
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
-          <ThemedText style={styles.headerTitle}>AI Sports Edge</ThemedText>
+          <AccessibleThemedText
+            style={styles.headerTitle}
+            type="h2"
+            accessibilityLabel="AI Sports Edge"
+          >
+            AI Sports Edge
+          </AccessibleThemedText>
         </View>
         <View style={styles.headerRight}>
           <LanguageSelector />
@@ -240,22 +339,39 @@ const HomeScreen = () => {
       {/* Content */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.welcomeSection}>
-          <ThemedText style={styles.welcomeText}>{t('home.welcome')}</ThemedText>
+          <AccessibleThemedText
+            style={styles.welcomeText}
+            type="h1"
+            accessibilityLabel={t('home.welcome')}
+          >
+            {t('home.welcome')}
+          </AccessibleThemedText>
         </View>
 
         {/* Featured Games Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>{t('home.featured_games')}</ThemedText>
+            <AccessibleThemedText
+              style={styles.sectionTitle}
+              type="h3"
+              accessibilityLabel={t('home.featured_games')}
+            >
+              {t('home.featured_games')}
+            </AccessibleThemedText>
             <TouchableOpacity
               onPress={() => {
                 // @ts-ignore - Navigation typing issue
                 navigation.navigate('Games');
               }}
             >
-              <ThemedText style={[styles.viewAllText, { color: colors.primary }]}>
+              <AccessibleThemedText
+                style={[styles.viewAllText, { color: colors.primary }]}
+                type="button"
+                accessibilityLabel={t('home.view_all')}
+                accessibilityHint={t('home.view_all_games_hint')}
+              >
                 {t('home.view_all')}
-              </ThemedText>
+              </AccessibleThemedText>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -271,7 +387,13 @@ const HomeScreen = () => {
         {/* Trending Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>{t('home.trending')}</ThemedText>
+            <AccessibleThemedText
+              style={styles.sectionTitle}
+              type="h3"
+              accessibilityLabel={t('home.trending')}
+            >
+              {t('home.trending')}
+            </AccessibleThemedText>
           </View>
           <FlatList
             data={trendingTopics}
@@ -283,7 +405,7 @@ const HomeScreen = () => {
           />
         </View>
       </ScrollView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 
