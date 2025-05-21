@@ -3,9 +3,9 @@ import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } fro
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
-import { ThemedView } from '../atomic/atoms/ThemedView';
-import { ThemedText } from '../atomic/atoms/ThemedText';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 
 // Define route params type
 type GameDetailsParams = {
@@ -80,38 +80,74 @@ const GameDetailsScreen = () => {
   // Render loading state
   if (loading) {
     return (
-      <ThemedView style={styles.loadingContainer}>
+      <AccessibleThemedView
+        style={styles.loadingContainer}
+        accessibilityLabel={t('common.loading_screen')}
+        accessibilityRole="progressbar"
+      >
         <ActivityIndicator size="large" color={colors.primary} />
-        <ThemedText style={styles.loadingText}>{t('common.loading')}</ThemedText>
-      </ThemedView>
+        <AccessibleThemedText
+          style={styles.loadingText}
+          type="bodyStd"
+          accessibilityLabel={t('common.loading')}
+        >
+          {t('common.loading')}
+        </AccessibleThemedText>
+      </AccessibleThemedView>
     );
   }
 
   // Render error state if game not found
   if (!game) {
     return (
-      <ThemedView style={styles.errorContainer}>
+      <AccessibleThemedView
+        style={styles.errorContainer}
+        accessibilityLabel={t('games.error_screen')}
+        accessibilityRole="alert"
+      >
         <Ionicons name="alert-circle-outline" size={64} color={colors.text} />
-        <ThemedText style={styles.errorText}>{t('games.game_not_found')}</ThemedText>
+        <AccessibleThemedText
+          style={styles.errorText}
+          type="h2"
+          accessibilityLabel={t('games.game_not_found')}
+        >
+          {t('games.game_not_found')}
+        </AccessibleThemedText>
         <TouchableOpacity
           style={[styles.backButton, { backgroundColor: colors.primary }]}
           onPress={() => navigation.goBack()}
+          accessibilityLabel={t('common.back')}
+          accessibilityRole="button"
         >
-          <ThemedText style={styles.backButtonText}>{t('common.back')}</ThemedText>
+          <AccessibleThemedText style={styles.backButtonText} type="button">
+            {t('common.back')}
+          </AccessibleThemedText>
         </TouchableOpacity>
-      </ThemedView>
+      </AccessibleThemedView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <AccessibleThemedView
+      style={styles.container}
+      accessibilityLabel={t('games.game_details_screen')}
+    >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity style={styles.backButtonContainer} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backButtonContainer}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel={t('common.back')}
+          accessibilityRole="button"
+        >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>
+        <AccessibleThemedText
+          style={styles.headerTitle}
+          type="h1"
+          accessibilityLabel={`${game.homeTeam.name} ${t('common.versus')} ${game.awayTeam.name}`}
+        >
           {game.homeTeam.name} vs {game.awayTeam.name}
-        </ThemedText>
+        </AccessibleThemedText>
         <View style={styles.headerRight} />
       </View>
 
@@ -123,14 +159,16 @@ const GameDetailsScreen = () => {
           ]}
           onPress={() => setActiveTab('overview')}
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
               activeTab === 'overview' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
+            type="button"
+            accessibilityLabel={t('games.overview')}
           >
             {t('games.overview')}
-          </ThemedText>
+          </AccessibleThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -140,14 +178,16 @@ const GameDetailsScreen = () => {
           ]}
           onPress={() => setActiveTab('stats')}
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
               activeTab === 'stats' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
+            type="button"
+            accessibilityLabel={t('games.stats')}
           >
             {t('games.stats')}
-          </ThemedText>
+          </AccessibleThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -157,51 +197,125 @@ const GameDetailsScreen = () => {
           ]}
           onPress={() => setActiveTab('players')}
         >
-          <ThemedText
+          <AccessibleThemedText
             style={[
               styles.tabText,
               activeTab === 'players' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
+            type="button"
+            accessibilityLabel={t('games.players')}
           >
             {t('games.players')}
-          </ThemedText>
+          </AccessibleThemedText>
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.scoreboardContainer}>
           <View style={styles.teamContainer}>
-            <ThemedText style={styles.teamLogo}>{game.homeTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName}>{game.homeTeam.name}</ThemedText>
-            <ThemedText style={styles.teamScore}>{game.homeTeam.score}</ThemedText>
+            <AccessibleThemedText
+              style={styles.teamLogo}
+              type="h2"
+              accessibilityLabel={`${t('game.home_team_logo')}`}
+            >
+              {game.homeTeam.logo}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamName}
+              type="h3"
+              accessibilityLabel={`${t('game.home_team')}: ${game.homeTeam.name}`}
+            >
+              {game.homeTeam.name}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamScore}
+              type="h1"
+              accessibilityLabel={`${t('game.home_team_score')}: ${game.homeTeam.score}`}
+            >
+              {game.homeTeam.score}
+            </AccessibleThemedText>
           </View>
 
           <View style={styles.gameInfoContainer}>
-            <ThemedText style={styles.gameStatus}>
+            <AccessibleThemedText
+              style={styles.gameStatus}
+              type="bodyStd"
+              accessibilityLabel={`${t('game.status')}: ${
+                game.status === 'live' ? t('game.live') : t('game.final')
+              }`}
+            >
               {game.status === 'live' ? 'LIVE' : 'FINAL'}
-            </ThemedText>
+            </AccessibleThemedText>
           </View>
 
           <View style={styles.teamContainer}>
-            <ThemedText style={styles.teamLogo}>{game.awayTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName}>{game.awayTeam.name}</ThemedText>
-            <ThemedText style={styles.teamScore}>{game.awayTeam.score}</ThemedText>
+            <AccessibleThemedText
+              style={styles.teamLogo}
+              type="h2"
+              accessibilityLabel={`${t('game.away_team_logo')}`}
+            >
+              {game.awayTeam.logo}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamName}
+              type="h3"
+              accessibilityLabel={`${t('game.away_team')}: ${game.awayTeam.name}`}
+            >
+              {game.awayTeam.name}
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.teamScore}
+              type="h1"
+              accessibilityLabel={`${t('game.away_team_score')}: ${game.awayTeam.score}`}
+            >
+              {game.awayTeam.score}
+            </AccessibleThemedText>
           </View>
         </View>
 
         <View style={[styles.infoCard, { backgroundColor: colors.card }]}>
-          <ThemedText style={styles.infoCardTitle}>{t('games.game_info')}</ThemedText>
+          <AccessibleThemedText
+            style={styles.infoCardTitle}
+            type="h3"
+            accessibilityLabel={t('games.game_info')}
+          >
+            {t('games.game_info')}
+          </AccessibleThemedText>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.infoLabel}>{t('games.venue')}:</ThemedText>
-            <ThemedText style={styles.infoValue}>{game.venue}</ThemedText>
+            <AccessibleThemedText
+              style={styles.infoLabel}
+              type="bodyStd"
+              accessibilityLabel={t('games.venue')}
+            >
+              {t('games.venue')}:
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.infoValue}
+              type="bodyStd"
+              accessibilityLabel={game.venue}
+            >
+              {game.venue}
+            </AccessibleThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.infoLabel}>{t('games.date')}:</ThemedText>
-            <ThemedText style={styles.infoValue}>{formatDate(game.date)}</ThemedText>
+            <AccessibleThemedText
+              style={styles.infoLabel}
+              type="bodyStd"
+              accessibilityLabel={t('games.date')}
+            >
+              {t('games.date')}:
+            </AccessibleThemedText>
+            <AccessibleThemedText
+              style={styles.infoValue}
+              type="bodyStd"
+              accessibilityLabel={formatDate(game.date)}
+            >
+              {formatDate(game.date)}
+            </AccessibleThemedText>
           </View>
         </View>
       </ScrollView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 
