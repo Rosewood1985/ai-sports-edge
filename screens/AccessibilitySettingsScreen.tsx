@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Switch, Platform } from 'react-native';
+import { StyleSheet, ScrollView, Switch, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { useThemeColor } from '../hooks/useThemeColor';
 import accessibilityService, { AccessibilityPreferences } from '../services/accessibilityService';
-import { analyticsService } from '../services/analyticsService';
+import { trackEvent } from '../services/analyticsService';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 /**
  * Screen for accessibility settings
@@ -17,27 +18,27 @@ const AccessibilitySettingsScreen: React.FC = () => {
   const [isScreenReaderActive, setIsScreenReaderActive] = useState<boolean>(
     accessibilityService.isScreenReaderActive()
   );
-  
+
   // Theme colors
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
+  const backgroundColor = useThemeColor({}, 'primaryBackground');
+  const textColor = useThemeColor({}, 'primaryText');
   const primaryColor = '#0a7ea4';
-  
+
   // Subscribe to accessibility service changes
   useEffect(() => {
-    const unsubscribe = accessibilityService.addListener((newPreferences) => {
+    const unsubscribe = accessibilityService.addListener(newPreferences => {
       setPreferences(newPreferences);
       setIsScreenReaderActive(accessibilityService.isScreenReaderActive());
     });
-    
+
     // Track screen view
-    analyticsService.trackScreenView('AccessibilitySettings');
-    
+    trackEvent('screen_view', { screen_name: 'AccessibilitySettings' });
+
     return () => {
       unsubscribe();
     };
   }, []);
-  
+
   /**
    * Update a preference
    * @param key Preference key
@@ -45,24 +46,24 @@ const AccessibilitySettingsScreen: React.FC = () => {
    */
   const updatePreference = async (key: keyof AccessibilityPreferences, value: boolean) => {
     await accessibilityService.updatePreferences({ [key]: value });
-    
+
     // Track event
-    analyticsService.trackEvent('accessibility_setting_changed', {
+    trackEvent('accessibility_setting_changed', {
       setting: key,
-      value
+      value,
     });
   };
-  
+
   /**
    * Reset preferences to default
    */
   const resetPreferences = async () => {
     await accessibilityService.resetPreferences();
-    
+
     // Track event
-    analyticsService.trackEvent('accessibility_settings_reset');
+    trackEvent('accessibility_settings_reset', {});
   };
-  
+
   /**
    * Render a setting item
    * @param title Setting title
@@ -80,25 +81,31 @@ const AccessibilitySettingsScreen: React.FC = () => {
     onValueChange: (value: boolean) => void,
     disabled: boolean = false
   ) => {
-    const accessibilityProps = accessibilityService.getAccessibilityProps(
-      title,
-      description,
-      'switch',
-      { checked: value, disabled }
-    );
-    
     return (
-      <View
+      <AccessibleThemedView
         style={styles.settingItem}
-        {...accessibilityProps}
+        accessibilityLabel={`${title} setting`}
+        accessibilityHint={description}
+        accessibilityRole="switch"
       >
-        <View style={styles.settingIconContainer}>
+        <AccessibleThemedView
+          style={styles.settingIconContainer}
+          accessibilityLabel={`${title} icon`}
+        >
           <Ionicons name={iconName as any} size={24} color={primaryColor} />
-        </View>
-        <View style={styles.settingContent}>
-          <ThemedText style={styles.settingTitle}>{title}</ThemedText>
-          <ThemedText style={styles.settingDescription}>{description}</ThemedText>
-        </View>
+        </AccessibleThemedView>
+        <AccessibleThemedView style={styles.settingContent}>
+          <AccessibleThemedText style={styles.settingTitle} type="h4" accessibilityLabel={title}>
+            {title}
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.settingDescription}
+            type="bodySmall"
+            accessibilityLabel={description}
+          >
+            {description}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
         <Switch
           value={value}
           onValueChange={onValueChange}
@@ -106,118 +113,179 @@ const AccessibilitySettingsScreen: React.FC = () => {
           trackColor={{ false: '#767577', true: primaryColor }}
           thumbColor={Platform.OS === 'ios' ? '#ffffff' : value ? '#ffffff' : '#f4f3f4'}
           ios_backgroundColor="#3e3e3e"
+          accessibilityLabel={`${title} switch`}
+          accessibilityState={{ checked: value, disabled }}
+          accessibilityRole="switch"
+          accessibilityHint={`Double tap to ${value ? 'disable' : 'enable'} ${title.toLowerCase()}`}
         />
-      </View>
+      </AccessibleThemedView>
     );
   };
-  
+
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Text Settings</ThemedText>
-          
+    <AccessibleThemedView
+      style={styles.container}
+      accessibilityLabel="Accessibility Settings Screen"
+    >
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        accessibilityLabel="Accessibility settings options"
+        accessibilityHint="Scroll to view all accessibility settings"
+      >
+        <AccessibleThemedView style={styles.section} accessibilityLabel="Text Settings Section">
+          <AccessibleThemedText
+            style={styles.sectionTitle}
+            type="h2"
+            accessibilityRole="header"
+            accessibilityLabel="Text Settings"
+          >
+            Text Settings
+          </AccessibleThemedText>
+
           {renderSettingItem(
             'Larger Text',
             'Increase the text size for better readability',
             'text',
             preferences.largeText,
-            (value) => updatePreference('largeText', value)
+            value => updatePreference('largeText', value)
           )}
-          
+
           {renderSettingItem(
             'Bold Text',
             'Make text bold for better visibility',
             'text-sharp',
             preferences.boldText || accessibilityService.isBoldTextActive(),
-            (value) => updatePreference('boldText', value),
+            value => updatePreference('boldText', value),
             accessibilityService.isBoldTextActive() && Platform.OS === 'ios'
           )}
-        </View>
-        
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Display Settings</ThemedText>
-          
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.section} accessibilityLabel="Display Settings Section">
+          <AccessibleThemedText
+            style={styles.sectionTitle}
+            type="h2"
+            accessibilityRole="header"
+            accessibilityLabel="Display Settings"
+          >
+            Display Settings
+          </AccessibleThemedText>
+
           {renderSettingItem(
             'High Contrast',
             'Increase contrast for better visibility',
             'contrast',
             preferences.highContrast || accessibilityService.isHighContrastActive(),
-            (value) => updatePreference('highContrast', value),
+            value => updatePreference('highContrast', value),
             accessibilityService.isHighContrastActive() && Platform.OS === 'ios'
           )}
-          
+
           {renderSettingItem(
             'Reduce Motion',
             'Minimize animations and motion effects',
             'eye',
             preferences.reduceMotion || accessibilityService.isReduceMotionActive(),
-            (value) => updatePreference('reduceMotion', value),
+            value => updatePreference('reduceMotion', value),
             accessibilityService.isReduceMotionActive()
           )}
-          
+
           {renderSettingItem(
             'Grayscale',
             'Display content in grayscale',
             'color-filter',
             preferences.grayscale || accessibilityService.isGrayscaleActive(),
-            (value) => updatePreference('grayscale', value),
+            value => updatePreference('grayscale', value),
             accessibilityService.isGrayscaleActive() && Platform.OS === 'ios'
           )}
-          
+
           {renderSettingItem(
             'Invert Colors',
             'Invert screen colors for better contrast',
             'invert-mode',
             preferences.invertColors || accessibilityService.isInvertColorsActive(),
-            (value) => updatePreference('invertColors', value),
+            value => updatePreference('invertColors', value),
             accessibilityService.isInvertColorsActive() && Platform.OS === 'ios'
           )}
-        </View>
-        
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Screen Reader Settings</ThemedText>
-          
+        </AccessibleThemedView>
+
+        <AccessibleThemedView
+          style={styles.section}
+          accessibilityLabel="Screen Reader Settings Section"
+        >
+          <AccessibleThemedText
+            style={styles.sectionTitle}
+            type="h2"
+            accessibilityRole="header"
+            accessibilityLabel="Screen Reader Settings"
+          >
+            Screen Reader Settings
+          </AccessibleThemedText>
+
           {renderSettingItem(
             'Screen Reader Hints',
             'Provide additional hints for screen readers',
             'information-circle',
             preferences.screenReaderHints,
-            (value) => updatePreference('screenReaderHints', value)
+            value => updatePreference('screenReaderHints', value)
           )}
-          
-          <View style={styles.infoBox}>
+
+          <AccessibleThemedView
+            style={styles.infoBox}
+            accessibilityLabel="Screen reader status information"
+          >
             <Ionicons name="information-circle" size={24} color={primaryColor} />
-            <ThemedText style={styles.infoText}>
+            <AccessibleThemedText
+              style={styles.infoText}
+              type="bodySmall"
+              accessibilityLabel={
+                isScreenReaderActive
+                  ? 'Screen reader is currently active on your device.'
+                  : 'Screen reader is currently inactive on your device. You can enable it in your device settings.'
+              }
+            >
               {isScreenReaderActive
                 ? 'Screen reader is currently active on your device.'
                 : 'Screen reader is currently inactive on your device. You can enable it in your device settings.'}
-            </ThemedText>
-          </View>
-        </View>
-        
-        <View style={styles.resetContainer}>
-          <ThemedText
-            style={styles.resetText}
+            </AccessibleThemedText>
+          </AccessibleThemedView>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView
+          style={styles.resetContainer}
+          accessibilityLabel="Reset settings section"
+        >
+          <AccessibleTouchableOpacity
             onPress={resetPreferences}
-            {...accessibilityService.getAccessibilityProps(
-              'Reset to Default Settings',
-              'Double tap to reset all accessibility settings to their default values',
-              'button'
-            )}
+            accessibilityLabel="Reset to Default Settings"
+            accessibilityRole="button"
+            accessibilityHint="Double tap to reset all accessibility settings to their default values"
           >
-            Reset to Default Settings
-          </ThemedText>
-        </View>
-        
-        <View style={styles.helpSection}>
-          <ThemedText style={styles.helpTitle}>Need Help?</ThemedText>
-          <ThemedText style={styles.helpText}>
-            If you need assistance with accessibility features, please contact our support team at support@aisportsedge.app
-          </ThemedText>
-        </View>
+            <AccessibleThemedText style={styles.resetText} type="button" color="statusLow">
+              Reset to Default Settings
+            </AccessibleThemedText>
+          </AccessibleTouchableOpacity>
+        </AccessibleThemedView>
+
+        <AccessibleThemedView style={styles.helpSection} accessibilityLabel="Help section">
+          <AccessibleThemedText
+            style={styles.helpTitle}
+            type="h3"
+            accessibilityRole="header"
+            accessibilityLabel="Need Help?"
+          >
+            Need Help?
+          </AccessibleThemedText>
+          <AccessibleThemedText
+            style={styles.helpText}
+            type="bodySmall"
+            accessibilityLabel="If you need assistance with accessibility features, please contact our support team at support@aisportsedge.app"
+          >
+            If you need assistance with accessibility features, please contact our support team at
+            support@aisportsedge.app
+          </AccessibleThemedText>
+        </AccessibleThemedView>
       </ScrollView>
-    </ThemedView>
+    </AccessibleThemedView>
   );
 };
 

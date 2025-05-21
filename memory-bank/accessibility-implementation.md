@@ -99,6 +99,7 @@ Key features:
 - ✅ Updated `screens/SettingsScreen.tsx`
 - ✅ Updated `screens/AuthScreen.tsx`
 - ✅ Updated `screens/PersonalizationScreen.tsx`
+- ✅ Updated `screens/AccessibilitySettingsScreen.tsx`
 
 ### Documentation
 
