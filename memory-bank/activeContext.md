@@ -96,7 +96,7 @@ We are following our atomic architecture pattern for both implementations:
 - **Implementation Guide**: `docs/implementation-guides/accessibility-implementation-guide.md`
 - **Accessibility Patterns**: `docs/implementation-guides/accessibility-patterns.md`
 - **Progress Report**: `memory-bank/progress.md`
-- **Commit Messages**: `commit-message-accessibility-enhancements.txt`, `commit-message-gdpr-consent-screen-accessibility.txt`, `commit-message-faq-screen-accessibility.txt`, `commit-message-home-screen-accessibility.txt`, `commit-message-profile-screen-accessibility.txt`, `commit-message-settings-screen-accessibility.txt`, `commit-message-legal-screen-accessibility.txt`, `commit-message-login-screen-accessibility.txt`
+- **Commit Messages**: `commit-message-accessibility-enhancements.txt`, `commit-message-gdpr-consent-screen-accessibility.txt`, `commit-message-faq-screen-accessibility.txt`, `commit-message-home-screen-accessibility.txt`, `commit-message-profile-screen-accessibility.txt`, `commit-message-settings-screen-accessibility.txt`, `commit-message-legal-screen-accessibility.txt`, `commit-message-login-screen-accessibility.txt`, `commit-message-odds-comparison-screen-accessibility.txt`, `commit-message-betting-analytics-screen-accessibility.txt`
 - **Translation Files**: `translations/en.json`, `translations/es.json` (accessibility section)
 - **CI/CD Configuration**: `.github/workflows/accessibility.yml`
 - **PR Template**: `.github/pull_request_template.md` (includes accessibility checklist)
@@ -128,6 +128,7 @@ We are following our atomic architecture pattern for both implementations:
    - ✅ LegalScreen.tsx
    - ✅ LoginScreen.tsx
    - ✅ OddsComparisonScreen.tsx
+   - ✅ BettingAnalyticsScreen.tsx
 6. Create accessibility unit tests for accessible components
 7. Implement color contrast testing in the accessibility testing script
 8. Create QA documentation for manual accessibility testing

@@ -1,0 +1,8 @@
+feat(accessibility): Enhance BettingAnalyticsScreen with accessible components
+
+- Replaced standard components with accessible alternatives
+- Added proper accessibility attributes to all elements
+- Implemented proper heading hierarchy with h1 for screen title
+- Enhanced screen reader experience for analytics content
+- Improved focus order and navigation
+- Maintained existing functionality while improving accessibility

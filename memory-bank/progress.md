@@ -142,9 +142,9 @@
    - Update remaining high-priority screens with accessible components:
      - ✅ LoginScreen.tsx
      - ⬜ SubscriptionScreen.tsx (ON HOLD - subscription tiers and pricing need to be finalized)
-     - ⬜ OddsComparisonScreen.tsx (NEXT PRIORITY)
-     - ⬜ BettingAnalyticsScreen.tsx
-     - ⬜ ParlayScreen.tsx
+     - ✅ OddsComparisonScreen.tsx
+     - ✅ BettingAnalyticsScreen.tsx
+     - ⬜ ParlayScreen.tsx (NEXT PRIORITY)
      - ⬜ Focus on remaining screens with complex interactions and forms
 
 2. **Testing**

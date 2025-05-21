@@ -1,32 +1,39 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import BettingAnalytics from '../components/BettingAnalytics';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 /**
  * Screen that displays betting analytics for the user
+ * Enhanced with accessibility features for better screen reader support
  */
 const BettingAnalyticsScreen: React.FC = () => {
   const navigation = useNavigation();
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <AccessibleTouchableOpacity
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back"
+          accessibilityHint="Returns to the previous screen"
+          accessibilityRole="button"
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Betting Analytics</ThemedText>
+        </AccessibleTouchableOpacity>
+        <AccessibleThemedText style={styles.headerTitle} type="h1" accessibilityRole="header">
+          Betting Analytics
+        </AccessibleThemedText>
       </View>
-      
-      <ThemedView style={styles.content}>
+
+      <AccessibleThemedView style={styles.content} accessibilityLabel="Betting analytics content">
         <BettingAnalytics />
-      </ThemedView>
+      </AccessibleThemedView>
     </SafeAreaView>
   );
 };
@@ -46,6 +53,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginRight: 16,
+    padding: 8, // Increased touch target for better accessibility
   },
   headerTitle: {
     fontSize: 20,

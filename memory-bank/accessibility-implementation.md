@@ -101,7 +101,11 @@ Key features:
 - ✅ Updated `screens/PersonalizationScreen.tsx`
 - ✅ Updated `screens/AccessibilitySettingsScreen.tsx`
 - ✅ Updated `screens/GamesScreen.tsx`
+- ✅ Updated `screens/PaymentScreen.tsx`
 - ✅ Updated `screens/LegalScreen.tsx`
+- ✅ Updated `screens/LoginScreen.tsx`
+- ✅ Updated `screens/OddsComparisonScreen.tsx`
+- ✅ Updated `screens/BettingAnalyticsScreen.tsx`
 
 ### Documentation
 
