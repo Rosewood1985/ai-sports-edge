@@ -17,6 +17,8 @@ Welcome to the AI Sports Edge documentation. This documentation is organized int
 - [Dependency Management](implementation-guides/dependency-management.md) - Guide for managing dependencies
 - [Internationalization Guide](implementation-guides/internationalization-guide.md) - Practical guide for implementing internationalization
 - [Privacy Compliance](implementation-guides/privacy-compliance.md) - Guide for implementing GDPR/CCPA compliance
+- [Accessibility Implementation](implementation-guides/accessibility-implementation-guide.md) - Guide for implementing accessibility features
+- [Accessibility Patterns](implementation-guides/accessibility-patterns.md) - Documentation of accessibility patterns used in the app
 - [Testing](implementation-guides/testing.md) - Testing strategies and practices
 
 ### API Reference

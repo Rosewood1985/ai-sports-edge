@@ -391,5 +391,47 @@
     },
     "success": "Éxito",
     "preferencesUpdated": "Sus preferencias de privacidad han sido actualizadas."
+  },
+  "accessibility": {
+    "settings": "Configuración de Accesibilidad",
+    "preferences": "Preferencias de Accesibilidad",
+    "high_contrast": "Alto Contraste",
+    "high_contrast_description": "Aumenta el contraste entre el texto y el fondo para una mejor legibilidad",
+    "large_text": "Texto Grande",
+    "large_text_description": "Aumenta el tamaño del texto para una mejor legibilidad",
+    "bold_text": "Texto en Negrita",
+    "bold_text_description": "Hace que el texto sea en negrita para una mejor legibilidad",
+    "screen_reader": "Lector de Pantalla",
+    "screen_reader_description": "Habilita la compatibilidad con lectores de pantalla",
+    "reduce_motion": "Reducir Movimiento",
+    "reduce_motion_description": "Reduce las animaciones y efectos de movimiento",
+    "button": "Botón",
+    "link": "Enlace",
+    "header": "Encabezado",
+    "image": "Imagen",
+    "text": "Texto",
+    "expand": "Expandir",
+    "collapse": "Colapsar",
+    "selected": "Seleccionado",
+    "not_selected": "No Seleccionado",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "required": "Requerido",
+    "optional": "Opcional",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "faq": {
+      "accessibility": {
+        "faq_item": "Pregunta frecuente",
+        "question": "Pregunta",
+        "answer": "Respuesta",
+        "expand": "Expandir para ver la respuesta",
+        "collapse": "Colapsar para ocultar la respuesta",
+        "questionHint": "Toque para expandir y ver la respuesta",
+        "linkHint": "Abre el documento legal"
+      }
+    }
   }
 }

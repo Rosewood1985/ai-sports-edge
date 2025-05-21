@@ -305,5 +305,47 @@
     },
     "success": "Success",
     "preferencesUpdated": "Your privacy preferences have been updated."
+  },
+  "accessibility": {
+    "settings": "Accessibility Settings",
+    "preferences": "Accessibility Preferences",
+    "high_contrast": "High Contrast",
+    "high_contrast_description": "Increases contrast between text and background for better readability",
+    "large_text": "Large Text",
+    "large_text_description": "Increases text size for better readability",
+    "bold_text": "Bold Text",
+    "bold_text_description": "Makes text bold for better readability",
+    "screen_reader": "Screen Reader",
+    "screen_reader_description": "Enables compatibility with screen readers",
+    "reduce_motion": "Reduce Motion",
+    "reduce_motion_description": "Reduces animations and motion effects",
+    "button": "Button",
+    "link": "Link",
+    "header": "Header",
+    "image": "Image",
+    "text": "Text",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "selected": "Selected",
+    "not_selected": "Not Selected",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "required": "Required",
+    "optional": "Optional",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "faq": {
+      "accessibility": {
+        "faq_item": "Frequently asked question",
+        "question": "Question",
+        "answer": "Answer",
+        "expand": "Expand to see answer",
+        "collapse": "Collapse to hide answer",
+        "questionHint": "Tap to expand and see the answer",
+        "linkHint": "Opens the legal document"
+      }
+    }
   }
 }

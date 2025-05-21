@@ -279,3 +279,272 @@ await backupService.restoreBackup(backup.path);
 - Provides a consistent process for backups
 - Enables quick recovery in case of data loss
 - Manages storage costs through retention policies
+
+## Accessibility Patterns (May 21, 2025)
+
+### Pattern: Accessible Component Wrappers
+
+**Description:**
+A pattern for creating accessible versions of standard UI components. This pattern ensures that all UI components have proper accessibility attributes and behavior, making the application usable by people with disabilities.
+
+**Components:**
+
+1. **AccessibleThemedText**: An accessible version of the ThemedText component
+2. **AccessibleThemedView**: An accessible version of the ThemedView component
+3. **AccessibleTouchableOpacity**: An accessible version of the TouchableOpacity component
+
+**Implementation:**
+
+```tsx
+// Example implementation pattern for accessible text component
+export type AccessibleThemedTextProps = TextProps & {
+  type?:
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'bodyStd'
+    | 'bodySmall'
+    | 'label'
+    | 'button'
+    | 'small'
+    | 'defaultSemiBold';
+  color?:
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'action'
+    | 'statusHigh'
+    | 'statusMedium'
+    | 'statusLow';
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  applyHighContrast?: boolean;
+  applyLargeText?: boolean;
+  applyBoldText?: boolean;
+  highContrastStyle?: any;
+  largeTextStyle?: any;
+  boldTextStyle?: any;
+};
+
+export function AccessibleThemedText({
+  style,
+  children,
+  type = 'bodyStd',
+  color,
+  accessibilityLabel,
+  accessibilityHint,
+  applyHighContrast = true,
+  applyLargeText = true,
+  applyBoldText = true,
+  highContrastStyle,
+  largeTextStyle,
+  boldTextStyle,
+  ...props
+}: AccessibleThemedTextProps) {
+  const { colors } = useTheme();
+  const [preferences, setPreferences] = React.useState<AccessibilityPreferences>(
+    accessibilityService.getPreferences()
+  );
+
+  // Get the text style based on the type prop
+  const getTextStyle = () => {
+    switch (type) {
+      case 'h1':
+        return styles.h1;
+      case 'h2':
+        return styles.h2;
+      case 'h3':
+        return styles.h3;
+      case 'h4':
+        return styles.h4;
+      case 'bodyStd':
+        return styles.bodyStd;
+      case 'bodySmall':
+        return styles.bodySmall;
+      case 'label':
+        return styles.label;
+      case 'button':
+        return styles.button;
+      case 'small':
+        return styles.small;
+      case 'defaultSemiBold':
+        return styles.defaultSemiBold;
+      default:
+        return styles.bodyStd;
+    }
+  };
+
+  // Determine accessibility role based on type
+  const getAccessibilityRole = () => {
+    switch (type) {
+      case 'h1':
+      case 'h2':
+      case 'h3':
+      case 'h4':
+        return 'header';
+      case 'button':
+        return 'button';
+      default:
+        return 'text';
+    }
+  };
+
+  // Get accessibility props
+  const accessibilityProps =
+    accessibilityLabel || getDefaultAccessibilityLabel()
+      ? accessibilityService.getAccessibilityProps(
+          accessibilityLabel || getDefaultAccessibilityLabel() || '',
+          accessibilityHint,
+          getAccessibilityRole(),
+          undefined
+        )
+      : {};
+
+  // Apply styles based on preferences
+  const appliedStyle = [
+    getTextStyle(),
+    { color: getTextColor() },
+    style,
+    shouldApplyHighContrast && styles.highContrast,
+    shouldApplyHighContrast && highContrastStyle,
+    shouldApplyLargeText && styles.largeText,
+    shouldApplyLargeText && largeTextStyle,
+    shouldApplyBoldText && styles.boldText,
+    shouldApplyBoldText && boldTextStyle,
+  ];
+
+  return (
+    <Text style={appliedStyle} {...accessibilityProps} {...props}>
+      {children}
+    </Text>
+  );
+}
+```
+
+**Usage:**
+
+```tsx
+// Example usage of the accessible component pattern
+<AccessibleThemedText
+  style={styles.title}
+  type="h1"
+  accessibilityLabel="Screen title"
+>
+  Welcome to AI Sports Edge
+</AccessibleThemedText>
+
+<AccessibleThemedView
+  style={styles.container}
+  accessibilityLabel="Main content container"
+>
+  {children}
+</AccessibleThemedView>
+
+<AccessibleTouchableOpacity
+  style={styles.button}
+  onPress={handlePress}
+  accessibilityLabel="Submit form"
+  accessibilityRole="button"
+  accessibilityHint="Submits the form and proceeds to the next screen"
+>
+  <AccessibleThemedText type="button">Submit</AccessibleThemedText>
+</AccessibleTouchableOpacity>
+```
+
+**Benefits:**
+
+- Ensures all UI components have proper accessibility attributes
+- Improves the user experience for people with disabilities
+- Centralizes accessibility logic in reusable components
+- Maintains consistent accessibility implementation across the application
+- Simplifies the process of making the application accessible
+
+### Pattern: Accessibility Testing Automation
+
+**Description:**
+A pattern for automating the testing of accessibility features in the application. This pattern ensures that accessibility issues are identified and fixed early in the development process.
+
+**Components:**
+
+1. **Accessibility Test Script**: A script that checks for common accessibility issues
+2. **CI/CD Integration**: Integration with the CI/CD pipeline to run accessibility tests
+3. **Reporting System**: A system for generating reports of accessibility issues
+
+**Implementation:**
+
+```javascript
+// Example implementation pattern for accessibility testing
+function checkAccessibility(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const issues = [];
+
+  // Check for missing accessibility props
+  if (content.includes('<View') && !content.includes('accessibilityLabel')) {
+    issues.push({
+      type: 'accessibilityProps',
+      component: path.basename(filePath),
+      description: 'View component without accessibility props',
+      line: findLineNumber(content, '<View'),
+      severity: 'medium',
+      suggestion: 'Add accessibilityLabel or use AccessibleThemedView',
+    });
+  }
+
+  // Check for text without accessibility
+  if (content.includes('<Text') && !content.includes('accessibilityLabel')) {
+    issues.push({
+      type: 'textAccessibility',
+      component: path.basename(filePath),
+      description: 'Text component without accessibility props',
+      line: findLineNumber(content, '<Text'),
+      severity: 'high',
+      suggestion: 'Add accessibilityLabel or use AccessibleThemedText',
+    });
+  }
+
+  // Check for touchable without accessibility
+  if (content.includes('<TouchableOpacity') && !content.includes('accessibilityRole')) {
+    issues.push({
+      type: 'touchableAccessibility',
+      component: path.basename(filePath),
+      description: 'TouchableOpacity without accessibility props',
+      line: findLineNumber(content, '<TouchableOpacity'),
+      severity: 'high',
+      suggestion: 'Add accessibilityRole and accessibilityLabel',
+    });
+  }
+
+  return issues;
+}
+```
+
+**Usage:**
+
+```javascript
+// Example usage of the accessibility testing pattern
+const files = scanDirectories(['./screens', './components']);
+let totalIssues = 0;
+
+files.forEach(file => {
+  const issues = checkAccessibility(file);
+  totalIssues += issues.length;
+
+  if (issues.length > 0) {
+    console.log(`Found ${issues.length} accessibility issues in ${file}:`);
+    issues.forEach(issue => {
+      console.log(`- ${issue.description} (line ${issue.line}): ${issue.suggestion}`);
+    });
+  }
+});
+
+console.log(`Total accessibility issues: ${totalIssues}`);
+```
+
+**Benefits:**
+
+- Identifies accessibility issues early in the development process
+- Ensures consistent accessibility implementation across the application
+- Provides clear guidance on how to fix accessibility issues
+- Integrates with the CI/CD pipeline to prevent accessibility regressions
+- Generates reports for tracking accessibility progress
