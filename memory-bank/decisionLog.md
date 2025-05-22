@@ -114,6 +114,28 @@ Refactor the PaymentScreen with accessibility features including voice control a
 - Improves the actual app rather than creating demo code
 - Serves as a template for refactoring other screens
 
+### Decision: Add Voice Commands to PaymentScreen
+
+**Context:**
+We needed to implement voice control in the PaymentScreen to demonstrate how voice commands can be used in a real-world scenario.
+
+**Options Considered:**
+
+1. Add generic voice commands only (e.g., "go back")
+2. Add screen-specific voice commands
+3. Add both generic and screen-specific commands
+
+**Decision:**
+Implement screen-specific voice commands for the PaymentScreen that align with the primary user actions.
+
+**Rationale:**
+
+- Screen-specific commands provide more value to users than generic commands alone
+- Commands like "subscribe now" and "cancel payment" map directly to the primary actions on the screen
+- Focus-related commands like "focus card field" help users with mobility impairments
+- Demonstrates how to implement contextual voice commands in other screens
+- Provides a complete example of voice control integration in a critical user flow
+
 ## Dependency Management Implementation (May 22, 2025)
 
 ### Decision: Create Dedicated Dependency Audit Script
@@ -227,3 +249,130 @@ Create a custom accessibility testing framework that extends jest-axe.
 - Allows for testing of React Native specific accessibility features
 - Can be tailored to the specific needs of the project
 - Provides a consistent approach to accessibility testing
+
+## Unified Admin Dashboard Implementation (May 22, 2025)
+
+### Decision: Use Next.js for Admin Dashboard
+
+**Context:**
+We needed to create a unified admin dashboard that would work alongside the existing React Native admin screens. The dashboard needed to be web-based for easier access by administrators.
+
+**Options Considered:**
+
+1. Create a React Native Web implementation
+2. Use Create React App
+3. Use Next.js
+4. Use a different framework (Vue, Angular, etc.)
+
+**Decision:**
+Use Next.js for the admin dashboard implementation.
+
+**Rationale:**
+
+- Next.js provides server-side rendering for better performance
+- Built-in API routes simplify backend integration
+- TypeScript support is excellent
+- File-based routing simplifies navigation structure
+- Built-in optimizations for production builds
+- Strong community support and extensive documentation
+- Integrates well with Tailwind CSS for styling
+
+### Decision: Use SWR for Data Fetching
+
+**Context:**
+We needed a data fetching strategy that would provide a good user experience with real-time updates and caching.
+
+**Options Considered:**
+
+1. Use React Query
+2. Use Apollo Client
+3. Use SWR
+4. Create custom data fetching hooks
+
+**Decision:**
+Use SWR (stale-while-revalidate) for data fetching.
+
+**Rationale:**
+
+- Provides automatic revalidation and refetching
+- Built-in caching with configurable strategies
+- Optimistic UI updates for better user experience
+- Error handling and retry mechanisms
+- Created by Vercel, the same team behind Next.js
+- Lightweight compared to alternatives
+- Simple API that's easy to use and understand
+
+### Decision: Implement Shared Authentication System
+
+**Context:**
+We needed an authentication system that would work with both the web admin dashboard and the existing React Native admin screens.
+
+**Options Considered:**
+
+1. Create separate authentication systems
+2. Use Firebase Auth directly in both platforms
+3. Create a custom authentication service
+4. Use a third-party auth provider
+
+**Decision:**
+Implement a shared authentication system using Firebase Auth with custom JWT tokens.
+
+**Rationale:**
+
+- Firebase Auth is already used in the React Native app
+- JWT tokens can be used across platforms
+- HTTP-only cookies provide better security for web
+- Shared middleware simplifies authorization logic
+- Consistent user experience across platforms
+- Reduces duplication of authentication code
+- Simplifies user management
+
+### Decision: Use WebSockets for Real-time Updates
+
+**Context:**
+The admin dashboard needed real-time updates for critical data like fraud alerts and system status.
+
+**Options Considered:**
+
+1. Use polling with regular API calls
+2. Use Firebase Realtime Database
+3. Use WebSockets
+4. Use Server-Sent Events (SSE)
+
+**Decision:**
+Implement WebSockets for real-time updates.
+
+**Rationale:**
+
+- Provides true real-time bidirectional communication
+- More efficient than polling for frequent updates
+- Can be used for both data updates and notifications
+- Works well with the existing backend infrastructure
+- Scales better than Firebase Realtime Database for admin use cases
+- Socket.io provides a robust implementation with fallbacks
+- Can be integrated with the existing notification system
+
+### Decision: Convert React Native Components to Web Equivalents
+
+**Context:**
+We needed to maintain a consistent UI between the web admin dashboard and the React Native admin screens.
+
+**Options Considered:**
+
+1. Create completely new web components
+2. Use React Native Web
+3. Convert React Native components to web equivalents
+4. Use a UI library like Material UI or Chakra UI
+
+**Decision:**
+Convert React Native components to web equivalents.
+
+**Rationale:**
+
+- Maintains consistent styling and behavior
+- Allows for platform-specific optimizations
+- Simpler than using React Native Web
+- More flexible than using a third-party UI library
+- Preserves the existing component hierarchy
+- Enables sharing of business logic between platforms
+- Follows the atomic design principles already in use

@@ -780,3 +780,11 @@ console.log(`Bets: ${JSON.stringify(parsedData.legs)}`);
 - Provides contextual analysis for better understanding
 - Validates data consistency
 - Calculates confidence scores for parsed data
+
+## Admin Dashboard Patterns
+
+See [admin-dashboard-patterns.md](./admin-dashboard-patterns.md) for detailed patterns related to the Unified Admin Dashboard implementation, including:
+
+1. **Cross-Platform Component Adaptation**: Pattern for adapting React Native components to web equivalents
+2. **SWR Data Fetching**: Pattern for fetching and caching data using the SWR library
+3. **API Gateway**: Pattern for routing API requests through a central gateway

@@ -30,12 +30,8 @@ type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Paym
 
 /**
  * PaymentScreen component for collecting payment information
- * @returns {JSX.Element} - Rendered component
- */
-/**
- * PaymentScreen component for collecting payment information
- * Enhanced with full accessibility support including keyboard navigation,
- * screen reader support, and focus management
+ * Enhanced with full accessibility features including keyboard navigation,
+ * screen reader support, focus management, and voice control
  * @returns {JSX.Element} - Rendered component
  */
 const PaymentScreen = (): JSX.Element => {
@@ -110,7 +106,7 @@ const PaymentScreen = (): JSX.Element => {
     }
   };
 
-  // Register keyboard navigable elements for accessibility
+  // Register keyboard navigable elements and voice commands for accessibility
   useEffect(() => {
     if (!selectedPlan) return;
 
@@ -158,6 +154,34 @@ const PaymentScreen = (): JSX.Element => {
       },
     });
 
+    // Register voice commands
+    const subscribeCommand = accessibilityService.registerVoiceCommand({
+      command: 'subscribe now',
+      handler: () => {
+        if (!cardComplete || loading) return;
+        handlePayment();
+      },
+      description: 'Completes the subscription payment process',
+    });
+
+    const cancelCommand = accessibilityService.registerVoiceCommand({
+      command: 'cancel payment',
+      handler: () => {
+        if (!loading) {
+          navigation.goBack();
+        }
+      },
+      description: 'Cancels the payment and returns to the previous screen',
+    });
+
+    const focusCardCommand = accessibilityService.registerVoiceCommand({
+      command: 'focus card field',
+      handler: () => {
+        accessibilityService.focusElement('payment-card-field');
+      },
+      description: 'Sets focus to the card input field',
+    });
+
     // Set initial focus to card field
     setTimeout(() => {
       accessibilityService.focusElement('payment-card-field');
@@ -168,8 +192,11 @@ const PaymentScreen = (): JSX.Element => {
       accessibilityService.unregisterKeyboardNavigableElement('payment-card-field');
       accessibilityService.unregisterKeyboardNavigableElement('payment-subscribe-button');
       accessibilityService.unregisterKeyboardNavigableElement('payment-cancel-button');
+      subscribeCommand();
+      cancelCommand();
+      focusCardCommand();
     };
-  }, [selectedPlan]);
+  }, [selectedPlan, cardComplete, loading, navigation, handlePayment]);
 
   if (!selectedPlan) {
     return (

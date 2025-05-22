@@ -1,14 +1,100 @@
-# Active Context: Voice Control Implementation
+# Active Context: Unified Admin Dashboard Implementation
 
-## Previous Context: Dependency Management Implementation
+## Previous Context: Voice Control Implementation
 
 _Note: This section preserved for historical context_
 
-Implementing real solutions for dependency management issues in the AI Sports Edge project. This work focuses on creating tools and documentation to systematically address dependency problems rather than creating workarounds.
+Implementing voice control accessibility features in the AI Sports Edge app. This work focuses on enhancing the accessibility of the app by providing voice command support as an alternative input method for users with mobility impairments or those who prefer voice interaction.
 
 ## Current Implementation Focus
 
-Implementing voice control accessibility features in the AI Sports Edge app. This work focuses on enhancing the accessibility of the app by providing voice command support as an alternative input method for users with mobility impairments or those who prefer voice interaction.
+Creating a comprehensive technical specification for the Unified Admin Dashboard project. This work focuses on designing a web-based admin dashboard that integrates with the existing React Native admin screens, providing enhanced monitoring capabilities and predictive analytics.
+
+### Key Components:
+
+1. **Project Setup & Configuration**:
+
+   - Next.js with TypeScript and Tailwind CSS
+   - Comprehensive package.json with all dependencies
+   - TypeScript configuration for type safety
+   - Environment variables for different deployment environments
+   - Folder structure following best practices
+
+2. **Core Layout Components**:
+
+   - Responsive dashboard layout with sidebar navigation
+   - Header with user profile and notifications
+   - Main content area with widget grid
+   - Sidebar navigation with collapsible sections
+   - Modal system for dialogs and forms
+
+3. **Authentication Integration**:
+
+   - Firebase Auth with custom JWT tokens
+   - Shared authentication middleware with React Native app
+   - Protected routes with role-based access control
+   - Session management with HTTP-only cookies
+   - Automatic token refresh
+
+4. **API Service Layer**:
+
+   - API gateway pattern for request routing
+   - SWR for data fetching with caching
+   - Error handling with retry mechanism
+   - WebSocket integration for real-time updates
+   - Shared data models with React Native app
+
+5. **Integration Strategy**:
+   - API compatibility with existing endpoints
+   - Shared authentication system
+   - Data synchronization between platforms
+   - Cross-platform navigation
+   - Shared UI component strategy
+
+### Implementation Approach
+
+The implementation follows these principles:
+
+1. **Cross-Platform Compatibility**: Ensure the dashboard works seamlessly with the existing React Native admin screens.
+
+2. **Performance First**: Optimize for fast loading and response times, with <200ms API response times.
+
+3. **Real-time Updates**: Use WebSockets for critical data that needs real-time updates.
+
+4. **Responsive Design**: Ensure the dashboard works well on all screen sizes, from mobile to desktop.
+
+5. **Accessibility**: Implement proper accessibility features for all components.
+
+### Priority Tasks
+
+1. **Draft Technical Specifications for All Phases:**
+
+   - Create detailed technical specifications for Phases 2-5
+   - Include component designs, API requirements, and integration details
+   - Ensure consistency across all phases
+
+2. **Implement Sentry Configuration:**
+
+   - Set up Sentry for error tracking and monitoring
+   - Configure error boundaries for React components
+   - Implement custom error handling with Sentry integration
+   - Add performance monitoring for critical operations
+
+3. **Begin Phase 2 Implementation:**
+   - Set up the Next.js project structure
+   - Implement the core layout components
+   - Set up the authentication flow
+   - Create protected routes
+   - Implement the API service layer
+   - Create initial dashboard screens with placeholder data
+
+### Documentation
+
+- [Technical Specification](../unified-admin-dashboard-technical-spec.md)
+- [Project Progress](../unified-admin-dashboard-progress.md)
+- [Memory Bank Entry](./unified-admin-dashboard-memory.md)
+- [Decision Log](./decisionLog.md)
+- [System Patterns](./admin-dashboard-patterns.md)
 
 ### Key Activities:
 
@@ -33,6 +119,10 @@ Implementing voice control accessibility features in the AI Sports Edge app. Thi
    - Implemented proper focus management
    - Added screen reader support
    - Enhanced keyboard navigation
+   - Added voice control support with specific commands:
+     - "subscribe now" - Completes the payment process
+     - "cancel payment" - Returns to the previous screen
+     - "focus card field" - Sets focus to the card input field
 
 4. **Voice Control Example Component**
 
