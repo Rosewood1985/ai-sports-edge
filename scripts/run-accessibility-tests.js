@@ -106,6 +106,20 @@ try {
     console.error(error.toString());
   }
 
+  // Check if the error is related to dependency issues
+  const errorString = error.toString();
+  const isDependencyError =
+    errorString.includes('react-test-renderer') ||
+    errorString.includes('jest-axe') ||
+    errorString.includes('version');
+
+  if (isDependencyError) {
+    console.warn(
+      '\n⚠️ Dependency conflict detected. This may be due to version mismatches between React and react-test-renderer.\n'
+    );
+    console.warn('Consider running: node scripts/fix-react-test-renderer.js\n');
+  }
+
   // Generate a failure report
   const reportDir = path.join(process.cwd(), 'test-results');
   if (!fs.existsSync(reportDir)) {
@@ -120,6 +134,7 @@ try {
     result: 'failed',
     command: testCommand,
     error: error.toString(),
+    isDependencyError: isDependencyError,
   };
 
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
