@@ -548,3 +548,235 @@ console.log(`Total accessibility issues: ${totalIssues}`);
 - Provides clear guidance on how to fix accessibility issues
 - Integrates with the CI/CD pipeline to prevent accessibility regressions
 - Generates reports for tracking accessibility progress
+
+## OCR Accuracy Improvement Patterns (May 22, 2025)
+
+### Pattern: Multi-Provider OCR Consensus
+
+**Description:**
+A pattern for improving OCR accuracy by using multiple OCR providers and building consensus from their results. This pattern ensures that OCR results are more accurate and reliable by leveraging the strengths of different OCR engines.
+
+**Components:**
+
+1. **Provider Selection**: Logic for selecting which OCR providers to use
+2. **Result Aggregation**: Logic for aggregating results from multiple providers
+3. **Consensus Building**: Logic for building consensus from multiple results
+4. **Confidence Scoring**: Logic for calculating confidence scores for results
+
+**Implementation:**
+
+```javascript
+// Example implementation pattern for multi-provider OCR consensus
+class MultiProviderOCRService {
+  constructor() {
+    this.providers = {
+      google: new vision.ImageAnnotatorClient({
+        keyFilename: process.env.GOOGLE_VISION_KEY_FILE,
+        projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+      }),
+      aws: new AWS.Textract({
+        region: process.env.AWS_REGION,
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      }),
+      azure: {
+        endpoint: process.env.AZURE_COMPUTER_VISION_ENDPOINT,
+        apiKey: process.env.AZURE_COMPUTER_VISION_KEY,
+      },
+    };
+  }
+
+  async processWithMultipleProviders(imagePath, options = {}) {
+    const {
+      providers = ['google', 'aws'],
+      useConsensus = true,
+      confidenceThreshold = 0.7,
+    } = options;
+
+    const results = [];
+
+    // Process with each provider
+    for (const provider of providers) {
+      try {
+        const result = await this.processWithProvider(imagePath, provider);
+        if (result) {
+          results.push({
+            provider,
+            ...result,
+          });
+        }
+      } catch (error) {
+        console.error(`OCR failed with ${provider}:`, error.message);
+      }
+    }
+
+    if (results.length === 0) {
+      throw new Error('All OCR providers failed');
+    }
+
+    // Use consensus if multiple providers succeeded
+    if (useConsensus && results.length > 1) {
+      return this.buildConsensusResult(results);
+    }
+
+    // Return best single result
+    return this.selectBestResult(results);
+  }
+
+  buildConsensusResult(results) {
+    // Find common text elements across providers
+    const allTexts = results.map(r => r.fullText);
+
+    // Simple consensus: take the result with highest confidence
+    const bestResult = results.reduce((best, current) =>
+      current.confidence > best.confidence ? current : best
+    );
+
+    // Enhance with cross-validation
+    return {
+      ...bestResult,
+      consensus: true,
+      providerCount: results.length,
+      alternativeTexts: allTexts.filter(text => text !== bestResult.fullText),
+    };
+  }
+}
+```
+
+**Usage:**
+
+```javascript
+// Example usage of the multi-provider OCR consensus pattern
+const ocrService = new MultiProviderOCRService();
+
+const result = await ocrService.processWithMultipleProviders('bet-slip.jpg', {
+  providers: ['google', 'aws', 'azure'],
+  useConsensus: true,
+  confidenceThreshold: 0.7,
+});
+
+console.log(`OCR result with confidence: ${result.confidence}`);
+console.log(`Text: ${result.fullText}`);
+```
+
+**Benefits:**
+
+- Improves OCR accuracy by leveraging multiple providers
+- Reduces errors through consensus-based recognition
+- Provides confidence scores for OCR results
+- Handles provider failures gracefully
+- Enables customization of provider selection
+
+### Pattern: Intelligent Document Parsing
+
+**Description:**
+A pattern for intelligently parsing OCR results based on document type and structure. This pattern ensures that OCR results are correctly interpreted and structured according to the specific document type.
+
+**Components:**
+
+1. **Document Type Detection**: Logic for detecting the type of document
+2. **Field Extraction**: Logic for extracting specific fields from the document
+3. **Contextual Analysis**: Logic for analyzing the context of extracted text
+4. **Validation**: Logic for validating extracted data
+
+**Implementation:**
+
+```javascript
+// Example implementation pattern for intelligent document parsing
+class IntelligentBetSlipParser {
+  constructor() {
+    this.sportsbookPatterns = this.initializeSportsbookPatterns();
+    this.sportPatterns = this.initializeSportPatterns();
+    this.betTypePatterns = this.initializeBetTypePatterns();
+  }
+
+  initializeSportsbookPatterns() {
+    return {
+      draftkings: {
+        name: 'DraftKings',
+        identifiers: [/draftkings/i, /dk sportsbook/i, /dksb/i, /draft kings/i],
+        oddsFormat: 'american',
+        fieldPatterns: {
+          odds: /([+-]\d{2,4})\s*(?:odds|line)?/gi,
+          stake: /\$(\d+\.?\d*)\s*(?:bet|wager|stake)?/gi,
+          event: /([A-Z\s]+)\s+(?:@|vs\.?|v\.?)\s+([A-Z\s]+)/gi,
+          betType: /(moneyline|spread|total|over|under|prop)/gi,
+        },
+      },
+      // Other sportsbooks...
+    };
+  }
+
+  async parseExtractedText(ocrResult, options = {}) {
+    const { useContextualAnalysis = true, validateConsistency = true } = options;
+
+    try {
+      const { fullText, textBlocks, confidence } = ocrResult;
+
+      // Step 1: Detect sportsbook
+      const detectedSportsbook = this.detectSportsbook(fullText);
+
+      // Step 2: Detect sport
+      const detectedSport = this.detectSport(fullText, textBlocks);
+
+      // Step 3: Extract structured data
+      const extractedData = await this.extractStructuredData(
+        fullText,
+        textBlocks,
+        detectedSportsbook,
+        detectedSport
+      );
+
+      // Step 4: Contextual analysis for better accuracy
+      if (useContextualAnalysis) {
+        extractedData.contextualAnalysis = await this.performContextualAnalysis(
+          extractedData,
+          textBlocks
+        );
+      }
+
+      // Step 5: Validate consistency
+      if (validateConsistency) {
+        extractedData.validationResults = await this.validateConsistency(extractedData);
+      }
+
+      // Step 6: Calculate final confidence score
+      extractedData.finalConfidence = this.calculateFinalConfidence(
+        confidence,
+        extractedData,
+        ocrResult.providerCount || 1
+      );
+
+      return extractedData;
+    } catch (error) {
+      console.error('Intelligent parsing failed:', error);
+      throw error;
+    }
+  }
+}
+```
+
+**Usage:**
+
+```javascript
+// Example usage of the intelligent document parsing pattern
+const parser = new IntelligentBetSlipParser();
+
+const parsedData = await parser.parseExtractedText(ocrResult, {
+  useContextualAnalysis: true,
+  validateConsistency: true,
+});
+
+console.log(`Parsed data with confidence: ${parsedData.finalConfidence}`);
+console.log(`Sportsbook: ${parsedData.sportsbook}`);
+console.log(`Sport: ${parsedData.sport}`);
+console.log(`Bets: ${JSON.stringify(parsedData.legs)}`);
+```
+
+**Benefits:**
+
+- Improves parsing accuracy for specific document types
+- Extracts structured data from OCR results
+- Provides contextual analysis for better understanding
+- Validates data consistency
+- Calculates confidence scores for parsed data
