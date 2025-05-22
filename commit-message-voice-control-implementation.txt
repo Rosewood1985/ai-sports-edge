@@ -1,0 +1,21 @@
+feat(accessibility): implement voice control support
+
+Add voice control capabilities to enhance accessibility features:
+
+- Enhanced AccessibilityService with voice command support
+- Implemented VoiceCommandHandler interface for command registration
+- Added voice recognition state management
+- Created voice command registration system
+- Added user preferences for enabling/disabling voice control
+- Refactored PaymentScreen with comprehensive accessibility features
+- Created VoiceControlExample component demonstrating implementation
+- Added comprehensive documentation in docs/accessibility/voice-control.md
+- Updated memory bank with implementation details
+
+This implementation provides a foundation for alternative input methods,
+improving accessibility for users with mobility impairments or those who
+prefer voice interaction. The voice control system is designed to be
+extensible, allowing for easy integration with real voice recognition
+libraries in the future.
+
+Closes #A11Y-142

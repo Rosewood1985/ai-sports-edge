@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  View,
+  findNodeHandle,
+  AccessibilityRole,
+} from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
@@ -9,6 +17,7 @@ import { useI18n } from '../atomic/organisms/i18n/I18nContext';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import accessibilityService from '../services/accessibilityService';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -23,10 +32,20 @@ type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Paym
  * PaymentScreen component for collecting payment information
  * @returns {JSX.Element} - Rendered component
  */
+/**
+ * PaymentScreen component for collecting payment information
+ * Enhanced with full accessibility support including keyboard navigation,
+ * screen reader support, and focus management
+ * @returns {JSX.Element} - Rendered component
+ */
 const PaymentScreen = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [cardComplete, setCardComplete] = useState<boolean>(false);
   const [selectedPlan, setSelectedPlan] = useState<(typeof SUBSCRIPTION_PLANS)[0] | null>(null);
+
+  // Refs for focus management
+  const cardFieldRef = useRef<View>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const navigation = useNavigation<PaymentScreenNavigationProp>();
   const route = useRoute<PaymentScreenRouteProp>();
@@ -69,7 +88,8 @@ const PaymentScreen = (): JSX.Element => {
       }
 
       // Create the subscription
-      const userId = auth.currentUser?.uid;
+      // Type assertion for auth to avoid TypeScript error
+      const userId = (auth as any).currentUser?.uid;
       if (!userId) {
         throw new Error(t('payment.errors.notAuthenticated'));
       }
@@ -90,12 +110,74 @@ const PaymentScreen = (): JSX.Element => {
     }
   };
 
+  // Register keyboard navigable elements for accessibility
+  useEffect(() => {
+    if (!selectedPlan) return;
+
+    // Register card field
+    if (cardFieldRef.current) {
+      const nodeHandle = findNodeHandle(cardFieldRef.current);
+      if (nodeHandle) {
+        accessibilityService.registerKeyboardNavigableElement('payment-card-field', {
+          ref: { current: { nodeHandle } },
+          nextElementId: 'payment-subscribe-button',
+          prevElementId: undefined, // Use undefined instead of null
+          onFocus: () => {
+            // Ensure the card field is visible when focused
+            if (scrollViewRef.current) {
+              scrollViewRef.current.scrollTo({ y: 200, animated: true });
+            }
+          },
+        });
+      }
+    }
+
+    // Register pay button
+    accessibilityService.registerKeyboardNavigableElement('payment-subscribe-button', {
+      ref: { current: null },
+      nextElementId: 'payment-cancel-button',
+      prevElementId: 'payment-card-field',
+      onFocus: () => {
+        // Ensure the button is visible when focused
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({ y: 300, animated: true });
+        }
+      },
+    });
+
+    // Register cancel button
+    accessibilityService.registerKeyboardNavigableElement('payment-cancel-button', {
+      ref: { current: null },
+      nextElementId: undefined, // Use undefined instead of null
+      prevElementId: 'payment-subscribe-button',
+      onFocus: () => {
+        // Ensure the button is visible when focused
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({ y: 400, animated: true });
+        }
+      },
+    });
+
+    // Set initial focus to card field
+    setTimeout(() => {
+      accessibilityService.focusElement('payment-card-field');
+    }, 500);
+
+    // Clean up on unmount
+    return () => {
+      accessibilityService.unregisterKeyboardNavigableElement('payment-card-field');
+      accessibilityService.unregisterKeyboardNavigableElement('payment-subscribe-button');
+      accessibilityService.unregisterKeyboardNavigableElement('payment-cancel-button');
+    };
+  }, [selectedPlan]);
+
   if (!selectedPlan) {
     return (
       <AccessibleThemedView
         style={styles.loadingContainer}
         accessibilityLabel={t('payment.loading')}
         accessibilityRole="progressbar"
+        accessibilityHint={t('payment.loadingHint')}
       >
         <ActivityIndicator
           size="large"
@@ -107,8 +189,21 @@ const PaymentScreen = (): JSX.Element => {
   }
 
   return (
-    <ScrollView style={styles.container} accessibilityLabel={t('payment.screenTitle')}>
-      <AccessibleThemedText style={styles.title} type="h1" accessibilityRole="header">
+    <ScrollView
+      ref={scrollViewRef}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      accessibilityLabel={t('payment.screenTitle')}
+      accessibilityHint={t('payment.screenHint')}
+      accessibilityRole="none"
+    >
+      <AccessibleThemedText
+        style={styles.title}
+        type="h1"
+        accessibilityRole="header"
+        accessibilityLabel={t('payment.title')}
+        accessibilityHint={t('payment.titleHint')}
+      >
         {t('payment.title')}
       </AccessibleThemedText>
 
@@ -116,6 +211,7 @@ const PaymentScreen = (): JSX.Element => {
         style={styles.subtitle}
         type="bodyStd"
         accessibilityLabel={t('payment.subtitleAccessibility', { planName: selectedPlan.name })}
+        accessibilityHint={t('payment.subtitleHint')}
       >
         {t('payment.subtitle', { planName: selectedPlan.name })}
       </AccessibleThemedText>
@@ -123,8 +219,14 @@ const PaymentScreen = (): JSX.Element => {
       <AccessibleThemedView
         style={styles.planSummary}
         accessibilityLabel={t('payment.planSummary.accessibilityLabel')}
+        accessibilityHint={t('payment.planSummary.accessibilityHint')}
       >
-        <AccessibleThemedText style={styles.planSummaryTitle} type="h2" accessibilityRole="header">
+        <AccessibleThemedText
+          style={styles.planSummaryTitle}
+          type="h2"
+          accessibilityRole="header"
+          accessibilityLabel={t('payment.planSummary.title')}
+        >
           {t('payment.planSummary.title')}
         </AccessibleThemedText>
 
@@ -161,23 +263,44 @@ const PaymentScreen = (): JSX.Element => {
       <AccessibleThemedView
         style={styles.cardContainer}
         accessibilityLabel={t('payment.cardContainerAccessibility')}
+        accessibilityHint={t('payment.cardContainerHint')}
       >
-        <AccessibleThemedText style={styles.cardLabel} type="h2" accessibilityRole="header">
+        <AccessibleThemedText
+          style={styles.cardLabel}
+          type="h2"
+          accessibilityRole="header"
+          accessibilityLabel={t('payment.cardInformation')}
+        >
           {t('payment.cardInformation')}
         </AccessibleThemedText>
 
-        <CardField
-          postalCodeEnabled={true}
-          placeholders={{
-            number: '4242 4242 4242 4242',
-          }}
-          style={styles.cardField}
-          onCardChange={(cardDetails: { complete: boolean }) => {
-            setCardComplete(cardDetails.complete);
-          }}
+        <View
+          ref={cardFieldRef}
+          accessible={true}
           accessibilityLabel={t('payment.cardFieldAccessibility')}
           accessibilityHint={t('payment.cardFieldHint')}
-        />
+          importantForAccessibility="yes"
+        >
+          <CardField
+            postalCodeEnabled={true}
+            placeholders={{
+              number: '4242 4242 4242 4242',
+            }}
+            style={styles.cardField}
+            onCardChange={(cardDetails: { complete: boolean }) => {
+              setCardComplete(cardDetails.complete);
+
+              // If card is complete, move focus to the subscribe button
+              if (cardDetails.complete && !cardComplete) {
+                setTimeout(() => {
+                  accessibilityService.focusElement('payment-subscribe-button');
+                }, 500);
+              }
+            }}
+            accessibilityLabel={t('payment.cardFieldAccessibility')}
+            accessibilityHint={t('payment.cardFieldHint')}
+          />
+        </View>
       </AccessibleThemedView>
 
       <AccessibleTouchableOpacity
@@ -188,6 +311,12 @@ const PaymentScreen = (): JSX.Element => {
         accessibilityRole="button"
         accessibilityState={{ disabled: !cardComplete || loading }}
         accessibilityHint={t('payment.subscribeButtonHint')}
+        // Custom props are handled in the component
+        {...{
+          keyboardNavigationId: 'payment-subscribe-button',
+          nextElementId: 'payment-cancel-button',
+          prevElementId: 'payment-card-field',
+        }}
       >
         {loading ? (
           <ActivityIndicator
@@ -196,7 +325,11 @@ const PaymentScreen = (): JSX.Element => {
             accessibilityLabel={t('payment.processingPayment')}
           />
         ) : (
-          <AccessibleThemedText style={styles.payButtonText} type="button">
+          <AccessibleThemedText
+            style={styles.payButtonText}
+            type="button"
+            accessibilityLabel={t('payment.subscribeNow')}
+          >
             {t('payment.subscribeNow')}
           </AccessibleThemedText>
         )}
@@ -206,6 +339,7 @@ const PaymentScreen = (): JSX.Element => {
         style={styles.secureText}
         type="small"
         accessibilityLabel={t('payment.secureInfoAccessibility')}
+        accessibilityHint={t('payment.secureInfoHint')}
       >
         🔒 {t('payment.secureInfo')}
       </AccessibleThemedText>
@@ -218,8 +352,18 @@ const PaymentScreen = (): JSX.Element => {
         accessibilityRole="button"
         accessibilityState={{ disabled: loading }}
         accessibilityHint={t('payment.cancelButtonHint')}
+        // Custom props are handled in the component
+        {...{
+          keyboardNavigationId: 'payment-cancel-button',
+          nextElementId: undefined,
+          prevElementId: 'payment-subscribe-button',
+        }}
       >
-        <AccessibleThemedText style={styles.cancelButtonText} type="button">
+        <AccessibleThemedText
+          style={styles.cancelButtonText}
+          type="button"
+          accessibilityLabel={t('common.cancel')}
+        >
           {t('common.cancel')}
         </AccessibleThemedText>
       </AccessibleTouchableOpacity>
@@ -232,6 +376,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f8f9fa',
+  },
+  contentContainer: {
+    paddingBottom: 40, // Add padding at the bottom for better scrolling
   },
   loadingContainer: {
     flex: 1,
@@ -294,6 +441,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     marginVertical: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
   },
   payButton: {
     backgroundColor: '#3498db',
@@ -304,6 +454,7 @@ const styles = StyleSheet.create({
   },
   payButtonDisabled: {
     backgroundColor: '#a0c8e7',
+    opacity: 0.7,
   },
   payButtonText: {
     color: '#fff',

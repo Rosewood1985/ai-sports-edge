@@ -85,6 +85,22 @@ export interface AccessibleTouchableOpacityProps extends TouchableOpacityProps {
    * Callback when the component loses focus
    */
   onBlur?: () => void;
+
+  /**
+   * ID for keyboard navigation
+   * Used to register this component with the accessibility service
+   */
+  keyboardNavigationId?: string;
+
+  /**
+   * ID of the next element in the tab order
+   */
+  nextElementId?: string;
+
+  /**
+   * ID of the previous element in the tab order
+   */
+  prevElementId?: string;
 }
 
 /**
@@ -108,6 +124,9 @@ const AccessibleTouchableOpacity: React.FC<AccessibleTouchableOpacityProps> = ({
   onBlur,
   onPressIn,
   onPressOut,
+  keyboardNavigationId,
+  nextElementId,
+  prevElementId,
   ...props
 }) => {
   // Use focus state hook
@@ -138,18 +157,24 @@ const AccessibleTouchableOpacity: React.FC<AccessibleTouchableOpacityProps> = ({
 
   // Set up accessibility focus handling
   useEffect(() => {
-    // React Native doesn't have direct keyboard focus events like web
-    // Instead, we'll use the screen reader focus as a proxy when available
-    // and rely on onPressIn/onPressOut for touch interactions
+    // Register for keyboard navigation if ID is provided
+    if (keyboardNavigationId) {
+      accessibilityService.registerKeyboardNavigableElement(keyboardNavigationId, {
+        ref: touchableRef,
+        nextElementId,
+        prevElementId,
+        onFocus: handleFocus,
+        onBlur: handleBlur,
+      });
 
-    // This is a simplified implementation since React Native's
-    // accessibility focus API is limited
-
-    // For future enhancement: Consider using a native module to
-    // track accessibility focus changes if needed
+      // Clean up on unmount
+      return () => {
+        accessibilityService.unregisterKeyboardNavigableElement(keyboardNavigationId);
+      };
+    }
 
     return undefined;
-  }, []);
+  }, [keyboardNavigationId, nextElementId, prevElementId, handleFocus, handleBlur]);
 
   // Wrap the original handlers to call both our focus handlers and the user's handlers
   const wrappedPressIn = (event: any) => {

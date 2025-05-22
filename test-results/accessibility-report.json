@@ -1,6 +1,7 @@
 {
-  "timestamp": "2025-05-22T18:16:04.438Z",
+  "timestamp": "2025-05-22T18:44:21.885Z",
   "result": "failed",
-  "command": "npx jest AccessibleTouchable --reporters=default --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations --setupFilesAfterEnv=./jest-setup-accessibility.js --coverage=false --runInBand",
-  "error": "Error: Command failed: npx jest AccessibleTouchable --reporters=default --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations --setupFilesAfterEnv=./jest-setup-accessibility.js --coverage=false --runInBand"
+  "command": "npx jest --testPathPattern=__tests__/accessibility --reporters=default --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations --setupFilesAfterEnv=./jest-setup-accessibility.js --coverage=false --runInBand",
+  "error": "Error: Command failed: npx jest --testPathPattern=__tests__/accessibility --reporters=default --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations --setupFilesAfterEnv=./jest-setup-accessibility.js --coverage=false --runInBand",
+  "isDependencyError": false
 }

@@ -50,6 +50,11 @@ export interface AccessibilityPreferences {
    * Whether to show focus indicators
    */
   showFocusIndicators: boolean;
+
+  /**
+   * Whether to enable voice control
+   */
+  voiceControl: boolean;
 }
 
 /**
@@ -95,11 +100,32 @@ const DEFAULT_PREFERENCES: AccessibilityPreferences = {
   invertColors: false,
   keyboardNavigation: true,
   showFocusIndicators: true,
+  voiceControl: false,
 };
 
 /**
  * Service for managing accessibility features
  */
+/**
+ * Voice command handler type
+ */
+export interface VoiceCommandHandler {
+  /**
+   * Command phrase to listen for
+   */
+  command: string;
+
+  /**
+   * Handler function to execute when command is recognized
+   */
+  handler: () => void;
+
+  /**
+   * Description of what the command does (for help screens)
+   */
+  description: string;
+}
+
 class AccessibilityService {
   private static readonly PREFERENCES_KEY = '@AISportsEdge:accessibilityPreferences';
 
@@ -114,6 +140,9 @@ class AccessibilityService {
   private systemListeners: Array<() => void> = [];
   private keyboardNavigableElements: Record<string, KeyboardNavigableElement> = {};
   private currentFocusedElementId: string | null = null;
+  private voiceCommandHandlers: VoiceCommandHandler[] = [];
+  private isVoiceRecognitionActive: boolean = false;
+  private voiceRecognitionListeners: Array<(isActive: boolean) => void> = [];
 
   /**
    * Initialize the accessibility service
@@ -655,6 +684,159 @@ class AccessibilityService {
    */
   shouldShowFocusIndicators(): boolean {
     return this.preferences.showFocusIndicators;
+  }
+
+  /**
+   * Check if voice control is enabled
+   * @returns Whether voice control is enabled
+   */
+  isVoiceControlEnabled(): boolean {
+    return this.preferences.voiceControl;
+  }
+
+  /**
+   * Enable or disable voice control
+   * @param enabled Whether to enable voice control
+   */
+  async setVoiceControlEnabled(enabled: boolean): Promise<void> {
+    await this.updatePreferences({ voiceControl: enabled });
+
+    if (enabled) {
+      this.startVoiceRecognition();
+    } else {
+      this.stopVoiceRecognition();
+    }
+  }
+
+  /**
+   * Register a voice command handler
+   * @param handler Voice command handler
+   * @returns Function to unregister the handler
+   */
+  registerVoiceCommand(handler: VoiceCommandHandler): () => void {
+    this.voiceCommandHandlers.push(handler);
+    console.log(`Registered voice command: ${handler.command}`);
+
+    // Start voice recognition if enabled and not already started
+    if (this.preferences.voiceControl && !this.isVoiceRecognitionActive) {
+      this.startVoiceRecognition();
+    }
+
+    // Return function to unregister the handler
+    return () => {
+      this.voiceCommandHandlers = this.voiceCommandHandlers.filter(
+        h => h.command !== handler.command
+      );
+      console.log(`Unregistered voice command: ${handler.command}`);
+    };
+  }
+
+  /**
+   * Get all registered voice commands
+   * @returns List of voice command handlers
+   */
+  getVoiceCommands(): VoiceCommandHandler[] {
+    return [...this.voiceCommandHandlers];
+  }
+
+  /**
+   * Add listener for voice recognition state changes
+   * @param listener Function to call when voice recognition state changes
+   * @returns Function to remove the listener
+   */
+  addVoiceRecognitionListener(listener: (isActive: boolean) => void): () => void {
+    this.voiceRecognitionListeners.push(listener);
+
+    // Notify listener immediately
+    listener(this.isVoiceRecognitionActive);
+
+    // Return function to remove the listener
+    return () => {
+      this.voiceRecognitionListeners = this.voiceRecognitionListeners.filter(l => l !== listener);
+    };
+  }
+
+  /**
+   * Start voice recognition
+   * This is a placeholder implementation that would be replaced with actual
+   * voice recognition implementation using a library like react-native-voice
+   */
+  private startVoiceRecognition(): void {
+    if (this.isVoiceRecognitionActive) return;
+
+    try {
+      // This would be replaced with actual voice recognition implementation
+      // For example:
+      // Voice.start('en-US');
+
+      console.log('Voice recognition started');
+      this.isVoiceRecognitionActive = true;
+
+      // Notify listeners
+      this.notifyVoiceRecognitionListeners();
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+    }
+  }
+
+  /**
+   * Stop voice recognition
+   */
+  private stopVoiceRecognition(): void {
+    if (!this.isVoiceRecognitionActive) return;
+
+    try {
+      // This would be replaced with actual voice recognition implementation
+      // For example:
+      // Voice.stop();
+
+      console.log('Voice recognition stopped');
+      this.isVoiceRecognitionActive = false;
+
+      // Notify listeners
+      this.notifyVoiceRecognitionListeners();
+    } catch (error) {
+      console.error('Error stopping voice recognition:', error);
+    }
+  }
+
+  /**
+   * Handle voice recognition results
+   * @param results Voice recognition results
+   */
+  private handleVoiceResults(results: string[]): void {
+    if (!this.isVoiceRecognitionActive || !this.preferences.voiceControl) return;
+
+    // Check if any of the results match a registered command
+    for (const result of results) {
+      const normalizedResult = result.toLowerCase().trim();
+
+      for (const handler of this.voiceCommandHandlers) {
+        const normalizedCommand = handler.command.toLowerCase().trim();
+
+        if (
+          normalizedResult === normalizedCommand ||
+          normalizedResult.includes(normalizedCommand)
+        ) {
+          console.log(`Voice command recognized: ${handler.command}`);
+          handler.handler();
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Notify voice recognition listeners of state changes
+   */
+  private notifyVoiceRecognitionListeners(): void {
+    this.voiceRecognitionListeners.forEach(listener => {
+      try {
+        listener(this.isVoiceRecognitionActive);
+      } catch (error) {
+        console.error('Error in voice recognition listener:', error);
+      }
+    });
   }
 }
 

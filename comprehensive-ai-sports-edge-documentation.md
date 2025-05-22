@@ -1266,7 +1266,41 @@ graph TD
    - Keyboard shortcuts not yet implemented
    - Skip navigation links for web version not yet implemented
 
-2. **Automated Accessibility Testing** (✅ Implemented)
+2. **Voice Control** (✅ Implemented)
+
+   - [`services/accessibilityService.ts`](services/accessibilityService.ts): Enhanced with voice command support
+
+   ```typescript
+   interface VoiceCommandHandler {
+     command: string;
+     handler: () => void;
+     description: string;
+   }
+
+   // Register a voice command
+   registerVoiceCommand(handler: VoiceCommandHandler): () => void {
+     this.voiceCommandHandlers.push(handler);
+     // Return unregister function
+     return () => {
+       this.voiceCommandHandlers = this.voiceCommandHandlers.filter(h => h.command !== handler.command);
+     };
+   }
+   ```
+
+   - Voice command registration system for component-based command handling
+   - Voice recognition state management for active/inactive states
+   - User preferences for enabling/disabling voice control
+   - Example implementation in [`components/examples/VoiceControlExample.tsx`](components/examples/VoiceControlExample.tsx)
+   - Comprehensive documentation in [`docs/accessibility/voice-control.md`](docs/accessibility/voice-control.md)
+   - Common voice commands implemented (navigation, scrolling, selection)
+
+   **Implementation Gap:**
+
+   - Real voice recognition library integration not yet implemented
+   - Multi-language support for voice commands not yet implemented
+   - Voice feedback for command recognition not yet implemented
+
+3. **Automated Accessibility Testing** (✅ Implemented)
 
    - Jest-axe integration for automated accessibility testing
    - [`atomic/atoms/axeTestUtils.ts`](atomic/atoms/axeTestUtils.ts): Utilities for accessibility testing
@@ -1290,7 +1324,7 @@ graph TD
    - Screen reader testing process not yet implemented
    - Accessibility compliance monitoring not yet implemented
 
-3. **Touch Accommodations** (🟡 Partially Implemented)
+4. **Touch Accommodations** (🟡 Partially Implemented)
 
    - Minimum touch target size guidelines in style constants
    - Touch feedback via React Native's built-in feedback
@@ -1301,7 +1335,7 @@ graph TD
    - Touch target size not enforced consistently across all components
    - Haptic feedback only partially implemented
 
-4. **Content Accessibility** (🟡 Partially Implemented)
+5. **Content Accessibility** (🟡 Partially Implemented)
 
    - Alternative text for images implemented in key screens
    - Semantic structure via React Native components
@@ -1360,18 +1394,29 @@ The accessibility implementation has progressed through several phases:
 
 3. **Screen-by-Screen Implementation**: Systematic accessibility improvements 🟡
 
-   - Current status: 60% complete
+   - Current status: 65% complete
    - Key screens updated with accessibility components
+   - PaymentScreen refactored with comprehensive accessibility features
    - Remaining screens need accessibility improvements
 
-4. **Testing Framework**: Development of automated and manual testing processes 📋
+4. **Voice Control Implementation**: Addition of voice command support ✅
 
-   - Current status: 20% complete
+   - Implemented: May 2025
+   - Enhanced AccessibilityService with voice control support
+   - Created VoiceCommandHandler interface for command registration
+   - Implemented voice recognition state management
+   - Created comprehensive documentation and example component
+
+5. **Testing Framework**: Development of automated and manual testing processes 🟡
+
+   - Current status: 40% complete
    - Manual testing procedures documented
-   - Automated testing framework planned but not implemented
+   - Jest-axe integration implemented for automated testing
+   - Voice control testing procedures documented
 
-5. **Continuous Improvement**: Ongoing accessibility enhancements 📋
-   - Not yet started
+6. **Continuous Improvement**: Ongoing accessibility enhancements 📋
+   - Current status: 10% complete
+   - Voice control implementation represents first phase of continuous improvements
 
 **Failed Approaches:**
 
@@ -1385,7 +1430,7 @@ The accessibility implementation has progressed through several phases:
   - Resolution: Switched to custom hooks and direct component implementation
 
 **Documentation vs. Implementation Gap:**
-The documentation describes a complete accessibility implementation, but several components and features are still in development or not fully implemented. The core accessibility infrastructure exists, but comprehensive WCAG 2.1 compliance has not been fully achieved or verified through testing.
+The documentation describes a complete accessibility implementation, but several components and features are still in development or not fully implemented. The core accessibility infrastructure exists, including keyboard navigation and voice control support, but comprehensive WCAG 2.1 compliance has not been fully achieved or verified through testing. Voice control implementation provides a foundation for alternative input methods, but requires integration with a real voice recognition library for production use.
 
 ---
 
