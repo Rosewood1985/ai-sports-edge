@@ -1,34 +1,37 @@
 /**
- * Atoms Index
- * This file exports all atom components for easier imports.
+ * Atoms index file
+ *
+ * This file exports all atom components for easy importing.
  */
 
-// Environment atoms
-export { default as envConfig } from './envConfig';
-export { default as envValidator } from './envValidator';
-
-// Error handling atoms
-export { default as errorUtils } from './errorUtils';
-
-// Firebase atoms
-export { default as firebaseApp } from './firebaseApp';
-
-// Service atoms
-export { default as serviceConfig } from './serviceConfig';
-
-// Theme atoms
-export { default as themeColors } from './themeColors';
-export { default as themeTokens } from './themeTokens';
-
-// UI atoms
-export { ThemedText } from './ThemedText';
-export { ThemedView } from './ThemedView';
-export { ResponsiveText } from './ResponsiveText';
-export { AccessibleThemedText } from './AccessibleThemedText';
-export { AccessibleThemedView } from './AccessibleThemedView';
+// Existing atoms
+export { default as AccessibleThemedText } from './AccessibleThemedText';
+export { default as AccessibleThemedView } from './AccessibleThemedView';
 export { default as AccessibleTouchableOpacity } from './AccessibleTouchableOpacity';
+export { default as ThemedText } from './ThemedText';
+export { default as ThemedView } from './ThemedView';
+export { default as ResponsiveText } from './ResponsiveText';
 
-// Privacy atoms
-export { default as privacyConfig } from './privacy/gdprConfig';
-export { default as privacyCategories } from './privacy/dataCategories';
-export { default as privacyStorage } from './privacy/storageUtils';
+// New atoms for CustomAlertsModal
+export { default as IconButton } from './IconButton';
+export { default as AlertTypeIcon } from './AlertTypeIcon';
+export { default as FilterTag } from './FilterTag';
+export { default as Slider } from './Slider';
+export { default as CheckboxWithLabel } from './CheckboxWithLabel';
+
+// New atoms for KnowledgeEdgeScreen
+export { default as NeonBorderView } from './NeonBorderView';
+
+// Export types
+export * from './AccessibleThemedText';
+export * from './AccessibleThemedView';
+export * from './AccessibleTouchableOpacity';
+export * from './ThemedText';
+export * from './ThemedView';
+export * from './ResponsiveText';
+export * from './IconButton';
+export * from './AlertTypeIcon';
+export * from './FilterTag';
+export * from './Slider';
+export * from './CheckboxWithLabel';
+export * from './NeonBorderView';

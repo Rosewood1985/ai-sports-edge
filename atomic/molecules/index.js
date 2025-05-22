@@ -1,23 +1,28 @@
 /**
- * Molecules Index
- * This file exports all molecule components for easier imports.
+ * Molecules index file
+ *
+ * This file exports all molecule components for easy importing.
  */
 
-// Environment molecules
+// Existing molecules
 export { default as environmentValidator } from './environmentValidator';
-
-// Firebase molecules
+export { default as errorTracking } from './errorTracking';
 export { default as firebaseAuth } from './firebaseAuth';
 export { default as firebaseFirestore } from './firebaseFirestore';
-
-// Monitoring molecules
-export { default as errorTracking } from './errorTracking';
 export { default as logging } from './logging';
 export { default as performance } from './performance';
+export { default as themeContext } from './themeContext';
 
-// Theme molecules
-export { default as themeContext, useTheme } from './themeContext';
-export { default as theme } from './theme';
+// New molecules for CustomAlertsModal
+export { default as ModalHeader } from './ModalHeader';
+export { default as AlertTypeOption } from './AlertTypeOption';
+export { default as FilterSection } from './FilterSection';
+export { default as AlertPreview } from './AlertPreview';
+export { default as ActionButtons } from './ActionButtons';
 
-// Cache molecules
-export { default as cache } from './cache';
+// Export types
+export * from './ModalHeader';
+export * from './AlertTypeOption';
+export * from './FilterSection';
+export * from './AlertPreview';
+export * from './ActionButtons';

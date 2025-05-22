@@ -1,19 +1,19 @@
-// External imports
-
-// Internal imports
-
 /**
- * Organisms Index
- * This file exports all organism components for easier imports.
+ * Organisms index file
+ *
+ * This file exports all organism components for easy importing.
  */
 
-// Environment organisms
-// Firebase organisms
-// Monitoring organisms
-// Theme organisms
-export { default as environmentBootstrap } from './environmentBootstrap';
-export { default as firebaseService } from './firebaseService';
-export { default as monitoringService } from './monitoringService';
-export { default as themeProvider } from './themeProvider';
-export { default as privacyService } from './privacy';
-export { default as apiService } from './api';
+// Existing organisms
+export { default as I18nContext } from './i18n/I18nContext';
+export { default as I18nProvider } from './i18n/I18nProvider';
+export { default as ThemeProvider } from './theme/ThemeProvider';
+
+// New organisms for CustomAlertsModal
+export { default as AlertTypeSelector } from './AlertTypeSelector';
+export { default as AlertFiltersForm } from './AlertFiltersForm';
+export { default as CustomAlertsModal } from './CustomAlertsModal';
+
+// Export types
+export * from './AlertFiltersForm';
+export * from './CustomAlertsModal';

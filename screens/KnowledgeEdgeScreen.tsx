@@ -16,6 +16,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { NeonBorderView } from '../atomic/atoms';
 import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 
 // Define types for the component props and state
@@ -458,89 +459,125 @@ const KnowledgeEdgeScreen = () => {
         </AccessibleThemedView>
 
         {/* Featured Guides */}
-        <AccessibleThemedView style={styles.sectionContainer}>
-          <AccessibleThemedText style={styles.sectionTitle} type="h3">
-            {t('knowledgeEdge.sections.featuredGuides').toUpperCase()}
-          </AccessibleThemedText>
-          {featuredGuides.map(renderFeaturedGuide)}
-        </AccessibleThemedView>
+        <NeonBorderView
+          borderWidth={2}
+          borderColor="#00BFFF"
+          rotationDuration={20000}
+          gridFlashDuration={3000}
+          gridDensity="medium"
+          optimizationLevel="auto"
+        >
+          <AccessibleThemedView style={styles.sectionContainer}>
+            <AccessibleThemedText style={styles.sectionTitle} type="h3">
+              {t('knowledgeEdge.sections.featuredGuides').toUpperCase()}
+            </AccessibleThemedText>
+            {featuredGuides.map(renderFeaturedGuide)}
+          </AccessibleThemedView>
+        </NeonBorderView>
 
         {/* Glossary */}
-        <AccessibleThemedView style={styles.sectionContainer}>
-          <AccessibleThemedText style={styles.sectionTitle} type="h3">
-            {t('knowledgeEdge.sections.glossary').toUpperCase()}
-          </AccessibleThemedText>
-          <AccessibleThemedView
-            style={[
-              styles.glossaryContainer,
-              { backgroundColor: colors.primaryBackground, borderColor: colors.border },
-            ]}
-          >
-            {glossaryTerms.map(renderGlossaryTerm)}
-            <AccessibleTouchableOpacity
-              style={styles.viewAllButton}
-              onPress={() => {}}
-              accessibilityRole="button"
-              accessibilityLabel={t('knowledgeEdge.viewFullGlossary')}
+        <NeonBorderView
+          borderWidth={1.5}
+          borderColor="#39FF14"
+          rotationDuration={15000}
+          gridFlashDuration={2500}
+          gridDensity="high"
+          optimizationLevel="auto"
+        >
+          <AccessibleThemedView style={styles.sectionContainer}>
+            <AccessibleThemedText style={styles.sectionTitle} type="h3">
+              {t('knowledgeEdge.sections.glossary').toUpperCase()}
+            </AccessibleThemedText>
+            <AccessibleThemedView
+              style={[
+                styles.glossaryContainer,
+                { backgroundColor: colors.primaryBackground, borderColor: colors.border },
+              ]}
             >
-              <AccessibleThemedText
-                style={[styles.viewAllButtonText, { color: colors.primaryAction }]}
-                type="small"
+              {glossaryTerms.map(renderGlossaryTerm)}
+              <AccessibleTouchableOpacity
+                style={styles.viewAllButton}
+                onPress={() => {}}
+                accessibilityRole="button"
+                accessibilityLabel={t('knowledgeEdge.viewFullGlossary')}
               >
-                {t('knowledgeEdge.viewFullGlossary')}
-              </AccessibleThemedText>
-            </AccessibleTouchableOpacity>
+                <AccessibleThemedText
+                  style={[styles.viewAllButtonText, { color: colors.primaryAction }]}
+                  type="small"
+                >
+                  {t('knowledgeEdge.viewFullGlossary')}
+                </AccessibleThemedText>
+              </AccessibleTouchableOpacity>
+            </AccessibleThemedView>
           </AccessibleThemedView>
-        </AccessibleThemedView>
+        </NeonBorderView>
 
         {/* Strategy Articles */}
-        <AccessibleThemedView style={styles.sectionContainer}>
-          <AccessibleThemedText style={styles.sectionTitle} type="h3">
-            {t('knowledgeEdge.sections.strategyArticles').toUpperCase()}
-          </AccessibleThemedText>
-          {strategyArticles.map(renderStrategyArticle)}
-          <AccessibleTouchableOpacity
-            style={[styles.loadMoreButton, { borderColor: colors.primaryAction }]}
-            onPress={() => {}}
-            accessibilityRole="button"
-            accessibilityLabel={t('knowledgeEdge.loadMoreArticles')}
-          >
-            <AccessibleThemedText
-              style={[styles.loadMoreButtonText, { color: colors.primaryAction }]}
-              type="small"
-            >
-              {t('knowledgeEdge.loadMoreArticles')}
+        <NeonBorderView
+          borderWidth={2.5}
+          borderColor="#FF00FF"
+          rotationDuration={25000}
+          gridFlashDuration={1800}
+          gridDensity="medium"
+          optimizationLevel="auto"
+        >
+          <AccessibleThemedView style={styles.sectionContainer}>
+            <AccessibleThemedText style={styles.sectionTitle} type="h3">
+              {t('knowledgeEdge.sections.strategyArticles').toUpperCase()}
             </AccessibleThemedText>
-          </AccessibleTouchableOpacity>
-        </AccessibleThemedView>
-
-        {/* FAQ */}
-        <AccessibleThemedView style={styles.sectionContainer}>
-          <AccessibleThemedText style={styles.sectionTitle} type="h3">
-            {t('knowledgeEdge.sections.faq').toUpperCase()}
-          </AccessibleThemedText>
-          <AccessibleThemedView
-            style={[
-              styles.faqContainer,
-              { backgroundColor: colors.primaryBackground, borderColor: colors.border },
-            ]}
-          >
-            {faqs.map(renderFaqItem)}
+            {strategyArticles.map(renderStrategyArticle)}
             <AccessibleTouchableOpacity
-              style={styles.viewAllButton}
+              style={[styles.loadMoreButton, { borderColor: colors.primaryAction }]}
               onPress={() => {}}
               accessibilityRole="button"
-              accessibilityLabel={t('knowledgeEdge.viewAllFaqs')}
+              accessibilityLabel={t('knowledgeEdge.loadMoreArticles')}
             >
               <AccessibleThemedText
-                style={[styles.viewAllButtonText, { color: colors.primaryAction }]}
+                style={[styles.loadMoreButtonText, { color: colors.primaryAction }]}
                 type="small"
               >
-                {t('knowledgeEdge.viewAllFaqs')}
+                {t('knowledgeEdge.loadMoreArticles')}
               </AccessibleThemedText>
             </AccessibleTouchableOpacity>
           </AccessibleThemedView>
-        </AccessibleThemedView>
+        </NeonBorderView>
+
+        {/* FAQ */}
+        <NeonBorderView
+          borderWidth={2}
+          borderColor="#00FFFF"
+          rotationDuration={18000}
+          gridFlashDuration={2000}
+          gridDensity="low"
+          optimizationLevel="auto"
+        >
+          <AccessibleThemedView style={styles.sectionContainer}>
+            <AccessibleThemedText style={styles.sectionTitle} type="h3">
+              {t('knowledgeEdge.sections.faq').toUpperCase()}
+            </AccessibleThemedText>
+            <AccessibleThemedView
+              style={[
+                styles.faqContainer,
+                { backgroundColor: colors.primaryBackground, borderColor: colors.border },
+              ]}
+            >
+              {faqs.map(renderFaqItem)}
+              <AccessibleTouchableOpacity
+                style={styles.viewAllButton}
+                onPress={() => {}}
+                accessibilityRole="button"
+                accessibilityLabel={t('knowledgeEdge.viewAllFaqs')}
+              >
+                <AccessibleThemedText
+                  style={[styles.viewAllButtonText, { color: colors.primaryAction }]}
+                  type="small"
+                >
+                  {t('knowledgeEdge.viewAllFaqs')}
+                </AccessibleThemedText>
+              </AccessibleTouchableOpacity>
+            </AccessibleThemedView>
+          </AccessibleThemedView>
+        </NeonBorderView>
       </ScrollView>
     </AccessibleThemedView>
   );
