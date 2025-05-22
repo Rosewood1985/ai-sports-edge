@@ -62,6 +62,9 @@ testCommand += ' --reporters=default';
 // Exclude translations directory to avoid JSON parsing issues
 testCommand += ' --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations';
 
+// Use the atomic setup file
+testCommand += ' --setupFilesAfterEnv=./jest.setup.atomic.js';
+
 console.log(`\n🔍 Running Accessibility Tests\n`);
 console.log(`Command: ${testCommand}\n`);
 
