@@ -1,6 +1,33 @@
-# Active Context: OCR Accuracy Improvements Implementation
+# Active Context: Documentation & Project Organization
+
+## Previous Context: OCR Accuracy Improvements Implementation
+
+_Note: This section preserved for historical context_
 
 ## Current Implementation Focus
+
+Improving project organization and documentation by consolidating to-do lists, archiving deprecated files, and ensuring proper tracking of documentation gaps. This work supports the overall goal of maintaining a clean, well-organized codebase with clear documentation of implementation status.
+
+### Key Activities:
+
+1. **To-Do List Consolidation**
+
+   - Consolidated multiple to-do lists into a single central .roo-todo.md file
+   - Added a note indicating it's the central to-do list
+   - Added "Documentation Gaps" section based on documentation audit findings
+
+2. **Codebase Cleanup**
+
+   - Archived deprecated ai-sports-edge-todo.md file to backups/20250522/
+   - Committed changes to the repository
+   - Updated memory-bank/progress.md with implementation details
+
+3. **Documentation Gap Tracking**
+   - Added tasks to update implementation status markers in documentation
+   - Added tasks to include "Implementation Gap" subsections in documentation
+   - Added tasks to improve documentation with specific file paths and code snippets
+
+## Previous Implementation Focus
 
 Implementing advanced OCR accuracy improvements for bet slip scanning in the AI Sports Edge app, including image preprocessing, multi-provider OCR engine, intelligent bet slip parser, and enhanced OCR service integration.
 

@@ -1,5 +1,24 @@
 # Implementation Progress
 
+## Documentation & Project Organization (May 22, 2025)
+
+### To-Do List Consolidation
+
+#### Completed
+
+- ✅ Consolidated to-do lists into a single central .roo-todo.md file
+- ✅ Added a note to .roo-todo.md indicating it's the central to-do list
+- ✅ Added "Documentation Gaps" section based on documentation audit findings
+- ✅ Archived deprecated ai-sports-edge-todo.md file to backups/20250522/
+- ✅ Committed changes to the repository
+
+#### Benefits
+
+- Improved project organization with a single source of truth for tasks
+- Better tracking of documentation gaps identified in the audit
+- Cleaner codebase with deprecated files properly archived
+- Enhanced project maintainability
+
 ## Accessibility Implementation (May 21, 2025)
 
 ### Focus States Implementation

@@ -1,5 +1,32 @@
 # Decision Log
 
+## To-Do List Consolidation (May 22, 2025)
+
+### Decision: Consolidate To-Do Lists and Archive Deprecated Files
+
+**Context:**
+
+- Multiple to-do lists existed in the project (ai-sports-edge-todo.md and .roo-todo.md)
+- Documentation audit identified gaps between documentation and implementation
+- Need for a single source of truth for project tasks
+- Need for a cleaner codebase with deprecated files properly archived
+
+**Decision:**
+
+- Consolidate all to-do lists into a single central .roo-todo.md file
+- Add a note to .roo-todo.md indicating it's the central to-do list
+- Add a "Documentation Gaps" section based on documentation audit findings
+- Archive deprecated ai-sports-edge-todo.md file to backups/20250522/
+- Update memory bank files to reflect the changes
+
+**Rationale:**
+
+- Improves project organization with a single source of truth for tasks
+- Enhances tracking of documentation gaps identified in the audit
+- Creates a cleaner codebase with deprecated files properly archived
+- Supports better project maintainability and knowledge sharing
+- Aligns with the goal of maintaining a clean and lean file structure
+
 ## GDPR/CCPA Compliance Implementation (May 20, 2025)
 
 ### Decision: Implement GDPR/CCPA Compliance Framework
