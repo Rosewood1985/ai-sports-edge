@@ -34,8 +34,5 @@ module.exports = {
     '^.+\\.(js|jsx)$': 'babel-jest',
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
-  reporters: [
-    'default',
-    ['jest-junit', { outputDirectory: 'test-results', outputName: 'jest-junit.xml' }],
-  ],
+  reporters: ['default'],
 };
