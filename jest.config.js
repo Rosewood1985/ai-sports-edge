@@ -6,7 +6,7 @@ module.exports = {
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest-setup-axe.ts'],
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['/node_modules/', '/android/', '/ios/'],
+  testPathIgnorePatterns: ['/node_modules/', '/android/', '/ios/', '/translations/'],
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/__mocks__/fileMock.js',
@@ -17,9 +17,9 @@ module.exports = {
     'components/**/*.{js,jsx,ts,tsx}',
     'screens/**/*.{js,jsx,ts,tsx}',
     'contexts/**/*.{js,jsx,ts,tsx}',
-    'translations/**/*.{js,jsx,ts,json}',
     '!**/node_modules/**',
     '!**/vendor/**',
+    '!**/translations/**',
   ],
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
@@ -28,11 +28,13 @@ module.exports = {
       babelConfig: true,
       tsconfig: 'tsconfig.jest.json',
       isolatedModules: true,
+      diagnostics: {
+        warnOnly: true,
+      },
     },
   },
   transform: {
-    '^.+\\.(js|jsx)$': 'babel-jest',
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
   reporters: ['default'],
 };

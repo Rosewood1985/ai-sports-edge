@@ -1,0 +1,6 @@
+{
+  "timestamp": "2025-05-22T18:16:04.438Z",
+  "result": "failed",
+  "command": "npx jest AccessibleTouchable --reporters=default --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations --setupFilesAfterEnv=./jest-setup-accessibility.js --coverage=false --runInBand",
+  "error": "Error: Command failed: npx jest AccessibleTouchable --reporters=default --testPathIgnorePatterns=node_modules --testPathIgnorePatterns=translations --setupFilesAfterEnv=./jest-setup-accessibility.js --coverage=false --runInBand"
+}

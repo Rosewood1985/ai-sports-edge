@@ -12,6 +12,8 @@
     "eject": "expo eject",
     "test": "jest --config=jest.config.js",
     "test:atomic": "jest --config=jest.config.atomic.js",
+    "test:accessibility": "node scripts/run-accessibility-tests.js",
+    "test:accessibility:component": "node scripts/run-accessibility-tests.js --component=",
     "lint": "eslint .",
     "lint:atomic": "eslint --config .eslintrc.atomic.js atomic/**/*.js",
     "build": "expo build",
@@ -80,7 +82,9 @@
     "node-html-parser": "^6.1.13",
     "prettier": "^2.6.2",
     "react-native-dotenv": "^3.4.11",
+    "react-test-renderer": "^17.0.2",
     "sftp-deploy": "^0.1.1",
+    "ts-jest": "^29.3.4",
     "typescript": "~4.3.5"
   },
   "private": true
