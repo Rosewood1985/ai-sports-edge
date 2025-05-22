@@ -22,6 +22,7 @@ import KnowledgeEdgeScreen from '../screens/KnowledgeEdgeScreen';
 
 // Import navigators
 import OnboardingNavigator from './OnboardingNavigator';
+import BettingNavigator from './BettingNavigator';
 
 // Define navigation types
 export type RootStackParamList = {
@@ -41,6 +42,7 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Home: undefined;
   Games: undefined;
+  BetSlip: undefined;
   Profile: undefined;
 };
 
@@ -61,6 +63,8 @@ const MainTabNavigator = () => {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Games') {
             iconName = focused ? 'football' : 'football-outline';
+          } else if (route.name === 'BetSlip') {
+            iconName = focused ? 'receipt' : 'receipt-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -84,6 +88,14 @@ const MainTabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Games" component={GamesScreen} />
+      <Tab.Screen
+        name="BetSlip"
+        component={BettingNavigator}
+        options={{
+          tabBarIcon: ({ color, size }) => <Ionicons name="receipt" size={size} color={color} />,
+          tabBarLabel: 'Bet Slip',
+        }}
+      />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

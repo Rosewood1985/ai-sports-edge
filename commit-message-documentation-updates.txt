@@ -1,0 +1,14 @@
+docs: add comprehensive implementation documentation
+
+Add and update documentation files for key project components:
+
+- Create knowledge-edge-implementation-summary.md with detailed screen implementation
+- Create backend-implementation-summary.md documenting all backend services
+- Create react-components-library-summary.md with component overview
+- Create implementation-summary.md tying all documentation together
+- Update .roo-todo.md to mark betting slip feature tasks as completed
+- Update betting-slip-feature-summary.md with new feature enhancements
+
+These documentation files provide comprehensive details about the architecture,
+implementation, and features of the AI Sports Edge application, improving
+knowledge sharing and onboarding for new team members.

@@ -195,3 +195,28 @@ The CustomAlertsModal component has been implemented following atomic design pri
 - **Internationalization**: Text strings are extracted for translation
 - **State Management**: Modal manages its own state for alert type and filters
 - **Responsive Design**: Components adapt to different screen sizes
+
+### Mobile-Optimized Components
+
+The mobile-optimized components have been implemented following atomic design principles, providing a touch-friendly experience with haptic feedback, animations, and offline support.
+
+#### Atoms
+
+- **MobileButton**: Touch-friendly button with haptic feedback, scale animations, and neon variants
+- **MobileInput**: Input field with animated borders, touch-friendly height (56px), and haptic feedback
+- **MobileCard**: Card component with neon glow effects, touchable interactions, and haptic feedback
+
+#### Organisms
+
+- **MobileCameraCapture**: Full-screen camera interface for scanning bet slips with visual guides
+- **MobileQuickBet**: Quick bet entry form with offline support and validation
+- **MobileBetSlipScreen**: Main screen with tab navigation for different entry methods
+
+#### Features
+
+- **Touch-Optimized**: All components have appropriate touch areas (minimum 56px)
+- **Haptic Feedback**: Interactive elements provide tactile feedback
+- **Animations**: Scale and glow animations for better user experience
+- **Offline Support**: Components work offline with automatic synchronization
+- **Cross-Platform**: Works on both React Native and web platforms
+- **Dark Mode**: Components support both light and dark themes
