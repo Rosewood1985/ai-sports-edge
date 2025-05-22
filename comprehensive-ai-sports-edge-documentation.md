@@ -1163,7 +1163,8 @@ graph TD
         A4[Text Scaling] -->|Implemented| A5
         A5[Reduced Motion] -->|Implemented| A6
         A6[Keyboard Navigation] -->|Implemented| A7
-        A7[Advanced Features] -->|In Progress| Complete
+        A7[Automated Testing] -->|Implemented| A8
+        A8[Advanced Features] -->|In Progress| Complete
 
         style A1 fill:#9f9,stroke:#484
         style A2 fill:#9f9,stroke:#484
@@ -1171,7 +1172,8 @@ graph TD
         style A4 fill:#9f9,stroke:#484
         style A5 fill:#9f9,stroke:#484
         style A6 fill:#9f9,stroke:#484
-        style A7 fill:#ff9,stroke:#484
+        style A7 fill:#9f9,stroke:#484
+        style A8 fill:#ff9,stroke:#484
     end
 ```
 
@@ -1257,13 +1259,38 @@ graph TD
    - Focus management system via [`services/accessibilityService.ts`](services/accessibilityService.ts:529-639)
    - Example implementation in [`components/examples/KeyboardNavigationExample.tsx`](components/examples/KeyboardNavigationExample.tsx)
    - Comprehensive documentation in [`docs/accessibility/keyboard-navigation.md`](docs/accessibility/keyboard-navigation.md)
+   - Automated testing via [`__tests__/accessibility/AccessibleTouchable.test.tsx`](__tests__/accessibility/AccessibleTouchable.test.tsx)
 
    **Implementation Gap:**
 
    - Keyboard shortcuts not yet implemented
    - Skip navigation links for web version not yet implemented
 
-2. **Touch Accommodations** (🟡 Partially Implemented)
+2. **Automated Accessibility Testing** (✅ Implemented)
+
+   - Jest-axe integration for automated accessibility testing
+   - [`atomic/atoms/axeTestUtils.ts`](atomic/atoms/axeTestUtils.ts): Utilities for accessibility testing
+
+   ```typescript
+   export async function expectNoAccessibilityViolations(
+     component: ReactElement,
+     customConfig = {}
+   ): Promise<void> {
+     const results = await testAccessibility(component, customConfig);
+     expect(results).toHaveNoViolations();
+   }
+   ```
+
+   - Comprehensive test suite for accessibility components
+   - Automated testing script via [`scripts/run-accessibility-tests.js`](scripts/run-accessibility-tests.js)
+   - CI/CD integration support with reporting capabilities
+
+   **Implementation Gap:**
+
+   - Screen reader testing process not yet implemented
+   - Accessibility compliance monitoring not yet implemented
+
+3. **Touch Accommodations** (🟡 Partially Implemented)
 
    - Minimum touch target size guidelines in style constants
    - Touch feedback via React Native's built-in feedback
@@ -1274,7 +1301,7 @@ graph TD
    - Touch target size not enforced consistently across all components
    - Haptic feedback only partially implemented
 
-3. **Content Accessibility** (🟡 Partially Implemented)
+4. **Content Accessibility** (🟡 Partially Implemented)
 
    - Alternative text for images implemented in key screens
    - Semantic structure via React Native components
@@ -2527,22 +2554,22 @@ This section provides a consolidated view of the implementation status across al
 
 ### Implementation Status Overview
 
-| Feature/Component          | Status      | Notes                                                   |
-| -------------------------- | ----------- | ------------------------------------------------------- |
-| Core App Structure         | ✅ Complete | Basic app architecture and navigation                   |
-| Atomic Design Architecture | ✅ Complete | Component organization follows atomic design            |
-| Betting Slip Import        | 🟡 Partial  | OCR functionality needs improvements                    |
-| Knowledge Edge System      | ✅ Complete | Educational content fully implemented                   |
-| Analytics Dashboard        | 🟡 Partial  | Basic analytics implemented, advanced features planned  |
-| Women's Sports Features    | 📋 Planned  | Initial research complete, implementation pending       |
-| ML Model Integration       | 🟡 Partial  | Basic models implemented, advanced features planned     |
-| Spanish Localization       | 🟡 Partial  | Core UI translated, some advanced features missing      |
-| Security & Privacy         | 🟡 Partial  | Phase 1 of 5 complete (Core Infrastructure)             |
-| Accessibility              | 🟡 Partial  | Core components accessible, advanced features missing   |
-| Testing Framework          | 🟡 Partial  | Basic tests implemented, comprehensive testing planned  |
-| Deployment Pipeline        | 🟡 Partial  | Manual deployment scripts, automation planned           |
-| Third-Party Integrations   | 🟡 Partial  | Core integrations complete, some pending                |
-| Performance Monitoring     | 🟡 Partial  | Basic monitoring implemented, advanced features planned |
+| Feature/Component          | Status      | Notes                                                                                                     |
+| -------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| Core App Structure         | ✅ Complete | Basic app architecture and navigation                                                                     |
+| Atomic Design Architecture | ✅ Complete | Component organization follows atomic design                                                              |
+| Betting Slip Import        | 🟡 Partial  | OCR functionality needs improvements                                                                      |
+| Knowledge Edge System      | ✅ Complete | Educational content fully implemented                                                                     |
+| Analytics Dashboard        | 🟡 Partial  | Basic analytics implemented, advanced features planned                                                    |
+| Women's Sports Features    | 📋 Planned  | Initial research complete, implementation pending                                                         |
+| ML Model Integration       | 🟡 Partial  | Basic models implemented, advanced features planned                                                       |
+| Spanish Localization       | 🟡 Partial  | Core UI translated, some advanced features missing                                                        |
+| Security & Privacy         | 🟡 Partial  | Phase 1 of 5 complete (Core Infrastructure)                                                               |
+| Accessibility              | 🟡 Partial  | Core components, keyboard navigation, and automated testing implemented; screen reader support incomplete |
+| Testing Framework          | 🟡 Partial  | Basic tests implemented, comprehensive testing planned                                                    |
+| Deployment Pipeline        | 🟡 Partial  | Manual deployment scripts, automation planned                                                             |
+| Third-Party Integrations   | 🟡 Partial  | Core integrations complete, some pending                                                                  |
+| Performance Monitoring     | 🟡 Partial  | Basic monitoring implemented, advanced features planned                                                   |
 
 ### Key Implementation Gaps
 
@@ -2556,7 +2583,7 @@ This section provides a consolidated view of the implementation status across al
 2. **Accessibility**
 
    - ✅ Keyboard navigation support implemented
-   - Automated accessibility testing not implemented
+   - ✅ Automated accessibility testing implemented
    - Screen reader support incomplete for some screens
    - ✅ Focus management system implemented
 
