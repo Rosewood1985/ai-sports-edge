@@ -18,6 +18,7 @@ import PurchaseHistoryScreen from '../screens/PurchaseHistoryScreen';
 import LanguageSettingsScreen from '../screens/LanguageSettingsScreen';
 import AuthScreen from '../screens/AuthScreen';
 import LegalScreen from '../screens/LegalScreen';
+import KnowledgeEdgeScreen from '../screens/KnowledgeEdgeScreen';
 
 // Import navigators
 import OnboardingNavigator from './OnboardingNavigator';
@@ -33,6 +34,8 @@ export type RootStackParamList = {
   Settings: undefined;
   LanguageSettings: undefined;
   Legal: { type: 'privacy-policy' | 'terms-of-service' };
+  KnowledgeEdge: undefined;
+  ArticleDetail: { articleId: string };
 };
 
 export type MainTabParamList = {
@@ -47,13 +50,13 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 // Main tab navigator
 const MainTabNavigator = () => {
   const { colors } = useTheme();
-  
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: string;
-          
+
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Games') {
@@ -63,7 +66,7 @@ const MainTabNavigator = () => {
           } else {
             iconName = 'help-circle';
           }
-          
+
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
         tabBarActiveTintColor: colors.primary,
@@ -90,10 +93,10 @@ const MainTabNavigator = () => {
 const AppNavigator = () => {
   // Use the navigation state context to determine the initial route
   const { initialRoute, isLoading, error } = useNavigationState();
-  
+
   // Add logging for navigation initialization
   console.log(`AppNavigator: Initializing navigation with route "${initialRoute}"`);
-  
+
   // Show loading indicator while determining the initial route
   if (isLoading) {
     console.log('AppNavigator: Still loading navigation state');
@@ -104,7 +107,7 @@ const AppNavigator = () => {
       </View>
     );
   }
-  
+
   // Show error message if there was an error determining the initial route
   if (error) {
     console.error('AppNavigator: Error in navigation state:', error);
@@ -116,7 +119,7 @@ const AppNavigator = () => {
       </View>
     );
   }
-  
+
   return (
     <Stack.Navigator
       initialRouteName={initialRoute}
@@ -133,6 +136,7 @@ const AppNavigator = () => {
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="LanguageSettings" component={LanguageSettingsScreen} />
       <Stack.Screen name="Legal" component={LegalScreen} />
+      <Stack.Screen name="KnowledgeEdge" component={KnowledgeEdgeScreen} />
     </Stack.Navigator>
   );
 };

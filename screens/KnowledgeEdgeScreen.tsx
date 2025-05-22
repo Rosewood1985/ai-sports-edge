@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
-  TouchableOpacity,
+  TextInput,
   StyleSheet,
   Image,
-  Platform,
   FlatList,
+  TouchableOpacity,
+  Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '../hooks';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 
 // Define types for the component props and state
 interface CategoryItem {
   id: string;
   name: string;
+  count: number;
 }
 
 interface ArticleItem {
@@ -29,6 +32,8 @@ interface ArticleItem {
   image: any;
   readTime: string;
   category: string;
+  trending?: boolean;
+  rating?: number;
 }
 
 interface GlossaryItem {
@@ -43,108 +48,123 @@ interface FaqItem {
   answer: string;
 }
 
-const KnowledgeEdgeScreen = () => {
-  const { t, i18n } = useTranslation();
-  const navigation = useNavigation();
-  const { colors, isDark } = useTheme();
-  const [selectedCategory, setSelectedCategory] = useState('all');
+interface LearningPathItem {
+  id: string;
+  title: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  progress: number;
+  total: number;
+}
 
-  // Categories for the knowledge edge content
-  const categories = [
-    { id: 'all', name: t('knowledgeEdge.categories.all') },
-    { id: 'guides', name: t('knowledgeEdge.categories.guides') },
-    { id: 'glossary', name: t('knowledgeEdge.categories.glossary') },
-    { id: 'strategies', name: t('knowledgeEdge.categories.strategies') },
-    { id: 'faq', name: t('knowledgeEdge.categories.faq') },
+const KnowledgeEdgeScreen = () => {
+  const { t } = useLanguage();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const { colors } = useTheme();
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [expandedGlossaryIndex, setExpandedGlossaryIndex] = useState<number | null>(0); // First item expanded by default
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [approvedQuestions, setApprovedQuestions] = useState<FAQQuestion[]>([]);
+
+  // Categories for the knowledge edge content with counters
+  const categories: CategoryItem[] = [
+    { id: 'all', name: t('knowledgeEdge.categories.all'), count: 47 },
+    { id: 'guides', name: t('knowledgeEdge.categories.guides'), count: 12 },
+    { id: 'glossary', name: t('knowledgeEdge.categories.glossary'), count: 28 },
+    { id: 'strategies', name: t('knowledgeEdge.categories.strategies'), count: 8 },
+    { id: 'faq', name: t('knowledgeEdge.categories.faq'), count: 15 },
   ];
 
+  // Current user's learning path
+  const currentLearningPath: LearningPathItem = {
+    id: 'intermediate-path',
+    title: 'Advanced Line Movement Analysis',
+    level: 'intermediate',
+    progress: 7,
+    total: 12,
+  };
+
   // Featured guides data
-  const featuredGuides = [
+  const featuredGuides: ArticleItem[] = [
     {
-      id: 'market-inefficiencies',
-      title: t('knowledgeEdge.articles.marketInefficiencies.title'),
-      description: t('knowledgeEdge.articles.marketInefficiencies.description'),
-      image: require('../assets/images/knowledge-edge/market-inefficiencies.png'),
-      readTime: '8',
+      id: 'cognitive-biases',
+      title: t('knowledgeEdge.articles.cognitiveBiases.title'),
+      description: t('knowledgeEdge.articles.cognitiveBiases.description'),
+      image: require('../assets/images/knowledge-edge/cognitive-biases.png'),
+      readTime: '12',
       category: 'strategies',
+      trending: true,
+      rating: 4.8,
     },
     {
       id: 'live-betting',
       title: t('knowledgeEdge.articles.liveBetting.title'),
       description: t('knowledgeEdge.articles.liveBetting.description'),
       image: require('../assets/images/knowledge-edge/live-betting.png'),
-      readTime: '7',
+      readTime: '15',
       category: 'strategies',
+      trending: false,
+      rating: 4.9,
     },
   ];
 
-  // Strategy articles data
-  const strategyArticles = [
-    {
-      id: 'cognitive-biases',
-      title: t('knowledgeEdge.articles.cognitiveBiases.title'),
-      description: t('knowledgeEdge.articles.cognitiveBiases.description'),
-      image: require('../assets/images/knowledge-edge/cognitive-biases.png'),
-      readTime: '9',
-      category: 'strategies',
-    },
-    {
-      id: 'parlay-strategies',
-      title: t('knowledgeEdge.articles.parlayStrategies.title'),
-      description: t('knowledgeEdge.articles.parlayStrategies.description'),
-      image: require('../assets/images/knowledge-edge/parlay-strategies.png'),
-      readTime: '6',
-      category: 'strategies',
-    },
+  // Strategy articles by level
+  const beginnerArticles: ArticleItem[] = [
     {
       id: 'value-betting',
       title: t('knowledgeEdge.articles.valueBetting.title'),
       description: t('knowledgeEdge.articles.valueBetting.description'),
       image: require('../assets/images/knowledge-edge/value-betting.png'),
-      readTime: '5',
+      readTime: '8',
       category: 'guides',
     },
+  ];
+
+  const intermediateArticles: ArticleItem[] = [
+    {
+      id: 'market-inefficiencies',
+      title: t('knowledgeEdge.articles.marketInefficiencies.title'),
+      description: t('knowledgeEdge.articles.marketInefficiencies.description'),
+      image: require('../assets/images/knowledge-edge/market-inefficiencies.png'),
+      readTime: '12',
+      category: 'strategies',
+    },
+  ];
+
+  const advancedArticles: ArticleItem[] = [
     {
       id: 'advanced-concepts',
       title: t('knowledgeEdge.articles.advancedConcepts.title'),
       description: t('knowledgeEdge.articles.advancedConcepts.description'),
       image: require('../assets/images/knowledge-edge/advanced-concepts.png'),
-      readTime: '10',
+      readTime: '18',
       category: 'guides',
     },
   ];
 
   // Glossary terms data
-  const glossaryTerms = [
+  const glossaryTerms: GlossaryItem[] = [
     {
       id: 'expected-value',
       term: t('knowledgeEdge.glossary.expectedValue.term'),
       definition: t('knowledgeEdge.glossary.expectedValue.definition'),
     },
     {
-      id: 'closing-line-value',
-      term: t('knowledgeEdge.glossary.closingLineValue.term'),
-      definition: t('knowledgeEdge.glossary.closingLineValue.definition'),
+      id: 'sharp-money',
+      term: 'Sharp Money',
+      definition:
+        'Wagers placed by professional or highly skilled bettors who consistently beat the market.',
     },
     {
-      id: 'vigorish',
-      term: t('knowledgeEdge.glossary.vigorish.term'),
-      definition: t('knowledgeEdge.glossary.vigorish.definition'),
-    },
-    {
-      id: 'arbitrage',
-      term: t('knowledgeEdge.glossary.arbitrage.term'),
-      definition: t('knowledgeEdge.glossary.arbitrage.definition'),
-    },
-    {
-      id: 'regression',
-      term: t('knowledgeEdge.glossary.regression.term'),
-      definition: t('knowledgeEdge.glossary.regression.definition'),
+      id: 'kelly-criterion',
+      term: 'Kelly Criterion',
+      definition:
+        'Mathematical formula for determining optimal bet sizing based on edge and bankroll.',
     },
   ];
 
-  // FAQ data
-  const faqs = [
+  // FAQ data - Migrated from FAQScreen
+  const staticFaqItems: FaqItem[] = [
     {
       id: 'ai-probabilities',
       question: t('knowledgeEdge.faq.aiProbabilities.question'),
@@ -160,14 +180,28 @@ const KnowledgeEdgeScreen = () => {
       question: t('knowledgeEdge.faq.mlUpdates.question'),
       answer: t('knowledgeEdge.faq.mlUpdates.answer'),
     },
-    {
-      id: 'high-confidence',
-      question: t('knowledgeEdge.faq.highConfidence.question'),
-      answer: t('knowledgeEdge.faq.highConfidence.answer'),
-    },
   ];
 
-  const renderCategoryItem = ({ item }) => (
+  // Load approved questions from FAQScreen
+  useEffect(() => {
+    const loadApprovedQuestions = async () => {
+      try {
+        const questions = await getApprovedQuestions();
+        setApprovedQuestions(questions);
+      } catch (error) {
+        console.error('Error loading approved questions:', error);
+      }
+    };
+
+    loadApprovedQuestions();
+  }, []);
+
+  // Combine static and dynamic FAQ items
+  const faqs: FaqItem[] = [...staticFaqItems];
+
+  // Render category item
+  // Render category item
+  const renderCategoryItem = ({ item }: { item: CategoryItem }) => (
     <AccessibleTouchableOpacity
       style={[
         styles.categoryButton,
@@ -195,7 +229,15 @@ const KnowledgeEdgeScreen = () => {
     </AccessibleTouchableOpacity>
   );
 
-  const renderFeaturedGuide = (item, index) => (
+  // Combine all strategy articles
+  const strategyArticles: ArticleItem[] = [
+    ...beginnerArticles,
+    ...intermediateArticles,
+    ...advancedArticles,
+  ];
+
+  // Render featured guide
+  const renderFeaturedGuide = (item: ArticleItem, index: number) => (
     <AccessibleTouchableOpacity
       key={item.id}
       style={[
@@ -238,7 +280,8 @@ const KnowledgeEdgeScreen = () => {
     </AccessibleTouchableOpacity>
   );
 
-  const renderStrategyArticle = (item, index) => (
+  // Render strategy article
+  const renderStrategyArticle = (item: ArticleItem, index: number) => (
     <AccessibleTouchableOpacity
       key={item.id}
       style={[
@@ -283,7 +326,8 @@ const KnowledgeEdgeScreen = () => {
     </AccessibleTouchableOpacity>
   );
 
-  const renderGlossaryTerm = (item, index) => (
+  // Render glossary term
+  const renderGlossaryTerm = (item: GlossaryItem, index: number) => (
     <AccessibleTouchableOpacity
       key={item.id}
       style={[
@@ -310,7 +354,8 @@ const KnowledgeEdgeScreen = () => {
     </AccessibleTouchableOpacity>
   );
 
-  const renderFaqItem = (item, index) => (
+  // Render FAQ item
+  const renderFaqItem = (item: FaqItem, index: number) => (
     <AccessibleTouchableOpacity
       key={item.id}
       style={[
@@ -545,6 +590,17 @@ const styles = StyleSheet.create({
   },
   selectedCategoryText: {
     color: 'white',
+  },
+  categoryCount: {
+    marginLeft: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  categoryCountText: {
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   scrollView: {
     flex: 1,
