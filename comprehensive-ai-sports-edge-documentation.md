@@ -15,6 +15,11 @@
 6. [User Experience & Site Map](#6-user-experience--site-map)
 7. [Spanish Localization Implementation](#7-spanish-localization-implementation)
 8. [Technical Architecture](#8-technical-architecture)
+   - [Frontend Architecture](#frontend-architecture)
+   - [Backend Architecture](#backend-architecture)
+   - [Integration Architecture](#integration-architecture)
+   - [DevOps Architecture](#devops-architecture)
+   - [Background Processes & Scheduled Tasks](#background-processes--scheduled-tasks)
 9. [Security & Privacy](#9-security--privacy)
 10. [Accessibility Standards](#10-accessibility-standards)
 11. [Testing Strategy & Quality Assurance](#11-testing-strategy--quality-assurance)
@@ -42,6 +47,7 @@ Several key features are still in development or partially implemented:
 - **Security & Privacy**: 🟡 In Progress (Phase 1 of 5 Complete)
 - **Accessibility Standards**: 🟡 Partially Implemented
 - **Performance & Analytics**: 🟡 Partially Implemented
+- **Background Processes**: 🟡 Partially Implemented (7 active, 5 ready for activation)
 
 This documentation provides a comprehensive overview of both implemented features and planned functionality. Each section includes an implementation status indicator (✅ Complete, 🟡 Partially Implemented, 📋 Planned) and details about implementation gaps where applicable.
 
@@ -893,10 +899,63 @@ AI Sports Edge employs a comprehensive technical architecture that combines Reac
    - Firebase deployment for backend services
 
 2. **Environment Management**
+
    - Development, staging, and production environments
    - Environment-specific configuration
    - Feature flags for controlled rollout
    - A/B testing infrastructure
+
+3. **Background Processes & Scheduled Tasks** 🟡 **Status: Partially Implemented**
+
+   - **Process Categories:**
+
+     - Category A (Production Active): 7 critical processes currently running
+     - Category B (Production Ready): 5 processes ready for activation
+     - Category C (Development/Staging Value): 6 processes for non-production environments
+     - Category D (Valuable Logic - Needs Migration): 3 processes requiring modernization
+     - Category E (Deprecated): 2 processes for archival
+
+   - **Firebase Cloud Functions:**
+
+     - `processScheduledNotifications`: Checks for scheduled notifications that are due to be sent
+     - `cleanupOldNotifications`: Removes notifications older than 30 days
+     - `processRssFeedsAndNotify`: Processes new RSS feed items and sends notifications
+     - `markAIPickOfDay`: Marks the top prediction as the AI Pick of the Day
+     - `predictTodayGames`: Predicts game outcomes using ML model
+     - `updateStatsPage`: Updates stats page with AI prediction performance metrics
+     - `scheduledFirestoreBackup`: Backs up Firestore data
+
+   - **System Cron Jobs:**
+
+     - Daily workflow commands (morning initialization, midday checkpoint, evening wrap-up)
+     - Maintenance commands (model updates, database cleanup, archiving)
+     - Development commands (sprint review reminders)
+
+   - **Mobile Services Background Processes:**
+
+     - Network reconnection handling
+     - Cross-platform data synchronization
+     - Offline data queue management
+     - Real-time player stats updates
+
+   - **Reorganization Plan:**
+     - Unified directory structure under `/src/background-processes/`
+     - Categorized subdirectories by process type
+     - Shared utilities for logging, error handling, and configuration
+     - Comprehensive documentation and monitoring
+
+   **Implementation Gap:** The following improvements are planned:
+
+   - Centralized process management system
+   - Real-time monitoring dashboard
+   - Unified error handling and logging
+   - Environment-specific process configuration
+   - Automated testing for background processes
+
+   **Reference Documentation:**
+
+   - [Background Process Assessment](./background-processes-assessment.md)
+   - [Background Process Reorganization Plan](./background-process-reorganization.md)
 
 ### Technical Evolution
 

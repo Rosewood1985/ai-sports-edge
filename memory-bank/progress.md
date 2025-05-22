@@ -419,3 +419,51 @@ The Unified Admin Dashboard will integrate with the existing admin infrastructur
 5. Extend testing to cover all key UI components
 
 See [accessibility-testing-implementation.md](./accessibility-testing-implementation.md) for a detailed breakdown of the current status and required actions.
+
+## Background Process Verification & Activation (May 22, 2025)
+
+### Completed
+
+- ✅ Updated comprehensive documentation with background processes information
+  - ✅ Added "Background Processes & Scheduled Tasks" section to Technical Architecture
+  - ✅ Updated Table of Contents to include the new section
+  - ✅ Updated Executive Summary to mention background processes status
+- ✅ Verified 7 critical background processes (Category A)
+  - ✅ `markAIPickOfDay` in functions/src/markAIPickOfDay.ts
+  - ✅ `predictTodayGames` in functions/src/predictTodayGames.ts
+  - ✅ `scheduledFirestoreBackup` in functions/src/backups.ts
+  - ✅ `processScheduledNotifications` in functions/processScheduledNotifications.js
+  - ✅ `cleanupOldNotifications` in functions/processScheduledNotifications.js
+  - ✅ `processRssFeedsAndNotify` in functions/rssFeedNotifications.js
+  - ✅ `updateStatsPage` in functions/src/updateStatsPage.ts
+- ✅ Activated 5 ready background processes (Category B)
+  - ✅ `syncSubscriptionStatus` in functions/database-consistency-triggers.js
+  - ✅ `syncCustomerId` in functions/database-consistency-triggers.js
+  - ✅ `standardizeStatusSpelling` in functions/database-consistency-triggers.js
+  - ✅ `generateReferralCode` in functions/generateReferralCode.js
+  - ✅ `rewardReferrer` in functions/rewardReferrer.js
+- ✅ Created detailed status report in background-process-status-report.md
+
+### Monitoring Implementation
+
+- ✅ Created comprehensive monitoring system for background processes
+  - ✅ Implemented core monitoring functionality in `process-monitor.js`
+  - ✅ Created wrapper functions for different process types in `process-wrappers.js`
+  - ✅ Developed dashboard component for visualization in `ProcessMonitoringDashboard.jsx`
+  - ✅ Added detailed documentation in `README.md`
+
+### Optimization Opportunities
+
+- ✅ Identified optimization opportunities for all activated processes
+  - ✅ Created detailed analysis in `background-process-optimization-opportunities.md`
+  - ✅ Identified batch processing opportunities for database consistency triggers
+  - ✅ Suggested performance improvements for referral system
+  - ✅ Recommended general optimization strategies for all processes
+
+### Next Steps
+
+1. Apply the identified optimizations to the activated processes
+2. Conduct thorough testing of the optimized processes
+3. Use the monitoring system to track performance improvements
+4. Proceed with the reorganization plan for all background processes
+5. Update the Firebase deployment scripts to include the newly activated functions
