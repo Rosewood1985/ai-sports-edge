@@ -86,7 +86,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user }) => {
             <div className="flex flex-wrap gap-2">
               {user.permissions.length > 0 ? (
                 user.permissions.map(permission => (
-                  <Badge key={permission.id} variant="outlined" className="mb-1">
+                  <Badge key={permission.id} variant="outlined" color="default" className="mb-1">
                     {permission.name}
                   </Badge>
                 ))

@@ -2,6 +2,8 @@ import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { ConversionFunnelData } from '../types/conversionFunnel';
+import { ReportTemplate, ScheduledReport, ReportType } from '../types/reporting';
+import { ExportConfig, ExportFormat, ExportHistory } from '../types/export';
 import {
   User,
   UserListResponse,
@@ -970,6 +972,215 @@ export const useWebSocketConnection = (url: string, onMessage: (data: any) => vo
 
 // Admin Dashboard Service
 export class AdminDashboardService {
+  // Reporting API methods
+  static async getReportTemplates(): Promise<ReportTemplate[]> {
+    // Mock data for development
+    return [
+      {
+        id: 'template-001',
+        name: 'Monthly Performance Report',
+        description: 'Comprehensive monthly performance analysis',
+        type: ReportType.ANALYTICS,
+        createdAt: '2025-05-01T10:00:00Z',
+        updatedAt: '2025-05-15T14:30:00Z',
+        widgets: ['bet-slip-performance', 'subscription-analytics', 'system-health'],
+        filters: [
+          { field: 'date', operator: 'greater_than', value: '2025-04-01' },
+          { field: 'date', operator: 'less_than', value: '2025-05-01' },
+        ],
+      },
+      {
+        id: 'template-002',
+        name: 'Weekly Subscription Summary',
+        description: 'Weekly summary of subscription metrics',
+        type: ReportType.STANDARD,
+        createdAt: '2025-05-05T09:15:00Z',
+        updatedAt: '2025-05-20T11:45:00Z',
+        widgets: ['subscription-analytics'],
+        filters: [
+          { field: 'date', operator: 'greater_than', value: '2025-05-13' },
+          { field: 'date', operator: 'less_than', value: '2025-05-20' },
+        ],
+      },
+      {
+        id: 'template-003',
+        name: 'System Health Check',
+        description: 'Daily system health monitoring report',
+        type: ReportType.PERFORMANCE,
+        createdAt: '2025-05-10T08:30:00Z',
+        updatedAt: '2025-05-22T16:20:00Z',
+        widgets: ['system-health'],
+        filters: [{ field: 'date', operator: 'equals', value: '2025-05-22' }],
+      },
+    ];
+  }
+
+  static async createReportTemplate(template: Omit<ReportTemplate, 'id'>): Promise<ReportTemplate> {
+    // Mock implementation
+    return {
+      ...template,
+      id: `template-${Math.floor(Math.random() * 1000)}`,
+    };
+  }
+
+  static async updateReportTemplate(template: ReportTemplate): Promise<ReportTemplate> {
+    // Mock implementation
+    return {
+      ...template,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  static async deleteReportTemplate(id: string): Promise<boolean> {
+    // Mock implementation
+    return true;
+  }
+
+  static async getScheduledReports(): Promise<ScheduledReport[]> {
+    // Mock data for development
+    return [
+      {
+        id: 'report-001',
+        name: 'Monthly Performance Report',
+        description: 'Automatically generated monthly performance report',
+        templateId: 'template-001',
+        schedule: {
+          frequency: 'monthly',
+          hour: 9,
+          minute: 0,
+          dayOfMonth: 1,
+        },
+        status: 'active',
+        lastRun: '2025-05-01T09:00:00Z',
+        nextRun: '2025-06-01T09:00:00Z',
+        recipients: ['admin@example.com', 'manager@example.com'],
+        format: 'pdf',
+        createdAt: '2025-04-15T14:30:00Z',
+        updatedAt: '2025-05-02T10:15:00Z',
+      },
+      {
+        id: 'report-002',
+        name: 'Weekly Subscription Summary',
+        description: 'Weekly summary of subscription metrics',
+        templateId: 'template-002',
+        schedule: {
+          frequency: 'weekly',
+          hour: 8,
+          minute: 30,
+          dayOfWeek: 1,
+        },
+        status: 'active',
+        lastRun: '2025-05-20T08:30:00Z',
+        nextRun: '2025-05-27T08:30:00Z',
+        recipients: ['admin@example.com', 'sales@example.com'],
+        format: 'excel',
+        createdAt: '2025-05-01T11:45:00Z',
+        updatedAt: '2025-05-20T09:00:00Z',
+      },
+      {
+        id: 'report-003',
+        name: 'Daily System Health Check',
+        description: 'Daily system health monitoring report',
+        templateId: 'template-003',
+        schedule: {
+          frequency: 'daily',
+          hour: 7,
+          minute: 0,
+        },
+        status: 'paused',
+        lastRun: '2025-05-22T07:00:00Z',
+        nextRun: '2025-05-23T07:00:00Z',
+        recipients: ['admin@example.com', 'tech@example.com'],
+        format: 'pdf',
+        createdAt: '2025-05-10T16:20:00Z',
+        updatedAt: '2025-05-22T08:15:00Z',
+      },
+    ];
+  }
+
+  static async createScheduledReport(
+    report: Omit<ScheduledReport, 'id'>
+  ): Promise<ScheduledReport> {
+    // Mock implementation
+    return {
+      ...report,
+      id: `report-${Math.floor(Math.random() * 1000)}`,
+    };
+  }
+
+  static async updateScheduledReport(report: ScheduledReport): Promise<ScheduledReport> {
+    // Mock implementation
+    return {
+      ...report,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  static async deleteScheduledReport(id: string): Promise<boolean> {
+    // Mock implementation
+    return true;
+  }
+
+  static async getExportFormats(): Promise<ExportFormat[]> {
+    // Mock data for development
+    return [
+      { id: 'pdf', name: 'PDF Document', extension: '.pdf', mimeType: 'application/pdf' },
+      {
+        id: 'excel',
+        name: 'Excel Spreadsheet',
+        extension: '.xlsx',
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+      { id: 'csv', name: 'CSV File', extension: '.csv', mimeType: 'text/csv' },
+      { id: 'json', name: 'JSON Data', extension: '.json', mimeType: 'application/json' },
+    ];
+  }
+
+  static async getExportHistory(): Promise<ExportHistory[]> {
+    // Mock data for development
+    return [
+      {
+        id: 'export-001',
+        format: 'pdf',
+        fileSize: 1250000,
+        downloadUrl: '#',
+        timestamp: '2025-05-22T14:30:00Z',
+        expiresAt: '2025-06-22T14:30:00Z',
+        status: 'success',
+      },
+      {
+        id: 'export-002',
+        format: 'excel',
+        fileSize: 850000,
+        downloadUrl: '#',
+        timestamp: '2025-05-21T10:15:00Z',
+        expiresAt: '2025-06-21T10:15:00Z',
+        status: 'success',
+      },
+      {
+        id: 'export-003',
+        format: 'csv',
+        fileSize: 450000,
+        downloadUrl: '#',
+        timestamp: '2025-05-20T16:45:00Z',
+        expiresAt: '2025-06-20T16:45:00Z',
+        status: 'success',
+      },
+    ];
+  }
+
+  static async deleteExport(id: string): Promise<boolean> {
+    // Mock implementation
+    return true;
+  }
+
+  static async exportData(config: ExportConfig): Promise<{ url: string; format: string }> {
+    // Mock implementation
+    return {
+      url: '#',
+      format: config.format,
+    };
+  }
   // Conversion Funnel
   static async getConversionFunnelData(): Promise<ConversionFunnelData> {
     try {
@@ -988,7 +1199,11 @@ export class AdminDashboardService {
       return data.data;
     } catch (error) {
       console.error('Error fetching conversion funnel data:', error);
-      return mockConversionFunnelData;
+      if (process.env.NODE_ENV === 'development') {
+        return mockConversionFunnelData;
+      } else {
+        throw new Error('Failed to fetch conversion funnel data. Please try again later.');
+      }
     }
   }
   // Bet Slip Performance

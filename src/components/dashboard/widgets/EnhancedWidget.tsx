@@ -1,96 +1,117 @@
-import React from 'react';
-import { Card, CardHeader, CardContent, CardFooter } from '../../../components/ui/Card';
-import { IconButton } from '../../../components/ui/IconButton';
-import { Tooltip } from '../../../components/ui/Tooltip';
-import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
-import { ErrorIcon } from '../../../components/ui/icons/ErrorIcon';
+import React, { ReactNode } from 'react';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { Button } from '../../ui/Button';
 
 export type WidgetSize = 'small' | 'medium' | 'large' | 'extra-large';
 
 export interface EnhancedWidgetProps {
   title: string;
   subtitle?: string;
-  icon?: React.ReactNode;
   size?: WidgetSize;
-  actions?: React.ReactNode[];
-  footer?: React.ReactNode;
   isLoading?: boolean;
   error?: Error | null;
   onRefresh?: () => void;
-  children: React.ReactNode;
+  actions?: ReactNode[];
+  footer?: ReactNode;
   className?: string;
+  children: ReactNode;
 }
 
+/**
+ * Enhanced widget component with loading, error handling, and refresh functionality
+ */
 export function EnhancedWidget({
   title,
   subtitle,
-  icon,
   size = 'medium',
-  actions = [],
-  footer,
   isLoading = false,
   error = null,
   onRefresh,
-  children,
+  actions = [],
+  footer,
   className = '',
+  children,
 }: EnhancedWidgetProps) {
-  // Size-based classes
   const sizeClasses = {
-    small: 'col-span-1',
-    medium: 'col-span-2',
-    large: 'col-span-3',
-    'extra-large': 'col-span-4',
-  }[size];
+    small: 'max-w-sm',
+    medium: 'max-w-2xl',
+    large: 'max-w-4xl',
+    'extra-large': 'max-w-full',
+  };
+
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
 
   return (
-    <Card className={`dashboard-widget ${sizeClasses} ${className}`}>
-      <CardHeader className="widget-header">
-        <div className="widget-title-container">
-          {icon && <div className="widget-icon">{icon}</div>}
-          <div className="widget-title-content">
-            <h3 className="widget-title">{title}</h3>
-            {subtitle && <p className="widget-subtitle">{subtitle}</p>}
-          </div>
-        </div>
-        <div className="widget-actions">
-          {onRefresh && (
-            <Tooltip content="Refresh">
-              <IconButton
-                icon="refresh"
-                onClick={onRefresh}
-                disabled={isLoading}
-                aria-label="Refresh widget"
-              />
-            </Tooltip>
+    <div
+      className={`bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden ${sizeClasses[size]} ${className}`}
+    >
+      <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">{title}</h3>
+          {subtitle && (
+            <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>
           )}
-          {actions.map((action, index) => (
-            <div key={`action-${index}`} className="widget-action">
-              {action}
-            </div>
-          ))}
         </div>
-      </CardHeader>
-      <CardContent className="widget-content">
-        {isLoading ? (
-          <div className="widget-loading">
-            <LoadingSpinner size="medium" />
-            <p>Loading data...</p>
+        <div className="flex space-x-2">
+          {actions.map((action, index) => (
+            <React.Fragment key={index}>{action}</React.Fragment>
+          ))}
+          {onRefresh && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              aria-label="Refresh"
+              className="p-1"
+              disabled={isLoading}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </Button>
+          )}
+        </div>
+      </div>
+      <div className="px-4 py-5 sm:p-6">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10">
+            <LoadingSpinner size="large" />
           </div>
-        ) : error ? (
-          <div className="widget-error">
-            <ErrorIcon />
+        )}
+        {error ? (
+          <div className="text-center text-red-500 p-4">
             <p>Error: {error.message}</p>
             {onRefresh && (
-              <button onClick={onRefresh} className="retry-button">
+              <Button onClick={handleRefresh} variant="secondary" className="mt-2">
                 Retry
-              </button>
+              </Button>
             )}
           </div>
         ) : (
           children
         )}
-      </CardContent>
-      {footer && <CardFooter className="widget-footer">{footer}</CardFooter>}
-    </Card>
+      </div>
+
+      {footer && (
+        <div className="px-4 py-4 sm:px-6 border-t border-gray-200 dark:border-gray-700">
+          {footer}
+        </div>
+      )}
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { BetSlipPerformanceWidget } from './widgets/BetSlipPerformanceWidget';
 import { EnhancedSubscriptionAnalyticsWidget } from './widgets/EnhancedSubscriptionAnalyticsWidget';
 import { SystemHealthMonitoringWidget } from './widgets/SystemHealthMonitoringWidget';
 import { ConversionFunnelWidget } from './widgets/ConversionFunnelWidget';
+import { ReportingCenter } from './reporting/ReportingCenter';
 
 export interface AdminDashboardProps {
   className?: string;
@@ -25,9 +26,9 @@ export function AdminDashboard({ className = '' }: AdminDashboardProps) {
         {/* Phase 2: Conversion & Fraud Intelligence */}
         <ConversionFunnelWidget />
 
-        {/* Phase 3 Placeholder */}
-        <div className="col-span-1 md:col-span-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-6 h-48 flex items-center justify-center">
-          <p className="text-gray-500 dark:text-gray-400">Phase 3 Features Coming Soon</p>
+        {/* Phase 3: Reporting & Automation */}
+        <div className="col-span-1 md:col-span-4">
+          <ReportingCenter />
         </div>
       </div>
     </div>

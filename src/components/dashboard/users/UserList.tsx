@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useUserManagement } from '../../../services/adminDashboardService';
 import { User, UserRole, UserStatus } from '../../../types/userManagement';
-import { Table, TableHead, TableRow, TableCell, TableBody, TablePagination } from '../../ui/Table';
+import { Table, TableHead, TableRow, TableCell, TableBody } from '../../ui/Table';
+// Update the import path below to the correct location of TablePagination:
+// import { TablePagination } from '../../ui/TablePagination';
+// TODO: Update the import path below to the correct location of TablePagination:
+import { TablePagination } from '../../ui/table/TablePagination';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { Select } from '../../ui/Select';

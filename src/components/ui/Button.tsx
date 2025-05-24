@@ -1,56 +1,71 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes, ReactNode } from 'react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   isLoading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  fullWidth?: boolean;
+  className?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+/**
+ * Button component for user interactions
+ */
+export function Button({
   children,
-  className = '',
   variant = 'primary',
   size = 'md',
   isLoading = false,
   leftIcon,
   rightIcon,
+  fullWidth = false,
+  className = '',
   disabled,
   ...props
-}) => {
-  // Variant styles
-  const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
-    outline: 'bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-700',
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
+}: ButtonProps) {
+  const getVariantClasses = () => {
+    switch (variant) {
+      case 'primary':
+        return 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm dark:bg-blue-500 dark:hover:bg-blue-600';
+      case 'secondary':
+        return 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm dark:bg-purple-500 dark:hover:bg-purple-600';
+      case 'outline':
+        return 'bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800';
+      case 'ghost':
+        return 'bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800';
+      case 'link':
+        return 'bg-transparent text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300';
+      case 'danger':
+        return 'bg-red-600 hover:bg-red-700 text-white shadow-sm dark:bg-red-500 dark:hover:bg-red-600';
+      default:
+        return 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm dark:bg-blue-500 dark:hover:bg-blue-600';
+    }
   };
 
-  // Size styles
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'sm':
+        return 'px-3 py-1.5 text-sm';
+      case 'lg':
+        return 'px-5 py-3 text-lg';
+      default:
+        return 'px-4 py-2 text-base';
+    }
   };
 
-  // Disabled styles
-  const disabledClasses =
-    disabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
+  const baseClasses =
+    'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed';
+  const widthClass = fullWidth ? 'w-full' : '';
 
   return (
     <button
-      className={`
-        inline-flex items-center justify-center
-        font-medium rounded-md
-        transition-colors duration-200
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-        ${variantClasses[variant]}
-        ${sizeClasses[size]}
-        ${disabledClasses}
-        ${className}
-      `}
+      className={`${baseClasses} ${getVariantClasses()} ${getSizeClasses()} ${widthClass} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >
@@ -76,12 +91,9 @@ export const Button: React.FC<ButtonProps> = ({
           ></path>
         </svg>
       )}
-
       {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
-
       {children}
-
       {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
     </button>
   );
-};
+}

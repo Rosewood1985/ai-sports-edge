@@ -76,11 +76,11 @@ export const ContentDetails: React.FC<ContentDetailsProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'published':
-        return <Badge variant="success">{status}</Badge>;
+        return <Badge color="success">{status}</Badge>;
       case 'draft':
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge color="secondary">{status}</Badge>;
       case 'archived':
-        return <Badge variant="danger">{status}</Badge>;
+        return <Badge color="danger">{status}</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -142,7 +142,7 @@ export const ContentDetails: React.FC<ContentDetailsProps> = ({
                 <dd className="text-gray-700 flex-1">
                   <div className="flex flex-wrap gap-1">
                     {getTagNames(currentItem.tags).map((tagName, index) => (
-                      <Badge key={index} variant="outlined">
+                      <Badge key={index} variant="outlined" color="default">
                         {tagName}
                       </Badge>
                     ))}

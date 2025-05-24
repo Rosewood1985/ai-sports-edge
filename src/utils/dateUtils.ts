@@ -1,123 +1,129 @@
 /**
+ * Utility functions for date and time formatting
+ */
+
+/**
  * Format a date string to a human-readable format
- * @param dateString - ISO date string
- * @param options - Intl.DateTimeFormatOptions
+ * @param dateString ISO date string
  * @returns Formatted date string
  */
-export function formatDate(
-  dateString: string,
-  options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }
-): string {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', options).format(date);
-}
-
-/**
- * Format a date string to include time
- * @param dateString - ISO date string
- * @returns Formatted date and time string
- */
 export function formatDateTime(dateString: string): string {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(date);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
 }
 
 /**
- * Get a relative time string (e.g., "2 hours ago", "yesterday")
- * @param dateString - ISO date string
+ * Format a date string to a date-only format
+ * @param dateString ISO date string
+ * @returns Formatted date string
+ */
+export function formatDate(dateString: string): string {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
+}
+
+/**
+ * Format a date string to a time-only format
+ * @param dateString ISO date string
+ * @returns Formatted time string
+ */
+export function formatTime(dateString: string): string {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(date);
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return dateString;
+  }
+}
+
+/**
+ * Format a number of bytes to a human-readable file size
+ * @param bytes Number of bytes
+ * @returns Formatted file size string
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/**
+ * Get a relative time string (e.g., "2 hours ago")
+ * @param dateString ISO date string
  * @returns Relative time string
  */
 export function getRelativeTimeString(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (!dateString) return '';
 
-  // Less than a minute
-  if (diffInSeconds < 60) {
-    return 'just now';
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) {
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return `${diffInMonths} month${diffInMonths !== 1 ? 's' : ''} ago`;
+    }
+
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `${diffInYears} year${diffInYears !== 1 ? 's' : ''} ago`;
+  } catch (error) {
+    console.error('Error calculating relative time:', error);
+    return dateString;
   }
-
-  // Less than an hour
-  if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
-  }
-
-  // Less than a day
-  if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-  }
-
-  // Less than a week
-  if (diffInSeconds < 604800) {
-    const days = Math.floor(diffInSeconds / 86400);
-    if (days === 1) return 'yesterday';
-    return `${days} days ago`;
-  }
-
-  // Less than a month
-  if (diffInSeconds < 2592000) {
-    const weeks = Math.floor(diffInSeconds / 604800);
-    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
-  }
-
-  // Less than a year
-  if (diffInSeconds < 31536000) {
-    const months = Math.floor(diffInSeconds / 2592000);
-    return `${months} ${months === 1 ? 'month' : 'months'} ago`;
-  }
-
-  // More than a year
-  const years = Math.floor(diffInSeconds / 31536000);
-  return `${years} ${years === 1 ? 'year' : 'years'} ago`;
-}
-
-/**
- * Format a date range
- * @param startDateString - ISO date string for start date
- * @param endDateString - ISO date string for end date
- * @returns Formatted date range string
- */
-export function formatDateRange(startDateString: string, endDateString: string): string {
-  const startDate = new Date(startDateString);
-  const endDate = new Date(endDateString);
-
-  // Same day
-  if (
-    startDate.getFullYear() === endDate.getFullYear() &&
-    startDate.getMonth() === endDate.getMonth() &&
-    startDate.getDate() === endDate.getDate()
-  ) {
-    return formatDate(startDateString);
-  }
-
-  // Same month and year
-  if (
-    startDate.getFullYear() === endDate.getFullYear() &&
-    startDate.getMonth() === endDate.getMonth()
-  ) {
-    return `${startDate.getDate()} - ${formatDate(endDateString)}`;
-  }
-
-  // Same year
-  if (startDate.getFullYear() === endDate.getFullYear()) {
-    return `${formatDate(startDateString, {
-      month: 'short',
-      day: 'numeric',
-    })} - ${formatDate(endDateString)}`;
-  }
-
-  // Different years
-  return `${formatDate(startDateString)} - ${formatDate(endDateString)}`;
 }

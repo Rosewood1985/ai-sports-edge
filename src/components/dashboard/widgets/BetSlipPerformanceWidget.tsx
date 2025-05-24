@@ -2,7 +2,6 @@ import React from 'react';
 import { EnhancedWidget } from './EnhancedWidget';
 import { MetricCard } from '../metrics/MetricCard';
 import { HorizontalBarChart } from '../charts/HorizontalBarChart';
-import { PieChart } from '../charts/PieChart';
 
 // Import the TrendDirection type
 import { TrendDirection } from '../metrics/MetricCard';

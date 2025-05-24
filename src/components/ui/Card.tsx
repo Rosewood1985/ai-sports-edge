@@ -1,92 +1,51 @@
-import React from 'react';
-
-export type CardVariant = 'default' | 'outlined' | 'elevated';
+import React, { ReactNode } from 'react';
 
 export interface CardProps {
-  children: React.ReactNode;
-  variant?: CardVariant;
+  children: ReactNode;
   className?: string;
   onClick?: () => void;
-  hoverable?: boolean;
 }
 
-export const Card: React.FC<CardProps> = ({
-  children,
-  variant = 'default',
-  className = '',
-  onClick,
-  hoverable = false,
-}) => {
-  // Variant styles
-  const variantClasses = {
-    default: 'bg-white',
-    outlined: 'bg-white border border-gray-200',
-    elevated: 'bg-white shadow-md',
-  }[variant];
-
-  // Hoverable style
-  const hoverableClass = hoverable ? 'transition-shadow hover:shadow-lg cursor-pointer' : '';
-
-  // Clickable style
-  const clickableClass = onClick ? 'cursor-pointer' : '';
-
+/**
+ * Card component with customizable styling
+ */
+export function Card({ children, className = '', onClick }: CardProps) {
   return (
     <div
-      className={`rounded-lg overflow-hidden ${variantClasses} ${hoverableClass} ${clickableClass} ${className}`}
+      className={`bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden ${
+        onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''
+      } ${className}`}
       onClick={onClick}
     >
       {children}
     </div>
   );
-};
-
-// Card Header Component
-export interface CardHeaderProps {
-  children: React.ReactNode;
-  className?: string;
-  title?: React.ReactNode;
-  subtitle?: React.ReactNode;
-  action?: React.ReactNode;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({
-  children,
-  className = '',
-  title,
-  subtitle,
-  action,
-}) => {
+export interface CardHeaderProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/**
+ * Card header component
+ */
+export function CardHeader({ children, className = '' }: CardHeaderProps) {
   return (
-    <div className={`px-4 py-3 border-b border-gray-200 ${className}`}>
-      {children || (
-        <div className="flex justify-between items-center">
-          <div>
-            {title && <h3 className="text-lg font-semibold">{title}</h3>}
-            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-          </div>
-          {action && <div>{action}</div>}
-        </div>
-      )}
+    <div className={`px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 ${className}`}>
+      {children}
     </div>
   );
-};
+}
 
-// Card Content Component
 export interface CardContentProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
-export const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => {
-  return <div className={`p-4 ${className}`}>{children}</div>;
-};
-
-// Card Footer Component
-export interface CardFooterProps {
-  children: React.ReactNode;
-  className?: string;
+/**
+ * Card content component
+ */
+export function CardContent({ children, className = '' }: CardContentProps) {
+  return <div className={`px-4 py-5 sm:p-6 ${className}`}>{children}</div>;
 }
-
-export const CardFooter: React.FC<CardFooterProps> = ({ children, className = '' }) => {
-  return <div className={`px-4 py-3 border-t border-gray-200 ${className}`}>{children}</div>;
-};
