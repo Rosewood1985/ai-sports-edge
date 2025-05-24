@@ -78,30 +78,252 @@ The technical specification document provides detailed implementation plans for:
    - Cross-platform navigation
    - Shared UI component strategy
 
-## Next Steps (Phase 2)
+## Enhanced Admin Dashboard Features (May 23, 2025)
 
-### Priority Tasks
+Phase 2-5 of the Unified Admin Dashboard project will focus on implementing enhanced monitoring features that provide comprehensive real-time analytics and integrate with the background process management system.
 
-1. **Draft Technical Specifications for All Phases:**
+### Key Enhanced Features
 
-   - Create detailed technical specifications for Phases 2-5
-   - Include component designs, API requirements, and integration details
-   - Ensure consistency across all phases
+#### 1. Bet Slip Performance Monitoring
 
-2. **Implement Sentry Configuration:**
+This feature provides real-time monitoring of the OCR-based bet slip processing system:
 
-   - Set up Sentry for error tracking and monitoring
-   - Configure error boundaries for React components
-   - Implement custom error handling with Sentry integration
-   - Add performance monitoring for critical operations
+- **OCR Performance Section**
 
-3. **Begin Phase 2 Implementation:**
-   - Set up the Next.js project structure
-   - Implement the core layout components
-   - Set up the authentication flow
-   - Create protected routes
-   - Implement the API service layer
-   - Create initial dashboard screens with placeholder data
+  - Success rate metrics with target thresholds
+  - Processing time tracking
+  - Queue length monitoring
+  - Alert indicators for metrics below targets
+
+- **Bet Type Analytics**
+
+  - Visualization of popular bet types
+  - Horizontal bar charts with value indicators
+  - 24-hour trend analysis
+
+- **Processing Error Analysis**
+
+  - Error categorization with pie charts
+  - Detailed error list with severity indicators
+  - Action buttons for reprocessing and viewing details
+
+- **ML Model Performance**
+  - Model accuracy metrics
+  - Confidence score tracking
+  - Low confidence bet identification
+
+#### 2. Conversion Funnel Tracking
+
+This feature visualizes the user journey from trial signup to paid conversion:
+
+- **Funnel Visualization**
+
+  - Step-by-step conversion visualization
+  - Percentage indicators at each step
+  - Drop-off analysis between steps
+
+- **Conversion Metrics**
+
+  - Overall conversion rate with targets
+  - Average time to convert
+  - Trial engagement scoring
+  - 7-day trial retention metrics
+
+- **Cohort Analysis**
+
+  - Trial cohort performance table
+  - Segmentation by acquisition source
+  - Retention and conversion by cohort
+
+- **Conversion Triggers**
+  - Top conversion trigger identification
+  - Conversion lift percentage by trigger
+  - Usage metrics for each trigger
+
+#### 3. Advanced Subscription Analytics
+
+This feature provides predictive analytics for subscription management:
+
+- **Revenue Forecasting**
+
+  - 12-month revenue projection charts
+  - Historical vs. projected visualization
+  - Confidence interval indicators
+
+- **Churn Analysis**
+
+  - Risk matrix with segmentation
+  - Action recommendations by risk level
+  - Count indicators for each risk segment
+
+- **Health Score Section**
+  - Subscription health score gauge
+  - Contributing factors breakdown
+  - Actionable recommendations with priority indicators
+  - Expected impact metrics for each recommendation
+
+#### 4. Predictive Fraud Detection
+
+This feature enhances fraud detection with machine learning:
+
+- **Risk Score Analysis**
+
+  - User risk score distribution histogram
+  - Threshold indicators for risk levels
+  - Segmentation by risk category
+
+- **ML Model Performance**
+
+  - Precision, recall, and F1 score metrics
+  - False positive rate tracking
+  - Model performance over time
+
+- **Fraud Pattern Analysis**
+  - Emerging fraud pattern detection
+  - Severity indicators for each pattern
+  - Pattern details with occurrence counts
+  - Action buttons for rule creation and investigation
+
+#### 5. System Health Monitoring
+
+This feature provides comprehensive system monitoring:
+
+- **Performance Monitoring**
+
+  - API response time metrics
+  - Database query time tracking
+  - Firebase Functions health indicators
+  - Trend visualization for key metrics
+
+- **Cost Analysis**
+
+  - Infrastructure cost breakdown
+  - Service-by-service cost tracking
+  - Monthly trend analysis
+
+- **Automated Actions**
+  - Recent automated action logging
+  - Success/failure indicators
+  - Action details and timestamps
+
+#### 6. Reporting & Export Center
+
+This feature provides advanced reporting capabilities:
+
+- **Report Templates**
+
+  - Predefined report templates
+  - Scheduling options
+  - Recipient management
+
+- **Export Options**
+  - Multiple format support (PDF, Excel, CSV, JSON)
+  - One-click export functionality
+  - Custom export configuration
+
+#### 7. Mobile-Responsive Design
+
+This feature ensures the dashboard works on all devices:
+
+- **Responsive Enhancements**
+  - Mobile-first widget sizing
+  - Adaptive grid layouts
+  - Device-specific optimizations
+  - Touch-friendly controls
+
+### Implementation Plan
+
+The implementation will follow this phased approach:
+
+**Phase 1: Core Monitoring Enhancement (1-2 weeks)**
+
+- Bet Slip Performance Monitoring
+- Enhanced Subscription Analytics
+- System Health Monitoring
+
+**Phase 2: Conversion & Fraud Intelligence (2-3 weeks)**
+
+- Conversion Funnel Tracking
+- Predictive Fraud Analytics
+- Advanced Error Handling
+
+**Phase 3: Reporting & Automation (1-2 weeks)**
+
+- Automated Reporting
+- Export Functionality
+- Mobile Optimization
+
+### API Service Extensions
+
+The implementation will extend the existing AdminAPIService with new endpoints:
+
+```typescript
+class EnhancedAdminAPIService extends AdminAPIService {
+  // Bet Slip Analytics
+  async getBetSlipPerformanceMetrics() {
+    return this.request('/bet-analytics/performance', {
+      timeRange: '24h',
+      includeErrorBreakdown: true,
+      includeMLMetrics: true,
+    });
+  }
+
+  // Conversion Tracking
+  async getConversionFunnelData() {
+    return this.request('/analytics/conversion-funnel', {
+      includeTrialMetrics: true,
+      includeCohortAnalysis: true,
+    });
+  }
+
+  // Enhanced Subscription Analytics
+  async getAdvancedSubscriptionMetrics() {
+    return this.request('/subscriptions/advanced-analytics', {
+      includeChurnPrediction: true,
+      includeRevenueForecasting: true,
+      includeHealthScore: true,
+    });
+  }
+
+  // Predictive Fraud Analytics
+  async getPredictiveFraudMetrics() {
+    return this.request('/fraud/predictive-analytics', {
+      includeMLMetrics: true,
+      includePatternAnalysis: true,
+      includeRiskDistribution: true,
+    });
+  }
+}
+```
+
+### Integration with Background Process Management
+
+The System Health Monitoring feature will integrate with the background process management system:
+
+- Real-time status indicators for all verified Category A processes
+- Manual trigger buttons for critical processes
+- Performance metrics for process execution times and success rates
+- Error notifications for process failures
+- Historical execution data visualization
+
+## Next Steps
+
+1. **Begin Implementation of Phase 1 Enhanced Features**
+
+   - Create core components for Bet Slip Performance Monitoring
+   - Implement Enhanced Subscription Analytics
+   - Develop System Health Monitoring with background process integration
+
+2. **Integrate with Background Process Management**
+
+   - Connect System Health Monitoring with background process verification
+   - Implement real-time status indicators for processes
+   - Add manual trigger buttons for critical processes
+
+3. **Set up Next.js Project Structure**
+   - Configure project with TypeScript and Tailwind CSS
+   - Implement responsive layout components
+   - Set up authentication flow
 
 ## Technical Considerations
 
@@ -111,3 +333,6 @@ The technical specification document provides detailed implementation plans for:
 - Implement proper error handling and logging throughout the system
 - Use shared authentication middleware for both web and mobile platforms
 - Implement real-time updates via WebSockets for critical data
+- Optimize component rendering for mobile devices
+- Implement efficient data fetching with SWR caching
+- Use virtualization for long lists to improve performance

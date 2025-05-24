@@ -114,13 +114,356 @@ The Unified Admin Dashboard will integrate with the existing admin infrastructur
 - [Project Progress](../unified-admin-dashboard-progress.md)
 - [Memory Bank Entry](./unified-admin-dashboard-memory.md)
 
+### Enhanced Admin Dashboard Features (May 23, 2025)
+
+#### New Direction
+
+We're enhancing the admin dashboard with advanced monitoring features that integrate with the background process management system. These features will provide comprehensive real-time analytics and monitoring capabilities.
+
+#### Enhanced Features
+
+1. **Bet Slip Performance Monitoring**
+
+   - Real-time OCR performance metrics
+   - Processing time and success rate tracking
+   - Error analysis and ML model performance
+   - Bet type analytics visualization
+
+2. **Conversion Funnel Tracking**
+
+   - Trial signup to paid conversion visualization
+   - Cohort analysis for 7-day trial users
+   - Conversion trigger identification
+   - Engagement score metrics
+
+3. **Advanced Subscription Analytics**
+
+   - Revenue forecasting and churn prediction
+   - Subscription health scoring
+   - Actionable recommendations
+   - Risk analysis matrix
+
+4. **Predictive Fraud Detection**
+
+   - Risk score distribution analysis
+   - ML model performance metrics
+   - Emerging fraud pattern detection
+   - Automated rule creation
+
+5. **System Health Monitoring**
+
+   - API and database performance tracking
+   - Infrastructure cost analysis
+   - Automated action logging
+   - Background process status integration
+
+6. **Reporting & Export Center**
+
+   - Scheduled report templates
+   - Multiple export formats
+   - Targeted distribution lists
+   - Custom report generation
+
+7. **Mobile-Responsive Design**
+   - Adaptive layouts for all screen sizes
+   - Optimized widget sizing
+   - Touch-friendly controls
+   - Consistent cross-platform experience
+
+#### Implementation Plan
+
+The implementation will follow this phased approach:
+
+**Phase 1: Core Monitoring Enhancement (1-2 weeks)**
+
+- Bet Slip Performance Monitoring
+- Enhanced Subscription Analytics
+- System Health Monitoring
+
+**Phase 2: Conversion & Fraud Intelligence (2-3 weeks)**
+
+- Conversion Funnel Tracking
+- Predictive Fraud Analytics
+- Advanced Error Handling
+
+**Phase 3: Reporting & Automation (1-2 weeks)**
+
+- Automated Reporting
+- Export Functionality
+- Mobile Optimization
+
+#### API Service Extensions
+
+We're extending the existing AdminAPIService with new endpoints:
+
+```typescript
+class EnhancedAdminAPIService extends AdminAPIService {
+  // Bet Slip Analytics
+  async getBetSlipPerformanceMetrics() {
+    return this.request('/bet-analytics/performance', {
+      timeRange: '24h',
+      includeErrorBreakdown: true,
+      includeMLMetrics: true,
+    });
+  }
+
+  // Conversion Tracking
+  async getConversionFunnelData() {
+    return this.request('/analytics/conversion-funnel', {
+      includeTrialMetrics: true,
+      includeCohortAnalysis: true,
+    });
+  }
+
+  // Enhanced Subscription Analytics
+  async getAdvancedSubscriptionMetrics() {
+    return this.request('/subscriptions/advanced-analytics', {
+      includeChurnPrediction: true,
+      includeRevenueForecasting: true,
+      includeHealthScore: true,
+    });
+  }
+
+  // Predictive Fraud Analytics
+  async getPredictiveFraudMetrics() {
+    return this.request('/fraud/predictive-analytics', {
+      includeMLMetrics: true,
+      includePatternAnalysis: true,
+      includeRiskDistribution: true,
+    });
+  }
+}
+```
+
 ### Next Steps
 
-1. Begin Phase 2 implementation
-2. Set up Next.js project structure
-3. Implement core layout components
-4. Set up authentication flow
-5. Create initial dashboard screens with placeholder data
+1. Begin implementation of Phase 1 enhanced features
+
+   - ✅ Create core components for Bet Slip Performance Monitoring
+   - Implement Enhanced Subscription Analytics
+   - Develop System Health Monitoring with background process integration
+
+2. Integrate with background process management
+
+   - Connect System Health Monitoring with background process verification
+   - Implement real-time status indicators for processes
+   - Add manual trigger buttons for critical processes
+
+3. Set up Next.js project structure
+   - ✅ Configure project with TypeScript and Tailwind CSS
+   - ✅ Implement responsive layout components
+   - Set up authentication flow
+
+### Enhanced Admin Dashboard Implementation (May 23, 2025)
+
+#### Completed Components
+
+- ✅ Core UI Components:
+
+  - ✅ Card components (Card, CardHeader, CardContent, CardFooter)
+  - ✅ IconButton component with various icon options
+  - ✅ Tooltip component with positioning options
+  - ✅ LoadingSpinner component
+  - ✅ ErrorIcon component
+  - ✅ MetricCard component for displaying metrics with trends
+
+- ✅ Enhanced Widget Components:
+
+  - ✅ EnhancedWidget base component for all dashboard widgets
+  - ✅ Data visualization components:
+    - ✅ HorizontalBarChart component
+    - ✅ PieChart component
+
+- ✅ Phase 1 Widgets:
+
+  - ✅ BetSlipPerformanceWidget component with:
+    - ✅ Real-time OCR performance metrics
+    - ✅ Processing time and success rate tracking
+    - ✅ Error analysis and ML model performance
+    - ✅ Bet type analytics visualization
+
+- ✅ Dashboard Layout:
+  - ✅ AdminDashboard component with responsive grid layout
+  - ✅ Dashboard page component
+
+#### In Progress
+
+- ✅ Enhanced Subscription Analytics widget
+- ✅ System Health Monitoring widget
+- ✅ API service layer implementation
+- ✅ WebSocket integration for real-time updates
+
+#### Next Steps
+
+1. ✅ Complete the Enhanced Subscription Analytics widget:
+
+   - ✅ Implement revenue forecasting visualization
+   - ✅ Add churn prediction metrics
+   - ✅ Create subscription health scoring component
+   - ✅ Add actionable recommendations section
+   - ✅ Add subscription growth chart
+
+2. ✅ Implement the System Health Monitoring widget:
+
+   - ✅ Create API and database performance tracking
+   - ✅ Add infrastructure cost analysis
+   - ✅ Implement background process status integration
+   - ✅ Add automated action logging
+
+3. ✅ Develop the API service layer:
+   - ✅ Implement SWR data fetching with caching
+   - ✅ Add error handling and retry mechanisms
+   - ✅ Create WebSocket integration for real-time updates
+   - ✅ Implement authentication integration
+
+### Enhanced Subscription Analytics Widget Implementation (May 23, 2025)
+
+#### Completed Components
+
+- ✅ Created LineChart component for time-series data visualization
+- ✅ Created RiskMatrix component for risk analysis visualization
+- ✅ Created RecommendationsList component for actionable recommendations
+- ✅ Implemented EnhancedSubscriptionAnalyticsWidget with:
+  - ✅ Revenue forecasting section with metrics and visualizations
+  - ✅ Subscription health section with health score and distribution
+  - ✅ Risk analysis section with risk matrix
+  - ✅ Recommendations section with actionable items
+  - ✅ Subscription growth section with trend chart
+- ✅ Updated AdminDashboard to include the new widget
+- ✅ Added tooltips for better user experience
+
+#### Implementation Details
+
+The Enhanced Subscription Analytics widget provides comprehensive subscription analytics with:
+
+1. **Revenue Forecasting**:
+
+   - Projected revenue for the current month
+   - Churn rate with trend indicators
+   - Revenue breakdown by plan type
+
+2. **Subscription Health**:
+
+   - Overall health score based on retention, growth, and engagement
+   - Retention rate with trend indicators
+   - Subscription distribution by plan type
+
+3. **Subscription Growth**:
+
+   - Growth rate with trend indicators
+   - New subscriptions trend over time
+
+4. **Risk Analysis**:
+
+   - High-risk subscriber count with trend indicators
+   - Risk matrix showing subscribers by churn likelihood and impact
+   - Color-coded risk levels for easy identification
+
+5. **Actionable Recommendations**:
+   - Prioritized list of recommended actions
+   - Action buttons for immediate response
+   - Color-coded by priority level
+
+The implementation follows the atomic design principles and uses the existing component patterns from the BetSlipPerformanceWidget for consistency.
+
+### System Health Monitoring Widget Implementation (May 23, 2025)
+
+#### Completed Components
+
+- ✅ Implemented SystemHealthMonitoringWidget with:
+  - ✅ API performance tracking with response time and error rate metrics
+  - ✅ Database performance monitoring with query time and operation metrics
+  - ✅ Infrastructure cost analysis with cost breakdown by service
+  - ✅ Background process status monitoring with real-time status indicators
+  - ✅ System action logging with color-coded status indicators
+- ✅ Created ProcessStatusBadge component for visualizing process status
+- ✅ Created ActionLogItem component for displaying system actions
+- ✅ Updated AdminDashboard to include the new widget
+
+#### Implementation Details
+
+The System Health Monitoring widget provides comprehensive system monitoring with:
+
+1. **API Performance Tracking**:
+
+   - Average response time with trend indicators
+   - Error rate with trend indicators
+   - Requests per minute with trend indicators
+   - Endpoint performance visualization
+
+2. **Database Performance Monitoring**:
+
+   - Average query time with trend indicators
+   - Read and write operations per minute
+   - Collection performance visualization
+
+3. **Infrastructure Cost Analysis**:
+
+   - Monthly cost with trend indicators
+   - Cost breakdown by service
+   - Cost trend visualization over time
+
+4. **Background Process Monitoring**:
+
+   - Active processes count with trend indicators
+   - Failed processes count with trend indicators
+   - Process status table with real-time status indicators
+   - Process duration tracking
+
+5. **System Action Logging**:
+   - Recent system actions with timestamps
+   - Color-coded status indicators for success, warning, and error
+   - Detailed action information
+
+The implementation includes responsive design for all screen sizes and follows the atomic design principles for consistency with other dashboard widgets.
+
+### API Service Layer Implementation (May 23, 2025)
+
+#### Completed Components
+
+- ✅ Created AdminDashboardService with:
+  - ✅ Data interfaces for all dashboard widgets
+  - ✅ Mock data for development and testing
+  - ✅ API fetcher function with error handling
+  - ✅ Authentication integration with JWT tokens
+- ✅ Implemented custom hooks for data fetching:
+  - ✅ useBetSlipPerformanceData hook for BetSlipPerformanceWidget
+  - ✅ useSubscriptionAnalyticsData hook for EnhancedSubscriptionAnalyticsWidget
+  - ✅ useSystemHealthData hook for SystemHealthMonitoringWidget
+- ✅ Implemented WebSocket integration for real-time updates
+- ✅ Added SWR for data fetching with caching
+
+#### Implementation Details
+
+The API service layer provides a comprehensive data fetching solution with:
+
+1. **SWR Integration**:
+
+   - Stale-while-revalidate caching strategy
+   - Automatic revalidation on focus and reconnect
+   - Deduplication of requests
+   - Error handling and retry mechanisms
+
+2. **Custom Hooks**:
+
+   - Widget-specific data hooks for encapsulated data fetching
+   - Loading and error state management
+   - Mock data fallback for development and testing
+   - Refetch functionality for manual data refresh
+
+3. **WebSocket Integration**:
+
+   - Real-time data updates for critical metrics
+   - Automatic reconnection on disconnection
+   - Error handling and logging
+   - Message parsing and distribution
+
+4. **Authentication Integration**:
+   - JWT token-based authentication
+   - Automatic token inclusion in API requests
+   - Error handling for authentication failures
+
+The implementation follows best practices for data fetching and state management, providing a robust and maintainable solution for the admin dashboard.
 
 ## Dependency Management Audit Implementation (May 22, 2025)
 

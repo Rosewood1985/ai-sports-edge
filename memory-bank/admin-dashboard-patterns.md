@@ -339,3 +339,512 @@ const response = await apiService.get('/api/admin/users');
 - Simplifies cross-platform compatibility
 - Provides a single point for logging and monitoring
 - Enables versioning and content negotiation
+
+## Pattern: Enhanced Widget Components (May 23, 2025)
+
+**Description:**
+A pattern for creating advanced monitoring widgets with consistent styling, behavior, and data integration. This pattern ensures that all dashboard widgets follow the same design principles while providing specialized functionality.
+
+**Components:**
+
+1. **Base Widget Container**: A reusable container component for all widgets
+2. **Widget Header**: A standardized header component with title and actions
+3. **Widget Content**: Content area with specialized visualization
+4. **Widget Footer**: Optional footer with additional actions or information
+5. **Widget Controls**: Interactive controls for filtering and configuration
+
+**Implementation:**
+
+```typescript
+// Example implementation pattern for enhanced widget components
+// src/components/dashboard/widgets/EnhancedWidget.tsx
+
+import React from 'react';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/Card';
+import { IconButton } from '@/components/ui/IconButton';
+import { Tooltip } from '@/components/ui/Tooltip';
+
+export type WidgetSize = 'small' | 'medium' | 'large' | 'extra-large';
+
+export interface EnhancedWidgetProps {
+  title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  size?: WidgetSize;
+  actions?: React.ReactNode[];
+  footer?: React.ReactNode;
+  isLoading?: boolean;
+  error?: Error | null;
+  onRefresh?: () => void;
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function EnhancedWidget({
+  title,
+  subtitle,
+  icon,
+  size = 'medium',
+  actions = [],
+  footer,
+  isLoading = false,
+  error = null,
+  onRefresh,
+  children,
+  className = '',
+}: EnhancedWidgetProps) {
+  // Size-based classes
+  const sizeClasses = {
+    small: 'col-span-1',
+    medium: 'col-span-2',
+    large: 'col-span-3',
+    'extra-large': 'col-span-4',
+  }[size];
+
+  return (
+    <Card className={`dashboard-widget ${sizeClasses} ${className}`}>
+      <CardHeader className="widget-header">
+        <div className="widget-title-container">
+          {icon && <div className="widget-icon">{icon}</div>}
+          <div className="widget-title-content">
+            <h3 className="widget-title">{title}</h3>
+            {subtitle && <p className="widget-subtitle">{subtitle}</p>}
+          </div>
+        </div>
+        <div className="widget-actions">
+          {onRefresh && (
+            <Tooltip content="Refresh">
+              <IconButton
+                icon="refresh"
+                onClick={onRefresh}
+                disabled={isLoading}
+                aria-label="Refresh widget"
+              />
+            </Tooltip>
+          )}
+          {actions.map((action, index) => (
+            <div key={`action-${index}`} className="widget-action">
+              {action}
+            </div>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent className="widget-content">
+        {isLoading ? (
+          <div className="widget-loading">
+            <LoadingSpinner size="medium" />
+            <p>Loading data...</p>
+          </div>
+        ) : error ? (
+          <div className="widget-error">
+            <ErrorIcon />
+            <p>Error: {error.message}</p>
+            {onRefresh && (
+              <button onClick={onRefresh} className="retry-button">
+                Retry
+              </button>
+            )}
+          </div>
+        ) : (
+          children
+        )}
+      </CardContent>
+      {footer && <CardFooter className="widget-footer">{footer}</CardFooter>}
+    </Card>
+  );
+}
+```
+
+**Usage:**
+
+```tsx
+// Example usage of the enhanced widget pattern
+import { EnhancedWidget } from '@/components/dashboard/widgets/EnhancedWidget';
+import { MetricCard } from '@/components/dashboard/metrics/MetricCard';
+import { useApiSWR } from '@/lib/api/swr';
+import { BetSlipMetrics } from '@/types/analytics';
+
+function BetSlipPerformanceWidget() {
+  const { data, error, isLoading, mutate } = useApiSWR<BetSlipMetrics>(
+    '/api/analytics/bet-slip-performance'
+  );
+
+  return (
+    <EnhancedWidget
+      title="Bet Slip Performance"
+      subtitle="Last 24 hours"
+      size="large"
+      isLoading={isLoading}
+      error={error}
+      onRefresh={() => mutate()}
+      footer={
+        <a href="/analytics/bet-slips" className="view-details-link">
+          View detailed analytics
+        </a>
+      }
+    >
+      <div className="metrics-grid">
+        <MetricCard
+          title="OCR Success Rate"
+          value={`${data?.ocrSuccessRate || 0}%`}
+          target="95%"
+          trend={data?.ocrSuccessRateTrend}
+          status={data?.ocrSuccessRate >= 95 ? 'success' : 'warning'}
+        />
+        <MetricCard
+          title="Avg Processing Time"
+          value={`${data?.avgProcessingTime || 0}s`}
+          target="<3s"
+          trend={data?.avgProcessingTimeTrend}
+          status={data?.avgProcessingTime <= 3 ? 'success' : 'warning'}
+        />
+        <MetricCard
+          title="Queue Length"
+          value={data?.queueLength || 0}
+          target="<50"
+          trend={data?.queueLengthTrend}
+          status={data?.queueLength <= 50 ? 'success' : 'warning'}
+        />
+      </div>
+    </EnhancedWidget>
+  );
+}
+```
+
+**Benefits:**
+
+- Ensures consistent styling and behavior across all widgets
+- Handles loading and error states automatically
+- Provides standardized layout and structure
+- Simplifies widget implementation
+- Improves maintainability through shared components
+
+## Pattern: Real-time Data Visualization
+
+**Description:**
+A pattern for creating real-time data visualizations with WebSocket integration. This pattern ensures that data visualizations are updated in real-time without requiring manual refreshes.
+
+**Components:**
+
+1. **WebSocket Connection**: Logic for establishing and maintaining WebSocket connections
+2. **Data Transformation**: Logic for transforming raw data into visualization-ready format
+3. **Visualization Components**: Reusable visualization components (charts, graphs, etc.)
+4. **Update Mechanism**: Logic for updating visualizations when new data arrives
+
+**Implementation:**
+
+```typescript
+// Example implementation pattern for real-time data visualization
+// src/hooks/useRealtimeData.ts
+
+import { useState, useEffect } from 'react';
+import { useWebSocket } from '@/hooks/useWebSocket';
+
+export interface RealtimeDataOptions<T> {
+  endpoint: string;
+  initialData?: T;
+  transformData?: (data: any) => T;
+  onError?: (error: Error) => void;
+}
+
+export function useRealtimeData<T>({
+  endpoint,
+  initialData,
+  transformData = data => data as T,
+  onError,
+}: RealtimeDataOptions<T>) {
+  const [data, setData] = useState<T | undefined>(initialData);
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const { socket, status } = useWebSocket({
+    url: `${process.env.NEXT_PUBLIC_WS_URL}${endpoint}`,
+    onOpen: () => {
+      setIsConnected(true);
+      setError(null);
+    },
+    onClose: () => {
+      setIsConnected(false);
+    },
+    onError: err => {
+      setError(err);
+      if (onError) onError(err);
+    },
+    onMessage: message => {
+      try {
+        const parsedData = JSON.parse(message.data);
+        const transformedData = transformData(parsedData);
+        setData(transformedData);
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(error);
+        if (onError) onError(error);
+      }
+    },
+  });
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+    };
+  }, [socket]);
+
+  return {
+    data,
+    isConnected,
+    error,
+    status,
+  };
+}
+```
+
+**Usage:**
+
+```tsx
+// Example usage of the real-time data visualization pattern
+import { useRealtimeData } from '@/hooks/useRealtimeData';
+import { LineChart } from '@/components/charts/LineChart';
+import { SystemMetrics } from '@/types/monitoring';
+
+function SystemHealthChart() {
+  const { data, isConnected, error } = useRealtimeData<SystemMetrics>({
+    endpoint: '/monitoring/system-health',
+    initialData: {
+      timestamps: [],
+      apiResponseTimes: [],
+      dbQueryTimes: [],
+      functionsHealth: [],
+    },
+    transformData: rawData => ({
+      timestamps: [...(data?.timestamps || []), rawData.timestamp],
+      apiResponseTimes: [...(data?.apiResponseTimes || []), rawData.apiResponseTime],
+      dbQueryTimes: [...(data?.dbQueryTimes || []), rawData.dbQueryTime],
+      functionsHealth: [...(data?.functionsHealth || []), rawData.functionsHealth],
+    }),
+  });
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  return (
+    <div className="chart-container">
+      <div className="connection-status">Status: {isConnected ? 'Connected' : 'Disconnected'}</div>
+      <LineChart
+        data={data}
+        series={[
+          { name: 'API Response Time', dataKey: 'apiResponseTimes' },
+          { name: 'DB Query Time', dataKey: 'dbQueryTimes' },
+          { name: 'Functions Health', dataKey: 'functionsHealth' },
+        ]}
+        xAxis={{ dataKey: 'timestamps', type: 'time' }}
+        yAxis={{ name: 'Time (ms)' }}
+      />
+    </div>
+  );
+}
+```
+
+**Benefits:**
+
+- Provides real-time updates without manual refreshes
+- Handles WebSocket connection management automatically
+- Transforms raw data into visualization-ready format
+- Manages error and connection states
+- Improves user experience with live data
+
+## Pattern: Process Monitoring Integration
+
+**Description:**
+A pattern for integrating background process monitoring with the admin dashboard. This pattern ensures that background processes are properly monitored and visualized in the dashboard.
+
+**Components:**
+
+1. **Process Status Indicator**: Visual indicator of process status
+2. **Process Performance Metrics**: Visualization of process performance metrics
+3. **Process Control Panel**: Interface for controlling processes
+4. **Process History Viewer**: Interface for viewing process execution history
+
+**Implementation:**
+
+```typescript
+// Example implementation pattern for process monitoring integration
+// src/components/dashboard/monitoring/ProcessMonitor.tsx
+
+import React from 'react';
+import { useApiSWR } from '@/lib/api/swr';
+import { useRealtimeData } from '@/hooks/useRealtimeData';
+import { ProcessStatus, ProcessMetrics } from '@/types/monitoring';
+import { StatusIndicator } from '@/components/ui/StatusIndicator';
+import { Button } from '@/components/ui/Button';
+import { apiService } from '@/services/api';
+
+export interface ProcessMonitorProps {
+  processId: string;
+  processName: string;
+  category: 'A' | 'B' | 'C' | 'D' | 'E';
+  description?: string;
+  canTrigger?: boolean;
+}
+
+export function ProcessMonitor({
+  processId,
+  processName,
+  category,
+  description,
+  canTrigger = false,
+}: ProcessMonitorProps) {
+  // Get process status and metrics
+  const {
+    data: processData,
+    error,
+    isLoading,
+    mutate,
+  } = useApiSWR<ProcessStatus>(`/api/monitoring/processes/${processId}/status`);
+
+  // Get real-time metrics
+  const { data: realtimeMetrics } = useRealtimeData<ProcessMetrics>({
+    endpoint: `/monitoring/processes/${processId}/metrics`,
+    transformData: rawData => ({
+      executionTime: rawData.executionTime,
+      successRate: rawData.successRate,
+      lastExecuted: new Date(rawData.lastExecuted),
+      errorCount: rawData.errorCount,
+    }),
+  });
+
+  // Trigger process manually
+  const triggerProcess = async () => {
+    try {
+      await apiService.post(`/api/monitoring/processes/${processId}/trigger`);
+      mutate(); // Refresh data
+    } catch (error) {
+      console.error('Failed to trigger process:', error);
+    }
+  };
+
+  return (
+    <div className="process-monitor">
+      <div className="process-header">
+        <div className="process-info">
+          <h4 className="process-name">{processName}</h4>
+          <span className="process-category">Category {category}</span>
+        </div>
+        <StatusIndicator
+          status={processData?.status || 'unknown'}
+          labels={{
+            running: 'Running',
+            idle: 'Idle',
+            failed: 'Failed',
+            disabled: 'Disabled',
+            unknown: 'Unknown',
+          }}
+        />
+      </div>
+
+      {description && <p className="process-description">{description}</p>}
+
+      <div className="process-metrics">
+        <div className="metric">
+          <span className="metric-label">Last Executed</span>
+          <span className="metric-value">
+            {realtimeMetrics?.lastExecuted
+              ? new Date(realtimeMetrics.lastExecuted).toLocaleString()
+              : 'Never'}
+          </span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">Execution Time</span>
+          <span className="metric-value">
+            {realtimeMetrics?.executionTime ? `${realtimeMetrics.executionTime}ms` : 'N/A'}
+          </span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">Success Rate</span>
+          <span className="metric-value">
+            {realtimeMetrics?.successRate ? `${realtimeMetrics.successRate}%` : 'N/A'}
+          </span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">Error Count</span>
+          <span className="metric-value">
+            {realtimeMetrics?.errorCount !== undefined ? realtimeMetrics.errorCount : 'N/A'}
+          </span>
+        </div>
+      </div>
+
+      <div className="process-actions">
+        <Button onClick={() => mutate()} variant="secondary" size="sm" disabled={isLoading}>
+          Refresh
+        </Button>
+        {canTrigger && (
+          <Button
+            onClick={triggerProcess}
+            variant="primary"
+            size="sm"
+            disabled={isLoading || processData?.status === 'running'}
+          >
+            Trigger Now
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+**Usage:**
+
+```tsx
+// Example usage of the process monitoring integration pattern
+import { ProcessMonitor } from '@/components/dashboard/monitoring/ProcessMonitor';
+import { EnhancedWidget } from '@/components/dashboard/widgets/EnhancedWidget';
+
+function BackgroundProcessesWidget() {
+  return (
+    <EnhancedWidget title="Background Processes" subtitle="Critical processes status" size="large">
+      <div className="processes-grid">
+        <ProcessMonitor
+          processId="markAIPickOfDay"
+          processName="Mark AI Pick of Day"
+          category="A"
+          description="Marks the top prediction as the AI Pick of the Day"
+          canTrigger={true}
+        />
+        <ProcessMonitor
+          processId="predictTodayGames"
+          processName="Predict Today's Games"
+          category="A"
+          description="Predicts game outcomes using ML model"
+          canTrigger={true}
+        />
+        <ProcessMonitor
+          processId="scheduledFirestoreBackup"
+          processName="Firestore Backup"
+          category="A"
+          description="Backs up Firestore data"
+          canTrigger={true}
+        />
+        <ProcessMonitor
+          processId="processScheduledNotifications"
+          processName="Process Notifications"
+          category="A"
+          description="Processes scheduled notifications"
+          canTrigger={true}
+        />
+      </div>
+    </EnhancedWidget>
+  );
+}
+```
+
+**Benefits:**
+
+- Provides real-time monitoring of background processes
+- Enables manual triggering of critical processes
+- Visualizes process performance metrics
+- Integrates with the existing monitoring system
+- Improves system reliability through better monitoring
