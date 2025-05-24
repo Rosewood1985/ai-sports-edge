@@ -5,39 +5,46 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
   helperText?: string;
   error?: string;
   fullWidth?: boolean;
-  children: React.ReactNode;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   (
-    { label, helperText, error, fullWidth = false, className = '', disabled, children, ...props },
+    { className = '', label, helperText, error, fullWidth = false, id, children, ...props },
     ref
   ) => {
-    const widthClass = fullWidth ? 'w-full' : '';
-    const errorClass = error
-      ? 'border-error focus:ring-error'
-      : 'border-gray-300 focus:ring-primary';
-    const disabledClass = disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white';
+    // Generate a unique ID if not provided
+    const selectId = id || `select-${Math.random().toString(36).substring(2, 9)}`;
 
     return (
-      <div className={`${widthClass}`}>
+      <div className={`${fullWidth ? 'w-full' : ''} ${className}`}>
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor={props.id}>
+          <label htmlFor={selectId} className="block text-sm font-medium text-gray-700 mb-1">
             {label}
           </label>
         )}
-        <div className="relative">
+
+        <div className="relative rounded-md shadow-sm">
           <select
             ref={ref}
-            className={`block appearance-none rounded-md shadow-sm border ${errorClass} ${disabledClass} focus:outline-none focus:ring-2 focus:ring-opacity-50 pl-3 pr-10 py-2 ${widthClass} ${className}`}
-            disabled={disabled}
+            id={selectId}
+            className={`
+              block w-full rounded-md border-gray-300 shadow-sm
+              focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+              ${error ? 'border-red-300 text-red-900' : ''}
+              appearance-none
+            `}
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={
+              error ? `${selectId}-error` : helperText ? `${selectId}-description` : undefined
+            }
             {...props}
           >
             {children}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             <svg
-              className="h-5 w-5"
+              className="h-5 w-5 text-gray-400"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -51,9 +58,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </svg>
           </div>
         </div>
-        {(helperText || error) && (
-          <p className={`mt-1 text-sm ${error ? 'text-error' : 'text-gray-500'}`}>
-            {error || helperText}
+
+        {helperText && !error && (
+          <p className="mt-1 text-sm text-gray-500" id={`${selectId}-description`}>
+            {helperText}
+          </p>
+        )}
+
+        {error && (
+          <p className="mt-1 text-sm text-red-600" id={`${selectId}-error`}>
+            {error}
           </p>
         )}
       </div>

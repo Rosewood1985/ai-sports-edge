@@ -1,44 +1,37 @@
 import React from 'react';
 
-export type SpinnerSize = 'small' | 'medium' | 'large';
-export type SpinnerColor = 'primary' | 'secondary' | 'white' | 'gray';
-
-export interface LoadingSpinnerProps {
-  size?: SpinnerSize;
-  color?: SpinnerColor;
+interface LoadingSpinnerProps {
+  size?: 'small' | 'medium' | 'large';
+  color?: 'primary' | 'secondary' | 'white';
   className?: string;
-  label?: string;
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'medium',
   color = 'primary',
   className = '',
-  label,
 }) => {
-  // Size styles
+  // Size classes
   const sizeClasses = {
     small: 'h-4 w-4',
     medium: 'h-8 w-8',
     large: 'h-12 w-12',
-  }[size];
+  };
 
-  // Color styles
+  // Color classes
   const colorClasses = {
-    primary: 'text-primary',
-    secondary: 'text-secondary',
+    primary: 'text-blue-600',
+    secondary: 'text-gray-600',
     white: 'text-white',
-    gray: 'text-gray-500',
-  }[color];
+  };
 
   return (
-    <div className={`flex flex-col items-center justify-center ${className}`}>
+    <div className={`inline-block ${className}`} role="status" aria-label="Loading">
       <svg
-        className={`animate-spin ${sizeClasses} ${colorClasses}`}
+        className={`animate-spin ${sizeClasses[size]} ${colorClasses[color]}`}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        data-testid="loading-spinner"
       >
         <circle
           className="opacity-25"
@@ -54,7 +47,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         ></path>
       </svg>
-      {label && <span className="mt-2 text-sm text-gray-500">{label}</span>}
+      <span className="sr-only">Loading</span>
     </div>
   );
 };
