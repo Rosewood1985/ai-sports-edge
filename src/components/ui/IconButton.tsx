@@ -1,6 +1,15 @@
 import React from 'react';
 
-export type IconType = 'refresh' | 'close' | 'edit' | 'delete' | 'settings' | 'download' | 'upload';
+export type IconType =
+  | 'refresh'
+  | 'close'
+  | 'edit'
+  | 'delete'
+  | 'settings'
+  | 'download'
+  | 'upload'
+  | 'eye'
+  | 'trash';
 
 export interface IconButtonProps {
   icon: IconType | React.ReactNode;
@@ -8,6 +17,7 @@ export interface IconButtonProps {
   disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'primary' | 'secondary' | 'ghost';
+  color?: 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
   className?: string;
   'aria-label': string;
 }
@@ -18,6 +28,7 @@ export function IconButton({
   disabled = false,
   size = 'md',
   variant = 'ghost',
+  color = 'default',
   className = '',
   'aria-label': ariaLabel,
   ...props
@@ -37,6 +48,20 @@ export function IconButton({
     ghost:
       'bg-transparent hover:bg-gray-100 text-gray-600 dark:hover:bg-gray-800 dark:text-gray-300',
   }[variant];
+
+  // Color classes (for text color in ghost variant)
+  const colorClasses =
+    variant === 'ghost'
+      ? {
+          default: 'text-gray-600 dark:text-gray-300',
+          primary: 'text-blue-600 dark:text-blue-400',
+          secondary: 'text-gray-600 dark:text-gray-400',
+          success: 'text-green-600 dark:text-green-400',
+          error: 'text-red-600 dark:text-red-400',
+          warning: 'text-yellow-600 dark:text-yellow-400',
+          info: 'text-blue-600 dark:text-blue-400',
+        }[color]
+      : '';
 
   // Disabled classes
   const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
@@ -168,6 +193,40 @@ export function IconButton({
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
           );
+        case 'eye':
+          return (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          );
+        case 'trash':
+          return (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          );
         default:
           return null;
       }
@@ -182,7 +241,7 @@ export function IconButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-full transition-colors ${sizeClasses} ${variantClasses} ${disabledClasses} ${className}`}
+      className={`rounded-full transition-colors ${sizeClasses} ${variantClasses} ${colorClasses} ${disabledClasses} ${className}`}
       aria-label={ariaLabel}
       {...props}
     >

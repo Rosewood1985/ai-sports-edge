@@ -2,6 +2,7 @@ import React from 'react';
 import { BetSlipPerformanceWidget } from './widgets/BetSlipPerformanceWidget';
 import { EnhancedSubscriptionAnalyticsWidget } from './widgets/EnhancedSubscriptionAnalyticsWidget';
 import { SystemHealthMonitoringWidget } from './widgets/SystemHealthMonitoringWidget';
+import { ConversionFunnelWidget } from './widgets/ConversionFunnelWidget';
 
 export interface AdminDashboardProps {
   className?: string;
@@ -21,9 +22,12 @@ export function AdminDashboard({ className = '' }: AdminDashboardProps) {
         <EnhancedSubscriptionAnalyticsWidget />
         <SystemHealthMonitoringWidget />
 
-        {/* Phase 2 & 3 Placeholders */}
+        {/* Phase 2: Conversion & Fraud Intelligence */}
+        <ConversionFunnelWidget />
+
+        {/* Phase 3 Placeholder */}
         <div className="col-span-1 md:col-span-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-6 h-48 flex items-center justify-center">
-          <p className="text-gray-500 dark:text-gray-400">Phase 2 & 3 Features Coming Soon</p>
+          <p className="text-gray-500 dark:text-gray-400">Phase 3 Features Coming Soon</p>
         </div>
       </div>
     </div>

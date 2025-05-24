@@ -788,3 +788,106 @@ See [admin-dashboard-patterns.md](./admin-dashboard-patterns.md) for detailed pa
 1. **Cross-Platform Component Adaptation**: Pattern for adapting React Native components to web equivalents
 2. **SWR Data Fetching**: Pattern for fetching and caching data using the SWR library
 3. **API Gateway**: Pattern for routing API requests through a central gateway
+
+# System Patterns
+
+## Dashboard Widget Implementation Pattern (May 24, 2025)
+
+### Pattern: Conversion Funnel Tracking Widget
+
+**Description:**
+A pattern for implementing dashboard widgets that visualize complex data flows and user journeys. This pattern was established during the implementation of the Conversion Funnel Tracking Widget and can be reused for similar visualization needs.
+
+**Components:**
+
+1. **Type Definitions**: Strongly typed interfaces for all data structures
+2. **Data Fetching Hook**: Custom hook using SWR for data fetching with caching
+3. **Visualization Components**: Reusable chart and visualization components
+4. **Mock Data**: Comprehensive mock data for development and testing
+5. **Service Integration**: API service methods for data retrieval
+
+**Implementation:**
+
+```typescript
+// Type definitions pattern
+export interface FunnelStage {
+  name: string;
+  count: number;
+  conversionRate: number;
+  dropOffRate: number;
+}
+
+export interface ConversionFunnelData {
+  funnelStages: FunnelStage[];
+  cohorts: Cohort[];
+  conversionTriggers: ConversionTrigger[];
+  engagementScore: EngagementScore;
+}
+
+// Data fetching hook pattern
+export const useConversionFunnelData = (shouldFetch = true) => {
+  const { data, error, mutate } = useSWR<ApiResponse<ConversionFunnelData>>(
+    shouldFetch ? '/api/admin/conversion-funnel' : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 seconds
+    }
+  );
+
+  // Mock data fallback for development
+  const [mockData, setMockData] = useState<ConversionFunnelData>(mockConversionFunnelData);
+
+  // Development simulation
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && !data && !error) {
+      const timer = setTimeout(() => {
+        mutate({ data: mockData, status: 200, message: 'Success' } as any, false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [data, error, mockData, mutate]);
+
+  return {
+    data: data?.data || mockData,
+    isLoading: !error && !data,
+    error,
+    refetch: () => mutate(),
+  };
+};
+
+// Widget component pattern
+export const ConversionFunnelWidget: React.FC = () => {
+  const { data, isLoading, error, refetch } = useConversionFunnelData();
+
+  // Widget implementation with loading, error, and data states
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState error={error} onRetry={refetch} />;
+
+  return (
+    <EnhancedWidget
+      title="Conversion Funnel"
+      description="Track user journey from trial to paid conversion"
+      onRefresh={refetch}
+    >
+      {/* Visualization components */}
+      <FunnelVisualization stages={data.funnelStages} />
+      <CohortAnalysisTable cohorts={data.cohorts} />
+      <ConversionTriggerAnalysis triggers={data.conversionTriggers} />
+      <EngagementScoreCard score={data.engagementScore} />
+    </EnhancedWidget>
+  );
+};
+```
+
+**Benefits:**
+
+- **Type Safety**: Strong typing ensures data consistency and prevents runtime errors
+- **Separation of Concerns**: Clear separation between data fetching, visualization, and business logic
+- **Reusability**: Components and hooks can be reused across different widgets
+- **Development Efficiency**: Mock data enables development without backend dependencies
+- **Performance**: SWR caching improves performance and reduces API calls
+
+**Usage Context:**
+This pattern is particularly useful for dashboard widgets that need to visualize complex data flows, user journeys, or multi-stage processes. It can be applied to other widgets like user onboarding flows, payment processing funnels, or multi-step form completion analytics.

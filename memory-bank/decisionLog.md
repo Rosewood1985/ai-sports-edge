@@ -495,3 +495,77 @@ Build custom components from scratch following a foundation-first approach.
   - PieChart component
 - Created the BetSlipPerformanceWidget as the first Phase 1 widget
 - Implemented the main dashboard layout with AdminDashboard component
+
+# Decision Log
+
+This document records implementation decisions and their rationale for the AI Sports Edge app.
+
+## Conversion Funnel Tracking Widget Implementation (May 24, 2025)
+
+### Decision: Implement Conversion Funnel Tracking Widget in Phase 2
+
+**Context:**
+The Unified Admin Dashboard needed a way to track and visualize the user journey from trial signup to paid conversion. This was identified as a critical feature for understanding user behavior and optimizing the conversion process, especially with the upcoming 7-day trial feature.
+
+**Options Considered:**
+
+1. Implement as part of Enhanced Subscription Analytics Widget
+2. Create a separate Conversion Funnel Tracking Widget
+3. Defer implementation to Phase 3
+
+**Decision:**
+Create a separate Conversion Funnel Tracking Widget in Phase 2 instead of waiting for Phase 3 as originally planned.
+
+**Rationale:**
+
+- **Data Separation**: Conversion funnel data is distinct from subscription analytics data and deserves its own dedicated visualization.
+- **Feature Importance**: With the upcoming 7-day trial feature, conversion funnel tracking becomes a critical tool for measuring success.
+- **Implementation Synergy**: The widget shares many components and patterns with other Phase 2 widgets, making it efficient to implement now.
+- **User Feedback**: Early feedback indicated that conversion tracking was a high-priority feature for the admin team.
+
+**Implementation Details:**
+
+- Created dedicated type definitions in `src/types/conversionFunnel.ts`
+- Implemented custom hook for data fetching in `src/hooks/useConversionFunnelData.ts`
+- Added `getConversionFunnelData` method to `AdminDashboardService`
+- Created the widget component in `src/components/dashboard/widgets/ConversionFunnelWidget.tsx`
+- Updated `AdminDashboard` to include the new widget
+
+**Benefits:**
+
+- Provides clear visualization of the conversion path with drop-off rates
+- Enables cohort analysis for retention tracking
+- Identifies key conversion triggers and their impact
+- Measures engagement through a comprehensive scoring system
+
+# Decision Log
+
+## Unified Admin Dashboard Phase 2 Implementation Priority (May 24, 2025)
+
+### Decision: Prioritize Notification System Before Content Management
+
+**Context:**
+When planning the implementation of the remaining components for Phase 2 of the Unified Admin Dashboard, we needed to determine the priority order for the four main components: User Management Interface, Content Management Components, Notification System, and Settings Management Interface.
+
+**Options Considered:**
+
+1. Implement in the original order: User Management → Content Management → Notification System → Settings Management
+2. Prioritize Notification System before Content Management: User Management → Notification System → Content Management → Settings Management
+3. Implement all components in parallel
+
+**Decision:**
+Prioritize the Notification System implementation before Content Management Components.
+
+**Rationale:**
+
+- The Notification System is more critical for users, providing immediate value through real-time alerts and updates
+- Real-time notifications are essential for monitoring system health and fraud alerts
+- The Notification System integrates with existing OneSignal infrastructure, making it a logical next step after User Management
+- Content Management can benefit from the real-time update patterns established in the Notification System
+
+**Implementation Impact:**
+
+- Updated implementation timeline to begin Notification System in Week 1 alongside User Management
+- Complete Notification System in Week 2 before starting Content Management
+- Shifted Content Management completion to Week 3
+- Maintained the overall project timeline with completion still targeted for June 13, 2025

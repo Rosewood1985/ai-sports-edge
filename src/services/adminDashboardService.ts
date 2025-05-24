@@ -1,6 +1,16 @@
 import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import { ConversionFunnelData } from '../types/conversionFunnel';
+import {
+  User,
+  UserListResponse,
+  UserCreateRequest,
+  UserUpdateRequest,
+  Permission,
+  PermissionGroup,
+  UserFilter,
+} from '../types/userManagement';
 
 // API response interfaces
 export interface ApiResponse<T> {
@@ -109,6 +119,122 @@ export interface SystemHealthData {
 }
 
 // Mock data for development
+const mockConversionFunnelData: ConversionFunnelData = {
+  funnelStages: [
+    { name: 'Trial View', count: 10000, conversionRate: 100, dropOffRate: 30 },
+    { name: 'Trial Signup', count: 7000, conversionRate: 70, dropOffRate: 40 },
+    { name: 'Feature Usage', count: 4200, conversionRate: 60, dropOffRate: 50 },
+    { name: 'Subscription Purchase', count: 2100, conversionRate: 50, dropOffRate: 0 },
+  ],
+  cohorts: [
+    {
+      startDate: '2025-05-01',
+      size: 2500,
+      conversionRate: 22,
+      retentionRates: [
+        { day: 1, rate: 80 },
+        { day: 3, rate: 65 },
+        { day: 7, rate: 45 },
+        { day: 14, rate: 30 },
+        { day: 30, rate: 25 },
+      ],
+    },
+    {
+      startDate: '2025-05-08',
+      size: 2800,
+      conversionRate: 24,
+      retentionRates: [
+        { day: 1, rate: 82 },
+        { day: 3, rate: 68 },
+        { day: 7, rate: 48 },
+        { day: 14, rate: 32 },
+        { day: 30, rate: 26 },
+      ],
+    },
+    {
+      startDate: '2025-05-15',
+      size: 3200,
+      conversionRate: 26,
+      retentionRates: [
+        { day: 1, rate: 85 },
+        { day: 3, rate: 70 },
+        { day: 7, rate: 50 },
+        { day: 14, rate: 35 },
+        { day: 30, rate: 28 },
+      ],
+    },
+  ],
+  conversionTriggers: [
+    {
+      name: 'Used AI Predictions',
+      conversionImpact: 0.85,
+      convertedPercentage: 78,
+      nonConvertedPercentage: 35,
+    },
+    {
+      name: 'Viewed Betting History',
+      conversionImpact: 0.72,
+      convertedPercentage: 65,
+      nonConvertedPercentage: 30,
+    },
+    {
+      name: 'Set Favorite Teams',
+      conversionImpact: 0.68,
+      convertedPercentage: 62,
+      nonConvertedPercentage: 28,
+    },
+    {
+      name: 'Enabled Notifications',
+      conversionImpact: 0.55,
+      convertedPercentage: 58,
+      nonConvertedPercentage: 32,
+    },
+    {
+      name: 'Completed Profile',
+      conversionImpact: 0.48,
+      convertedPercentage: 52,
+      nonConvertedPercentage: 25,
+    },
+  ],
+  engagementScore: {
+    overallScore: 72,
+    scoreTrend: { direction: 'up', value: '+5' },
+    metrics: [
+      {
+        name: 'Session Duration',
+        value: 8.5,
+        weight: 2.0,
+        trend: { direction: 'up', value: '+1.2' },
+      },
+      {
+        name: 'Sessions per Week',
+        value: 4.2,
+        weight: 1.5,
+        trend: { direction: 'up', value: '+0.8' },
+      },
+      { name: 'Feature Usage', value: 65, weight: 1.8, trend: { direction: 'up', value: '+12%' } },
+      { name: 'Retention Rate', value: 78, weight: 2.5, trend: { direction: 'up', value: '+5%' } },
+      {
+        name: 'Notification Open Rate',
+        value: 42,
+        weight: 1.0,
+        trend: { direction: 'down', value: '-3%' },
+      },
+      {
+        name: 'Social Shares',
+        value: 1.2,
+        weight: 0.8,
+        trend: { direction: 'flat', value: '0%' },
+      },
+    ],
+    thresholds: {
+      low: 40,
+      medium: 60,
+      high: 80,
+    },
+  },
+};
+
 const mockBetSlipPerformanceData: BetSlipPerformanceData = {
   ocrSuccessRate: 94.5,
   ocrSuccessRateTrend: { direction: 'up', value: '+2.3%' },
@@ -429,6 +555,118 @@ const mockSystemHealthData: SystemHealthData = {
   ],
 };
 
+// Mock data for user management
+const mockPermissions: Permission[] = [
+  { id: 'perm_1', name: 'users.view', description: 'View users', category: 'users' },
+  { id: 'perm_2', name: 'users.edit', description: 'Edit users', category: 'users' },
+  { id: 'perm_3', name: 'users.create', description: 'Create users', category: 'users' },
+  { id: 'perm_4', name: 'users.delete', description: 'Delete users', category: 'users' },
+  { id: 'perm_5', name: 'analytics.view', description: 'View analytics', category: 'analytics' },
+  {
+    id: 'perm_6',
+    name: 'analytics.export',
+    description: 'Export analytics',
+    category: 'analytics',
+  },
+  { id: 'perm_7', name: 'content.view', description: 'View content', category: 'content' },
+  { id: 'perm_8', name: 'content.edit', description: 'Edit content', category: 'content' },
+  { id: 'perm_9', name: 'content.create', description: 'Create content', category: 'content' },
+  { id: 'perm_10', name: 'content.delete', description: 'Delete content', category: 'content' },
+  { id: 'perm_11', name: 'settings.view', description: 'View settings', category: 'settings' },
+  { id: 'perm_12', name: 'settings.edit', description: 'Edit settings', category: 'settings' },
+  { id: 'perm_13', name: 'system.view', description: 'View system', category: 'system' },
+  { id: 'perm_14', name: 'system.manage', description: 'Manage system', category: 'system' },
+];
+
+const mockPermissionGroups: PermissionGroup[] = [
+  {
+    category: 'users',
+    permissions: mockPermissions.filter(p => p.category === 'users'),
+  },
+  {
+    category: 'analytics',
+    permissions: mockPermissions.filter(p => p.category === 'analytics'),
+  },
+  {
+    category: 'content',
+    permissions: mockPermissions.filter(p => p.category === 'content'),
+  },
+  {
+    category: 'settings',
+    permissions: mockPermissions.filter(p => p.category === 'settings'),
+  },
+  {
+    category: 'system',
+    permissions: mockPermissions.filter(p => p.category === 'system'),
+  },
+];
+
+const mockUsers: User[] = [
+  {
+    id: '1',
+    email: 'admin@aisportsedge.app',
+    displayName: 'Admin User',
+    role: 'admin',
+    status: 'active',
+    createdAt: '2025-01-15T08:30:00Z',
+    lastLogin: '2025-05-23T14:25:00Z',
+    permissions: mockPermissions,
+  },
+  {
+    id: '2',
+    email: 'editor@aisportsedge.app',
+    displayName: 'Editor User',
+    role: 'editor',
+    status: 'active',
+    createdAt: '2025-02-10T10:15:00Z',
+    lastLogin: '2025-05-22T09:45:00Z',
+    permissions: mockPermissions.filter(
+      p =>
+        (p.category === 'users' && p.name !== 'users.delete') ||
+        p.category === 'analytics' ||
+        p.category === 'content'
+    ),
+  },
+  {
+    id: '3',
+    email: 'viewer@aisportsedge.app',
+    displayName: 'Viewer User',
+    role: 'viewer',
+    status: 'active',
+    createdAt: '2025-03-05T14:20:00Z',
+    lastLogin: '2025-05-21T16:30:00Z',
+    permissions: mockPermissions.filter(p => p.name.endsWith('.view')),
+  },
+  {
+    id: '4',
+    email: 'suspended@aisportsedge.app',
+    displayName: 'Suspended User',
+    role: 'user',
+    status: 'suspended',
+    createdAt: '2025-01-20T11:45:00Z',
+    lastLogin: '2025-04-15T08:20:00Z',
+    permissions: [],
+  },
+  {
+    id: '5',
+    email: 'pending@aisportsedge.app',
+    displayName: 'Pending User',
+    role: 'user',
+    status: 'pending',
+    createdAt: '2025-05-18T09:30:00Z',
+    lastLogin: '',
+    permissions: [],
+  },
+];
+
+const mockUserListResponse: UserListResponse = {
+  users: mockUsers,
+  total: mockUsers.length,
+  page: 1,
+  pageSize: 10,
+  totalPages: 1,
+};
+
 // API fetcher function
 const fetcher = async <T>(url: string): Promise<T> => {
   try {
@@ -550,6 +788,125 @@ export const useSystemHealthData = (shouldFetch = true) => {
   };
 };
 
+// User Management Hook
+export const useUserManagement = (
+  shouldFetch = true,
+  filter: UserFilter = {},
+  page = 1,
+  pageSize = 10
+) => {
+  const { data, error, mutate } = useSWR<ApiResponse<UserListResponse>>(
+    shouldFetch
+      ? `/api/admin/users?page=${page}&pageSize=${pageSize}${
+          filter.role ? `&role=${filter.role}` : ''
+        }${filter.status ? `&status=${filter.status}` : ''}${
+          filter.search ? `&search=${encodeURIComponent(filter.search)}` : ''
+        }${
+          filter.permissions && filter.permissions.length > 0
+            ? `&permissions=${filter.permissions.join(',')}`
+            : ''
+        }`
+      : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 seconds
+    }
+  );
+
+  // Use mock data for development or when API fails
+  const [mockData, setMockData] = useState<UserListResponse>(mockUserListResponse);
+
+  // For development, simulate API call with mock data
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && !data && !error) {
+      const timer = setTimeout(() => {
+        // Apply filters to mock data
+        let filteredUsers = [...mockUsers];
+
+        if (filter.role) {
+          filteredUsers = filteredUsers.filter(user => user.role === filter.role);
+        }
+
+        if (filter.status) {
+          filteredUsers = filteredUsers.filter(user => user.status === filter.status);
+        }
+
+        if (filter.search) {
+          const searchLower = filter.search.toLowerCase();
+          filteredUsers = filteredUsers.filter(
+            user =>
+              user.displayName.toLowerCase().includes(searchLower) ||
+              user.email.toLowerCase().includes(searchLower)
+          );
+        }
+
+        if (filter.permissions && filter.permissions.length > 0) {
+          filteredUsers = filteredUsers.filter(user =>
+            filter.permissions!.every(permId => user.permissions.some(p => p.id === permId))
+          );
+        }
+
+        // Apply pagination
+        const startIndex = (page - 1) * pageSize;
+        const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
+
+        const filteredResponse: UserListResponse = {
+          users: paginatedUsers,
+          total: filteredUsers.length,
+          page,
+          pageSize,
+          totalPages: Math.ceil(filteredUsers.length / pageSize),
+        };
+
+        mutate({ data: filteredResponse, status: 200, message: 'Success' } as any, false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [data, error, filter, mockData, mutate, page, pageSize]);
+
+  return {
+    data: data?.data || mockData,
+    isLoading: !error && !data,
+    error,
+    refetch: () => mutate(),
+  };
+};
+
+// Permission Groups Hook
+export const usePermissionGroups = (shouldFetch = true) => {
+  const { data, error, mutate } = useSWR<ApiResponse<PermissionGroup[]>>(
+    shouldFetch ? '/api/admin/permissions' : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000, // 60 seconds
+    }
+  );
+
+  // Use mock data for development or when API fails
+  const [mockData, setMockData] = useState<PermissionGroup[]>(mockPermissionGroups);
+
+  // For development, simulate API call with mock data
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && !data && !error) {
+      const timer = setTimeout(() => {
+        mutate({ data: mockData, status: 200, message: 'Success' } as any, false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [data, error, mockData, mutate]);
+
+  return {
+    data: data?.data || mockData,
+    isLoading: !error && !data,
+    error,
+    refetch: () => mutate(),
+  };
+};
+
 // WebSocket connection for real-time updates
 export const useWebSocketConnection = (url: string, onMessage: (data: any) => void) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -613,6 +970,27 @@ export const useWebSocketConnection = (url: string, onMessage: (data: any) => vo
 
 // Admin Dashboard Service
 export class AdminDashboardService {
+  // Conversion Funnel
+  static async getConversionFunnelData(): Promise<ConversionFunnelData> {
+    try {
+      const response = await fetch('/api/admin/conversion-funnel', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error fetching conversion funnel data:', error);
+      return mockConversionFunnelData;
+    }
+  }
   // Bet Slip Performance
   static async getBetSlipPerformanceData(): Promise<BetSlipPerformanceData> {
     try {
@@ -725,6 +1103,190 @@ export class AdminDashboardService {
     } catch (error) {
       console.error('Error executing system action:', error);
       return false;
+    }
+  }
+
+  // User Management
+  static async getUserList(
+    page = 1,
+    pageSize = 10,
+    filter: UserFilter = {}
+  ): Promise<UserListResponse> {
+    try {
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+      });
+
+      if (filter.role) {
+        queryParams.append('role', filter.role);
+      }
+
+      if (filter.status) {
+        queryParams.append('status', filter.status);
+      }
+
+      if (filter.search) {
+        queryParams.append('search', filter.search);
+      }
+
+      if (filter.permissions && filter.permissions.length > 0) {
+        queryParams.append('permissions', filter.permissions.join(','));
+      }
+
+      const response = await fetch(`/api/admin/users?${queryParams.toString()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error fetching user list:', error);
+      return mockUserListResponse;
+    }
+  }
+
+  static async getUserById(id: string): Promise<User | null> {
+    try {
+      const response = await fetch(`/api/admin/users/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error(`Error fetching user with ID ${id}:`, error);
+      return mockUsers.find(user => user.id === id) || null;
+    }
+  }
+
+  static async createUser(userData: UserCreateRequest): Promise<User | null> {
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      // Return mock data for development
+      if (process.env.NODE_ENV === 'development') {
+        const newUser: User = {
+          id: `new-${Date.now()}`,
+          email: userData.email,
+          displayName: userData.displayName,
+          role: userData.role,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          lastLogin: '',
+          permissions: mockPermissions.filter(p => userData.permissions.includes(p.id)),
+        };
+        return newUser;
+      }
+      return null;
+    }
+  }
+
+  static async updateUser(userData: UserUpdateRequest): Promise<User | null> {
+    try {
+      const response = await fetch(`/api/admin/users/${userData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error(`Error updating user with ID ${userData.id}:`, error);
+      // Return mock data for development
+      if (process.env.NODE_ENV === 'development') {
+        const userIndex = mockUsers.findIndex(user => user.id === userData.id);
+        if (userIndex !== -1) {
+          const updatedUser = {
+            ...mockUsers[userIndex],
+            ...userData,
+            permissions: userData.permissions
+              ? mockPermissions.filter(p => userData.permissions!.includes(p.id))
+              : mockUsers[userIndex].permissions,
+          };
+          return updatedUser;
+        }
+      }
+      return null;
+    }
+  }
+
+  static async deleteUser(id: string): Promise<boolean> {
+    try {
+      const response = await fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error(`Error deleting user with ID ${id}:`, error);
+      return false;
+    }
+  }
+
+  static async getPermissions(): Promise<PermissionGroup[]> {
+    try {
+      const response = await fetch('/api/admin/permissions', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+      return mockPermissionGroups;
     }
   }
 }
