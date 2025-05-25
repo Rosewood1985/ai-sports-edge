@@ -6,12 +6,11 @@
 
 export { LineChart } from './LineChart';
 export { PieChart } from './PieChart';
+export { BettingAnalyticsChart } from './BettingAnalyticsChart';
 
 export type {
   LineChartDataPoint,
-  LineChartProps,
-  PieChartItem,
-  PieChartProps
+  LineChartProps
 } from './LineChart';
 
 export type {

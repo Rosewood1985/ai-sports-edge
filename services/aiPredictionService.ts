@@ -8,6 +8,7 @@ import {
   markFreeDailyPickAsUsed
 } from './firebaseSubscriptionService';
 import { mlPredictionService } from './mlPredictionService';
+import { AIInputValidator } from './security/AIInputValidator';
 
 /**
  * Generate an AI prediction for a game
@@ -20,16 +21,35 @@ export const generateAIPrediction = async (
   language = 'en'
 ): Promise<AIPrediction> => {
   try {
-    // Use the ML prediction service to generate a prediction
-    return await mlPredictionService.generatePrediction(game, language);
+    // Validate inputs
+    if (!game || !game.home_team || !game.away_team) {
+      throw new Error('Invalid game object');
+    }
+
+    // Validate and sanitize language parameter
+    const validLanguage = AIInputValidator.validateLanguage(language);
+    
+    // Sanitize team names to prevent injection
+    const sanitizedGame = {
+      ...game,
+      home_team: AIInputValidator.sanitizeTeamName(game.home_team),
+      away_team: AIInputValidator.sanitizeTeamName(game.away_team)
+    };
+
+    // Use the ML prediction service to generate a prediction with validated inputs
+    return await mlPredictionService.generatePrediction(sanitizedGame, validLanguage);
   } catch (error) {
     console.error('Error generating AI prediction:', error);
-    // Return a fallback prediction with error message
+    
+    // Validate language for fallback message
+    const validLanguage = AIInputValidator.validateLanguage(language);
+    
+    // Return a safe fallback prediction
     return {
-      predicted_winner: game.home_team,
-      confidence: 'low', // Always 'low' confidence for error cases
+      predicted_winner: game?.home_team || 'Unknown Team',
+      confidence: 'low' as ConfidenceLevel,
       confidence_score: 30,
-      reasoning: language === 'es'
+      reasoning: validLanguage === 'es'
         ? 'Error al generar la predicción. Usando predicción de respaldo.'
         : 'Error generating prediction. Using fallback prediction.',
       historical_accuracy: 60

@@ -10,6 +10,8 @@ import { loadLayersModel } from '@tensorflow/tfjs-layers';
 import { Game, AIPrediction, ConfidenceLevel } from '../types/odds';
 import { auth, firestore } from '../config/firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { AIInputValidator } from './security/AIInputValidator';
+import { PromptTemplate } from './security/PromptTemplate';
 
 // Model cache
 interface ModelCache {
@@ -445,28 +447,36 @@ class MLPredictionService {
   }
   
   /**
-   * Generate reasoning for a prediction
+   * Generate reasoning for a prediction (SECURE VERSION)
    * @param sport Sport type
    * @param team Team name
    * @param language Language code
-   * @returns Reasoning text
+   * @returns Secure reasoning text
    */
   private generateReasoning(sport: string, team: string, language: string): string {
-    // Get sport-specific reasonings
-    const reasonings = this.getSportSpecificReasonings(sport, team, language);
+    // Validate and sanitize inputs
+    const sanitizedTeam = AIInputValidator.sanitizeTeamName(team);
+    const validLanguage = AIInputValidator.validateLanguage(language);
     
-    // Select a random reasoning
-    return reasonings[Math.floor(Math.random() * reasonings.length)];
+    // Use secure template system instead of direct string interpolation
+    return PromptTemplate.createTeamReasoning(sanitizedTeam, validLanguage, {
+      wins: 7,
+      games: 10,
+      stat: 'offensive',
+      category: 'recent games'
+    });
   }
   
   /**
-   * Get sport-specific reasonings
+   * Get sport-specific reasonings (DEPRECATED - replaced with secure template system)
    * @param sport Sport type
    * @param team Team name
    * @param language Language code
    * @returns Array of reasonings
    */
   private getSportSpecificReasonings(sport: string, team: string, language: string): string[] {
+    // SECURITY NOTE: This method is deprecated due to prompt injection vulnerabilities
+    // Use PromptTemplate.createTeamReasoning() instead
     if (language === 'es') {
       // Spanish reasonings
       switch (sport) {

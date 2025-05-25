@@ -22,6 +22,10 @@ export { default as CheckboxWithLabel } from './CheckboxWithLabel';
 // New atoms for KnowledgeEdgeScreen
 export { default as NeonBorderView } from './NeonBorderView';
 
+// New utility atoms
+export { LoadingIndicator } from './LoadingIndicator';
+export { Toast } from './Toast';
+
 // Export types
 export * from './AccessibleThemedText';
 export * from './AccessibleThemedView';
@@ -35,3 +39,5 @@ export * from './FilterTag';
 export * from './Slider';
 export * from './CheckboxWithLabel';
 export * from './NeonBorderView';
+export * from './LoadingIndicator';
+export * from './Toast';

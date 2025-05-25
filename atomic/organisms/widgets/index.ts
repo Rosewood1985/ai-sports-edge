@@ -5,6 +5,7 @@
  */
 
 export { EnhancedSubscriptionAnalyticsWidget } from './EnhancedSubscriptionAnalyticsWidget';
+export { BettingAnalyticsWidget } from './BettingAnalyticsWidget';
 
 // Export types for convenience
 export type {
