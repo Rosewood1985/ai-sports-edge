@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const axios = require('axios');
+const { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } = require('./sentryCronConfig');
 
 // Initialize admin if not already initialized
 if (!admin.apps.length) {
@@ -18,7 +19,10 @@ const db = admin.firestore();
  */
 exports.processScheduledNotifications = functions.pubsub
   .schedule('every 1 minutes')
-  .onRun(async (context) => {
+  .onRun(wrapScheduledFunction(
+    'processScheduledNotifications',
+    'every 1 minutes',
+    async (context) => {
     try {
       console.log('Processing scheduled notifications...');
       
@@ -32,7 +36,10 @@ exports.processScheduledNotifications = functions.pubsub
         .where('sent', '==', false)
         .limit(100); // Process in batches to avoid timeout
       
-      const snapshot = await query.get();
+      const snapshot = await trackDatabaseOperation(
+        'query_scheduled_notifications',
+        () => query.get()
+      );
       
       if (snapshot.empty) {
         console.log('No notifications to process');
@@ -90,11 +97,14 @@ exports.processScheduledNotifications = functions.pubsub
           }
           
           // Send notification using OneSignal
-          await sendOneSignalNotification(
-            notification.title,
-            notification.message,
-            notification.data,
-            externalUserId
+          await trackApiCall(
+            'onesignal_send_notification',
+            () => sendOneSignalNotification(
+              notification.title,
+              notification.message,
+              notification.data,
+              externalUserId
+            )
           );
           
           // Mark notification as sent
@@ -116,7 +126,10 @@ exports.processScheduledNotifications = functions.pubsub
       }
       
       // Commit the batch
-      await batch.commit();
+      await trackDatabaseOperation(
+        'commit_notification_batch',
+        () => batch.commit()
+      );
       
       console.log(`Successfully processed ${processedNotifications.length} notifications`);
       return null;
@@ -124,7 +137,7 @@ exports.processScheduledNotifications = functions.pubsub
       console.error('Error processing scheduled notifications:', error);
       return null;
     }
-  });
+  }));
 
 /**
  * Send a notification using OneSignal
@@ -180,7 +193,10 @@ async function sendOneSignalNotification(title, message, data, externalUserId) {
  */
 exports.cleanupOldNotifications = functions.pubsub
   .schedule('every 24 hours')
-  .onRun(async (context) => {
+  .onRun(wrapScheduledFunction(
+    'cleanupOldNotifications',
+    'every 24 hours',
+    async (context) => {
     try {
       console.log('Cleaning up old notifications...');
       
@@ -195,7 +211,10 @@ exports.cleanupOldNotifications = functions.pubsub
         .where('sent', '==', true)
         .limit(500); // Process in batches to avoid timeout
       
-      const snapshot = await query.get();
+      const snapshot = await trackDatabaseOperation(
+        'query_old_notifications',
+        () => query.get()
+      );
       
       if (snapshot.empty) {
         console.log('No old notifications to clean up');
@@ -212,7 +231,10 @@ exports.cleanupOldNotifications = functions.pubsub
       });
       
       // Commit the batch
-      await batch.commit();
+      await trackDatabaseOperation(
+        'commit_cleanup_batch',
+        () => batch.commit()
+      );
       
       console.log(`Successfully cleaned up ${snapshot.size} old notifications`);
       return null;
@@ -220,4 +242,4 @@ exports.cleanupOldNotifications = functions.pubsub
       console.error('Error cleaning up old notifications:', error);
       return null;
     }
-  });
+  }));

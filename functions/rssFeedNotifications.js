@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const personalizedNotificationService = require('./personalizedNotificationService');
+const { wrapScheduledFunction, trackDatabaseOperation } = require('./sentryCronConfig');
 
 /**
  * Extract teams mentioned in RSS item
@@ -202,10 +203,13 @@ function processRssItems(items) {
  */
 async function matchContentWithUsers(items) {
   // Get all users with RSS notifications enabled
-  const usersSnapshot = await admin.firestore()
-    .collection('users')
-    .where('preferences.notifications.rssAlerts.enabled', '==', true)
-    .get();
+  const usersSnapshot = await trackDatabaseOperation(
+    'query_rss_notification_users',
+    () => admin.firestore()
+      .collection('users')
+      .where('preferences.notifications.rssAlerts.enabled', '==', true)
+      .get()
+  );
   
   if (usersSnapshot.empty) {
     console.log('No users have RSS notifications enabled');
@@ -318,34 +322,46 @@ async function triggerRssNotifications(userMatches) {
  */
 exports.processRssFeedsAndNotify = functions.pubsub
   .schedule('every 30 minutes')
-  .onRun(async (context) => {
+  .onRun(wrapScheduledFunction(
+    'processRssFeedsAndNotify',
+    'every 30 minutes',
+    async (context) => {
     // Get timestamp of last run
-    const lastRunDoc = await admin.firestore()
-      .collection('system')
-      .doc('rssNotificationLastRun')
-      .get();
+    const lastRunDoc = await trackDatabaseOperation(
+      'get_last_rss_run_timestamp',
+      () => admin.firestore()
+        .collection('system')
+        .doc('rssNotificationLastRun')
+        .get()
+    );
     
     const lastRunTime = lastRunDoc.exists 
       ? lastRunDoc.data().timestamp.toDate() 
       : new Date(0); // Default to epoch if no previous run
     
     // Get new RSS feed items since last run
-    const newItemsSnapshot = await admin.firestore()
-      .collection('rssItems')
-      .where('pubDate', '>', lastRunTime)
-      .orderBy('pubDate', 'desc')
-      .get();
+    const newItemsSnapshot = await trackDatabaseOperation(
+      'query_new_rss_items',
+      () => admin.firestore()
+        .collection('rssItems')
+        .where('pubDate', '>', lastRunTime)
+        .orderBy('pubDate', 'desc')
+        .get()
+    );
     
     if (newItemsSnapshot.empty) {
       console.log('No new RSS feed items since last run');
       
       // Update last run timestamp
-      await admin.firestore()
-        .collection('system')
-        .doc('rssNotificationLastRun')
-        .set({
-          timestamp: admin.firestore.Timestamp.now()
-        });
+      await trackDatabaseOperation(
+        'update_rss_last_run_no_items',
+        () => admin.firestore()
+          .collection('system')
+          .doc('rssNotificationLastRun')
+          .set({
+            timestamp: admin.firestore.Timestamp.now()
+          })
+      );
       
       return null;
     }
@@ -367,15 +383,18 @@ exports.processRssFeedsAndNotify = functions.pubsub
     await triggerRssNotifications(userMatches);
     
     // Update last run timestamp
-    await admin.firestore()
-      .collection('system')
-      .doc('rssNotificationLastRun')
-      .set({
-        timestamp: admin.firestore.Timestamp.now()
-      });
+    await trackDatabaseOperation(
+      'update_rss_last_run_timestamp',
+      () => admin.firestore()
+        .collection('system')
+        .doc('rssNotificationLastRun')
+        .set({
+          timestamp: admin.firestore.Timestamp.now()
+        })
+    );
     
     return null;
-  });
+  }));
 
 /**
  * Cloud function to process RSS feed items when they are created

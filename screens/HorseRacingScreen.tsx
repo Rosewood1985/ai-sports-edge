@@ -32,6 +32,7 @@ import {
   RaceStatus
 } from '../types/horseRacing';
 import { trackScreenView } from '../services/analyticsService';
+import { sentryService } from '../services/sentryService';
 
 // Mock data for development
 const MOCK_TRACKS: Track[] = [
@@ -156,6 +157,8 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
   // Track screen view
   useEffect(() => {
     trackScreenView('HorseRacingScreen');
+    sentryService.addBreadcrumb('Horse Racing Screen Viewed', 'navigation', 'info');
+    sentryService.trackFeatureUsage('horse_racing', 'screen_view', auth.currentUser?.uid);
   }, []);
   
   // Load bankroll data
@@ -186,8 +189,15 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
   
   // Load data
   const loadData = useCallback(async () => {
+    const transaction = sentryService.startTransaction('horse-racing-load-data', 'user_interaction', 'Load horse racing data');
+    const startTime = Date.now();
+    
     try {
       setError(null);
+      sentryService.trackRacingOperation('load_horse_racing_data', 'horse_racing', {
+        userId: auth.currentUser?.uid || 'anonymous',
+        selectedTrackId: selectedTrack?.id
+      });
       
       // In a real app, we would fetch tracks and races from an API
       // For now, we'll use mock data
@@ -201,9 +211,33 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
       if (!selectedTrack && MOCK_TRACKS.length > 0) {
         setSelectedTrack(MOCK_TRACKS[0]);
       }
+      
+      const duration = Date.now() - startTime;
+      sentryService.trackRacingOperation('horse_racing_data_loaded', 'horse_racing', {
+        trackCount: MOCK_TRACKS.length,
+        raceCount: MOCK_RACES.length,
+        selectedTrackId: selectedTrack?.id,
+        duration
+      });
+      
+      transaction?.finish();
     } catch (error) {
+      const duration = Date.now() - startTime;
       console.error('Error loading horse racing data:', error);
       setError('Failed to load horse racing data. Please try again.');
+      
+      sentryService.captureError(error as Error, {
+        feature: 'horse_racing',
+        action: 'load_data',
+        additionalData: {
+          selectedTrackId: selectedTrack?.id,
+          duration,
+          userId: auth.currentUser?.uid || 'anonymous'
+        }
+      });
+      
+      transaction?.setStatus('internal_error');
+      transaction?.finish();
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -223,6 +257,14 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
   
   // Navigate to race detail screen
   const navigateToRaceDetail = (race: Race) => {
+    sentryService.trackFeatureUsage('horse_racing', 'race_selected', auth.currentUser?.uid, {
+      raceId: race.id,
+      trackId: race.trackId,
+      raceNumber: race.raceNumber,
+      raceName: race.name,
+      purse: race.purse
+    });
+    
     // In a real app, we would navigate to a race detail screen
     Alert.alert('Race Selected', `You selected ${race.track.name} Race ${race.raceNumber}`);
   };
@@ -237,7 +279,14 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
           borderColor: selectedTrack?.id === item.id ? colors.primary : 'transparent',
         },
       ]}
-      onPress={() => setSelectedTrack(item)}
+      onPress={() => {
+        sentryService.trackFeatureUsage('horse_racing', 'track_selected', auth.currentUser?.uid, {
+          trackId: item.id,
+          trackName: item.name,
+          location: item.location
+        });
+        setSelectedTrack(item);
+      }}
     >
       <ThemedText style={styles.trackName}>{item.name}</ThemedText>
       <ThemedText style={styles.trackLocation}>{item.location}</ThemedText>

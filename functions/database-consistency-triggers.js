@@ -11,6 +11,7 @@
 
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const { wrapEventFunction, trackDatabaseFunction, captureCloudFunctionError, trackFunctionPerformance } = require('./sentryConfig');
 
 // If admin SDK isn't already initialized in this context
 try {
@@ -27,10 +28,16 @@ try {
  *
  * Source of truth: subscriptions subcollection (subscriptions.status)
  */
-exports.syncSubscriptionStatus = functions.firestore
+exports.syncSubscriptionStatus = wrapEventFunction(functions.firestore
   .document('users/{userId}/subscriptions/{subscriptionId}')
   .onWrite(async (change, context) => {
+    const startTime = Date.now();
     try {
+      trackDatabaseFunction('syncSubscriptionStatus', 'subscription_write', {
+        userId: context.params.userId,
+        subscriptionId: context.params.subscriptionId,
+        isDelete: !change.after.exists,
+      });
       // Skip if the document was deleted
       if (!change.after.exists) {
         console.log('Subscription document was deleted, skipping status sync');
@@ -72,13 +79,23 @@ exports.syncSubscriptionStatus = functions.firestore
         });
 
         console.log(`Successfully synced subscription status to user ${userId}`);
+        trackDatabaseFunction('syncSubscriptionStatus', 'status_synced', {
+          userId,
+          subscriptionStatus: userStatus,
+        });
+        trackFunctionPerformance('syncSubscriptionStatus', Date.now() - startTime, true);
         return null;
       });
     } catch (error) {
       console.error('Error syncing subscription status:', error);
+      captureCloudFunctionError(error, 'syncSubscriptionStatus', {
+        userId: context.params.userId,
+        subscriptionId: context.params.subscriptionId,
+      });
+      trackFunctionPerformance('syncSubscriptionStatus', Date.now() - startTime, false);
       return null;
     }
-  });
+  }));
 
 /**
  * Syncs customer ID changes from the users collection to the subscriptions subcollection
@@ -88,10 +105,15 @@ exports.syncSubscriptionStatus = functions.firestore
  *
  * Source of truth: users collection (users.stripeCustomerId)
  */
-exports.syncCustomerId = functions.firestore
+exports.syncCustomerId = wrapEventFunction(functions.firestore
   .document('users/{userId}')
   .onUpdate(async (change, context) => {
+    const startTime = Date.now();
     try {
+      trackDatabaseFunction('syncCustomerId', 'user_updated', {
+        userId: context.params.userId,
+        hasCustomerId: !!change.after.data().stripeCustomerId,
+      });
       const userId = context.params.userId;
       const beforeData = change.before.data();
       const afterData = change.after.data();
@@ -136,12 +158,22 @@ exports.syncCustomerId = functions.firestore
       console.log(
         `Successfully synced customer ID to ${subscriptionsSnapshot.size} subscriptions for user ${userId}`
       );
+      trackDatabaseFunction('syncCustomerId', 'customer_id_synced', {
+        userId,
+        subscriptionCount: subscriptionsSnapshot.size,
+        customerId: afterData.stripeCustomerId,
+      });
+      trackFunctionPerformance('syncCustomerId', Date.now() - startTime, true);
       return null;
     } catch (error) {
       console.error('Error syncing customer ID:', error);
+      captureCloudFunctionError(error, 'syncCustomerId', {
+        userId: context.params.userId,
+      });
+      trackFunctionPerformance('syncCustomerId', Date.now() - startTime, false);
       return null;
     }
-  });
+  }));
 
 /**
  * Standardizes the spelling of "canceled"/"cancelled" across all collections
@@ -153,10 +185,16 @@ exports.syncCustomerId = functions.firestore
  * This helps prevent UI inconsistencies and business logic errors due to
  * different spellings of the same status.
  */
-exports.standardizeStatusSpelling = functions.firestore
+exports.standardizeStatusSpelling = wrapEventFunction(functions.firestore
   .document('users/{userId}/subscriptions/{subscriptionId}')
   .onWrite(async (change, context) => {
+    const startTime = Date.now();
     try {
+      trackDatabaseFunction('standardizeStatusSpelling', 'subscription_write', {
+        userId: context.params.userId,
+        subscriptionId: context.params.subscriptionId,
+        isDelete: !change.after.exists,
+      });
       // Skip if the document was deleted
       if (!change.after.exists) {
         return null;
@@ -184,14 +222,25 @@ exports.standardizeStatusSpelling = functions.firestore
         console.log(
           `Successfully standardized status spelling in subscription ${context.params.subscriptionId}`
         );
+        trackDatabaseFunction('standardizeStatusSpelling', 'status_standardized', {
+          subscriptionId: context.params.subscriptionId,
+          fromStatus: 'cancelled',
+          toStatus: 'canceled',
+        });
       }
 
+      trackFunctionPerformance('standardizeStatusSpelling', Date.now() - startTime, true);
       return null;
     } catch (error) {
       console.error('Error standardizing status spelling:', error);
+      captureCloudFunctionError(error, 'standardizeStatusSpelling', {
+        userId: context.params.userId,
+        subscriptionId: context.params.subscriptionId,
+      });
+      trackFunctionPerformance('standardizeStatusSpelling', Date.now() - startTime, false);
       return null;
     }
-  });
+  }));
 
 /**
  * Updates the index.js file to export the new triggers

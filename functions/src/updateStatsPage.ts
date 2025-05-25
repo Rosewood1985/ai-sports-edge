@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions';
+import { wrapScheduledFunction, trackDatabaseOperation } from '../sentryCronConfig';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -83,7 +84,10 @@ interface StatsData {
 export const updateStatsPage = functions.pubsub
   .schedule('0 0 * * 0') // Run at midnight every Sunday
   .timeZone('America/New_York')
-  .onRun(async (context) => {
+  .onRun(wrapScheduledFunction(
+    'updateStatsPage',
+    '0 0 * * 0',
+    async (context) => {
     logger.info('Starting updateStatsPage function');
     
     try {
@@ -93,7 +97,10 @@ export const updateStatsPage = functions.pubsub
         .where('aiConfidence', '>', 0) // Only games with predictions
         .where('result', 'in', ['win', 'loss', 'push']); // Only completed games
       
-      const gamesSnapshot = await gamesQuery.get();
+      const gamesSnapshot = await trackDatabaseOperation(
+        'query_completed_games_with_predictions',
+        () => gamesQuery.get()
+      );
       
       if (gamesSnapshot.empty) {
         logger.info('No completed games with predictions found');
@@ -294,15 +301,21 @@ export const updateStatsPage = functions.pubsub
       };
       
       // Save stats to Firestore
-      await firestore.collection('stats').doc('aiPicks').set(statsData);
+      await trackDatabaseOperation(
+        'save_stats_data',
+        () => firestore.collection('stats').doc('aiPicks').set(statsData)
+      );
       
       logger.info('Successfully updated stats page data');
       
       // Also save a historical record
-      await firestore.collection('statsHistory').add({
-        ...statsData,
-        timestamp: admin.firestore.Timestamp.now()
-      });
+      await trackDatabaseOperation(
+        'save_stats_history',
+        () => firestore.collection('statsHistory').add({
+          ...statsData,
+          timestamp: admin.firestore.Timestamp.now()
+        })
+      );
       
       logger.info('Added entry to statsHistory collection');
       
@@ -311,4 +324,4 @@ export const updateStatsPage = functions.pubsub
       logger.error('Error in updateStatsPage function:', error);
       throw error;
     }
-  });
+  }));

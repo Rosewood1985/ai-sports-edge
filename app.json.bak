@@ -86,7 +86,7 @@
       "googleMapsApiKey": "AIzaSyBhpjKTEw4mdCz-pfhYp7ZgHpKYvturILg",
       "mapboxApiKey": "MAPBOX_API_KEY",
       "sentry": {
-        "dsn": "https://54a49d79ad378791571acf30b15ab89a@o4509368605081600.ingest.us.sentry.io/4509385186082816",
+        "dsn": "SENTRY_DSN",
         "enableInExpoDevelopment": true,
         "debug": false,
         "organization": "ai-sports-edge",

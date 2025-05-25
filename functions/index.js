@@ -2,12 +2,31 @@ const admin = require("firebase-admin");
 const { onRequest } = require("firebase-functions/v2/https");
 const { onCreate } = require("firebase-functions/v2/auth");
 
+// Initialize Sentry first
+const {
+  initSentry,
+  wrapHttpFunction,
+  wrapEventFunction,
+  trackStripeFunction,
+  trackSubscriptionFunction,
+  captureCloudFunctionError,
+  trackFunctionPerformance,
+} = require('./sentryConfig');
+
+initSentry();
+
 // Initialize Firebase Admin
 admin.initializeApp();
 
 // Create a simple Stripe webhook handler
-exports.stripeWebhook = onRequest({ cors: true }, async (req, res) => {
+exports.stripeWebhook = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
   try {
+    trackStripeFunction('stripeWebhook', 'webhook_received', {
+      method: req.method,
+      contentType: req.get('content-type'),
+    });
+
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -16,15 +35,28 @@ exports.stripeWebhook = onRequest({ cors: true }, async (req, res) => {
 
     // Return a 200 response to acknowledge receipt of the event
     res.status(200).send({ received: true });
+    
+    trackFunctionPerformance('stripeWebhook', Date.now() - startTime, true);
   } catch (error) {
     console.error("Error processing webhook:", error);
+    captureCloudFunctionError(error, 'stripeWebhook', {
+      method: req.method,
+      url: req.url,
+    });
+    trackFunctionPerformance('stripeWebhook', Date.now() - startTime, false);
     res.status(500).send({ error: "Webhook processing failed" });
   }
-});
+}));
 
 // Handle checkout session completed
 async function handleCheckoutSessionCompleted(session) {
+  const startTime = Date.now();
   try {
+    trackStripeFunction('handleCheckoutSessionCompleted', 'session_completed', {
+      sessionId: session.id,
+      customerId: session.customer,
+    });
+
     console.log('Processing checkout session:', session.id);
     const db = admin.firestore();
 
@@ -46,14 +78,30 @@ async function handleCheckoutSessionCompleted(session) {
     });
 
     console.log(`Updated user ${userId} with Stripe customer ID ${customerId}`);
+    trackSubscriptionFunction('handleCheckoutSessionCompleted', 'user_updated', {
+      userId,
+      customerId,
+    });
+    trackFunctionPerformance('handleCheckoutSessionCompleted', Date.now() - startTime, true);
   } catch (error) {
     console.error('Error handling checkout session completed:', error);
+    captureCloudFunctionError(error, 'handleCheckoutSessionCompleted', {
+      sessionId: session.id,
+    });
+    trackFunctionPerformance('handleCheckoutSessionCompleted', Date.now() - startTime, false);
   }
 }
 
 // Handle invoice paid
 async function handleInvoicePaid(invoice) {
+  const startTime = Date.now();
   try {
+    trackStripeFunction('handleInvoicePaid', 'invoice_paid', {
+      invoiceId: invoice.id,
+      customerId: invoice.customer,
+      subscriptionId: invoice.subscription,
+    });
+
     console.log('Processing paid invoice:', invoice.id);
     const db = admin.firestore();
 
@@ -104,14 +152,31 @@ async function handleInvoicePaid(invoice) {
     });
 
     console.log(`Updated subscription ${subscriptionId} for user ${userId}`);
+    trackSubscriptionFunction('handleInvoicePaid', 'subscription_updated', {
+      userId,
+      subscriptionId,
+    });
+    trackFunctionPerformance('handleInvoicePaid', Date.now() - startTime, true);
   } catch (error) {
     console.error('Error handling invoice paid:', error);
+    captureCloudFunctionError(error, 'handleInvoicePaid', {
+      invoiceId: invoice.id,
+      customerId: invoice.customer,
+    });
+    trackFunctionPerformance('handleInvoicePaid', Date.now() - startTime, false);
   }
 }
 
 // Handle invoice payment failed
 async function handleInvoicePaymentFailed(invoice) {
+  const startTime = Date.now();
   try {
+    trackStripeFunction('handleInvoicePaymentFailed', 'invoice_payment_failed', {
+      invoiceId: invoice.id,
+      customerId: invoice.customer,
+      subscriptionId: invoice.subscription,
+    });
+
     console.log('Processing failed invoice payment:', invoice.id);
     const db = admin.firestore();
 
@@ -158,14 +223,31 @@ async function handleInvoicePaymentFailed(invoice) {
     });
 
     console.log(`Updated subscription ${subscriptionId} to past_due for user ${userId}`);
+    trackSubscriptionFunction('handleInvoicePaymentFailed', 'subscription_past_due', {
+      userId,
+      subscriptionId,
+    });
+    trackFunctionPerformance('handleInvoicePaymentFailed', Date.now() - startTime, true);
   } catch (error) {
     console.error('Error handling invoice payment failed:', error);
+    captureCloudFunctionError(error, 'handleInvoicePaymentFailed', {
+      invoiceId: invoice.id,
+      customerId: invoice.customer,
+    });
+    trackFunctionPerformance('handleInvoicePaymentFailed', Date.now() - startTime, false);
   }
 }
 
 // Handle subscription created
 async function handleSubscriptionCreated(subscription) {
+  const startTime = Date.now();
   try {
+    trackSubscriptionFunction('handleSubscriptionCreated', 'subscription_created', {
+      subscriptionId: subscription.id,
+      customerId: subscription.customer,
+      status: subscription.status,
+    });
+
     console.log('Processing subscription created:', subscription.id);
     const db = admin.firestore();
 
@@ -213,14 +295,31 @@ async function handleSubscriptionCreated(subscription) {
     });
 
     console.log(`Created subscription ${subscription.id} for user ${userId}`);
+    trackSubscriptionFunction('handleSubscriptionCreated', 'subscription_stored', {
+      userId,
+      subscriptionId: subscription.id,
+    });
+    trackFunctionPerformance('handleSubscriptionCreated', Date.now() - startTime, true);
   } catch (error) {
     console.error('Error handling subscription created:', error);
+    captureCloudFunctionError(error, 'handleSubscriptionCreated', {
+      subscriptionId: subscription.id,
+      customerId: subscription.customer,
+    });
+    trackFunctionPerformance('handleSubscriptionCreated', Date.now() - startTime, false);
   }
 }
 
 // Handle subscription updated
 async function handleSubscriptionUpdated(subscription) {
+  const startTime = Date.now();
   try {
+    trackSubscriptionFunction('handleSubscriptionUpdated', 'subscription_updated', {
+      subscriptionId: subscription.id,
+      customerId: subscription.customer,
+      status: subscription.status,
+    });
+
     console.log('Processing subscription updated:', subscription.id);
     const db = admin.firestore();
 
@@ -269,14 +368,30 @@ async function handleSubscriptionUpdated(subscription) {
     });
 
     console.log(`Updated subscription ${subscription.id} for user ${userId}`);
+    trackSubscriptionFunction('handleSubscriptionUpdated', 'subscription_synced', {
+      userId,
+      subscriptionId: subscription.id,
+    });
+    trackFunctionPerformance('handleSubscriptionUpdated', Date.now() - startTime, true);
   } catch (error) {
     console.error('Error handling subscription updated:', error);
+    captureCloudFunctionError(error, 'handleSubscriptionUpdated', {
+      subscriptionId: subscription.id,
+      customerId: subscription.customer,
+    });
+    trackFunctionPerformance('handleSubscriptionUpdated', Date.now() - startTime, false);
   }
 }
 
 // Handle subscription deleted
 async function handleSubscriptionDeleted(subscription) {
+  const startTime = Date.now();
   try {
+    trackSubscriptionFunction('handleSubscriptionDeleted', 'subscription_deleted', {
+      subscriptionId: subscription.id,
+      customerId: subscription.customer,
+    });
+
     console.log('Processing subscription deleted:', subscription.id);
     const db = admin.firestore();
 
@@ -317,15 +432,31 @@ async function handleSubscriptionDeleted(subscription) {
     });
 
     console.log(`Marked subscription ${subscription.id} as canceled for user ${userId}`);
+    trackSubscriptionFunction('handleSubscriptionDeleted', 'subscription_canceled', {
+      userId,
+      subscriptionId: subscription.id,
+    });
+    trackFunctionPerformance('handleSubscriptionDeleted', Date.now() - startTime, true);
   } catch (error) {
     console.error('Error handling subscription deleted:', error);
+    captureCloudFunctionError(error, 'handleSubscriptionDeleted', {
+      subscriptionId: subscription.id,
+      customerId: subscription.customer,
+    });
+    trackFunctionPerformance('handleSubscriptionDeleted', Date.now() - startTime, false);
   }
 }
 
 // Add user creation hook to set up Stripe customer
-exports.onUserCreate = onCreate(async (event) => {
+exports.onUserCreate = wrapEventFunction(onCreate(async (event) => {
   const user = event.data;
+  const startTime = Date.now();
   try {
+    trackSubscriptionFunction('onUserCreate', 'user_created', {
+      userId: user.uid,
+      email: user.email,
+    });
+
     const db = admin.firestore();
     const userRef = db.collection('users').doc(user.uid);
 
@@ -348,12 +479,21 @@ exports.onUserCreate = onCreate(async (event) => {
     );
 
     console.log(`Created Stripe customer for user ${user.uid}`);
+    trackSubscriptionFunction('onUserCreate', 'customer_created', {
+      userId: user.uid,
+      customerId: customer.id,
+    });
+    trackFunctionPerformance('onUserCreate', Date.now() - startTime, true);
     return null;
   } catch (error) {
     console.error('Error creating Stripe customer on user creation:', error);
+    captureCloudFunctionError(error, 'onUserCreate', {
+      userId: user.uid,
+    });
+    trackFunctionPerformance('onUserCreate', Date.now() - startTime, false);
     return null;
   }
-});
+}));
 
 // Referral + Reward Functions
 const { generateReferralCode } = require("./generateReferralCode");
@@ -370,3 +510,39 @@ const {
 exports.syncSubscriptionStatus = syncSubscriptionStatus;
 exports.syncCustomerId = syncCustomerId;
 exports.standardizeStatusSpelling = standardizeStatusSpelling;
+
+// Sentry Test Functions (for verification only - remove after testing)
+const {
+  sentryTest,
+  sentryErrorTest,
+  sentryRacingTest,
+  sentryMLTest,
+  sentryPerformanceTest,
+} = require("./sentryTest");
+exports.sentryTest = sentryTest;
+exports.sentryErrorTest = sentryErrorTest;
+exports.sentryRacingTest = sentryRacingTest;
+exports.sentryMLTest = sentryMLTest;
+exports.sentryPerformanceTest = sentryPerformanceTest;
+
+// Scheduled Functions with Sentry Monitoring
+const { 
+  processScheduledNotifications, 
+  cleanupOldNotifications 
+} = require("./processScheduledNotifications");
+const { updateReferralLeaderboard } = require("./leaderboardUpdates");
+const { 
+  processRssFeedsAndNotify,
+  onNewRssItem 
+} = require("./rssFeedNotifications");
+
+// Export scheduled functions
+exports.processScheduledNotifications = processScheduledNotifications;
+exports.cleanupOldNotifications = cleanupOldNotifications;
+exports.updateReferralLeaderboard = updateReferralLeaderboard;
+exports.processRssFeedsAndNotify = processRssFeedsAndNotify;
+exports.onNewRssItem = onNewRssItem;
+
+// Export TypeScript scheduled functions
+exports.predictTodayGames = require("./lib/predictTodayGames").predictTodayGames;
+exports.updateStatsPage = require("./lib/updateStatsPage").updateStatsPage;

@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const personalizedNotificationService = require('./personalizedNotificationService');
+const { wrapScheduledFunction, trackDatabaseOperation } = require('./sentryCronConfig');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -14,14 +15,20 @@ if (!admin.apps.length) {
 exports.updateReferralLeaderboard = functions.pubsub
   .schedule('0 0 * * *') // Run daily at midnight
   .timeZone('America/New_York')
-  .onRun(async (context) => {
+  .onRun(wrapScheduledFunction(
+    'updateReferralLeaderboard',
+    '0 0 * * *',
+    async (context) => {
     try {
       const db = admin.firestore();
       
       // Get all users with referral counts
-      const usersSnapshot = await db.collection('users')
-        .where('referralCount', '>', 0)
-        .get();
+      const usersSnapshot = await trackDatabaseOperation(
+        'query_users_with_referrals',
+        () => db.collection('users')
+          .where('referralCount', '>', 0)
+          .get()
+      );
       
       if (usersSnapshot.empty) {
         console.log('No users with referrals found');
@@ -91,7 +98,10 @@ exports.updateReferralLeaderboard = functions.pubsub
       
       // Get previous leaderboard entries to check for rank changes
       const previousAllTimeEntries = new Map();
-      const previousAllTimeSnapshot = await allTimeLeaderboardRef.collection('entries').get();
+      const previousAllTimeSnapshot = await trackDatabaseOperation(
+        'query_previous_leaderboard',
+        () => allTimeLeaderboardRef.collection('entries').get()
+      );
       
       previousAllTimeSnapshot.forEach(doc => {
         const data = doc.data();
@@ -172,7 +182,10 @@ exports.updateReferralLeaderboard = functions.pubsub
       }
       
       // Commit the batch
-      await batch.commit();
+      await trackDatabaseOperation(
+        'commit_leaderboard_batch',
+        () => batch.commit()
+      );
       
       // Send notifications after batch is committed
       await Promise.all(notificationPromises);
@@ -183,7 +196,7 @@ exports.updateReferralLeaderboard = functions.pubsub
       console.error('Error updating referral leaderboard:', error);
       return null;
     }
-  });
+  }));
 
 // Export the functions
 module.exports = {

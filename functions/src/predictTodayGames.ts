@@ -7,6 +7,7 @@ import { spawn } from 'child_process';
 import { logger } from 'firebase-functions';
 import * as https from 'https';
 import * as http from 'http';
+import { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } from '../sentryCronConfig';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -22,7 +23,10 @@ const firestore = admin.firestore();
 export const predictTodayGames = functions.pubsub
   .schedule(process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *') // Use Remote Config value or default
   .timeZone('America/New_York')
-  .onRun(async (context) => {
+  .onRun(wrapScheduledFunction(
+    'predictTodayGames',
+    process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *',
+    async (context) => {
     logger.info('Starting predictTodayGames function');
     
     try {
@@ -46,7 +50,10 @@ export const predictTodayGames = functions.pubsub
         .where('startTime', '>=', todayTimestamp)
         .where('startTime', '<', tomorrowTimestamp);
       
-      const gamesSnapshot = await gamesQuery.get();
+      const gamesSnapshot = await trackDatabaseOperation(
+        'query_games_for_prediction',
+        () => gamesQuery.get()
+      );
       
       if (gamesSnapshot.empty) {
         logger.info('No games scheduled for today');
@@ -85,12 +92,15 @@ export const predictTodayGames = functions.pubsub
           
           if (prediction) {
             // Update game document with prediction
-            await gameDoc.ref.update({
-              aiPredictedWinner: prediction.predictedWinner,
-              aiConfidence: prediction.adjustedConfidence,
-              aiInsightText: prediction.aiInsightText,
-              aiPredictionTimestamp: admin.firestore.FieldValue.serverTimestamp()
-            });
+            await trackDatabaseOperation(
+              'update_game_with_prediction',
+              () => gameDoc.ref.update({
+                aiPredictedWinner: prediction.predictedWinner,
+                aiConfidence: prediction.adjustedConfidence,
+                aiInsightText: prediction.aiInsightText,
+                aiPredictionTimestamp: admin.firestore.FieldValue.serverTimestamp()
+              })
+            );
             
             logger.info(`Updated game ${gameId} with prediction: ${prediction.predictedWinner} (${prediction.adjustedConfidence}% confidence)`);
             
@@ -114,19 +124,22 @@ export const predictTodayGames = functions.pubsub
       logger.info(`Successfully processed ${validPredictions.length} out of ${gamesSnapshot.size} games`);
       
       // Save prediction summary to Firestore
-      await firestore.collection('predictionLogs').add({
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        totalGames: gamesSnapshot.size,
-        processedGames: validPredictions.length,
-        date: today.toISOString().split('T')[0]
-      });
+      await trackDatabaseOperation(
+        'save_prediction_summary',
+        () => firestore.collection('predictionLogs').add({
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          totalGames: gamesSnapshot.size,
+          processedGames: validPredictions.length,
+          date: today.toISOString().split('T')[0]
+        })
+      );
       
       return validPredictions;
     } catch (error) {
       logger.error('Error in predictTodayGames function:', error);
       throw error;
     }
-  });
+  }));
 
 /**
  * Predicts the outcome of a game using the ML model
@@ -166,7 +179,10 @@ async function predictWithPythonScript(gameData: any): Promise<any> {
     
     // Download the model to a temporary file
     const modelPath = path.join(tempDir, 'model.pkl');
-    await downloadFile(modelUrl, modelPath);
+    await trackApiCall(
+      'download_ml_model',
+      () => downloadFile(modelUrl, modelPath)
+    );
     
     // Path to the Python script
     const scriptPath = path.join(__dirname, '../../ml/inference/predict_outcome.py');

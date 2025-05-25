@@ -5,6 +5,16 @@ const path = require('path');
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
+// Add Sentry support
+config.serializer = {
+  ...config.serializer,
+  // Enable source maps for Sentry
+  createModuleIdFactory: () => (path) => {
+    // Use relative paths for Sentry source maps
+    return path.substr(path.lastIndexOf('/') + 1);
+  },
+};
+
 // Exclude xcode-git-ai-sports-edge directory to fix Haste module naming collision
 config.resolver.blockList = [
   new RegExp(path.resolve(__dirname, 'xcode-git-ai-sports-edge') + '/.*'),

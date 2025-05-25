@@ -8,13 +8,17 @@
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT ./lib && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT ./lib",
+    "build:sentry": "npm run build && npm run sentry:sourcemaps",
+    "deploy:sentry": "npm run build:sentry && firebase deploy --only functions"
   },
   "engines": {
     "node": "20"
   },
   "main": "index.js",
   "dependencies": {
+    "@sentry/google-cloud-serverless": "^9.22.0",
     "@types/stripe": "^8.0.416",
     "axios": "^1.9.0",
     "firebase-admin": "^13.4.0",
@@ -28,7 +32,8 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.25.4",
     "firebase-functions-test": "^3.1.0",
-    "typescript": "^4.9.0"
+    "typescript": "^4.9.0",
+    "@sentry/cli": "^2.21.0"
   },
   "private": true
 }

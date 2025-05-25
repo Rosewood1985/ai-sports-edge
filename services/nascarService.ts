@@ -1,6 +1,7 @@
 import { auth, firestore } from '../config/firebase';
 import { hasPremiumAccess } from './firebaseSubscriptionService';
 import { nascarDataService } from './racing/nascarDataService';
+import { sentryService } from './sentryService';
 
 /**
  * NASCAR race data interface
@@ -76,7 +77,12 @@ export interface NascarPrediction {
  * @returns List of upcoming races
  */
 export const getUpcomingRaces = async (): Promise<NascarRace[]> => {
+  const transaction = sentryService.startTransaction('nascar-get-upcoming-races', 'query', 'Fetch upcoming NASCAR races');
+  const startTime = Date.now();
+  
   try {
+    sentryService.trackRacingOperation('get_upcoming_races', 'nascar', { source: 'nascar_api' });
+    
     // In a real implementation, this would call the NASCAR API
     // For now, we'll return mock data
     return [
@@ -114,7 +120,23 @@ export const getUpcomingRaces = async (): Promise<NascarRace[]> => {
         laps: 500
       }
     ];
+    
+    const duration = Date.now() - startTime;
+    sentryService.trackAPIPerformance('/api/nascar/races', 'GET', 200, duration);
+    transaction?.finish();
+    
+    return mockRaces;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    sentryService.captureError(error as Error, {
+      feature: 'nascar',
+      action: 'get_upcoming_races',
+      additionalData: { duration, source: 'nascar_api' }
+    });
+    
+    transaction?.setStatus('internal_error');
+    transaction?.finish();
+    
     console.error('Error fetching NASCAR races:', error);
     return [];
   }
@@ -125,7 +147,12 @@ export const getUpcomingRaces = async (): Promise<NascarRace[]> => {
  * @returns List of drivers with their standings
  */
 export const getDriverStandings = async (): Promise<NascarDriver[]> => {
+  const transaction = sentryService.startTransaction('nascar-get-driver-standings', 'query', 'Fetch NASCAR driver standings');
+  const startTime = Date.now();
+  
   try {
+    sentryService.trackRacingOperation('get_driver_standings', 'nascar', { season: new Date().getFullYear() });
+    
     // Use the NASCAR data service
     
     // Get current season standings
@@ -145,7 +172,32 @@ export const getDriverStandings = async (): Promise<NascarDriver[]> => {
       top5: stats.top5,
       top10: stats.top10
     }));
+    
+    const duration = Date.now() - startTime;
+    sentryService.trackAPIPerformance('/api/nascar/standings/drivers', 'GET', 200, duration);
+    sentryService.trackRacingOperation('driver_standings_success', 'nascar', { 
+      driverCount: seasonData.driverStats.length,
+      season: currentSeason,
+      duration 
+    });
+    transaction?.finish();
+    
+    return standings;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    sentryService.captureError(error as Error, {
+      feature: 'nascar',
+      action: 'get_driver_standings',
+      additionalData: { 
+        season: new Date().getFullYear(),
+        duration,
+        dataSource: 'nascar_data_service'
+      }
+    });
+    
+    transaction?.setStatus('internal_error');
+    transaction?.finish();
+    
     console.error('Error fetching NASCAR driver standings:', error);
     
     // Fallback: check if legacy environment variables are configured
@@ -162,7 +214,12 @@ export const getDriverStandings = async (): Promise<NascarDriver[]> => {
  * @returns List of teams with their standings
  */
 export const getTeamStandings = async (): Promise<NascarTeam[]> => {
+  const transaction = sentryService.startTransaction('nascar-get-team-standings', 'query', 'Fetch NASCAR team standings');
+  const startTime = Date.now();
+  
   try {
+    sentryService.trackRacingOperation('get_team_standings', 'nascar', { season: new Date().getFullYear() });
+    
     // Use the NASCAR data service
     
     // Get current season data
@@ -202,7 +259,32 @@ export const getTeamStandings = async (): Promise<NascarTeam[]> => {
       .map(team => team as NascarTeam)
       .sort((a, b) => (b.points || 0) - (a.points || 0))
       .map((team, index) => ({ ...team, position: index + 1 }));
+    
+    const duration = Date.now() - startTime;
+    sentryService.trackAPIPerformance('/api/nascar/standings/teams', 'GET', 200, duration);
+    sentryService.trackRacingOperation('team_standings_success', 'nascar', { 
+      teamCount: teamStandings.length,
+      season: currentSeason,
+      duration 
+    });
+    transaction?.finish();
+    
+    return teamStandings;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    sentryService.captureError(error as Error, {
+      feature: 'nascar',
+      action: 'get_team_standings',
+      additionalData: { 
+        season: new Date().getFullYear(),
+        duration,
+        aggregationSource: 'driver_data'
+      }
+    });
+    
+    transaction?.setStatus('internal_error');
+    transaction?.finish();
+    
     console.error('Error fetching NASCAR team standings:', error);
     return [];
   }
@@ -218,7 +300,15 @@ export const getRacePrediction = async (
   raceId: string,
   userId: string = auth.currentUser?.uid || ''
 ): Promise<NascarPrediction | null> => {
+  const transaction = sentryService.startTransaction('nascar-get-race-prediction', 'query', 'Fetch NASCAR race prediction');
+  const startTime = Date.now();
+  
   try {
+    sentryService.trackRacingOperation('get_race_prediction', 'nascar', { 
+      raceId, 
+      userId: userId ? 'authenticated' : 'anonymous'
+    });
+    
     // Check if user has premium access or has purchased this prediction
     const hasPremium = await hasPremiumAccess(userId);
     
@@ -283,7 +373,33 @@ export const getRacePrediction = async (
       },
       generatedAt: new Date().toISOString()
     };
+    
+    const duration = Date.now() - startTime;
+    sentryService.trackAPIPerformance('/api/nascar/predictions', 'GET', 200, duration);
+    sentryService.trackFeatureUsage('nascar_prediction', 'accessed', userId, {
+      raceId,
+      hasPremium,
+      duration
+    });
+    transaction?.finish();
+    
+    return prediction;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    sentryService.captureError(error as Error, {
+      userId,
+      feature: 'nascar',
+      action: 'get_race_prediction',
+      additionalData: { 
+        raceId,
+        duration,
+        predictionType: 'race_outcome'
+      }
+    });
+    
+    transaction?.setStatus('internal_error');
+    transaction?.finish();
+    
     console.error('Error fetching NASCAR race prediction:', error);
     return null;
   }
