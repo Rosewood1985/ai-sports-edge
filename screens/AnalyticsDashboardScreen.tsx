@@ -22,7 +22,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { analyticsService } from '../services/analyticsService';
+import { enhancedAnalyticsService } from '../services/enhancedAnalyticsService';
 
 // Define TIME_PERIODS directly in this file since the constants file might not be properly imported
 const TIME_PERIODS = {
@@ -35,88 +35,7 @@ const TIME_PERIODS = {
   CUSTOM: 'custom',
 };
 
-// Mock implementation for development
-const mockAnalyticsService = {
-  getDashboardData: async (timePeriod: string) => {
-    // Return mock data for development
-    return {
-      revenue: {
-        total_revenue: 1250.75,
-        active_users: 450,
-        daily_data: {
-          '2025-03-12': 150.25,
-          '2025-03-13': 175.50,
-          '2025-03-14': 200.00,
-          '2025-03-15': 185.75,
-          '2025-03-16': 210.25,
-          '2025-03-17': 225.50,
-          '2025-03-18': 103.50,
-        }
-      },
-      cookies: {
-        cookie_inits: 850,
-        cookie_persists: 720,
-        redirects: 380,
-        conversions: 210,
-        persist_rate: 84.7,
-        redirect_success_rate: 55.3,
-      },
-      microtransactions: {
-        total_revenue: 1250.75,
-        by_type: {
-          'Live Parlay Odds': {
-            impressions: 2500,
-            clicks: 450,
-            purchases: 180,
-            revenue: 540.00,
-            click_rate: 18.0,
-            conversion_rate: 40.0,
-          },
-          'Premium Stats': {
-            impressions: 3200,
-            clicks: 580,
-            purchases: 210,
-            revenue: 420.00,
-            click_rate: 18.1,
-            conversion_rate: 36.2,
-          },
-          'Expert Picks': {
-            impressions: 1800,
-            clicks: 320,
-            purchases: 95,
-            revenue: 190.75,
-            click_rate: 17.8,
-            conversion_rate: 29.7,
-          },
-          'Player Insights': {
-            impressions: 1200,
-            clicks: 180,
-            purchases: 50,
-            revenue: 100.00,
-            click_rate: 15.0,
-            conversion_rate: 27.8,
-          },
-        }
-      },
-      user_journey: {
-        stages: {
-          impressions: 8700,
-          clicks: 1530,
-          purchases: 535,
-          redirects: 380,
-          conversions: 210,
-        },
-        dropoff_rates: {
-          impression_to_click: 82.4,
-          click_to_purchase: 65.0,
-          purchase_to_redirect: 29.0,
-          redirect_to_conversion: 44.7,
-        },
-        completion_rate: 2.4,
-      }
-    };
-  }
-};
+// Production analytics service integration
 import { useThemeColor } from '../hooks/useThemeColor';
 import Colors from '../constants/Colors';
 
@@ -405,8 +324,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      // Use mock service for development
-      const data = await mockAnalyticsService.getDashboardData(selectedPeriod);
+      // Use real analytics service for production
+      const data = await enhancedAnalyticsService.getDashboardData(selectedPeriod);
       setDashboardData(data);
     } catch (error) {
       console.error('Error loading dashboard data:', error);

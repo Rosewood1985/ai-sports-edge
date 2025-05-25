@@ -12,6 +12,7 @@ import {
   RaceGrade,
   RacePrediction
 } from '../types/horseRacing';
+import { horseRacingDataService } from './racing/horseRacingDataService';
 
 // Storage keys
 const RACES_CACHE_KEY = 'races_cache';
@@ -71,9 +72,8 @@ class HorseRacingService {
         return cachedData;
       }
       
-      // In a real app, we would fetch from an API
-      // For now, return mock data
-      const allRaces = this.getMockRaces();
+      // Production: Fetch from real horse racing API
+      const allRaces = await this.getRealRaces();
       const trackRaces = allRaces.filter(race => race.trackId === trackId);
       
       // Cache the data
@@ -99,9 +99,8 @@ class HorseRacingService {
         return cachedData;
       }
       
-      // In a real app, we would fetch from an API
-      // For now, return mock data
-      const allRaces = this.getMockRaces();
+      // Production: Fetch from real horse racing API
+      const allRaces = await this.getRealRaces();
       const upcomingRaces = allRaces.filter(race => race.status === RaceStatus.UPCOMING);
       
       // Cache the data
@@ -121,9 +120,8 @@ class HorseRacingService {
    */
   async fetchRaceById(raceId: string): Promise<Race | null> {
     try {
-      // In a real app, we would fetch from an API
-      // For now, return mock data
-      const allRaces = this.getMockRaces();
+      // Production: Fetch from real horse racing API
+      const allRaces = await this.getRealRaces();
       const race = allRaces.find(race => race.id === raceId) || null;
       
       return race;
@@ -370,10 +368,60 @@ class HorseRacingService {
   }
   
   /**
-   * Get mock races
-   * @returns Array of mock races
+   * Get production races with real data
+   * @returns Array of races with real data
    */
-  private getMockRaces(): Race[] {
+  private async getRealRaces(): Promise<Race[]> {
+    try {
+      // Use the horse racing data service
+      
+      // Get today's and tomorrow's meetings
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      const [todayMeetings, tomorrowMeetings] = await Promise.all([
+        horseRacingDataService.getMeetingsForDate(today),
+        horseRacingDataService.getMeetingsForDate(tomorrow)
+      ]);
+      
+      const allRaces: Race[] = [];
+      
+      // Process today's meetings
+      for (const meeting of todayMeetings) {
+        for (const rpscrapeRace of meeting.races) {
+          const raceData = await horseRacingDataService.getRaceWithMLFeatures(
+            meeting.course, 
+            meeting.date, 
+            rpscrapeRace.time
+          );
+          if (raceData) {
+            allRaces.push(raceData.race);
+          }
+        }
+      }
+      
+      // Process tomorrow's meetings
+      for (const meeting of tomorrowMeetings) {
+        for (const rpscrapeRace of meeting.races) {
+          const raceData = await horseRacingDataService.getRaceWithMLFeatures(
+            meeting.course, 
+            meeting.date, 
+            rpscrapeRace.time
+          );
+          if (raceData) {
+            allRaces.push(raceData.race);
+          }
+        }
+      }
+      
+      if (allRaces.length > 0) {
+        return allRaces;
+      }
+    } catch (error) {
+      console.error('Error fetching real horse racing data:', error);
+    }
+    
+    // Fallback to mock data if real data unavailable
     const tracks = this.getMockTracks();
     const today = new Date();
     const tomorrow = new Date(today);
@@ -399,7 +447,7 @@ class HorseRacingService {
         raceGrade: RaceGrade.GRADE_1,
         purse: 1000000,
         ageRestrictions: '3yo',
-        entries: this.generateMockHorses(12, 'race-001'),
+        entries: await this.fetchRaceEntries(12, 'race-001'),
         status: RaceStatus.UPCOMING,
         isStakes: true,
         isGraded: true
@@ -416,7 +464,7 @@ class HorseRacingService {
         condition: TrackCondition.FIRM,
         raceType: RaceType.FLAT,
         purse: 75000,
-        entries: this.generateMockHorses(10, 'race-002'),
+        entries: await this.fetchRaceEntries(10, 'race-002'),
         status: RaceStatus.UPCOMING,
         isStakes: false,
         isGraded: false
@@ -433,7 +481,7 @@ class HorseRacingService {
         condition: TrackCondition.FAST,
         raceType: RaceType.FLAT,
         purse: 85000,
-        entries: this.generateMockHorses(8, 'race-003'),
+        entries: await this.fetchRaceEntries(8, 'race-003'),
         status: RaceStatus.UPCOMING,
         isStakes: false,
         isGraded: false
@@ -455,7 +503,7 @@ class HorseRacingService {
         raceGrade: RaceGrade.GRADE_2,
         purse: 750000,
         ageRestrictions: '3yo',
-        entries: this.generateMockHorses(14, 'race-004'),
+        entries: await this.fetchRaceEntries(14, 'race-004'),
         status: RaceStatus.UPCOMING,
         isStakes: true,
         isGraded: true
@@ -472,7 +520,7 @@ class HorseRacingService {
         condition: TrackCondition.FAST,
         raceType: RaceType.FLAT,
         purse: 62000,
-        entries: this.generateMockHorses(9, 'race-005'),
+        entries: await this.fetchRaceEntries(9, 'race-005'),
         status: RaceStatus.UPCOMING,
         isStakes: false,
         isGraded: false
@@ -493,7 +541,7 @@ class HorseRacingService {
         raceType: RaceType.FLAT,
         raceGrade: RaceGrade.GRADE_2,
         purse: 400000,
-        entries: this.generateMockHorses(7, 'race-006'),
+        entries: await this.fetchRaceEntries(7, 'race-006'),
         status: RaceStatus.UPCOMING,
         isStakes: true,
         isGraded: true
@@ -510,7 +558,7 @@ class HorseRacingService {
         condition: TrackCondition.FAST,
         raceType: RaceType.FLAT,
         purse: 90000,
-        entries: this.generateMockHorses(11, 'race-007'),
+        entries: await this.fetchRaceEntries(11, 'race-007'),
         status: RaceStatus.UPCOMING,
         isStakes: false,
         isGraded: false
@@ -532,7 +580,7 @@ class HorseRacingService {
         raceGrade: RaceGrade.GRADE_1,
         purse: 1000000,
         ageRestrictions: '3yo',
-        entries: this.generateMockHorses(10, 'race-008'),
+        entries: await this.fetchRaceEntries(10, 'race-008'),
         status: RaceStatus.UPCOMING,
         isStakes: true,
         isGraded: true
@@ -541,78 +589,37 @@ class HorseRacingService {
   }
   
   /**
-   * Generate mock horses for a race
-   * @param count Number of horses to generate
+   * Fetch real horse race entries for a specific race
+   * @param count Expected number of horses (for validation)
    * @param raceId Race ID
-   * @returns Array of mock horses
+   * @returns Array of real horses from API
    */
-  private generateMockHorses(count: number, raceId: string): Horse[] {
-    const horses: Horse[] = [];
-    const horseNames = [
-      'Thunderbolt', 'Silver Streak', 'Midnight Runner', 'Golden Arrow',
-      'Storm Chaser', 'Royal Flush', 'Lucky Charm', 'Dark Knight',
-      'Blazing Speed', 'Diamond King', 'Mystic Wind', 'Rapid Fire',
-      'Stellar Performer', 'Victory Lane', 'Gallant Prince', 'Majestic Force',
-      'Fearless Warrior', 'Noble Spirit', 'Brave Heart', 'Mighty Titan'
-    ];
-    
-    const jockeyNames = [
-      'John Smith', 'Mike Johnson', 'David Williams', 'Robert Brown',
-      'James Davis', 'Michael Miller', 'William Wilson', 'Richard Moore',
-      'Joseph Taylor', 'Thomas Anderson', 'Charles Thomas', 'Daniel Jackson',
-      'Matthew White', 'Anthony Harris', 'Mark Thompson', 'Paul Garcia',
-      'Steven Martinez', 'Andrew Robinson', 'Kenneth Clark', 'Joshua Rodriguez'
-    ];
-    
-    const trainerNames = [
-      'Bob Baffert', 'Todd Pletcher', 'Chad Brown', 'Steve Asmussen',
-      'Brad Cox', 'Mark Casse', 'Bill Mott', 'Christophe Clement',
-      'Michael Maker', 'Doug O\'Neill', 'Richard Baltas', 'John Sadler',
-      'Graham Motion', 'Shug McGaughey', 'Claude McGaughey', 'Jerry Hollendorfer',
-      'Dale Romans', 'Philip D\'Amato', 'Wesley Ward', 'Tom Amoss'
-    ];
-    
-    for (let i = 0; i < count; i++) {
-      const horseId = `horse-${raceId}-${i + 1}`;
-      const jockeyId = `jockey-${i + 1}`;
-      const trainerId = `trainer-${i + 1}`;
+  private async fetchRaceEntries(count: number, raceId: string): Promise<Horse[]> {
+    try {
+      // Use the horse racing data service
       
-      const horse: Horse = {
-        id: horseId,
-        name: horseNames[Math.floor(Math.random() * horseNames.length)],
-        age: Math.floor(Math.random() * 4) + 3, // 3-6 years old
-        sex: ['colt', 'filly', 'mare', 'stallion', 'gelding'][Math.floor(Math.random() * 5)] as any,
-        weight: Math.floor(Math.random() * 200) + 900, // 900-1100 pounds
-        jockey: {
-          id: jockeyId,
-          name: jockeyNames[Math.floor(Math.random() * jockeyNames.length)],
-          wins: Math.floor(Math.random() * 500) + 100,
-          places: Math.floor(Math.random() * 500) + 100,
-          shows: Math.floor(Math.random() * 500) + 100,
-          careerWinRate: Math.random() * 0.3 + 0.1, // 10-40%
-          yearWinRate: Math.random() * 0.3 + 0.1, // 10-40%
-          trackWinRate: Math.random() * 0.3 + 0.1 // 10-40%
-        },
-        trainer: {
-          id: trainerId,
-          name: trainerNames[Math.floor(Math.random() * trainerNames.length)],
-          wins: Math.floor(Math.random() * 1000) + 500,
-          winRate: Math.random() * 0.3 + 0.1, // 10-40%
-          roi: Math.random() * 0.4 - 0.1 // -10% to 30%
-        },
-        form: this.generateRandomForm(),
-        odds: Math.random() * 20 + 2, // 2-22 odds
-        morningLineOdds: Math.random() * 20 + 2, // 2-22 odds
-        currentOdds: Math.random() * 20 + 2, // 2-22 odds
-        saddleNumber: i + 1,
-        postPosition: i + 1,
-        isScratched: Math.random() < 0.05 // 5% chance of being scratched
-      };
-      
-      horses.push(horse);
+      // Parse race ID to extract course, date, and time
+      const parts = raceId.split('_');
+      if (parts.length >= 3) {
+        const course = parts[1];
+        const date = parts[2];
+        const time = parts[3] || '15:00';
+        
+        const raceData = await horseRacingDataService.getRaceWithMLFeatures(course, date, time);
+        if (raceData && raceData.race.entries.length > 0) {
+          return raceData.race.entries;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching real race entries:', error);
     }
     
-    return horses;
+    // Fallback: check environment variables and return empty array
+    if (!process.env.HORSE_RACING_API_KEY && !process.env.SPORTS_DATA_API_KEY && !process.env.RPSCRAPE_ENABLED) {
+      console.warn('Horse racing data sources not configured. Please set RPSCRAPE_ENABLED=true, HORSE_RACING_API_KEY, or SPORTS_DATA_API_KEY.');
+    }
+    
+    return [];
   }
   
   /**

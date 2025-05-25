@@ -98,16 +98,41 @@ Key categories:
 - **User Management**: `ProfileScreen.tsx`, `SettingsScreen.tsx`, `PersonalizationScreen.tsx`
 - **Analytics**: `AnalyticsDashboardScreen.tsx`, `SubscriptionAnalyticsScreen.tsx`
 
-#### 2.4 Service Layer (`/services/` - 115 files)
+#### 2.4 Service Layer (`/services/` - 115+ files)
 **Purpose**: Business logic, API integration, and data management
 **Pattern**: `serviceName.ts` or `ServiceName.js`
 
 Key categories:
-- **Odds Services**: `OddsService.js`, `UfcOddsService.js`, `Formula1OddsService.js`
-- **API Services**: `apiService.ts`, `analyticsService.ts`, `notificationService.ts`
-- **User Services**: `userPreferencesService.ts`, `onboardingService.ts`
-- **Payment Services**: `paymentService.js`, `stripeTaxService.js`
-- **Utility Services**: `cacheService.ts`, `geolocationService.ts`, `deepLinkingService.ts`
+- **Odds Services**: `OddsService.js`, `UfcOddsService.js`, `Formula1OddsService.js`, `NbaOddsService.js`, `MlbOddsService.js`, `NhlOddsService.js`, `WnbaOddsService.js`, `SoccerOddsService.js`, `HorseRacingOddsService.js`
+- **Sports Services**: `ufcService.ts`, `formula1Service.ts`, `horseRacingService.ts`, `cricketService.ts`, `rugbyService.ts`, `nascarService.ts`, `ncaaBasketballService.ts`
+- **API Services**: `apiService.ts`, `analyticsService.ts`, `notificationService.ts`, `sportsDataService.ts`, `sportsNewsService.ts`
+- **User Services**: `userPreferencesService.ts`, `onboardingService.ts`, `userService.ts`, `userSportsPreferencesService.ts`, `optimizedUserService.ts`
+- **Payment Services**: `paymentService.js`, `stripeTaxService.js`, `stripeTaxService.ts`, `revenueReportingService.ts`
+- **Betting Services**: `betSlipService.ts`, `bettingAffiliateService.ts`, `bettingAnalyticsService.ts`, `parlayService.ts`, `parlayOddsService.ts`
+- **Analytics Services**: `advancedAnalyticsService.ts`, `enhancedAnalyticsService.ts`, `subscriptionAnalyticsService.ts`, `performanceMonitoringService.ts`
+- **Notification Services**: `pushNotificationService.ts`, `referralNotificationService.ts`
+- **Utility Services**: `cacheService.ts`, `geolocationService.ts`, `deepLinkingService.ts`, `networkService.ts`, `offlineService.ts`, `searchService.ts`
+- **Firebase Services**: `firebaseService.ts`, `firebaseMonitoringService.ts`, `firebaseSubscriptionService.ts`
+- **Security Services**: `/security/AIInputValidator.ts`, `/security/PromptTemplate.ts`
+- **ML/AI Services**: `mlPredictionService.ts`, `aiPredictionService.ts`, `aiSummaryService.ts`, `aiNewsAnalysisService.ts`, `aiPickSelector.ts`, `/ml-sports-edge/MLSportsEdgeService.js`
+
+#### 2.5 Utilities Layer (`/utils/` - 25+ files)
+**Purpose**: Shared utility functions, helpers, and cross-cutting concerns
+**Pattern**: `utilityName.ts` or `utilityName.js`
+
+Key categories:
+- **Accessibility Utils**: `accessibilityTestUtils.ts`, `responsiveTestUtils.ts`
+- **Animation Utils**: `animationOptimizer.ts`, `animationUtils.ts`
+- **API Utils**: `apiKeys.ts`, `urlUtils.ts`
+- **Data Utils**: `dataMigrationUtils.ts`, `dateUtils.ts`, `db.ts`
+- **Environment Utils**: `envCheck.js`, `envConfig.js`, `environmentUtils.ts`
+- **Firebase Utils**: `firebaseCacheConfig.ts`, `firebaseTest.ts`
+- **Geo/Location Utils**: `/geoip/geoipService.ts`, `/geoip/geoipService.web.js`, `/geoip/geoipService.node.js`
+- **Performance Utils**: `deviceOptimization.ts`, `memoryManagement.ts`, `responsiveImageLoader.ts`
+- **Business Logic Utils**: `betting.ts`, `cache.ts`, `codeGenerator.ts`, `languageDetection.ts`
+- **Tax/Financial Utils**: `stripeTaxConfig.ts`, `tax-report-generator.js`, `taxRateCache.js`, `taxReportGenerator.js`
+- **Error Handling**: `errorHandling.ts`, `errorHandlingUtils.js`, `logger.ts`
+- **Testing Utils**: `referralABTesting.ts`, `responsiveUtils.ts`
 
 ### 3. Configuration and Setup
 
@@ -115,11 +140,21 @@ Key categories:
 ```
 /config/
 ├── 🔑 apiKeys.ts               # API key management
+├── 🔑 api-keys.json            # JSON API key configuration
 ├── 🔥 firebase.ts              # Firebase configuration
+├── 🔥 firebase-production.json # Production Firebase config
 ├── 💳 stripe.ts                # Stripe payment configuration
+├── 💳 stripe-tax.json          # Stripe tax configuration
 ├── 🎨 teamColors.ts            # Sports team color definitions
 ├── 🔗 affiliateConfig.ts       # Affiliate program configuration
-└── 📊 seo.ts                   # SEO optimization settings
+├── 📊 seo.ts                   # SEO optimization settings
+├── 📊 seo.js                   # SEO JavaScript configuration
+├── 🏀 ncaaBasketballApi.ts     # NCAA Basketball API config
+├── 🎯 oddsApi.ts               # Odds API configuration
+├── 🥊 ufcApi.ts                # UFC API configuration
+├── 📈 sportRadarApi.ts         # SportRadar API configuration
+├── 🏈 sportsbook.ts            # Sportsbook configuration
+└── 📄 database.json            # Database configuration
 ```
 
 #### 3.2 Context Providers (`/contexts/` - 6 files)
@@ -191,16 +226,118 @@ Key categories:
 ```
 /build/                         # Production build output
 /deploy/                        # Deployment-ready files
+├── ai_logo_new.svg             # Logo asset
+├── bundle.js                   # Bundled JavaScript
+├── index.html                  # Main HTML entry
+├── login.html                  # Login page
+├── signup.html                 # Signup page
+└── styles.css                  # Compiled styles
+
 /public/                        # Static web assets
+├── index.html                  # Main web entry point
+├── login.html                  # Login page
+├── ai_logo_new.svg             # Logo
+├── styles.css                  # Main styles
+├── neon-ui.css                 # Neon UI styles
+├── service-worker.js           # PWA service worker
+├── register-service-worker.js  # Service worker registration
+└── sitemap*.xml                # SEO sitemaps (en, es variants)
 ```
 
-#### 6.2 Deployment Scripts (`/scripts/` - 150+ files)
+#### 6.2 Special Directories
+
+##### Machine Learning (`/ml/`)
+```
+/ml/
+├── README.md                   # ML setup documentation
+└── train_and_push.sh           # Model training script
+```
+
+##### Data Storage (`/data/` and `/cache/`)
+```
+/data/                          # Application data storage
+/cache/                         # Model and API response cache
+├── glama_models.json           # Glama AI models cache
+├── openrouter_models.json      # OpenRouter models cache
+├── requesty_models.json        # Requesty models cache
+└── unbound_models.json         # Unbound models cache
+```
+
+##### Infrastructure (`/infrastructure/`)
+```
+/infrastructure/
+└── deploy-production.sh        # Production deployment script
+```
+
+##### Platform-Specific (`/android/`, `/ios/`)
+```
+/android/                       # Android-specific files
+/ios/                          # iOS-specific files
+├── LocaleManager.m             # Objective-C locale manager
+└── LocaleManager.swift         # Swift locale manager
+```
+
+##### Archive and Backups (`/archive/`, `/backups/`)
+```
+/archive/                       # Archived files
+/backups/                       # Project backups
+├── aisportsedge-deploy_*.zip   # Deployment backups
+└── atomic-imports-*            # Atomic migration backups
+```
+
+#### 6.3 Deployment Scripts (`/scripts/` - 150+ files)
 **Purpose**: Automated deployment, testing, and maintenance scripts
 **Key Scripts**:
 - `deploy-to-firebase.sh` - Firebase deployment
 - `deploy-vscode-sftp.sh` - SFTP deployment
 - `run-accessibility-tests.js` - Accessibility validation
 - `dependency-audit.js` - Security auditing
+- `test-accessibility.js` - Accessibility testing
+- `generate-report.js` - Report generation
+- `validate-deployment-config.sh` - Deployment validation
+
+### 7. Additional Infrastructure
+
+#### 7.1 Middleware (`/middleware/`)
+```
+/middleware/
+└── authMiddleware.js           # Authentication middleware for server
+```
+
+#### 7.2 Server Components (`/server/`)
+```
+/server/
+├── api.js                      # API route handlers
+├── auditLogging.js             # Audit log middleware
+├── ddosProtection.js           # DDoS protection
+├── securityHeaders.js          # Security header middleware
+└── ssr.js                      # Server-side rendering
+```
+
+#### 7.3 Job Processors (`/jobs/`)
+```
+/jobs/
+└── rssFeedCronJob.js          # RSS feed processing job
+```
+
+#### 7.4 Constants (`/constants/`)
+```
+/constants/
+├── AnalyticsConstants.ts       # Analytics event constants
+├── Colors.ts                   # Color scheme constants
+└── navigation.ts               # Navigation constants
+```
+
+#### 7.5 Examples (`/examples/`)
+```
+/examples/
+├── README.md                   # Example usage guide
+├── ApiCachingExample.tsx       # API caching patterns
+├── AppInitialization.js        # App initialization example
+├── ProfileScreen.js            # Profile screen example
+├── ResponsiveCardExample.tsx   # Responsive design patterns
+└── ThemeToggleExample.tsx      # Theme switching example
+```
 
 ---
 
@@ -225,6 +362,54 @@ Atoms (Basic UI elements)
 - **Legacy**: `/components/` → **Modern**: `/atomic/`
 - **Import Pattern**: `import { Component } from '../atomic/atoms'`
 - **Compliance**: 100% atomic architecture implementation complete
+
+#### Advanced Atomic Components
+
+**NeonBorderView (Multi-file Component)**
+```
+/atomic/atoms/NeonBorderView/
+├── NeonBorderView.tsx          # Main component
+├── NeonBorderView.styles.ts    # Styled components
+├── CircuitGridPattern.tsx      # Background pattern
+├── RotationAnimation.ts        # Animation logic
+└── index.ts                    # Export barrel
+```
+
+**Privacy Management (Multi-component System)**
+```
+/atomic/atoms/privacy/
+├── dataCategories.ts           # Data classification
+├── dataRetentionPolicies.ts    # Retention rules
+├── gdprConfig.ts               # GDPR configuration
+├── privacyTypes.ts             # TypeScript definitions
+├── storageUtils.ts             # Storage utilities
+└── index.ts                    # Export barrel
+
+/atomic/molecules/privacy/
+├── ConsentManager.ts           # Consent collection
+├── DataAccessManager.ts        # Data access requests
+├── DataDeletionManager.ts      # Data deletion handling
+├── PrivacyManager.ts           # Main privacy orchestrator
+└── initializeDataRetention.ts  # Retention initialization
+
+/atomic/organisms/privacy/
+├── PrivacyService.ts           # Privacy business logic
+├── PrivacySettingsScreen.tsx   # Privacy settings UI
+└── index.ts                    # Export barrel
+```
+
+**Reporting System (Widget Architecture)**
+```
+/atomic/organisms/reporting/
+├── useReportHistory.ts         # Report history hooks
+├── useReportTemplates.ts       # Template management hooks
+└── index.ts                    # Export barrel
+
+/atomic/organisms/widgets/
+├── BettingAnalyticsWidget.tsx  # Betting analytics display
+├── EnhancedSubscriptionAnalyticsWidget.tsx # Subscription metrics
+└── index.ts                    # Export barrel
+```
 
 ### 2. Service Layer Patterns
 
@@ -420,12 +605,20 @@ export const BettingNavigator: React.FC
 
 #### Translation System
 ```
-/atomic/atoms/translations/
+Primary Location: /atomic/atoms/translations/
 ├── 📄 index.js                 # Translation loader
 ├── 🇺🇸 en.json                 # English base translations
 ├── 🇪🇸 es.json                 # Spanish translations
+├── 🇪🇸 es-error-updates.json   # Spanish error message updates
 ├── 🎯 odds-comparison-en.json  # Feature-specific English
 └── 🎯 odds-comparison-es.json  # Feature-specific Spanish
+
+Secondary Location: /translations/ (Root level)
+├── 🇺🇸 en.json                 # English base translations
+├── 🇪🇸 es.json                 # Spanish translations
+├── 🇪🇸 es-error-updates.json   # Spanish error updates
+├── 🎯 odds-comparison-en.json  # Odds comparison English
+└── 🎯 odds-comparison-es.json  # Odds comparison Spanish
 ```
 
 #### Usage Pattern
@@ -684,29 +877,50 @@ npm run deploy:atomic
 ### Common File Paths
 ```
 📱 Main App: /App.tsx
+🗺️ Project Map: /AI-SPORTS-EDGE-PROJECT-MAP.md
 🏗️ Architecture: /ARCHITECTURE.md
 🧱 Atomic Design: /atomic/README.md
 🔧 Firebase Config: /config/firebase.ts
+🔑 API Keys: /config/apiKeys.ts
 🎨 Theme System: /contexts/ThemeContext.tsx
-🌐 Translations: /atomic/atoms/translations/
+🌐 Translations: /atomic/atoms/translations/ & /translations/
 📊 Analytics: /services/analyticsService.ts
 🔐 Authentication: /hooks/useAuth.ts
+🛠️ Utilities: /utils/
+🏗️ Server: /server/
+📂 Scripts: /scripts/
 ```
 
 ### Import Patterns
 ```typescript
 // Atomic components
-import { LoadingIndicator, Toast } from '../atomic/atoms';
-import { LineChart } from '../atomic/molecules/charts';
-import { BettingAnalyticsWidget } from '../atomic/organisms/widgets';
+import { LoadingIndicator, Toast, ThemedText } from '../atomic/atoms';
+import { LineChart, PieChart } from '../atomic/molecules/charts';
+import { BettingAnalyticsWidget, EnhancedSubscriptionAnalyticsWidget } from '../atomic/organisms/widgets';
+import { NeonBorderView } from '../atomic/atoms/NeonBorderView';
 
 // Services
 import { apiService } from '../services/apiService';
 import { analyticsService } from '../services/analyticsService';
+import { userPreferencesService } from '../services/userPreferencesService';
+import { stripeTaxService } from '../services/stripeTaxService';
 
 // Hooks & Context
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../hooks/useTranslation';
+import { useResponsiveStyles } from '../hooks/useResponsiveStyles';
+
+// Utils
+import { formatUtils } from '../atomic/atoms/formatUtils';
+import { errorUtils } from '../atomic/atoms/errorUtils';
+import { dateUtils } from '../utils/dateUtils';
+import { environmentUtils } from '../utils/environmentUtils';
+
+// Privacy & Security
+import { PrivacyManager } from '../atomic/molecules/privacy/PrivacyManager';
+import { ConsentManager } from '../atomic/molecules/privacy/ConsentManager';
+import { AIInputValidator } from '../services/security/AIInputValidator';
 ```
 
 ### Configuration Files
@@ -715,12 +929,37 @@ import { useTheme } from '../contexts/ThemeContext';
 // API Keys: /config/apiKeys.ts  
 // Stripe: /config/stripe.ts
 // Colors: /config/teamColors.ts
+// SEO: /config/seo.ts
+// Odds APIs: /config/oddsApi.ts, /config/ufcApi.ts, /config/ncaaBasketballApi.ts
+// Sports APIs: /config/sportRadarApi.ts
 ```
+
+### Key Architecture Highlights
+
+- **🧱 Atomic Design**: Complete implementation with 117+ atomic components
+- **🔄 Dual Architecture**: Legacy `/components/` + Modern `/atomic/` structure
+- **🌐 Internationalization**: Dual-location translation system (atomic + root)
+- **🔧 Service Layer**: 115+ services organized by function and responsibility
+- **🎯 Type Safety**: Full TypeScript implementation with comprehensive type definitions
+- **🧪 Testing**: Jest + React Testing Library + Jest-Axe accessibility testing
+- **🔒 Security**: Multi-layer security with input validation, Firebase rules, and privacy management
+- **📊 Analytics**: Comprehensive analytics with multiple service layers
+- **💳 Payments**: Full Stripe integration with tax handling and subscription management
+- **🚀 Deployment**: Multi-environment deployment with 150+ automation scripts
+
+### Total File Count Summary
+- **Components**: 132 traditional + 117 atomic = 249 total components
+- **Services**: 115+ business logic services
+- **Screens**: 84 full-screen components
+- **Utils**: 25+ utility functions and helpers
+- **Scripts**: 150+ deployment and automation scripts
+- **Documentation**: 150+ documentation files
+- **Configuration**: 16 config files + environment-specific variants
 
 ---
 
-*This project map serves as the definitive reference for AI Sports Edge codebase navigation and development standards.*
+*This comprehensive project map serves as the definitive reference for AI Sports Edge codebase navigation, architecture understanding, and development standards. It provides complete visibility into the project's structure, patterns, and implementation details.*
 
 **Last Updated**: May 25, 2025  
-**Version**: 1.0  
+**Version**: 2.0 (Comprehensive Update)  
 **Maintained by**: AI Sports Edge Development Team

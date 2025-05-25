@@ -17,10 +17,11 @@
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "*.ts"
   ],
   "exclude": [
     "node_modules",
-    "../utils/geoip"
+    "../utils/geoip",
+    "src"
   ]
 }

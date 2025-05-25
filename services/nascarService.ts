@@ -1,5 +1,6 @@
 import { auth, firestore } from '../config/firebase';
 import { hasPremiumAccess } from './firebaseSubscriptionService';
+import { nascarDataService } from './racing/nascarDataService';
 
 /**
  * NASCAR race data interface
@@ -125,48 +126,33 @@ export const getUpcomingRaces = async (): Promise<NascarRace[]> => {
  */
 export const getDriverStandings = async (): Promise<NascarDriver[]> => {
   try {
-    // In a real implementation, this would call the NASCAR API
-    // For now, we'll return mock data
-    return [
-      {
-        id: 'driver-1',
-        name: 'Kyle Larson',
-        number: 5,
-        team: 'Hendrick Motorsports',
-        manufacturer: 'Chevrolet',
-        points: 2400,
-        position: 1,
-        wins: 6,
-        top5: 15,
-        top10: 20
-      },
-      {
-        id: 'driver-2',
-        name: 'Denny Hamlin',
-        number: 11,
-        team: 'Joe Gibbs Racing',
-        manufacturer: 'Toyota',
-        points: 2350,
-        position: 2,
-        wins: 5,
-        top5: 14,
-        top10: 19
-      },
-      {
-        id: 'driver-3',
-        name: 'Joey Logano',
-        number: 22,
-        team: 'Team Penske',
-        manufacturer: 'Ford',
-        points: 2300,
-        position: 3,
-        wins: 4,
-        top5: 12,
-        top10: 18
-      }
-    ];
+    // Use the NASCAR data service
+    
+    // Get current season standings
+    const currentSeason = new Date().getFullYear();
+    const seasonData = await nascarDataService.getSeasonData(currentSeason, 'Cup');
+    
+    // Convert to legacy format for compatibility
+    return seasonData.driverStats.map(stats => ({
+      id: stats.driverId,
+      name: stats.driverName,
+      number: 0, // Would need additional data mapping
+      team: '', // Would need additional data mapping
+      manufacturer: 'Unknown' as 'Ford' | 'Chevrolet' | 'Toyota',
+      points: stats.points,
+      position: stats.position,
+      wins: stats.wins,
+      top5: stats.top5,
+      top10: stats.top10
+    }));
   } catch (error) {
     console.error('Error fetching NASCAR driver standings:', error);
+    
+    // Fallback: check if legacy environment variables are configured
+    if (!process.env.NASCAR_API_KEY && !process.env.SPORTS_DATA_API_KEY && !process.env.NASCAR_DATA_REPO_URL) {
+      console.warn('NASCAR data sources not configured. Please set NASCAR_DATA_REPO_URL, NASCAR_API_KEY, or SPORTS_DATA_API_KEY.');
+    }
+    
     return [];
   }
 };
@@ -177,37 +163,45 @@ export const getDriverStandings = async (): Promise<NascarDriver[]> => {
  */
 export const getTeamStandings = async (): Promise<NascarTeam[]> => {
   try {
-    // In a real implementation, this would call the NASCAR API
-    // For now, we'll return mock data
-    return [
-      {
-        id: 'team-1',
-        name: 'Hendrick Motorsports',
-        manufacturer: 'Chevrolet',
-        drivers: ['Kyle Larson', 'Chase Elliott', 'William Byron', 'Alex Bowman'],
-        points: 4500,
-        position: 1,
-        wins: 12
-      },
-      {
-        id: 'team-2',
-        name: 'Joe Gibbs Racing',
-        manufacturer: 'Toyota',
-        drivers: ['Denny Hamlin', 'Martin Truex Jr.', 'Christopher Bell', 'Ty Gibbs'],
-        points: 4300,
-        position: 2,
-        wins: 10
-      },
-      {
-        id: 'team-3',
-        name: 'Team Penske',
-        manufacturer: 'Ford',
-        drivers: ['Joey Logano', 'Ryan Blaney', 'Austin Cindric'],
-        points: 4100,
-        position: 3,
-        wins: 8
-      }
-    ];
+    // Use the NASCAR data service
+    
+    // Get current season data
+    const currentSeason = new Date().getFullYear();
+    const seasonData = await nascarDataService.getSeasonData(currentSeason, 'Cup');
+    
+    // Aggregate team standings from driver data
+    const teamMap = new Map<string, Partial<NascarTeam>>();
+    
+    seasonData.races.forEach(race => {
+      race.results.forEach(result => {
+        if (!teamMap.has(result.team)) {
+          teamMap.set(result.team, {
+            id: `team-${result.team.toLowerCase().replace(/\s+/g, '-')}`,
+            name: result.team,
+            manufacturer: result.manufacturer,
+            drivers: [],
+            points: 0,
+            wins: 0,
+            position: 0
+          });
+        }
+        
+        const team = teamMap.get(result.team)!;
+        if (!team.drivers?.includes(result.driverName)) {
+          team.drivers?.push(result.driverName);
+        }
+        team.points = (team.points || 0) + result.points;
+        if (result.finishPosition === 1) {
+          team.wins = (team.wins || 0) + 1;
+        }
+      });
+    });
+    
+    // Convert to array and sort by points
+    return Array.from(teamMap.values())
+      .map(team => team as NascarTeam)
+      .sort((a, b) => (b.points || 0) - (a.points || 0))
+      .map((team, index) => ({ ...team, position: index + 1 }));
   } catch (error) {
     console.error('Error fetching NASCAR team standings:', error);
     return [];

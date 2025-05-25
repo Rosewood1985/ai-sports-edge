@@ -27,12 +27,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserPurchases = exports.verifyPurchase = exports.createOneTimePayment = void 0;
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const stripe_1 = __importDefault(require("stripe"));
 // Initialize Stripe with your secret key
-const stripe = new stripe_1.default(functions.config().stripe.secret, {
-    apiVersion: '2025-02-24.acacia',
+const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY || "", {
+    apiVersion: "2024-12-18.acacia",
 });
 // Initialize Firestore
 const db = admin.firestore();

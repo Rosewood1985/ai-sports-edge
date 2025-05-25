@@ -1,23 +1,24 @@
-const admin = require('firebase-admin');
-const functions = require('firebase-functions');
+const admin = require("firebase-admin");
+const { onRequest } = require("firebase-functions/v2/https");
+const { onCreate } = require("firebase-functions/v2/auth");
 
 // Initialize Firebase Admin
 admin.initializeApp();
 
 // Create a simple Stripe webhook handler
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+exports.stripeWebhook = onRequest({ cors: true }, async (req, res) => {
   try {
-    const stripe = require('stripe')(functions.config().stripe.secret_key);
-    const webhookSecret = functions.config().stripe.webhook_secret;
+    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     // Log the webhook request
-    console.log('Received Stripe webhook request');
+    console.log("Received Stripe webhook request");
 
     // Return a 200 response to acknowledge receipt of the event
     res.status(200).send({ received: true });
   } catch (error) {
-    console.error('Error processing webhook:', error);
-    res.status(500).send({ error: 'Webhook processing failed' });
+    console.error("Error processing webhook:", error);
+    res.status(500).send({ error: "Webhook processing failed" });
   }
 });
 
@@ -322,13 +323,14 @@ async function handleSubscriptionDeleted(subscription) {
 }
 
 // Add user creation hook to set up Stripe customer
-exports.onUserCreate = functions.auth.user().onCreate(async user => {
+exports.onUserCreate = onCreate(async (event) => {
+  const user = event.data;
   try {
     const db = admin.firestore();
     const userRef = db.collection('users').doc(user.uid);
 
     // Create a Stripe customer for the new user
-    const stripe = require('stripe')(functions.config().stripe.secret_key);
+    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
     const customer = await stripe.customers.create({
       email: user.email,
       metadata: { firebaseUserId: user.uid },
@@ -354,8 +356,8 @@ exports.onUserCreate = functions.auth.user().onCreate(async user => {
 });
 
 // Referral + Reward Functions
-const { generateReferralCode } = require('./generateReferralCode');
-const { rewardReferrer } = require('./rewardReferrer');
+const { generateReferralCode } = require("./generateReferralCode");
+const { rewardReferrer } = require("./rewardReferrer");
 exports.generateReferralCode = generateReferralCode;
 exports.rewardReferrer = rewardReferrer;
 
@@ -364,7 +366,7 @@ const {
   syncSubscriptionStatus,
   syncCustomerId,
   standardizeStatusSpelling,
-} = require('./database-consistency-triggers');
+} = require("./database-consistency-triggers");
 exports.syncSubscriptionStatus = syncSubscriptionStatus;
 exports.syncCustomerId = syncCustomerId;
 exports.standardizeStatusSpelling = standardizeStatusSpelling;
