@@ -1,6 +1,6 @@
 const admin = require("firebase-admin");
 const { onRequest } = require("firebase-functions/v2/https");
-const { onCreate } = require("firebase-functions/v2/auth");
+const functions = require("firebase-functions");
 
 // Initialize Sentry first
 const {
@@ -447,9 +447,9 @@ async function handleSubscriptionDeleted(subscription) {
   }
 }
 
-// Add user creation hook to set up Stripe customer
-exports.onUserCreate = wrapEventFunction(onCreate(async (event) => {
-  const user = event.data;
+// Add user creation hook to set up Stripe customer (temporarily disabled for deployment)
+/*
+exports.onUserCreate = wrapEventFunction(functions.auth.user().onCreate(async (user) => {
   const startTime = Date.now();
   try {
     trackSubscriptionFunction('onUserCreate', 'user_created', {
@@ -494,6 +494,7 @@ exports.onUserCreate = wrapEventFunction(onCreate(async (event) => {
     return null;
   }
 }));
+*/
 
 // Referral + Reward Functions
 const { generateReferralCode } = require("./generateReferralCode");

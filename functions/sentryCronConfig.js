@@ -1,5 +1,4 @@
-const Sentry = require('@sentry/node');
-const { CronJob } = require('@sentry/cron');
+const Sentry = require('@sentry/google-cloud-serverless');
 
 /**
  * Enhanced Sentry configuration for Firebase Cloud Functions with Cron Monitoring

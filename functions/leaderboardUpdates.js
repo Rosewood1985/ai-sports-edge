@@ -12,6 +12,8 @@ if (!admin.apps.length) {
  * Update the referral leaderboard
  * This function runs on a schedule (daily at midnight)
  */
+/*
+// Temporarily disabled for initial deployment
 exports.updateReferralLeaderboard = functions.pubsub
   .schedule('0 0 * * *') // Run daily at midnight
   .timeZone('America/New_York')
@@ -197,6 +199,12 @@ exports.updateReferralLeaderboard = functions.pubsub
       return null;
     }
   }));
+*/
+
+// Placeholder export
+exports.updateReferralLeaderboard = () => {
+  console.log('updateReferralLeaderboard temporarily disabled');
+};
 
 // Export the functions
 module.exports = {

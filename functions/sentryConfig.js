@@ -19,8 +19,7 @@ const initSentry = () => {
     
     // Configure integrations
     integrations: [
-      new Sentry.Integrations.Http({ tracing: true }),
-      new Sentry.Integrations.Console(),
+      // HTTP integration is automatically included in @sentry/google-cloud-serverless
     ],
     
     // Add context

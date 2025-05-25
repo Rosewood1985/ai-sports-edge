@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { geoipService } from '../utils/geoip/geoipService';
+const axios = require('axios');
+const geoipService = require('../utils/geoip');
 
 const IPGEOLOCATION_API_KEY = process.env.REACT_APP_IPGEOLOCATION_API_KEY;
 const IPGEOLOCATION_API_URL = 'https://api.ipgeolocation.io/ipgeo';

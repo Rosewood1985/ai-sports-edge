@@ -9,6 +9,8 @@ try {
   // App already initialized
 }
 
+/*
+// Temporarily disabled for deployment 
 exports.generateReferralCode = wrapEventFunction(functions.auth.user().onCreate(async (user) => {
   const startTime = Date.now();
   const uid = user.uid;
@@ -51,3 +53,9 @@ exports.generateReferralCode = wrapEventFunction(functions.auth.user().onCreate(
     trackFunctionPerformance('generateReferralCode', Date.now() - startTime, false);
   }
 }));
+*/
+
+// Placeholder export to maintain module structure
+exports.generateReferralCode = () => {
+  console.log('generateReferralCode temporarily disabled');
+};

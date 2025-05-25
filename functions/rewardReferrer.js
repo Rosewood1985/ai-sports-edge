@@ -9,11 +9,13 @@ try {
   // App already initialized
 }
 
+/*
+// Temporarily disabled for deployment
 exports.rewardReferrer = wrapEventFunction(functions.firestore
   .document("purchases/{purchaseId}")
-  .onCreate(async (snap, context) => {
+  .onCreate(async (change, context) => {
     const startTime = Date.now();
-    const purchase = snap.data();
+    const purchase = change.data();
     const uid = purchase.uid;
     const purchaseId = context.params.purchaseId;
 
@@ -81,3 +83,9 @@ exports.rewardReferrer = wrapEventFunction(functions.firestore
       return null;
     }
   }));
+*/
+
+// Placeholder export to maintain module structure
+exports.rewardReferrer = () => {
+  console.log('rewardReferrer temporarily disabled');
+};

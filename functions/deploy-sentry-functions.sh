@@ -170,14 +170,41 @@ fi
 echo -e "\n${YELLOW}🔐 Firebase Authentication${NC}"
 echo "=========================="
 
+# Check for CI token in environment or .env file
+if [ -z "$FIREBASE_TOKEN" ] && [ -f "../.env" ]; then
+    log "Loading environment variables from .env..."
+    source ../.env
+fi
+
+if [ -z "$FIREBASE_TOKEN" ] && [ -f ".env" ]; then
+    log "Loading environment variables from functions/.env..."
+    source .env
+fi
+
 log "Checking Firebase authentication..."
-if firebase projects:list >/dev/null 2>&1; then
+if [ -n "$FIREBASE_TOKEN" ]; then
+    log "Using Firebase CI token authentication..."
+    if firebase projects:list --token "$FIREBASE_TOKEN" >/dev/null 2>&1; then
+        CURRENT_PROJECT=$(firebase use --current --token "$FIREBASE_TOKEN" 2>/dev/null || echo "Not set")
+        log "${GREEN}✅ Authenticated with Firebase using CI token${NC}"
+        log "Current project: $CURRENT_PROJECT"
+        
+        # Export token for subsequent firebase commands
+        export FIREBASE_TOKEN
+        FIREBASE_CMD="firebase --token $FIREBASE_TOKEN"
+    else
+        echo -e "${RED}❌ Invalid Firebase CI token${NC}"
+        echo "Please run: ./setup-firebase-ci-auth.sh"
+        exit 1
+    fi
+elif firebase projects:list >/dev/null 2>&1; then
     CURRENT_PROJECT=$(firebase use --current 2>/dev/null || echo "Not set")
     log "${GREEN}✅ Authenticated with Firebase${NC}"
     log "Current project: $CURRENT_PROJECT"
+    FIREBASE_CMD="firebase"
 else
     echo -e "${RED}❌ Not authenticated with Firebase${NC}"
-    echo "Please run: firebase login"
+    echo "Please run: ./setup-firebase-ci-auth.sh"
     exit 1
 fi
 
@@ -189,11 +216,20 @@ log "Starting Firebase Functions deployment..."
 echo -e "${YELLOW}Deploying with Sentry monitoring enabled...${NC}"
 
 # Deploy only functions (not hosting, storage, etc.)
-if firebase deploy --only functions; then
-    log "${GREEN}✅ Functions deployed successfully!${NC}"
+if [ -n "$FIREBASE_TOKEN" ]; then
+    if firebase deploy --only functions --token "$FIREBASE_TOKEN"; then
+        log "${GREEN}✅ Functions deployed successfully!${NC}"
+    else
+        echo -e "${RED}❌ Deployment failed${NC}"
+        exit 1
+    fi
 else
-    echo -e "${RED}❌ Deployment failed${NC}"
-    exit 1
+    if firebase deploy --only functions; then
+        log "${GREEN}✅ Functions deployed successfully!${NC}"
+    else
+        echo -e "${RED}❌ Deployment failed${NC}"
+        exit 1
+    fi
 fi
 
 # Post-deployment verification
@@ -205,7 +241,11 @@ sleep 10
 
 # List deployed functions
 log "Listing deployed functions..."
-firebase functions:list 2>/dev/null || echo "Unable to list functions (this is normal for some regions)"
+if [ -n "$FIREBASE_TOKEN" ]; then
+    firebase functions:list --token "$FIREBASE_TOKEN" 2>/dev/null || echo "Unable to list functions (this is normal for some regions)"
+else
+    firebase functions:list 2>/dev/null || echo "Unable to list functions (this is normal for some regions)"
+fi
 
 # Verify Sentry integration
 echo -e "\n${YELLOW}🔍 Sentry Integration Verification${NC}"

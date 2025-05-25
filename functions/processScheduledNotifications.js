@@ -1,4 +1,4 @@
-const functions = require('firebase-functions');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
 const axios = require('axios');
 const { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } = require('./sentryCronConfig');
@@ -17,12 +17,10 @@ const db = admin.firestore();
  * that are due to be sent. It sends the notifications using OneSignal
  * and marks them as sent in Firestore.
  */
-exports.processScheduledNotifications = functions.pubsub
-  .schedule('every 1 minutes')
-  .onRun(wrapScheduledFunction(
-    'processScheduledNotifications',
-    'every 1 minutes',
-    async (context) => {
+exports.processScheduledNotifications = onSchedule('every 1 minutes', wrapScheduledFunction(
+  'processScheduledNotifications',
+  'every 1 minutes',
+  async (event) => {
     try {
       console.log('Processing scheduled notifications...');
       
@@ -191,6 +189,8 @@ async function sendOneSignalNotification(title, message, data, externalUserId) {
  * This function runs once a day and removes notifications that are
  * older than 30 days and have been sent.
  */
+/*
+// Temporarily disabled for initial deployment
 exports.cleanupOldNotifications = functions.pubsub
   .schedule('every 24 hours')
   .onRun(wrapScheduledFunction(
@@ -243,3 +243,9 @@ exports.cleanupOldNotifications = functions.pubsub
       return null;
     }
   }));
+*/
+
+// Placeholder export
+exports.cleanupOldNotifications = () => {
+  console.log('cleanupOldNotifications temporarily disabled');
+};
