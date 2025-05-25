@@ -19,9 +19,21 @@ We are currently implementing a reporting system for the admin dashboard using a
    - Filter configuration for data selection
 
 3. **Report Generation**
+
    - Asynchronous report generation
    - Progress tracking and status updates
    - Download of generated reports
+
+4. **Report Scheduling**
+
+   - Schedule creation and management
+   - Frequency configuration (daily, weekly, monthly)
+   - Recipient management
+
+5. **Report History**
+   - History tracking and filtering
+   - Status monitoring
+   - Download and view options
 
 ### Implementation Approach
 
@@ -41,22 +53,26 @@ We're following atomic design principles to create a modular and maintainable sy
   - Atoms: TemplateStatusBadge, WidgetChip
   - Molecules: TemplateCard, TemplateActions, JobProgressIndicator
   - Organisms: TemplateList, ReportTemplateForm
+- Implemented atomic components for report scheduling:
+  - Atoms: ScheduleStatusBadge, FrequencyBadge, RecipientChip, DateRangePicker
+  - Molecules: ScheduledReportCard
+  - Organisms: ScheduledReportsList
+- Implemented atomic components for report history:
+  - Atoms: HistoryStatusBadge, FormatBadge
+  - Molecules: ReportHistoryCard
+  - Organisms: ReportHistoryList
 
 ### Next Steps
 
-1. Implement ReportScheduling components:
+1. Implement Report Generation components:
 
-   - ScheduleForm
-   - ScheduleList
-   - ScheduleActions
+   - GenerationForm
+   - GenerationOptions
+   - GenerationPreview
 
-2. Implement ReportHistory components:
+2. Connect components to real API endpoints when available
 
-   - HistoryList
-   - HistoryDetails
-   - HistoryFilters
-
-3. Connect components to real API endpoints when available
+3. Implement comprehensive unit tests for all components
 
 ### Technical Considerations
 

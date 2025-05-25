@@ -49,6 +49,7 @@ export interface ScheduledReport {
   name: string;
   description?: string;
   templateId: string;
+  templateName: string;
   schedule: ReportSchedule;
   recipients: ReportRecipient[];
   status: ReportStatus;
@@ -60,18 +61,42 @@ export interface ScheduledReport {
   tags?: string[];
 }
 
+export interface ScheduleReportConfig {
+  templateId: string;
+  name: string;
+  description?: string;
+  schedule: ReportSchedule;
+  recipients: ReportRecipient[];
+}
+
+export interface ReportHistoryFilters {
+  startDate?: string;
+  endDate?: string;
+  templateId?: string;
+  status?: 'success' | 'failed';
+  reportType?: ReportType;
+}
+
+export interface ReportRecipientWithDeliveryStatus extends ReportRecipient {
+  deliveryStatus: 'sent' | 'failed' | 'pending';
+  deliveredAt?: string;
+  errorMessage?: string;
+}
+
 export interface ReportHistory {
   id: string;
   scheduledReportId?: string;
   templateId: string;
+  templateName: string;
   name: string;
   runAt: string;
   runBy: string;
   status: 'success' | 'failed';
   fileUrl?: string;
-  recipients?: ReportRecipient[];
+  recipients?: ReportRecipientWithDeliveryStatus[];
   error?: string;
   format: ReportFormat;
+  reportType: ReportType;
 }
 
 export interface ExportOptions {
@@ -90,4 +115,21 @@ export interface MetricDefinition {
   category: string;
   dataSource: string;
   isAvailableForExport: boolean;
+}
+
+export interface ReportGenerationOptions {
+  startDate?: string;
+  endDate?: string;
+  filters?: Record<string, any>;
+  format?: ReportFormat;
+  includeCharts?: boolean;
+}
+
+export interface ReportResult {
+  id: string;
+  fileUrl: string;
+  format: ReportFormat;
+  generatedAt: string;
+  status: 'success' | 'failed';
+  error?: string;
 }

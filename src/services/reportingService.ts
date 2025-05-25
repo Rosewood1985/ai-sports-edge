@@ -4,6 +4,8 @@ import {
   ReportResult,
   ScheduledReport,
   ScheduleReportConfig,
+  ReportHistory,
+  ReportHistoryFilters,
 } from '../types/reporting';
 
 /**
@@ -176,5 +178,35 @@ export class ReportingService {
     return this.request(`/api/reports/scheduled/${id}/run`, {
       method: 'POST',
     });
+  }
+
+  /**
+   * Get report history
+   * @param filters Optional filters for history
+   * @returns Promise with array of report history items
+   */
+  static async getReportHistory(filters?: ReportHistoryFilters): Promise<ReportHistory[]> {
+    return this.request('/api/reports/history', {
+      method: 'POST',
+      body: JSON.stringify({ filters }),
+    });
+  }
+
+  /**
+   * Get a specific report history item
+   * @param id History item ID
+   * @returns Promise with report history item
+   */
+  static async getReportHistoryItem(id: string): Promise<ReportHistory> {
+    return this.request(`/api/reports/history/${id}`);
+  }
+
+  /**
+   * Download a report file
+   * @param id History item ID
+   * @returns Promise with download URL
+   */
+  static async downloadReport(id: string): Promise<{ url: string }> {
+    return this.request(`/api/reports/history/${id}/download`);
   }
 }

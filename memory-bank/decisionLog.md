@@ -93,3 +93,22 @@
 
 - JavaScript with PropTypes: Rejected due to limited type checking capabilities
 - JavaScript with JSDoc: Rejected due to verbosity and limited IDE support
+
+### Decision 6: Box-based Layout for Grid Components
+
+**Context:** Material UI Grid components were causing TypeScript errors with the `item` prop.
+
+**Decision:** Replace Material UI Grid components with Box components using CSS Grid for layout.
+
+**Rationale:**
+
+- Resolves TypeScript errors with Material UI Grid components
+- Provides more flexibility for responsive layouts
+- Simplifies component structure
+- Reduces bundle size by using native CSS Grid instead of additional components
+
+**Alternatives Considered:**
+
+- Fix Material UI Grid TypeScript definitions: Rejected due to complexity and potential for future issues
+- Use div elements with custom styling: Rejected due to inconsistency with the rest of the application
+- Use a different UI library: Rejected due to integration complexity

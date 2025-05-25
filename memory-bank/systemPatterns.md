@@ -12,6 +12,12 @@ Atoms are the basic building blocks of the system, representing the smallest fun
 
 - **TemplateStatusBadge**: Displays the status/type of a report template with appropriate styling.
 - **WidgetChip**: Displays a widget as a chip with consistent styling.
+- **ScheduleStatusBadge**: Displays the status of a scheduled report (active, paused, error).
+- **FrequencyBadge**: Displays the frequency of a scheduled report (daily, weekly, monthly).
+- **RecipientChip**: Displays a recipient email or user as a chip with consistent styling.
+- **HistoryStatusBadge**: Displays the status of a report history item (success, failed).
+- **FormatBadge**: Displays the format of a report (PDF, CSV, Excel).
+- **DateRangePicker**: Provides a date range picker for filtering reports.
 
 #### Molecules
 
@@ -20,6 +26,8 @@ Molecules are groups of atoms bonded together, forming more complex UI component
 - **TemplateCard**: Displays a report template as a card, including its name, description, type, and widgets.
 - **TemplateActions**: Provides a menu of actions for a template (edit, generate, duplicate, delete).
 - **JobProgressIndicator**: Displays the progress of an asynchronous job with status information.
+- **ScheduledReportCard**: Displays a scheduled report as a card, including its name, frequency, and status.
+- **ReportHistoryCard**: Displays a report history item as a card, including its name, generation time, and status.
 
 #### Organisms
 
@@ -27,6 +35,8 @@ Organisms are groups of molecules functioning together as a unit.
 
 - **TemplateList**: Displays a list of report templates with functionality to create, edit, and delete templates.
 - **ReportTemplateForm**: Provides a form for creating and editing report templates.
+- **ScheduledReportsList**: Displays a list of scheduled reports with filtering and pagination.
+- **ReportHistoryList**: Displays a list of report history items with filtering and pagination.
 
 ### Asynchronous Processing Architecture
 
@@ -58,6 +68,9 @@ The reporting system uses an asynchronous processing architecture to handle pote
 - **Empty State**: Lists show a helpful message when empty.
 - **Loading State**: Lists show a loading indicator when data is being fetched.
 - **Error State**: Lists show an error message when data fetching fails.
+- **Filtering**: Lists include filtering options for narrowing down results.
+- **Pagination**: Lists include pagination for handling large datasets.
+- **Search**: Lists include search functionality for finding specific items.
 
 #### Dialog Patterns
 
@@ -77,3 +90,12 @@ The reporting system uses an asynchronous processing architecture to handle pote
 - **Mock Implementation**: Services include mock implementations for development.
 - **Error Handling**: Services include consistent error handling.
 - **Loading States**: Components show loading indicators during API calls.
+
+### Material UI Integration Patterns
+
+- **Grid Layout**: Using Material UI Grid for responsive layouts.
+- **Card Components**: Using Material UI Card components for consistent styling.
+- **Form Components**: Using Material UI form components for consistent styling and behavior.
+- **Dialog Components**: Using Material UI Dialog components for consistent styling and behavior.
+- **Typography**: Using Material UI Typography for consistent text styling.
+- **Theme Integration**: Using Material UI theming for consistent colors and styling.
