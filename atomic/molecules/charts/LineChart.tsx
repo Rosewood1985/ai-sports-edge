@@ -1,3 +1,8 @@
+/**
+ * Atomic Molecule: LineChart
+ * Reusable chart component with null safety and error handling
+ * Location: /atomic/molecules/charts/LineChart.tsx
+ */
 import React from 'react';
 
 export interface LineChartDataPoint {
@@ -24,13 +29,24 @@ export function LineChart({
   showPoints = true,
   showLabels = true,
 }: LineChartProps) {
+  // Handle empty data
+  if (!data || data.length === 0) {
+    return (
+      <div className={`line-chart ${className}`} style={{ height: `${height}px` }}>
+        <div className="flex items-center justify-center h-full text-gray-500">
+          No data available
+        </div>
+      </div>
+    );
+  }
+
   // Sort data by date
   const sortedData = [...data].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
   // Find min and max values for scaling
-  const counts = sortedData.map(item => item.count);
+  const counts = sortedData.map(item => item.count || 0);
   const minCount = Math.min(...counts);
   const maxCount = Math.max(...counts);
   const countRange = maxCount - minCount;

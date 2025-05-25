@@ -201,7 +201,7 @@ export function EnhancedSubscriptionAnalyticsWidget() {
             <Tooltip content="Projected revenue for the current month">
               <MetricCard
                 title="Projected Revenue"
-                value={`$${data?.revenueForecasting.currentMonthRevenue.toLocaleString()}`}
+                value={`$${(data?.revenueForecasting?.currentMonthRevenue ?? 0).toLocaleString()}`}
                 trend={data?.revenueForecasting.revenueTrend}
                 status={
                   data?.revenueForecasting.revenueTrend.direction === 'up' ? 'success' : 'warning'
@@ -211,7 +211,7 @@ export function EnhancedSubscriptionAnalyticsWidget() {
             <Tooltip content="Percentage of subscribers expected to cancel this month">
               <MetricCard
                 title="Churn Rate"
-                value={`${data?.revenueForecasting.churnRate}%`}
+                value={`${(data?.revenueForecasting?.churnRate ?? 0).toFixed(1)}%`}
                 trend={data?.revenueForecasting.churnRateTrend}
                 status={
                   data?.revenueForecasting.churnRateTrend.direction === 'down' ? 'success' : 'error'
@@ -232,7 +232,7 @@ export function EnhancedSubscriptionAnalyticsWidget() {
             <Tooltip content="Overall health score based on retention, growth, and engagement">
               <MetricCard
                 title="Health Score"
-                value={data?.subscriptionHealth.healthScore}
+                value={(data?.subscriptionHealth?.healthScore ?? 0).toFixed(1)}
                 target="85+"
                 trend={data?.subscriptionHealth.healthScoreTrend}
                 status={data?.subscriptionHealth.healthScore >= 85 ? 'success' : 'warning'}
@@ -241,7 +241,7 @@ export function EnhancedSubscriptionAnalyticsWidget() {
             <Tooltip content="Percentage of subscribers who renew their subscription">
               <MetricCard
                 title="Retention Rate"
-                value={`${data?.subscriptionHealth.retentionRate}%`}
+                value={`${(data?.subscriptionHealth?.retentionRate ?? 0).toFixed(1)}%`}
                 target="90%+"
                 trend={data?.subscriptionHealth.retentionRateTrend}
                 status={data?.subscriptionHealth.retentionRate >= 90 ? 'success' : 'warning'}

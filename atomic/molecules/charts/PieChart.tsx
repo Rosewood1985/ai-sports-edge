@@ -1,3 +1,8 @@
+/**
+ * Atomic Molecule: PieChart
+ * Reusable pie chart component with division by zero protection
+ * Location: /atomic/molecules/charts/PieChart.tsx
+ */
 import React from 'react';
 
 export interface PieChartItem {
@@ -18,8 +23,30 @@ export function PieChart({
   showLegend = true,
   colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'],
 }: PieChartProps) {
+  // Handle empty data
+  if (!data || data.length === 0) {
+    return (
+      <div className={`pie-chart ${className}`}>
+        <div className="flex items-center justify-center h-48 text-gray-500">
+          No data available
+        </div>
+      </div>
+    );
+  }
+
   // Calculate total for percentages
   const total = data.reduce((sum, item) => sum + (item.value || 0), 0);
+
+  // Handle case where total is zero
+  if (total === 0) {
+    return (
+      <div className={`pie-chart ${className}`}>
+        <div className="flex items-center justify-center h-48 text-gray-500">
+          No values to display
+        </div>
+      </div>
+    );
+  }
 
   // Calculate segments
   let cumulativePercentage = 0;

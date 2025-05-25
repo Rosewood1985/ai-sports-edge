@@ -17,3 +17,7 @@ export { default as CustomAlertsModal } from './CustomAlertsModal';
 // Export types
 export * from './AlertFiltersForm';
 export * from './CustomAlertsModal';
+
+// Export new reporting and widget modules
+export * from './reporting';
+export * from './widgets';

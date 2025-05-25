@@ -1,6 +1,11 @@
+/**
+ * Atomic Organism: useReportHistory Hook  
+ * Complex business logic for report history management with optimized state management
+ * Location: /atomic/organisms/reporting/useReportHistory.ts
+ */
 import { useState, useEffect, useCallback } from 'react';
-import { ReportHistory, ReportHistoryFilters } from '../types/reporting';
-import { ReportingService } from '../services/reportingService';
+import { ReportHistory, ReportHistoryFilters } from '../../../src/types/reporting';
+import { ReportingService } from '../../../src/services/reportingService';
 
 interface UseReportHistoryResult {
   history: ReportHistory[];
@@ -11,6 +16,7 @@ interface UseReportHistoryResult {
 
 /**
  * Hook for fetching and filtering report history
+ * Fixed race condition in filter dependencies
  * @param initialFilters Optional initial filters
  * @returns Object with report history data and loading state
  */

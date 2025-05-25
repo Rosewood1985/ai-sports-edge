@@ -26,3 +26,6 @@ export * from './AlertTypeOption';
 export * from './FilterSection';
 export * from './AlertPreview';
 export * from './ActionButtons';
+
+// Export new chart components
+export * from './charts';

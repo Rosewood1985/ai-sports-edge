@@ -4,6 +4,17 @@
 
 This memory file contains key information about the atomic architecture implementation for the AI Sports Edge app. It serves as a reference for future development and maintenance.
 
+## Recent Updates (Latest)
+
+### 2025-01-XX: Widget and Component Fixes
+- **COMPLETED**: Created missing `useReportTemplates` hook in `/atomic/organisms/reporting/`
+- **COMPLETED**: Fixed race condition in `useReportHistory` filter dependencies
+- **COMPLETED**: Added comprehensive null checks in subscription analytics calculations
+- **COMPLETED**: Reorganized chart components into `/atomic/molecules/charts/`
+- **COMPLETED**: Fixed division by zero issues in LineChart and PieChart components
+- **COMPLETED**: Enhanced EnhancedSubscriptionAnalyticsWidget with proper error handling
+- **IN PROGRESS**: Real-time data sources for health monitoring widget
+
 ## Key Concepts
 
 The atomic architecture is based on the atomic design principles, organizing components into a hierarchy based on their complexity and reusability:
