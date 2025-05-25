@@ -6,10 +6,12 @@ AI Sports Edge is a mobile application that provides sports analytics, predictio
 
 - Advanced sports analytics and statistics
 - AI-powered predictions for games and player performance
+- **NEW**: NASCAR and Horse Racing data integration with real-time predictions
 - Microtransactions for premium features
 - Multi-language support (English, Spanish)
 - Dark mode support
 - User profiles and preferences
+- Comprehensive racing analytics (NASCAR.data & UK/Ireland racing)
 
 ## Getting Started
 

@@ -10,20 +10,25 @@ AI Sports Edge is built using a hybrid atomic-modular architecture that promotes
 |:--|:--|:--|
 | UI Components | Atomic Design | Small reusable elements like buttons, inputs, and toasts. |
 | Pages | Modular Structure | Full-page features like Dashboard, Account, Bets. |
-| Services | Modular Structure | Firebase Authentication, Firestore Database, APIs. |
+| Services | Modular Structure | Firebase Authentication, Firestore Database, APIs, Racing Data. |
+| Racing Integration | Atomic + Modular | NASCAR & Horse Racing data services with ML features. |
 | Routing | Modular Routing | Centralized configuration for clean navigation. |
 | i18n | Modular Language Packs | English live; Spanish scaffolding initiated. |
 
 ## 3. Folder Structure
 
 ```
-/src
-  /components        (Atomic UI Elements)
-  /pages             (Dashboard, Account, Bets, etc.)
-  /services          (Auth services, Firestore services)
-  /routes            (Route handling and protection)
-  /i18n              (Internationalization files)
-  /assets            (Static assets: images, icons, logos)
+/ai-sports-edge-restore
+  /atomic            (Modern Atomic Design Components)
+    /atoms           (Basic UI elements, racing types/utils)
+    /molecules       (Composed components, racing charts)
+    /organisms       (Complex systems, racing dashboards)
+  /components        (Legacy UI Elements - being migrated)
+  /screens           (Full-screen features: Dashboard, Betting, etc.)
+  /services          (Business logic services)
+    /racing          (NEW: NASCAR & Horse Racing data services)
+  /config            (Configuration files)
+  /functions         (Firebase Cloud Functions)
   /utils             (Helper functions and constants)
 App.tsx              (Application root file)
 ```

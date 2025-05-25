@@ -56,16 +56,17 @@ Key categories:
 - **Navigation**: `Header.tsx`, `TabTransition.tsx`, `PageTransition.tsx`
 - **Accessibility**: `AccessibleText.tsx`, `AccessibleTouchable.tsx`, `AccessibleView.tsx`
 
-#### 2.2 Atomic Architecture (`/atomic/` - 117 files total)
+#### 2.2 Atomic Architecture (`/atomic/` - 120+ files total)
 **Purpose**: Modern component architecture following Brad Frost's atomic design methodology
 
 ```
 /atomic/
-├── atoms/ (47 files)           # Basic building blocks
+├── atoms/ (50+ files)          # Basic building blocks
 │   ├── UI Elements: ThemedText, ThemedView, LoadingIndicator, Toast
 │   ├── Form Controls: CheckboxWithLabel, Slider, FilterTag
 │   ├── Accessibility: AccessibleThemedText, AccessibleThemedView
 │   ├── Icons: AlertTypeIcon, IconButton
+│   ├── Racing: types/, utils/, components/ (NEW - Phase 1 Complete)
 │   └── Utilities: focusStateUtils, formatUtils, errorUtils
 ├── molecules/ (40 files)       # Compound components
 │   ├── charts/: LineChart, PieChart, BettingAnalyticsChart
@@ -105,6 +106,7 @@ Key categories:
 Key categories:
 - **Odds Services**: `OddsService.js`, `UfcOddsService.js`, `Formula1OddsService.js`, `NbaOddsService.js`, `MlbOddsService.js`, `NhlOddsService.js`, `WnbaOddsService.js`, `SoccerOddsService.js`, `HorseRacingOddsService.js`
 - **Sports Services**: `ufcService.ts`, `formula1Service.ts`, `horseRacingService.ts`, `cricketService.ts`, `rugbyService.ts`, `nascarService.ts`, `ncaaBasketballService.ts`
+- **Racing Data Services** (NEW): `racing/nascarDataService.ts`, `racing/horseRacingDataService.ts` - NASCAR.data & rpscrape integration
 - **API Services**: `apiService.ts`, `analyticsService.ts`, `notificationService.ts`, `sportsDataService.ts`, `sportsNewsService.ts`
 - **User Services**: `userPreferencesService.ts`, `onboardingService.ts`, `userService.ts`, `userSportsPreferencesService.ts`, `optimizedUserService.ts`
 - **Payment Services**: `paymentService.js`, `stripeTaxService.js`, `stripeTaxService.ts`, `revenueReportingService.ts`
@@ -396,6 +398,30 @@ Atoms (Basic UI elements)
 ├── PrivacyService.ts           # Privacy business logic
 ├── PrivacySettingsScreen.tsx   # Privacy settings UI
 └── index.ts                    # Export barrel
+```
+
+**Racing Data Integration (NEW - Phase 1 Complete)**
+```
+/atomic/atoms/racing/
+├── types/index.ts              # Racing type definitions & ML features
+├── utils/index.ts              # Racing utilities (odds, weight, distance)
+├── components/RacingDataStatus.tsx # Data source status display
+└── index.ts                    # Export barrel
+
+/atomic/molecules/racing/
+├── cache/                      # Racing-specific cache management
+├── charts/                     # Racing analytics charts
+└── explanations/               # Racing prediction explanations
+
+/atomic/organisms/racing/
+├── ml/                         # Racing ML pipeline integration
+├── database/                   # Racing database optimization
+├── testing/                    # Racing A/B testing framework
+└── dashboards/                 # Racing admin dashboards
+
+/services/racing/
+├── nascarDataService.ts        # NASCAR.data GitHub integration (688 lines)
+└── horseRacingDataService.ts   # rpscrape UK/Ireland integration (934 lines)
 ```
 
 **Reporting System (Widget Architecture)**
@@ -948,12 +974,18 @@ import { AIInputValidator } from '../services/security/AIInputValidator';
 - **🚀 Deployment**: Multi-environment deployment with 150+ automation scripts
 
 ### Total File Count Summary
-- **Components**: 132 traditional + 117 atomic = 249 total components
-- **Services**: 115+ business logic services
+- **Components**: 132 traditional + 120+ atomic = 252+ total components
+- **Services**: 117+ business logic services (includes new racing data services)
 - **Screens**: 84 full-screen components
 - **Utils**: 25+ utility functions and helpers
 - **Scripts**: 150+ deployment and automation scripts
-- **Documentation**: 150+ documentation files
+- **Documentation**: 155+ documentation files
+
+### Recent Updates (May 25, 2025)
+- ✅ **Racing Data Integration Phase 1**: NASCAR & Horse Racing data acquisition services
+- ✅ **Atomic Racing Architecture**: Complete type system, utilities, and components
+- ✅ **Production Integration**: 2,205+ lines of racing data service code
+- ✅ **Documentation**: Racing integration plan and completion reports
 - **Configuration**: 16 config files + environment-specific variants
 
 ---
