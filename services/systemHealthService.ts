@@ -6,6 +6,7 @@
 import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { firestore as db } from '../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import { optimizedQuery } from './firebaseOptimizationService';
 
 export interface SystemHealthData {
   apiPerformance: {
@@ -184,16 +185,17 @@ export class SystemHealthService {
       const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
       const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      const metricsQuery = query(
-        collection(db, `${this.collectionPrefix}_metrics`),
-        where('type', '==', 'api'),
-        where('timestamp', '>=', oneHourAgo),
-        orderBy('timestamp', 'desc'),
-        limit(100)
-      );
-
-      const metricsSnapshot = await getDocs(metricsQuery);
-      const metrics = metricsSnapshot.docs.map(doc => doc.data() as SystemMetric);
+      // Use optimized query with caching
+      const metrics = await optimizedQuery(`${this.collectionPrefix}_metrics`)
+        .where('type', '==', 'api')
+        .where('timestamp', '>=', oneHourAgo)
+        .orderBy('timestamp', 'desc')
+        .limit(100)
+        .execute<SystemMetric>({
+          useCache: true,
+          cacheTtl: 30000, // 30 seconds cache for real-time metrics
+          enableMetrics: true,
+        });
 
       // Calculate current metrics
       const responseTimeMetrics = metrics.filter(m => m.name === 'response_time');
@@ -204,18 +206,18 @@ export class SystemHealthService {
       const currentErrorRate = this.calculateAverage(errorRateMetrics.map(m => m.value));
       const currentRequestsPerMinute = this.calculateSum(requestsMetrics.slice(0, 1).map(m => m.value));
 
-      // Get historical data for trends
-      const historicalQuery = query(
-        collection(db, `${this.collectionPrefix}_metrics`),
-        where('type', '==', 'api'),
-        where('timestamp', '>=', oneDayAgo),
-        where('timestamp', '<', oneHourAgo),
-        orderBy('timestamp', 'desc'),
-        limit(100)
-      );
-
-      const historicalSnapshot = await getDocs(historicalQuery);
-      const historicalMetrics = historicalSnapshot.docs.map(doc => doc.data() as SystemMetric);
+      // Get historical data for trends with optimized query
+      const historicalMetrics = await optimizedQuery(`${this.collectionPrefix}_metrics`)
+        .where('type', '==', 'api')
+        .where('timestamp', '>=', oneDayAgo)
+        .where('timestamp', '<', oneHourAgo)
+        .orderBy('timestamp', 'desc')
+        .limit(100)
+        .execute<SystemMetric>({
+          useCache: true,
+          cacheTtl: 300000, // 5 minutes cache for historical data
+          enableMetrics: true,
+        });
 
       const historicalResponseTime = this.calculateAverage(
         historicalMetrics.filter(m => m.name === 'response_time').map(m => m.value)
@@ -255,16 +257,17 @@ export class SystemHealthService {
       const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
       const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      const metricsQuery = query(
-        collection(db, `${this.collectionPrefix}_metrics`),
-        where('type', '==', 'database'),
-        where('timestamp', '>=', oneHourAgo),
-        orderBy('timestamp', 'desc'),
-        limit(100)
-      );
-
-      const metricsSnapshot = await getDocs(metricsQuery);
-      const metrics = metricsSnapshot.docs.map(doc => doc.data() as SystemMetric);
+      // Use optimized query for database metrics
+      const metrics = await optimizedQuery(`${this.collectionPrefix}_metrics`)
+        .where('type', '==', 'database')
+        .where('timestamp', '>=', oneHourAgo)
+        .orderBy('timestamp', 'desc')
+        .limit(100)
+        .execute<SystemMetric>({
+          useCache: true,
+          cacheTtl: 30000, // 30 seconds cache
+          enableMetrics: true,
+        });
 
       // Calculate current metrics
       const queryTimeMetrics = metrics.filter(m => m.name === 'query_time');
@@ -275,18 +278,18 @@ export class SystemHealthService {
       const currentReadOps = this.calculateSum(readOpsMetrics.slice(0, 1).map(m => m.value));
       const currentWriteOps = this.calculateSum(writeOpsMetrics.slice(0, 1).map(m => m.value));
 
-      // Get historical data for trends
-      const historicalQuery = query(
-        collection(db, `${this.collectionPrefix}_metrics`),
-        where('type', '==', 'database'),
-        where('timestamp', '>=', oneDayAgo),
-        where('timestamp', '<', oneHourAgo),
-        orderBy('timestamp', 'desc'),
-        limit(100)
-      );
-
-      const historicalSnapshot = await getDocs(historicalQuery);
-      const historicalMetrics = historicalSnapshot.docs.map(doc => doc.data() as SystemMetric);
+      // Get historical data for trends with optimized query
+      const historicalMetrics = await optimizedQuery(`${this.collectionPrefix}_metrics`)
+        .where('type', '==', 'database')
+        .where('timestamp', '>=', oneDayAgo)
+        .where('timestamp', '<', oneHourAgo)
+        .orderBy('timestamp', 'desc')
+        .limit(100)
+        .execute<SystemMetric>({
+          useCache: true,
+          cacheTtl: 300000, // 5 minutes cache for historical data
+          enableMetrics: true,
+        });
 
       const historicalQueryTime = this.calculateAverage(
         historicalMetrics.filter(m => m.name === 'query_time').map(m => m.value)
@@ -352,24 +355,23 @@ export class SystemHealthService {
       const now = new Date();
       const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      // Get current process status
-      const processQuery = query(
-        collection(db, `${this.collectionPrefix}_processes`),
-        orderBy('startTime', 'desc'),
-        limit(20)
-      );
+      // Get current process status with optimized query
+      const processData = await optimizedQuery(`${this.collectionPrefix}_processes`)
+        .orderBy('startTime', 'desc')
+        .limit(20)
+        .execute<BackgroundProcess>({
+          useCache: true,
+          cacheTtl: 60000, // 1 minute cache for process status
+          enableMetrics: true,
+        });
 
-      const processSnapshot = await getDocs(processQuery);
-      const processes = processSnapshot.docs.map(doc => {
-        const data = doc.data() as BackgroundProcess;
-        return {
-          id: data.id,
-          name: data.name,
-          status: data.status,
-          lastRun: data.startTime.toISOString(),
-          duration: data.duration || 0,
-        };
-      });
+      const processes = processData.map(data => ({
+        id: data.id,
+        name: data.name,
+        status: data.status,
+        lastRun: data.startTime.toISOString(),
+        duration: data.duration || 0,
+      }));
 
       // Count active and failed processes
       const activeProcesses = processes.filter(p => p.status === 'running').length;
@@ -378,16 +380,16 @@ export class SystemHealthService {
         new Date(p.lastRun) >= oneDayAgo
       ).length;
 
-      // Get historical data for trends
+      // Get historical data for trends with optimized query
       const yesterdayStart = new Date(oneDayAgo.getTime() - 24 * 60 * 60 * 1000);
-      const historicalQuery = query(
-        collection(db, `${this.collectionPrefix}_processes`),
-        where('startTime', '>=', yesterdayStart),
-        where('startTime', '<', oneDayAgo)
-      );
-
-      const historicalSnapshot = await getDocs(historicalQuery);
-      const historicalProcesses = historicalSnapshot.docs.map(doc => doc.data() as BackgroundProcess);
+      const historicalProcesses = await optimizedQuery(`${this.collectionPrefix}_processes`)
+        .where('startTime', '>=', yesterdayStart)
+        .where('startTime', '<', oneDayAgo)
+        .execute<BackgroundProcess>({
+          useCache: true,
+          cacheTtl: 600000, // 10 minutes cache for historical process data
+          enableMetrics: true,
+        });
 
       const historicalActive = historicalProcesses.filter(p => p.status === 'running').length;
       const historicalFailed = historicalProcesses.filter(p => p.status === 'failed').length;
@@ -414,24 +416,24 @@ export class SystemHealthService {
       const now = new Date();
       const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      const actionsQuery = query(
-        collection(db, `${this.collectionPrefix}_actions`),
-        where('timestamp', '>=', oneDayAgo),
-        orderBy('timestamp', 'desc'),
-        limit(10)
-      );
+      // Use optimized query for system actions
+      const actionsData = await optimizedQuery(`${this.collectionPrefix}_actions`)
+        .where('timestamp', '>=', oneDayAgo)
+        .orderBy('timestamp', 'desc')
+        .limit(10)
+        .execute<SystemAction>({
+          useCache: true,
+          cacheTtl: 120000, // 2 minutes cache for system actions
+          enableMetrics: true,
+        });
 
-      const actionsSnapshot = await getDocs(actionsQuery);
-      return actionsSnapshot.docs.map(doc => {
-        const data = doc.data() as SystemAction;
-        return {
-          id: data.id,
-          timestamp: data.timestamp.toISOString(),
-          action: data.action,
-          status: data.status,
-          details: data.details,
-        };
-      });
+      return actionsData.map(data => ({
+        id: data.id,
+        timestamp: data.timestamp.toISOString(),
+        action: data.action,
+        status: data.status,
+        details: data.details,
+      }));
 
     } catch (error) {
       Sentry.captureException(error);

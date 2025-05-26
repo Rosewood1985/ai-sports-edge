@@ -7,6 +7,7 @@ import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit 
 import { firestore as db } from '../config/firebase';
 import * as Sentry from '@sentry/react-native';
 import { nbaMLPredictionService } from './nba/nbaMLPredictionService';
+import { firebaseOptimizationService, optimizedQuery } from './firebaseOptimizationService';
 
 export interface PropBet {
   id: string;
