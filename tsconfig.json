@@ -11,5 +11,15 @@
       "atomic/templates/*": ["atomic/templates/*"],
       "atomic/pages/*": ["atomic/pages/*"]
     }
-  }
+  },
+  "exclude": [
+    "**/__tests__/**",
+    "**/node_modules/**",
+    "**/backups/**",
+    "**/build/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.test.js",
+    "**/*.test.jsx"
+  ]
 }

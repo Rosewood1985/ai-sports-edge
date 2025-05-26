@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, type ViewProps } from 'react-native';
+import { View, ViewProps } from 'react-native';
 import { useUITheme } from './UIThemeProvider'; // Import the simplified theme hook
 
 // Define semantic background types based on theme.colors keys

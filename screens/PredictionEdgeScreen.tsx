@@ -428,3 +428,197 @@ const PredictionEdgeScreen: React.FC = () => {
         </AccessibleThemedView>
         <View style={styles.timeLabels}>
           <AccessibleThemedText style={styles.timeLabel}>10 AM</AccessibleThemedText>
+          <AccessibleThemedText style={styles.timeLabel}>2 PM</AccessibleThemedText>
+          <AccessibleThemedText style={styles.timeLabel}>6 PM</AccessibleThemedText>
+        </View>
+      </AccessibleThemedView>
+    </AccessibleThemedView>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="auto" />
+      
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        {/* Header */}
+        <AccessibleThemedView style={styles.header}>
+          <AccessibleThemedText style={styles.title}>
+            {t('prediction.title')}
+          </AccessibleThemedText>
+          <AccessibleThemedText style={styles.subtitle}>
+            {t('prediction.subtitle')}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+
+        {/* Loading State */}
+        {loading && (
+          <AccessibleThemedView style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <AccessibleThemedText style={styles.loadingText}>
+              {t('prediction.loading')}
+            </AccessibleThemedText>
+          </AccessibleThemedView>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <AccessibleThemedView style={styles.errorContainer}>
+            <AccessibleThemedText style={styles.errorText}>
+              {error}
+            </AccessibleThemedText>
+            <AccessibleTouchableOpacity
+              style={styles.retryButton}
+              onPress={loadPredictions}
+              accessibilityLabel={t('accessibility.retry')}
+              accessibilityRole="button"
+            >
+              <AccessibleThemedText style={styles.retryText}>
+                {t('common.retry')}
+              </AccessibleThemedText>
+            </AccessibleTouchableOpacity>
+          </AccessibleThemedView>
+        )}
+
+        {/* Content */}
+        {!loading && !error && (
+          <>
+            {/* Featured Prediction */}
+            {featuredPrediction && renderFeaturedPrediction(featuredPrediction)}
+
+            {/* Top Predictions */}
+            <AccessibleThemedView style={styles.section}>
+              <AccessibleThemedText style={styles.sectionTitle}>
+                {t('prediction.topPredictions')}
+              </AccessibleThemedText>
+              <FlatList
+                data={topPredictions}
+                renderItem={renderPredictionCard}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                showsVerticalScrollIndicator={false}
+              />
+            </AccessibleThemedView>
+
+            {/* Line Movement */}
+            <AccessibleThemedView style={styles.section}>
+              <AccessibleThemedText style={styles.sectionTitle}>
+                {t('prediction.lineMovement')}
+              </AccessibleThemedText>
+              <FlatList
+                data={lineMovementData}
+                renderItem={renderLineMovement}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              />
+            </AccessibleThemedView>
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+  errorContainer: {
+    padding: 20,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  errorText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  retryText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+  },
+  chartContainer: {
+    marginTop: 8,
+  },
+  chart: {
+    height: 120,
+    borderRadius: 8,
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chartPlaceholder: {
+    fontSize: 14,
+    opacity: 0.6,
+  },
+  timeLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingHorizontal: 8,
+  },
+  timeLabel: {
+    fontSize: 12,
+    opacity: 0.6,
+  },
+});
+
+export default PredictionEdgeScreen;

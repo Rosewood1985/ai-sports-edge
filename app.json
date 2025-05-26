@@ -7,6 +7,8 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "sdkVersion": "51.0.0",
+    "platforms": ["ios", "android", "web"],
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
@@ -68,13 +70,20 @@
         "expo-build-properties",
         {
           "ios": {
-            "deploymentTarget": "13.0"
+            "deploymentTarget": "13.4"
           },
           "android": {
-            "compileSdkVersion": 31,
-            "targetSdkVersion": 31,
-            "buildToolsVersion": "31.0.0"
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
           }
+        }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "ai-sports-edge",
+          "project": "react-native"
         }
       ]
     ],

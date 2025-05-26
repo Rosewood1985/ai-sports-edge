@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, type TextProps, StyleSheet, type TextStyle } from 'react-native'; // Import TextStyle
+import { Text, TextProps, StyleSheet, TextStyle } from 'react-native'; // Import TextStyle
 import { useUITheme } from './UIThemeProvider'; // Import the simplified theme hook
 import { Colors } from '../constants/Colors'; // Import Colors directly for status access
 

@@ -2,7 +2,7 @@
  * Sentry Error Tracking Service
  * Centralized error monitoring and performance tracking
  * 
- * Compatible with Expo SDK 45.0.8
+ * Compatible with Expo SDK 51.0.0 and Sentry v5.22.0
  */
 
 import * as Sentry from '@sentry/react-native';
@@ -49,37 +49,28 @@ class SentryService {
         environment: config.environment,
         enableAutoSessionTracking: config.enableAutoSessionTracking,
         enableNativeCrashHandling: config.enableNativeCrashHandling,
-        // enableInAppFrames: config.enableInAppFrames, // Not available in this version
+        enableInAppFrames: config.enableInAppFrames,
         tracesSampleRate: config.tracesSampleRate,
         debug: config.debug,
         
-        // Add app context
-        initialScope: {
-          tags: {
-            appVersion: Constants.manifest?.version || '1.0.0',
-            expoVersion: Constants.expoVersion || '45.0.8',
-            platform: Constants.platform?.ios ? 'ios' : 'android',
-          },
-          contexts: {
-            app: {
-              name: 'AI Sports Edge',
-              version: Constants.manifest?.version || '1.0.0',
-            },
-            device: {
-              model: Constants.deviceName || 'unknown',
-              simulator: Constants.isDevice === false,
-            }
-          }
-        },
-
         beforeSend: (event) => {
           // Filter out non-production errors in development
           if (config.environment === 'development' && !config.debug) {
             return null;
           }
 
-          // Add racing data context if available
+          // Add app context
           if (event.contexts) {
+            event.contexts.app = {
+              name: 'AI Sports Edge',
+              version: Constants.expoConfig?.version || Constants.manifest2?.extra?.expoClient?.version || '1.0.0',
+            };
+            
+            event.contexts.device = {
+              model: Constants.deviceName || 'unknown',
+              simulator: Constants.isDevice === false,
+            };
+
             event.contexts.racing = {
               phase: 'phase3-complete',
               features: ['nascar', 'horse_racing'],
@@ -87,12 +78,20 @@ class SentryService {
             };
           }
 
+          // Add tags
+          if (event.tags) {
+            event.tags.appVersion = Constants.expoConfig?.version || Constants.manifest2?.extra?.expoClient?.version || '1.0.0';
+            event.tags.expoVersion = Constants.expoConfig?.sdkVersion || '51.0.0';
+            event.tags.platform = Constants.platform?.ios ? 'ios' : 'android';
+          }
+
           return event;
         },
 
         integrations: [
-          new Sentry.Integrations.ReactNativeErrorHandlers({
-            patchGlobalPromise: true,
+          Sentry.reactNativeTracingIntegration({
+            enableUserInteractionTracing: true,
+            enableNativeFramesTracking: true,
           }),
           // Note: ReactNavigation integration will be added separately
         ],
@@ -388,8 +387,9 @@ export const sentryService = new SentryService();
 export const createSentryConfig = (environment: 'development' | 'staging' | 'production'): SentryConfig => {
   // Get DSN from environment variables or Expo config
   const sentryDsn = process.env.SENTRY_DSN || 
-                   Constants.manifest?.extra?.sentry?.dsn || 
-                   Constants.expoConfig?.extra?.sentry?.dsn || '';
+                   Constants.expoConfig?.extra?.sentry?.dsn || 
+                   Constants.manifest2?.extra?.expoClient?.extra?.sentry?.dsn || 
+                   Constants.manifest?.extra?.sentry?.dsn || '';
 
   const configs = {
     development: {
@@ -399,7 +399,7 @@ export const createSentryConfig = (environment: 'development' | 'staging' | 'pro
       enableNativeCrashHandling: false,
       enableInAppFrames: true,
       tracesSampleRate: 0.1,
-      debug: Constants.manifest?.extra?.sentry?.debug || true,
+      debug: Constants.expoConfig?.extra?.sentry?.debug || Constants.manifest?.extra?.sentry?.debug || true,
     },
     staging: {
       dsn: sentryDsn,
