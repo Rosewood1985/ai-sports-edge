@@ -54,8 +54,15 @@ else {
     // Try to load the Node.js implementation
     const fs = require('fs');
     const path = require('path');
-    const requestIp = require('request-ip');
-    const geoip2 = require('@maxmind/geoip2-node');
+    let requestIp, geoip2;
+    
+    try {
+      requestIp = require('request-ip');
+      geoip2 = require('@maxmind/geoip2-node');
+    } catch (moduleError) {
+      console.log('GeoIP dependencies not available, falling back to web service');
+      throw moduleError;
+    }
     
     /**
      * GeoIP service for getting location data based on IP address

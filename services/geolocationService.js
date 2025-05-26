@@ -62,7 +62,13 @@ class GeolocationService {
       if (useGPS) {
         try {
           // Import Expo Location dynamically to avoid issues in environments where it's not available
-          const Location = await import('expo-location');
+          let Location;
+          try {
+            Location = require('expo-location');
+          } catch (importError) {
+            console.warn('Expo Location not available in this environment');
+            throw new Error('Expo Location not available');
+          }
           
           // Request permission to access the device's location
           const { status } = await Location.requestForegroundPermissionsAsync();
@@ -418,4 +424,6 @@ class GeolocationService {
   }
 }
 
-export default new GeolocationService();
+// Create and export a singleton instance
+const geolocationService = new GeolocationService();
+module.exports = geolocationService;

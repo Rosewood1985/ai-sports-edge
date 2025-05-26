@@ -1,10 +1,10 @@
-import * as functions from 'firebase-functions';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { spawn } from 'child_process';
-import { logger } from 'firebase-functions';
+import { logger } from 'firebase-functions/v2';
 import * as https from 'https';
 import * as http from 'http';
 import { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } from '../sentryCronConfig';
@@ -20,13 +20,13 @@ const firestore = admin.firestore();
  * Firebase Cloud Function that runs daily to predict game outcomes
  * using the trained ML model.
  */
-export const predictTodayGames = functions.pubsub
-  .schedule(process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *') // Use Remote Config value or default
-  .timeZone('America/New_York')
-  .onRun(wrapScheduledFunction(
-    'predictTodayGames',
-    process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *',
-    async (context) => {
+export const predictTodayGames = onSchedule({
+  schedule: process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *',
+  timeZone: 'America/New_York'
+}, wrapScheduledFunction(
+  'predictTodayGames',
+  process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *',
+  async (event) => {
     logger.info('Starting predictTodayGames function');
     
     try {

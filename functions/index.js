@@ -520,7 +520,10 @@ const {
   sentryMLTest,
   sentryPerformanceTest,
 } = require("./sentryTest");
+const { sentryTestMinimal } = require("./sentryTestMinimal");
+
 exports.sentryTest = sentryTest;
+exports.sentryTestMinimal = sentryTestMinimal;
 exports.sentryErrorTest = sentryErrorTest;
 exports.sentryRacingTest = sentryRacingTest;
 exports.sentryMLTest = sentryMLTest;
@@ -544,6 +547,68 @@ exports.updateReferralLeaderboard = updateReferralLeaderboard;
 exports.processRssFeedsAndNotify = processRssFeedsAndNotify;
 exports.onNewRssItem = onNewRssItem;
 
-// Export TypeScript scheduled functions
+// Export TypeScript scheduled functions (temporarily disabled for deployment)
+/*
 exports.predictTodayGames = require("./lib/predictTodayGames").predictTodayGames;
 exports.updateStatsPage = require("./lib/updateStatsPage").updateStatsPage;
+*/
+
+// Export Sentry test function
+const sentryTestModule = require("./sentryTest");
+exports.sentryTest = sentryTestModule.sentryTest;
+
+// Import simple Sentry functions for deployment verification
+const {
+  sentryBasicTest,
+  healthCheck,
+  performanceTest
+} = require('./sentrySimpleFunctions');
+
+// Import new generation functions with Sentry monitoring
+const {
+  sentryVerifyV2,
+  stripeWebhookV2,
+  processNotificationsV2,
+  updateLeaderboardV2,
+  dailyCleanupV2,
+  backupUserDataV2
+} = require('./sentryMonitoredFunctions');
+
+// Export simple Sentry functions
+exports.sentryBasicTest = sentryBasicTest;
+exports.healthCheck = healthCheck;
+exports.performanceTest = performanceTest;
+
+// Export new generation scheduled functions
+exports.sentryVerifyV2 = sentryVerifyV2;
+exports.stripeWebhookV2 = stripeWebhookV2;
+exports.processNotificationsV2 = processNotificationsV2;
+exports.updateLeaderboardV2 = updateLeaderboardV2;
+exports.dailyCleanupV2 = dailyCleanupV2;
+exports.backupUserDataV2 = backupUserDataV2;
+
+// Import and export sports data sync functions
+const {
+  syncLiveOddsV2,
+  syncPlayerStatsV2,
+  syncGameSchedulesV2,
+  syncRacingDataV2,
+  sportsDataHealthCheckV2
+} = require('./sportsDataSyncV2');
+
+exports.syncLiveOddsV2 = syncLiveOddsV2;
+exports.syncPlayerStatsV2 = syncPlayerStatsV2;
+exports.syncGameSchedulesV2 = syncGameSchedulesV2;
+exports.syncRacingDataV2 = syncRacingDataV2;
+exports.sportsDataHealthCheckV2 = sportsDataHealthCheckV2;
+
+// Import and export UFC scheduled functions
+const { syncUFCData } = require("./scheduled/sportsSync/syncUFCData");
+const { syncUFCEvents } = require("./scheduled/sportsSync/syncUFCEvents");
+const { syncUFCOdds } = require("./scheduled/sportsSync/syncUFCOdds");
+
+exports.syncUFCData = syncUFCData;
+exports.syncUFCEvents = syncUFCEvents;
+exports.syncUFCOdds = syncUFCOdds;
+
+console.log("All functions loaded successfully (including Sentry V2 and UFC functions)");

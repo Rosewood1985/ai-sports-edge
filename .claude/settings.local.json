@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(grep:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(rg:*)",
+      "Bash(npx @sentry/wizard:*)",
+      "Bash(chmod:*)",
+      "Bash(npm run test:sentry:*)",
+      "Bash(npm run setup:sentry:*)",
+      "Bash(./verify-sentry-integration.sh:*)",
+      "Bash(./run-comprehensive-sentry-tests.sh:*)",
+      "Bash(./deploy-sentry-functions.sh:*)",
+      "Bash(firebase --version)",
+      "Bash(firebase projects:list:*)",
+      "Bash(env)",
+      "Bash(./setup-firebase-ci-auth.sh:*)",
+      "Bash(npm run lint)",
+      "Bash(touch:*)",
+      "Bash(source .env)",
+      "Bash(firebase deploy:*)",
+      "Bash(cp:*)",
+      "Bash(firebase functions:deploy:*)",
+      "Bash(firebase use:*)",
+      "Bash(npx prettier:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
-import { logger } from 'firebase-functions';
+import { logger } from 'firebase-functions/v2';
 import { wrapScheduledFunction, trackDatabaseOperation } from '../sentryCronConfig';
 
 // Initialize Firebase Admin SDK if not already initialized
@@ -81,13 +81,13 @@ interface StatsData {
 /**
  * Firebase Cloud Function that runs weekly to update stats page data
  */
-export const updateStatsPage = functions.pubsub
-  .schedule('0 0 * * 0') // Run at midnight every Sunday
-  .timeZone('America/New_York')
-  .onRun(wrapScheduledFunction(
-    'updateStatsPage',
-    '0 0 * * 0',
-    async (context) => {
+export const updateStatsPage = onSchedule({
+  schedule: '0 0 * * 0', // Run at midnight every Sunday
+  timeZone: 'America/New_York'
+}, wrapScheduledFunction(
+  'updateStatsPage',
+  '0 0 * * 0',
+  async (event) => {
     logger.info('Starting updateStatsPage function');
     
     try {
