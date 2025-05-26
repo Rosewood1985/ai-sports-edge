@@ -27,7 +27,12 @@
       "Bash(cp:*)",
       "Bash(firebase functions:deploy:*)",
       "Bash(firebase use:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "Bash(export NODE_OPTIONS=\"--max-old-space-size=8192 --optimize-for-size\")",
+      "Bash(pkill:*)",
+      "Bash(export NODE_OPTIONS=\"--max-old-space-size=8192\")",
+      "mcp__ide__getDiagnostics",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

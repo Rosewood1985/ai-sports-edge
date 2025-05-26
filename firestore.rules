@@ -138,6 +138,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Subscription logs (admin read-only, system write-only)
+    match /subscription_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Only Firebase Functions can write
+    }
+    
+    // Analytics events (admin read-only, system write-only)
+    match /analytics_events/{eventId} {
+      allow read: if isAdmin();
+      allow write: if false; // Only Firebase Functions can write
+    }
+    
     // Audit logs (admin only)
     match /auditLogs/{logId} {
       allow read: if isAdmin();
