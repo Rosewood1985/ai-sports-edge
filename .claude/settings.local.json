@@ -32,7 +32,8 @@
       "Bash(pkill:*)",
       "Bash(export NODE_OPTIONS=\"--max-old-space-size=8192\")",
       "mcp__ide__getDiagnostics",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
