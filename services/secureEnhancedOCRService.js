@@ -11,6 +11,7 @@
 const { PrismaClient } = require('@prisma/client');
 const { secureFileUploadService, SecurityError } = require('./secureFileUploadService');
 const { secureCommandService, CommandSecurityError } = require('./secureCommandService');
+const { securityMonitoringService, SEVERITY_LEVELS, INCIDENT_TYPES } = require('./securityMonitoringService');
 const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
@@ -27,7 +28,7 @@ const prisma = new PrismaClient();
  */
 class SecureEnhancedOCRService {
   constructor() {
-    this.imagePreprocessor = new ImagePreprocessingService();
+    this.imagePreprocessor = secureImagePreprocessingService;
     this.intelligentParser = new IntelligentBetSlipParser();
     this.activeProcesses = new Map();
     this.processingQueue = new Map();
@@ -185,8 +186,8 @@ class SecureEnhancedOCRService {
       // Validate image path before processing
       const validatedPath = secureFileUploadService.validatePathForOCR(imagePath);
       
-      // Use secure preprocessing (updated imagePreprocessingService needed)
-      const result = await this.imagePreprocessor.preprocessImage(validatedPath);
+      // Use secure preprocessing service
+      const result = await this.imagePreprocessor.preprocessImageSecurely(validatedPath, options);
       
       // Validate result path
       if (result && result !== validatedPath) {
@@ -458,16 +459,42 @@ class SecureEnhancedOCRService {
    */
   async logSecurityIncident(uploadId, error, processingId) {
     try {
-      console.error(`[SECURITY INCIDENT] Upload ${uploadId}:`, {
-        error: error.message,
-        code: error.code,
-        processingId,
-        timestamp: new Date().toISOString(),
-        type: error.constructor.name
-      });
+      // Determine incident type based on error
+      let incidentType = INCIDENT_TYPES.OCR_SECURITY_VIOLATION;
+      let severity = SEVERITY_LEVELS.MEDIUM;
       
-      // TODO: Integrate with security monitoring system
-      // await securityMonitoringService.logIncident({...});
+      if (error instanceof CommandSecurityError) {
+        if (error.code === 'COMMAND_NOT_ALLOWED' || error.code === 'DANGEROUS_ARG_CHARS') {
+          incidentType = INCIDENT_TYPES.COMMAND_INJECTION;
+          severity = SEVERITY_LEVELS.HIGH;
+        }
+      } else if (error instanceof SecurityError) {
+        if (error.code === 'INVALID_OCR_PATH' || error.code === 'PATH_TRAVERSAL') {
+          incidentType = INCIDENT_TYPES.PATH_TRAVERSAL;
+          severity = SEVERITY_LEVELS.HIGH;
+        } else if (error.code === 'MALICIOUS_FILE' || error.code === 'DANGEROUS_PATH_CHARS') {
+          incidentType = INCIDENT_TYPES.MALICIOUS_FILE;
+          severity = SEVERITY_LEVELS.CRITICAL;
+        }
+      }
+      
+      // Log incident with security monitoring service
+      await securityMonitoringService.logIncident({
+        severity,
+        type: incidentType,
+        source: 'secure_ocr_service',
+        message: `OCR security violation: ${error.message}`,
+        details: {
+          uploadId,
+          processingId,
+          errorCode: error.code,
+          errorType: error.constructor.name,
+          stackTrace: error.stack?.split('\n').slice(0, 5).join('\n') // Limit stack trace
+        },
+        uploadId,
+        processingId,
+        errorCode: error.code
+      });
       
     } catch (logError) {
       console.error(`[SECURE OCR] Failed to log security incident:`, logError);

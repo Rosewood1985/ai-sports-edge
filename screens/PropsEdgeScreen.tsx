@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TextInput, FlatList, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, StyleSheet, TextInput, FlatList, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '../hooks';
@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { propPredictionService, PropBet, TopPropBet } from '../services/propPredictionService';
 
 // Define types for the component props and state
 interface SportFilter {
@@ -17,42 +18,6 @@ interface SportFilter {
 interface PropTypeFilter {
   id: string;
   name: string;
-}
-
-interface PlayerInfo {
-  id: string;
-  name: string;
-  team: string;
-  opponent: string;
-  gameTime: string;
-  image?: any;
-}
-
-interface PropBet {
-  id: string;
-  player: PlayerInfo;
-  propType: string;
-  line: number;
-  prediction: number;
-  confidence: number;
-  confidenceLevel: 'High' | 'Medium' | 'Low';
-  seasonAverage: number;
-  last10Average: number;
-  overRate: string;
-  lastGames: number[];
-  aiAnalysis: string;
-  recommendation: 'OVER' | 'UNDER';
-}
-
-interface TopPropBet {
-  id: string;
-  player: PlayerInfo;
-  propType: string;
-  line: number;
-  recommendation: 'OVER' | 'UNDER';
-  average: number;
-  last5Average: number;
-  confidence: number;
 }
 
 /**
@@ -67,6 +32,10 @@ const PropsEdgeScreen: React.FC = () => {
   const [selectedSport, setSelectedSport] = useState('nba');
   const [selectedPropType, setSelectedPropType] = useState('points');
   const [searchQuery, setSearchQuery] = useState('');
+  const [featuredPropBet, setFeaturedPropBet] = useState<PropBet | null>(null);
+  const [topPropBets, setTopPropBets] = useState<TopPropBet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Sample data for sports filters
   const sportFilters: SportFilter[] = [
@@ -85,85 +54,55 @@ const PropsEdgeScreen: React.FC = () => {
     { id: 'threes', name: t('props.threePointers') },
   ];
 
-  // Sample data for featured prop bet
-  const featuredPropBet: PropBet = {
-    id: 'prop1',
-    player: {
-      id: 'player1',
-      name: 'Luka Dončić',
-      team: 'Dallas Mavericks',
-      opponent: 'Warriors',
-      gameTime: '7:30 PM ET',
-    },
-    propType: 'Points',
-    line: 30.5,
-    prediction: 33.7,
-    confidence: 72,
-    confidenceLevel: 'High',
-    seasonAverage: 32.4,
-    last10Average: 33.7,
-    overRate: '62% (8/13 games)',
-    lastGames: [38, 26, 34, 29, 42, 31, 36, 28, 35, 33],
-    aiAnalysis:
-      'Dončić has exceeded this points line in 7 of his last 10 games. He faces a Warriors defense that ranks 18th against opposing guards, allowing 48.3 points per game to the position. His usage rate increases to 38% when playing against Golden State.',
-    recommendation: 'OVER',
-  };
+  // Load real prop predictions
+  useEffect(() => {
+    loadPropPredictions();
+  }, [selectedSport, selectedPropType]);
 
-  // Sample data for top prop bets
-  const topPropBets: TopPropBet[] = [
-    {
-      id: 'top1',
-      player: {
-        id: 'player2',
-        name: 'Nikola Jokić',
-        team: 'Nuggets',
-        opponent: 'Lakers',
-        gameTime: '8:00 PM ET',
-      },
-      propType: 'Rebounds',
-      line: 11.5,
-      recommendation: 'OVER',
-      average: 12.3,
-      last5Average: 13.2,
-      confidence: 75,
-    },
-    {
-      id: 'top2',
-      player: {
-        id: 'player3',
-        name: 'Stephen Curry',
-        team: 'Warriors',
-        opponent: 'Mavericks',
-        gameTime: '7:30 PM ET',
-      },
-      propType: '3-Pointers',
-      line: 4.5,
-      recommendation: 'OVER',
-      average: 5.2,
-      last5Average: 6.0,
-      confidence: 82,
-    },
-    {
-      id: 'top3',
-      player: {
-        id: 'player4',
-        name: 'LeBron James',
-        team: 'Lakers',
-        opponent: 'Nuggets',
-        gameTime: '8:00 PM ET',
-      },
-      propType: 'Pts+Reb+Ast',
-      line: 45.5,
-      recommendation: 'UNDER',
-      average: 42.7,
-      last5Average: 40.2,
-      confidence: 68,
-    },
-  ];
+  const loadPropPredictions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Load featured prop and top props in parallel
+      const [featured, topProps] = await Promise.all([
+        propPredictionService.getFeaturedPropPrediction(selectedSport),
+        propPredictionService.getTopPropPredictions(3, selectedSport)
+      ]);
+
+      setFeaturedPropBet(featured);
+      setTopPropBets(topProps);
+    } catch (err) {
+      console.error('Error loading prop predictions:', err);
+      setError('Failed to load predictions. Using cached data.');
+      
+      // Fallback to service's built-in fallback data
+      const fallbackFeatured = await propPredictionService.getFeaturedPropPrediction(selectedSport);
+      const fallbackTop = await propPredictionService.getTopPropPredictions(3, selectedSport);
+      
+      setFeaturedPropBet(fallbackFeatured);
+      setTopPropBets(fallbackTop);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Open filter options
   const openFilters = () => {
     console.log('Open filters');
+    // TODO: Implement filter modal
+  };
+
+  // Handle sport selection change
+  const handleSportChange = (sportId: string) => {
+    setSelectedSport(sportId);
+    // loadPropPredictions will be called by useEffect
+  };
+
+  // Handle prop type selection change
+  const handlePropTypeChange = (propTypeId: string) => {
+    setSelectedPropType(propTypeId);
+    // Could filter existing predictions or reload
   };
 
   // Render sport filter item
@@ -175,7 +114,7 @@ const PropsEdgeScreen: React.FC = () => {
           backgroundColor: selectedSport === item.id ? colors.primary : colors.card,
         },
       ]}
-      onPress={() => setSelectedSport(item.id)}
+      onPress={() => handleSportChange(item.id)}
       accessibilityLabel={t('accessibility.selectSport', { sport: item.name })}
       accessibilityRole="button"
       accessibilityState={{ selected: selectedSport === item.id }}
@@ -202,7 +141,7 @@ const PropsEdgeScreen: React.FC = () => {
           backgroundColor: selectedPropType === item.id ? colors.primary : colors.card,
         },
       ]}
-      onPress={() => setSelectedPropType(item.id)}
+      onPress={() => handlePropTypeChange(item.id)}
       accessibilityLabel={t('accessibility.selectPropType', { propType: item.name })}
       accessibilityRole="button"
       accessibilityState={{ selected: selectedPropType === item.id }}
@@ -221,162 +160,175 @@ const PropsEdgeScreen: React.FC = () => {
   );
 
   // Render featured prop bet card
-  const renderFeaturedPropBet = () => (
-    <AccessibleThemedView style={styles.card}>
-      {/* Player Header */}
-      <AccessibleThemedView style={styles.playerHeader}>
-        <View style={styles.playerInfo}>
-          <View style={[styles.playerAvatar, { backgroundColor: colors.card }]} />
-          <View style={styles.playerDetails}>
-            <AccessibleThemedText style={styles.playerName}>
-              {featuredPropBet.player.name}
-            </AccessibleThemedText>
-            <AccessibleThemedText style={styles.playerTeam}>
-              {featuredPropBet.player.team} • vs. {featuredPropBet.player.opponent} •{' '}
-              {featuredPropBet.player.gameTime}
-            </AccessibleThemedText>
-          </View>
-        </View>
-        <AccessibleTouchableOpacity
-          accessibilityLabel={t('accessibility.sharePrediction')}
-          accessibilityRole="button"
-        >
-          <Ionicons name="share-social-outline" size={16} color={colors.primary} />
-        </AccessibleTouchableOpacity>
-      </AccessibleThemedView>
-
-      {/* Prop Type Header */}
-      <AccessibleThemedView style={[styles.propTypeHeader, { backgroundColor: colors.card }]}>
-        <View style={styles.propTypeInfo}>
-          <View style={[styles.propTypeIcon, { backgroundColor: colors.primary + '20' }]}>
-            <Ionicons name="help-circle" size={20} color={colors.primary} />
-          </View>
-          <AccessibleThemedText style={styles.propTypeName}>
-            {featuredPropBet.propType}
-          </AccessibleThemedText>
-        </View>
-        <AccessibleThemedText style={[styles.propRecommendation, { color: colors.primary }]}>
-          {featuredPropBet.recommendation} {featuredPropBet.line}
-        </AccessibleThemedText>
-      </AccessibleThemedView>
-
-      {/* Prop Details */}
-      <AccessibleThemedView style={styles.propDetails}>
-        {/* AI Prediction */}
-        <View style={styles.propDetailRow}>
-          <View style={styles.propDetailLabel}>
-            <View style={[styles.aiIcon, { backgroundColor: colors.primary }]}>
-              <AccessibleThemedText style={[styles.aiIconText, { color: colors.background }]}>
-                AI
-              </AccessibleThemedText>
-            </View>
-            <AccessibleThemedText style={styles.propDetailLabelText}>
-              {t('props.prediction')}:
-            </AccessibleThemedText>
-          </View>
-          <AccessibleThemedText style={styles.propDetailValue}>
-            {featuredPropBet.prediction} {featuredPropBet.propType}
-          </AccessibleThemedText>
-        </View>
-
-        {/* Confidence */}
-        <View style={styles.propDetailRow}>
-          <AccessibleThemedText style={styles.propDetailLabelText}>
-            {t('props.confidence')}:
-          </AccessibleThemedText>
-          <AccessibleThemedText style={[styles.propDetailValue, { color: colors.success }]}>
-            {t(`props.confidenceLevel.${featuredPropBet.confidenceLevel.toLowerCase()}`)} (
-            {featuredPropBet.confidence}%)
-          </AccessibleThemedText>
-        </View>
-
-        {/* Season Average */}
-        <View style={styles.propDetailRow}>
-          <AccessibleThemedText style={styles.propDetailLabelText}>
-            {t('props.seasonAverage')}:
-          </AccessibleThemedText>
-          <AccessibleThemedText style={styles.propDetailValue}>
-            {featuredPropBet.seasonAverage} {t('props.ppg')}
-          </AccessibleThemedText>
-        </View>
-
-        {/* Last 10 Games */}
-        <View style={styles.propDetailRow}>
-          <AccessibleThemedText style={styles.propDetailLabelText}>
-            {t('props.last10Games')}:
-          </AccessibleThemedText>
-          <AccessibleThemedText style={styles.propDetailValue}>
-            {featuredPropBet.last10Average} {t('props.ppg')}
-          </AccessibleThemedText>
-        </View>
-
-        {/* Over Rate */}
-        <View style={styles.propDetailRow}>
-          <AccessibleThemedText style={styles.propDetailLabelText}>
-            {t('props.overRate')}:
-          </AccessibleThemedText>
-          <AccessibleThemedText style={styles.propDetailValue}>
-            {featuredPropBet.overRate}
-          </AccessibleThemedText>
-        </View>
-
-        {/* Performance Chart */}
-        <View style={styles.chartSection}>
-          <AccessibleThemedText style={styles.chartTitle}>
-            {t('props.last10GamesPerformance')}
-          </AccessibleThemedText>
-          <View style={[styles.chart, { backgroundColor: colors.card }]}>
-            {/* Line representing the prop line */}
-            <View
-              style={[
-                styles.propLine,
-                {
-                  borderColor: colors.error,
-                  top: '30%',
-                },
-              ]}
-            />
-            <View style={styles.propLineLabel}>
-              <AccessibleThemedText style={[styles.propLineLabelText, { color: colors.error }]}>
-                {featuredPropBet.line}
-              </AccessibleThemedText>
-            </View>
-
-            {/* Bar chart */}
-            <View style={styles.barChart}>
-              {featuredPropBet.lastGames.map((value, index) => (
-                <View key={index} style={styles.barContainer}>
-                  <View
-                    style={[
-                      styles.bar,
-                      {
-                        backgroundColor:
-                          value > featuredPropBet.line ? colors.success : colors.secondary,
-                        height: `${Math.min(value * 1.5, 100)}%`,
-                      },
-                    ]}
-                  />
-                  <AccessibleThemedText style={styles.barValue}>{value}</AccessibleThemedText>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* AI Analysis */}
-        <AccessibleThemedView
-          style={[styles.aiAnalysis, { backgroundColor: colors.primary + '20' }]}
-        >
-          <AccessibleThemedText style={styles.aiAnalysisTitle}>
-            {t('props.aiAnalysis')}
-          </AccessibleThemedText>
-          <AccessibleThemedText style={styles.aiAnalysisText}>
-            {featuredPropBet.aiAnalysis}
+  const renderFeaturedPropBet = () => {
+    if (!featuredPropBet) {
+      return (
+        <AccessibleThemedView style={[styles.card, styles.loadingCard]}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <AccessibleThemedText style={styles.loadingText}>
+            Loading prop predictions...
           </AccessibleThemedText>
         </AccessibleThemedView>
+      );
+    }
+
+    return (
+      <AccessibleThemedView style={styles.card}>
+        {/* Player Header */}
+        <AccessibleThemedView style={styles.playerHeader}>
+          <View style={styles.playerInfo}>
+            <View style={[styles.playerAvatar, { backgroundColor: colors.card }]} />
+            <View style={styles.playerDetails}>
+              <AccessibleThemedText style={styles.playerName}>
+                {featuredPropBet.player.name}
+              </AccessibleThemedText>
+              <AccessibleThemedText style={styles.playerTeam}>
+                {featuredPropBet.player.team} • vs. {featuredPropBet.player.opponent} •{' '}
+                {featuredPropBet.player.gameTime}
+              </AccessibleThemedText>
+            </View>
+          </View>
+          <AccessibleTouchableOpacity
+            accessibilityLabel={t('accessibility.sharePrediction')}
+            accessibilityRole="button"
+          >
+            <Ionicons name="share-social-outline" size={16} color={colors.primary} />
+          </AccessibleTouchableOpacity>
+        </AccessibleThemedView>
+
+        {/* Prop Type Header */}
+        <AccessibleThemedView style={[styles.propTypeHeader, { backgroundColor: colors.card }]}>
+          <View style={styles.propTypeInfo}>
+            <View style={[styles.propTypeIcon, { backgroundColor: colors.primary + '20' }]}>
+              <Ionicons name="help-circle" size={20} color={colors.primary} />
+            </View>
+            <AccessibleThemedText style={styles.propTypeName}>
+              {featuredPropBet.propType}
+            </AccessibleThemedText>
+          </View>
+          <AccessibleThemedText style={[styles.propRecommendation, { color: colors.primary }]}>
+            {featuredPropBet.recommendation} {featuredPropBet.line}
+          </AccessibleThemedText>
+        </AccessibleThemedView>
+
+        {/* Prop Details */}
+        <AccessibleThemedView style={styles.propDetails}>
+          {/* AI Prediction */}
+          <View style={styles.propDetailRow}>
+            <View style={styles.propDetailLabel}>
+              <View style={[styles.aiIcon, { backgroundColor: colors.primary }]}>
+                <AccessibleThemedText style={[styles.aiIconText, { color: colors.background }]}>
+                  AI
+                </AccessibleThemedText>
+              </View>
+              <AccessibleThemedText style={styles.propDetailLabelText}>
+                {t('props.prediction')}:
+              </AccessibleThemedText>
+            </View>
+            <AccessibleThemedText style={styles.propDetailValue}>
+              {featuredPropBet.prediction} {featuredPropBet.propType}
+            </AccessibleThemedText>
+          </View>
+
+          {/* Confidence */}
+          <View style={styles.propDetailRow}>
+            <AccessibleThemedText style={styles.propDetailLabelText}>
+              {t('props.confidence')}:
+            </AccessibleThemedText>
+            <AccessibleThemedText style={[styles.propDetailValue, { color: colors.success }]}>
+              {t(`props.confidenceLevel.${featuredPropBet.confidenceLevel.toLowerCase()}`)} (
+              {featuredPropBet.confidence}%)
+            </AccessibleThemedText>
+          </View>
+
+          {/* Season Average */}
+          <View style={styles.propDetailRow}>
+            <AccessibleThemedText style={styles.propDetailLabelText}>
+              {t('props.seasonAverage')}:
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.propDetailValue}>
+              {featuredPropBet.seasonAverage} {t('props.ppg')}
+            </AccessibleThemedText>
+          </View>
+
+          {/* Last 10 Games */}
+          <View style={styles.propDetailRow}>
+            <AccessibleThemedText style={styles.propDetailLabelText}>
+              {t('props.last10Games')}:
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.propDetailValue}>
+              {featuredPropBet.last10Average} {t('props.ppg')}
+            </AccessibleThemedText>
+          </View>
+
+          {/* Over Rate */}
+          <View style={styles.propDetailRow}>
+            <AccessibleThemedText style={styles.propDetailLabelText}>
+              {t('props.overRate')}:
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.propDetailValue}>
+              {featuredPropBet.overRate}
+            </AccessibleThemedText>
+          </View>
+
+          {/* Performance Chart */}
+          <View style={styles.chartSection}>
+            <AccessibleThemedText style={styles.chartTitle}>
+              {t('props.last10GamesPerformance')}
+            </AccessibleThemedText>
+            <View style={[styles.chart, { backgroundColor: colors.card }]}>
+              {/* Line representing the prop line */}
+              <View
+                style={[
+                  styles.propLine,
+                  {
+                    borderColor: colors.error,
+                    top: '30%',
+                  },
+                ]}
+              />
+              <View style={styles.propLineLabel}>
+                <AccessibleThemedText style={[styles.propLineLabelText, { color: colors.error }]}>
+                  {featuredPropBet.line}
+                </AccessibleThemedText>
+              </View>
+
+              {/* Bar chart */}
+              <View style={styles.barChart}>
+                {featuredPropBet.lastGames.map((value, index) => (
+                  <View key={index} style={styles.barContainer}>
+                    <View
+                      style={[
+                        styles.bar,
+                        {
+                          backgroundColor:
+                            value > featuredPropBet.line ? colors.success : colors.secondary,
+                          height: `${Math.min(value * 1.5, 100)}%`,
+                        },
+                      ]}
+                    />
+                    <AccessibleThemedText style={styles.barValue}>{value}</AccessibleThemedText>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
+
+          {/* AI Analysis */}
+          <AccessibleThemedView
+            style={[styles.aiAnalysis, { backgroundColor: colors.primary + '20' }]}
+          >
+            <AccessibleThemedText style={styles.aiAnalysisTitle}>
+              {t('props.aiAnalysis')}
+            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.aiAnalysisText}>
+              {featuredPropBet.aiAnalysis}
+            </AccessibleThemedText>
+          </AccessibleThemedView>
+        </AccessibleThemedView>
       </AccessibleThemedView>
-    </AccessibleThemedView>
-  );
+    );
+  };
 
   // Render top prop bet card
   const renderTopPropBet = ({ item }: { item: TopPropBet }) => (
@@ -489,7 +441,25 @@ const PropsEdgeScreen: React.FC = () => {
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={loadPropPredictions}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+          />
+        }
       >
+        {/* Error Message */}
+        {error && (
+          <AccessibleThemedView style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}>
+            <Ionicons name="warning-outline" size={20} color={colors.error} />
+            <AccessibleThemedText style={[styles.errorText, { color: colors.error }]}>
+              {error}
+            </AccessibleThemedText>
+          </AccessibleThemedView>
+        )}
+
         {/* Featured Prop Bet */}
         {renderFeaturedPropBet()}
 
@@ -498,12 +468,28 @@ const PropsEdgeScreen: React.FC = () => {
           <AccessibleThemedText style={styles.sectionTitle}>
             {t('props.topPlayerProps').toUpperCase()}
           </AccessibleThemedText>
-          <FlatList
-            data={topPropBets}
-            renderItem={renderTopPropBet}
-            keyExtractor={item => item.id}
-            scrollEnabled={false}
-          />
+          {loading ? (
+            <AccessibleThemedView style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <AccessibleThemedText style={styles.loadingText}>
+                Loading top props...
+              </AccessibleThemedText>
+            </AccessibleThemedView>
+          ) : (
+            <FlatList
+              data={topPropBets}
+              renderItem={renderTopPropBet}
+              keyExtractor={item => item.id}
+              scrollEnabled={false}
+              ListEmptyComponent={
+                <AccessibleThemedView style={styles.emptyContainer}>
+                  <AccessibleThemedText style={styles.emptyText}>
+                    No prop predictions available for {selectedSport.toUpperCase()}
+                  </AccessibleThemedText>
+                </AccessibleThemedView>
+              }
+            />
+          )}
         </AccessibleThemedView>
       </ScrollView>
 
@@ -839,6 +825,41 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 12,
+  },
+  loadingCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    padding: 12,
+    borderRadius: 8,
+  },
+  errorText: {
+    fontSize: 14,
+    marginLeft: 8,
+    flex: 1,
+  },
+  emptyContainer: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

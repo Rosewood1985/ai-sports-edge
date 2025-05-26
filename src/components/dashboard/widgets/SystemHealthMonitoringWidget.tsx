@@ -4,241 +4,9 @@ import { MetricCard } from '../metrics/MetricCard';
 import { HorizontalBarChart } from '../charts/HorizontalBarChart';
 import { LineChart } from '../charts/LineChart';
 import { Tooltip } from '../../../components/ui/Tooltip';
-import { TrendDirection } from '../metrics/MetricCard';
+// TrendDirection type is now handled by the systemHealthService interface
 
-// Data interfaces
-interface SystemHealthData {
-  apiPerformance: {
-    responseTime: number;
-    responseTimeTrend: { direction: TrendDirection; value: string };
-    errorRate: number;
-    errorRateTrend: { direction: TrendDirection; value: string };
-    requestsPerMinute: number;
-    requestsPerMinuteTrend: { direction: TrendDirection; value: string };
-    endpointPerformance: { name: string; value: number }[];
-  };
-  databasePerformance: {
-    queryTime: number;
-    queryTimeTrend: { direction: TrendDirection; value: string };
-    readOperations: number;
-    readOperationsTrend: { direction: TrendDirection; value: string };
-    writeOperations: number;
-    writeOperationsTrend: { direction: TrendDirection; value: string };
-    collectionPerformance: { name: string; value: number }[];
-  };
-  infrastructureCosts: {
-    totalCost: number;
-    totalCostTrend: { direction: TrendDirection; value: string };
-    costByService: { name: string; value: number }[];
-    costHistory: { date: string; count: number }[];
-  };
-  backgroundProcesses: {
-    activeProcesses: number;
-    activeProcessesTrend: { direction: TrendDirection; value: string };
-    failedProcesses: number;
-    failedProcessesTrend: { direction: TrendDirection; value: string };
-    processStatus: {
-      id: string;
-      name: string;
-      status: 'running' | 'completed' | 'failed' | 'pending';
-      lastRun: string;
-      duration: number;
-    }[];
-  };
-  systemActions: {
-    id: string;
-    timestamp: string;
-    action: string;
-    status: 'success' | 'warning' | 'error';
-    details: string;
-  }[];
-}
-
-// Mock data for development
-const mockData: SystemHealthData = {
-  apiPerformance: {
-    responseTime: 156,
-    responseTimeTrend: { direction: 'down', value: '-12ms' },
-    errorRate: 0.8,
-    errorRateTrend: { direction: 'down', value: '-0.3%' },
-    requestsPerMinute: 342,
-    requestsPerMinuteTrend: { direction: 'up', value: '+28' },
-    endpointPerformance: [
-      { name: '/api/users', value: 210 },
-      { name: '/api/predictions', value: 185 },
-      { name: '/api/games', value: 145 },
-      { name: '/api/subscriptions', value: 120 },
-      { name: '/api/analytics', value: 95 },
-    ],
-  },
-  databasePerformance: {
-    queryTime: 68,
-    queryTimeTrend: { direction: 'down', value: '-5ms' },
-    readOperations: 1250,
-    readOperationsTrend: { direction: 'up', value: '+120' },
-    writeOperations: 380,
-    writeOperationsTrend: { direction: 'up', value: '+45' },
-    collectionPerformance: [
-      { name: 'users', value: 45 },
-      { name: 'predictions', value: 72 },
-      { name: 'games', value: 58 },
-      { name: 'subscriptions', value: 65 },
-      { name: 'analytics', value: 85 },
-    ],
-  },
-  infrastructureCosts: {
-    totalCost: 1250.75,
-    totalCostTrend: { direction: 'up', value: '+$125.50' },
-    costByService: [
-      { name: 'Firebase', value: 450.25 },
-      { name: 'GCP Compute', value: 325.5 },
-      { name: 'Storage', value: 175.0 },
-      { name: 'CDN', value: 150.0 },
-      { name: 'Other', value: 150.0 },
-    ],
-    costHistory: [
-      { date: '2025-04-23', count: 1050 },
-      { date: '2025-04-24', count: 1075 },
-      { date: '2025-04-25', count: 1060 },
-      { date: '2025-04-26', count: 1080 },
-      { date: '2025-04-27', count: 1100 },
-      { date: '2025-04-28', count: 1125 },
-      { date: '2025-04-29', count: 1150 },
-      { date: '2025-04-30', count: 1175 },
-      { date: '2025-05-01', count: 1200 },
-      { date: '2025-05-02', count: 1225 },
-      { date: '2025-05-03', count: 1210 },
-      { date: '2025-05-04', count: 1190 },
-      { date: '2025-05-05', count: 1180 },
-      { date: '2025-05-06', count: 1195 },
-      { date: '2025-05-07', count: 1205 },
-      { date: '2025-05-08', count: 1220 },
-      { date: '2025-05-09', count: 1235 },
-      { date: '2025-05-10', count: 1250 },
-      { date: '2025-05-11', count: 1240 },
-      { date: '2025-05-12', count: 1230 },
-      { date: '2025-05-13', count: 1245 },
-      { date: '2025-05-14', count: 1260 },
-      { date: '2025-05-15', count: 1275 },
-      { date: '2025-05-16', count: 1290 },
-      { date: '2025-05-17', count: 1280 },
-      { date: '2025-05-18', count: 1270 },
-      { date: '2025-05-19', count: 1285 },
-      { date: '2025-05-20', count: 1300 },
-      { date: '2025-05-21', count: 1315 },
-      { date: '2025-05-22', count: 1330 },
-      { date: '2025-05-23', count: 1250 },
-    ],
-  },
-  backgroundProcesses: {
-    activeProcesses: 8,
-    activeProcessesTrend: { direction: 'up', value: '+2' },
-    failedProcesses: 1,
-    failedProcessesTrend: { direction: 'down', value: '-3' },
-    processStatus: [
-      {
-        id: 'proc-001',
-        name: 'Data Sync',
-        status: 'running',
-        lastRun: '2025-05-23T10:15:00Z',
-        duration: 120,
-      },
-      {
-        id: 'proc-002',
-        name: 'Analytics Aggregation',
-        status: 'completed',
-        lastRun: '2025-05-23T09:30:00Z',
-        duration: 450,
-      },
-      {
-        id: 'proc-003',
-        name: 'Fraud Detection',
-        status: 'running',
-        lastRun: '2025-05-23T10:00:00Z',
-        duration: 300,
-      },
-      {
-        id: 'proc-004',
-        name: 'Subscription Renewal',
-        status: 'completed',
-        lastRun: '2025-05-23T08:45:00Z',
-        duration: 180,
-      },
-      {
-        id: 'proc-005',
-        name: 'Database Backup',
-        status: 'completed',
-        lastRun: '2025-05-23T07:00:00Z',
-        duration: 600,
-      },
-      {
-        id: 'proc-006',
-        name: 'Email Notifications',
-        status: 'running',
-        lastRun: '2025-05-23T10:30:00Z',
-        duration: 90,
-      },
-      {
-        id: 'proc-007',
-        name: 'Cache Refresh',
-        status: 'failed',
-        lastRun: '2025-05-23T09:15:00Z',
-        duration: 60,
-      },
-      {
-        id: 'proc-008',
-        name: 'Log Rotation',
-        status: 'completed',
-        lastRun: '2025-05-23T06:00:00Z',
-        duration: 120,
-      },
-      {
-        id: 'proc-009',
-        name: 'ML Model Training',
-        status: 'running',
-        lastRun: '2025-05-23T08:00:00Z',
-        duration: 1800,
-      },
-    ],
-  },
-  systemActions: [
-    {
-      id: 'action-001',
-      timestamp: '2025-05-23T10:45:00Z',
-      action: 'Cache refresh triggered manually',
-      status: 'success',
-      details: 'Cache refreshed successfully in 45 seconds',
-    },
-    {
-      id: 'action-002',
-      timestamp: '2025-05-23T10:30:00Z',
-      action: 'Failed process restarted: Cache Refresh',
-      status: 'warning',
-      details: 'Process restarted after initial failure',
-    },
-    {
-      id: 'action-003',
-      timestamp: '2025-05-23T10:15:00Z',
-      action: 'Database connection pool increased',
-      status: 'success',
-      details: 'Connection pool increased from 10 to 15',
-    },
-    {
-      id: 'action-004',
-      timestamp: '2025-05-23T10:00:00Z',
-      action: 'API rate limiting adjusted',
-      status: 'success',
-      details: 'Rate limit increased from 100 to 150 requests per minute',
-    },
-    {
-      id: 'action-005',
-      timestamp: '2025-05-23T09:45:00Z',
-      action: 'Error alert: High database query time',
-      status: 'error',
-      details: 'Query time exceeded threshold of 100ms for users collection',
-    },
-  ],
-};
+// SystemHealthData interface and real data is imported from systemHealthService
 
 // Custom hook for data fetching
 const useSystemHealthData = () => {
@@ -357,9 +125,14 @@ export function SystemHealthMonitoringWidget() {
       error={error}
       onRefresh={refetch}
       footer={
-        <a href="/admin/system-health" className="text-blue-500 hover:underline text-sm">
-          View detailed system health metrics
-        </a>
+        <div className="flex justify-between items-center">
+          <a href="/admin/system-health" className="text-blue-500 hover:underline text-sm">
+            View detailed system health metrics
+          </a>
+          <span className="text-xs text-gray-500">
+            Last updated: {data?.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : 'Never'}
+          </span>
+        </div>
       }
     >
       <div className="space-y-6">
@@ -520,7 +293,7 @@ export function SystemHealthMonitoringWidget() {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {data?.backgroundProcesses.processStatus.map(process => (
+                  {data?.backgroundProcesses.processStatus.map((process: any) => (
                     <tr key={process.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {process.name}
@@ -546,7 +319,7 @@ export function SystemHealthMonitoringWidget() {
         <div className="system-actions-section mt-6">
           <h4 className="text-lg font-medium mb-3">Recent System Actions</h4>
           <div className="action-log">
-            {data?.systemActions.map(action => (
+            {data?.systemActions.map((action: any) => (
               <ActionLogItem key={action.id} action={action} />
             ))}
           </div>

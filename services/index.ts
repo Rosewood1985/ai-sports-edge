@@ -20,6 +20,7 @@ export * from './subscriptionAnalyticsService';
 export * from './ufcService';
 export * from './userPreferencesService';
 export * from './userSportsPreferencesService';
+export * from './venueService';
 
 // Export services with potential naming conflicts as namespaces
 import * as firebaseSubscription from './firebaseSubscriptionService';

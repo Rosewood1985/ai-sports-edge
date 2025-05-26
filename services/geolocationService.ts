@@ -36,6 +36,30 @@ export interface Location {
   timestamp?: number;
 }
 
+// LocationData interface for compatibility
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  timestamp?: number;
+  accuracy?: number;
+  ip?: string;
+}
+
+// Odds suggestion interface
+export interface OddsSuggestion {
+  team: string;
+  game: string;
+  odds: number;
+  suggestion: 'bet' | 'avoid' | 'watch';
+  timestamp: string;
+  confidence?: number;
+  reasoning?: string;
+}
+
 /**
  * Geolocation Service
  * Web-compatible version
@@ -351,6 +375,160 @@ class GeolocationService {
       console.error('Failed to get cached teams:', error);
       return null;
     }
+  }
+
+  /**
+   * Get local teams based on location
+   */
+  async getLocalTeams(location?: LocationData | null): Promise<string[]> {
+    try {
+      let currentLocation = location;
+      
+      // Get current location if not provided
+      if (!currentLocation) {
+        currentLocation = await this.getCurrentLocation() as LocationData;
+      }
+      
+      if (!currentLocation || !currentLocation.city) {
+        return [];
+      }
+      
+      const city = currentLocation.city;
+      const state = currentLocation.state || '';
+      
+      // Check if we have teams for the user's city
+      if (cityTeamMap[city]) {
+        await this.cacheTeams(cityTeamMap[city]);
+        return cityTeamMap[city];
+      }
+      
+      // If not, check for teams in the user's state
+      const stateTeams: string[] = [];
+      Object.entries(cityTeamMap).forEach(([cityName, teams]) => {
+        if (cityName.includes(state) || state.includes(cityName)) {
+          stateTeams.push(...teams);
+        }
+      });
+      
+      if (stateTeams.length > 0) {
+        await this.cacheTeams(stateTeams);
+        return stateTeams;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error getting local teams:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get localized odds suggestions
+   */
+  async getLocalizedOddsSuggestions(location?: LocationData | null): Promise<OddsSuggestion[]> {
+    try {
+      // Get local teams
+      const localTeams = await this.getLocalTeams(location);
+      
+      if (localTeams.length === 0) {
+        return [];
+      }
+      
+      // Generate odds suggestions for local teams
+      return localTeams.map(team => {
+        // Generate a realistic opponent
+        const opponent = this.generateOpponent(team);
+        
+        // Generate realistic odds
+        const baseOdds = 2.0;
+        const popularityFactor = team.includes('Yankees') || team.includes('Lakers') ? 0.8 : 1.2;
+        const odds = baseOdds * popularityFactor * (0.9 + Math.random() * 0.4);
+        
+        // Generate suggestion based on odds
+        const suggestion: 'bet' | 'avoid' | 'watch' = odds < 1.8 ? 'bet' : odds > 2.5 ? 'avoid' : 'watch';
+        
+        return {
+          team,
+          game: `${team} vs. ${opponent}`,
+          odds: parseFloat(odds.toFixed(2)),
+          suggestion,
+          timestamp: new Date().toISOString(),
+          confidence: Math.random() * 0.3 + 0.7, // 70-100% confidence
+          reasoning: this.generateReasoning(suggestion, odds)
+        };
+      });
+    } catch (error) {
+      console.error('Error getting localized odds suggestions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Generate an opponent team name
+   */
+  private generateOpponent(team: string): string {
+    const opponents: Record<string, string[]> = {
+      'Yankees': ['Red Sox', 'Blue Jays', 'Orioles'],
+      'Lakers': ['Warriors', 'Clippers', 'Celtics'],
+      'Cowboys': ['Giants', 'Eagles', 'Commanders'],
+      'Chiefs': ['Raiders', 'Broncos', 'Chargers'],
+    };
+    
+    // Find opponent based on team name
+    for (const [teamKey, opponentList] of Object.entries(opponents)) {
+      if (team.includes(teamKey)) {
+        return opponentList[Math.floor(Math.random() * opponentList.length)];
+      }
+    }
+    
+    // Default opponents
+    const defaultOpponents = ['Visitors', 'Away Team', 'Opposition'];
+    return defaultOpponents[Math.floor(Math.random() * defaultOpponents.length)];
+  }
+
+  /**
+   * Generate reasoning for betting suggestion
+   */
+  private generateReasoning(suggestion: string, odds: number): string {
+    switch (suggestion) {
+      case 'bet':
+        return `Favorable odds at ${odds.toFixed(2)}. Good value bet opportunity.`;
+      case 'avoid':
+        return `High odds at ${odds.toFixed(2)}. Risk outweighs potential reward.`;
+      case 'watch':
+        return `Moderate odds at ${odds.toFixed(2)}. Monitor for line movement.`;
+      default:
+        return 'Standard betting recommendation based on current odds.';
+    }
+  }
+
+  /**
+   * Get user location (compatibility method)
+   */
+  async getUserLocation(useGPS: boolean = false, forceRefresh: boolean = false): Promise<LocationData | null> {
+    const location = await this.getCurrentLocation(forceRefresh);
+    return location as LocationData;
+  }
+
+  /**
+   * Check if location services are available
+   */
+  isLocationAvailable(): boolean {
+    return this.isPermissionGranted || (typeof navigator !== 'undefined' && 'geolocation' in navigator);
+  }
+
+  /**
+   * Get distance between two coordinates in kilometers
+   */
+  getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
 }
 

@@ -257,21 +257,39 @@ export class CheckoutService {
    */
   async getCheckoutSessionStatus(sessionId: string): Promise<'open' | 'complete' | 'expired'> {
     try {
-      // This would typically call a Firebase function that safely retrieves
-      // session status without exposing sensitive data
-      // For now, we'll implement a basic version
-      
       const user = auth.currentUser;
       if (!user) {
         throw new Error('User must be authenticated');
       }
 
-      // You could implement a Firebase function for this
-      // For now, return a placeholder
-      return 'complete';
+      // Call the Firebase function for secure session status retrieval
+      const getStatusCallable = httpsCallable<{sessionId: string}, {status: string; payment_status: string}>(
+        functions, 
+        'getCheckoutSessionStatus'
+      );
+
+      const result = await getStatusCallable({ sessionId });
+      
+      // Map Stripe status to our simplified status
+      if (result.data.status === 'complete' && result.data.payment_status === 'paid') {
+        return 'complete';
+      } else if (result.data.status === 'expired') {
+        return 'expired';
+      } else {
+        return 'open';
+      }
 
     } catch (error) {
       console.error('Error getting checkout session status:', error);
+      
+      // Track status check error
+      await analyticsService.trackEvent(AnalyticsEventType.CHECKOUT_ERROR, {
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+        session_id: sessionId,
+        user_id: auth.currentUser?.uid,
+        error_type: 'status_check_failed'
+      });
+
       return 'expired';
     }
   }

@@ -19,6 +19,8 @@ import LanguageSettingsScreen from '../screens/LanguageSettingsScreen';
 import AuthScreen from '../screens/AuthScreen';
 import LegalScreen from '../screens/LegalScreen';
 import KnowledgeEdgeScreen from '../screens/KnowledgeEdgeScreen';
+import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
+import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
 
 // Import navigators
 import OnboardingNavigator from './OnboardingNavigator';
@@ -37,6 +39,8 @@ export type RootStackParamList = {
   Legal: { type: 'privacy-policy' | 'terms-of-service' };
   KnowledgeEdge: undefined;
   ArticleDetail: { articleId: string };
+  NearbyVenues: undefined;
+  LocalTeamOdds: undefined;
 };
 
 export type MainTabParamList = {
@@ -149,6 +153,8 @@ const AppNavigator = () => {
       <Stack.Screen name="LanguageSettings" component={LanguageSettingsScreen} />
       <Stack.Screen name="Legal" component={LegalScreen} />
       <Stack.Screen name="KnowledgeEdge" component={KnowledgeEdgeScreen} />
+      <Stack.Screen name="NearbyVenues" component={NearbyVenuesScreen} />
+      <Stack.Screen name="LocalTeamOdds" component={LocalTeamOddsScreen} />
     </Stack.Navigator>
   );
 };

@@ -611,4 +611,17 @@ exports.syncUFCData = syncUFCData;
 exports.syncUFCEvents = syncUFCEvents;
 exports.syncUFCOdds = syncUFCOdds;
 
-console.log("All functions loaded successfully (including Sentry V2 and UFC functions)");
+// Import and export Stripe checkout functions
+const {
+  createCheckoutSession,
+  handleSuccessfulPayment,
+  checkEduDiscount,
+  getCheckoutSessionStatus
+} = require('./createCheckoutSession');
+
+exports.createCheckoutSession = createCheckoutSession;
+exports.handleSuccessfulPayment = handleSuccessfulPayment;
+exports.checkEduDiscount = checkEduDiscount;
+exports.getCheckoutSessionStatus = getCheckoutSessionStatus;
+
+console.log("All functions loaded successfully (including Sentry V2, UFC, and Stripe checkout functions)");
