@@ -33,7 +33,15 @@
       "Bash(export NODE_OPTIONS=\"--max-old-space-size=8192\")",
       "mcp__ide__getDiagnostics",
       "Bash(mv:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm view:*)",
+      "Bash(git commit:*)",
+      "Bash(git mv:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
