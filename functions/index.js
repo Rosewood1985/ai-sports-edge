@@ -18,6 +18,16 @@ initSentry();
 // Initialize Firebase Admin
 admin.initializeApp();
 
+// Import advanced Stripe features
+const {
+  calculateProration,
+  updateSubscriptionWithProration,
+  calculateTax,
+  createMultiCurrencyPricing,
+  getPricingForCurrency,
+  createAdvancedSubscription
+} = require('./stripeAdvancedFeatures');
+
 // Create a simple Stripe webhook handler
 exports.stripeWebhook = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
@@ -624,4 +634,12 @@ exports.handleSuccessfulPayment = handleSuccessfulPayment;
 exports.checkEduDiscount = checkEduDiscount;
 exports.getCheckoutSessionStatus = getCheckoutSessionStatus;
 
-console.log("All functions loaded successfully (including Sentry V2, UFC, and Stripe checkout functions)");
+// Export advanced Stripe features
+exports.calculateProration = calculateProration;
+exports.updateSubscriptionWithProration = updateSubscriptionWithProration;
+exports.calculateTax = calculateTax;
+exports.createMultiCurrencyPricing = createMultiCurrencyPricing;
+exports.getPricingForCurrency = getPricingForCurrency;
+exports.createAdvancedSubscription = createAdvancedSubscription;
+
+console.log("All functions loaded successfully (including Sentry V2, UFC, Stripe checkout, and advanced Stripe functions)");

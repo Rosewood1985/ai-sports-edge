@@ -4,8 +4,6 @@ import {
   TouchableOpacityProps,
   StyleSheet,
   Animated,
-  Platform,
-  findNodeHandle,
 } from 'react-native';
 import accessibilityService from '../../services/accessibilityService';
 import { useFocusState } from './focusStateUtils';
@@ -18,6 +16,11 @@ import { useFocusState } from './focusStateUtils';
  * for both touch and keyboard navigation.
  */
 export interface AccessibleTouchableOpacityProps extends TouchableOpacityProps {
+  /**
+   * Children elements to render inside the touchable
+   */
+  children?: React.ReactNode;
+
   /**
    * Accessibility label that describes the action of the touchable
    */
