@@ -669,58 +669,203 @@ const mockUserListResponse: UserListResponse = {
   totalPages: 1,
 };
 
-// API fetcher function
+// Enhanced API fetcher with retry logic and authentication
 const fetcher = async <T>(url: string): Promise<T> => {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
-      },
-    });
+  const maxRetries = 3;
+  let lastError: Error;
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'X-Request-ID': `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
+      });
+
+      if (response.status === 401) {
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminToken');
+        window.location.href = '/admin/login';
+        throw new Error('Unauthorized - redirecting to login');
+      }
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`API fetch attempt ${attempt} failed:`, error);
+      lastError = error as Error;
+      
+      if (attempt < maxRetries) {
+        // Exponential backoff: 1s, 2s, 4s
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt - 1) * 1000));
+      }
     }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('API fetch error:', error);
-    throw error;
   }
+
+  throw lastError!;
 };
 
-// Custom hooks for data fetching
+// WebSocket service for real-time updates
+class WebSocketService {
+  private static instance: WebSocketService;
+  private ws: WebSocket | null = null;
+  private reconnectTimer: NodeJS.Timeout | null = null;
+  private subscribers: Map<string, Set<(data: any) => void>> = new Map();
+  private isConnected = false;
+
+  static getInstance(): WebSocketService {
+    if (!WebSocketService.instance) {
+      WebSocketService.instance = new WebSocketService();
+    }
+    return WebSocketService.instance;
+  }
+
+  connect(): void {
+    const wsUrl = process.env.NODE_ENV === 'production' 
+      ? 'wss://api.aisportsedge.app/ws/admin'
+      : 'ws://localhost:8080/ws/admin';
+
+    try {
+      this.ws = new WebSocket(wsUrl);
+
+      this.ws.onopen = () => {
+        this.isConnected = true;
+        console.log('Admin WebSocket connected');
+        if (this.reconnectTimer) {
+          clearTimeout(this.reconnectTimer);
+          this.reconnectTimer = null;
+        }
+      };
+
+      this.ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          this.notifySubscribers(message.type, message.data);
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+
+      this.ws.onclose = () => {
+        this.isConnected = false;
+        console.log('Admin WebSocket disconnected, reconnecting...');
+        this.scheduleReconnect();
+      };
+
+      this.ws.onerror = (error) => {
+        console.error('Admin WebSocket error:', error);
+      };
+    } catch (error) {
+      console.error('Error connecting to WebSocket:', error);
+      this.scheduleReconnect();
+    }
+  }
+
+  private scheduleReconnect(): void {
+    if (this.reconnectTimer) return;
+    
+    this.reconnectTimer = setTimeout(() => {
+      this.connect();
+    }, 5000);
+  }
+
+  subscribe(channel: string, callback: (data: any) => void): () => void {
+    if (!this.subscribers.has(channel)) {
+      this.subscribers.set(channel, new Set());
+    }
+    this.subscribers.get(channel)!.add(callback);
+
+    // Return unsubscribe function
+    return () => {
+      const channelSubscribers = this.subscribers.get(channel);
+      if (channelSubscribers) {
+        channelSubscribers.delete(callback);
+        if (channelSubscribers.size === 0) {
+          this.subscribers.delete(channel);
+        }
+      }
+    };
+  }
+
+  private notifySubscribers(channel: string, data: any): void {
+    const channelSubscribers = this.subscribers.get(channel);
+    if (channelSubscribers) {
+      channelSubscribers.forEach(callback => callback(data));
+    }
+  }
+
+  disconnect(): void {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    this.isConnected = false;
+  }
+
+  getConnectionStatus(): boolean {
+    return this.isConnected;
+  }
+}
+
+// Enhanced SWR hooks with real-time updates and caching
 export const useBetSlipPerformanceData = (shouldFetch = true) => {
   const { data, error, mutate } = useSWR<ApiResponse<BetSlipPerformanceData>>(
     shouldFetch ? '/api/admin/bet-slip-performance' : null,
     fetcher,
     {
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      dedupingInterval: 30000, // 30 seconds
+      revalidateOnReconnect: true,
+      dedupingInterval: 30000,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
+      refreshInterval: 60000, // Refresh every minute
     }
   );
 
-  // Use mock data for development or when API fails
-  const [mockData, setMockData] = useState<BetSlipPerformanceData>(mockBetSlipPerformanceData);
-
-  // For development, simulate API call with mock data
+  // Real-time updates via WebSocket
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && !data && !error) {
-      const timer = setTimeout(() => {
-        mutate({ data: mockData, status: 200, message: 'Success' } as any, false);
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (!shouldFetch) return;
+
+    const wsService = WebSocketService.getInstance();
+    wsService.connect();
+
+    const unsubscribe = wsService.subscribe('bet-slip-performance', (newData) => {
+      mutate({ data: newData, status: 200, message: 'Real-time update' } as any, false);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [shouldFetch, mutate]);
+
+  // Fallback to mock data only in development when API is unavailable
+  const [fallbackData, setFallbackData] = useState<BetSlipPerformanceData | null>(null);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && error && !data) {
+      console.warn('API unavailable, using fallback data for bet slip performance');
+      setFallbackData(mockBetSlipPerformanceData);
     }
-  }, [data, error, mockData, mutate]);
+  }, [data, error]);
 
   return {
-    data: data?.data || mockData,
-    isLoading: !error && !data,
-    error,
+    data: data?.data || fallbackData,
+    isLoading: !error && !data && !fallbackData,
+    error: error && !fallbackData ? error : null,
     refetch: () => mutate(),
+    isRealTime: !!data?.data,
   };
 };
 

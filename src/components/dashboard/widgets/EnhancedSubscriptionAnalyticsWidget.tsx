@@ -8,176 +8,39 @@ import { RiskMatrix } from './RiskMatrix';
 import { RecommendationsList } from './RecommendationsList';
 import { TrendDirection } from '../metrics/MetricCard';
 import { Tooltip } from '../../../components/ui/Tooltip';
+import { useSubscriptionAnalyticsData, SubscriptionAnalyticsData } from '../../../services/adminDashboardService';
+import { DataStatusIndicator } from '../atoms/DataStatusIndicator';
 
-// Data interfaces
-interface SubscriptionAnalyticsData {
-  revenueForecasting: {
-    currentMonthRevenue: number;
-    revenueTrend: { direction: TrendDirection; value: string };
-    churnRate: number;
-    churnRateTrend: { direction: TrendDirection; value: string };
-    revenueByPlan: { name: string; value: number }[];
-  };
-  subscriptionHealth: {
-    healthScore: number;
-    healthScoreTrend: { direction: TrendDirection; value: string };
-    retentionRate: number;
-    retentionRateTrend: { direction: TrendDirection; value: string };
-    subscriptionDistribution: { name: string; value: number }[];
-  };
-  riskAnalysis: {
-    highRiskCount: number;
-    highRiskCountTrend: { direction: TrendDirection; value: string };
-    riskMatrix: {
-      churnLikelihood: 'low' | 'medium' | 'high';
-      impact: 'low' | 'medium' | 'high';
-      count: number;
-    }[];
-  };
-  subscriptionGrowth: {
-    newSubscriptions: { date: string; count: number }[];
-    totalGrowthRate: number;
-    growthRateTrend: { direction: TrendDirection; value: string };
-  };
-  recommendations: {
-    id: string;
-    priority: 'low' | 'medium' | 'high';
-    message: string;
-    action: string;
-  }[];
-}
+// Real-time recommendation action handler
+const useRecommendationActions = () => {
+  const handleRecommendationAction = async (id: string, action: string) => {
+    try {
+      const response = await fetch('/api/admin/execute-recommendation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+        body: JSON.stringify({ id, action }),
+      });
 
-// Mock data for development
-const mockData: SubscriptionAnalyticsData = {
-  revenueForecasting: {
-    currentMonthRevenue: 125750,
-    revenueTrend: { direction: 'up', value: '+5.3%' },
-    churnRate: 3.2,
-    churnRateTrend: { direction: 'down', value: '-0.5%' },
-    revenueByPlan: [
-      { name: 'Premium Annual', value: 68250 },
-      { name: 'Premium Monthly', value: 42500 },
-      { name: 'Basic Annual', value: 9500 },
-      { name: 'Basic Monthly', value: 5500 },
-    ],
-  },
-  subscriptionHealth: {
-    healthScore: 87,
-    healthScoreTrend: { direction: 'up', value: '+2.1' },
-    retentionRate: 92.5,
-    retentionRateTrend: { direction: 'up', value: '+1.2%' },
-    subscriptionDistribution: [
-      { name: 'Premium Annual', value: 450 },
-      { name: 'Premium Monthly', value: 850 },
-      { name: 'Basic Annual', value: 190 },
-      { name: 'Basic Monthly', value: 275 },
-    ],
-  },
-  riskAnalysis: {
-    highRiskCount: 87,
-    highRiskCountTrend: { direction: 'down', value: '-12' },
-    riskMatrix: [
-      { churnLikelihood: 'high', impact: 'high', count: 32 },
-      { churnLikelihood: 'high', impact: 'medium', count: 45 },
-      { churnLikelihood: 'high', impact: 'low', count: 10 },
-      { churnLikelihood: 'medium', impact: 'high', count: 28 },
-      { churnLikelihood: 'medium', impact: 'medium', count: 120 },
-      { churnLikelihood: 'medium', impact: 'low', count: 95 },
-      { churnLikelihood: 'low', impact: 'high', count: 15 },
-      { churnLikelihood: 'low', impact: 'medium', count: 210 },
-      { churnLikelihood: 'low', impact: 'low', count: 1210 },
-    ],
-  },
-  subscriptionGrowth: {
-    newSubscriptions: [
-      { date: '2025-04-23', count: 42 },
-      { date: '2025-04-24', count: 38 },
-      { date: '2025-04-25', count: 45 },
-      { date: '2025-04-26', count: 39 },
-      { date: '2025-04-27', count: 35 },
-      { date: '2025-04-28', count: 52 },
-      { date: '2025-04-29', count: 48 },
-      { date: '2025-04-30', count: 51 },
-      { date: '2025-05-01', count: 55 },
-      { date: '2025-05-02', count: 49 },
-      { date: '2025-05-03', count: 42 },
-      { date: '2025-05-04', count: 40 },
-      { date: '2025-05-05', count: 45 },
-      { date: '2025-05-06', count: 53 },
-      { date: '2025-05-07', count: 58 },
-      { date: '2025-05-08', count: 62 },
-      { date: '2025-05-09', count: 65 },
-      { date: '2025-05-10', count: 59 },
-      { date: '2025-05-11', count: 54 },
-      { date: '2025-05-12', count: 57 },
-      { date: '2025-05-13', count: 63 },
-      { date: '2025-05-14', count: 68 },
-      { date: '2025-05-15', count: 72 },
-      { date: '2025-05-16', count: 75 },
-      { date: '2025-05-17', count: 70 },
-      { date: '2025-05-18', count: 65 },
-      { date: '2025-05-19', count: 68 },
-      { date: '2025-05-20', count: 74 },
-      { date: '2025-05-21', count: 79 },
-      { date: '2025-05-22', count: 82 },
-      { date: '2025-05-23', count: 85 },
-    ],
-    totalGrowthRate: 8.5,
-    growthRateTrend: { direction: 'up', value: '+2.3%' },
-  },
-  recommendations: [
-    {
-      id: 'rec-001',
-      priority: 'high',
-      message: 'Contact 32 high-risk premium subscribers at risk of churning',
-      action: 'Generate contact list',
-    },
-    {
-      id: 'rec-002',
-      priority: 'medium',
-      message: 'Offer discounted annual plan to 45 monthly subscribers with high churn risk',
-      action: 'Create campaign',
-    },
-    {
-      id: 'rec-003',
-      priority: 'medium',
-      message: 'Review pricing strategy for Basic Monthly plan with declining conversion',
-      action: 'View analysis',
-    },
-    {
-      id: 'rec-004',
-      priority: 'low',
-      message: 'Consider loyalty rewards for 210 medium-risk subscribers',
-      action: 'Plan rewards',
-    },
-  ],
-};
+      if (!response.ok) {
+        throw new Error(`Failed to execute action: ${response.statusText}`);
+      }
 
-// Custom hook for data fetching
-const useSubscriptionAnalyticsData = () => {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
-  const [data, setData] = React.useState(mockData);
-
-  const refetch = () => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setData(mockData);
-      setIsLoading(false);
-    }, 1000);
+      return true;
+    } catch (error) {
+      console.error('Error executing recommendation action:', error);
+      return false;
+    }
   };
 
-  return { data, isLoading, error, refetch };
+  return { handleRecommendationAction };
 };
 
 export function EnhancedSubscriptionAnalyticsWidget() {
-  const { data, isLoading, error, refetch } = useSubscriptionAnalyticsData();
-
-  const handleRecommendationAction = (id: string, action: string) => {
-    console.log(`Action ${action} clicked for recommendation ${id}`);
-    // This would be replaced with actual action handling
-  };
+  const { data, isLoading, error, refetch, isRealTime } = useSubscriptionAnalyticsData(true);
+  const { handleRecommendationAction } = useRecommendationActions();
 
   return (
     <EnhancedWidget
@@ -188,9 +51,16 @@ export function EnhancedSubscriptionAnalyticsWidget() {
       error={error}
       onRefresh={refetch}
       footer={
-        <a href="/analytics/subscriptions" className="text-blue-500 hover:underline text-sm">
-          View detailed subscription analytics
-        </a>
+        <div className="flex justify-between items-center">
+          <a href="/analytics/subscriptions" className="text-blue-500 hover:underline text-sm">
+            View detailed subscription analytics
+          </a>
+          <DataStatusIndicator 
+            isRealTime={isRealTime || false}
+            lastUpdated={new Date().toISOString()}
+            connectionStatus={!error}
+          />
+        </div>
       }
     >
       <div className="space-y-6">

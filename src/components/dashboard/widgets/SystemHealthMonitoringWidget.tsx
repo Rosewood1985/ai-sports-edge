@@ -4,27 +4,8 @@ import { MetricCard } from '../metrics/MetricCard';
 import { HorizontalBarChart } from '../charts/HorizontalBarChart';
 import { LineChart } from '../charts/LineChart';
 import { Tooltip } from '../../../components/ui/Tooltip';
-// TrendDirection type is now handled by the systemHealthService interface
-
-// SystemHealthData interface and real data is imported from systemHealthService
-
-// Custom hook for data fetching
-const useSystemHealthData = () => {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
-  const [data, setData] = React.useState(mockData);
-
-  const refetch = () => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setData(mockData);
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  return { data, isLoading, error, refetch };
-};
+import { useSystemHealthData, SystemHealthData } from '../../../services/adminDashboardService';
+import { DataStatusIndicator } from '../atoms/DataStatusIndicator';
 
 // Process status badge component
 interface ProcessStatusBadgeProps {
@@ -88,7 +69,7 @@ const ActionLogItem: React.FC<ActionLogItemProps> = ({ action }) => {
 };
 
 export function SystemHealthMonitoringWidget() {
-  const { data, isLoading, error, refetch } = useSystemHealthData();
+  const { data, isLoading, error, refetch, isRealTime } = useSystemHealthData(true);
 
   // Format duration in seconds to a readable format
   const formatDuration = (seconds: number) => {
@@ -129,9 +110,11 @@ export function SystemHealthMonitoringWidget() {
           <a href="/admin/system-health" className="text-blue-500 hover:underline text-sm">
             View detailed system health metrics
           </a>
-          <span className="text-xs text-gray-500">
-            Last updated: {data?.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : 'Never'}
-          </span>
+          <DataStatusIndicator 
+            isRealTime={isRealTime || false}
+            lastUpdated={new Date().toISOString()}
+            connectionStatus={!error}
+          />
         </div>
       }
     >
