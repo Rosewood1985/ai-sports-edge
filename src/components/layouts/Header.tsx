@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useAuth } from '../../hooks/useAuth';
 import { IconButton } from '../ui/IconButton';
 
@@ -64,11 +63,9 @@ export function Header({
               </button>
             )}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/admin/dashboard">
-                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                  AI Sports Edge
-                </span>
-              </Link>
+              <a href="/admin/dashboard" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                AI Sports Edge
+              </a>
             </div>
           </div>
 
@@ -108,20 +105,20 @@ export function Header({
                   aria-orientation="vertical"
                   aria-labelledby="user-menu"
                 >
-                  <Link
+                  <a
                     href="/admin/profile"
                     className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
                     role="menuitem"
                   >
                     Your Profile
-                  </Link>
-                  <Link
+                  </a>
+                  <a
                     href="/admin/settings"
                     className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
                     role="menuitem"
                   >
                     Settings
-                  </Link>
+                  </a>
                   <button
                     onClick={() => {
                       // Sign out logic

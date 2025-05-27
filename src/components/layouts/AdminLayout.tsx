@@ -1,12 +1,7 @@
 import React, { ReactNode, useState, useEffect } from 'react';
-import Head from 'next/head';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import { 
-  useResponsiveAdminLayout, 
-  useCrossPlatformAuth, 
-  useCrossPlatformNotifications 
-} from '../../hooks/useCrossPlatform';
+import { useCrossPlatform } from '../../hooks/useCrossPlatform';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -58,26 +53,20 @@ const CrossPlatformLoader: React.FC = () => (
  * Enhanced Cross-Platform Admin Layout
  */
 export function AdminLayout({ children, title, description, showBackButton, onBack }: AdminLayoutProps) {
-  const { 
-    sidebarOpen, 
-    setSidebarOpen, 
-    isMobile, 
-    useTabNavigation, 
-    showFullSidebar 
-  } = useResponsiveAdminLayout();
+  const { isMobile } = useCrossPlatform();
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const useTabNavigation = isMobile;
+  const showFullSidebar = !isMobile;
   
-  const { isAuthenticated, isValidating } = useCrossPlatformAuth();
-  const { requestPermission } = useCrossPlatformNotifications();
+  // Simplified auth state - in a real app this would connect to your auth service
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isValidating, setIsValidating] = useState(false);
   
   const [currentSection, setCurrentSection] = useState('dashboard');
 
   const pageTitle = title ? `${title} | AI Sports Edge Admin` : 'AI Sports Edge Admin';
-  const pageDescription = description || 'Admin dashboard for AI Sports Edge';
 
-  // Request notification permissions on load
-  useEffect(() => {
-    requestPermission();
-  }, [requestPermission]);
+  // Future: Add notification permissions request here
 
   // Detect current section from URL or title
   useEffect(() => {
@@ -103,16 +92,15 @@ export function AdminLayout({ children, title, description, showBackButton, onBa
     return <CrossPlatformLoader />;
   }
 
+  // Set document title for browser
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = pageTitle;
+    }
+  }, [pageTitle]);
+
   return (
     <>
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="mobile-web-app-capable" content="yes" />
-      </Head>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Mobile-optimized header */}

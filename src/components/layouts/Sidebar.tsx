@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 interface NavItem {
   name: string;
@@ -16,8 +14,17 @@ interface SidebarProps {
  * Sidebar component for admin layout
  */
 export function Sidebar({ onNavigate }: SidebarProps) {
-  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Simple current path detection for highlighting active nav items
+  const getCurrentPath = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname;
+    }
+    return '/admin/dashboard';
+  };
+  
+  const currentPath = getCurrentPath();
 
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: 'chart-bar' },
@@ -172,7 +179,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
       <nav className="mt-5 px-2 space-y-1">
         {navigation.map(item => {
-          const isActive = router.pathname === item.href;
+          const isActive = currentPath === item.href;
           
           const handleClick = (e: React.MouseEvent) => {
             if (onNavigate) {
@@ -182,7 +189,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           };
           
           return (
-            <Link
+            <a
               key={item.name}
               href={item.href}
               onClick={handleClick}
@@ -196,7 +203,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                 {renderIcon(item.icon)}
               </div>
               {!isCollapsed && <span>{item.name}</span>}
-            </Link>
+            </a>
           );
         })}
       </nav>
