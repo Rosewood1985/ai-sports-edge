@@ -133,34 +133,8 @@ export function useReportTemplates() {
     setIsLoading(true);
     setError(null);
     try {
-      // Mock data for now - replace with actual API call
-      const mockTemplates: ReportTemplate[] = [
-        {
-          id: '1',
-          name: 'Daily Analytics Report',
-          description: 'Daily overview of key metrics',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          type: 'analytics' as any,
-          widgets: ['subscriptions', 'revenue', 'users'],
-          filters: [],
-          format: 'pdf' as any,
-          isSystem: false,
-        },
-        {
-          id: '2',
-          name: 'Weekly Performance Report',
-          description: 'Weekly performance metrics',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          type: 'performance' as any,
-          widgets: ['performance', 'errors', 'uptime'],
-          filters: [],
-          format: 'excel' as any,
-          isSystem: false,
-        }
-      ];
-      setTemplates(mockTemplates);
+      const data = await AdminDashboardService.getReportTemplates();
+      setTemplates(data);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch report templates'));
       console.error('Error fetching report templates:', err);
@@ -169,24 +143,11 @@ export function useReportTemplates() {
     }
   }, []);
 
-  const createTemplate = useCallback(async (template: Partial<ReportTemplate>) => {
+  const createTemplate = useCallback(async (template: Omit<ReportTemplate, 'id'>) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Mock implementation - replace with actual API call
-      const newTemplate: ReportTemplate = {
-        id: `template-${Date.now()}`,
-        name: template.name || 'New Template',
-        description: template.description || '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        type: template.type || 'standard' as any,
-        widgets: template.widgets || [],
-        filters: template.filters || [],
-        format: template.format || 'pdf' as any,
-        isSystem: false,
-      };
-      
+      const newTemplate = await AdminDashboardService.createReportTemplate(template);
       setTemplates(prev => [...prev, newTemplate]);
       return newTemplate;
     } catch (err) {
@@ -198,16 +159,15 @@ export function useReportTemplates() {
     }
   }, []);
 
-  const updateTemplate = useCallback(async (id: string, updates: Partial<ReportTemplate>) => {
+  const updateTemplate = useCallback(async (template: ReportTemplate) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Mock implementation - replace with actual API call
-      setTemplates(prev => prev.map(template => 
-        template.id === id 
-          ? { ...template, ...updates, updatedAt: new Date().toISOString() }
-          : template
+      const updatedTemplate = await AdminDashboardService.updateReportTemplate(template);
+      setTemplates(prev => prev.map(t => 
+        t.id === template.id ? updatedTemplate : t
       ));
+      return updatedTemplate;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to update report template'));
       console.error('Error updating report template:', err);
@@ -221,7 +181,7 @@ export function useReportTemplates() {
     setIsLoading(true);
     setError(null);
     try {
-      // Mock implementation - replace with actual API call
+      await AdminDashboardService.deleteReportTemplate(id);
       setTemplates(prev => prev.filter(template => template.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to delete report template'));

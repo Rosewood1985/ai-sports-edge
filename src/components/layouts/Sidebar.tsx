@@ -8,10 +8,14 @@ interface NavItem {
   icon: string;
 }
 
+interface SidebarProps {
+  onNavigate?: (href: string) => void;
+}
+
 /**
  * Sidebar component for admin layout
  */
-export function Sidebar() {
+export function Sidebar({ onNavigate }: SidebarProps) {
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -169,10 +173,19 @@ export function Sidebar() {
       <nav className="mt-5 px-2 space-y-1">
         {navigation.map(item => {
           const isActive = router.pathname === item.href;
+          
+          const handleClick = (e: React.MouseEvent) => {
+            if (onNavigate) {
+              e.preventDefault();
+              onNavigate(item.href);
+            }
+          };
+          
           return (
             <Link
               key={item.name}
               href={item.href}
+              onClick={handleClick}
               className={`${
                 isActive
                   ? 'bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-200'

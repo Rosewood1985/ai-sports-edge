@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ConversionFunnelData } from '../types/conversionFunnel';
 import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import useSWR from 'swr';
+import { WebSocketService } from '../services/adminDashboardService';
 
 // Mock data for development
 const mockConversionFunnelData: ConversionFunnelData = {
@@ -127,26 +128,46 @@ interface ApiResponse<T> {
   message: string;
 }
 
-// API fetcher function
+// Enhanced fetcher with retry logic and authentication
 const fetcher = async <T>(url: string): Promise<T> => {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
-      },
-    });
+  const maxRetries = 3;
+  let lastError: Error;
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'X-Request-ID': `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminToken');
+        window.location.href = '/admin/login';
+        throw new Error('Unauthorized - redirecting to login');
+      }
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`API fetch attempt ${attempt} failed:`, error);
+      lastError = error as Error;
+      
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt - 1) * 1000));
+      }
     }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('API fetch error:', error);
-    throw error;
   }
+
+  throw lastError!;
 };
 
 export function useConversionFunnelData(shouldFetch = true) {
@@ -155,28 +176,45 @@ export function useConversionFunnelData(shouldFetch = true) {
     fetcher,
     {
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      dedupingInterval: 30000, // 30 seconds
+      revalidateOnReconnect: true,
+      dedupingInterval: 30000,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
+      refreshInterval: 120000, // Refresh every 2 minutes for conversion data
     }
   );
 
-  // Use mock data for development or when API fails
-  const [mockData, setMockData] = useState<ConversionFunnelData>(mockConversionFunnelData);
-
-  // For development, simulate API call with mock data
+  // Real-time updates via WebSocket
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && !data && !error) {
-      const timer = setTimeout(() => {
-        mutate({ data: mockData, status: 200, message: 'Success' } as any, false);
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (!shouldFetch) return;
+
+    const wsService = WebSocketService.getInstance();
+    wsService.connect();
+
+    const unsubscribe = wsService.subscribe('conversion-funnel', (newData) => {
+      mutate({ data: newData, status: 200, message: 'Real-time update' } as any, false);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [shouldFetch, mutate]);
+
+  // Fallback to mock data only in development when API is unavailable
+  const [fallbackData, setFallbackData] = useState<ConversionFunnelData | null>(null);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && error && !data) {
+      console.warn('API unavailable, using fallback data for conversion funnel');
+      setFallbackData(mockConversionFunnelData);
     }
-  }, [data, error, mockData, mutate]);
+  }, [data, error]);
 
   return {
-    data: data?.data || mockData,
-    isLoading: !error && !data,
-    error,
+    data: data?.data || fallbackData,
+    isLoading: !error && !data && !fallbackData,
+    error: error && !fallbackData ? error : null,
     refetch: () => mutate(),
+    isRealTime: !!data?.data,
   };
 }

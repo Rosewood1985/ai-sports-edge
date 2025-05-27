@@ -3,10 +3,22 @@ import Link from 'next/link';
 import { useAuth } from '../../hooks/useAuth';
 import { IconButton } from '../ui/IconButton';
 
+interface HeaderProps {
+  showMenuButton?: boolean;
+  onMenuClick?: () => void;
+  showBackButton?: boolean;
+  onBack?: () => void;
+}
+
 /**
  * Header component for admin layout
  */
-export function Header() {
+export function Header({ 
+  showMenuButton = false, 
+  onMenuClick, 
+  showBackButton = false, 
+  onBack 
+}: HeaderProps) {
   const { user } = useAuth();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -28,6 +40,29 @@ export function Header() {
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
+            {/* Mobile menu button or back button */}
+            {showMenuButton && (
+              <button
+                onClick={onMenuClick}
+                className="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Open main menu"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            )}
+            {showBackButton && (
+              <button
+                onClick={onBack}
+                className="p-2 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Go back"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/admin/dashboard">
                 <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
