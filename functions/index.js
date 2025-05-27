@@ -642,4 +642,547 @@ exports.createMultiCurrencyPricing = createMultiCurrencyPricing;
 exports.getPricingForCurrency = getPricingForCurrency;
 exports.createAdvancedSubscription = createAdvancedSubscription;
 
-console.log("All functions loaded successfully (including Sentry V2, UFC, Stripe checkout, and advanced Stripe functions)");
+// Export subscription analytics
+const { generateSubscriptionReport, trackSubscriptionEvent } = require('./subscriptionAnalytics');
+exports.generateSubscriptionReport = generateSubscriptionReport;
+exports.trackSubscriptionEvent = trackSubscriptionEvent;
+
+// HTTP endpoint for admin dashboard
+exports.subscriptionAnalytics = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    // Verify admin token
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    
+    // Call the subscription report function
+    const result = await generateSubscriptionReport({ timeRange: '30d' }, {
+      auth: { uid: decodedToken.uid, token: decodedToken }
+    });
+
+    res.status(200).json({
+      status: 200,
+      message: 'Success',
+      data: result
+    });
+
+  } catch (error) {
+    console.error('Subscription analytics HTTP error:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+// HTTP endpoint for featured games (production data)
+exports.featuredGames = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
+  try {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
+    // Fetch featured games from live_odds collection
+    const db = admin.firestore();
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+    const snapshot = await db.collection('live_odds')
+      .where('timestamp', '>=', oneHourAgo)
+      .orderBy('timestamp', 'desc')
+      .limit(10)
+      .get();
+
+    const games = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.game && data.odds) {
+        games.push({
+          id: data.game.id || doc.id,
+          homeTeam: {
+            name: data.game.home_team || 'Home',
+            logo: '🏠',
+            score: data.game.home_score || null
+          },
+          awayTeam: {
+            name: data.game.away_team || 'Away', 
+            logo: '🏃',
+            score: data.game.away_score || null
+          },
+          venue: data.game.venue || 'TBD',
+          date: data.game.commence_time ? new Date(data.game.commence_time) : new Date(),
+          status: data.game.completed ? 'completed' : 'live',
+          quarter: data.game.quarter || 1,
+          timeRemaining: data.game.time_remaining || '15:00'
+        });
+      }
+    });
+
+    trackFunctionPerformance('featuredGames', Date.now() - startTime, true);
+
+    res.status(200).json({
+      success: true,
+      games: games,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Featured games API error:', error);
+    captureCloudFunctionError(error, 'featuredGames');
+    trackFunctionPerformance('featuredGames', Date.now() - startTime, false);
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch featured games',
+      games: []
+    });
+  }
+}));
+
+// HTTP endpoint for trending topics (production data)
+exports.trendingTopics = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
+  try {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
+    // Fetch trending topics from sports news feeds and analytics
+    const db = admin.firestore();
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+    // Get trending from RSS feed items and user analytics
+    const rssSnapshot = await db.collection('rss_feed_items')
+      .where('publishDate', '>=', oneHourAgo)
+      .orderBy('publishDate', 'desc')
+      .limit(5)
+      .get();
+
+    const topics = [];
+    rssSnapshot.forEach(doc => {
+      const data = doc.data();
+      topics.push({
+        id: doc.id,
+        title: data.title || 'Sports News',
+        image: data.category === 'news' ? '📰' : '🏀',
+        category: data.category || 'news'
+      });
+    });
+
+    // Add some real-time analytics-based trending topics
+    const analyticsSnapshot = await db.collection('user_analytics')
+      .where('timestamp', '>=', oneHourAgo)
+      .orderBy('timestamp', 'desc')
+      .limit(3)
+      .get();
+
+    analyticsSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.popular_topics) {
+        data.popular_topics.forEach(topic => {
+          topics.push({
+            id: `analytics_${doc.id}_${topic.id}`,
+            title: topic.title || 'Trending Analysis',
+            image: '📊',
+            category: 'analytics'
+          });
+        });
+      }
+    });
+
+    trackFunctionPerformance('trendingTopics', Date.now() - startTime, true);
+
+    res.status(200).json({
+      success: true,
+      topics: topics.slice(0, 6), // Limit to 6 topics
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Trending topics API error:', error);
+    captureCloudFunctionError(error, 'trendingTopics');
+    trackFunctionPerformance('trendingTopics', Date.now() - startTime, false);
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch trending topics',
+      topics: []
+    });
+  }
+}));
+
+// HTTP endpoint for game statistics (production data)
+exports.gameStats = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
+  try {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    const gameId = req.query.gameId;
+    if (!gameId) {
+      return res.status(400).json({
+        success: false,
+        error: "Game ID required"
+      });
+    }
+
+    // Fetch game statistics from Firestore
+    const db = admin.firestore();
+    const gameStatsDoc = await db.collection("game_stats").doc(gameId).get();
+
+    if (gameStatsDoc.exists) {
+      const statsData = gameStatsDoc.data();
+      trackFunctionPerformance("gameStats", Date.now() - startTime, true);
+
+      res.status(200).json({
+        success: true,
+        stats: statsData,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Return default stats structure if no data found
+      trackFunctionPerformance("gameStats", Date.now() - startTime, true);
+      
+      res.status(200).json({
+        success: true,
+        stats: {
+          home: {
+            points: 0,
+            rebounds: 0,
+            assists: 0,
+            steals: 0,
+            blocks: 0,
+            turnovers: 0,
+            fieldGoalPercentage: "0%",
+            threePointPercentage: "0%"
+          },
+          away: {
+            points: 0,
+            rebounds: 0,
+            assists: 0,
+            steals: 0,
+            blocks: 0,
+            turnovers: 0,
+            fieldGoalPercentage: "0%",
+            threePointPercentage: "0%"
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
+
+  } catch (error) {
+    console.error("Game stats API error:", error);
+    captureCloudFunctionError(error, "gameStats");
+    trackFunctionPerformance("gameStats", Date.now() - startTime, false);
+    
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch game statistics"
+    });
+  }
+}));
+
+// HTTP endpoint for horse racing tracks (production data)
+exports.racingTracks = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
+  try {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    // Fetch racing tracks from Firestore
+    const db = admin.firestore();
+    const tracksSnapshot = await db.collection("racing_tracks")
+      .where("active", "==", true)
+      .orderBy("name")
+      .get();
+
+    const tracks = [];
+    tracksSnapshot.forEach(doc => {
+      const data = doc.data();
+      tracks.push({
+        id: doc.id,
+        name: data.name,
+        code: data.code,
+        location: data.location,
+        country: data.country,
+        timezone: data.timezone,
+        surface: data.surface || ["dirt"]
+      });
+    });
+
+    trackFunctionPerformance("racingTracks", Date.now() - startTime, true);
+
+    res.status(200).json({
+      success: true,
+      tracks: tracks,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error("Racing tracks API error:", error);
+    captureCloudFunctionError(error, "racingTracks");
+    trackFunctionPerformance("racingTracks", Date.now() - startTime, false);
+    
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch racing tracks",
+      tracks: []
+    });
+  }
+}));
+
+// HTTP endpoint for horse racing races (production data)
+exports.racingRaces = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
+  try {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    const trackId = req.query.trackId;
+    const date = req.query.date || new Date().toISOString().split("T")[0];
+
+    // Fetch racing data from Firestore
+    const db = admin.firestore();
+    let query = db.collection("racing_events")
+      .where("date", "==", date)
+      .orderBy("postTime");
+
+    if (trackId) {
+      query = query.where("trackId", "==", trackId);
+    }
+
+    const racesSnapshot = await query.limit(20).get();
+
+    const races = [];
+    racesSnapshot.forEach(doc => {
+      const data = doc.data();
+      races.push({
+        id: doc.id,
+        trackId: data.trackId,
+        track: data.track,
+        date: data.date,
+        postTime: data.postTime,
+        raceNumber: data.raceNumber,
+        name: data.name,
+        distance: data.distance,
+        surface: data.surface,
+        condition: data.condition,
+        raceType: data.raceType,
+        raceGrade: data.raceGrade,
+        purse: data.purse,
+        ageRestrictions: data.ageRestrictions,
+        entries: data.entries || [],
+        status: data.status,
+        isStakes: data.isStakes || false,
+        isGraded: data.isGraded || false
+      });
+    });
+
+    trackFunctionPerformance("racingRaces", Date.now() - startTime, true);
+
+    res.status(200).json({
+      success: true,
+      races: races,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error("Racing races API error:", error);
+    captureCloudFunctionError(error, "racingRaces");
+    trackFunctionPerformance("racingRaces", Date.now() - startTime, false);
+    
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch racing data",
+      races: []
+    });
+  }
+}));
+
+// HTTP endpoint for personalized recommendations (production data)
+exports.personalizedRecommendations = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
+  const startTime = Date.now();
+  try {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "User ID required"
+      });
+    }
+
+    // Fetch personalized recommendations from Firestore
+    const db = admin.firestore();
+    
+    // Get user preferences
+    const userPrefsDoc = await db.collection("user_preferences").doc(userId).get();
+    const userPrefs = userPrefsDoc.exists ? userPrefsDoc.data() : {};
+    
+    // Get recommended bets based on user preferences
+    const recsSnapshot = await db.collection("betting_recommendations")
+      .where("userId", "==", userId)
+      .where("active", "==", true)
+      .orderBy("confidence", "desc")
+      .limit(5)
+      .get();
+
+    const recommendedBets = [];
+    recsSnapshot.forEach(doc => {
+      const data = doc.data();
+      recommendedBets.push({
+        sport: data.sport,
+        league: data.league,
+        confidence: data.confidence,
+        team1: data.team1,
+        team2: data.team2,
+        recommendation: data.recommendation,
+        odds: data.odds
+      });
+    });
+
+    // Get upcoming games for user's favorite sports
+    const favoriteSports = userPrefs.favoriteSports || ["NBA", "NFL", "MLB"];
+    const upcomingGamesSnapshot = await db.collection("upcoming_games")
+      .where("league", "in", favoriteSports)
+      .where("gameDate", ">=", new Date())
+      .orderBy("gameDate")
+      .limit(10)
+      .get();
+
+    const upcomingGames = [];
+    upcomingGamesSnapshot.forEach(doc => {
+      const data = doc.data();
+      upcomingGames.push({
+        league: data.league,
+        time: data.gameTime,
+        team1: data.team1,
+        team2: data.team2,
+        gameDate: data.gameDate
+      });
+    });
+
+    // Get personalized news based on user interests
+    const newsSnapshot = await db.collection("sports_news")
+      .where("categories", "array-contains-any", userPrefs.newsCategories || ["general"])
+      .orderBy("publishDate", "desc")
+      .limit(10)
+      .get();
+
+    const news = [];
+    newsSnapshot.forEach(doc => {
+      const data = doc.data();
+      news.push({
+        title: data.title,
+        image: data.image,
+        source: data.source,
+        time: data.publishDate,
+        category: data.category
+      });
+    });
+
+    trackFunctionPerformance("personalizedRecommendations", Date.now() - startTime, true);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        recommendedBets,
+        upcomingGames,
+        news
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error("Personalized recommendations API error:", error);
+    captureCloudFunctionError(error, "personalizedRecommendations");
+    trackFunctionPerformance("personalizedRecommendations", Date.now() - startTime, false);
+    
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch personalized recommendations",
+      data: {
+        recommendedBets: [],
+        upcomingGames: [],
+        news: []
+      }
+    });
+  }
+}));
+
+// Import and export ML sports integration
+const { integrateAllSportsToML, integrateSportToML, SPORTS_CONFIG } = require('./mlSportsIntegration');
+exports.integrateAllSportsToML = integrateAllSportsToML;
+exports.integrateSportToML = integrateSportToML;
+exports.mlSportsConfig = SPORTS_CONFIG;
+
+// Import and export language analytics
+const { languageSegmentedAnalytics, trackLanguageEvent } = require('./languageAnalytics');
+exports.languageSegmentedAnalytics = languageSegmentedAnalytics;
+exports.trackLanguageEvent = trackLanguageEvent;
+
+// Import and export accessibility audit
+const { accessibilityAudit } = require('./accessibilityAudit');
+exports.accessibilityAudit = accessibilityAudit;
+
+// Import and export security audit for Spanish features
+const { securityAuditSpanish } = require('./securityAuditSpanish');
+exports.securityAuditSpanish = securityAuditSpanish;
+
+// Import and export Spanish content audit
+const { auditSpanishContent } = require('./spanishContentAudit');
+exports.auditSpanishContent = auditSpanishContent;
+
+console.log("All functions loaded successfully (including Sentry V2, UFC, Stripe checkout, advanced Stripe functions, subscription analytics, sports API endpoints, ML sports integration, and Spanish content audit)");

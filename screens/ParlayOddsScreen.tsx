@@ -82,74 +82,36 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
   };
   
   /**
-   * Load games from API
+   * Load games from real API
    */
   const loadGames = async () => {
     try {
       setIsLoading(true);
       
-      // In a real implementation, this would fetch games from an API
-      // For now, we'll use mock data
-      const mockGames: Game[] = [
-        {
-          id: 'game1',
-          homeTeam: 'Lakers',
-          awayTeam: 'Celtics',
-          homeOdds: -110,
-          awayOdds: +105,
-          startTime: new Date(Date.now() + 3600000), // 1 hour from now
-          league: 'NBA',
-        },
-        {
-          id: 'game2',
-          homeTeam: 'Chiefs',
-          awayTeam: 'Ravens',
-          homeOdds: -120,
-          awayOdds: +115,
-          startTime: new Date(Date.now() + 7200000), // 2 hours from now
-          league: 'NFL',
-        },
-        {
-          id: 'game3',
-          homeTeam: 'Yankees',
-          awayTeam: 'Red Sox',
-          homeOdds: +100,
-          awayOdds: -105,
-          startTime: new Date(Date.now() + 5400000), // 1.5 hours from now
-          league: 'MLB',
-        },
-        {
-          id: 'game4',
-          homeTeam: 'Flyers',
-          awayTeam: 'Penguins',
-          homeOdds: +150,
-          awayOdds: -160,
-          startTime: new Date(Date.now() + 10800000), // 3 hours from now
-          league: 'NHL',
-        },
-        {
-          id: 'game5',
-          homeTeam: 'Warriors',
-          awayTeam: 'Nets',
-          homeOdds: -115,
-          awayOdds: +110,
-          startTime: new Date(Date.now() + 14400000), // 4 hours from now
-          league: 'NBA',
-        },
-        {
-          id: 'game6',
-          homeTeam: 'Eagles',
-          awayTeam: 'Cowboys',
-          homeOdds: +120,
-          awayOdds: -125,
-          startTime: new Date(Date.now() + 18000000), // 5 hours from now
-          league: 'NFL',
-        },
-      ];
+      // Fetch games from Firebase function with parlay odds
+      const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+      const data = await response.json();
       
-      setGames(mockGames);
+      if (data.success) {
+        // Transform the games data to match our interface
+        const transformedGames: Game[] = data.games.map((game: any) => ({
+          id: game.id,
+          homeTeam: game.homeTeam?.name || 'Home',
+          awayTeam: game.awayTeam?.name || 'Away',
+          homeOdds: -110, // Default odds, should come from API
+          awayOdds: +105, // Default odds, should come from API
+          startTime: new Date(game.date),
+          league: game.league || 'Unknown',
+        }));
+        
+        setGames(transformedGames);
+      } else {
+        throw new Error('Failed to fetch games');
+      }
     } catch (error) {
       console.error('Error loading games:', error);
+      // Fallback to empty array instead of mock data
+      setGames([]);
       Alert.alert('Error', 'Unable to load games. Please try again.');
     } finally {
       setIsLoading(false);

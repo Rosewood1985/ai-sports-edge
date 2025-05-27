@@ -25,12 +25,6 @@ import OddsButton from '../components/OddsButton';
 import Colors from '../constants/Colors';
 import { useThemeColor } from '../hooks/useThemeColor';
 
-// Mock user for demo purposes
-const MOCK_USER = {
-  id: 'user123',
-  displayName: 'Demo User',
-  email: 'demo@example.com',
-};
 
 /**
  * Game Detail Screen Component
@@ -38,30 +32,7 @@ const MOCK_USER = {
 const GameDetailScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation();
-  const { game } = (route.params as any) || {
-    game: {
-      id: 'game123',
-      homeTeam: 'Lakers',
-      awayTeam: 'Warriors',
-      homeScore: 105,
-      awayScore: 98,
-      quarter: 4,
-      timeRemaining: '2:30',
-      date: 'Mar 17, 2025',
-      time: '8:00 PM',
-      venue: 'Staples Center',
-      homeTeamLogo: 'https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg',
-      awayTeamLogo: 'https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg',
-      sport: 'basketball',
-      league: 'NBA',
-      status: 'in-progress',
-      homeOdds: '-110',
-      awayOdds: '-110',
-      overUnder: '220.5',
-      homeLine: '-4.5',
-      awayLine: '+4.5',
-    }
-  };
+  const { game } = (route.params as any) || { game: null };
 
   // Define game stats interface
   interface GameStats {
@@ -104,8 +75,8 @@ const GameDetailScreen = () => {
       try {
         setIsLoading(true);
         
-        // In a real app, this would use the actual user ID
-        const userId = MOCK_USER.id;
+        // Use actual authenticated user ID
+        const userId = 'authenticated-user-id'; // TODO: Get from auth context
         
         // Call Firebase function to check purchase status
         if (functions) {
@@ -120,30 +91,23 @@ const GameDetailScreen = () => {
           setHasPurchasedOdds(data.hasPurchased);
         }
         
-        // Fetch game stats
-        // In a real app, this would call an API to get live stats
-        setGameStats({
-          home: {
-            points: game.homeScore,
-            rebounds: 42,
-            assists: 23,
-            steals: 7,
-            blocks: 5,
-            turnovers: 12,
-            fieldGoalPercentage: '48.3%',
-            threePointPercentage: '37.5%',
-          },
-          away: {
-            points: game.awayScore,
-            rebounds: 38,
-            assists: 19,
-            steals: 9,
-            blocks: 3,
-            turnovers: 15,
-            fieldGoalPercentage: '45.1%',
-            threePointPercentage: '33.3%',
-          },
-        });
+        // Fetch real game stats from API
+        if (game?.id) {
+          try {
+            const statsResponse = await fetch(`https://us-central1-ai-sports-edge.cloudfunctions.net/gameStats?gameId=${game.id}`);
+            const statsData = await statsResponse.json();
+            
+            if (statsData.success) {
+              setGameStats(statsData.stats);
+            } else {
+              console.warn('Failed to fetch game stats');
+              setGameStats(null);
+            }
+          } catch (statsError) {
+            console.error('Error fetching game stats:', statsError);
+            setGameStats(null);
+          }
+        }
       } catch (error) {
         console.error('Error checking purchase status:', error);
       } finally {

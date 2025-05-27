@@ -4,123 +4,98 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
-  Image,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import LanguageSelector from '../components/LanguageSelector';
-import { Colors } from '../constants/Colors'; // Import base Colors
 
-// Mock data (remains the same)
-const FEATURED_GAMES = [
-  {
-    id: 'game1',
-    homeTeam: {
-      id: 'team1',
-      name: 'Lakers',
-      logo: '🏀',
-      score: 105,
-    },
-    awayTeam: {
-      id: 'team2',
-      name: 'Warriors',
-      logo: '🏀',
-      score: 98,
-    },
-    status: 'completed',
-    date: new Date(2025, 2, 20, 19, 30),
-    venue: 'Staples Center',
-  },
-  {
-    id: 'game2',
-    homeTeam: {
-      id: 'team3',
-      name: 'Celtics',
-      logo: '🏀',
-      score: 0,
-    },
-    awayTeam: {
-      id: 'team4',
-      name: 'Nets',
-      logo: '🏀',
-      score: 0,
-    },
-    status: 'upcoming',
-    date: new Date(2025, 3, 25, 20, 0),
-    venue: 'TD Garden',
-  },
-  {
-    id: 'game3',
-    homeTeam: {
-      id: 'team5',
-      name: 'Heat',
-      logo: '🏀',
-      score: 87,
-    },
-    awayTeam: {
-      id: 'team6',
-      name: 'Bulls',
-      logo: '🏀',
-      score: 92,
-    },
-    status: 'live',
-    date: new Date(),
-    venue: 'American Airlines Arena',
-    quarter: 4,
-    timeRemaining: '3:45',
-  },
-];
-const TRENDING_TOPICS = [
-  {
-    id: 'trend1',
-    title: 'LeBron James breaks scoring record',
-    image: '🏆',
-    category: 'news',
-  },
-  {
-    id: 'trend2',
-    title: 'Warriors on 10-game winning streak',
-    image: '🔥',
-    category: 'stats',
-  },
-  {
-    id: 'trend3',
-    title: 'Top 5 rookies to watch this season',
-    image: '👀',
-    category: 'analysis',
-  },
-];
+// Dynamic featured games from real sports API
+const useFeaturedGames = () => {
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedGames = async () => {
+      try {
+        // Use real sports API to get today's featured games from Firebase function
+        const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+        const data = await response.json();
+        
+        if (data.success) {
+          setGames(data.games);
+        } else {
+          throw new Error('Failed to fetch games');
+        }
+      } catch (error) {
+        console.error('Error fetching featured games:', error);
+        // Fallback to empty array instead of hardcoded data
+        setGames([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedGames();
+    
+    // Refresh every 30 seconds for live games
+    const interval = setInterval(fetchFeaturedGames, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { games, loading };
+};
+
+// Dynamic trending topics from real sports news API
+const useTrendingTopics = () => {
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrendingTopics = async () => {
+      try {
+        // Use real sports news API to get trending topics from Firebase function
+        const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/trendingTopics');
+        const data = await response.json();
+        
+        if (data.success) {
+          setTopics(data.topics);
+        } else {
+          throw new Error('Failed to fetch trending topics');
+        }
+      } catch (error) {
+        console.error('Error fetching trending topics:', error);
+        // Fallback to empty array instead of hardcoded data
+        setTopics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrendingTopics();
+    
+    // Refresh every 5 minutes for trending topics
+    const interval = setInterval(fetchTrendingTopics, 300000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { topics, loading };
+};
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme(); // Use theme colors provided by NavigationContainer
   const { t } = useLanguage();
-  const [loading, setLoading] = useState(true);
-  const [featuredGames, setFeaturedGames] = useState(FEATURED_GAMES);
-  const [trendingTopics, setTrendingTopics] = useState(TRENDING_TOPICS);
-
-  // Load data (remains the same)
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setTimeout(() => {
-          setFeaturedGames(FEATURED_GAMES);
-          setTrendingTopics(TRENDING_TOPICS);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        console.error('Error loading home data:', error);
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
+  
+  // Use dynamic hooks for real API data
+  const { games: featuredGames, loading: gamesLoading } = useFeaturedGames();
+  const { topics: trendingTopics, loading: topicsLoading } = useTrendingTopics();
+  
+  const loading = gamesLoading || topicsLoading;
 
   // Format date (remains the same)
   const formatDate = (date: Date) => {
@@ -134,7 +109,7 @@ const HomeScreen = () => {
   };
 
   // Render featured game item
-  const renderFeaturedGameItem = ({ item }: { item: (typeof FEATURED_GAMES)[0] }) => {
+  const renderFeaturedGameItem = ({ item }: { item: any }) => {
     return (
       <AccessibleTouchableOpacity
         style={[styles.cardBase, styles.gameCard, { backgroundColor: colors.card }]} // Use theme card color
@@ -261,7 +236,7 @@ const HomeScreen = () => {
   };
 
   // Render trending topic item
-  const renderTrendingTopicItem = ({ item }: { item: (typeof TRENDING_TOPICS)[0] }) => {
+  const renderTrendingTopicItem = ({ item }: { item: any }) => {
     return (
       <AccessibleTouchableOpacity
         style={[styles.cardBase, styles.trendingCard, { backgroundColor: colors.card }]} // Use theme card color

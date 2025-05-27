@@ -51,6 +51,20 @@ const PersonalizedHomeScreen = () => {
   const handleRefresh = async () => {
     setRefreshing(true);
     await refreshPersonalizedContent();
+    
+    // Also refresh personalized data
+    try {
+      const userId = userProfile?.uid || 'default-user';
+      const response = await fetch(`https://us-central1-ai-sports-edge.cloudfunctions.net/personalizedRecommendations?userId=${userId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setPersonalizedData(data.data);
+      }
+    } catch (error) {
+      console.error('Error refreshing personalized data:', error);
+    }
+    
     setRefreshing(false);
   };
 
@@ -263,67 +277,47 @@ const PersonalizedHomeScreen = () => {
     </AccessibleTouchableOpacity>
   );
 
-  // Mock data for demonstration
-  const mockRecommendedBets = [
-    {
-      sport: 'NBA',
-      league: 'Basketball',
-      confidence: 87,
-      team1: {
-        name: 'Lakers',
-        logo: 'https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg',
-      },
-      team2: {
-        name: 'Warriors',
-        logo: 'https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg',
-      },
-      recommendation: 'Lakers -4.5',
-      odds: '-110',
-    },
-  ];
+  // State for personalized data
+  const [personalizedData, setPersonalizedData] = useState({
+    recommendedBets: [],
+    upcomingGames: [],
+    news: []
+  });
+  const [dataLoading, setDataLoading] = useState(true);
 
-  const mockUpcomingGames = [
-    {
-      league: 'NFL',
-      time: 'Today, 8:30 PM',
-      team1: {
-        name: 'Chiefs',
-        logo: 'https://static.www.nfl.com/image/private/f_auto/league/puhrqgj71gobgmwxqkdz',
-      },
-      team2: {
-        name: 'Ravens',
-        logo: 'https://static.www.nfl.com/image/private/f_auto/league/ucsdijmddsqcj1i9tddd',
-      },
-    },
-    {
-      league: 'MLB',
-      time: 'Tomorrow, 7:00 PM',
-      team1: {
-        name: 'Yankees',
-        logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-light/147.svg',
-      },
-      team2: {
-        name: 'Red Sox',
-        logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-light/111.svg',
-      },
-    },
-  ];
+  // Load personalized data
+  useEffect(() => {
+    const loadPersonalizedData = async () => {
+      try {
+        setDataLoading(true);
+        
+        // Get user ID from userProfile or use default
+        const userId = userProfile?.uid || 'default-user';
+        
+        // Fetch personalized data from Firebase function
+        const response = await fetch(`https://us-central1-ai-sports-edge.cloudfunctions.net/personalizedRecommendations?userId=${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setPersonalizedData(data.data);
+        } else {
+          throw new Error('Failed to fetch personalized data');
+        }
+      } catch (error) {
+        console.error('Error loading personalized data:', error);
+        // Fallback to empty arrays instead of mock data
+        setPersonalizedData({
+          recommendedBets: [],
+          upcomingGames: [],
+          news: []
+        });
+      } finally {
+        setDataLoading(false);
+      }
+    };
 
-  const mockNews = [
-    {
-      title: 'Lakers sign new star player to 3-year contract',
-      image: 'https://cdn.nba.com/manage/2020/10/GettyImages-1229130751-784x523.jpg',
-      source: 'ESPN',
-      time: '2 hours ago',
-    },
-    {
-      title: 'NFL announces new playoff format for upcoming season',
-      image:
-        'https://static.www.nfl.com/image/private/t_editorial_landscape_12_desktop/league/vmvmxjxe6xdtjwxeosa2',
-      source: 'NFL.com',
-      time: '5 hours ago',
-    },
-  ];
+    loadPersonalizedData();
+  }, [userProfile]);
 
   if (isLoading) {
     return (
@@ -382,15 +376,27 @@ const PersonalizedHomeScreen = () => {
 
         {/* Recommended Bets */}
         {renderSectionHeader('RECOMMENDED BETS')}
-        {mockRecommendedBets.map((bet, index) => renderRecommendedBetCard(bet, index))}
+        {dataLoading ? (
+          <LoadingIndicator />
+        ) : (
+          personalizedData.recommendedBets.map((bet, index) => renderRecommendedBetCard(bet, index))
+        )}
 
         {/* Upcoming Games */}
         {renderSectionHeader('UPCOMING GAMES')}
-        {mockUpcomingGames.map((game, index) => renderUpcomingGameCard(game, index))}
+        {dataLoading ? (
+          <LoadingIndicator />
+        ) : (
+          personalizedData.upcomingGames.map((game, index) => renderUpcomingGameCard(game, index))
+        )}
 
         {/* News */}
         {renderSectionHeader('LATEST NEWS')}
-        {mockNews.map((news, index) => renderNewsItem(news, index))}
+        {dataLoading ? (
+          <LoadingIndicator />
+        ) : (
+          personalizedData.news.map((news, index) => renderNewsItem(news, index))
+        )}
       </ScrollView>
       {/* Bet Now Popup */}
       <BetNowPopup
@@ -398,8 +404,8 @@ const PersonalizedHomeScreen = () => {
         onClose={() => setShowBetPopup(false)}
         message="Ready to place your bets? Use our exclusive FanDuel affiliate link for a special bonus!"
         teamId={
-          mockRecommendedBets[0]?.team1
-            ? `nba-${mockRecommendedBets[0].team1.name.toLowerCase()}`
+          personalizedData.recommendedBets[0]?.team1
+            ? `nba-${personalizedData.recommendedBets[0].team1.name.toLowerCase()}`
             : undefined
         }
       />

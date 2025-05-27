@@ -9,72 +9,13 @@ import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
-// Mock data for games
-const MOCK_GAMES = [
-  {
-    id: 'game1',
-    homeTeam: {
-      id: 'team1',
-      name: 'Lakers',
-      logo: '🏀',
-      score: 105,
-    },
-    awayTeam: {
-      id: 'team2',
-      name: 'Warriors',
-      logo: '🏀',
-      score: 98,
-    },
-    status: 'completed',
-    date: new Date(2025, 2, 20, 19, 30),
-    venue: 'Staples Center',
-  },
-  {
-    id: 'game2',
-    homeTeam: {
-      id: 'team3',
-      name: 'Celtics',
-      logo: '🏀',
-      score: 0,
-    },
-    awayTeam: {
-      id: 'team4',
-      name: 'Nets',
-      logo: '🏀',
-      score: 0,
-    },
-    status: 'upcoming',
-    date: new Date(2025, 3, 25, 20, 0),
-    venue: 'TD Garden',
-  },
-  {
-    id: 'game3',
-    homeTeam: {
-      id: 'team5',
-      name: 'Heat',
-      logo: '🏀',
-      score: 87,
-    },
-    awayTeam: {
-      id: 'team6',
-      name: 'Bulls',
-      logo: '🏀',
-      score: 92,
-    },
-    status: 'live',
-    date: new Date(),
-    venue: 'American Airlines Arena',
-    quarter: 4,
-    timeRemaining: '3:45',
-  },
-];
 
 const GamesScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const { t } = useLanguage();
-  const [games, setGames] = useState(MOCK_GAMES);
-  const [loading, setLoading] = useState(false);
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
@@ -83,24 +24,30 @@ const GamesScreen = () => {
     try {
       setLoading(true);
 
-      // In a real app, this would be an API call
-      // const response = await gamesService.getGames(tab);
-      // setGames(response.data);
+      // Fetch games from Firebase function
+      const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+      const data = await response.json();
+      
+      if (data.success) {
+        let filteredGames = data.games;
 
-      // For now, we'll just filter the mock data
-      let filteredGames = [...MOCK_GAMES];
-
-      if (tab === 'live') {
-        filteredGames = MOCK_GAMES.filter(game => game.status === 'live');
-      } else if (tab === 'upcoming') {
-        filteredGames = MOCK_GAMES.filter(game => game.status === 'upcoming');
-      } else if (tab === 'completed') {
-        filteredGames = MOCK_GAMES.filter(game => game.status === 'completed');
+        // Filter games based on selected tab
+        if (tab === 'live') {
+          filteredGames = data.games.filter(game => game.status === 'live');
+        } else if (tab === 'upcoming') {
+          filteredGames = data.games.filter(game => game.status === 'upcoming');
+        } else if (tab === 'completed') {
+          filteredGames = data.games.filter(game => game.status === 'completed');
+        }
+        
+        setGames(filteredGames);
+      } else {
+        throw new Error('Failed to fetch games');
       }
-
-      setGames(filteredGames);
     } catch (error) {
       console.error('Error loading games:', error);
+      // Fallback to empty array instead of mock data
+      setGames([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -136,7 +83,7 @@ const GamesScreen = () => {
   };
 
   // Render game item
-  const renderGameItem = ({ item }: { item: (typeof MOCK_GAMES)[0] }) => {
+  const renderGameItem = ({ item }: { item: any }) => {
     const gameStatusText =
       item.status === 'live'
         ? 'Live game'

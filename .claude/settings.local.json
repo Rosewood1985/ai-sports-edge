@@ -41,7 +41,9 @@
       "Bash(npm view:*)",
       "Bash(git commit:*)",
       "Bash(git mv:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(./test-sentry-crons.sh:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }

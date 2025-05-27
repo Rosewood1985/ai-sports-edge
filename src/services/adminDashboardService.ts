@@ -880,23 +880,8 @@ export const useSubscriptionAnalyticsData = (shouldFetch = true) => {
     }
   );
 
-  // Use mock data for development or when API fails
-  const [mockData, setMockData] = useState<SubscriptionAnalyticsData>(
-    mockSubscriptionAnalyticsData
-  );
-
-  // For development, simulate API call with mock data
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && !data && !error) {
-      const timer = setTimeout(() => {
-        mutate({ data: mockData, status: 200, message: 'Success' } as any, false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [data, error, mockData, mutate]);
-
   return {
-    data: data?.data || mockData,
+    data: data?.data,
     isLoading: !error && !data,
     error,
     refetch: () => mutate(),

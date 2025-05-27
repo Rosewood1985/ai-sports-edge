@@ -12,52 +12,49 @@ type GameDetailsParams = {
   gameId: string;
 };
 
-// Mock game data
-const MOCK_GAME = {
-  id: 'game1',
-  homeTeam: {
-    id: 'team1',
-    name: 'Lakers',
-    logo: '🏀',
-    score: 105,
-  },
-  awayTeam: {
-    id: 'team2',
-    name: 'Warriors',
-    logo: '🏀',
-    score: 98,
-  },
-  status: 'completed',
-  date: new Date(2025, 2, 20, 19, 30),
-  venue: 'Staples Center',
-};
 
 const GameDetailsScreen = () => {
   const route = useRoute<RouteProp<Record<string, GameDetailsParams>, string>>();
   const navigation = useNavigation();
   const { colors } = useTheme();
   const { t } = useLanguage();
-  const [game, setGame] = useState<typeof MOCK_GAME | null>(null);
+  const [game, setGame] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
   // Get game ID from route params
   const { gameId } = route.params || {};
 
-  // Load game data
+  // Load game data from API
   useEffect(() => {
     const loadGameData = async () => {
       try {
         setLoading(true);
 
-        // In a real app, this would be an API call
-        // For now, we'll just use mock data
-        setTimeout(() => {
-          setGame(MOCK_GAME);
-          setLoading(false);
-        }, 500);
+        if (!gameId) {
+          throw new Error('No game ID provided');
+        }
+
+        // Fetch specific game from Firebase function
+        const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+        const data = await response.json();
+        
+        if (data.success) {
+          // Find the specific game by ID
+          const foundGame = data.games.find(g => g.id === gameId);
+          if (foundGame) {
+            setGame(foundGame);
+          } else {
+            throw new Error('Game not found');
+          }
+        } else {
+          throw new Error('Failed to fetch game data');
+        }
       } catch (error) {
         console.error('Error loading game details:', error);
+        // Set game to null instead of mock data
+        setGame(null);
+      } finally {
         setLoading(false);
       }
     };

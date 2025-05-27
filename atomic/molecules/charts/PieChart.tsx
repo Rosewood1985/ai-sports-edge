@@ -3,7 +3,7 @@
  * Reusable pie chart component with division by zero protection
  * Location: /atomic/molecules/charts/PieChart.tsx
  */
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 
 export interface PieChartItem {
   name: string;
@@ -17,12 +17,12 @@ export interface PieChartProps {
   colors?: string[];
 }
 
-export function PieChart({
+export const PieChart = memo<PieChartProps>(({
   data,
   className = '',
   showLegend = true,
   colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'],
-}: PieChartProps) {
+}: PieChartProps) => {
   // Handle empty data
   if (!data || data.length === 0) {
     return (
@@ -34,8 +34,31 @@ export function PieChart({
     );
   }
 
-  // Calculate total for percentages
-  const total = data.reduce((sum, item) => sum + (item.value || 0), 0);
+  // Memoize calculations for performance
+  const { total, segments } = useMemo(() => {
+    // Calculate total for percentages
+    const total = data.reduce((sum, item) => sum + (item.value || 0), 0);
+
+    // Calculate segments
+    let cumulativePercentage = 0;
+    const segments = data.map((item, index) => {
+      // Prevent division by zero
+      const percentage = total > 0 ? (item.value / total) * 100 : 0;
+      const startAngle = cumulativePercentage;
+      cumulativePercentage += percentage;
+      const endAngle = cumulativePercentage;
+
+      return {
+        ...item,
+        percentage,
+        startAngle,
+        endAngle,
+        color: colors[index % colors.length],
+      };
+    });
+
+    return { total, segments };
+  }, [data, colors]);
 
   // Handle case where total is zero
   if (total === 0) {
@@ -48,63 +71,51 @@ export function PieChart({
     );
   }
 
-  // Calculate segments
-  let cumulativePercentage = 0;
-  const segments = data.map((item, index) => {
-    // Prevent division by zero
-    const percentage = total > 0 ? (item.value / total) * 100 : 0;
-    const startAngle = cumulativePercentage;
-    cumulativePercentage += percentage;
-    const endAngle = cumulativePercentage;
+  // Memoize SVG path generation
+  const segmentPaths = useMemo(() => {
+    return segments.map((segment) => {
+      // Convert angles to radians
+      const startRad = (segment.startAngle / 100) * 2 * Math.PI - Math.PI / 2;
+      const endRad = (segment.endAngle / 100) * 2 * Math.PI - Math.PI / 2;
 
-    return {
-      ...item,
-      percentage,
-      startAngle,
-      endAngle,
-      color: colors[index % colors.length],
-    };
-  });
+      // Calculate coordinates
+      const radius = 50;
+      const centerX = 50;
+      const centerY = 50;
 
-  // SVG path for each segment
-  const createPieSegment = (startAngle: number, endAngle: number, color: string) => {
-    // Convert angles to radians
-    const startRad = (startAngle / 100) * 2 * Math.PI - Math.PI / 2;
-    const endRad = (endAngle / 100) * 2 * Math.PI - Math.PI / 2;
+      const startX = centerX + radius * Math.cos(startRad);
+      const startY = centerY + radius * Math.sin(startRad);
+      const endX = centerX + radius * Math.cos(endRad);
+      const endY = centerY + radius * Math.sin(endRad);
 
-    // Calculate coordinates
-    const radius = 50;
-    const centerX = 50;
-    const centerY = 50;
+      // Create arc flag
+      const largeArcFlag = segment.endAngle - segment.startAngle > 50 ? 1 : 0;
 
-    const startX = centerX + radius * Math.cos(startRad);
-    const startY = centerY + radius * Math.sin(startRad);
-    const endX = centerX + radius * Math.cos(endRad);
-    const endY = centerY + radius * Math.sin(endRad);
+      // Create SVG path
+      const path = [
+        `M ${centerX} ${centerY}`,
+        `L ${startX} ${startY}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
+        'Z',
+      ].join(' ');
 
-    // Create arc flag
-    const largeArcFlag = endAngle - startAngle > 50 ? 1 : 0;
-
-    // Create SVG path
-    const path = [
-      `M ${centerX} ${centerY}`,
-      `L ${startX} ${startY}`,
-      `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
-      'Z',
-    ].join(' ');
-
-    return <path d={path} fill={color} stroke="#fff" strokeWidth="1" />;
-  };
+      return { path, color: segment.color };
+    });
+  }, [segments]);
 
   return (
     <div className={`pie-chart ${className}`}>
       <div className="flex flex-col md:flex-row items-center">
         <div className="pie-container w-48 h-48 relative">
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            {segments.map((segment, index) => (
-              <g key={`segment-${index}`}>
-                {createPieSegment(segment.startAngle, segment.endAngle, segment.color)}
-              </g>
+            {segmentPaths.map((segment, index) => (
+              <path
+                key={`segment-${index}`}
+                d={segment.path}
+                fill={segment.color}
+                stroke="#fff"
+                strokeWidth="1"
+              />
             ))}
           </svg>
         </div>
@@ -130,4 +141,11 @@ export function PieChart({
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for performance optimization
+  return (
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data) &&
+    prevProps.showLegend === nextProps.showLegend &&
+    JSON.stringify(prevProps.colors) === JSON.stringify(nextProps.colors)
+  );
+});

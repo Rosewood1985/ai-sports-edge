@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/41</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -515,29 +515,7 @@
 <a name='L450'></a><a href='#L450'>450</a>
 <a name='L451'></a><a href='#L451'>451</a>
 <a name='L452'></a><a href='#L452'>452</a>
-<a name='L453'></a><a href='#L453'>453</a>
-<a name='L454'></a><a href='#L454'>454</a>
-<a name='L455'></a><a href='#L455'>455</a>
-<a name='L456'></a><a href='#L456'>456</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L453'></a><a href='#L453'>453</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -570,14 +548,30 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -987,52 +981,49 @@ type GameDetailsParams = {
   gameId: string;
 };
 &nbsp;
-// Mock game data
-const MOCK_GAME = <span class="cstat-no" title="statement not covered" >{</span>
-  id: 'game1',
-  homeTeam: {
-    id: 'team1',
-    name: 'Lakers',
-    logo: '🏀',
-    score: 105,
-  },
-  awayTeam: {
-    id: 'team2',
-    name: 'Warriors',
-    logo: '🏀',
-    score: 98,
-  },
-  status: 'completed',
-  date: new Date(2025, 2, 20, 19, 30),
-  venue: 'Staples Center',
-};
 &nbsp;
 const GameDetailsScreen = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
   const route = <span class="cstat-no" title="statement not covered" >useRoute&lt;RouteProp&lt;Record&lt;string, GameDetailsParams&gt;, string&gt;&gt;();</span>
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation();</span>
   const { colors } = <span class="cstat-no" title="statement not covered" >useTheme();</span>
   const { t } = <span class="cstat-no" title="statement not covered" >useLanguage();</span>
-  const [game, setGame] = <span class="cstat-no" title="statement not covered" >useState&lt;typeof MOCK_GAME | null&gt;(null);</span>
+  const [game, setGame] = <span class="cstat-no" title="statement not covered" >useState&lt;any | null&gt;(null);</span>
   const [loading, setLoading] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
   const [activeTab, setActiveTab] = <span class="cstat-no" title="statement not covered" >useState('overview');</span>
 &nbsp;
   // Get game ID from route params
   const { gameId } = <span class="cstat-no" title="statement not covered" >route.params || {};</span>
 &nbsp;
-  // Load game data
+  // Load game data from API
 <span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const loadGameData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
 <span class="cstat-no" title="statement not covered" >        setLoading(true);</span>
 &nbsp;
-        // In a real app, this would be an API call
-        // For now, we'll just use mock data
-<span class="cstat-no" title="statement not covered" >        setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >          setGame(MOCK_GAME);</span>
-<span class="cstat-no" title="statement not covered" >          setLoading(false);</span>
-        }, 500);
+<span class="cstat-no" title="statement not covered" >        if (!gameId) {</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error('No game ID provided');</span>
+        }
+&nbsp;
+        // Fetch specific game from Firebase function
+        const response = <span class="cstat-no" title="statement not covered" >await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');</span>
+        const data = <span class="cstat-no" title="statement not covered" >await response.json();</span>
+        
+<span class="cstat-no" title="statement not covered" >        if (data.success) {</span>
+          // Find the specific game by ID
+          const foundGame = <span class="cstat-no" title="statement not covered" >data.games.find(<span class="fstat-no" title="function not covered" >g </span>=&gt; <span class="cstat-no" title="statement not covered" >g.id === gameId)</span>;</span>
+<span class="cstat-no" title="statement not covered" >          if (foundGame) {</span>
+<span class="cstat-no" title="statement not covered" >            setGame(foundGame);</span>
+          } else {
+<span class="cstat-no" title="statement not covered" >            throw new Error('Game not found');</span>
+          }
+        } else {
+<span class="cstat-no" title="statement not covered" >          throw new Error('Failed to fetch game data');</span>
+        }
       } catch (error) {
 <span class="cstat-no" title="statement not covered" >        console.error('Error loading game details:', error);</span>
+        // Set game to null instead of mock data
+<span class="cstat-no" title="statement not covered" >        setGame(null);</span>
+      } finally {
 <span class="cstat-no" title="statement not covered" >        setLoading(false);</span>
       }
     };
@@ -1435,7 +1426,7 @@ export default GameDetailsScreen;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-22T18:14:42.694Z
+                at 2025-05-27T21:43:10.049Z
             </div>
         <script src="../prettify.js"></script>
         <script>

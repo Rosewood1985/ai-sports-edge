@@ -34,106 +34,7 @@ import {
 import { trackScreenView } from '../services/analyticsService';
 import { sentryService } from '../services/sentryService';
 
-// Mock data for development
-const MOCK_TRACKS: Track[] = [
-  {
-    id: 'track-001',
-    name: 'Santa Anita Park',
-    code: 'SA',
-    location: 'Arcadia, California',
-    country: 'USA',
-    timezone: 'America/Los_Angeles',
-    surface: ['dirt', 'turf']
-  },
-  {
-    id: 'track-002',
-    name: 'Churchill Downs',
-    code: 'CD',
-    location: 'Louisville, Kentucky',
-    country: 'USA',
-    timezone: 'America/New_York',
-    surface: ['dirt', 'turf']
-  },
-  {
-    id: 'track-003',
-    name: 'Belmont Park',
-    code: 'BEL',
-    location: 'Elmont, New York',
-    country: 'USA',
-    timezone: 'America/New_York',
-    surface: ['dirt', 'turf']
-  },
-  {
-    id: 'track-004',
-    name: 'Keeneland',
-    code: 'KEE',
-    location: 'Lexington, Kentucky',
-    country: 'USA',
-    timezone: 'America/New_York',
-    surface: ['dirt', 'turf', 'synthetic']
-  }
-];
 
-// Mock races for development
-const MOCK_RACES: Race[] = [
-  {
-    id: 'race-001',
-    trackId: 'track-001',
-    track: MOCK_TRACKS[0],
-    date: '2025-03-16',
-    postTime: '14:30:00',
-    raceNumber: 5,
-    name: 'Santa Anita Derby',
-    distance: 9, // 1 1/8 miles = 9 furlongs
-    surface: 'dirt',
-    condition: TrackCondition.FAST,
-    raceType: RaceType.FLAT,
-    raceGrade: RaceGrade.GRADE_1,
-    purse: 1000000,
-    ageRestrictions: '3yo',
-    entries: [],
-    status: RaceStatus.UPCOMING,
-    isStakes: true,
-    isGraded: true
-  },
-  {
-    id: 'race-002',
-    trackId: 'track-001',
-    track: MOCK_TRACKS[0],
-    date: '2025-03-16',
-    postTime: '15:30:00',
-    raceNumber: 6,
-    distance: 6, // 6 furlongs
-    surface: 'turf',
-    condition: TrackCondition.FIRM,
-    raceType: RaceType.FLAT,
-    purse: 75000,
-    entries: [],
-    status: RaceStatus.UPCOMING,
-    isStakes: false,
-    isGraded: false
-  },
-  {
-    id: 'race-003',
-    trackId: 'track-002',
-    track: MOCK_TRACKS[1],
-    date: '2025-03-16',
-    postTime: '16:45:00',
-    raceNumber: 8,
-    name: 'Kentucky Derby Prep',
-    distance: 8, // 1 mile = 8 furlongs
-    surface: 'dirt',
-    condition: TrackCondition.FAST,
-    raceType: RaceType.FLAT,
-    raceGrade: RaceGrade.GRADE_2,
-    purse: 750000,
-    ageRestrictions: '3yo',
-    entries: [],
-    status: RaceStatus.UPCOMING,
-    isStakes: true,
-    isGraded: true
-  }
-];
 
 // Navigation prop type
 type HorseRacingScreenNavigationProp = StackNavigationProp<any, 'HorseRacing'>;
@@ -144,8 +45,8 @@ interface HorseRacingScreenProps {
 
 const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState<'races' | 'bankroll'>('races');
-  const [tracks, setTracks] = useState<Track[]>(MOCK_TRACKS);
-  const [races, setRaces] = useState<Race[]>(MOCK_RACES);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [races, setRaces] = useState<Race[]>([]);
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [bankrollData, setBankrollData] = useState<BankrollData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -199,23 +100,38 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
         selectedTrackId: selectedTrack?.id
       });
       
-      // In a real app, we would fetch tracks and races from an API
-      // For now, we'll use mock data
-      setTracks(MOCK_TRACKS);
-      setRaces(MOCK_RACES);
+      // Fetch tracks from Firebase function
+      const tracksResponse = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/racingTracks');
+      const tracksData = await tracksResponse.json();
+      
+      if (tracksData.success) {
+        setTracks(tracksData.tracks);
+        
+        // Select first track by default if none selected
+        if (!selectedTrack && tracksData.tracks.length > 0) {
+          setSelectedTrack(tracksData.tracks[0]);
+        }
+      } else {
+        throw new Error('Failed to fetch racing tracks');
+      }
+      
+      // Fetch races from Firebase function
+      const racesResponse = await fetch(`https://us-central1-ai-sports-edge.cloudfunctions.net/racingRaces${selectedTrack ? `?trackId=${selectedTrack.id}` : ''}`);
+      const racesData = await racesResponse.json();
+      
+      if (racesData.success) {
+        setRaces(racesData.races);
+      } else {
+        throw new Error('Failed to fetch racing data');
+      }
       
       // Load bankroll data
       await loadBankrollData();
       
-      // Select first track by default if none selected
-      if (!selectedTrack && MOCK_TRACKS.length > 0) {
-        setSelectedTrack(MOCK_TRACKS[0]);
-      }
-      
       const duration = Date.now() - startTime;
       sentryService.trackRacingOperation('horse_racing_data_loaded', 'horse_racing', {
-        trackCount: MOCK_TRACKS.length,
-        raceCount: MOCK_RACES.length,
+        trackCount: tracks.length,
+        raceCount: races.length,
         selectedTrackId: selectedTrack?.id,
         duration
       });

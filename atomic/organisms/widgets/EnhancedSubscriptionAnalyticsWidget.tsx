@@ -3,7 +3,7 @@
  * Complex analytics widget with comprehensive null safety
  * Location: /atomic/organisms/widgets/EnhancedSubscriptionAnalyticsWidget.tsx
  */
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart } from '../../molecules/charts';
 
 interface AnalyticsData {
@@ -29,11 +29,11 @@ interface EnhancedSubscriptionAnalyticsWidgetProps {
   isLoading?: boolean;
 }
 
-export function EnhancedSubscriptionAnalyticsWidget({
+export const EnhancedSubscriptionAnalyticsWidget = memo<EnhancedSubscriptionAnalyticsWidgetProps>(({
   data,
   className = '',
   isLoading = false
-}: EnhancedSubscriptionAnalyticsWidgetProps) {
+}: EnhancedSubscriptionAnalyticsWidgetProps) => {
   
   if (isLoading) {
     return (
@@ -51,10 +51,35 @@ export function EnhancedSubscriptionAnalyticsWidget({
     );
   }
 
-  // Safe access with null coalescing
-  const revenueData = data?.revenueForecasting;
-  const healthData = data?.subscriptionHealth;
-  const trendsData = data?.trends || [];
+  // Memoize calculations for performance
+  const { revenueData, healthData, trendsData, recommendations } = useMemo(() => {
+    const revenueData = data?.revenueForecasting;
+    const healthData = data?.subscriptionHealth;
+    const trendsData = data?.trends || [];
+
+    // Pre-calculate recommendations
+    const recommendations = [];
+    if ((revenueData?.churnRate ?? 0) > 5) {
+      recommendations.push({
+        type: 'warning',
+        message: 'Churn rate is above 5%. Consider implementing retention campaigns.'
+      });
+    }
+    if ((healthData?.healthScore ?? 0) < 70) {
+      recommendations.push({
+        type: 'error',
+        message: 'Health score is below 70. Review customer satisfaction metrics.'
+      });
+    }
+    if ((healthData?.retentionRate ?? 0) > 90) {
+      recommendations.push({
+        type: 'success',
+        message: 'Excellent retention rate! Consider upselling opportunities.'
+      });
+    }
+
+    return { revenueData, healthData, trendsData, recommendations };
+  }, [data]);
 
   return (
     <div className={`enhanced-subscription-analytics-widget ${className}`}>
@@ -110,33 +135,43 @@ export function EnhancedSubscriptionAnalyticsWidget({
         </div>
 
         {/* Recommendations */}
-        <div className="recommendations mt-6">
-          <h4 className="text-md font-semibold mb-4">Recommendations</h4>
-          <div className="space-y-2">
-            {(revenueData?.churnRate ?? 0) > 5 && (
-              <div className="recommendation-item p-3 bg-yellow-50 border-l-4 border-yellow-400">
-                <p className="text-sm text-yellow-800">
-                  Churn rate is above 5%. Consider implementing retention campaigns.
-                </p>
-              </div>
-            )}
-            {(healthData?.healthScore ?? 0) < 70 && (
-              <div className="recommendation-item p-3 bg-red-50 border-l-4 border-red-400">
-                <p className="text-sm text-red-800">
-                  Health score is below 70. Review customer satisfaction metrics.
-                </p>
-              </div>
-            )}
-            {(healthData?.retentionRate ?? 0) > 90 && (
-              <div className="recommendation-item p-3 bg-green-50 border-l-4 border-green-400">
-                <p className="text-sm text-green-800">
-                  Excellent retention rate! Consider upselling opportunities.
-                </p>
-              </div>
-            )}
+        {recommendations.length > 0 && (
+          <div className="recommendations mt-6">
+            <h4 className="text-md font-semibold mb-4">Recommendations</h4>
+            <div className="space-y-2">
+              {recommendations.map((rec, index) => (
+                <div
+                  key={index}
+                  className={`recommendation-item p-3 border-l-4 ${
+                    rec.type === 'warning'
+                      ? 'bg-yellow-50 border-yellow-400'
+                      : rec.type === 'error'
+                      ? 'bg-red-50 border-red-400'
+                      : 'bg-green-50 border-green-400'
+                  }`}
+                >
+                  <p className={`text-sm ${
+                    rec.type === 'warning'
+                      ? 'text-yellow-800'
+                      : rec.type === 'error'
+                      ? 'text-red-800'
+                      : 'text-green-800'
+                  }`}>
+                    {rec.message}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for performance optimization
+  return (
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data) &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.className === nextProps.className
+  );
+});
