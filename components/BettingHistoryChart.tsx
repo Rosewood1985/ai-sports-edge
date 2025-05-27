@@ -5,17 +5,17 @@ import { bettingAnalyticsService, TimePeriodFilter, BetType, BetStatus, BetResul
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 
-interface BettingHistoryChartProps {
+interface WageringHistoryChartProps {
   timePeriod?: TimePeriodFilter['period'];
-  chartType?: 'profit' | 'winRate' | 'betType' | 'sport';
+  chartType?: 'profit' | 'winRate' | 'pickType' | 'sport';
   height?: number;
   width?: number;
 }
 
 /**
- * Component that displays betting history charts
+ * Component that displays wagering history charts
  */
-const BettingHistoryChart: React.FC<BettingHistoryChartProps> = ({
+const WageringHistoryChart: React.FC<WageringHistoryChartProps> = ({
   timePeriod = 'month',
   chartType = 'profit',
   height = 220,
@@ -58,8 +58,8 @@ const BettingHistoryChart: React.FC<BettingHistoryChartProps> = ({
         case 'winRate':
           data = generateWinRateChartData(bets);
           break;
-        case 'betType':
-          data = generateBetTypeChartData(bets);
+        case 'pickType':
+          data = generatePickTypeChartData(bets);
           break;
         case 'sport':
           data = generateSportChartData(bets);
@@ -161,9 +161,9 @@ const BettingHistoryChart: React.FC<BettingHistoryChartProps> = ({
   };
   
   /**
-   * Generate bet type chart data
+   * Generate pick type chart data
    */
-  const generateBetTypeChartData = (bets: any[]) => {
+  const generatePickTypeChartData = (bets: any[]) => {
     // Count bets by type
     const betTypeCounts: Record<string, number> = {};
     
@@ -394,11 +394,11 @@ const BettingHistoryChart: React.FC<BettingHistoryChartProps> = ({
           title: 'Win Rate History',
           description: `Average win rate: ${avgWinRate.toFixed(1)}%`
         };
-      case 'betType':
+      case 'pickType':
         const totalBets = chartData.reduce((sum: number, item: any) => sum + item.count, 0);
         const topType = chartData.sort((a: any, b: any) => b.count - a.count)[0];
         return {
-          title: 'Bet Types',
+          title: 'Pick Types',
           description: `Most common: ${topType.name} (${((topType.count / totalBets) * 100).toFixed(1)}%)`
         };
       case 'sport':
@@ -447,7 +447,7 @@ const BettingHistoryChart: React.FC<BettingHistoryChartProps> = ({
           />
         )}
         
-        {(chartType === 'betType' || chartType === 'sport') && (
+        {(chartType === 'pickType' || chartType === 'sport') && (
           <PieChart
             data={chartData}
             width={width}
@@ -537,4 +537,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BettingHistoryChart;
+export default WageringHistoryChart;

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useReportTemplates } from '../../../hooks/useReporting';
 import { ReportTemplate, ReportType } from '../../../types/reporting';
 import { EnhancedWidget } from '../widgets/EnhancedWidget';
 import { Button } from '../../ui/Button';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
 
 export interface ReportBuilderProps {
   initialTemplate?: ReportTemplate | null;
@@ -22,6 +22,7 @@ export function ReportBuilder({
   className = '',
 }: ReportBuilderProps) {
   const { createTemplate, updateTemplate, isLoading } = useReportTemplates();
+  const { isMobile } = useCrossPlatform();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -29,6 +30,8 @@ export function ReportBuilder({
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [filters, setFilters] = useState<any[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Initialize form with template data if provided
   useEffect(() => {
@@ -129,14 +132,111 @@ export function ReportBuilder({
     }
   };
 
-  // Mock data for available widgets
+  // Drag and drop handlers
+  const handleDragStart = useCallback((e: React.DragEvent, widgetId: string) => {
+    if (isMobile) return; // Disable drag on mobile
+    
+    setDraggedWidget(widgetId);
+    e.dataTransfer.setData('text/plain', widgetId);
+    e.dataTransfer.effectAllowed = 'copy';
+  }, [isMobile]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const widgetId = e.dataTransfer.getData('text/plain');
+    
+    if (widgetId && !selectedWidgets.includes(widgetId)) {
+      setSelectedWidgets(prev => [...prev, widgetId]);
+    }
+    
+    setDraggedWidget(null);
+    setIsDragOver(false);
+  }, [selectedWidgets]);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggedWidget(null);
+    setIsDragOver(false);
+  }, []);
+
+  // Enhanced widget data with categories and descriptions
   const availableWidgets = [
-    { id: 'bet-slip-performance', name: 'Bet Slip Performance' },
-    { id: 'subscription-analytics', name: 'Subscription Analytics' },
-    { id: 'system-health', name: 'System Health' },
-    { id: 'conversion-funnel', name: 'Conversion Funnel' },
-    { id: 'fraud-detection', name: 'Fraud Detection' },
+    { 
+      id: 'bet-slip-performance', 
+      name: 'Bet Slip Performance',
+      category: 'Analytics',
+      description: 'OCR success rates, processing times, and error analysis',
+      icon: '🎯'
+    },
+    { 
+      id: 'subscription-analytics', 
+      name: 'Subscription Analytics',
+      category: 'Business',
+      description: 'Revenue forecasting, churn analysis, and growth metrics',
+      icon: '📊'
+    },
+    { 
+      id: 'system-health', 
+      name: 'System Health',
+      category: 'Technical',
+      description: 'API performance, database metrics, and infrastructure costs',
+      icon: '⚙️'
+    },
+    { 
+      id: 'conversion-funnel', 
+      name: 'Conversion Funnel',
+      category: 'Business',
+      description: 'User journey analysis and conversion optimization',
+      icon: '📈'
+    },
+    { 
+      id: 'fraud-detection', 
+      name: 'Fraud Detection',
+      category: 'Security',
+      description: 'Risk analysis and fraud prevention metrics',
+      icon: '🔒'
+    },
+    {
+      id: 'user-engagement',
+      name: 'User Engagement',
+      category: 'Analytics',
+      description: 'Session duration, feature usage, and retention metrics',
+      icon: '👥'
+    },
+    {
+      id: 'revenue-breakdown',
+      name: 'Revenue Breakdown',
+      category: 'Business',
+      description: 'Revenue by source, plan type, and geographic region',
+      icon: '💰'
+    },
+    {
+      id: 'performance-metrics',
+      name: 'Performance Metrics',
+      category: 'Technical',
+      description: 'Response times, throughput, and error rates',
+      icon: '⚡'
+    }
   ];
+
+  // Group widgets by category
+  const widgetsByCategory = availableWidgets.reduce((acc, widget) => {
+    if (!acc[widget.category]) {
+      acc[widget.category] = [];
+    }
+    acc[widget.category].push(widget);
+    return acc;
+  }, {} as Record<string, typeof availableWidgets>);
 
   return (
     <EnhancedWidget
@@ -216,40 +316,151 @@ export function ReportBuilder({
           </div>
         </div>
 
-        {/* Widgets Selection */}
+        {/* Enhanced Widgets Selection with Drag & Drop */}
         <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Widgets</h3>
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Report Widgets</h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-              Select widgets to include in the report
+              {isMobile ? 'Tap to select widgets' : 'Drag widgets to the selected area or click to toggle'}
             </p>
           </div>
           <div className="px-4 py-5 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availableWidgets.map(widget => (
-                <div
-                  key={widget.id}
-                  className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                    selectedWidgets.includes(widget.id)
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
-                  }`}
-                  onClick={() => handleWidgetToggle(widget.id)}
-                >
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={selectedWidgets.includes(widget.id)}
-                      onChange={() => {}}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:border-gray-600"
-                    />
-                    <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {widget.name}
-                    </label>
-                  </div>
+            {/* Selected Widgets Drop Zone */}
+            {!isMobile && (
+              <div 
+                className={`mb-6 p-4 border-2 border-dashed rounded-lg transition-colors min-h-[120px] ${
+                  isDragOver 
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <div className="text-center">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Selected Widgets ({selectedWidgets.length})
+                  </h4>
+                  {selectedWidgets.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Drag widgets here or click widgets below to add them
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {selectedWidgets.map(widgetId => {
+                        const widget = availableWidgets.find(w => w.id === widgetId);
+                        return widget ? (
+                          <span
+                            key={widgetId}
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
+                          >
+                            <span className="mr-1">{widget.icon}</span>
+                            {widget.name}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleWidgetToggle(widgetId);
+                              }}
+                              className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-100"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Available Widgets by Category */}
+            {Object.entries(widgetsByCategory).map(([category, widgets]) => (
+              <div key={category} className="mb-6 last:mb-0">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                  <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs mr-2">
+                    {category}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">({widgets.length})</span>
+                </h4>
+                <div className={`grid gap-3 ${
+                  isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                }`}>
+                  {widgets.map(widget => (
+                    <div
+                      key={widget.id}
+                      className={`border rounded-lg shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md ${
+                        selectedWidgets.includes(widget.id)
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
+                      } ${draggedWidget === widget.id ? 'opacity-50' : ''}`}
+                      draggable={!isMobile}
+                      onDragStart={(e: React.DragEvent) => handleDragStart(e, widget.id)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => handleWidgetToggle(widget.id)}
+                    >
+                      <div className="p-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center flex-1">
+                            <span className="text-lg mr-2" role="img" aria-label={widget.name}>
+                              {widget.icon}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedWidgets.includes(widget.id)}
+                                  onChange={() => {}}
+                                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:border-gray-600 mr-2"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <h5 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                  {widget.name}
+                                </h5>
+                              </div>
+                              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                                {widget.description}
+                              </p>
+                            </div>
+                          </div>
+                          {!isMobile && (
+                            <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                ☰
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Mobile Selected Widgets Summary */}
+            {isMobile && selectedWidgets.length > 0 && (
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                  Selected Widgets ({selectedWidgets.length})
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedWidgets.map(widgetId => {
+                    const widget = availableWidgets.find(w => w.id === widgetId);
+                    return widget ? (
+                      <span
+                        key={widgetId}
+                        className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
+                      >
+                        <span className="mr-1">{widget.icon}</span>
+                        {widget.name}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -336,13 +547,22 @@ export function ReportBuilder({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end space-x-3">
-          <Button onClick={handleCancel} variant="secondary">
+        {/* Mobile-optimized Actions */}
+        <div className={`flex ${isMobile ? 'flex-col-reverse space-y-reverse space-y-3' : 'justify-end space-x-3'}`}>
+          <Button 
+            onClick={handleCancel} 
+            variant="secondary"
+            className={isMobile ? 'w-full' : ''}
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} variant="primary" isLoading={isLoading}>
-            Save Template
+          <Button 
+            onClick={handleSave} 
+            variant="primary" 
+            isLoading={isLoading}
+            className={`${isMobile ? 'w-full' : ''} bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700`}
+          >
+            {isLoading ? 'Saving...' : 'Save Template'}
           </Button>
         </div>
       </div>

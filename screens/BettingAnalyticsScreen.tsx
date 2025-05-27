@@ -2,13 +2,13 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import BettingAnalytics from '../components/BettingAnalytics';
+import WageringAnalytics from '../components/BettingAnalytics';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 /**
- * Screen that displays betting analytics for the user
+ * Screen that displays wagering analytics for the user
  * Enhanced with accessibility features for better screen reader support
  */
 const BettingAnalyticsScreen: React.FC = () => {
@@ -27,12 +27,12 @@ const BettingAnalyticsScreen: React.FC = () => {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </AccessibleTouchableOpacity>
         <AccessibleThemedText style={styles.headerTitle} type="h1" accessibilityRole="header">
-          Betting Analytics
+          Wagering Analytics
         </AccessibleThemedText>
       </View>
 
-      <AccessibleThemedView style={styles.content} accessibilityLabel="Betting analytics content">
-        <BettingAnalytics />
+      <AccessibleThemedView style={styles.content} accessibilityLabel="Wagering analytics content">
+        <WageringAnalytics />
       </AccessibleThemedView>
     </SafeAreaView>
   );

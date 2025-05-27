@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import BettingHistoryChart from '../components/BettingHistoryChart';
+import WageringHistoryChart from '../components/BettingHistoryChart';
 import { TimePeriodFilter } from '../services/bettingAnalyticsService';
 import {  ThemedText  } from '../atomic/atoms/ThemedText';
 import {  ThemedView  } from '../atomic/atoms/ThemedView';
 
 /**
- * Screen that displays betting history charts
+ * Screen that displays wagering history charts
  */
-const BettingHistoryScreen: React.FC = () => {
+const WageringHistoryScreen: React.FC = () => {
   const navigation = useNavigation();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriodFilter['period']>('month');
-  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'winRate' | 'betType' | 'sport'>('profit');
+  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'winRate' | 'pickType' | 'sport'>('profit');
   
   /**
    * Handle period selection
@@ -25,7 +25,7 @@ const BettingHistoryScreen: React.FC = () => {
   /**
    * Handle chart type selection
    */
-  const handleChartTypeChange = (chartType: 'profit' | 'winRate' | 'betType' | 'sport') => {
+  const handleChartTypeChange = (chartType: 'profit' | 'winRate' | 'pickType' | 'sport') => {
     setSelectedChartType(chartType);
   };
   
@@ -162,22 +162,22 @@ const BettingHistoryScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'betType' && styles.selectedChartTypeButton
+              selectedChartType === 'pickType' && styles.selectedChartTypeButton
             ]}
-            onPress={() => handleChartTypeChange('betType')}
+            onPress={() => handleChartTypeChange('pickType')}
           >
             <Ionicons 
               name="pie-chart" 
               size={20} 
-              color={selectedChartType === 'betType' ? '#fff' : '#666'} 
+              color={selectedChartType === 'pickType' ? '#fff' : '#666'} 
             />
             <ThemedText
               style={[
                 styles.chartTypeButtonText,
-                selectedChartType === 'betType' && styles.selectedChartTypeButtonText
+                selectedChartType === 'pickType' && styles.selectedChartTypeButtonText
               ]}
             >
-              Bet Types
+              Pick Types
             </ThemedText>
           </TouchableOpacity>
           
@@ -205,7 +205,7 @@ const BettingHistoryScreen: React.FC = () => {
         </View>
         
         <ScrollView style={styles.chartContainer}>
-          <BettingHistoryChart 
+          <WageringHistoryChart 
             timePeriod={selectedPeriod}
             chartType={selectedChartType}
           />
@@ -292,4 +292,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BettingHistoryScreen;
+export default WageringHistoryScreen;

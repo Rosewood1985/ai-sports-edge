@@ -6,14 +6,14 @@ import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import BettingAnalyticsChart from './BettingAnalyticsChart';
 
-interface BettingAnalyticsProps {
+interface WageringAnalyticsProps {
   onRefresh?: () => void;
 }
 
 /**
- * Component that displays betting analytics for the user
+ * Component that displays wagering analytics for the user
  */
-const BettingAnalytics: React.FC<BettingAnalyticsProps> = ({ onRefresh }) => {
+const WageringAnalytics: React.FC<WageringAnalyticsProps> = ({ onRefresh }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -924,4 +924,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BettingAnalytics;
+export default WageringAnalytics;

@@ -1,272 +1,350 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  InputAdornment,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Pagination,
-  CircularProgress,
-  Alert,
-  Button,
-  SelectChangeEvent,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { ReportHistory, ReportFormat, ReportType } from '../../../../types/reporting';
-import { ReportHistoryCard } from '../molecules';
-import { DateRangePicker } from '../atoms';
+import React, { useState, useCallback } from 'react';
+import { ReportHistory, ReportFormat, ReportType, ReportHistoryFilters } from '../../../../types/reporting';
+import { Button } from '../../../ui/Button';
+import { Input } from '../../../ui/Input';
+import { Select } from '../../../ui/Select';
+import { Card } from '../../../ui/Card';
+import { useCrossPlatform } from '../../../../hooks/useCrossPlatform';
 
-interface ReportHistoryListProps {
-  history: ReportHistory[];
-  loading: boolean;
-  error: Error | null;
-  onDownload: (id: string) => void;
-  onView: (id: string) => void;
-  onFilter: (filters: ReportHistoryFilters) => void;
+export interface ReportHistoryListProps {
   className?: string;
-}
-
-interface ReportHistoryFilters {
-  startDate: string;
-  endDate: string;
-  status: 'all' | 'success' | 'failed';
-  format: 'all' | ReportFormat;
-  reportType: 'all' | ReportType;
 }
 
 /**
  * Component for displaying a list of report history items with filtering and pagination
  */
-export const ReportHistoryList: React.FC<ReportHistoryListProps> = ({
-  history,
-  loading,
-  error,
-  onDownload,
-  onView,
-  onFilter,
-  className,
-}) => {
+export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
+  const { isMobile } = useCrossPlatform();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<ReportHistoryFilters>({
     startDate: '',
     endDate: '',
-    status: 'all',
-    format: 'all',
-    reportType: 'all',
+    status: 'success',
+    reportType: ReportType.STANDARD,
   });
-  const [page, setPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
-  const itemsPerPage = 6;
+
+  // Mock data for development
+  const mockHistory: ReportHistory[] = [
+    {
+      id: 'hist-001',
+      templateId: 'template-001',
+      templateName: 'Monthly Performance Report',
+      name: 'May 2025 Performance Report',
+      runAt: '2025-05-23T10:30:00Z',
+      runBy: 'admin@aisportsedge.app',
+      status: 'success',
+      fileUrl: '#',
+      format: 'pdf',
+      reportType: ReportType.ANALYTICS,
+    },
+    {
+      id: 'hist-002',
+      templateId: 'template-002',
+      templateName: 'Weekly Subscription Summary',
+      name: 'Week 21 Subscription Summary',
+      runAt: '2025-05-22T08:30:00Z',
+      runBy: 'admin@aisportsedge.app',
+      status: 'success',
+      fileUrl: '#',
+      format: 'excel',
+      reportType: ReportType.STANDARD,
+    },
+    {
+      id: 'hist-003',
+      templateId: 'template-003',
+      templateName: 'System Health Check',
+      name: 'Daily Health Check - May 22',
+      runAt: '2025-05-22T07:00:00Z',
+      runBy: 'system@aisportsedge.app',
+      status: 'failed',
+      error: 'Database connection timeout',
+      format: 'pdf',
+      reportType: ReportType.PERFORMANCE,
+    },
+    {
+      id: 'hist-004',
+      templateId: 'template-001',
+      templateName: 'Monthly Performance Report',
+      name: 'April 2025 Performance Report',
+      runAt: '2025-05-01T10:30:00Z',
+      runBy: 'admin@aisportsedge.app',
+      status: 'success',
+      fileUrl: '#',
+      format: 'pdf',
+      reportType: ReportType.ANALYTICS,
+    },
+  ];
 
   // Filter history based on search term and filters
-  const filteredHistory = history.filter(item => {
+  const filteredHistory = mockHistory.filter(item => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.templateName.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = filters.status === 'all' || item.status === filters.status;
-    const matchesFormat = filters.format === 'all' || item.format === filters.format;
-    const matchesReportType =
-      filters.reportType === 'all' || item.reportType === filters.reportType;
+    const matchesStatus = !filters.status || item.status === filters.status;
+    const matchesReportType = !filters.reportType || item.reportType === filters.reportType;
 
     const matchesDateRange =
       (!filters.startDate || new Date(item.runAt) >= new Date(filters.startDate)) &&
       (!filters.endDate || new Date(item.runAt) <= new Date(filters.endDate));
 
-    return matchesSearch && matchesStatus && matchesFormat && matchesReportType && matchesDateRange;
+    return matchesSearch && matchesStatus && matchesReportType && matchesDateRange;
   });
 
-  // Paginate history
-  const paginatedHistory = filteredHistory.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const handleDownload = useCallback((id: string) => {
+    const item = mockHistory.find(h => h.id === id);
+    if (item?.fileUrl) {
+      window.open(item.fileUrl, '_blank');
+    }
+  }, []);
 
-  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
+  const handleView = useCallback((id: string) => {
+    console.log('View report:', id);
+  }, []);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-    setPage(1); // Reset to first page when search changes
-  };
-
-  const handleFilterChange = (key: keyof ReportHistoryFilters, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-    }));
-    setPage(1); // Reset to first page when filter changes
-  };
-
-  const handleApplyFilters = () => {
-    onFilter(filters);
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      startDate: '',
-      endDate: '',
-      status: 'all',
-      format: 'all',
-      reportType: 'all',
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
-    setPage(1);
+  };
+
+  const getStatusBgColor = (status: string) => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+      case 'failed':
+        return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100';
+    }
+  };
+
+  const getFormatIcon = (format: ReportFormat) => {
+    switch (format) {
+      case 'pdf':
+        return '📄';
+      case 'excel':
+        return '📊';
+      case 'csv':
+        return '📋';
+      default:
+        return '📄';
+    }
   };
 
   return (
-    <Box className={className}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold' }}>
-          Report History
-        </Typography>
-        <Button
-          variant="outlined"
-          color="primary"
-          startIcon={<FilterListIcon />}
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          {showFilters ? 'Hide Filters' : 'Show Filters'}
-        </Button>
-      </Box>
+    <div className={`space-y-6 ${className}`}>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Report History
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            View and download previously generated reports
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className="whitespace-nowrap"
+          >
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </Button>
+        </div>
+      </div>
 
-      <Box sx={{ mb: 3 }}>
-        <TextField
+      {/* Search */}
+      <div className="w-full">
+        <Input
+          type="text"
           placeholder="Search reports..."
           value={searchTerm}
-          onChange={handleSearchChange}
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full"
         />
-      </Box>
+      </div>
 
+      {/* Filters */}
       {showFilters && (
-        <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Filters
-          </Typography>
-
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Date Range
-            </Typography>
-            <DateRangePicker
-              startDate={filters.startDate}
-              endDate={filters.endDate}
-              onStartDateChange={date => handleFilterChange('startDate', date)}
-              onEndDateChange={date => handleFilterChange('endDate', date)}
-            />
-          </Box>
-
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-            <FormControl sx={{ minWidth: 150 }}>
-              <InputLabel id="status-filter-label">Status</InputLabel>
+        <Card className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+            Filter Reports
+          </h4>
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-4'}`}>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Start Date
+              </label>
+              <Input
+                type="date"
+                value={filters.startDate}
+                onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                End Date
+              </label>
+              <Input
+                type="date"
+                value={filters.endDate}
+                onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Status
+              </label>
               <Select
-                labelId="status-filter-label"
-                value={filters.status}
-                label="Status"
-                onChange={(e: SelectChangeEvent) => handleFilterChange('status', e.target.value)}
+                value={filters.status || 'all'}
+                onChange={(e) => setFilters(prev => ({ 
+                  ...prev, 
+                  status: e.target.value === 'all' ? undefined : e.target.value as 'success' | 'failed'
+                }))}
               >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="success">Success</MenuItem>
-                <MenuItem value="failed">Failed</MenuItem>
+                <option value="all">All</option>
+                <option value="success">Success</option>
+                <option value="failed">Failed</option>
               </Select>
-            </FormControl>
-
-            <FormControl sx={{ minWidth: 150 }}>
-              <InputLabel id="format-filter-label">Format</InputLabel>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Report Type
+              </label>
               <Select
-                labelId="format-filter-label"
-                value={filters.format}
-                label="Format"
-                onChange={(e: SelectChangeEvent) => handleFilterChange('format', e.target.value)}
+                value={filters.reportType || 'all'}
+                onChange={(e) => setFilters(prev => ({ 
+                  ...prev, 
+                  reportType: e.target.value === 'all' ? undefined : e.target.value as ReportType
+                }))}
               >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="pdf">PDF</MenuItem>
-                <MenuItem value="csv">CSV</MenuItem>
-                <MenuItem value="excel">Excel</MenuItem>
+                <option value="all">All Types</option>
+                <option value="standard">Standard</option>
+                <option value="analytics">Analytics</option>
+                <option value="performance">Performance</option>
+                <option value="custom">Custom</option>
               </Select>
-            </FormControl>
-
-            <FormControl sx={{ minWidth: 150 }}>
-              <InputLabel id="type-filter-label">Report Type</InputLabel>
-              <Select
-                labelId="type-filter-label"
-                value={filters.reportType}
-                label="Report Type"
-                onChange={(e: SelectChangeEvent) =>
-                  handleFilterChange('reportType', e.target.value)
-                }
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="standard">Standard</MenuItem>
-                <MenuItem value="analytics">Analytics</MenuItem>
-                <MenuItem value="performance">Performance</MenuItem>
-                <MenuItem value="custom">Custom</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleApplyFilters}>
-              Apply Filters
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setFilters({
+                startDate: '',
+                endDate: '',
+                status: undefined,
+                reportType: undefined,
+              })}
+            >
+              Clear Filters
             </Button>
-            <Button variant="outlined" onClick={handleResetFilters}>
-              Reset
-            </Button>
-          </Box>
-        </Box>
+          </div>
+        </Card>
       )}
 
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
+      {/* Results */}
+      {filteredHistory.length === 0 ? (
+        <Card className="p-8 text-center">
+          <div className="text-gray-500 dark:text-gray-400">
+            <div className="text-4xl mb-2">📊</div>
+            <h3 className="text-lg font-medium mb-2">No Reports Found</h3>
+            <p className="text-sm">
+              {searchTerm || Object.values(filters).some(v => v)
+                ? 'Try adjusting your search or filters.'
+                : 'No reports have been generated yet.'}
+            </p>
+          </div>
+        </Card>
+      ) : (
+        <div className={`grid gap-4 ${
+          isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        }`}>
+          {filteredHistory.map(item => (
+            <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {item.name}
+                  </h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {item.templateName}
+                  </p>
+                </div>
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${getStatusBgColor(item.status)}`}>
+                  {item.status}
+                </span>
+              </div>
+
+              <div className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between">
+                  <span>Generated:</span>
+                  <span>{formatDate(item.runAt)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Format:</span>
+                  <span className="flex items-center">
+                    <span className="mr-1">{getFormatIcon(item.format)}</span>
+                    {item.format.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Type:</span>
+                  <span className="capitalize">{item.reportType}</span>
+                </div>
+                {item.runBy && (
+                  <div className="flex items-center justify-between">
+                    <span>Run by:</span>
+                    <span className="truncate max-w-[120px]">{item.runBy}</span>
+                  </div>
+                )}
+              </div>
+
+              {item.error && (
+                <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-600 dark:text-red-400">
+                  <strong>Error:</strong> {item.error}
+                </div>
+              )}
+
+              <div className="flex gap-2 mt-4">
+                {item.status === 'success' && item.fileUrl && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleDownload(item.id)}
+                    className="flex-1"
+                  >
+                    Download
+                  </Button>
+                )}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleView(item.id)}
+                  className="flex-1"
+                >
+                  View Details
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
       )}
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error.message}
-        </Alert>
-      )}
-
-      {!loading && !error && filteredHistory.length === 0 && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          No report history found.{' '}
-          {searchTerm || Object.values(filters).some(v => v !== 'all' && v !== '')
-            ? 'Try adjusting your filters.'
-            : ''}
-        </Alert>
-      )}
-
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-          gap: 3,
-        }}
-      >
-        {paginatedHistory.map(item => (
-          <Box key={item.id}>
-            <ReportHistoryCard history={item} onDownload={onDownload} onView={onView} />
-          </Box>
-        ))}
-      </Box>
-
-      {totalPages > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
-        </Box>
-      )}
-    </Box>
+      {/* Summary */}
+      <div className="flex justify-center">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Showing {filteredHistory.length} of {mockHistory.length} reports
+        </div>
+      </div>
+    </div>
   );
-};
+}

@@ -15,17 +15,17 @@ import { Ionicons } from '@expo/vector-icons';
 import PremiumFeature from '../components/PremiumFeature';
 
 type RootStackParamList = {
-  BetComparison: { games: Game[] };
+  PickComparison: { games: Game[] };
 };
 
-type BetComparisonScreenRouteProp = RouteProp<RootStackParamList, 'BetComparison'>;
-type BetComparisonScreenNavigationProp = StackNavigationProp<any>;
+type PickComparisonScreenRouteProp = RouteProp<RootStackParamList, 'PickComparison'>;
+type PickComparisonScreenNavigationProp = StackNavigationProp<any>;
 
 /**
- * BetComparisonScreen component displays AI-generated bets alongside actual game results
+ * PickComparisonScreen component displays AI-generated picks alongside actual game results
  * @returns {JSX.Element} - Rendered component
  */
-const BetComparisonScreen = (): JSX.Element => {
+const PickComparisonScreen = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [gamesWithResults, setGamesWithResults] = useState<Game[]>([]);
   const [stats, setStats] = useState({
@@ -39,8 +39,8 @@ const BetComparisonScreen = (): JSX.Element => {
     }
   });
   
-  const navigation = useNavigation<BetComparisonScreenNavigationProp>();
-  const route = useRoute<BetComparisonScreenRouteProp>();
+  const navigation = useNavigation<PickComparisonScreenNavigationProp>();
+  const route = useRoute<PickComparisonScreenRouteProp>();
   
   useEffect(() => {
     const loadResults = async () => {
@@ -502,4 +502,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default BetComparisonScreen;
+export default PickComparisonScreen;

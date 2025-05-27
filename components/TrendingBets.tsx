@@ -10,24 +10,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 
-interface TrendingBet {
+interface TrendingPick {
   game_id: string;
   description: string;
   percentage: number;
 }
 
-interface TrendingBetsProps {
-  trendingBets: TrendingBet[];
+interface TrendingPicksProps {
+  trendingPicks: TrendingPick[];
   showUpgradePrompt?: boolean;
 }
 
 /**
- * TrendingBets component shows public betting percentages for free users
- * @param {TrendingBetsProps} props - Component props
+ * TrendingPicks component shows public wagering percentages for free users
+ * @param {TrendingPicksProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const TrendingBets: React.FC<TrendingBetsProps> = ({ 
-  trendingBets,
+const TrendingPicks: React.FC<TrendingPicksProps> = ({ 
+  trendingPicks,
   showUpgradePrompt = true
 }) => {
   const navigation = useNavigation();
@@ -40,7 +40,7 @@ const TrendingBets: React.FC<TrendingBetsProps> = ({
   };
 
   // Render trending bet item
-  const renderTrendingBet = ({ item }: { item: TrendingBet }) => {
+  const renderTrendingPick = ({ item }: { item: TrendingPick }) => {
     // Determine color based on percentage
     const getPercentageColor = (percentage: number): string => {
       if (percentage >= 70) return '#4CAF50'; // Green
@@ -89,13 +89,13 @@ const TrendingBets: React.FC<TrendingBetsProps> = ({
           </Text>
         </View>
         <Text style={[styles.subtitle, { color: colors.text }]}>
-          What the public is betting on
+          What the public is picking
         </Text>
       </View>
 
       <FlatList
-        data={trendingBets}
-        renderItem={renderTrendingBet}
+        data={trendingPicks}
+        renderItem={renderTrendingPick}
         keyExtractor={(item) => item.game_id}
         scrollEnabled={false}
         ItemSeparatorComponent={() => (
@@ -204,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TrendingBets;
+export default TrendingPicks;

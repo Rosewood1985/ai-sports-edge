@@ -8,12 +8,13 @@ import { AdminDashboardService } from '../../../services/adminDashboardService';
 
 export interface ReportTemplateListProps {
   className?: string;
+  onEditTemplate?: (template: ReportTemplate) => void;
 }
 
 /**
  * Component for displaying and managing report templates
  */
-export function ReportTemplateList({ className = '' }: ReportTemplateListProps) {
+export function ReportTemplateList({ className = '', onEditTemplate }: ReportTemplateListProps) {
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -76,8 +77,10 @@ export function ReportTemplateList({ className = '' }: ReportTemplateListProps) 
   };
 
   const handleEditTemplate = (templateId: string) => {
-    // In a real implementation, this would open a modal or navigate to an edit page
-    console.log('Edit template:', templateId);
+    const template = templates.find(t => t.id === templateId);
+    if (template && onEditTemplate) {
+      onEditTemplate(template);
+    }
   };
 
   const handleDeleteTemplate = async (templateId: string) => {
@@ -98,17 +101,20 @@ export function ReportTemplateList({ className = '' }: ReportTemplateListProps) 
   };
 
   const handleCreateTemplate = () => {
-    // In a real implementation, this would open a modal or navigate to a create page
-    console.log('Create new template');
+    if (onEditTemplate) {
+      onEditTemplate({ id: 'new' } as ReportTemplate);
+    }
   };
 
   return (
     <div className={`space-y-6 ${className}`}>
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Report Templates</h3>
-        <Button variant="primary" onClick={handleCreateTemplate}>
-          Create Template
-        </Button>
+        {onEditTemplate && (
+          <Button variant="primary" onClick={handleCreateTemplate}>
+            Create Template
+          </Button>
+        )}
       </div>
 
       <EnhancedWidget
