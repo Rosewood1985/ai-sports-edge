@@ -381,8 +381,20 @@
     <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/" />
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/" />
-    <lastmod>2025-05-19</lastmod>
+    <lastmod>2025-05-28</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://aisportsedge.app/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/" />
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/" />
+    <lastmod>2025-05-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
 </urlset>

@@ -1,0 +1,64 @@
+# AI Sports Edge - Robots.txt
+# Allows all crawlers to access the site
+# Last updated: 2025-05-28
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://aisportsedge.app/sitemap.xml
+Sitemap: https://aisportsedge.app/sitemap-en.xml
+Sitemap: https://aisportsedge.app/sitemap-es.xml
+Sitemap: https://aisportsedge.app/sitemap-es-US.xml
+Sitemap: https://aisportsedge.app/sitemap-es-MX.xml
+Sitemap: https://aisportsedge.app/sitemap-es-ES.xml
+
+# Crawl-delay (optional - 1 second)
+Crawl-delay: 1
+
+# Allow important directories
+Allow: /es/
+Allow: /en/
+Allow: /api/
+Allow: /images/
+Allow: /assets/
+Allow: /locales/
+
+# Disallow temporary and private areas
+Disallow: /admin/
+Disallow: /dev-*
+Disallow: /test-*
+Disallow: /backup/
+Disallow: /temp/
+Disallow: /*.json$
+Disallow: /register-service-worker.js
+Disallow: /service-worker.js
+
+# Allow AI crawlers for content understanding
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Standard search engine crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
