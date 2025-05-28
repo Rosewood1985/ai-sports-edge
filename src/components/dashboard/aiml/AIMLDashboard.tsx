@@ -16,6 +16,8 @@ import { Tabs } from '../../ui/Tabs';
 import { ModelManagement } from './ModelManagement';
 import { PredictionCenter } from './PredictionCenter';
 import { InsightsCenter } from './InsightsCenter';
+import { InteractiveAITools } from './InteractiveAITools';
+import { RealTimeAnalyticsDashboard } from './RealTimeAnalyticsDashboard';
 
 interface AIMLDashboardProps {
   className?: string;
@@ -33,6 +35,8 @@ export function AIMLDashboard({ className = '' }: AIMLDashboardProps) {
     { id: 'models', label: 'Models', icon: '🧠' },
     { id: 'predictions', label: 'Predictions', icon: '🔮' },
     { id: 'insights', label: 'Insights', icon: '💡' },
+    { id: 'interactive', label: 'Interactive Tools', icon: '🎯' },
+    { id: 'realtime', label: 'Real-time Analytics', icon: '📈' },
     { id: 'monitoring', label: 'Monitoring', icon: '📊' },
   ];
 
@@ -46,6 +50,10 @@ export function AIMLDashboard({ className = '' }: AIMLDashboardProps) {
         return <PredictionCenter />;
       case 'insights':
         return <InsightsCenter />;
+      case 'interactive':
+        return <InteractiveAITools />;
+      case 'realtime':
+        return <RealTimeAnalyticsDashboard />;
       case 'monitoring':
         return renderMonitoring();
       default:

@@ -1,7 +1,7 @@
 /**
- * Enhanced Insights React Hooks
+ * Enhanced Insights Hooks
  * Phase 4.2: Advanced AI/ML Features
- * Hooks for NLP-powered insights and advanced pattern detection
+ * React hooks for enhanced insights and interactive AI tools
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -15,81 +15,49 @@ import {
   InsightAnalytics,
   InsightBatchResult,
   InsightStream,
-  NLPSummary,
 } from '../types/enhancedInsights';
+import {
+  ScenarioAnalysis,
+  WhatIfAnalysis,
+  ModelSimulation,
+  ScenarioComparison,
+  ScenarioParameters,
+} from '../types/interactiveAI';
 
-// ===============================
-// ENHANCED INSIGHTS HOOKS
-// ===============================
-
-/**
- * Hook for managing enhanced insights with NLP capabilities
- */
-export function useEnhancedInsights(initialFilters?: InsightFilters) {
+// Main hook for enhanced insights
+export const useEnhancedInsights = () => {
   const [insights, setInsights] = useState<EnhancedInsight[]>([]);
   const [analytics, setAnalytics] = useState<InsightAnalytics | null>(null);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<InsightFilters>(initialFilters || {});
-  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const loadInsights = useCallback(async (newPage = 1, newFilters = filters) => {
+  // Scenarios state
+  const [scenarios, setScenarios] = useState<ScenarioAnalysis[]>([]);
+  const [whatIfAnalysis, setWhatIfAnalysis] = useState<WhatIfAnalysis | null>(null);
+
+  // Fetch enhanced insights
+  const fetchInsights = useCallback(async (
+    filters?: InsightFilters,
+    page = 1,
+    limit = 20
+  ) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await EnhancedInsightsService.getEnhancedInsights(
-        newFilters,
-        newPage,
-        20
-      );
-      
-      setInsights(response.insights);
-      setAnalytics(response.analytics);
-      setTotal(response.total);
-      setPage(newPage);
+      const result = await EnhancedInsightsService.getEnhancedInsights(filters, page, limit);
+      setInsights(result.insights);
+      setAnalytics(result.analytics);
+      setTotal(result.total);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load insights');
+      setError(err instanceof Error ? err.message : 'Failed to fetch insights');
     } finally {
       setLoading(false);
     }
-  }, [filters]);
-
-  const updateFilters = useCallback((newFilters: InsightFilters) => {
-    setFilters(newFilters);
-    loadInsights(1, newFilters);
-  }, [loadInsights]);
-
-  const updateInsightStatus = useCallback(async (
-    insightId: string,
-    status: EnhancedInsight['status'],
-    assignedTo?: string,
-    notes?: string
-  ) => {
-    try {
-      setError(null);
-      const updatedInsight = await EnhancedInsightsService.updateInsightStatus(
-        insightId,
-        status,
-        assignedTo,
-        notes
-      );
-      
-      // Update local state
-      setInsights(prev =>
-        prev.map(insight =>
-          insight.id === insightId ? updatedInsight : insight
-        )
-      );
-      
-      return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update insight');
-      return false;
-    }
   }, []);
 
+  // Generate insights from data
   const generateInsights = useCallback(async (
     dataSource: string,
     options?: {
@@ -98,87 +66,428 @@ export function useEnhancedInsights(initialFilters?: InsightFilters) {
       includeCorrelations?: boolean;
       includePredictions?: boolean;
     }
-  ) => {
+  ): Promise<InsightBatchResult | null> => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setError(null);
       const result = await EnhancedInsightsService.generateInsights(dataSource, options);
-      
       // Refresh insights after generation
-      await loadInsights();
-      
+      await fetchInsights();
       return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate insights');
       return null;
+    } finally {
+      setLoading(false);
     }
-  }, [loadInsights]);
+  }, [fetchInsights]);
 
-  useEffect(() => {
-    loadInsights();
-  }, [loadInsights]);
-
-  return {
-    insights,
-    analytics,
-    total,
-    loading,
-    error,
-    filters,
-    page,
-    loadInsights,
-    updateFilters,
-    updateInsightStatus,
-    generateInsights,
-    nextPage: () => loadInsights(page + 1),
-    previousPage: () => loadInsights(Math.max(1, page - 1)),
-  };
-}
-
-/**
- * Hook for individual enhanced insight details
- */
-export function useEnhancedInsight(insightId: string | null) {
-  const [insight, setInsight] = useState<EnhancedInsight | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadInsight = useCallback(async (id: string) => {
+  // Update insight status
+  const updateInsightStatus = useCallback(async (
+    insightId: string,
+    status: EnhancedInsight['status'],
+    assignedTo?: string,
+    notes?: string
+  ) => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await EnhancedInsightsService.getInsightDetails(id);
-      setInsight(data);
+      const updatedInsight = await EnhancedInsightsService.updateInsightStatus(
+        insightId,
+        status,
+        assignedTo,
+        notes
+      );
+      
+      // Update local state
+      setInsights(prev => prev.map(insight => 
+        insight.id === insightId ? updatedInsight : insight
+      ));
+      
+      return updatedInsight;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load insight');
+      setError(err instanceof Error ? err.message : 'Failed to update insight');
+      throw err;
+    }
+  }, []);
+
+  // Run scenario analysis
+  const runScenarioAnalysis = useCallback(async (
+    metric: string,
+    parameters: ScenarioParameters
+  ): Promise<ModelSimulation> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Mock implementation - in real app, this would call a service
+      const result: ModelSimulation = {
+        id: `simulation_${Date.now()}`,
+        name: `${metric} Scenario Analysis`,
+        type: 'monte_carlo',
+        model: {
+          id: 'scenario_model_v1',
+          name: 'Scenario Analysis Model',
+          version: '1.0.0',
+          description: 'General scenario analysis model',
+          inputs: [],
+          outputs: [],
+          assumptions: ['Normal market conditions', 'Linear growth patterns'],
+          limitations: ['6-month horizon', 'Single metric focus'],
+        },
+        parameters: {
+          iterations: 10000,
+          timeHorizon: '6 months',
+          timeStep: '1 day',
+          confidenceLevel: 0.95,
+          convergenceCriteria: {
+            enabled: true,
+            tolerance: 0.001,
+            minIterations: 1000,
+            maxIterations: 50000,
+            metric: 'standard_error',
+          },
+          customSettings: parameters,
+        },
+        results: {
+          summary: {
+            iterations: 10000,
+            convergenceReached: true,
+            computeTime: 2450,
+            meanOutcome: 125000,
+            medianOutcome: 123000,
+            confidenceIntervals: [
+              { level: 95, lowerBound: 95000, upperBound: 155000 },
+              { level: 90, lowerBound: 102000, upperBound: 148000 },
+            ],
+            percentiles: [
+              { percentile: 5, value: 95000 },
+              { percentile: 25, value: 115000 },
+              { percentile: 75, value: 135000 },
+              { percentile: 95, value: 155000 },
+            ],
+          },
+          distributions: [],
+          correlations: { variables: [], matrix: [], significanceMatrix: [] },
+          sensitivityAnalysis: [],
+          scenarios: [],
+          performance: {
+            executionTime: 2450,
+            memoryUsage: 256,
+            convergenceIterations: 8500,
+            accuracy: 0.95,
+            stability: 0.89,
+          },
+        },
+        validation: {
+          backtesting: [],
+          crossValidation: {
+            folds: 5,
+            averageError: 0.12,
+            standardDeviation: 0.08,
+            r2Score: 0.85,
+            meanAbsoluteError: 0.09,
+          },
+          realityCheck: [],
+          uncertaintyQuantification: {
+            aleatory: 0.15,
+            epistemic: 0.08,
+            total: 0.23,
+            propagation: [],
+          },
+        },
+        predictedOutcome: {
+          value: 125000,
+          confidence: 0.84,
+          range: {
+            lower: 118000,
+            upper: 132000,
+            percentile95: 155000,
+            percentile5: 95000,
+          },
+          distribution: {
+            type: 'normal',
+            mean: 125000,
+            median: 123000,
+            standardDeviation: 15000,
+          },
+        },
+        influencingFactors: [
+          {
+            name: 'Growth Rate',
+            impact: parameters.growthRate || 15,
+            confidence: 0.89,
+            description: 'User and revenue growth rate',
+            controllable: true,
+          },
+          {
+            name: 'Market Factor',
+            impact: (parameters.marketFactor || 1.0) * 10,
+            confidence: 0.76,
+            description: 'Overall market conditions',
+            controllable: false,
+          },
+          {
+            name: 'Seasonality',
+            impact: (parameters.seasonality || 0.2) * 20,
+            confidence: 0.92,
+            description: 'Seasonal variations',
+            controllable: false,
+          },
+        ],
+        timeSeriesData: {
+          timestamps: Array.from({ length: 180 }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() + i);
+            return date.toISOString().split('T')[0];
+          }),
+          values: Array.from({ length: 180 }, (_, i) => {
+            const base = 125000;
+            const growth = (parameters.growthRate || 15) / 100;
+            const seasonality = Math.sin((i / 365) * 2 * Math.PI) * (parameters.seasonality || 0.2);
+            const noise = (Math.random() - 0.5) * 0.1;
+            return base * (1 + (growth * i / 365) + seasonality + noise);
+          }),
+          metadata: {
+            frequency: 'daily',
+            seasonality: true,
+            trend: 'increasing',
+          },
+        },
+        riskAssessment: {
+          level: 'medium',
+          score: 45,
+          factors: [
+            {
+              name: 'Market Volatility',
+              impact: -12,
+              probability: 0.35,
+              category: 'market',
+              description: 'Potential market downturns',
+              earlyWarningSignals: ['Economic indicators', 'Competitor actions'],
+            },
+          ],
+          mitigationStrategies: [
+            {
+              name: 'Diversification',
+              description: 'Diversify revenue streams',
+              effectiveness: 0.7,
+              cost: 50000,
+              timeToImplement: '3 months',
+              prerequisites: ['Market analysis', 'Product development'],
+            },
+          ],
+          monitoringRequirements: ['Weekly performance reviews', 'Market condition tracking'],
+        },
+      };
+      
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to run scenario analysis');
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    if (insightId) {
-      loadInsight(insightId);
-    } else {
-      setInsight(null);
+  // Run what-if analysis
+  const runWhatIfAnalysis = useCallback(async (
+    question: string,
+    changes: Record<string, number>
+  ): Promise<WhatIfAnalysis> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Mock implementation
+      const result: WhatIfAnalysis = {
+        id: `whatif_${Date.now()}`,
+        question,
+        baselineScenario: {
+          id: 'baseline',
+          name: 'Current State',
+          variables: { revenue: 100000, users: 5000, conversion: 0.15 },
+          outcomes: { revenue: 100000, growth: 0.12 },
+          metadata: {
+            createdAt: new Date().toISOString(),
+            computeTime: 150,
+            confidence: 0.85,
+          },
+        },
+        modifiedScenario: {
+          id: 'modified',
+          name: 'Modified State',
+          variables: { ...changes },
+          outcomes: { revenue: 125000, growth: 0.18 },
+          metadata: {
+            createdAt: new Date().toISOString(),
+            computeTime: 180,
+            confidence: 0.82,
+          },
+        },
+        variableChanges: Object.entries(changes).map(([variable, newValue]) => ({
+          variable,
+          originalValue: 100000, // mock original
+          newValue,
+          changePercent: ((newValue - 100000) / 100000) * 100,
+          changeType: 'relative',
+          justification: `Modified ${variable} to test impact`,
+        })),
+        impactAnalysis: {
+          primaryMetrics: [
+            {
+              metric: 'revenue',
+              currentValue: 100000,
+              projectedValue: 125000,
+              absoluteChange: 25000,
+              percentageChange: 25,
+              confidence: 0.84,
+              significance: 'high',
+            },
+          ],
+          secondaryMetrics: [],
+          cascadingEffects: [],
+          timeToImpact: '2-4 weeks',
+          persistenceDuration: '6+ months',
+        },
+        sensitivityAnalysis: {
+          mostSensitiveVariables: [],
+          elasticity: [],
+          thresholds: [],
+          robustness: {
+            overall: 75,
+            volatility: 25,
+            resilience: 80,
+            adaptability: 70,
+            factors: ['Market conditions', 'User behavior'],
+          },
+        },
+        recommendations: [],
+      };
+      
+      setWhatIfAnalysis(result);
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to run what-if analysis');
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  }, [insightId, loadInsight]);
+  }, []);
+
+  // Run model simulation
+  const runModelSimulation = useCallback(async (
+    modelType: 'monte_carlo' | 'discrete_event' | 'agent_based',
+    parameters: Record<string, any>
+  ): Promise<ModelSimulation> => {
+    return runScenarioAnalysis('simulation', parameters);
+  }, [runScenarioAnalysis]);
+
+  // Compare scenarios
+  const compareScenarios = useCallback(async (
+    scenarioIds: string[]
+  ): Promise<ScenarioComparison> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Mock implementation
+      const result: ScenarioComparison = {
+        id: `comparison_${Date.now()}`,
+        name: 'Scenario Comparison',
+        scenarios: scenarioIds.map(id => ({
+          id,
+          name: `Scenario ${id}`,
+          description: 'Mock scenario for comparison',
+          parameters: { growth: 15, risk: 0.2 },
+          outcomes: { revenue: 125000, probability: 0.8 },
+          risk: {
+            overall: 45,
+            categories: { market: 30, operational: 20 },
+            mitigations: ['Diversification', 'Monitoring'],
+          },
+          feasibility: {
+            technical: 85,
+            financial: 70,
+            operational: 80,
+            timeline: 75,
+            overall: 77,
+          },
+        })),
+        comparisonMetrics: [],
+        analysis: {
+          dominantScenarios: [scenarioIds[0]],
+          tradeoffs: [],
+          sensitivityToChanges: [],
+          robustness: [],
+          optimalChoice: {
+            scenarioId: scenarioIds[0],
+            confidence: 0.85,
+            reasoning: ['Highest expected return', 'Acceptable risk level'],
+            conditions: ['Market stability', 'Resource availability'],
+            monitoring: ['Weekly reviews', 'KPI tracking'],
+          },
+        },
+        recommendations: [],
+        visualization: {
+          type: 'radar',
+          config: {
+            title: 'Scenario Comparison',
+            axes: [],
+            colors: ['#007bff', '#28a745', '#ffc107'],
+            annotations: [],
+            interactivity: {
+              zoomable: true,
+              pannable: true,
+              selectable: true,
+              tooltips: true,
+              filters: [],
+            },
+          },
+          data: {},
+        },
+      };
+      
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to compare scenarios');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initialize - fetch insights on mount
+  useEffect(() => {
+    fetchInsights();
+  }, [fetchInsights]);
 
   return {
-    insight,
+    // State
+    insights,
+    analytics,
     loading,
     error,
-    reload: () => insightId && loadInsight(insightId),
+    total,
+    scenarios,
+    whatIfAnalysis,
+    
+    // Actions
+    fetchInsights,
+    generateInsights,
+    updateInsightStatus,
+    runScenarioAnalysis,
+    runWhatIfAnalysis,
+    runModelSimulation,
+    compareScenarios,
+    
+    // Utility
+    refresh: () => fetchInsights(),
+    clearError: () => setError(null),
   };
-}
+};
 
-// ===============================
-// PATTERN DETECTION HOOKS
-// ===============================
-
-/**
- * Hook for pattern detection in metrics
- */
-export function usePatternDetection() {
+// Hook for pattern detection
+export const usePatternDetection = () => {
   const [patterns, setPatterns] = useState<PatternDetection[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -192,36 +501,16 @@ export function usePatternDetection() {
       includeSeasonality?: boolean;
     }
   ) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
-      const detectedPatterns = await EnhancedInsightsService.detectPatterns(
-        metrics,
-        timeRange,
-        options
-      );
-      setPatterns(detectedPatterns);
-      return detectedPatterns;
+      const result = await EnhancedInsightsService.detectPatterns(metrics, timeRange, options);
+      setPatterns(result);
+      return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to detect patterns');
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const analyzeMetricPatterns = useCallback(async (
-    metric: string,
-    timeRange: { start: string; end: string }
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const patterns = await EnhancedInsightsService.getPatternAnalysis(metric, timeRange);
-      return patterns;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to analyze patterns');
-      return [];
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -232,18 +521,12 @@ export function usePatternDetection() {
     loading,
     error,
     detectPatterns,
-    analyzeMetricPatterns,
+    clearError: () => setError(null),
   };
-}
+};
 
-// ===============================
-// CORRELATION ANALYSIS HOOKS
-// ===============================
-
-/**
- * Hook for correlation analysis between metrics
- */
-export function useCorrelationAnalysis() {
+// Hook for correlation analysis
+export const useCorrelationAnalysis = () => {
   const [correlations, setCorrelations] = useState<CorrelationAnalysis[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -257,19 +540,16 @@ export function useCorrelationAnalysis() {
       includeCausality?: boolean;
     }
   ) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
-      const analysis = await EnhancedInsightsService.analyzeCorrelations(
-        metrics,
-        timeRange,
-        options
-      );
-      setCorrelations(analysis);
-      return analysis;
+      const result = await EnhancedInsightsService.analyzeCorrelations(metrics, timeRange, options);
+      setCorrelations(result);
+      return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze correlations');
-      return [];
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -280,17 +560,12 @@ export function useCorrelationAnalysis() {
     loading,
     error,
     analyzeCorrelations,
+    clearError: () => setError(null),
   };
-}
+};
 
-// ===============================
-// PREDICTIVE INSIGHTS HOOKS
-// ===============================
-
-/**
- * Hook for predictive insights generation
- */
-export function usePredictiveInsights() {
+// Hook for predictive insights
+export const usePredictiveInsights = () => {
   const [predictions, setPredictions] = useState<PredictiveInsight[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -304,19 +579,16 @@ export function usePredictiveInsights() {
       includeOpportunities?: boolean;
     }
   ) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
-      const insights = await EnhancedInsightsService.generatePredictiveInsights(
-        metrics,
-        horizon,
-        options
-      );
-      setPredictions(insights);
-      return insights;
+      const result = await EnhancedInsightsService.generatePredictiveInsights(metrics, horizon, options);
+      setPredictions(result);
+      return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate predictions');
-      return [];
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -327,98 +599,48 @@ export function usePredictiveInsights() {
     loading,
     error,
     generatePredictions,
+    clearError: () => setError(null),
   };
-}
+};
 
-// ===============================
-// NLP PROCESSING HOOKS
-// ===============================
-
-/**
- * Hook for NLP text processing
- */
-export function useNLPProcessor() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const processText = useCallback(async (
-    text: string,
-    options?: {
-      extractEntities?: boolean;
-      analyzeSentiment?: boolean;
-      identifyTopics?: boolean;
-      extractKeyPhrases?: boolean;
-    }
-  ): Promise<NLPSummary | null> => {
-    try {
-      setLoading(true);
-      setError(null);
-      const summary = await EnhancedInsightsService.processTextWithNLP(text, options);
-      return summary;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process text');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    loading,
-    error,
-    processText,
-  };
-}
-
-// ===============================
-// REAL-TIME INSIGHTS HOOKS
-// ===============================
-
-/**
- * Hook for real-time insight streaming
- */
-export function useInsightStream(filters: InsightFilters) {
+// Hook for real-time insight streaming
+export const useInsightStream = () => {
   const [stream, setStream] = useState<InsightStream | null>(null);
   const [insights, setInsights] = useState<EnhancedInsight[]>([]);
-  const [connected, setConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(false);
   const streamRef = useRef<InsightStream | null>(null);
 
-  const startStream = useCallback(async () => {
+  const startStream = useCallback(async (filters: InsightFilters) => {
     try {
-      setError(null);
-      
       const newStream = await EnhancedInsightsService.startInsightStream(
         filters,
         (insight: EnhancedInsight) => {
-          setInsights(prev => [insight, ...prev.slice(0, 49)]); // Keep last 50 insights
+          setInsights(prev => [insight, ...prev].slice(0, 100)); // Keep latest 100
         }
       );
       
       setStream(newStream);
       streamRef.current = newStream;
-      setConnected(true);
+      setIsActive(true);
+      return newStream;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start insight stream');
-    }
-  }, [filters]);
-
-  const stopStream = useCallback(async () => {
-    if (streamRef.current) {
-      try {
-        await EnhancedInsightsService.stopInsightStream(streamRef.current.id);
-        setConnected(false);
-        setStream(null);
-        streamRef.current = null;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to stop insight stream');
-      }
+      console.error('Failed to start insight stream:', err);
+      throw err;
     }
   }, []);
 
+  const stopStream = useCallback(async () => {
+    if (streamRef.current) {
+      await EnhancedInsightsService.stopInsightStream(streamRef.current.id);
+      setStream(null);
+      streamRef.current = null;
+      setIsActive(false);
+    }
+  }, []);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Cleanup stream on unmount
       if (streamRef.current) {
         EnhancedInsightsService.stopInsightStream(streamRef.current.id);
       }
@@ -428,93 +650,11 @@ export function useInsightStream(filters: InsightFilters) {
   return {
     stream,
     insights,
-    connected,
-    error,
+    isActive,
     startStream,
     stopStream,
+    clearInsights: () => setInsights([]),
   };
-}
-
-// ===============================
-// ANALYTICS HOOKS
-// ===============================
-
-/**
- * Hook for insight analytics and metrics
- */
-export function useInsightAnalytics(timeRange?: { start: string; end: string }) {
-  const [analytics, setAnalytics] = useState<InsightAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadAnalytics = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await EnhancedInsightsService.getInsightAnalytics(timeRange);
-      setAnalytics(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load analytics');
-    } finally {
-      setLoading(false);
-    }
-  }, [timeRange]);
-
-  useEffect(() => {
-    loadAnalytics();
-  }, [loadAnalytics]);
-
-  return {
-    analytics,
-    loading,
-    error,
-    reload: loadAnalytics,
-  };
-}
-
-// ===============================
-// COMBINED DASHBOARD HOOK
-// ===============================
-
-/**
- * Combined hook for enhanced insights dashboard
- */
-export function useEnhancedInsightsDashboard(filters?: InsightFilters) {
-  const insightsData = useEnhancedInsights(filters);
-  const analyticsData = useInsightAnalytics();
-  const patternData = usePatternDetection();
-  const correlationData = useCorrelationAnalysis();
-
-  const quickStats = {
-    totalInsights: insightsData.total,
-    newInsights: insightsData.insights.filter(i => i.status === 'new').length,
-    criticalInsights: insightsData.insights.filter(i => i.severity === 'critical').length,
-    averageConfidence: analyticsData.analytics?.averageConfidence || 0,
-    topCategory: analyticsData.analytics ? 
-      Object.entries(analyticsData.analytics.byCategory)
-        .sort(([,a], [,b]) => b - a)[0]?.[0] : 'N/A',
-  };
-
-  return {
-    insights: insightsData,
-    analytics: analyticsData,
-    patterns: patternData,
-    correlations: correlationData,
-    quickStats,
-    loading: insightsData.loading || analyticsData.loading,
-    error: insightsData.error || analyticsData.error,
-  };
-}
-
-// Hook exports
-export {
-  useEnhancedInsights,
-  useEnhancedInsight,
-  usePatternDetection,
-  useCorrelationAnalysis,
-  usePredictiveInsights,
-  useNLPProcessor,
-  useInsightStream,
-  useInsightAnalytics,
-  useEnhancedInsightsDashboard,
 };
+
+export default useEnhancedInsights;
