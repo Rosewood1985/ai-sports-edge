@@ -7,14 +7,14 @@ import { generateRandomCode } from '../utils/codeGenerator';
 const firestore = getFirestore();
 const functions = getFunctions();
 
-// Gift subscription amounts
+// Gift subscription amounts - Updated for new pricing structure
 export const GIFT_SUBSCRIPTION_AMOUNTS = [
-  { label: '$25 (1 month)', value: 2500 },
-  { label: '$50 (2 months)', value: 5000 },
-  { label: '$75 (3 months)', value: 7500 },
-  { label: '$100 (4 months)', value: 10000 },
-  { label: '$150 (6 months)', value: 15000 },
-  { label: '$300 (1 year)', value: 30000 }
+  { label: '$20 (1 month Insight)', value: 2000 },
+  { label: '$75 (1 month Analyst)', value: 7500 },
+  { label: '$150 (2 months Analyst)', value: 15000 },
+  { label: '$190 (1 month Edge Collective)', value: 19000 },
+  { label: '$300 (4 months Analyst)', value: 30000 },
+  { label: '$500 (Gift Card)', value: 50000 }
 ];
 
 /**

@@ -21,6 +21,9 @@ import LegalScreen from '../screens/LegalScreen';
 import KnowledgeEdgeScreen from '../screens/KnowledgeEdgeScreen';
 import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
 import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
+import ReferralRewardsScreen from '../screens/ReferralRewardsScreen';
+import ReferralLeaderboardScreen from '../screens/ReferralLeaderboardScreen';
+import ReferralNotificationsScreen from '../screens/ReferralNotificationsScreen';
 
 // Import navigators
 import OnboardingNavigator from './OnboardingNavigator';
@@ -41,6 +44,9 @@ export type RootStackParamList = {
   ArticleDetail: { articleId: string };
   NearbyVenues: undefined;
   LocalTeamOdds: undefined;
+  ReferralRewards: undefined;
+  ReferralLeaderboard: undefined;
+  ReferralNotifications: undefined;
 };
 
 export type MainTabParamList = {

@@ -26,6 +26,7 @@ type RootStackParamList = {
   SubscriptionManagement: undefined;
   RefundPolicy: undefined;
   GiftRedemption: undefined;
+  GiftSubscription: undefined;
   GroupSubscription: undefined;
   // Other screens...
 };
@@ -260,14 +261,26 @@ const SubscriptionScreen = (): JSX.Element => {
       </View>
 
       <View style={styles.footerLinks}>
-        <TouchableOpacity
-          style={styles.giftButton}
-          onPress={() => navigation.navigate('GiftRedemption')}
-        >
-          <Text style={styles.giftButtonText}>
-            {t('subscription.gift.redeemButton') || 'Redeem Gift'}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.giftContainer}>
+          <TouchableOpacity
+            style={[styles.giftButton, styles.giveGiftButton]}
+            onPress={() => navigation.navigate('GiftSubscription')}
+          >
+            <Ionicons name="gift" size={16} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.giftButtonText}>
+              {t('subscription.gift.giveButton') || 'Give Gift'}
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.giftButton}
+            onPress={() => navigation.navigate('GiftRedemption')}
+          >
+            <Text style={styles.giftButtonText}>
+              {t('subscription.gift.redeemButton') || 'Redeem Gift'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={styles.policyLink}

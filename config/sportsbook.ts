@@ -76,7 +76,8 @@ export const SPORTSBOOK_CONFIG = {
 export const TIER_CONFIG = {
   insight: {
     name: 'Insight',
-    price: 29.99,
+    monthlyPrice: 19.99,
+    annualPrice: 167.92, // 30% off from $239.88
     features: {
       manualEntry: true,
       screenshotUpload: false,
@@ -85,8 +86,9 @@ export const TIER_CONFIG = {
     },
   },
   analyst: {
-    name: 'Analyst',
-    price: 79.99,
+    name: 'Analyst', 
+    monthlyPrice: 74.99,
+    annualPrice: 629.92, // 30% off from $899.88
     features: {
       manualEntry: true,
       screenshotUpload: true,
@@ -106,7 +108,28 @@ export const TIER_CONFIG = {
   },
   edge_collective: {
     name: 'Edge Collective',
-    price: 199.99,
+    monthlyPrice: 189.99,
+    annualPrice: 1595.92, // 30% off from $2,279.88
+    splitPayment: {
+      // Split payment options for 1-3 users
+      solo: {
+        monthly: 189.99,
+        annual: 1595.92,
+      },
+      duo: {
+        monthly: 95.00, // $189.99 ÷ 2
+        annual: 797.96, // $1595.92 ÷ 2
+      },
+      trio: {
+        monthly: 63.33, // $189.99 ÷ 3 (rounded)
+        annual: 531.97, // $1595.92 ÷ 3 (rounded)
+      },
+    },
+    groupActivation: {
+      signupWindow: 48, // hours
+      minMembers: 1,
+      maxMembers: 3,
+    },
     features: {
       manualEntry: true,
       screenshotUpload: true,
@@ -123,7 +146,17 @@ export const TIER_CONFIG = {
         'csv_export',
         'group_analytics',
         'shared_insights',
+        'aggregate_performance',
+        'group_leaderboard',
+        'collaborative_tools',
       ],
     },
   },
+};
+
+// Legacy price field for backward compatibility
+export const LEGACY_TIER_CONFIG = {
+  insight: { ...TIER_CONFIG.insight, price: TIER_CONFIG.insight.monthlyPrice },
+  analyst: { ...TIER_CONFIG.analyst, price: TIER_CONFIG.analyst.monthlyPrice },
+  edge_collective: { ...TIER_CONFIG.edge_collective, price: TIER_CONFIG.edge_collective.monthlyPrice },
 };

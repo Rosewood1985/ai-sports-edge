@@ -3,22 +3,25 @@ import { functions } from '../config/firebase';
 import { analyticsService } from './analyticsService';
 import { AnalyticsEventType } from './analyticsService';
 
-// Stripe price mappings - these should match your actual Stripe price IDs
+// Stripe price mappings - CONSOLIDATED SYSTEM #1 (Sportsbook Config)
 const STRIPE_PRICES = {
-  insight_monthly: 'price_ABC123',
-  insight_annual: 'price_DEF456',
-  analyst_monthly: 'price_XYZ123',
-  analyst_annual: 'price_XYZ456',
-  edge_collective_monthly: 'price_EDGE123',
-  edge_collective_annual: 'price_EDGE456',
-  edge_collective_bf: 'price_EDGEBF123',
-  // AI Sports Edge specific plans
-  basic_monthly: 'price_basic_monthly',
-  premium_monthly: 'price_premium_monthly',
-  premium_yearly: 'price_premium_yearly',
-  group_pro_monthly: 'price_group_pro_monthly',
-  weekend_pass: 'price_weekend_pass',
-  game_day_pass: 'price_game_day_pass'
+  // Main subscription tiers - UPDATED PRICING
+  insight_monthly: 'price_insight_monthly_1999',
+  insight_annual: 'price_insight_annual_16792',
+  analyst_monthly: 'price_analyst_monthly_7499', 
+  analyst_annual: 'price_analyst_annual_62992',
+  edge_collective_monthly_solo: 'price_edge_solo_monthly_18999',
+  edge_collective_annual_solo: 'price_edge_solo_annual_159592',
+  
+  // Edge Collective split payment options - UPDATED PRICING
+  edge_collective_monthly_duo: 'price_edge_duo_monthly_9500',
+  edge_collective_annual_duo: 'price_edge_duo_annual_79796',
+  edge_collective_monthly_trio: 'price_edge_trio_monthly_6333',
+  edge_collective_annual_trio: 'price_edge_trio_annual_53197',
+  
+  // One-time purchases
+  weekend_pass: 'price_weekend_pass_499',
+  game_day_pass: 'price_game_day_pass_299'
 };
 
 // Educational discount promo code
@@ -131,13 +134,12 @@ export function getPlanDisplayName(planKey: keyof typeof STRIPE_PRICES): string 
     insight_annual: 'Insight Annual',
     analyst_monthly: 'Analyst Monthly', 
     analyst_annual: 'Analyst Annual',
-    edge_collective_monthly: 'Edge Collective Monthly',
-    edge_collective_annual: 'Edge Collective Annual',
-    edge_collective_bf: 'Edge Collective Black Friday',
-    basic_monthly: 'Basic Monthly',
-    premium_monthly: 'Premium Monthly',
-    premium_yearly: 'Premium Yearly',
-    group_pro_monthly: 'Group Pro Monthly',
+    edge_collective_monthly_solo: 'Edge Collective Monthly (Solo)',
+    edge_collective_annual_solo: 'Edge Collective Annual (Solo)',
+    edge_collective_monthly_duo: 'Edge Collective Monthly (2 Users)',
+    edge_collective_annual_duo: 'Edge Collective Annual (2 Users)',
+    edge_collective_monthly_trio: 'Edge Collective Monthly (3 Users)',
+    edge_collective_annual_trio: 'Edge Collective Annual (3 Users)',
     weekend_pass: 'Weekend Pass',
     game_day_pass: 'Game Day Pass'
   };
@@ -149,14 +151,18 @@ export function getPlanDisplayName(planKey: keyof typeof STRIPE_PRICES): string 
  * Helper function to check if a plan is eligible for educational discount
  */
 export function isPlanEduEligible(planKey: keyof typeof STRIPE_PRICES): boolean {
-  // Define which plans are eligible for educational discounts
+  // Define which plans are eligible for educational discounts (all main tiers)
   const eduEligiblePlans: (keyof typeof STRIPE_PRICES)[] = [
     'insight_monthly',
     'insight_annual', 
     'analyst_monthly',
     'analyst_annual',
-    'premium_monthly',
-    'premium_yearly'
+    'edge_collective_monthly_solo',
+    'edge_collective_annual_solo',
+    'edge_collective_monthly_duo',
+    'edge_collective_annual_duo',
+    'edge_collective_monthly_trio',
+    'edge_collective_annual_trio'
   ];
 
   return eduEligiblePlans.includes(planKey);
@@ -231,6 +237,5 @@ export async function startStripeCheckoutWithEduValidation({
   }
 }
 
-// Export types and constants for external use
-export type { StartCheckoutParams, CheckoutResponse };
+// Export constants for external use
 export { STRIPE_PRICES, EDU_PROMO_CODE_ID };

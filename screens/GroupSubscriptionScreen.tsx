@@ -451,8 +451,8 @@ const GroupSubscriptionScreen: React.FC = () => {
   const renderInfoStep = () => (
     <ScrollView style={styles.scrollContent}>
       <View style={styles.section}>
-        <ThemedText style={styles.title}>Group Pro Subscription</ThemedText>
-        <ThemedText style={styles.subtitle}>$149.99/month for up to 3 users</ThemedText>
+        <ThemedText style={styles.title}>Edge Collective</ThemedText>
+        <ThemedText style={styles.subtitle}>$189.99/month for up to 3 users</ThemedText>
         
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
@@ -537,7 +537,7 @@ const GroupSubscriptionScreen: React.FC = () => {
         </TouchableOpacity>
         
         <ThemedText style={styles.disclaimer}>
-          By continuing, you agree to be charged $149.99/month for your group subscription.
+          By continuing, you agree to be charged $189.99/month for your group subscription.
           You can cancel anytime from the subscription management screen.
         </ThemedText>
       </View>
@@ -554,8 +554,8 @@ const GroupSubscriptionScreen: React.FC = () => {
           <ThemedText style={styles.summaryTitle}>Order Summary</ThemedText>
           
           <View style={styles.summaryRow}>
-            <ThemedText>Group Pro Subscription</ThemedText>
-            <ThemedText>$149.99/month</ThemedText>
+            <ThemedText>Edge Collective</ThemedText>
+            <ThemedText>$189.99/month</ThemedText>
           </View>
           
           <View style={styles.summaryRow}>
@@ -567,7 +567,7 @@ const GroupSubscriptionScreen: React.FC = () => {
           
           <View style={styles.summaryRow}>
             <ThemedText style={styles.totalLabel}>Total</ThemedText>
-            <ThemedText style={styles.totalAmount}>$149.99/month</ThemedText>
+            <ThemedText style={styles.totalAmount}>$189.99/month</ThemedText>
           </View>
         </View>
         
@@ -624,7 +624,7 @@ const GroupSubscriptionScreen: React.FC = () => {
             
             <View style={styles.statusRow}>
               <ThemedText style={styles.statusLabel}>Price:</ThemedText>
-              <ThemedText>$149.99/month</ThemedText>
+              <ThemedText>$189.99/month</ThemedText>
             </View>
           </View>
           

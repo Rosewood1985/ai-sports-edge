@@ -45,7 +45,8 @@
       "Bash(./test-sentry-crons.sh:*)",
       "Bash(npm test:*)",
       "Bash(diff:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }
