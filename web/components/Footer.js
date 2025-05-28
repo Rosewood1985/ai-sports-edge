@@ -51,9 +51,9 @@ const Footer = () => {
             <h3 className="footer-title">Quick Links</h3>
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/features">Features</Link></li>
-              <li><Link to="/pricing">Pricing</Link></li>
-              <li><Link to="/about">About</Link></li>
+              <li><a href="/faq.html">FAQ</a></li>
+              <li><a href="/knowledge-edge.html">Knowledge Edge</a></li>
+              <li><a href="/ml-sports-edge.html">ML Sports Edge</a></li>
               <li><Link to="/download">Download</Link></li>
             </ul>
           </div>

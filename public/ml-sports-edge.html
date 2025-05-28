@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ML Sports Edge - Advanced AI-powered sports betting predictions using machine learning algorithms. Real-time analysis of NBA, NFL, MLB, and soccer leagues with value bets and model performance tracking.">
+    <meta name="keywords" content="AI sports predictions, machine learning betting, sports analytics, value betting AI, NBA predictions, NFL predictions, MLB predictions, soccer predictions, betting algorithms">
+    <meta name="author" content="AI Sports Edge">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ML Sports Edge - AI Sports Edge | Machine Learning Predictions">
+    <meta property="og:description" content="Advanced AI-powered sports betting predictions using machine learning. Real-time analysis across NBA, NFL, MLB, and soccer with value betting opportunities.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://aisportsedge.app/ml-sports-edge.html">
+    <meta property="og:image" content="https://aisportsedge.app/assets/images/ml-sports-edge-og-image.jpg">
+    <meta property="og:site_name" content="AI Sports Edge">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ML Sports Edge - AI Sports Edge | Machine Learning Predictions">
+    <meta name="twitter:description" content="Advanced AI-powered sports betting predictions using machine learning algorithms across multiple sports leagues.">
+    <meta name="twitter:image" content="https://aisportsedge.app/assets/images/ml-sports-edge-twitter-card.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://aisportsedge.app/ml-sports-edge.html">
+    
+    <!-- Structured Data - Software Application Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "ML Sports Edge",
+      "description": "Advanced machine learning platform for sports betting predictions and analysis",
+      "url": "https://aisportsedge.app/ml-sports-edge.html",
+      "applicationCategory": "Sports Analytics",
+      "operatingSystem": "Web Browser",
+      "provider": {
+        "@type": "Organization",
+        "name": "AI Sports Edge",
+        "url": "https://aisportsedge.app",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://aisportsedge.app/ai_logo_new.svg"
+        }
+      },
+      "featureList": [
+        "Real-time sports predictions",
+        "Machine learning algorithms",
+        "Value bet identification",
+        "Model performance tracking",
+        "Multi-sport analysis",
+        "ESPN and Bet365 data integration"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+    
+    <title>ML Sports Edge - AI Sports Edge | Machine Learning Predictions</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .ml-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .ml-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ml-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .ml-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #00BFFF, #39FF14, #FF00FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        }
+        
+        .ml-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            color: #ccc;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .breadcrumb a {
+            color: #00BFFF;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .selectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+        
+        .selector-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .selector-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .custom-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-select:focus {
+            outline: none;
+            border-color: #00BFFF;
+            box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+        }
+        
+        .custom-select option {
+            background: #1a1a2e;
+            color: white;
+        }
+        
+        .run-button {
+            background: linear-gradient(135deg, #00BFFF, #0066CC);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .run-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 191, 255, 0.3);
+        }
+        
+        .run-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .run-button.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            color: #39FF14;
+        }
+        
+        .status-error {
+            background: rgba(255, 57, 57, 0.1);
+            border: 1px solid rgba(255, 57, 57, 0.3);
+            color: #FF3939;
+        }
+        
+        .status-loading {
+            background: rgba(0, 191, 255, 0.1);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            color: #00BFFF;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00BFFF, #39FF14, #FF00FF, #00FFFF);
+            background-size: 400% 100%;
+            animation: neonFlow 3s linear infinite;
+        }
+        
+        @keyframes neonFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 400% 0%; }
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+        }
+        
+        .value-bets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .value-bet-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #39FF14;
+        }
+        
+        .bet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .bet-title {
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .bet-value {
+            background: linear-gradient(135deg, #39FF14, #00FF7F);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .bet-details {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .predictions-table {
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: #ccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+        }
+        
+        .table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .confidence-high {
+            color: #39FF14;
+            font-weight: 600;
+        }
+        
+        .confidence-medium {
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .confidence-low {
+            color: #FF6B6B;
+            font-weight: 600;
+        }
+        
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #00BFFF, #39FF14);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #ccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .ml-title {
+                font-size: 2.5rem;
+            }
+            
+            .ml-container {
+                padding: 10px;
+            }
+            
+            .selectors {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ml-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="/">Home</a> > <span>ML Sports Edge</span>
+        </nav>
+        
+        <!-- Header -->
+        <div class="ml-header">
+            <h1 class="ml-title">ML Sports Edge</h1>
+            <p class="ml-subtitle">Powered by ESPN and Bet365 data • Advanced Machine Learning Predictions</p>
+        </div>
+        
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="selectors">
+                <div class="selector-group">
+                    <label class="selector-label">Sport</label>
+                    <select class="custom-select" id="sportSelect">
+                        <option value="basketball">🏀 Basketball</option>
+                        <option value="football">🏈 Football</option>
+                        <option value="baseball">⚾ Baseball</option>
+                        <option value="soccer">⚽ Soccer</option>
+                    </select>
+                </div>
+                
+                <div class="selector-group">
+                    <label class="selector-label">League</label>
+                    <select class="custom-select" id="leagueSelect">
+                        <option value="nba">NBA</option>
+                    </select>
+                </div>
+                
+                <button class="run-button" id="runButton" onclick="runMLPipeline()">
+                    <span id="buttonText">Run ML Pipeline</span>
+                </button>
+            </div>
+            
+            <div id="statusMessage" class="status-message" style="display: none;"></div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Value Bets Card -->
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <span class="card-icon">💎</span>
+                    Value Bets
+                </h2>
+                <div id="valueBetsList" class="value-bets-list">
+                    <div class="no-data">Run the ML pipeline to discover value betting opportunities</div>
+                </div>
+            </div>
+            
+            <!-- Model Performance -->
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <span class="card-icon">📊</span>
+                    Model Performance
+                </h2>
+                <div id="performanceMetrics" class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">ROI</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">Hit Rate</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">Sharp %</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Predictions Table -->
+        <div class="dashboard-card">
+            <h2 class="card-title">
+                <span class="card-icon">🎯</span>
+                AI Predictions
+            </h2>
+            <div id="predictionsTable" class="predictions-table">
+                <div class="no-data">No predictions available. Select a sport and league, then run the ML pipeline.</div>
+            </div>
+        </div>
+        
+        <!-- Live Model Status -->
+        <div class="dashboard-card">
+            <h2 class="card-title">
+                <span class="card-icon">🤖</span>
+                Live Model Status
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="background: rgba(57, 255, 20, 0.1); padding: 20px; border-radius: 10px; border: 1px solid rgba(57, 255, 20, 0.3);">
+                    <div style="color: #39FF14; font-weight: 600; margin-bottom: 5px;">🟢 Data Pipeline</div>
+                    <div style="color: #ccc; font-size: 0.9rem;">Real-time updates active</div>
+                </div>
+                <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px; border: 1px solid rgba(255, 215, 0, 0.3);">
+                    <div style="color: #FFD700; font-weight: 600; margin-bottom: 5px;">🟡 Model Training</div>
+                    <div style="color: #ccc; font-size: 0.9rem;">Last updated: 2 hours ago</div>
+                </div>
+                <div style="background: rgba(0, 191, 255, 0.1); padding: 20px; border-radius: 10px; border: 1px solid rgba(0, 191, 255, 0.3);">
+                    <div style="color: #00BFFF; font-weight: 600; margin-bottom: 5px;">🔵 API Status</div>
+                    <div style="color: #ccc; font-size: 0.9rem;">ESPN & Bet365 connected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const leagues = {
+            basketball: [
+                { label: 'NBA', value: 'nba' }
+            ],
+            football: [
+                { label: 'NFL', value: 'nfl' }
+            ],
+            baseball: [
+                { label: 'MLB', value: 'mlb' }
+            ],
+            soccer: [
+                { label: 'English Premier League', value: 'epl' },
+                { label: 'La Liga', value: 'laliga' },
+                { label: 'Bundesliga', value: 'bundesliga' },
+                { label: 'Serie A', value: 'seriea' },
+                { label: 'Ligue 1', value: 'ligue1' },
+                { label: 'MLS', value: 'mls' }
+            ]
+        };
+        
+        // Update league options when sport changes
+        document.getElementById('sportSelect').addEventListener('change', function() {
+            const sport = this.value;
+            const leagueSelect = document.getElementById('leagueSelect');
+            
+            leagueSelect.innerHTML = '';
+            leagues[sport].forEach(league => {
+                const option = document.createElement('option');
+                option.value = league.value;
+                option.textContent = league.label;
+                leagueSelect.appendChild(option);
+            });
+        });
+        
+        async function runMLPipeline() {
+            const sport = document.getElementById('sportSelect').value;
+            const league = document.getElementById('leagueSelect').value;
+            const button = document.getElementById('runButton');
+            const buttonText = document.getElementById('buttonText');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            // Show loading state
+            button.disabled = true;
+            button.classList.add('loading');
+            buttonText.textContent = 'Running...';
+            
+            showStatus('Running ML pipeline...', 'loading');
+            
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Show success
+                showStatus('ML pipeline completed successfully!', 'success');
+                
+                // Update the dashboard with mock data
+                updateValueBets();
+                updatePerformanceMetrics();
+                updatePredictionsTable();
+                
+            } catch (error) {
+                showStatus('Error running ML pipeline. Please try again.', 'error');
+                console.error(error);
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                button.classList.remove('loading');
+                buttonText.textContent = 'Run ML Pipeline';
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        function updateValueBets() {
+            const valueBetsList = document.getElementById('valueBetsList');
+            const mockBets = [
+                {
+                    title: 'Lakers vs Warriors',
+                    type: 'Over 225.5 Points',
+                    value: '+12.3%',
+                    odds: '-110',
+                    confidence: 'High'
+                },
+                {
+                    title: 'Celtics vs Heat',
+                    type: 'Celtics -4.5',
+                    value: '+8.7%',
+                    odds: '-105',
+                    confidence: 'Medium'
+                },
+                {
+                    title: 'Nuggets vs Suns',
+                    type: 'Under 218.5 Points',
+                    value: '+6.2%',
+                    odds: '-115',
+                    confidence: 'Medium'
+                }
+            ];
+            
+            valueBetsList.innerHTML = mockBets.map(bet => `
+                <div class="value-bet-item">
+                    <div class="bet-info">
+                        <span class="bet-title">${bet.title}</span>
+                        <span class="bet-value">${bet.value} EV</span>
+                    </div>
+                    <div class="bet-details">
+                        ${bet.type} (${bet.odds}) • Confidence: ${bet.confidence}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updatePerformanceMetrics() {
+            const metrics = [
+                { value: '73.2%', label: 'Accuracy' },
+                { value: '+15.8%', label: 'ROI' },
+                { value: '68.4%', label: 'Hit Rate' },
+                { value: '24.7%', label: 'Sharp %' }
+            ];
+            
+            const performanceMetrics = document.getElementById('performanceMetrics');
+            performanceMetrics.innerHTML = metrics.map(metric => `
+                <div class="metric">
+                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-label">${metric.label}</div>
+                </div>
+            `).join('');
+        }
+        
+        function updatePredictionsTable() {
+            const mockPredictions = [
+                {
+                    game: 'Lakers @ Warriors',
+                    prediction: 'Over 225.5',
+                    probability: '67.8%',
+                    confidence: 'High',
+                    expectedValue: '+12.3%'
+                },
+                {
+                    game: 'Celtics @ Heat',
+                    prediction: 'Celtics -4.5',
+                    probability: '63.2%',
+                    confidence: 'Medium',
+                    expectedValue: '+8.7%'
+                },
+                {
+                    game: 'Nuggets @ Suns',
+                    prediction: 'Under 218.5',
+                    probability: '59.4%',
+                    confidence: 'Medium',
+                    expectedValue: '+6.2%'
+                }
+            ];
+            
+            const predictionsTable = document.getElementById('predictionsTable');
+            predictionsTable.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Game</th>
+                            <th>Prediction</th>
+                            <th>Probability</th>
+                            <th>Confidence</th>
+                            <th>Expected Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${mockPredictions.map(pred => `
+                            <tr>
+                                <td>${pred.game}</td>
+                                <td>${pred.prediction}</td>
+                                <td>${pred.probability}</td>
+                                <td class="confidence-${pred.confidence.toLowerCase()}">${pred.confidence}</td>
+                                <td style="color: #39FF14; font-weight: 600;">${pred.expectedValue}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    </script>
+</body>
+</html>

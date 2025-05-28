@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Knowledge Edge - Comprehensive sports betting guides, strategies, and educational resources. Learn advanced betting concepts, AI-powered insights, and expert strategies for profitable sports betting.">
+    <meta name="keywords" content="sports betting guide, betting strategies, AI sports analysis, betting education, value betting, sharp money, Kelly criterion, sports betting glossary, betting tips">
+    <meta name="author" content="AI Sports Edge">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Knowledge Edge - AI Sports Edge | Sports Betting Guides & Strategies">
+    <meta property="og:description" content="Master sports betting with our comprehensive guides, strategies, and AI-powered insights. Learn from experts and improve your betting edge.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://aisportsedge.app/knowledge-edge.html">
+    <meta property="og:image" content="https://aisportsedge.app/assets/images/knowledge-edge-og-image.jpg">
+    <meta property="og:site_name" content="AI Sports Edge">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Knowledge Edge - AI Sports Edge | Sports Betting Education">
+    <meta name="twitter:description" content="Master sports betting with comprehensive guides, strategies, and AI-powered insights. Educational resources for all skill levels.">
+    <meta name="twitter:image" content="https://aisportsedge.app/assets/images/knowledge-edge-twitter-card.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://aisportsedge.app/knowledge-edge.html">
+    
+    <!-- Structured Data - Educational Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "AI Sports Edge Knowledge Center",
+      "description": "Comprehensive sports betting education and strategy resources powered by AI",
+      "url": "https://aisportsedge.app/knowledge-edge.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "AI Sports Edge",
+        "url": "https://aisportsedge.app",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://aisportsedge.app/ai_logo_new.svg"
+        }
+      },
+      "educationalLevel": ["Beginner", "Intermediate", "Advanced"],
+      "teaches": [
+        "Sports Betting Strategies",
+        "Value Betting Concepts",
+        "AI-Powered Sports Analysis",
+        "Bankroll Management",
+        "Market Analysis"
+      ],
+      "hasCourse": [
+        {
+          "@type": "Course",
+          "name": "Cognitive Biases in Sports Betting",
+          "description": "Learn to identify and overcome psychological traps that affect betting decisions",
+          "provider": {
+            "@type": "Organization",
+            "name": "AI Sports Edge"
+          }
+        },
+        {
+          "@type": "Course",
+          "name": "Advanced Line Movement Analysis",
+          "description": "Master the art of reading market movements and identifying sharp money",
+          "provider": {
+            "@type": "Organization",
+            "name": "AI Sports Edge"
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <title>Knowledge Edge - AI Sports Edge | Sports Betting Guides & Strategies</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .knowledge-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .knowledge-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .knowledge-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        .knowledge-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .knowledge-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .search-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 4px 20px rgba(52, 152, 219, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .categories-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            padding: 12px 24px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+        
+        .neon-border {
+            position: relative;
+            padding: 30px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+        
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: linear-gradient(45deg, #00BFFF, #39FF14, #FF00FF, #00FFFF);
+            background-size: 400% 400%;
+            animation: neonPulse 3s ease-in-out infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: subtract;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: subtract;
+        }
+        
+        @keyframes neonPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .featured-guides {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .guide-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .guide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .guide-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .guide-content {
+            padding: 25px;
+        }
+        
+        .guide-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .guide-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .guide-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .read-time {
+            background: #f8f9fa;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .trending-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .glossary-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .glossary-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .glossary-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .glossary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .glossary-term {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .glossary-definition {
+            color: #666;
+            line-height: 1.6;
+            display: none;
+        }
+        
+        .glossary-definition.expanded {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .expand-icon {
+            color: #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .strategy-articles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .strategy-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+        
+        .strategy-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+        }
+        
+        .strategy-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .strategy-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .level-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .level-beginner {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .level-intermediate {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .level-advanced {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .knowledge-title {
+                font-size: 2rem;
+            }
+            
+            .knowledge-container {
+                padding: 10px;
+            }
+            
+            .categories-nav {
+                justify-content: flex-start;
+            }
+            
+            .featured-guides,
+            .strategy-articles {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="knowledge-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="/">Home</a> > <span>Knowledge Edge</span>
+        </nav>
+        
+        <!-- Header -->
+        <div class="knowledge-header">
+            <h1 class="knowledge-title">Knowledge Edge</h1>
+            <p class="knowledge-subtitle">Master sports betting with AI-powered insights and expert strategies</p>
+        </div>
+        
+        <!-- Search -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search guides, strategies, and concepts..." id="searchInput">
+            <span class="search-icon">🔍</span>
+        </div>
+        
+        <!-- Categories Navigation -->
+        <nav class="categories-nav">
+            <a href="#" class="category-btn active" data-category="all">All (47)</a>
+            <a href="#" class="category-btn" data-category="guides">Guides (12)</a>
+            <a href="#" class="category-btn" data-category="strategies">Strategies (8)</a>
+            <a href="#" class="category-btn" data-category="glossary">Glossary (28)</a>
+            <a href="#" class="category-btn" data-category="faq">FAQ (15)</a>
+        </nav>
+        
+        <!-- Featured Guides -->
+        <section class="section">
+            <div class="neon-border">
+                <h2 class="section-title">Featured Guides</h2>
+                <div class="featured-guides">
+                    <div class="guide-card">
+                        <div class="guide-image">🧠</div>
+                        <div class="guide-content">
+                            <h3 class="guide-title">Cognitive Biases in Sports Betting</h3>
+                            <p class="guide-description">Learn to identify and overcome psychological traps that affect betting decisions. Master the mental game of sports betting.</p>
+                            <div class="guide-meta">
+                                <span class="read-time">12 min read</span>
+                                <span class="trending-badge">Trending</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="guide-card">
+                        <div class="guide-image">⚡</div>
+                        <div class="guide-content">
+                            <h3 class="guide-title">Live Betting Strategies</h3>
+                            <p class="guide-description">Advanced techniques for in-game betting. Learn to read game flow and capitalize on shifting momentum.</p>
+                            <div class="guide-meta">
+                                <span class="read-time">15 min read</span>
+                                <span style="background: #3498db; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem;">Strategies</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Glossary -->
+        <section class="section">
+            <div class="neon-border">
+                <h2 class="section-title">Betting Glossary</h2>
+                <div class="glossary-container">
+                    <div class="glossary-item" onclick="toggleGlossary(this)">
+                        <div class="glossary-term">
+                            Expected Value (EV)
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        <div class="glossary-definition expanded">
+                            The theoretical average outcome of a bet if it were made repeatedly. Positive EV bets are profitable long-term, while negative EV bets lose money over time. Our AI calculates EV for every recommendation.
+                        </div>
+                    </div>
+                    
+                    <div class="glossary-item" onclick="toggleGlossary(this)">
+                        <div class="glossary-term">
+                            Sharp Money
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        <div class="glossary-definition">
+                            Wagers placed by professional or highly skilled bettors who consistently beat the market. Sharp money often causes line movements and indicates where the smart money is going.
+                        </div>
+                    </div>
+                    
+                    <div class="glossary-item" onclick="toggleGlossary(this)">
+                        <div class="glossary-term">
+                            Kelly Criterion
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        <div class="glossary-definition">
+                            Mathematical formula for determining optimal bet sizing based on your edge and bankroll. Helps maximize long-term growth while minimizing risk of ruin.
+                        </div>
+                    </div>
+                    
+                    <div class="glossary-item" onclick="toggleGlossary(this)">
+                        <div class="glossary-term">
+                            Closing Line Value (CLV)
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        <div class="glossary-definition">
+                            Measure of how good your betting line was compared to the final closing line. Consistently beating closing lines indicates sharp betting ability.
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="#" style="color: #3498db; text-decoration: none; font-weight: 600;">View Full Glossary →</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Strategy Articles -->
+        <section class="section">
+            <div class="neon-border">
+                <h2 class="section-title">Strategy Articles</h2>
+                <div class="strategy-articles">
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">Value Betting Fundamentals</h3>
+                        <p class="strategy-description">Master the core concept of finding bets with positive expected value. Learn to identify when odds don't reflect true probability.</p>
+                        <span class="level-badge level-beginner">Beginner</span>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">Market Inefficiencies</h3>
+                        <p class="strategy-description">Discover how to exploit temporary market imbalances and capitalize on sportsbook pricing errors.</p>
+                        <span class="level-badge level-intermediate">Intermediate</span>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">Advanced Correlation Analysis</h3>
+                        <p class="strategy-description">Deep dive into complex betting relationships and multi-dimensional market analysis techniques.</p>
+                        <span class="level-badge level-advanced">Advanced</span>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">Bankroll Management Systems</h3>
+                        <p class="strategy-description">Protect and grow your betting capital with proven money management strategies and risk controls.</p>
+                        <span class="level-badge level-beginner">Beginner</span>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">Line Movement Analysis</h3>
+                        <p class="strategy-description">Read between the lines to understand market sentiment and identify sharp money movements.</p>
+                        <span class="level-badge level-intermediate">Intermediate</span>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">AI Model Integration</h3>
+                        <p class="strategy-description">Learn how to effectively use AI predictions and combine them with your own analysis for maximum edge.</p>
+                        <span class="level-badge level-advanced">Advanced</span>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button style="background: #3498db; color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: 600;">Load More Articles</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Learning Path -->
+        <section class="section">
+            <div class="neon-border">
+                <h2 class="section-title">Your Learning Path</h2>
+                <div style="background: linear-gradient(135deg, #74b9ff, #0984e3); color: white; padding: 30px; border-radius: 12px; text-align: center;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 1.5rem;">Advanced Line Movement Analysis</h3>
+                    <p style="margin: 0 0 20px 0; opacity: 0.9;">Intermediate Level • Progress: 7/12 modules</p>
+                    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 4px; margin: 0 0 20px 0;">
+                        <div style="background: white; height: 100%; width: 58.3%; border-radius: 4px;"></div>
+                    </div>
+                    <button style="background: white; color: #0984e3; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: 600;">Continue Learning</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- FAQ Preview -->
+        <section class="section">
+            <div class="neon-border">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="glossary-container">
+                    <div class="glossary-item">
+                        <div class="glossary-term">
+                            How do AI probabilities work?
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glossary-item">
+                        <div class="glossary-term">
+                            What's the difference between sharp and public money?
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glossary-item">
+                        <div class="glossary-term">
+                            How often are ML models updated?
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="faq.html" style="color: #3498db; text-decoration: none; font-weight: 600;">View All FAQs →</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI Assistant CTA -->
+        <section class="section">
+            <div style="background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: white; padding: 40px; border-radius: 16px; text-align: center;">
+                <h3 style="font-size: 1.8rem; margin: 0 0 15px 0;">🤖 Edge Assistant</h3>
+                <p style="font-size: 1.1rem; margin: 0 0 25px 0; opacity: 0.9;">Get personalized betting insights and strategy recommendations from our AI assistant</p>
+                <button style="background: white; color: #6c5ce7; border: none; padding: 15px 30px; border-radius: 25px; cursor: pointer; font-weight: 600; font-size: 1rem;">Chat Now</button>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        function toggleGlossary(item) {
+            const definition = item.querySelector('.glossary-definition');
+            const icon = item.querySelector('.expand-icon');
+            
+            if (definition.classList.contains('expanded')) {
+                definition.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                // Close all other definitions
+                document.querySelectorAll('.glossary-definition.expanded').forEach(el => {
+                    el.classList.remove('expanded');
+                });
+                document.querySelectorAll('.expand-icon.expanded').forEach(el => {
+                    el.classList.remove('expanded');
+                });
+                
+                // Open this definition
+                definition.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        // Category filtering
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Update active state
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter content (simplified for demo)
+                const category = this.dataset.category;
+                console.log('Filtering by category:', category);
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Implement search functionality here
+            console.log('Searching for:', searchTerm);
+        });
+    </script>
+</body>
+</html>
