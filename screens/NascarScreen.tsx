@@ -12,7 +12,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { Container } from '../components/ResponsiveLayout';
+import { Container } from '../atomic/molecules/layout/ResponsiveLayout';
 import { ThemedText } from '../atomic/atoms/ThemedText';
 import { LoadingIndicator, ErrorMessage } from '../atomic/atoms';
 import { EmptyState } from '../atomic/atoms';

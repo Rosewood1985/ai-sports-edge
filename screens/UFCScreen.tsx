@@ -9,7 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import { Container, Grid } from '../components/ResponsiveLayout';
+import { Container, Grid } from '../atomic/molecules/layout/ResponsiveLayout';
 import { DeviceType, getDeviceType, responsiveSpacing } from '../utils/responsiveUtils';
 import { useResponsiveStyles } from '../hooks/useResponsiveStyles';
 import { Ionicons } from '@expo/vector-icons';

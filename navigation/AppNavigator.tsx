@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { View, Text, ActivityIndicator, Button } from 'react-native';
 import { useNavigationState } from '../contexts/NavigationStateContext';
-import ThemeToggle from '../components/ThemeToggle';
+import ThemeToggle from '../atomic/molecules/theme/ThemeToggle';
 
 // Import screens
 import HomeScreen from '../screens/HomeScreen';

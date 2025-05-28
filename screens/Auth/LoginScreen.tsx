@@ -10,7 +10,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import { useNavigation } from "@react-navigation/native";
 import { useUITheme } from "../../components/UIThemeProvider";
-import ThemeToggle from "../../components/ThemeToggle";
+import ThemeToggle from '../../atomic/molecules/theme/ThemeToggle';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState("");

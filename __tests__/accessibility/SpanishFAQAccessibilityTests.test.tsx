@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 import FAQScreen from '../../screens/FAQScreen';
-import QuestionSubmissionForm from '../../components/QuestionSubmissionForm';
+import QuestionSubmissionForm from '../../atomic/molecules/forms/QuestionSubmissionForm';
 import { I18nProvider } from '../../../atomic/organisms/i18n/I18nContext';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 

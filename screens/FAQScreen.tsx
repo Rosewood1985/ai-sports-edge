@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation, ParamListBase, NavigationProp } from '@react-navigation/native';
-import QuestionSubmissionForm from '../components/QuestionSubmissionForm';
+import QuestionSubmissionForm from '../atomic/molecules/forms/QuestionSubmissionForm';
 import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 import { Timestamp } from 'firebase/firestore';
 import { useLanguage } from '../contexts/LanguageContext';

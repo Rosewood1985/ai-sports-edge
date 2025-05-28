@@ -9,7 +9,7 @@ import {
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import { useNavigation } from "@react-navigation/native";
-import ThemeToggle from "../../components/ThemeToggle";
+import ThemeToggle from '../../atomic/molecules/theme/ThemeToggle';
 
 const ForgotPasswordScreen: React.FC = () => {
   const [email, setEmail] = useState("");

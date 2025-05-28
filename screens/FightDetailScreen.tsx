@@ -13,7 +13,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
 import { ufcService } from '../services/ufcService';
 import { UFCFight, RoundBettingOption, FightStatus } from '../types/ufc';
-import { Container } from '../components/ResponsiveLayout';
+import { Container } from '../atomic/molecules/layout/ResponsiveLayout';
 import {  ThemedText  } from '../atomic/atoms/ThemedText';
 import RoundBettingCard from '../components/RoundBettingCard';
 import LoadingIndicator from '../components/LoadingIndicator';

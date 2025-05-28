@@ -23,9 +23,11 @@ const useFeaturedGames = () => {
     const fetchFeaturedGames = async () => {
       try {
         // Use real sports API to get today's featured games from Firebase function
-        const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+        const response = await fetch(
+          'https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames'
+        );
         const data = await response.json();
-        
+
         if (data.success) {
           setGames(data.games);
         } else {
@@ -41,7 +43,7 @@ const useFeaturedGames = () => {
     };
 
     fetchFeaturedGames();
-    
+
     // Refresh every 30 seconds for live games
     const interval = setInterval(fetchFeaturedGames, 30000);
     return () => clearInterval(interval);
@@ -59,9 +61,11 @@ const useTrendingTopics = () => {
     const fetchTrendingTopics = async () => {
       try {
         // Use real sports news API to get trending topics from Firebase function
-        const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/trendingTopics');
+        const response = await fetch(
+          'https://us-central1-ai-sports-edge.cloudfunctions.net/trendingTopics'
+        );
         const data = await response.json();
-        
+
         if (data.success) {
           setTopics(data.topics);
         } else {
@@ -77,7 +81,7 @@ const useTrendingTopics = () => {
     };
 
     fetchTrendingTopics();
-    
+
     // Refresh every 5 minutes for trending topics
     const interval = setInterval(fetchTrendingTopics, 300000);
     return () => clearInterval(interval);
@@ -90,11 +94,11 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme(); // Use theme colors provided by NavigationContainer
   const { t } = useLanguage();
-  
+
   // Use dynamic hooks for real API data
   const { games: featuredGames, loading: gamesLoading } = useFeaturedGames();
   const { topics: trendingTopics, loading: topicsLoading } = useTrendingTopics();
-  
+
   const loading = gamesLoading || topicsLoading;
 
   // Format date (remains the same)

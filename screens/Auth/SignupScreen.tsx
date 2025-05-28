@@ -15,7 +15,7 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, OA
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useI18n } from "../../../atomic/organisms/i18n/I18nContext";
 import { getAuth } from "firebase/auth";
-import ThemeToggle from "../../components/ThemeToggle";
+import ThemeToggle from '../../atomic/molecules/theme/ThemeToggle';
 import { useTheme } from "../../screens/Onboarding/Context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 

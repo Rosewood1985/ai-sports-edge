@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import MobileAppDownload from '../components/MobileAppDownload';
 import { appDownloadService } from '../services/appDownloadService';
 import { useI18n } from '../contexts/I18nContext';
-import ThemeToggle from '../components/ThemeToggle';
+import ThemeToggle from '../atomic/molecules/theme/ThemeToggle';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
