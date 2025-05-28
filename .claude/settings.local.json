@@ -49,7 +49,10 @@
       "Bash(python3:*)",
       "Bash(git push:*)",
       "Bash(git config:*)",
-      "Bash(git symbolic-ref:*)"
+      "Bash(git symbolic-ref:*)",
+      "Bash(firebase ext:list:*)",
+      "Bash(npx firebase ext:list:*)",
+      "Bash(firebase login:*)"
     ],
     "deny": []
   }

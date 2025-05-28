@@ -28,6 +28,13 @@ const {
   createAdvancedSubscription
 } = require('./stripeAdvancedFeatures');
 
+// Import Stripe Extension integration
+const {
+  handleStripeWebhook,
+  handleSubscriptionChange,
+  onUserCreate
+} = require('./stripeExtensionIntegration');
+
 // Create a simple Stripe webhook handler
 exports.stripeWebhook = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
@@ -1185,4 +1192,9 @@ exports.securityAuditSpanish = securityAuditSpanish;
 const { auditSpanishContent } = require('./spanishContentAudit');
 exports.auditSpanishContent = auditSpanishContent;
 
-console.log("All functions loaded successfully (including Sentry V2, UFC, Stripe checkout, advanced Stripe functions, subscription analytics, sports API endpoints, ML sports integration, and Spanish content audit)");
+// Export Stripe Extension integration functions
+exports.handleStripeExtensionWebhook = handleStripeWebhook;
+exports.handleStripeSubscriptionChange = handleSubscriptionChange;
+exports.onUserCreateStripe = onUserCreate;
+
+console.log("All functions loaded successfully (including Sentry V2, UFC, Stripe checkout, advanced Stripe functions, Stripe Extension integration, subscription analytics, sports API endpoints, ML sports integration, and Spanish content audit)");
