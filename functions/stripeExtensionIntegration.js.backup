@@ -1,0 +1,301 @@
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin if not already initialized
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+const { onDocumentWritten } = require('firebase-functions/v2/firestore');
+/**
+ * Cloud Function to handle Stripe Extension webhook events
+ * This integrates with the Firestore Stripe Payments extension
+ */
+exports.handleStripeWebhook = functions.firestore
+exports.handleStripeWebhook = onDocumentWritten(
+  'customers/{userId}/payments/{paymentId}',
+  async (event) => {
+    const change = event.data;
+    const context = event;    const payment = change.after.exists ? change.after.data() : null;
+    const previousPayment = change.before.exists ? change.before.data() : null;
+    
+    console.log(`Payment update for user ${userId}, payment ${paymentId}`);
+    
+    try {
+      const db = admin.firestore();
+      const userRef = db.collection('users').doc(userId);
+      
+      if (!payment) {
+        // Payment was deleted
+        console.log(`Payment ${paymentId} was deleted for user ${userId}`);
+        return null;
+      }
+      
+      // Handle payment status changes
+      if (payment.status !== previousPayment?.status) {
+        await handlePaymentStatusChange(userRef, payment, previousPayment);
+      }
+      
+      // Update user's payment history
+      await updatePaymentHistory(userRef, payment);
+      
+      // Handle subscription changes
+      if (payment.subscription) {
+        await handleSubscriptionUpdate(userRef, payment);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error handling Stripe webhook:', error);
+      throw error;
+    }
+  });
+
+/**
+ * Handle payment status changes
+ */
+async function handlePaymentStatusChange(userRef, payment, previousPayment) {
+  const statusUpdate = {
+    lastPaymentStatus: payment.status,
+    lastPaymentUpdate: admin.firestore.FieldValue.serverTimestamp()
+  };
+  
+  // Handle specific status changes
+  switch (payment.status) {
+    case 'succeeded':
+      console.log(`Payment succeeded for user ${userRef.id}`);
+      statusUpdate.lastSuccessfulPayment = admin.firestore.FieldValue.serverTimestamp();
+      
+      // If this is a subscription payment, update subscription status
+      if (payment.subscription) {
+        statusUpdate.subscriptionStatus = 'active';
+      }
+      break;
+      
+    case 'failed':
+      console.log(`Payment failed for user ${userRef.id}`);
+      statusUpdate.lastFailedPayment = admin.firestore.FieldValue.serverTimestamp();
+      
+      // Track failed payment attempts
+      await userRef.collection('analytics').doc('payments').set({
+        failedPayments: admin.firestore.FieldValue.increment(1),
+        lastFailedPayment: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      break;
+      
+    case 'processing':
+      console.log(`Payment processing for user ${userRef.id}`);
+      break;
+      
+    case 'requires_action':
+      console.log(`Payment requires action for user ${userRef.id}`);
+      // Could trigger a notification to the user
+      break;
+  }
+  
+  await userRef.update(statusUpdate);
+}
+
+/**
+ * Update user's payment history
+ */
+async function updatePaymentHistory(userRef, payment) {
+  const historyEntry = {
+    paymentId: payment.id,
+    amount: payment.amount,
+    currency: payment.currency,
+    status: payment.status,
+    created: payment.created,
+    updated: admin.firestore.FieldValue.serverTimestamp()
+  };
+  
+  if (payment.subscription) {
+    historyEntry.subscriptionId = payment.subscription;
+    historyEntry.type = 'subscription';
+  } else {
+    historyEntry.type = 'one_time';
+  }
+  
+  await userRef.collection('paymentHistory').doc(payment.id).set(historyEntry, { merge: true });
+}
+
+/**
+ * Handle subscription updates
+ */
+async function handleSubscriptionUpdate(userRef, payment) {
+  if (payment.status === 'succeeded' && payment.subscription) {
+    // Get subscription details from the customers/{userId}/subscriptions collection
+    const subscriptionRef = userRef.collection('subscriptions').doc(payment.subscription);
+    const subscriptionDoc = await subscriptionRef.get();
+    
+    if (subscriptionDoc.exists) {
+      const subscription = subscriptionDoc.data();
+      
+      // Update user's subscription status
+      await userRef.update({
+        subscriptionStatus: subscription.status,
+        subscriptionId: payment.subscription,
+        currentPeriodStart: subscription.current_period_start,
+        currentPeriodEnd: subscription.current_period_end,
+        subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Update analytics
+      await userRef.collection('analytics').doc('subscription').set({
+        totalPayments: admin.firestore.FieldValue.increment(1),
+        totalRevenue: admin.firestore.FieldValue.increment(payment.amount / 100), // Convert cents to dollars
+        lastPayment: admin.firestore.FieldValue.serverTimestamp(),
+        planType: subscription.price?.product?.name || 'unknown'
+      }, { merge: true });
+    }
+  }
+}
+
+/**
+ * Cloud Function to handle subscription status changes
+ */
+exports.handleSubscriptionChange = functions.firestore
+  .document('customers/{userId}/subscriptions/{subscriptionId}')
+  .onWrite(async (change, context) => {
+    const { userId, subscriptionId } = context.params;
+    const subscription = change.after.exists ? change.after.data() : null;
+    const previousSubscription = change.before.exists ? change.before.data() : null;
+    
+    console.log(`Subscription update for user ${userId}, subscription ${subscriptionId}`);
+    
+    try {
+      const db = admin.firestore();
+      const userRef = db.collection('users').doc(userId);
+      
+      if (!subscription) {
+        // Subscription was deleted
+        await userRef.update({
+          subscriptionStatus: 'canceled',
+          subscriptionId: null,
+          subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        return null;
+      }
+      
+      // Handle subscription status changes
+      if (subscription.status !== previousSubscription?.status) {
+        await handleSubscriptionStatusChange(userRef, subscription, previousSubscription);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error handling subscription change:', error);
+      throw error;
+    }
+  });
+
+/**
+ * Handle subscription status changes
+ */
+async function handleSubscriptionStatusChange(userRef, subscription, previousSubscription) {
+  const statusUpdate = {
+    subscriptionStatus: subscription.status,
+    subscriptionId: subscription.id,
+    subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+  
+  // Add subscription period information
+  if (subscription.current_period_start) {
+    statusUpdate.currentPeriodStart = subscription.current_period_start;
+  }
+  
+  if (subscription.current_period_end) {
+    statusUpdate.currentPeriodEnd = subscription.current_period_end;
+  }
+  
+  // Handle specific status changes
+  switch (subscription.status) {
+    case 'active':
+      console.log(`Subscription activated for user ${userRef.id}`);
+      statusUpdate.subscriptionActivatedAt = admin.firestore.FieldValue.serverTimestamp();
+      break;
+      
+    case 'canceled':
+      console.log(`Subscription canceled for user ${userRef.id}`);
+      statusUpdate.subscriptionCanceledAt = admin.firestore.FieldValue.serverTimestamp();
+      break;
+      
+    case 'past_due':
+      console.log(`Subscription past due for user ${userRef.id}`);
+      statusUpdate.subscriptionPastDueAt = admin.firestore.FieldValue.serverTimestamp();
+      
+      // Could trigger dunning management or notifications
+      break;
+      
+    case 'unpaid':
+      console.log(`Subscription unpaid for user ${userRef.id}`);
+      statusUpdate.subscriptionUnpaidAt = admin.firestore.FieldValue.serverTimestamp();
+      break;
+      
+    case 'incomplete':
+      console.log(`Subscription incomplete for user ${userRef.id}`);
+      // Could trigger a notification to complete payment setup
+      break;
+  }
+  
+  await userRef.update(statusUpdate);
+  
+  // Update subscription analytics
+  await userRef.collection('analytics').doc('subscription').set({
+    status: subscription.status,
+    statusChangeDate: admin.firestore.FieldValue.serverTimestamp(),
+    previousStatus: previousSubscription?.status || 'none'
+  }, { merge: true });
+}
+
+/**
+ * Cloud Function to create Stripe customer when user is created
+ * This works with the Stripe Extension's automatic customer creation
+ */
+exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
+  console.log(`New user created: ${user.uid}`);
+  
+  try {
+    const db = admin.firestore();
+    
+    // Initialize user document with Stripe integration fields
+    await db.collection('users').doc(user.uid).set({
+      email: user.email,
+      displayName: user.displayName || null,
+      photoURL: user.photoURL || null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      subscriptionStatus: 'none',
+      subscriptionId: null,
+      stripeCustomerId: null, // Will be populated by Stripe Extension
+      lastPaymentStatus: null,
+      totalViewsUsed: 0,
+      maxFreeViews: 50,
+      bonusViews: 0
+    }, { merge: true });
+    
+    // Initialize analytics collections
+    await db.collection('users').doc(user.uid).collection('analytics').doc('general').set({
+      accountCreated: admin.firestore.FieldValue.serverTimestamp(),
+      loginCount: 0,
+      lastLogin: null
+    });
+    
+    await db.collection('users').doc(user.uid).collection('analytics').doc('subscription').set({
+      totalPayments: 0,
+      totalRevenue: 0,
+      status: 'none',
+      planType: 'free'
+    });
+    
+    console.log(`User document initialized for ${user.uid}`);
+    return null;
+  } catch (error) {
+    console.error('Error initializing user:', error);
+    throw error;
+  }
+});
+
+module.exports = {
+  handleStripeWebhook: exports.handleStripeWebhook,
+  handleSubscriptionChange: exports.handleSubscriptionChange,
+  onUserCreate: exports.onUserCreate
+};

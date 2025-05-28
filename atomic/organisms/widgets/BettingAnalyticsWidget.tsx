@@ -3,10 +3,22 @@
  * Complex analytics widget with comprehensive betting data display
  * Location: /atomic/organisms/widgets/BettingAnalyticsWidget.tsx
  */
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { bettingAnalyticsService, AnalyticsSummary, TimePeriodFilter, BetResult, BetType } from '../../../services/bettingAnalyticsService';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Share,
+} from 'react-native';
+
+import {
+  bettingAnalyticsService,
+  AnalyticsSummary,
+  TimePeriodFilter,
+} from '../../../services/bettingAnalyticsService';
 import { ThemedText } from '../../atoms/ThemedText';
 import { ThemedView } from '../../atoms/ThemedView';
 import { BettingAnalyticsChart } from '../../molecules/charts';
@@ -19,21 +31,23 @@ interface BettingAnalyticsWidgetProps {
 /**
  * Component that displays betting analytics for the user
  */
-export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({ 
+export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
   onRefresh,
-  className = ''
+  className = '',
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriodFilter['period']>('month');
-  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'betTypes' | 'winRate'>('profit');
+  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'betTypes' | 'winRate'>(
+    'profit'
+  );
   const [showCharts, setShowCharts] = useState<boolean>(false);
-  
+
   useEffect(() => {
     loadAnalytics();
   }, [selectedPeriod]);
-  
+
   /**
    * Load analytics data with error handling
    */
@@ -41,16 +55,15 @@ export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
     try {
       setLoading(true);
       setError(null);
-      
+
       const data = await bettingAnalyticsService.getAnalyticsSummary({
         period: selectedPeriod,
-        includeCharts: showCharts
+        includeCharts: showCharts,
       });
-      
+
       setAnalytics(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
-      console.error('Error loading betting analytics:', err);
     } finally {
       setLoading(false);
     }
@@ -82,15 +95,15 @@ export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
    */
   const shareAnalytics = async () => {
     if (!analytics) return;
-    
+
     try {
       const shareData = {
         title: 'My Betting Analytics',
-        message: \`Win Rate: \${analytics.winRate}% | ROI: \${analytics.roi}% | Total Bets: \${analytics.totalBets}\`,
+        message: `Win Rate: ${analytics.winRate}% | ROI: ${analytics.roi}% | Total Bets: ${analytics.totalBets}`,
       };
       await Share.share(shareData);
-    } catch (err) {
-      console.error('Error sharing analytics:', err);
+    } catch {
+      // Silently handle share error - user likely cancelled
     }
   };
 
@@ -135,19 +148,15 @@ export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
 
         {/* Period Selector */}
         <View style={styles.periodSelector}>
-          {['week', 'month', 'quarter', 'year'].map((period) => (
+          {['week', 'month', 'quarter', 'year'].map(period => (
             <TouchableOpacity
               key={period}
-              style={[
-                styles.periodButton,
-                selectedPeriod === period && styles.selectedPeriod
-              ]}
+              style={[styles.periodButton, selectedPeriod === period && styles.selectedPeriod]}
               onPress={() => handlePeriodChange(period as TimePeriodFilter['period'])}
             >
-              <ThemedText style={[
-                styles.periodText,
-                selectedPeriod === period && styles.selectedPeriodText
-              ]}>
+              <ThemedText
+                style={[styles.periodText, selectedPeriod === period && styles.selectedPeriodText]}
+              >
                 {period.charAt(0).toUpperCase() + period.slice(1)}
               </ThemedText>
             </TouchableOpacity>
@@ -158,14 +167,18 @@ export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
         <View style={styles.metricsContainer}>
           <View style={styles.metricCard}>
             <ThemedText style={styles.metricLabel}>Win Rate</ThemedText>
-            <ThemedText style={styles.metricValue}>{analytics.winRate?.toFixed(1) ?? 0}%</ThemedText>
+            <ThemedText style={styles.metricValue}>
+              {analytics.winRate?.toFixed(1) ?? 0}%
+            </ThemedText>
           </View>
           <View style={styles.metricCard}>
             <ThemedText style={styles.metricLabel}>ROI</ThemedText>
-            <ThemedText style={[
-              styles.metricValue,
-              { color: (analytics.roi ?? 0) >= 0 ? '#10B981' : '#EF4444' }
-            ]}>
+            <ThemedText
+              style={[
+                styles.metricValue,
+                { color: (analytics.roi ?? 0) >= 0 ? '#10B981' : '#EF4444' },
+              ]}
+            >
               {analytics.roi?.toFixed(1) ?? 0}%
             </ThemedText>
           </View>
@@ -175,10 +188,12 @@ export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
           </View>
           <View style={styles.metricCard}>
             <ThemedText style={styles.metricLabel}>Profit/Loss</ThemedText>
-            <ThemedText style={[
-              styles.metricValue,
-              { color: (analytics.totalProfit ?? 0) >= 0 ? '#10B981' : '#EF4444' }
-            ]}>
+            <ThemedText
+              style={[
+                styles.metricValue,
+                { color: (analytics.totalProfit ?? 0) >= 0 ? '#10B981' : '#EF4444' },
+              ]}
+            >
               ${analytics.totalProfit?.toFixed(2) ?? '0.00'}
             </ThemedText>
           </View>
@@ -189,35 +204,34 @@ export const BettingAnalyticsWidget: React.FC<BettingAnalyticsWidgetProps> = ({
           <ThemedText style={styles.chartsToggleText}>
             {showCharts ? 'Hide Charts' : 'Show Charts'}
           </ThemedText>
-          <Ionicons 
-            name={showCharts ? 'chevron-up' : 'chevron-down'} 
-            size={20} 
-          />
+          <Ionicons name={showCharts ? 'chevron-up' : 'chevron-down'} size={20} />
         </TouchableOpacity>
 
         {/* Charts Section */}
         {showCharts && (
           <View style={styles.chartsSection}>
             <View style={styles.chartTypeSelector}>
-              {['profit', 'betTypes', 'winRate'].map((type) => (
+              {['profit', 'betTypes', 'winRate'].map(type => (
                 <TouchableOpacity
                   key={type}
                   style={[
                     styles.chartTypeButton,
-                    selectedChartType === type && styles.selectedChartType
+                    selectedChartType === type && styles.selectedChartType,
                   ]}
                   onPress={() => handleChartTypeChange(type as any)}
                 >
-                  <ThemedText style={[
-                    styles.chartTypeText,
-                    selectedChartType === type && styles.selectedChartTypeText
-                  ]}>
+                  <ThemedText
+                    style={[
+                      styles.chartTypeText,
+                      selectedChartType === type && styles.selectedChartTypeText,
+                    ]}
+                  >
                     {type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1')}
                   </ThemedText>
                 </TouchableOpacity>
               ))}
             </View>
-            
+
             <BettingAnalyticsChart
               data={analytics}
               chartType={selectedChartType}

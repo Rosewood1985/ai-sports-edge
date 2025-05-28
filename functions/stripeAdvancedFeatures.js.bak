@@ -6,13 +6,7 @@
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-let stripe = null;
-const getStripe = () => {
-  if (!stripe) {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-  }
-  return stripe;
-};
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -59,10 +53,10 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
     }
 
     // Get current subscription
-    const subscription = await getStripe().subscriptions.retrieve(data.subscriptionId);
+    const subscription = await stripe.subscriptions.retrieve(data.subscriptionId);
     
     // Calculate proration preview
-    const invoice = await getStripe().invoices.createPreview({
+    const invoice = await stripe.invoices.createPreview({
       customer: subscription.customer,
       subscription: data.subscriptionId,
       subscription_items: [{
@@ -88,11 +82,11 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
     const netProration = chargeAmount - creditAmount;
 
     // Get new price details
-    const newPrice = await getStripe().prices.retrieve(data.newPriceId, {
+    const newPrice = await stripe.prices.retrieve(data.newPriceId, {
       expand: ['product']
     });
 
-    const currentPrice = await getStripe().prices.retrieve(subscription.items.data[0].price.id, {
+    const currentPrice = await stripe.prices.retrieve(subscription.items.data[0].price.id, {
       expand: ['product']
     });
 
@@ -173,10 +167,10 @@ exports.updateSubscriptionWithProration = functions.https.onCall(async (data, co
     const userRef = db.collection('users').doc(data.userId);
     
     // Get current subscription
-    const currentSubscription = await getStripe().subscriptions.retrieve(data.subscriptionId);
+    const currentSubscription = await stripe.subscriptions.retrieve(data.subscriptionId);
 
     // Update subscription with proration
-    const updatedSubscription = await getStripe().subscriptions.update(data.subscriptionId, {
+    const updatedSubscription = await stripe.subscriptions.update(data.subscriptionId, {
       items: [{
         id: currentSubscription.items.data[0].id,
         price: data.newPriceId,
@@ -185,7 +179,7 @@ exports.updateSubscriptionWithProration = functions.https.onCall(async (data, co
     });
 
     // Get new price details
-    const newPrice = await getStripe().prices.retrieve(data.newPriceId, {
+    const newPrice = await stripe.prices.retrieve(data.newPriceId, {
       expand: ['product']
     });
 
@@ -265,10 +259,10 @@ exports.calculateTax = functions.https.onCall(async (data, context) => {
     const customerId = userDoc.data().stripeCustomerId;
 
     // Get price details
-    const price = await getStripe().prices.retrieve(data.priceId);
+    const price = await stripe.prices.retrieve(data.priceId);
 
     // Create a tax calculation
-    const taxCalculation = await getStripe().tax.calculations.create({
+    const taxCalculation = await stripe.tax.calculations.create({
       currency: price.currency,
       customer_details: {
         address: data.customerDetails.address,
@@ -281,7 +275,7 @@ exports.calculateTax = functions.https.onCall(async (data, context) => {
     });
 
     // Update customer with tax information
-    await getStripe().customers.update(customerId, {
+    await stripe.customers.update(customerId, {
       address: data.customerDetails.address,
       tax_exempt: data.customerDetails.tax_exempt || 'none',
     });
@@ -364,7 +358,7 @@ exports.createMultiCurrencyPricing = functions.https.onCall(async (data, context
       }
 
       // Create price in Stripe
-      const price = await getStripe().prices.create({
+      const price = await stripe.prices.create({
         product: data.productId,
         unit_amount: amount,
         currency: currency.toLowerCase(),
@@ -509,7 +503,7 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
       customerId = userDoc.data().stripeCustomerId;
     } else {
       const user = await admin.auth().getUser(data.userId);
-      const customer = await getStripe().customers.create({
+      const customer = await stripe.customers.create({
         email: user.email,
         metadata: { firebaseUserId: data.userId }
       });
@@ -522,18 +516,18 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
     }
 
     // Update customer with address and tax information
-    await getStripe().customers.update(customerId, {
+    await stripe.customers.update(customerId, {
       address: data.customerDetails.address,
       preferred_locales: [data.customerDetails.locale || 'en'],
     });
 
     // Attach payment method
-    await getStripe().paymentMethods.attach(data.paymentMethodId, {
+    await stripe.paymentMethods.attach(data.paymentMethodId, {
       customer: customerId
     });
 
     // Create subscription with automatic tax calculation
-    const subscription = await getStripe().subscriptions.create({
+    const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: data.priceId }],
       payment_behavior: 'default_incomplete',
@@ -543,7 +537,7 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
     });
 
     // Get price and product details
-    const price = await getStripe().prices.retrieve(data.priceId, {
+    const price = await stripe.prices.retrieve(data.priceId, {
       expand: ['product']
     });
 

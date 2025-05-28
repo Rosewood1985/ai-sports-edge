@@ -52,8 +52,15 @@
       "Bash(git symbolic-ref:*)",
       "Bash(firebase ext:list:*)",
       "Bash(npx firebase ext:list:*)",
-      "Bash(firebase login:*)"
+      "Bash(firebase login:*)",
+      "Bash(./scripts/deploy-stripe-system.sh:*)",
+      "Bash(firebase functions:config:set:*)",
+      "Bash(./scripts/verify-deployment-status.sh:*)",
+      "Bash(cat:*)",
+      "Bash(awk:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": false
 }

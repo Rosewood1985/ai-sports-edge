@@ -17,6 +17,13 @@ import {
 import { db, auth } from '../config/firebase';
 import { User } from 'firebase/auth';
 
+// Configured Price IDs from Stripe
+export const PRICE_IDS = {
+  INSIGHT: 'price_1RTpnOBpGzv2zgRcutbfCICB',
+  ANALYST: 'price_1RTpnpBpGzv2zgRccFtbSsgl', 
+  EDGE_COLLECTIVE: 'price_1RTpomBpGzv2zgRc72MCfG7F'
+} as const;
+
 export interface StripeCustomer {
   email: string;
   stripeId: string;
