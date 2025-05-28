@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, TextProps, StyleSheet } from 'react-native';
+import { Text, TextProps } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Colors } from '../../constants/Colors';
+import { useUITheme } from '../../components/UIThemeProvider';
 import accessibilityService, {
   AccessibilityPreferences,
 } from '../../services/accessibilityService';
@@ -90,6 +91,7 @@ export function AccessibleThemedText({
   ...props
 }: AccessibleThemedTextProps) {
   const { colors } = useTheme();
+  const { theme } = useUITheme();
   const [preferences, setPreferences] = React.useState<AccessibilityPreferences>(
     accessibilityService.getPreferences()
   );
@@ -129,31 +131,90 @@ export function AccessibleThemedText({
     }
   };
 
-  // Get the text style based on the type prop
+  // Get the text style based on the type prop using theme typography
   const getTextStyle = () => {
     switch (type) {
       case 'h1':
-        return styles.h1;
+        return {
+          fontSize: theme.typography.fontSize.h1,
+          lineHeight: theme.typography.lineHeight.h1,
+          fontWeight: theme.typography.fontWeight.bold,
+          fontFamily: theme.typography.fontFamily.heading,
+          marginBottom: theme.spacing.xs,
+        };
       case 'h2':
-        return styles.h2;
+        return {
+          fontSize: theme.typography.fontSize.h2,
+          lineHeight: theme.typography.lineHeight.h2,
+          fontWeight: theme.typography.fontWeight.bold,
+          fontFamily: theme.typography.fontFamily.heading,
+          marginBottom: theme.spacing.xxs,
+        };
       case 'h3':
-        return styles.h3;
+        return {
+          fontSize: theme.typography.fontSize.h3,
+          lineHeight: theme.typography.lineHeight.h3,
+          fontWeight: theme.typography.fontWeight.semiBold,
+          fontFamily: theme.typography.fontFamily.heading,
+          marginBottom: theme.spacing.xxs,
+        };
       case 'h4':
-        return styles.h4;
+        return {
+          fontSize: theme.typography.fontSize.bodyLg,
+          lineHeight: theme.typography.lineHeight.bodyLg,
+          fontWeight: theme.typography.fontWeight.semiBold,
+          fontFamily: theme.typography.fontFamily.body,
+          marginBottom: theme.spacing.xxs,
+        };
       case 'bodyStd':
-        return styles.bodyStd;
+        return {
+          fontSize: theme.typography.fontSize.bodyStd,
+          lineHeight: theme.typography.lineHeight.bodyStd,
+          fontWeight: theme.typography.fontWeight.regular,
+          fontFamily: theme.typography.fontFamily.body,
+        };
       case 'bodySmall':
-        return styles.bodySmall;
+        return {
+          fontSize: theme.typography.fontSize.label,
+          lineHeight: theme.typography.lineHeight.label,
+          fontWeight: theme.typography.fontWeight.regular,
+          fontFamily: theme.typography.fontFamily.body,
+        };
       case 'label':
-        return styles.label;
+        return {
+          fontSize: theme.typography.fontSize.label,
+          lineHeight: theme.typography.lineHeight.label,
+          fontWeight: theme.typography.fontWeight.medium,
+          fontFamily: theme.typography.fontFamily.body,
+        };
       case 'button':
-        return styles.button;
+        return {
+          fontSize: theme.typography.fontSize.button,
+          lineHeight: theme.typography.lineHeight.button,
+          fontWeight: theme.typography.fontWeight.semiBold,
+          fontFamily: theme.typography.fontFamily.body,
+        };
       case 'small':
-        return styles.small;
+        return {
+          fontSize: theme.typography.fontSize.small,
+          lineHeight: theme.typography.lineHeight.small,
+          fontWeight: theme.typography.fontWeight.regular,
+          fontFamily: theme.typography.fontFamily.body,
+        };
       case 'defaultSemiBold':
-        return styles.defaultSemiBold;
+        return {
+          fontSize: theme.typography.fontSize.bodyStd,
+          lineHeight: theme.typography.lineHeight.bodyStd,
+          fontWeight: theme.typography.fontWeight.semiBold,
+          fontFamily: theme.typography.fontFamily.body,
+        };
       default:
-        return styles.bodyStd;
+        return {
+          fontSize: theme.typography.fontSize.bodyStd,
+          lineHeight: theme.typography.lineHeight.bodyStd,
+          fontWeight: theme.typography.fontWeight.regular,
+          fontFamily: theme.typography.fontFamily.body,
+        };
     }
   };
 
@@ -207,11 +268,18 @@ export function AccessibleThemedText({
     getTextStyle(),
     { color: getTextColor() },
     style,
-    shouldApplyHighContrast && styles.highContrast,
+    shouldApplyHighContrast && {
+      color: '#000000',
+      backgroundColor: '#ffffff',
+    },
     shouldApplyHighContrast && highContrastStyle,
-    shouldApplyLargeText && styles.largeText,
+    shouldApplyLargeText && {
+      fontSize: theme.typography.fontSize.bodyLg, // Scale up by one step
+    },
     shouldApplyLargeText && largeTextStyle,
-    shouldApplyBoldText && styles.boldText,
+    shouldApplyBoldText && {
+      fontWeight: theme.typography.fontWeight.bold,
+    },
     shouldApplyBoldText && boldTextStyle,
   ];
 
@@ -221,62 +289,5 @@ export function AccessibleThemedText({
     </Text>
   );
 }
-
-const styles = StyleSheet.create({
-  h1: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  h2: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  h3: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  h4: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  bodyStd: {
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  bodySmall: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  button: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  small: {
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  defaultSemiBold: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  highContrast: {
-    color: '#000000',
-    backgroundColor: '#ffffff',
-  },
-  largeText: {
-    fontSize: 18, // Base size, will be scaled
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
-});
 
 export default AccessibleThemedText;

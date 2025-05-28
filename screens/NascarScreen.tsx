@@ -14,9 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { Container } from '../components/ResponsiveLayout';
 import { ThemedText } from '../atomic/atoms/ThemedText';
-import LoadingIndicator from '../components/LoadingIndicator';
-import ErrorMessage from '../components/ErrorMessage';
-import EmptyState from '../components/EmptyState';
+import { LoadingIndicator, ErrorMessage } from '../atomic/atoms';
+import { EmptyState } from '../atomic/atoms';
 import { sentryService } from '../services/sentryService';
 import nascarService, {
   NascarRace,

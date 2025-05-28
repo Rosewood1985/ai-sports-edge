@@ -12,7 +12,7 @@ import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
-import LanguageSelector from '../components/LanguageSelector';
+import { LanguageSelector } from '../atomic/molecules';
 
 // Dynamic featured games from real sports API
 const useFeaturedGames = () => {

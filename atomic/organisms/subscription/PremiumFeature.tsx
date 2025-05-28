@@ -1,3 +1,8 @@
+/**
+ * Atomic Organism: Premium Feature
+ * Complex component that wraps premium content with subscription state management
+ * Location: /atomic/organisms/subscription/PremiumFeature.tsx
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,10 +13,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../config/firebase';
-import { hasActiveSubscription } from '../services/subscriptionService';
-import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import { auth } from '../../../config/firebase';
+import { hasActiveSubscription } from '../../../services/subscriptionService';
+import { useUITheme } from '../../../components/UIThemeProvider';
+import { useI18n } from '../i18n/I18nContext';
 
 interface PremiumFeatureProps {
   children: React.ReactNode;
@@ -26,7 +31,7 @@ interface PremiumFeatureProps {
  * @param {PremiumFeatureProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const PremiumFeature: React.FC<PremiumFeatureProps> = ({
+export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   children,
   teaser = false,
   message = 'This feature requires a premium subscription',
@@ -35,7 +40,7 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const [hasPremium, setHasPremium] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
-  const { colors, isDark } = useTheme();
+  const { theme } = useUITheme();
   const { t } = useI18n();
 
   // Check if user has premium access
@@ -90,12 +95,74 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       navigation.navigate('Subscription');
     }
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.surfaceBackground,
+      padding: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: theme.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    loadingContainer: {
+      padding: theme.spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    lockedText: {
+      fontSize: theme.typography.fontSize.bodyStd,
+      fontFamily: theme.typography.fontFamily.body,
+      color: theme.colors.text,
+      textAlign: 'center',
+      marginVertical: theme.spacing.sm,
+    },
+    upgradeButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: theme.borderRadius.sm,
+      marginTop: theme.spacing.xs,
+    },
+    upgradeButtonText: {
+      color: theme.colors.onPrimary,
+      fontWeight: theme.typography.fontWeight.semiBold as '600',
+      fontSize: theme.typography.fontSize.label,
+      fontFamily: theme.typography.fontFamily.body,
+    },
+    teaserContent: {
+      width: '100%',
+      position: 'relative',
+    },
+    teaserOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      backgroundColor: theme.colors.surfaceBackground + 'D9', // 85% opacity
+    },
+    teaserText: {
+      fontSize: theme.typography.fontSize.bodyStd,
+      fontFamily: theme.typography.fontFamily.body,
+      color: theme.colors.text,
+      textAlign: 'center',
+      marginVertical: theme.spacing.sm,
+      fontWeight: theme.typography.fontWeight.semiBold as '600',
+    },
+  });
   
   // If loading, show loading indicator
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color={colors.primary} />
+        <ActivityIndicator size="small" color={theme.colors.primary} />
       </View>
     );
   }
@@ -109,7 +176,7 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   if (teaser) {
     return (
       <View
-        style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}
+        style={styles.container}
         accessible={true}
         accessibilityRole="alert"
         accessibilityLabel={message}
@@ -117,18 +184,18 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         <View style={styles.teaserContent}>
           {children}
           <View
-            style={[styles.teaserOverlay, { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)' }]}
+            style={styles.teaserOverlay}
             importantForAccessibility="yes"
           >
-            <Ionicons name="lock-closed" size={32} color={colors.primary} />
+            <Ionicons name="lock-closed" size={32} color={theme.colors.primary} />
             <Text
-              style={[styles.teaserText, { color: colors.text }]}
+              style={styles.teaserText}
               accessibilityRole="text"
             >
               {message}
             </Text>
             <TouchableOpacity
-              style={[styles.upgradeButton, { backgroundColor: colors.primary }]}
+              style={styles.upgradeButton}
               onPress={handleUpgrade}
               accessible={true}
               accessibilityRole="button"
@@ -146,20 +213,20 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   // Otherwise, show a locked message with an upgrade button
   return (
     <View
-      style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}
+      style={styles.container}
       accessible={true}
       accessibilityRole="alert"
       accessibilityLabel={message}
     >
-      <Ionicons name="lock-closed" size={32} color={colors.primary} />
+      <Ionicons name="lock-closed" size={32} color={theme.colors.primary} />
       <Text
-        style={[styles.lockedText, { color: colors.text }]}
+        style={styles.lockedText}
         accessibilityRole="text"
       >
         {message}
       </Text>
       <TouchableOpacity
-        style={[styles.upgradeButton, { backgroundColor: colors.primary }]}
+        style={styles.upgradeButton}
         onPress={handleUpgrade}
         accessible={true}
         accessibilityRole="button"
@@ -171,59 +238,5 @@ const PremiumFeature: React.FC<PremiumFeatureProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  loadingContainer: {
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  lockedText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 12,
-  },
-  upgradeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
-    marginTop: 8,
-  },
-  upgradeButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  teaserContent: {
-    width: '100%',
-    position: 'relative',
-  },
-  teaserOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 8,
-  },
-  teaserText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 12,
-    fontWeight: '600',
-  },
-});
 
 export default PremiumFeature;

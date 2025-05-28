@@ -6,40 +6,44 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { ThemedText } from './ThemedText';
+import { useUITheme } from '../../organisms/theme/UIThemeProvider';
 
 interface LoadingIndicatorProps {
   size?: 'small' | 'large';
   color?: string;
   text?: string;
   style?: any;
-  className?: string;
 }
 
 export function LoadingIndicator({
   size = 'large',
-  color = '#3B82F6',
+  color,
   text,
   style,
-  className = '',
 }: LoadingIndicatorProps) {
+  const { theme } = useUITheme();
+  
+  const styles = StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.md,
+    },
+    text: {
+      marginTop: theme.spacing.xs,
+      fontSize: theme.typography.fontSize.sm,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
+
   return (
-    <View style={[styles.container, style]} className={className}>
-      <ActivityIndicator size={size} color={color} />
+    <View style={[styles.container, style]}>
+      <ActivityIndicator 
+        size={size} 
+        color={color || theme.colors.primary} 
+      />
       {text && <ThemedText style={styles.text}>{text}</ThemedText>}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  text: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-});

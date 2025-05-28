@@ -39,7 +39,7 @@ const LoginScreen: React.FC = () => {
     },
     title: {
       fontSize: theme.typography.fontSize.h1,
-      fontWeight: theme.typography.fontWeight.bold,
+      fontWeight: theme.typography.fontWeight.bold as '700',
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.heading,
       marginBottom: theme.spacing.lg,
@@ -62,7 +62,7 @@ const LoginScreen: React.FC = () => {
     },
     buttonText: { 
       color: theme.colors.onPrimary, 
-      fontWeight: theme.typography.fontWeight.semiBold, 
+      fontWeight: theme.typography.fontWeight.semiBold as '600', 
       fontSize: theme.typography.fontSize.button 
     },
     link: { 

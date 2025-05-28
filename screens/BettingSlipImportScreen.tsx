@@ -42,7 +42,7 @@ import {
   SubscriptionRequirements
 } from '../types/bettingSlipImport';
 import { useTheme } from '../contexts/ThemeContext';
-import PremiumFeature from '../components/PremiumFeature';
+import { PremiumFeature } from '../atomic/organisms';
 
 /**
  * Betting Slip Import Screen

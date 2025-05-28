@@ -6,7 +6,7 @@ import pushNotificationService, { NotificationPreferences } from '../services/pu
 import { analyticsService } from '../services/analyticsService';
 import {  ThemedText  } from '../atomic/atoms/ThemedText';
 import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import Header from '../components/Header';
+import { Header } from '../atomic/organisms';
 
 /**
  * Notification Settings Screen

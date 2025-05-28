@@ -12,8 +12,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import { auth } from '../config/firebase';
 import { hasActiveSubscription } from '../services/subscriptionService';
-import Header from '../components/Header';
-import PremiumFeature from '../components/PremiumFeature';
+import { Header } from '../atomic/organisms';
+import { PremiumFeature } from '../atomic/organisms';
 import OddsComparisonComponent from '../components/OddsComparisonComponent';
 import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
 import {

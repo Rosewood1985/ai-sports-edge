@@ -16,8 +16,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
 import { redeemGiftSubscription } from '../services/firebaseSubscriptionService';
 import { useTheme } from '../contexts/ThemeContext';
-import { NeonContainer, NeonText, NeonButton } from '../components/ui';
-import Header from '../components/Header';
+import { NeonContainer, NeonText, NeonButton } from '../atomic/atoms';
+import { Header } from '../atomic/organisms';
 
 /**
  * Screen for redeeming gift subscription codes

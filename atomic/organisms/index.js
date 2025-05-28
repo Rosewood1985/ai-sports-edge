@@ -14,9 +14,17 @@ export { default as AlertTypeSelector } from './AlertTypeSelector';
 export { default as AlertFiltersForm } from './AlertFiltersForm';
 export { default as CustomAlertsModal } from './CustomAlertsModal';
 
+// Layout organisms
+export { Header } from './layout/Header';
+
+// Subscription organisms
+export { PremiumFeature } from './subscription/PremiumFeature';
+
 // Export types
 export * from './AlertFiltersForm';
 export * from './CustomAlertsModal';
+export * from './layout/Header';
+export * from './subscription/PremiumFeature';
 
 // Export new reporting and widget modules
 export * from './reporting';

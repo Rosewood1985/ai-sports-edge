@@ -1,3 +1,8 @@
+/**
+ * Atomic Atom: Neon Card
+ * Card component with neon glow effect using UI theme system
+ * Location: /atomic/atoms/ui/NeonCard.tsx
+ */
 import React from 'react';
 import {
   View,
@@ -9,14 +14,14 @@ import {
   Animated,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { colors, borderRadius, spacing, shadows } from '../../styles/theme';
+import { useUITheme } from '../../../components/UIThemeProvider';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   getOptimizedShadow,
   getOptimizedGlowIntensity,
   getResponsiveSpacing
-} from '../../utils/deviceOptimization';
-import { useGlowHoverEffect } from '../../utils/animationUtils';
+} from '../../../utils/deviceOptimization';
+import { useGlowHoverEffect } from '../../../utils/animationUtils';
 
 interface NeonCardProps extends ViewProps {
   borderColor?: string;
@@ -35,12 +40,12 @@ interface NeonCardProps extends ViewProps {
  * @param {NeonCardProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const NeonCard: React.FC<NeonCardProps> = ({
-  borderColor = colors.neon.blue,
-  glowColor = colors.neon.blue,
+export const NeonCard: React.FC<NeonCardProps> = ({
+  borderColor,
+  glowColor,
   glowIntensity = 'medium',
   gradient = false,
-  gradientColors = ['#121212', '#1A1A1A'] as const,
+  gradientColors,
   style,
   contentStyle,
   onPress,
@@ -48,11 +53,19 @@ const NeonCard: React.FC<NeonCardProps> = ({
   children,
   ...rest
 }) => {
+  const { theme } = useUITheme();
+  
+  // Use theme colors if not provided
+  const cardBorderColor = borderColor || theme.colors.primary;
+  const cardGlowColor = glowColor || theme.colors.primary;
+  const defaultGradientColors = gradientColors || [theme.colors.primaryBackground, theme.colors.surfaceBackground];
+
   // Apply glow hover effect if animated is true
   const { glowOpacity, glowRadius, onPressIn, onPressOut } = useGlowHoverEffect(
     glowIntensity === 'none' ? 'low' : glowIntensity,
     glowIntensity === 'none' ? 'medium' : glowIntensity === 'high' ? 'high' : glowIntensity === 'medium' ? 'high' : 'medium'
   );
+
   // Get shadow style based on glow intensity with device optimization
   const getShadowStyle = () => {
     if (glowIntensity === 'none') return {};
@@ -60,7 +73,7 @@ const NeonCard: React.FC<NeonCardProps> = ({
     // If animated is true, use animated values for shadow
     if (animated) {
       return {
-        shadowColor: glowColor,
+        shadowColor: cardGlowColor,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: glowOpacity,
         shadowRadius: glowRadius,
@@ -74,7 +87,7 @@ const NeonCard: React.FC<NeonCardProps> = ({
 
     // Base shadow properties
     const shadowProps = {
-      shadowColor: glowColor,
+      shadowColor: cardGlowColor,
       shadowOffset: { width: 0, height: 0 },
       elevation: Platform.OS === 'android' ? 4 : 0, // Android elevation
     };
@@ -113,14 +126,14 @@ const NeonCard: React.FC<NeonCardProps> = ({
   const renderCardContent = () => {
     if (gradient) {
       // Ensure we have at least two colors for the gradient
-      const colors: readonly [string, string] = Array.isArray(gradientColors) && gradientColors.length >= 2
-        ? [gradientColors[0], gradientColors[1]] as const
-        : ['#121212', '#1A1A1A'] as const;
+      const colors: readonly [string, string] = Array.isArray(defaultGradientColors) && defaultGradientColors.length >= 2
+        ? [defaultGradientColors[0], defaultGradientColors[1]] as const
+        : [theme.colors.primaryBackground, theme.colors.surfaceBackground] as const;
         
       return (
         <LinearGradient
           colors={colors}
-          style={[styles.gradient, contentStyle]}
+          style={[styles.gradient, { padding: getResponsiveSpacing(theme.spacing.sm) }, contentStyle]}
         >
           {children}
         </LinearGradient>
@@ -128,7 +141,7 @@ const NeonCard: React.FC<NeonCardProps> = ({
     }
 
     return (
-      <View style={[styles.content, contentStyle]}>
+      <View style={[styles.content, { padding: getResponsiveSpacing(theme.spacing.sm) }, contentStyle]}>
         {children}
       </View>
     );
@@ -141,8 +154,10 @@ const NeonCard: React.FC<NeonCardProps> = ({
         style={[
           styles.container,
           {
-            borderColor,
-            backgroundColor: colors.background.secondary,
+            borderColor: cardBorderColor,
+            backgroundColor: theme.colors.surfaceBackground,
+            borderRadius: theme.borderRadius.md,
+            margin: getResponsiveSpacing(theme.spacing.xxs),
           },
           getShadowStyle(),
           style,
@@ -175,16 +190,14 @@ const NeonCard: React.FC<NeonCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: borderRadius.md,
     borderWidth: 1,
     overflow: 'hidden',
-    margin: getResponsiveSpacing(spacing.xs),
   },
   content: {
-    padding: getResponsiveSpacing(spacing.md),
+    // padding handled dynamically with theme spacing
   },
   gradient: {
-    padding: getResponsiveSpacing(spacing.md),
+    // padding handled dynamically with theme spacing
   },
 });
 

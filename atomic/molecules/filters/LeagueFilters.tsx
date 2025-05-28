@@ -1,7 +1,12 @@
+/**
+ * Atomic Molecule: League Filters
+ * Complex filtering component for leagues using UI theme system
+ * Location: /atomic/molecules/filters/LeagueFilters.tsx
+ */
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { LeagueFilter } from '../types/sports';
+import { useUITheme } from '../../../components/UIThemeProvider';
+import { LeagueFilter } from '../../../types/sports';
 import { Ionicons } from '@expo/vector-icons';
 
 interface LeagueFiltersProps {
@@ -38,8 +43,8 @@ const SPORTS: FilterOption[] = [
  * @param {LeagueFiltersProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }) => {
-  const { colors, isDark } = useTheme();
+export const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }) => {
+  const { theme } = useUITheme();
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showSportModal, setShowSportModal] = useState(false);
   
@@ -57,6 +62,110 @@ const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }
     return sport ? sport.label : 'All Sports';
   };
   
+  // Create dynamic styles using theme
+  const styles = StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.surfaceBackground,
+      padding: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      margin: theme.spacing.sm,
+      marginTop: 0,
+    },
+    title: {
+      fontSize: theme.typography.fontSize.bodyLg,
+      fontWeight: theme.typography.fontWeight.bold as '700',
+      fontFamily: theme.typography.fontFamily.heading,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.sm,
+    },
+    filterRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: theme.spacing.sm,
+    },
+    filterLabel: {
+      fontSize: theme.typography.fontSize.bodyStd,
+      fontFamily: theme.typography.fontFamily.body,
+      color: theme.colors.text,
+      flex: 1,
+    },
+    selectorButton: {
+      flex: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: theme.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.primaryBackground,
+      borderRadius: theme.borderRadius.sm,
+    },
+    selectorText: {
+      fontSize: theme.typography.fontSize.label,
+      fontFamily: theme.typography.fontFamily.body,
+      color: theme.colors.text,
+    },
+    resetButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.sm,
+      marginTop: theme.spacing.xs,
+    },
+    resetButtonText: {
+      marginLeft: theme.spacing.xs,
+      fontWeight: theme.typography.fontWeight.medium as '500',
+      fontFamily: theme.typography.fontFamily.body,
+      color: theme.colors.primary,
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+      width: '80%',
+      maxHeight: '70%',
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      backgroundColor: theme.colors.surfaceBackground,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm,
+    },
+    modalTitle: {
+      fontSize: theme.typography.fontSize.bodyLg,
+      fontWeight: theme.typography.fontWeight.bold as '700',
+      fontFamily: theme.typography.fontFamily.heading,
+      color: theme.colors.text,
+    },
+    optionsList: {
+      maxHeight: 300,
+    },
+    optionItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.xs,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    optionText: {
+      fontSize: theme.typography.fontSize.bodyStd,
+      fontFamily: theme.typography.fontFamily.body,
+      color: theme.colors.text,
+    },
+  });
+  
   // Render selector modal
   const renderSelectorModal = (
     options: FilterOption[],
@@ -72,16 +181,13 @@ const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[
-          styles.modalContent,
-          { backgroundColor: isDark ? '#2c2c2c' : '#ffffff' }
-        ]}>
+        <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
+            <Text style={styles.modalTitle}>
               Select Option
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close-outline" size={24} color={colors.text} />
+              <Ionicons name="close-outline" size={24} color={theme.colors.text} />
             </TouchableOpacity>
           </View>
           
@@ -91,18 +197,18 @@ const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }
                 key={option.value}
                 style={[
                   styles.optionItem,
-                  selectedValue === option.value && { backgroundColor: colors.primary + '20' }
+                  selectedValue === option.value && { backgroundColor: theme.colors.primary + '20' }
                 ]}
                 onPress={() => {
                   onSelect(option.value);
                   onClose();
                 }}
               >
-                <Text style={[styles.optionText, { color: colors.text }]}>
+                <Text style={styles.optionText}>
                   {option.label}
                 </Text>
                 {selectedValue === option.value && (
-                  <Ionicons name="checkmark" size={20} color={colors.primary} />
+                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
               </TouchableOpacity>
             ))}
@@ -113,68 +219,59 @@ const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }
   );
   
   return (
-    <View style={[
-      styles.container,
-      { backgroundColor: isDark ? '#1e1e1e' : '#f5f5f5' }
-    ]}>
-      <Text style={[styles.title, { color: colors.text }]}>
+    <View style={styles.container}>
+      <Text style={styles.title}>
         Filter Leagues
       </Text>
       
       {/* Country Filter */}
       <View style={styles.filterRow}>
-        <Text style={[styles.filterLabel, { color: colors.text }]}>Country:</Text>
+        <Text style={styles.filterLabel}>Country:</Text>
         <TouchableOpacity
-          style={[
-            styles.selectorButton,
-            { backgroundColor: colors.background, borderColor: colors.border }
-          ]}
+          style={styles.selectorButton}
           onPress={() => setShowCountryModal(true)}
         >
-          <Text style={[styles.selectorText, { color: colors.text }]}>
+          <Text style={styles.selectorText}>
             {getSelectedCountryLabel()}
           </Text>
-          <Ionicons name="chevron-down-outline" size={16} color={colors.text} />
+          <Ionicons name="chevron-down-outline" size={16} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
       
       {/* Sport Filter */}
       <View style={styles.filterRow}>
-        <Text style={[styles.filterLabel, { color: colors.text }]}>Sport:</Text>
+        <Text style={styles.filterLabel}>Sport:</Text>
         <TouchableOpacity
-          style={[
-            styles.selectorButton,
-            { backgroundColor: colors.background, borderColor: colors.border }
-          ]}
+          style={styles.selectorButton}
           onPress={() => setShowSportModal(true)}
         >
-          <Text style={[styles.selectorText, { color: colors.text }]}>
+          <Text style={styles.selectorText}>
             {getSelectedSportLabel()}
           </Text>
-          <Ionicons name="chevron-down-outline" size={16} color={colors.text} />
+          <Ionicons name="chevron-down-outline" size={16} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
       
       {/* College Filter */}
       <View style={styles.filterRow}>
-        <Text style={[styles.filterLabel, { color: colors.text }]}>
+        <Text style={styles.filterLabel}>
           College Leagues Only:
         </Text>
         <Switch
           value={filters.isCollege === true}
           onValueChange={(value: boolean) => onFilterChange({ isCollege: value ? true : undefined })}
-          trackColor={{ false: '#767577', true: colors.primary }}
+          trackColor={{ false: '#767577', true: theme.colors.primary }}
           thumbColor={filters.isCollege ? '#f4f3f4' : '#f4f3f4'}
         />
       </View>
       
       {/* Reset Filters Button */}
       <TouchableOpacity
-        style={[styles.resetButton, { borderColor: colors.primary }]}
+        style={styles.resetButton}
         onPress={() => onFilterChange({ country: undefined, sport: undefined, isCollege: undefined })}
       >
-        <Ionicons name="refresh-outline" size={16} color={colors.primary} />
-        <Text style={[styles.resetButtonText, { color: colors.primary }]}>
+        <Ionicons name="refresh-outline" size={16} color={theme.colors.primary} />
+        <Text style={styles.resetButtonText}>
           Reset Filters
         </Text>
       </TouchableOpacity>
@@ -199,91 +296,5 @@ const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterChange }
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 8,
-    margin: 16,
-    marginTop: 0,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  filterLabel: {
-    fontSize: 16,
-    flex: 1,
-  },
-  selectorButton: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 4,
-  },
-  selectorText: {
-    fontSize: 14,
-  },
-  resetButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 8,
-    borderWidth: 1,
-    borderRadius: 4,
-    marginTop: 8,
-  },
-  resetButtonText: {
-    marginLeft: 8,
-    fontWeight: '500',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    maxHeight: '70%',
-    borderRadius: 8,
-    padding: 16,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  optionsList: {
-    maxHeight: 300,
-  },
-  optionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  optionText: {
-    fontSize: 16,
-  },
-});
 
 export default LeagueFilters;

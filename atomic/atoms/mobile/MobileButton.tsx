@@ -4,7 +4,6 @@ import {
   Animated,
   Text,
   View,
-  StyleSheet,
   ViewStyle,
   TextStyle,
 } from 'react-native';
@@ -91,8 +90,8 @@ export const MobileButton: React.FC<MobileButtonProps> = ({
   const sizes = {
     sm: {
       paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 6,
+      paddingVertical: 8,
+      borderRadius: 8,
     },
     md: {
       paddingHorizontal: 16,

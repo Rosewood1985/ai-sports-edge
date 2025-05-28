@@ -1,3 +1,8 @@
+/**
+ * Atomic Atom: Neon Container
+ * Container component with gradient background using UI theme system
+ * Location: /atomic/atoms/ui/NeonContainer.tsx
+ */
 import React from 'react';
 import {
   View,
@@ -7,7 +12,7 @@ import {
   ViewStyle,
   SafeAreaView,
 } from 'react-native';
-import { colors, spacing } from '../../styles/theme';
+import { useUITheme } from '../../../components/UIThemeProvider';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface NeonContainerProps extends ViewProps {
@@ -23,19 +28,24 @@ interface NeonContainerProps extends ViewProps {
  * @param {NeonContainerProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const NeonContainer: React.FC<NeonContainerProps> = ({
+export const NeonContainer: React.FC<NeonContainerProps> = ({
   gradient = true,
-  gradientColors = [colors.background.primary, '#0D0D0D'],
+  gradientColors,
   useSafeArea = true,
   style,
   contentStyle,
   children,
   ...rest
 }) => {
+  const { theme } = useUITheme();
+  
+  // Use theme colors if no custom gradient colors provided
+  const defaultGradientColors = gradientColors || [theme.colors.primaryBackground, theme.colors.surfaceBackground];
+
   // Render container content
   const renderContent = () => {
     return (
-      <View style={[styles.content, contentStyle]} {...rest}>
+      <View style={[styles.content, { padding: theme.spacing.sm }, contentStyle]} {...rest}>
         {children}
       </View>
     );
@@ -45,9 +55,9 @@ const NeonContainer: React.FC<NeonContainerProps> = ({
   const renderContainer = () => {
     if (gradient) {
       // Ensure we have at least two colors for the gradient
-      const gradientColorsArray: readonly [string, string] = Array.isArray(gradientColors) && gradientColors.length >= 2
-        ? [gradientColors[0], gradientColors[1]] as const
-        : [colors.background.primary, '#0D0D0D'] as const;
+      const gradientColorsArray: readonly [string, string] = Array.isArray(defaultGradientColors) && defaultGradientColors.length >= 2
+        ? [defaultGradientColors[0], defaultGradientColors[1]] as const
+        : [theme.colors.primaryBackground, theme.colors.surfaceBackground] as const;
         
       return (
         <LinearGradient
@@ -66,7 +76,7 @@ const NeonContainer: React.FC<NeonContainerProps> = ({
         style={[
           styles.container,
           {
-            backgroundColor: colors.background.primary,
+            backgroundColor: theme.colors.primaryBackground,
           },
           style,
         ]}
@@ -83,7 +93,7 @@ const NeonContainer: React.FC<NeonContainerProps> = ({
         style={[
           styles.safeArea,
           {
-            backgroundColor: gradientColors[0],
+            backgroundColor: defaultGradientColors[0],
           },
         ]}
       >
@@ -104,7 +114,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: spacing.md,
+    // padding handled dynamically with theme spacing
   },
 });
 

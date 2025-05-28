@@ -1,3 +1,8 @@
+/**
+ * Atomic Atom: External Link
+ * Link component for external URLs with proper platform handling
+ * Location: /atomic/atoms/ExternalLink.tsx
+ */
 import { Link } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { ComponentProps } from 'react';
@@ -22,3 +27,5 @@ export function ExternalLink({ href, ...rest }: Props) {
     />
   );
 }
+
+export default ExternalLink;

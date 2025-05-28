@@ -12,8 +12,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../config/firebase';
 import { generateSubscriptionReport } from '../services/subscriptionAnalyticsService';
-import { NeonContainer, NeonText } from '../components/ui';
-import Header from '../components/Header';
+import { NeonContainer, NeonText } from '../atomic/atoms';
+import { Header } from '../atomic/organisms';
 
 // Mock data for initial development
 const MOCK_DATA = {

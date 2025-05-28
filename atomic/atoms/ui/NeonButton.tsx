@@ -1,3 +1,8 @@
+/**
+ * Atomic Atom: Neon Button
+ * Button component with neon glow effect using UI theme system
+ * Location: /atomic/atoms/ui/NeonButton.tsx
+ */
 import React from 'react';
 import {
   TouchableOpacity,
@@ -10,9 +15,9 @@ import {
   View,
   Animated,
 } from 'react-native';
-import { colors, typography, borderRadius, spacing } from '../../styles/theme';
+import { useUITheme } from '../../../components/UIThemeProvider';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useHoverEffect, useGlowHoverEffect } from '../../utils/animationUtils';
+import { useHoverEffect, useGlowHoverEffect } from '../../../utils/animationUtils';
 
 interface NeonButtonProps {
   title: string;
@@ -33,7 +38,7 @@ interface NeonButtonProps {
  * @param {NeonButtonProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const NeonButton: React.FC<NeonButtonProps> = ({
+export const NeonButton: React.FC<NeonButtonProps> = ({
   title,
   onPress,
   type = 'primary',
@@ -46,6 +51,8 @@ const NeonButton: React.FC<NeonButtonProps> = ({
   textStyle,
   gradientColors,
 }) => {
+  const { theme } = useUITheme();
+  
   // Apply hover effect animation
   const { animatedStyle, onPressIn, onPressOut } = useHoverEffect(1.05);
   
@@ -53,12 +60,13 @@ const NeonButton: React.FC<NeonButtonProps> = ({
   const baseIntensity = type === 'primary' ? 'medium' : 'low';
   const hoverIntensity = type === 'primary' ? 'high' : 'medium';
   const { glowOpacity, glowRadius } = useGlowHoverEffect(baseIntensity, hoverIntensity);
+
   // Determine button colors based on type
   const getButtonColors = () => {
     if (disabled) {
       return {
-        background: colors.button.disabled,
-        text: colors.text.secondary,
+        background: theme.colors.surfaceBackground,
+        text: theme.colors.textSecondary,
         border: 'transparent',
       };
     }
@@ -66,26 +74,26 @@ const NeonButton: React.FC<NeonButtonProps> = ({
     switch (type) {
       case 'primary':
         return {
-          background: colors.button.primary,
-          text: colors.text.primary,
+          background: theme.colors.primary,
+          text: theme.colors.onPrimary,
           border: 'transparent',
         };
       case 'secondary':
         return {
-          background: colors.button.secondary,
-          text: colors.background.primary,
+          background: theme.colors.surfaceBackground,
+          text: theme.colors.text,
           border: 'transparent',
         };
       case 'outline':
         return {
           background: 'transparent',
-          text: colors.button.primary,
-          border: colors.button.primary,
+          text: theme.colors.primary,
+          border: theme.colors.primary,
         };
       default:
         return {
-          background: colors.button.primary,
-          text: colors.text.primary,
+          background: theme.colors.primary,
+          text: theme.colors.onPrimary,
           border: 'transparent',
         };
     }
@@ -96,19 +104,19 @@ const NeonButton: React.FC<NeonButtonProps> = ({
     switch (size) {
       case 'small':
         return {
-          paddingVertical: spacing.xs,
-          paddingHorizontal: spacing.md,
+          paddingVertical: theme.spacing.xs,
+          paddingHorizontal: theme.spacing.sm,
         };
       case 'large':
         return {
-          paddingVertical: spacing.md,
-          paddingHorizontal: spacing.xl,
+          paddingVertical: theme.spacing.sm,
+          paddingHorizontal: theme.spacing.xl,
         };
       case 'medium':
       default:
         return {
-          paddingVertical: spacing.sm,
-          paddingHorizontal: spacing.lg,
+          paddingVertical: theme.spacing.xs,
+          paddingHorizontal: theme.spacing.md,
         };
     }
   };
@@ -117,12 +125,12 @@ const NeonButton: React.FC<NeonButtonProps> = ({
   const getTextSize = () => {
     switch (size) {
       case 'small':
-        return typography.fontSize.sm;
+        return theme.typography.fontSize.label;
       case 'large':
-        return typography.fontSize.lg;
+        return theme.typography.fontSize.bodyLg;
       case 'medium':
       default:
-        return typography.fontSize.md;
+        return theme.typography.fontSize.button;
     }
   };
 
@@ -134,17 +142,17 @@ const NeonButton: React.FC<NeonButtonProps> = ({
     if (gradientColors && gradientColors.length >= 2)
       return [gradientColors[0], gradientColors[1]] as const;
     if (disabled)
-      return [colors.button.disabled, colors.button.disabled] as const;
+      return [theme.colors.surfaceBackground, theme.colors.surfaceBackground] as const;
     
     switch (type) {
       case 'primary':
-        return ['#00D4FF', '#00BFFF'] as const;
+        return [theme.colors.primary, theme.colors.primary] as const;
       case 'secondary':
-        return ['#00FF88', '#00CC88'] as const;
+        return [theme.colors.surfaceBackground, theme.colors.surfaceBackground] as const;
       case 'outline':
         return ['transparent', 'transparent'] as const;
       default:
-        return ['#00D4FF', '#00BFFF'] as const;
+        return [theme.colors.primary, theme.colors.primary] as const;
     }
   };
 
@@ -161,7 +169,7 @@ const NeonButton: React.FC<NeonButtonProps> = ({
         ) : (
           <>
             {icon && iconPosition === 'left' && (
-              <View style={styles.iconLeft}>{icon}</View>
+              <View style={[styles.iconLeft, { marginRight: theme.spacing.xs }]}>{icon}</View>
             )}
             <Text
               style={[
@@ -169,6 +177,8 @@ const NeonButton: React.FC<NeonButtonProps> = ({
                 {
                   color: buttonColors.text,
                   fontSize: getTextSize(),
+                  fontFamily: theme.typography.fontFamily.body,
+                  fontWeight: theme.typography.fontWeight.semiBold as '600',
                 },
                 textStyle,
               ]}
@@ -176,7 +186,7 @@ const NeonButton: React.FC<NeonButtonProps> = ({
               {title}
             </Text>
             {icon && iconPosition === 'right' && (
-              <View style={styles.iconRight}>{icon}</View>
+              <View style={[styles.iconRight, { marginLeft: theme.spacing.xs }]}>{icon}</View>
             )}
           </>
         )}
@@ -207,6 +217,7 @@ const NeonButton: React.FC<NeonButtonProps> = ({
                 backgroundColor: buttonColors.background,
                 borderColor: buttonColors.border,
                 borderWidth: type === 'outline' ? 1 : 0,
+                borderRadius: theme.borderRadius.md,
               },
               style,
             ]}
@@ -231,7 +242,7 @@ const NeonButton: React.FC<NeonButtonProps> = ({
           onPressOut={onPressOut}
           disabled={disabled || loading}
           activeOpacity={0.8}
-          style={[styles.buttonWrapper, style]}
+          style={[styles.buttonWrapper, { borderRadius: theme.borderRadius.md }, style]}
         >
           <LinearGradient
             colors={getGradientColors()}
@@ -251,11 +262,9 @@ const NeonButton: React.FC<NeonButtonProps> = ({
 
 const styles = StyleSheet.create({
   buttonWrapper: {
-    borderRadius: borderRadius.md,
     overflow: 'hidden',
   },
   button: {
-    borderRadius: borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -266,17 +275,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontWeight: '600',
     textAlign: 'center',
   },
   iconLeft: {
-    marginRight: spacing.xs,
+    // marginRight handled dynamically with theme.spacing.xs
   },
   iconRight: {
-    marginLeft: spacing.xs,
+    // marginLeft handled dynamically with theme.spacing.xs
   },
   loader: {
-    marginHorizontal: spacing.xs,
+    // margin handled dynamically with theme.spacing.xs
   },
 });
 

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Modal, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Modal, FlatList, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../organisms/i18n/LanguageContext';
-import { ThemedText } from '../../atoms/ThemedText';
-import { ThemedView } from '../../atoms/ThemedView';
-import { useTheme } from '@react-navigation/native';
-import AccessibleTouchableOpacity from '../../atoms/AccessibleTouchableOpacity';
+import { ThemedText, ThemedView } from '../../atoms';
+import { useUITheme } from '../../../components/UIThemeProvider';
 
 interface LanguageOption {
   code: string;

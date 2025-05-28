@@ -5,10 +5,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import { sportsDataService } from '../services/sportsDataService';
 import { userPreferencesService } from '../services/userPreferencesService';
 import { League, LeagueFilter } from '../types/sports';
-import Header from '../components/Header';
+import { Header } from '../atomic/organisms';
 import LeagueItem from '../components/LeagueItem';
-import LeagueFilters from '../components/LeagueFilters';
-import EmptyState from '../components/EmptyState';
+import { LeagueFilters } from '../atomic/molecules';
+import { EmptyState } from '../atomic/atoms';
 import { Ionicons } from '@expo/vector-icons';
 import { trackScreenView } from '../services/analyticsService';
 

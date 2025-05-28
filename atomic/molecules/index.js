@@ -29,3 +29,9 @@ export * from './ActionButtons';
 
 // Export new chart components
 export * from './charts';
+
+// Export filter components
+export { LeagueFilters } from './filters/LeagueFilters';
+
+// Export language components
+export { LanguageSelector } from './language/LanguageSelector';

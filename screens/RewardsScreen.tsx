@@ -15,7 +15,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { auth } from '../config/firebase';
 import { rewardsService } from '../services/rewardsService';
 import { UserRewards, Achievement, RewardTier, LoyaltyLevel } from '../types/rewards';
-import Header from '../components/Header';
+import { Header } from '../atomic/organisms';
 import LoyaltyBadge from '../components/LoyaltyBadge';
 import AchievementBadge from '../components/AchievementBadge';
 import ReferralLeaderboard from '../components/ReferralLeaderboard';

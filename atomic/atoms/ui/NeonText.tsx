@@ -1,7 +1,12 @@
+/**
+ * Atomic Atom: Neon Text
+ * Text component with neon glow effect using UI theme system
+ * Location: /atomic/atoms/ui/NeonText.tsx
+ */
 import React from 'react';
 import { Text, StyleSheet, TextProps, StyleProp, TextStyle } from 'react-native';
-import { colors, typography, shadows } from '../../styles/theme';
-import { scaleFontSize, getOptimizedGlowIntensity } from '../../utils/deviceOptimization';
+import { useUITheme } from '../../../components/UIThemeProvider';
+import { scaleFontSize, getOptimizedGlowIntensity } from '../../../utils/deviceOptimization';
 
 interface NeonTextProps extends TextProps {
   color?: string;
@@ -16,8 +21,8 @@ interface NeonTextProps extends TextProps {
  * @param {NeonTextProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const NeonText: React.FC<NeonTextProps> = ({
-  color = colors.text.heading,
+export const NeonText: React.FC<NeonTextProps> = ({
+  color,
   glow = true,
   intensity = 'medium',
   type = 'body',
@@ -25,19 +30,22 @@ const NeonText: React.FC<NeonTextProps> = ({
   children,
   ...rest
 }) => {
+  const { theme } = useUITheme();
+  
+  // Use theme color if no color provided
+  const textColor = color || theme.colors.primary;
+
   // Determine font family based on type
   const getFontFamily = () => {
     switch (type) {
       case 'heading':
-        return typography.fontFamily.heading;
       case 'subheading':
-        return typography.fontFamily.heading;
+        return theme.typography.fontFamily.heading;
       case 'body':
-        return typography.fontFamily.body;
       case 'caption':
-        return typography.fontFamily.body;
+        return theme.typography.fontFamily.body;
       default:
-        return typography.fontFamily.body;
+        return theme.typography.fontFamily.body;
     }
   };
 
@@ -46,19 +54,19 @@ const NeonText: React.FC<NeonTextProps> = ({
     let baseSize;
     switch (type) {
       case 'heading':
-        baseSize = typography.fontSize.xl;
+        baseSize = theme.typography.fontSize.h1;
         break;
       case 'subheading':
-        baseSize = typography.fontSize.lg;
+        baseSize = theme.typography.fontSize.h2;
         break;
       case 'body':
-        baseSize = typography.fontSize.md;
+        baseSize = theme.typography.fontSize.bodyStd;
         break;
       case 'caption':
-        baseSize = typography.fontSize.sm;
+        baseSize = theme.typography.fontSize.small;
         break;
       default:
-        baseSize = typography.fontSize.md;
+        baseSize = theme.typography.fontSize.bodyStd;
     }
     
     // Scale font size based on device
@@ -69,15 +77,14 @@ const NeonText: React.FC<NeonTextProps> = ({
   const getFontWeight = (): "normal" | "bold" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900" => {
     switch (type) {
       case 'heading':
-        return '700'; // bold
+        return theme.typography.fontWeight.bold as '700';
       case 'subheading':
-        return '600'; // semiBold
+        return theme.typography.fontWeight.semiBold as '600';
       case 'body':
-        return '400'; // regular
       case 'caption':
-        return '400'; // regular
+        return theme.typography.fontWeight.regular as '400';
       default:
-        return '400'; // regular
+        return theme.typography.fontWeight.regular as '400';
     }
   };
 
@@ -89,7 +96,7 @@ const NeonText: React.FC<NeonTextProps> = ({
     const optimizedIntensity = getOptimizedGlowIntensity(intensity);
     
     return {
-      textShadowColor: color,
+      textShadowColor: textColor,
       textShadowOffset: { width: 0, height: 0 },
       textShadowRadius: optimizedIntensity === 'low' ? 2 : optimizedIntensity === 'medium' ? 5 : 10,
     };
@@ -100,7 +107,7 @@ const NeonText: React.FC<NeonTextProps> = ({
       style={[
         styles.text,
         {
-          color,
+          color: textColor,
           fontFamily: getFontFamily(),
           fontSize: getFontSize(),
           fontWeight: getFontWeight(),

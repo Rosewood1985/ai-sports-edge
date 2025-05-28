@@ -15,9 +15,8 @@ import { Formula1Race, Formula1Driver, Formula1Team, Formula1Prediction } from '
 import { auth } from '../config/firebase';
 import { useTheme } from '../contexts/ThemeContext';
 import Formula1BlurredPrediction from '../components/Formula1BlurredPrediction';
-import PremiumFeature from '../components/PremiumFeature';
-import LoadingIndicator from '../components/LoadingIndicator';
-import EmptyState from '../components/EmptyState';
+import { PremiumFeature } from '../atomic/organisms';
+import { LoadingIndicator, EmptyState } from '../atomic/atoms';
 
 /**
  * Formula 1 screen component

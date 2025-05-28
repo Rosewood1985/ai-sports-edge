@@ -8,7 +8,7 @@ import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { useTheme } from '@react-navigation/native';
 import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
-import LanguageSelector from '../components/LanguageSelector';
+import { LanguageSelector } from '../atomic/molecules';
 import { ThemeToggle } from 'atomic/molecules/theme';
 
 const SettingsScreen = () => {
