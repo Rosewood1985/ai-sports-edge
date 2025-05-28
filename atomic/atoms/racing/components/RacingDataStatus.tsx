@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ThemedText } from '../../../../components/ThemedText';
+import { ThemedText } from '../../ThemedText';
 import { ThemedView } from '../../../../components/ThemedView';
 
 export interface RacingDataStatusProps {

@@ -9,6 +9,7 @@ import {
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import { useNavigation } from "@react-navigation/native";
+import { useUITheme } from "../../components/UIThemeProvider";
 import ThemeToggle from "../../components/ThemeToggle";
 
 const LoginScreen: React.FC = () => {
@@ -16,6 +17,7 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigation = useNavigation();
+  const { theme } = useUITheme();
 
   const handleLogin = async () => {
     setError("");
@@ -27,6 +29,56 @@ const LoginScreen: React.FC = () => {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.primaryBackground,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: theme.spacing.lg,
+    },
+    title: {
+      fontSize: theme.typography.fontSize.h1,
+      fontWeight: theme.typography.fontWeight.bold,
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.heading,
+      marginBottom: theme.spacing.lg,
+    },
+    input: {
+      width: "100%",
+      backgroundColor: theme.colors.surfaceBackground,
+      padding: theme.spacing.md,
+      borderRadius: theme.borders.radius.md,
+      marginBottom: theme.spacing.md,
+      color: theme.colors.text,
+      fontSize: theme.typography.fontSize.bodyStd,
+    },
+    button: {
+      width: "100%",
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.md,
+      borderRadius: theme.borders.radius.md,
+      alignItems: "center",
+    },
+    buttonText: { 
+      color: theme.colors.onPrimary, 
+      fontWeight: theme.typography.fontWeight.semiBold, 
+      fontSize: theme.typography.fontSize.button 
+    },
+    link: { 
+      marginTop: theme.spacing.md, 
+      color: theme.colors.textSecondary, 
+      textDecorationLine: "underline",
+      fontSize: theme.typography.fontSize.bodyStd,
+    },
+    error: {
+      color: theme.colors.error,
+      marginBottom: theme.spacing.sm,
+      fontSize: theme.typography.fontSize.small,
+      textAlign: "center",
+    },
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AI Sports Edge</Text>
@@ -34,14 +86,14 @@ const LoginScreen: React.FC = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#aaa"
+        placeholderTextColor={theme.colors.textTertiary}
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
-        placeholderTextColor="#aaa"
+        placeholderTextColor={theme.colors.textTertiary}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -68,44 +120,5 @@ const LoginScreen: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#38bdf8",
-    marginBottom: 32,
-  },
-  input: {
-    width: "100%",
-    backgroundColor: "#1e293b",
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 16,
-    color: "#fff",
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "#38bdf8",
-    padding: 14,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: { color: "#0f172a", fontWeight: "600", fontSize: 16 },
-  link: { marginTop: 16, color: "#94a3b8", textDecorationLine: "underline" },
-  error: {
-    color: "#f87171",
-    marginBottom: 12,
-    fontSize: 14,
-    textAlign: "center",
-  },
-});
 
 export default LoginScreen;
