@@ -1,6 +1,0 @@
-
-[0;33mStep 1: Checking source directory...[0m
-[0;32m✓ Source directory check completed successfully[0m
-
-[0;33mStep 2: Checking if required files exist...[0m
-[0;31msignup.html not found in vscode-sftp-deploy/.vscode directory.[0m

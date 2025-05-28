@@ -1,7 +1,0 @@
-Starting atomic architecture migration completion at Tue Apr 22 15:50:49 EDT 2025
-----------------------------------------
-Step 1: Migrating remaining components
-----------------------------------------
-Enter components to migrate in the format: ComponentName,type,source_file
-Example: LoginPage,pages,LoginPage.js
-Enter 'done' when finished

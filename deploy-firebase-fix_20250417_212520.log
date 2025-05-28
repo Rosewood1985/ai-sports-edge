@@ -1,9 +1,0 @@
-
-[0;33mStep 1: Running Firebase service initialization debugger...[0m
-[0;32m✓ Firebase service initialization debugger completed successfully[0m
-
-[0;33mStep 2: Running services debugger...[0m
-[0;32m✓ Services debugger completed successfully[0m
-
-[0;33mStep 3: Running detailed app debugger...[0m
-[0;31m✗ Detailed app debugger failed[0m

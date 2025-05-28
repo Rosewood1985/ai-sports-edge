@@ -1,8 +1,0 @@
-
-[0;33mStep 1: Implementing Firebase caching...[0m
-[0;32m✓ Creating utils directory completed successfully[0m
-[0;32m✓ Creating utils/firebaseCacheConfig.ts completed successfully[0m
-
-[0;33mStep 2: Optimizing bundle size...[0m
-[0;32m✓ Creating webpack.prod.optimized.js completed successfully[0m
-[0;31m✗ Updating package.json with build:optimized script failed[0m
