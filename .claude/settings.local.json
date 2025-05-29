@@ -58,7 +58,9 @@
       "Bash(./scripts/verify-deployment-status.sh:*)",
       "Bash(cat:*)",
       "Bash(awk:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm start)"
     ],
     "deny": []
   },

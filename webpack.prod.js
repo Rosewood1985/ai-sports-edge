@@ -11,7 +11,7 @@ const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   mode: 'production',
-  entry: './src/index.js', // Update this to your entry point
+  entry: './index.js', // Main entry point
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].js',
@@ -90,15 +90,19 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [
-              ['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }],
-              '@babel/preset-react',
-              '@babel/preset-typescript',
-            ],
+            presets: ['babel-preset-expo'],
             plugins: [
-              '@babel/plugin-transform-runtime',
-              '@babel/plugin-proposal-class-properties',
-              '@babel/plugin-proposal-object-rest-spread',
+              [
+                'module:react-native-dotenv',
+                {
+                  moduleName: '@env',
+                  path: '.env',
+                  blacklist: null,
+                  whitelist: null,
+                  safe: false,
+                  allowUndefined: true,
+                },
+              ],
             ],
           },
         },
@@ -188,12 +192,14 @@ module.exports = {
         minifyURLs: true,
       },
     }),
-    // Uncomment to generate bundle analysis report
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: 'static',
-    //   reportFilename: 'bundle-report.html',
-    //   openAnalyzer: false,
-    // }),
+    // Generate bundle analysis report
+    new BundleAnalyzerPlugin({
+      analyzerMode: process.env.ANALYZE_BUNDLE ? 'server' : 'static',
+      reportFilename: 'bundle-report.html',
+      openAnalyzer: false,
+      generateStatsFile: true,
+      statsFilename: 'bundle-stats.json',
+    }),
   ],
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

@@ -3,6 +3,7 @@
 // React Native Performance Enhancement and Monitoring
 // =============================================================================
 
+import React from 'react';
 import { InteractionManager, DeviceEventEmitter } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 
@@ -696,7 +697,7 @@ export function withPerformanceMonitoring<P extends {}>(
       recordRender();
     });
     
-    return <WrappedComponent {...props} />;
+    return React.createElement(WrappedComponent, props);
   });
 }
 

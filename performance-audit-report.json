@@ -1,0 +1,400 @@
+{
+  "timestamp": "2025-05-28T23:43:32.288Z",
+  "bundleAnalysis": {
+    "totalSize": 2006524,
+    "chunks": [
+      {
+        "id": 578,
+        "names": [
+          "vendor.firebase"
+        ],
+        "size": 1638745,
+        "modules": 8,
+        "files": [
+          "vendor.firebase.7d0b7ab9cd0c7397dccc.js"
+        ]
+      },
+      {
+        "id": 344,
+        "names": [
+          "vendor.sentry"
+        ],
+        "size": 912612,
+        "modules": 20,
+        "files": [
+          "vendor.sentry.093d15e10935d9c0d0e1.js"
+        ]
+      },
+      {
+        "id": 792,
+        "names": [
+          "main"
+        ],
+        "size": 807363,
+        "modules": 12,
+        "files": [
+          "main.578c45243a04b0989d51.js"
+        ]
+      },
+      {
+        "id": 27,
+        "names": [
+          "vendor.react-native-web"
+        ],
+        "size": 615841,
+        "modules": 54,
+        "files": [
+          "vendor.react-native-web.0d6c0bae02ddd0717021.js"
+        ]
+      },
+      {
+        "id": 747,
+        "names": [
+          "vendor.react-native-reanimated"
+        ],
+        "size": 613481,
+        "modules": 4,
+        "files": [
+          "vendor.react-native-reanimated.4857b07a630cfea5c0c4.js"
+        ]
+      },
+      {
+        "id": 145,
+        "names": [
+          "vendor.expo"
+        ],
+        "size": 478458,
+        "modules": 5,
+        "files": [
+          "vendor.expo.f91de17fe23cd298add3.js"
+        ]
+      },
+      {
+        "id": 449,
+        "names": [
+          "vendor.react-navigation"
+        ],
+        "size": 356042.80000000005,
+        "modules": 19,
+        "files": [
+          "vendor.react-navigation.bff77097a86c6a3836b6.js"
+        ]
+      },
+      {
+        "id": 277,
+        "names": [
+          "vendor.axios"
+        ],
+        "size": 199839,
+        "modules": 2,
+        "files": [
+          "vendor.axios.5896b3a39b3ee27857dc.js"
+        ]
+      },
+      {
+        "id": 95,
+        "names": [
+          "vendor.react-native-gesture-handler"
+        ],
+        "size": 186094,
+        "modules": 1,
+        "files": [
+          "vendor.react-native-gesture-handler.cc72f7a5db8769dfd25c.js"
+        ]
+      },
+      {
+        "id": 823,
+        "names": [],
+        "size": 170162,
+        "modules": 70,
+        "files": [
+          "823.22c4a06df4c113b4492e.js"
+        ]
+      },
+      {
+        "id": 70,
+        "names": [
+          "vendor.react"
+        ],
+        "size": 141276,
+        "modules": 6,
+        "files": [
+          "vendor.react.9bded22cc94434970f9a.js"
+        ]
+      },
+      {
+        "id": 634,
+        "names": [
+          "vendor.sentry-internal"
+        ],
+        "size": 120051,
+        "modules": 1,
+        "files": [
+          "vendor.sentry-internal.2522d6647260e15fc822.js"
+        ]
+      },
+      {
+        "id": 286,
+        "names": [
+          "vendor.react-native"
+        ],
+        "size": 83644,
+        "modules": 20,
+        "files": [
+          "vendor.react-native.7c44ba5b0ffa95f028e0.js"
+        ]
+      },
+      {
+        "id": 102,
+        "names": [
+          "vendor.lodash"
+        ],
+        "size": 62657,
+        "modules": 89,
+        "files": [
+          "vendor.lodash.91d7e3c16f44e6fb061e.js"
+        ]
+      },
+      {
+        "id": 300,
+        "names": [],
+        "size": 22987,
+        "modules": 1,
+        "files": [
+          "300.d88c900a1b6052dba174.chunk.js"
+        ]
+      },
+      {
+        "id": 522,
+        "names": [
+          "vendor.react-native-screens"
+        ],
+        "size": 22599,
+        "modules": 1,
+        "files": [
+          "vendor.react-native-screens.cf6b1f0d8aef0427a381.js"
+        ]
+      },
+      {
+        "id": 996,
+        "names": [
+          "vendor.color-convert"
+        ],
+        "size": 21005,
+        "modules": 3,
+        "files": [
+          "vendor.color-convert.945ea3d94330eeedbfb8.js"
+        ]
+      },
+      {
+        "id": 121,
+        "names": [
+          "runtime"
+        ],
+        "size": 9062,
+        "modules": 16,
+        "files": [
+          "runtime.7587af86368da399aece.js"
+        ]
+      }
+    ],
+    "dependencies": [
+      {
+        "name": "@sentry",
+        "size": 4119564,
+        "modules": 679
+      },
+      {
+        "name": "@firebase",
+        "size": 1637697,
+        "modules": 10
+      },
+      {
+        "name": "firebase",
+        "size": 1496892,
+        "modules": 4
+      },
+      {
+        "name": "react-native-reanimated",
+        "size": 1229714,
+        "modules": 160
+      },
+      {
+        "name": "@sentry-internal",
+        "size": 1081438,
+        "modules": 129
+      },
+      {
+        "name": "react-native-web",
+        "size": 1010216,
+        "modules": 159
+      },
+      {
+        "name": "@react-navigation",
+        "size": 698078.8,
+        "modules": 150
+      },
+      {
+        "name": "@expo",
+        "size": 478325,
+        "modules": 60
+      },
+      {
+        "name": "react-native-gesture-handler",
+        "size": 370240,
+        "modules": 62
+      },
+      {
+        "name": "axios",
+        "size": 300757,
+        "modules": 51
+      },
+      {
+        "name": "react-dom",
+        "size": 133100,
+        "modules": 2
+      },
+      {
+        "name": "localforage",
+        "size": 93750,
+        "modules": 1
+      },
+      {
+        "name": "react-native",
+        "size": 70784,
+        "modules": 19
+      },
+      {
+        "name": "lodash",
+        "size": 62657,
+        "modules": 89
+      },
+      {
+        "name": "react-native-screens",
+        "size": 43885,
+        "modules": 24
+      },
+      {
+        "name": "expo-asset",
+        "size": 24902,
+        "modules": 12
+      },
+      {
+        "name": "expo-modules-core",
+        "size": 21155,
+        "modules": 26
+      },
+      {
+        "name": "color-convert",
+        "size": 21005,
+        "modules": 3
+      },
+      {
+        "name": "expo-font",
+        "size": 19132,
+        "modules": 8
+      },
+      {
+        "name": "expo-web-browser",
+        "size": 18916,
+        "modules": 3
+      }
+    ],
+    "duplicates": []
+  },
+  "performanceMetrics": {
+    "buildTime": -1,
+    "bundleSize": 2006524,
+    "dependencies": {
+      "total": 92,
+      "production": 43,
+      "development": 49,
+      "outdated": 41
+    },
+    "codeComplexity": {
+      "totalFiles": 159,
+      "totalLines": 38795,
+      "averageLinesPerFile": 244,
+      "complexity": "Very High"
+    }
+  },
+  "imageOptimization": {
+    "totalImages": 15,
+    "totalSize": 172028,
+    "formats": {
+      ".png": {
+        "count": 10,
+        "size": 128213
+      },
+      ".svg": {
+        "count": 3,
+        "size": 14
+      },
+      ".jpeg": {
+        "count": 1,
+        "size": 34991
+      },
+      ".webp": {
+        "count": 1,
+        "size": 8810
+      }
+    },
+    "recommendations": []
+  },
+  "recommendations": [
+    {
+      "category": "Bundle Size",
+      "priority": "High",
+      "description": "Bundle size exceeds 500KB. Consider code splitting and lazy loading.",
+      "impact": "Performance"
+    },
+    {
+      "category": "Dependencies",
+      "priority": "Medium",
+      "description": "Consider replacing @mui/material with selective imports",
+      "impact": "800KB"
+    },
+    {
+      "category": "Security",
+      "priority": "Critical",
+      "description": "Fix 20 security vulnerabilities",
+      "impact": "Security"
+    }
+  ],
+  "scores": {
+    "bundleSize": 50,
+    "codeQuality": 100,
+    "security": 0,
+    "performance": 75,
+    "overall": 56
+  },
+  "dependencyAnalysis": {
+    "heavy": [
+      {
+        "name": "@mui/material",
+        "size": "1.2MB",
+        "alternative": "selective imports",
+        "savings": "800KB"
+      }
+    ],
+    "opportunities": [
+      {
+        "type": "dependency",
+        "package": "@mui/material",
+        "recommendation": "Consider replacing @mui/material with selective imports",
+        "impact": "800KB"
+      }
+    ]
+  },
+  "codeQuality": {
+    "eslintErrors": 0,
+    "eslintWarnings": 0,
+    "typescript": "Has errors",
+    "testCoverage": null
+  },
+  "security": {
+    "vulnerabilities": 20,
+    "outdatedPackages": 0,
+    "securityIssues": []
+  }
+}

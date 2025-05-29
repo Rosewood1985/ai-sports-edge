@@ -4,6 +4,7 @@ import { getAuth, Auth } from 'firebase/auth';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { StackNavigationProp } from '@react-navigation/stack';
 import MobileAppDownload from '../components/MobileAppDownload';
+import LegalAcceptanceCheckbox from '../components/LegalAcceptanceCheckbox';
 import { appDownloadService } from '../services/appDownloadService';
 import { useI18n } from '../contexts/I18nContext';
 import ThemeToggle from '../atomic/molecules/theme/ThemeToggle';
@@ -29,6 +30,8 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [showDownloadPrompt, setShowDownloadPrompt] = useState<boolean>(false);
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
+  const [legalAccepted, setLegalAccepted] = useState<boolean>(false);
+  const [isSignupMode, setIsSignupMode] = useState<boolean>(false);
 
   // Get Firebase auth instance
   const auth: Auth = getAuth();
@@ -78,6 +81,12 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
 
     if (!password.trim()) {
       Alert.alert(t('common.error'), t('login.errors.passwordRequired'));
+      return;
+    }
+
+    // Check if legal agreement is accepted
+    if (!legalAccepted) {
+      Alert.alert(t('common.error'), t('auth.agreement_required'));
       return;
     }
 
@@ -212,51 +221,58 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
         accessibilityRole="text"
       />
 
+      {/* Show legal acceptance checkbox in signup mode */}
+      {isSignupMode && (
+        <LegalAcceptanceCheckbox
+          isAccepted={legalAccepted}
+          onAcceptanceChange={setLegalAccepted}
+          showNavigationLinks={true}
+        />
+      )}
+
+      {/* Primary action button (changes based on mode) */}
       <AccessibleTouchableOpacity
-        accessibilityLabel={t('login.signIn')}
+        accessibilityLabel={isSignupMode ? t('login.signUp') : t('login.signIn')}
         accessibilityRole="button"
-        accessibilityHint={t('login.signInHint')}
-        onPress={handleLogin}
-        style={styles.button}
+        accessibilityHint={isSignupMode ? t('login.signUpHint') : t('login.signInHint')}
+        onPress={isSignupMode ? handleSignUp : handleLogin}
+        style={[styles.button, styles.primaryButton]}
       >
         <AccessibleThemedText style={styles.buttonText} type="button">
-          {t('login.signIn')}
+          {isSignupMode ? t('login.signUp') : t('login.signIn')}
         </AccessibleThemedText>
       </AccessibleTouchableOpacity>
 
+      {/* Mode toggle button */}
       <AccessibleTouchableOpacity
-        accessibilityLabel={t('login.signUp')}
+        accessibilityLabel={isSignupMode ? t('auth.already_have_account') : t('auth.dont_have_account')}
         accessibilityRole="button"
-        accessibilityHint={t('login.signUpHint')}
-        onPress={handleSignUp}
-        style={styles.button}
-      >
-        <AccessibleThemedText style={styles.buttonText} type="button">
-          {t('login.signUp')}
-        </AccessibleThemedText>
-      </AccessibleTouchableOpacity>
-
-      <AccessibleTouchableOpacity
-        accessibilityLabel={t('login.forgotPassword')}
-        accessibilityRole="link"
-        accessibilityHint={t('login.forgotPasswordHint')}
         onPress={() => {
-          /* Handle forgot password */
+          setIsSignupMode(!isSignupMode);
+          setLegalAccepted(false); // Reset legal acceptance when switching modes
         }}
+        style={styles.modeToggleButton}
       >
-        <AccessibleThemedText style={styles.forgotPassword}>
-          {t('login.forgotPassword')}
+        <AccessibleThemedText style={styles.modeToggleText}>
+          {isSignupMode ? t('auth.already_have_account') : t('auth.dont_have_account')}
         </AccessibleThemedText>
       </AccessibleTouchableOpacity>
 
-      <AccessibleThemedView accessibilityLabel={t('login.accountInfo')}>
-        <AccessibleThemedText style={styles.dontHaveAccount}>
-          {t('login.dontHaveAccount')}{' '}
-          <AccessibleThemedText style={styles.signUpLink} accessibilityRole="link">
-            {t('login.signUp')}
+      {/* Only show forgot password in login mode */}
+      {!isSignupMode && (
+        <AccessibleTouchableOpacity
+          accessibilityLabel={t('login.forgotPassword')}
+          accessibilityRole="link"
+          accessibilityHint={t('login.forgotPasswordHint')}
+          onPress={() => {
+            /* Handle forgot password */
+          }}
+        >
+          <AccessibleThemedText style={styles.forgotPassword}>
+            {t('login.forgotPassword')}
           </AccessibleThemedText>
-        </AccessibleThemedText>
-      </AccessibleThemedView>
+        </AccessibleTouchableOpacity>
+      )}
 
       {/* Theme Toggle */}
       <ThemeToggle />
@@ -300,23 +316,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  primaryButton: {
+    backgroundColor: '#FFD700',
+  },
   buttonText: {
     color: '#121212',
     fontWeight: 'bold',
     fontSize: 16,
   },
+  modeToggleButton: {
+    marginTop: 16,
+    paddingVertical: 8,
+  },
+  modeToggleText: {
+    color: '#FFD700',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
   forgotPassword: {
     color: '#FFD700',
     marginTop: 15,
     fontSize: 14,
-  },
-  dontHaveAccount: {
-    color: '#CCCCCC',
-    marginTop: 20,
-    fontSize: 14,
-  },
-  signUpLink: {
-    color: '#FFD700',
-    fontWeight: 'bold',
   },
 });

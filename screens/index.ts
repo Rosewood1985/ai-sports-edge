@@ -2,3 +2,8 @@ export { default as HomeScreen } from './HomeScreen';
 export { default as SearchScreen } from './SearchScreen';
 export { default as ProfileScreen } from './ProfileScreen';
 export { default as SettingsScreen } from './SettingsScreen';
+export { default as PrivacyPolicyScreen } from './PrivacyPolicyScreen';
+export { default as TermsOfServiceScreen } from './TermsOfServiceScreen';
+export { default as PrivacySettingsScreen } from './PrivacySettingsScreen';
+export { default as GDPRConsentScreen } from './GDPRConsentScreen';
+export { default as CCPAConsentScreen } from './CCPAConsentScreen';

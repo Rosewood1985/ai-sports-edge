@@ -9,6 +9,10 @@ import { Platform, View, Text } from 'react-native';
 import { sentryService, createSentryConfig } from './services/sentryService';
 import { sentryNavigationInstrumentation } from './utils/sentryNavigationInstrumentation';
 
+// Import optimization services
+import { optimizationOrchestrator } from './services/optimizationOrchestrator';
+import { advancedImageOptimizationService } from './services/advancedImageOptimizationService';
+
 // Import navigation
 import AppNavigator from './navigation/AppNavigator';
 
@@ -30,6 +34,42 @@ export default function App() {
     } else {
       console.log('[Sentry] DSN not configured - error tracking disabled');
     }
+
+    // Initialize optimization services
+    const initOptimizations = async () => {
+      try {
+        console.log('🚀 Initializing optimization services...');
+        
+        // Initialize optimization orchestrator
+        await optimizationOrchestrator.initialize();
+        
+        // Enable lazy loading for images
+        advancedImageOptimizationService.enableLazyLoading();
+        
+        console.log('✅ Optimization services activated');
+        
+        if (sentryService.isActive()) {
+          sentryService.addBreadcrumb(
+            'Optimization services initialized',
+            'optimization',
+            'info'
+          );
+        }
+      } catch (error) {
+        console.error('❌ Failed to initialize optimizations:', error);
+        
+        if (sentryService.isActive()) {
+          sentryService.captureError(error, {
+            additionalData: {
+              context: 'optimization_initialization',
+              timestamp: new Date().toISOString(),
+            },
+          });
+        }
+      }
+    };
+    
+    initOptimizations();
 
     // Initialize other services (will be added back when imports are fixed)
     // firebaseService.initialize();

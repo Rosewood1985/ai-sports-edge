@@ -331,10 +331,7 @@ const PrivacySettingsScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.linkButton}
           onPress={() => {
-            // Use Alert to show privacy policy since we don't have a dedicated screen yet
-            Alert.alert(t('privacy.privacyPolicy'), t('privacy.privacyPolicyText'), [
-              { text: t('common.ok') },
-            ]);
+            navigation.navigate('PrivacyPolicy');
           }}
         >
           <Text style={styles.linkText}>{t('privacy.viewPrivacyPolicy')}</Text>
@@ -343,10 +340,7 @@ const PrivacySettingsScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.linkButton}
           onPress={() => {
-            // Use Alert to show terms of service since we don't have a dedicated screen yet
-            Alert.alert(t('privacy.termsOfService'), t('privacy.termsOfServiceText'), [
-              { text: t('common.ok') },
-            ]);
+            navigation.navigate('TermsOfService');
           }}
         >
           <Text style={styles.linkText}>{t('privacy.viewTerms')}</Text>
