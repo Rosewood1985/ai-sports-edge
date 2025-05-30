@@ -60,7 +60,14 @@
       "Bash(awk:*)",
       "Bash(npx eslint:*)",
       "Bash(npm ls:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(firebase ext:install:*)",
+      "WebFetch(domain:aisportsedge.app)",
+      "WebFetch(domain:www.aisportsedge.app)",
+      "Bash(curl:*)",
+      "Bash(bash:*)",
+      "Bash(npx expo export:*)",
+      "Bash(scp:*)"
     ],
     "deny": []
   },
