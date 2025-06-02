@@ -1211,7 +1211,7 @@
     <script src="/register-service-worker.js"></script>
 </head>
 <body>
-  <div id="app-content" style="display: none;">
+  <div id="app-content" style="display: block;">
     <header class="header">
       <div class="container">
         <div class="header-content">
@@ -1799,7 +1799,7 @@
   </div>
 
   <!-- Loading spinner while checking auth -->
-  <div id="loading-spinner" style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #121212;">
+  <div id="loading-spinner" style="display: none; justify-content: center; align-items: center; height: 100vh; background-color: #121212;">
     <div style="width: 50px; height: 50px; border: 3px solid rgba(0, 136, 255, 0.3); border-radius: 50%; border-top-color: #0088ff; animation: spin 1s ease-in-out infinite;"></div>
   </div>
 
@@ -1826,13 +1826,13 @@ firebase.auth().onAuthStateChanged((user) => {
   document.getElementById('loading-spinner').style.display = 'none';
   
   if (user) {
-    // User is signed in, show content
+    // User is signed in, show additional features
     console.log('User is signed in:', user.email);
-    document.getElementById('app-content').style.display = 'block';
+    // Add any authenticated user features here
   } else {
-    // User is not signed in, redirect to login page
-    console.log('User is not signed in, redirecting to login page');
-    window.location.href = '/login.html';
+    // User is not signed in, show public content
+    console.log('User is not signed in, showing public content');
+    // Content is already visible, no redirect needed
   }
 });
 
