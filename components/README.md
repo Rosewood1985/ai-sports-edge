@@ -1,0 +1,1 @@
+/* test accessibility trigger */
