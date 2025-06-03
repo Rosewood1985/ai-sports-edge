@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "site": "aisportsedge-app",
+      "site": "ai-sports-edge",
       "public": "public",
     "ignore": [
       "firebase.json",
