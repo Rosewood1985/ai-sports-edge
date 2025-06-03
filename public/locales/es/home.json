@@ -1,62 +1,152 @@
 {
   "meta": {
-    "title": "AI Sports Edge - Predicciones de Apuestas Deportivas Impulsadas por IA",
-    "description": "Obtenga predicciones precisas de apuestas deportivas impulsadas por IA. Mejore su estrategia de apuestas con análisis avanzados e información en tiempo real.",
-    "keywords": "apuestas deportivas, predicciones de IA, análisis de apuestas, ventaja deportiva",
-    "ogTitle": "AI Sports Edge - Predicciones de Apuestas Deportivas Impulsadas por IA",
-    "ogDescription": "Obtenga predicciones precisas de apuestas deportivas impulsadas por IA. Mejore su estrategia de apuestas con análisis avanzados e información en tiempo real."
+    "title": "AI Sports Edge - Análisis Deportivo Potenciado por IA",
+    "description": "Obtenga análisis deportivos precisos potenciados por IA. Mejore sus decisiones deportivas con insights de datos avanzados e inteligencia en tiempo real.",
+    "keywords": "análisis deportivo, predicciones de IA, análisis de datos deportivos, ventaja deportiva, inteligencia artificial",
+    "ogTitle": "AI Sports Edge - Análisis Deportivo Potenciado por IA",
+    "ogDescription": "Obtenga análisis deportivos precisos potenciados por IA. Mejore sus decisiones deportivas con insights de datos avanzados e inteligencia en tiempo real."
   },
   "hero": {
-    "title": "Predicciones de Apuestas Deportivas Impulsadas por IA",
-    "subtitle": "Obtenga predicciones precisas, análisis e información para decisiones de apuestas más inteligentes.",
+    "title": "Plataforma de Análisis Deportivo Potenciada por IA",
+    "subtitle": "Obtenga análisis precisos, predicciones e insights para decisiones deportivas más inteligentes con tecnología de IA avanzada.",
+    "downloadButton": "Descargar App",
     "imageAlt": "Aplicación AI Sports Edge"
+  },
+  "statistics": {
+    "accuracy": "95% de Precisión en Predicciones",
+    "users": "50K+ Usuarios Activos", 
+    "sports": "25+ Deportes Cubiertos",
+    "updates": "Actualizaciones 24/7"
   },
   "features": {
     "title": "¿Por Qué Elegir AI Sports Edge?",
+    "subtitle": "Descubra las poderosas características que hacen que nuestro análisis deportivo y inteligencia de decisiones sean los más precisos de la industria.",
     "feature1": {
       "title": "Predicciones de IA",
-      "description": "Algoritmos avanzados de aprendizaje automático analizan grandes cantidades de datos para proporcionar predicciones precisas de apuestas."
+      "description": "Algoritmos avanzados de aprendizaje automático analizan grandes cantidades de datos para proporcionar análisis deportivos e insights precisos."
     },
     "feature2": {
       "title": "Análisis en Tiempo Real",
-      "description": "Obtenga estadísticas, probabilidades y análisis actualizados al minuto para tomar decisiones informadas de apuestas."
+      "description": "Obtenga estadísticas, datos y análisis actualizados al minuto para tomar decisiones deportivas informadas."
     },
     "feature3": {
       "title": "Cobertura Multi-Deporte",
       "description": "Desde la NFL hasta la Fórmula 1, cubrimos todos los deportes principales con modelos de predicción especializados para cada uno."
     },
     "feature4": {
-      "title": "Información de la Comunidad",
-      "description": "Conéctese con otros apostadores, comparta estrategias y aprenda de la sabiduría colectiva de la comunidad."
-    },
-    "exploreButton": "Explorar Todas las Características"
-  },
-  "howItWorks": {
-    "title": "Cómo Funciona",
-    "step1": {
-      "title": "Descargue la Aplicación",
-      "description": "Obtenga AI Sports Edge en su dispositivo iOS o Android."
-    },
-    "step2": {
-      "title": "Seleccione Sus Deportes",
-      "description": "Elija los deportes en los que está interesado en apostar."
-    },
-    "step3": {
-      "title": "Obtenga Predicciones",
-      "description": "Reciba predicciones y análisis impulsados por IA."
-    },
-    "step4": {
-      "title": "Haga Apuestas Más Inteligentes",
-      "description": "Utilice nuestra información para mejorar su estrategia de apuestas."
+      "title": "Insights de la Comunidad",
+      "description": "Conéctese con otros entusiastas deportivos, comparta insights y aprenda del conocimiento colectivo de la comunidad."
     }
   },
-  "cta": {
-    "title": "¿Listo para Transformar Su Estrategia de Apuestas?",
-    "description": "Únase a miles de usuarios que están tomando decisiones de apuestas más inteligentes con AI Sports Edge.",
-    "downloadButton": "Descargar Ahora",
-    "specialOfferButton": "Ver nuestra oferta especial de apuestas"
+  "sports": {
+    "title": "Cobertura Deportiva Integral",
+    "subtitle": "Modelos de IA especializados para cada deporte principal, entregando predicciones precisas en todas las ligas y eventos.",
+    "nfl": {
+      "title": "NFL",
+      "description": "Spreads de puntos, over/unders, props de jugadores"
+    },
+    "nba": {
+      "title": "NBA", 
+      "description": "Ganadores de juegos, totales de puntos, rendimiento de jugadores"
+    },
+    "mlb": {
+      "title": "MLB",
+      "description": "Líneas de dinero, totales de carreras, análisis de pitchers"
+    },
+    "nhl": {
+      "title": "NHL",
+      "description": "Líneas de puck, totales de goles, predicciones de power play"
+    },
+    "soccer": {
+      "title": "Fútbol",
+      "description": "Resultados de partidos, totales de goles, corners"
+    },
+    "formula1": {
+      "title": "Fórmula 1",
+      "description": "Ganadores de carreras, finales de podio, resultados de calificación"
+    },
+    "ufc": {
+      "title": "UFC/MMA",
+      "description": "Resultados de peleas, método de victoria, predicciones de rounds"
+    },
+    "horseRacing": {
+      "title": "Carreras de Caballos",
+      "description": "Ganadores de carreras, exactas, trifectas"
+    }
   },
-  "betNowPopup": {
-    "message": "¿Listo para hacer sus apuestas? ¡Utilice nuestro enlace exclusivo de afiliado de FanDuel para obtener un bono especial!"
+  "about": {
+    "title": "Acerca de AI Sports Edge",
+    "subtitle": "Revolucionando el análisis deportivo con inteligencia artificial y ciencia de datos.",
+    "mission": {
+      "title": "Nuestra Misión",
+      "description1": "En AI Sports Edge, creemos que las decisiones deportivas deben estar potenciadas por inteligencia y datos. Nuestra misión es democratizar el acceso a análisis deportivos de grado profesional e insights impulsados por IA, dando a cada entusiasta deportivo las herramientas para tomar decisiones más inteligentes e informadas.",
+      "description2": "Hemos construido la plataforma de análisis deportivo más avanzada combinando aprendizaje automático, modelado estadístico y análisis de datos en tiempo real para entregar precisión sin precedentes en insights deportivos."
+    },
+    "values": {
+      "team": {
+        "title": "Equipo Experto",
+        "description": "Nuestro equipo consiste en científicos de datos, atletas profesionales retirados y expertos en análisis deportivo que entienden tanto los aspectos técnicos como estratégicos de la predicción deportiva."
+      },
+      "platform": {
+        "title": "Plataforma Confiable",
+        "description": "Con seguridad de grado empresarial y metodologías transparentes, hemos construido una plataforma en la que más de 50,000 usuarios confían con sus decisiones deportivas todos los días."
+      },
+      "results": {
+        "title": "Resultados Comprobados",
+        "description": "Nuestros modelos de IA han logrado una tasa de precisión del 95% en predicciones en todos los deportes principales, superando consistentemente los métodos de análisis tradicionales y predicciones de expertos."
+      }
+    },
+    "commitment": {
+      "title": "¿Por Qué Confiar en AI Sports Edge?",
+      "description1": "Estamos comprometidos con el análisis deportivo responsable y la transparencia. Cada predicción viene con análisis detallado e intervalos de confianza, para que entiendas exactamente cómo nuestra IA llegó a sus conclusiones. Nuestros algoritmos se mejoran continuamente basándose en resultados del mundo real, asegurando que siempre tengas acceso a las predicciones más precisas disponibles.",
+      "description2": "Únete a miles de usuarios exitosos que han transformado su enfoque al análisis deportivo con AI Sports Edge. Experimenta el futuro de la toma de decisiones deportivas inteligente hoy."
+    }
+  },
+  "liveAnalytics": {
+    "title": "Análisis en Vivo y Predicciones",
+    "subtitle": "Obtenga insights potenciados por IA para próximos juegos. Acceda a análisis premium para ver nuestras predicciones detalladas y análisis.",
+    "moreButton": "¿Quiere Más Predicciones?",
+    "moreDescription": "Descargue nuestra aplicación móvil para cobertura integral y características avanzadas.",
+    "downloadApp": "Descargar App"
+  },
+  "download": {
+    "title": "Descargar AI Sports Edge",
+    "subtitle": "Comience con análisis deportivo potenciado por IA hoy.",
+    "qrDescription": "Escanee con la cámara de su teléfono o la app Expo Go",
+    "steps": {
+      "step1": "Descargue Expo Go del App Store o Google Play",
+      "step2": "Abra Expo Go y escanee el código QR",
+      "step3": "Disfrute AI Sports Edge con todas las características habilitadas"
+    },
+    "openButton": "Abrir en Expo Go"
+  },
+  "footer": {
+    "description": "Su compañero definitivo de análisis deportivo potenciado por IA. Obtenga predicciones, análisis e insights para decisiones deportivas más inteligentes.",
+    "platform": "Plataforma",
+    "sports": "Deportes", 
+    "company": "Empresa",
+    "legal": "Legal",
+    "links": {
+      "features": "Características",
+      "pricing": "Precios",
+      "liveAnalytics": "Análisis en Vivo",
+      "downloadApp": "Descargar App",
+      "aboutUs": "Acerca de Nosotros",
+      "contact": "Contacto",
+      "careers": "Carreras",
+      "blog": "Blog",
+      "helpCenter": "Centro de Ayuda",
+      "privacyPolicy": "Política de Privacidad",
+      "termsOfService": "Términos de Servicio",
+      "cookiePolicy": "Política de Cookies",
+      "responsibleAnalytics": "Análisis Responsable",
+      "dataProtection": "Protección de Datos"
+    },
+    "badges": {
+      "secured": "🔒 SSL Seguro",
+      "mobile": "📱 iOS y Android", 
+      "accuracy": "🏆 95% Precisión"
+    },
+    "copyright": "© 2025 AI Sports Edge. Todos los derechos reservados."
   }
 }

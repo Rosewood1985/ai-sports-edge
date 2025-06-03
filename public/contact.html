@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00F0FF">
+  <meta name="description" content="Contact AI Sports Edge - Get in touch with our sports analytics team for support, partnerships, and inquiries.">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(self), interest-cohort=()">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://aisportsedge.app/contact.html">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aisportsedge.app/contact.html">
+  <meta property="og:title" content="Contact AI Sports Edge - Sports Analytics Support">
+  <meta property="og:description" content="Get in touch with our AI Sports Edge team for support, partnerships, and inquiries about our sports analytics platform.">
+  <meta property="og:image" content="https://aisportsedge.app/og-image.jpg">
+  
+  <title>Contact Us - AI Sports Edge</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/ai_logo_new.svg">
+  <link rel="apple-touch-icon" href="/ai_logo_new.svg">
+  
+  <!-- Enhanced Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap CSS for enhanced styling -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <!-- Font Awesome for enhanced icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Original Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="neon-ui.css">
+  
+  <!-- Enhanced Design Variables -->
+  <style>
+    :root {
+      /* NEON BLUE THEME - Consistent with Mobile App */
+      --primary-color: #00F0FF;
+      --primary-dark: #00D4E6;
+      --primary-light: #66F2FF;
+      --primary-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --accent-color: #40E0D0;
+      --accent-dark: #35C7B8;
+      --accent-light: #6DE6D4;
+      --accent-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+      --success-color: #39FF14;
+      --warning-color: #FFF000;
+      --danger-color: #FF1010;
+      --white: #ffffff;
+      --off-white: #121212;
+      --gray-100: #1E1E1E;
+      --gray-200: #2D2D2D;
+      --gray-300: #404040;
+      --gray-400: #595959;
+      --gray-500: #737373;
+      --gray-600: #808080;
+      --gray-700: #B0B0B0;
+      --gray-800: #FFFFFF;
+      --gray-900: #FFFFFF;
+      --dark-blue: #000000;
+      
+      /* Enhanced typography */
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      
+      /* Enhanced shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-glow: 0 0 15px rgba(0, 102, 255, 0.5);
+      
+      /* Enhanced transitions */
+      --transition-fast: 0.15s;
+      --transition-normal: 0.3s;
+      --transition-slow: 0.5s;
+      --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      background-color: var(--gray-100);
+      color: var(--gray-800);
+      font-family: var(--font-primary);
+      line-height: 1.6;
+    }
+    
+    /* Enhanced Header */
+    .header {
+      background-color: rgba(18, 18, 18, 0.98) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--gray-200);
+      transition: all var(--transition-normal);
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      transition: transform var(--transition-normal);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--white);
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+    }
+    
+    .logo:hover {
+      transform: scale(1.05);
+      color: var(--primary-color);
+    }
+    
+    .logo img {
+      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .logo:hover img {
+      box-shadow: var(--shadow-lg);
+      transform: rotate(5deg);
+    }
+    
+    .nav-item a {
+      position: relative;
+      transition: all var(--transition-normal) var(--transition-timing);
+      color: var(--gray-700);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+    
+    .nav-item a:hover {
+      color: var(--primary-color);
+    }
+    
+    .nav-item a.active {
+      color: var(--primary-color);
+      background-color: rgba(0, 240, 255, 0.1);
+    }
+    
+    .nav-item a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--primary-color);
+      transition: width var(--transition-normal) var(--transition-timing);
+      border-radius: 2px;
+    }
+    
+    .nav-item a:hover::after,
+    .nav-item a.active::after {
+      width: 100%;
+    }
+    
+    /* Contact Hero Section */
+    .contact-hero {
+      background: var(--primary-gradient) !important;
+      padding: 6rem 0 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .contact-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .contact-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .contact-hero h1 {
+      font-family: var(--font-heading);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .contact-hero p {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    
+    /* Contact Section */
+    .contact-section {
+      padding: 6rem 0;
+      background: var(--white);
+    }
+    
+    .contact-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .contact-info {
+      padding: 2rem;
+    }
+    
+    .contact-info h2 {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      color: var(--gray-900);
+      margin-bottom: 1.5rem;
+    }
+    
+    .contact-info p {
+      font-size: 1.125rem;
+      color: var(--gray-600);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    
+    .contact-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .contact-method {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      transition: all var(--transition-normal);
+    }
+    
+    .contact-method:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
+    }
+    
+    .contact-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--primary-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    
+    .contact-details h4 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+    }
+    
+    .contact-details p {
+      color: var(--gray-600);
+      margin: 0;
+      font-size: 0.875rem;
+    }
+    
+    .contact-details a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .contact-details a:hover {
+      color: var(--primary-dark);
+    }
+    
+    /* Contact Form */
+    .contact-form {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+    }
+    
+    .contact-form h3 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      color: var(--gray-900);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: var(--font-primary);
+      transition: border-color var(--transition-normal);
+      background-color: var(--white);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .primary-button {
+      background: var(--primary-gradient) !important;
+      color: var(--white) !important;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-normal) var(--transition-timing);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .primary-button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      color: var(--white) !important;
+    }
+    
+    .primary-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* FAQ Section */
+    .faq-section {
+      background: var(--gray-100);
+      padding: 6rem 0;
+    }
+    
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .faq-item {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: all var(--transition-normal);
+    }
+    
+    .faq-item:hover {
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .faq-question {
+      padding: 1.5rem;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .faq-question:hover {
+      color: var(--primary-color);
+    }
+    
+    .faq-answer {
+      padding: 0 1.5rem 1.5rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      display: none;
+    }
+    
+    .faq-answer.show {
+      display: block;
+    }
+    
+    /* Section Headers */
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    
+    .section-header h2 {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+    }
+    
+    .section-header p {
+      font-size: 1.25rem;
+      color: var(--gray-600);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .contact-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .contact-hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .contact-form {
+        padding: 1.5rem;
+      }
+      
+      .contact-info {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content d-flex justify-content-between align-items-center">
+        <a href="/" class="logo">
+          <img src="/ai_logo_new.svg" alt="AI Sports Edge Logo" style="width: 40px; height: 40px;">
+          <span>AI Sports Edge</span>
+        </a>
+        <nav class="nav">
+          <ul class="nav-list d-flex list-unstyled m-0">
+            <li class="nav-item"><a href="/">Home</a></li>
+            <li class="nav-item"><a href="pricing.html">Pricing</a></li>
+            <li class="nav-item"><a href="about.html">About</a></li>
+            <li class="nav-item"><a href="contact.html" class="active">Contact</a></li>
+            <li class="nav-item"><a href="login.html">Login</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contact Hero Section -->
+  <section class="contact-hero">
+    <div class="container">
+      <div class="contact-hero-content">
+        <h1>Get in Touch</h1>
+        <p>Have questions about AI Sports Edge? Want to partner with us? Our team is here to help you succeed with intelligent sports analytics.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="contact-container">
+        <div class="contact-info">
+          <h2>Let's Connect</h2>
+          <p>We're always excited to hear from sports enthusiasts, potential partners, and users who want to elevate their sports analytics game. Reach out to us through any of the channels below.</p>
+          
+          <div class="contact-methods">
+            <div class="contact-method">
+              <div class="contact-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Email Support</h4>
+                <p>For general inquiries and support</p>
+                <a href="mailto:support@aisportsedge.app">support@aisportsedge.app</a>
+              </div>
+            </div>
+            
+            <div class="contact-method">
+              <div class="contact-icon">
+                <i class="fas fa-handshake"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Partnerships</h4>
+                <p>Business partnerships and collaborations</p>
+                <a href="mailto:partnerships@aisportsedge.app">partnerships@aisportsedge.app</a>
+              </div>
+            </div>
+            
+            <div class="contact-method">
+              <div class="contact-icon">
+                <i class="fas fa-bug"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Technical Support</h4>
+                <p>Bug reports and technical issues</p>
+                <a href="mailto:tech@aisportsedge.app">tech@aisportsedge.app</a>
+              </div>
+            </div>
+            
+            <div class="contact-method">
+              <div class="contact-icon">
+                <i class="fas fa-comments"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Live Chat</h4>
+                <p>Real-time support (Mon-Fri, 9AM-6PM EST)</p>
+                <p>Available in-app and on website</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-form">
+          <h3>Send us a Message</h3>
+          <form id="contactForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="subject">Subject *</label>
+              <select id="subject" name="subject" required>
+                <option value="">Select a topic</option>
+                <option value="general">General Inquiry</option>
+                <option value="support">Technical Support</option>
+                <option value="partnership">Partnership Opportunity</option>
+                <option value="billing">Billing & Subscriptions</option>
+                <option value="feature">Feature Request</option>
+                <option value="bug">Bug Report</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="message">Message *</label>
+              <textarea id="message" name="message" placeholder="Tell us how we can help you..." required></textarea>
+            </div>
+            
+            <button type="submit" class="primary-button" id="submitBtn">
+              <span id="submitText">Send Message</span>
+              <span id="submitSpinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Sending...
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Frequently Asked Questions</h2>
+        <p>Quick answers to common questions about AI Sports Edge.</p>
+      </div>
+      
+      <div class="faq-container">
+        <div class="faq-item">
+          <button class="faq-question">
+            How quickly do you respond to support requests?
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            We typically respond to support requests within 24 hours on business days. For urgent technical issues, our premium subscribers receive priority support with responses within 4-6 hours.
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question">
+            Do you offer partnerships with sportsbooks or media companies?
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Yes! We're actively seeking partnerships with sportsbooks, media companies, and other sports-related businesses. Contact our partnerships team to discuss collaboration opportunities.
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question">
+            Can I request new features for the platform?
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Absolutely! We love hearing from our users about new features and improvements. Use the contact form above or reach out directly to share your ideas.
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question">
+            Is there a phone number I can call for support?
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Currently, we provide support through email and live chat for the best documentation and response times. This allows us to provide detailed, accurate assistance for technical questions.
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <button class="faq-question">
+            Do you provide custom analytics solutions for enterprises?
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer">
+            Yes, we offer custom analytics solutions and API access for enterprise clients. Contact our partnerships team to discuss your specific requirements and pricing.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enhanced Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // FAQ Toggle functionality
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', () => {
+        const faqItem = question.parentElement;
+        const answer = faqItem.querySelector('.faq-answer');
+        const icon = question.querySelector('i');
+        
+        // Toggle display
+        if (answer.classList.contains('show')) {
+          answer.classList.remove('show');
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          // Close all other open FAQs
+          document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('show'));
+          document.querySelectorAll('.faq-question i').forEach(i => i.style.transform = 'rotate(0deg)');
+          
+          // Open this FAQ
+          answer.classList.add('show');
+          icon.style.transform = 'rotate(180deg)';
+        }
+      });
+    });
+    
+    // Contact Form Submission
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const submitText = document.getElementById('submitText');
+      const submitSpinner = document.getElementById('submitSpinner');
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.style.display = 'none';
+      submitSpinner.style.display = 'inline';
+      
+      // Get form data
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+      
+      // Simulate form submission (replace with actual API call)
+      setTimeout(() => {
+        // Reset form
+        this.reset();
+        
+        // Show success message
+        submitText.textContent = 'Message Sent!';
+        submitText.style.display = 'inline';
+        submitSpinner.style.display = 'none';
+        submitBtn.disabled = false;
+        
+        // Reset button text after 3 seconds
+        setTimeout(() => {
+          submitText.textContent = 'Send Message';
+        }, 3000);
+        
+        // Log form data (replace with actual submission logic)
+        console.log('Contact form submitted:', data);
+        
+        // Show success alert
+        alert('Thank you for contacting us! We\'ll get back to you within 24 hours.');
+      }, 2000);
+    });
+    
+    // Form validation
+    const form = document.getElementById('contactForm');
+    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+    
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (this.value.trim() === '') {
+          this.style.borderColor = 'var(--danger-color)';
+        } else {
+          this.style.borderColor = 'var(--success-color)';
+        }
+      });
+      
+      input.addEventListener('focus', function() {
+        this.style.borderColor = 'var(--primary-color)';
+      });
+    });
+  </script>
+</body>
+</html>

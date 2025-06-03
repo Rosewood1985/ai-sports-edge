@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00F0FF">
+  <meta name="description" content="About AI Sports Edge - Learn about our mission to revolutionize sports analytics with AI-powered predictions and insights.">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(self), interest-cohort=()">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://aisportsedge.app/about.html">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aisportsedge.app/about.html">
+  <meta property="og:title" content="About AI Sports Edge - Sports Analytics Innovation">
+  <meta property="og:description" content="Discover how AI Sports Edge is revolutionizing sports analytics with cutting-edge AI technology and data science.">
+  <meta property="og:image" content="https://aisportsedge.app/og-image.jpg">
+  
+  <title>About Us - AI Sports Edge</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/ai_logo_new.svg">
+  <link rel="apple-touch-icon" href="/ai_logo_new.svg">
+  
+  <!-- Enhanced Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap CSS for enhanced styling -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <!-- Font Awesome for enhanced icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Original Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="neon-ui.css">
+  
+  <!-- Enhanced Design Variables -->
+  <style>
+    :root {
+      /* NEON BLUE THEME - Consistent with Mobile App */
+      --primary-color: #00F0FF;
+      --primary-dark: #00D4E6;
+      --primary-light: #66F2FF;
+      --primary-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --accent-color: #40E0D0;
+      --accent-dark: #35C7B8;
+      --accent-light: #6DE6D4;
+      --accent-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+      --success-color: #39FF14;
+      --warning-color: #FFF000;
+      --danger-color: #FF1010;
+      --white: #ffffff;
+      --off-white: #121212;
+      --gray-100: #1E1E1E;
+      --gray-200: #2D2D2D;
+      --gray-300: #404040;
+      --gray-400: #595959;
+      --gray-500: #737373;
+      --gray-600: #808080;
+      --gray-700: #B0B0B0;
+      --gray-800: #FFFFFF;
+      --gray-900: #FFFFFF;
+      --dark-blue: #000000;
+      
+      /* Enhanced typography */
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      
+      /* Enhanced shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-glow: 0 0 15px rgba(0, 102, 255, 0.5);
+      
+      /* Enhanced transitions */
+      --transition-fast: 0.15s;
+      --transition-normal: 0.3s;
+      --transition-slow: 0.5s;
+      --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      background-color: var(--gray-100);
+      color: var(--gray-800);
+      font-family: var(--font-primary);
+      line-height: 1.6;
+    }
+    
+    /* Enhanced Header */
+    .header {
+      background-color: rgba(18, 18, 18, 0.98) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--gray-200);
+      transition: all var(--transition-normal);
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      transition: transform var(--transition-normal);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--white);
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+    }
+    
+    .logo:hover {
+      transform: scale(1.05);
+      color: var(--primary-color);
+    }
+    
+    .logo img {
+      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .logo:hover img {
+      box-shadow: var(--shadow-lg);
+      transform: rotate(5deg);
+    }
+    
+    .nav-item a {
+      position: relative;
+      transition: all var(--transition-normal) var(--transition-timing);
+      color: var(--gray-700);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+    
+    .nav-item a:hover {
+      color: var(--primary-color);
+    }
+    
+    .nav-item a.active {
+      color: var(--primary-color);
+      background-color: rgba(0, 240, 255, 0.1);
+    }
+    
+    .nav-item a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--primary-color);
+      transition: width var(--transition-normal) var(--transition-timing);
+      border-radius: 2px;
+    }
+    
+    .nav-item a:hover::after,
+    .nav-item a.active::after {
+      width: 100%;
+    }
+    
+    /* About Hero Section */
+    .about-hero {
+      background: var(--primary-gradient) !important;
+      padding: 6rem 0 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .about-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .about-hero h1 {
+      font-family: var(--font-heading);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .about-hero p {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    
+    /* Mission Section */
+    .mission-section {
+      padding: 6rem 0;
+      background: var(--white);
+    }
+    
+    .mission-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .mission-content h2 {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      color: var(--gray-900);
+      margin-bottom: 2rem;
+    }
+    
+    .mission-content p {
+      font-size: 1.125rem;
+      color: var(--gray-700);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Values Section */
+    .values-section {
+      padding: 6rem 0;
+      background: var(--gray-100);
+    }
+    
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    
+    .value-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .value-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--primary-gradient);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--transition-normal);
+    }
+    
+    .value-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
+    }
+    
+    .value-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .value-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: var(--white);
+      font-size: 1.5rem;
+      transition: transform var(--transition-normal);
+    }
+    
+    .value-card:hover .value-icon {
+      transform: scale(1.1);
+    }
+    
+    .value-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    
+    .value-card p {
+      color: var(--gray-600);
+      line-height: 1.6;
+    }
+    
+    /* Team Section */
+    .team-section {
+      padding: 6rem 0;
+      background: var(--white);
+    }
+    
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    
+    .team-member {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      transition: all var(--transition-normal);
+    }
+    
+    .team-member:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .team-avatar {
+      width: 100px;
+      height: 100px;
+      background: var(--primary-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: var(--white);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    
+    .team-member h4 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    
+    .team-role {
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .team-member p {
+      color: var(--gray-600);
+      line-height: 1.6;
+      font-size: 0.875rem;
+    }
+    
+    /* Technology Section */
+    .technology-section {
+      padding: 6rem 0;
+      background: var(--gray-100);
+    }
+    
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem;
+      margin-top: 3rem;
+      align-items: center;
+    }
+    
+    .tech-content h3 {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      color: var(--gray-900);
+      margin-bottom: 1.5rem;
+    }
+    
+    .tech-content p {
+      font-size: 1.125rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    
+    .tech-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .tech-features li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      color: var(--gray-700);
+    }
+    
+    .tech-features li::before {
+      content: '✓';
+      color: var(--success-color);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    
+    .tech-visual {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      text-align: center;
+    }
+    
+    .tech-chart {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      padding: 6rem 0;
+      background: var(--primary-gradient);
+      color: var(--white);
+      text-align: center;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    
+    .stat-item {
+      padding: 2rem 1rem;
+    }
+    
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--white);
+      font-family: var(--font-heading);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+    
+    /* Section Headers */
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    
+    .section-header h2 {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+    }
+    
+    .section-header p {
+      font-size: 1.25rem;
+      color: var(--gray-600);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .primary-button {
+      background: var(--white) !important;
+      color: var(--primary-color) !important;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-normal) var(--transition-timing);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .primary-button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      color: var(--primary-dark) !important;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 1024px) {
+      .values-grid,
+      .team-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .tech-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .about-hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+      
+      .tech-chart {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content d-flex justify-content-between align-items-center">
+        <a href="/" class="logo">
+          <img src="/ai_logo_new.svg" alt="AI Sports Edge Logo" style="width: 40px; height: 40px;">
+          <span>AI Sports Edge</span>
+        </a>
+        <nav class="nav">
+          <ul class="nav-list d-flex list-unstyled m-0">
+            <li class="nav-item"><a href="/">Home</a></li>
+            <li class="nav-item"><a href="pricing.html">Pricing</a></li>
+            <li class="nav-item"><a href="about.html" class="active">About</a></li>
+            <li class="nav-item"><a href="contact.html">Contact</a></li>
+            <li class="nav-item"><a href="login.html">Login</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- About Hero Section -->
+  <section class="about-hero">
+    <div class="container">
+      <div class="about-hero-content">
+        <h1>Revolutionizing Sports Analytics</h1>
+        <p>We're building the future of intelligent sports decision-making through cutting-edge AI technology and data science innovation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="mission-section">
+    <div class="container">
+      <div class="mission-content">
+        <h2>Our Mission</h2>
+        <p>At AI Sports Edge, we believe that sports decisions should be powered by intelligence and data. Our mission is to democratize access to professional-grade sports analytics and AI-driven insights, giving every sports enthusiast the tools to make smarter, more informed decisions.</p>
+        <p>We've built the most advanced sports analytics platform by combining machine learning, statistical modeling, and real-time data analysis to deliver unprecedented accuracy in sports insights. Our goal is to transform how people engage with sports through the power of artificial intelligence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="values-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Core Values</h2>
+        <p>The principles that guide everything we do at AI Sports Edge.</p>
+      </div>
+      
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3>Innovation</h3>
+          <p>We constantly push the boundaries of what's possible with AI and machine learning to deliver cutting-edge sports analytics solutions.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Accuracy</h3>
+          <p>Our commitment to precision drives us to continuously refine our models and deliver the most accurate predictions in the industry.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Community</h3>
+          <p>We believe in the power of collective intelligence and foster a community where sports enthusiasts can learn and grow together.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>Transparency</h3>
+          <p>We provide clear insights into our methodologies and confidence intervals, so users understand exactly how our AI reaches its conclusions.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <h3>Excellence</h3>
+          <p>We strive for excellence in every aspect of our platform, from user experience to prediction accuracy and customer support.</p>
+        </div>
+        
+        <div class="value-card">
+          <div class="value-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h3>Integrity</h3>
+          <p>We operate with the highest ethical standards and promote responsible sports analytics practices across our platform.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Meet Our Team</h2>
+        <p>The brilliant minds behind AI Sports Edge's innovative technology and vision.</p>
+      </div>
+      
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="team-avatar">AS</div>
+          <h4>Alex Smith</h4>
+          <div class="team-role">CEO & Co-Founder</div>
+          <p>Former data scientist at top tech companies with 10+ years in machine learning and sports analytics. Passionate about democratizing access to professional-grade sports insights.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-avatar">MJ</div>
+          <h4>Maria Johnson</h4>
+          <div class="team-role">CTO & Co-Founder</div>
+          <p>AI expert with PhD in Computer Science and extensive experience in real-time data processing. Previously led AI initiatives at Fortune 500 companies.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-avatar">DB</div>
+          <h4>David Brown</h4>
+          <div class="team-role">Head of Sports Analytics</div>
+          <p>Former professional athlete turned data scientist. Brings unique insight into sports strategy and statistical modeling with 15+ years in professional sports.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-avatar">SC</div>
+          <h4>Sarah Chen</h4>
+          <div class="team-role">VP of Product</div>
+          <p>Product management expert with background in user experience design. Previously launched successful sports apps with millions of users.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-avatar">RW</div>
+          <h4>Robert Wilson</h4>
+          <div class="team-role">Head of Engineering</div>
+          <p>Full-stack engineer with expertise in scalable systems architecture. Led development teams at major sports media companies for 8+ years.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-avatar">LG</div>
+          <h4>Lisa Garcia</h4>
+          <div class="team-role">Head of Business Development</div>
+          <p>Sports industry veteran with extensive partnership experience. Former executive at leading sportsbooks and media companies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Section -->
+  <section class="technology-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Technology</h2>
+        <p>Advanced AI and machine learning powering the most accurate sports predictions.</p>
+      </div>
+      
+      <div class="tech-grid">
+        <div class="tech-content">
+          <h3>Cutting-Edge AI Models</h3>
+          <p>Our proprietary machine learning algorithms analyze thousands of data points in real-time to generate the most accurate sports predictions available. We continuously train our models on historical data, player performance metrics, weather conditions, and countless other variables.</p>
+          
+          <ul class="tech-features">
+            <li>Deep neural networks for pattern recognition</li>
+            <li>Real-time data processing and analysis</li>
+            <li>Multi-source data integration</li>
+            <li>Continuous model improvement</li>
+            <li>Advanced statistical modeling</li>
+            <li>Predictive analytics and forecasting</li>
+          </ul>
+        </div>
+        
+        <div class="tech-visual">
+          <div class="tech-chart">
+            <i class="fas fa-chart-area" style="font-size: 4rem;"></i>
+          </div>
+          <h4>95% Prediction Accuracy</h4>
+          <p>Our AI models consistently achieve industry-leading accuracy rates across all major sports.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <h2>AI Sports Edge by the Numbers</h2>
+      <p>Our impact on the sports analytics industry continues to grow.</p>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">50K+</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">95%</div>
+          <div class="stat-label">Prediction Accuracy</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">25+</div>
+          <div class="stat-label">Sports Covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">1M+</div>
+          <div class="stat-label">Predictions Made</div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 3rem;">
+        <a href="pricing.html" class="primary-button">Join Our Community</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enhanced Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Add smooth scrolling to anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+    
+    // Animate numbers when they come into view
+    const animateNumbers = () => {
+      const statNumbers = document.querySelectorAll('.stat-number');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = entry.target;
+            const text = target.textContent;
+            const number = text.replace(/[^\d]/g, '');
+            const suffix = text.replace(/[\d]/g, '');
+            
+            if (number) {
+              animateNumber(target, 0, parseInt(number), suffix, 2000);
+            }
+            
+            observer.unobserve(target);
+          }
+        });
+      });
+      
+      statNumbers.forEach(num => observer.observe(num));
+    };
+    
+    const animateNumber = (element, start, end, suffix, duration) => {
+      const startTime = performance.now();
+      
+      const updateNumber = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const current = Math.floor(progress * (end - start) + start);
+        element.textContent = current + suffix;
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateNumber);
+        }
+      };
+      
+      requestAnimationFrame(updateNumber);
+    };
+    
+    // Initialize animations when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      animateNumbers();
+    });
+  </script>
+</body>
+</html>
