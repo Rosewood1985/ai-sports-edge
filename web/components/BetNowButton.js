@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useBettingAffiliate } from '../../contexts/BettingAffiliateContext';
+import { FANDUEL_CONFIG } from '../../config/affiliateConfig';
 import '../styles/BetNowButton.css';
 
 /**

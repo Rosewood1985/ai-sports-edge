@@ -1,255 +1,211 @@
+/**
+ * Settings Page Tests
+ * Tests for the Settings Page component.
+ */
+
 // External imports
 import React from 'react';
-
 import { Alert } from 'react-native';
-
-import * as Linking from 'expo-linking';
-import Constants from 'expo-constants';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-
 
 // Internal imports
 import { SettingsPage } from '../../../atomic/pages';
 
+// Mock Alert
+global.Alert = { alert: jest.fn() };
 
+// Mock dependencies
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: jest.fn(),
+  }),
+}));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          'Are you sure you want to delete your account? This action cannot be undone.',
-          analytics: true,
-          location: false,
-          notifications: true,
-          onPress: expect.any(Function),
-          style: 'cancel',
-          style: 'destructive',
-          text: 'Cancel',
-          text: 'Delete',
-        'common.cancel': 'Cancel',
-        'common.delete': 'Delete',
-        'common.error': 'Error',
-        'common.loading': 'Loading...',
-        'common.success': 'Success',
-        'settings.account': 'Account',
-        'settings.alerts.saved': 'Settings saved successfully',
-        'settings.analytics': 'Analytics',
-        'settings.appearance': 'Appearance',
-        'settings.darkMode': 'Dark Mode',
-        'settings.deleteAccount': 'Delete Account',
-        'settings.deleteAccountConfirm':
-        'settings.errors.deleteFailed': 'Failed to delete account',
-        'settings.errors.loadFailed': 'Failed to load settings',
-        'settings.errors.saveFailed': 'Failed to save settings',
-        'settings.helpCenter': 'Help Center',
-        'settings.language': 'Language',
-        'settings.location': 'Location',
-        'settings.notifications': 'Notifications',
-        'settings.preferences': 'Preferences',
-        'settings.privacyPolicy': 'Privacy Policy',
-        'settings.saveSettings': 'Save Settings',
-        'settings.support': 'Support',
-        'settings.termsOfService': 'Terms of Service',
-        'settings.version': 'Version',
-        Promise.resolve({
-        email: 'test@example.com',
-        uid: 'test-uid',
-        {
-        {
-        })
-        },
-        },
-      'Are you sure you want to delete your account? This action cannot be undone.',
-      'Delete Account',
-      ),
-      [
-      ],
-      analytics: true,
+jest.mock('../../../atomic/molecules/themeContext', () => ({
+  useTheme: jest.fn(() => ({
+    colors: {
       background: '#FFFFFF',
-      border: '#E0E0E0',
-      captureException: jest.fn(),
-      const translations = {
-      deleteUser: jest.fn(() => Promise.resolve()),
-      deleteUserData: jest.fn(() => Promise.resolve()),
+      text: '#000000',
+      primary: '#007BFF',
+      secondary: '#6C757D',
       error: '#FF3B30',
-      expect(getByText('Account')).toBeTruthy();
-      expect(getByText('Analytics')).toBeTruthy();
-      expect(getByText('Appearance')).toBeTruthy();
-      expect(getByText('Dark Mode')).toBeTruthy();
-      expect(getByText('Delete Account')).toBeTruthy();
-      expect(getByText('Help Center')).toBeTruthy();
-      expect(getByText('Language')).toBeTruthy();
-      expect(getByText('Location')).toBeTruthy();
-      expect(getByText('Notifications')).toBeTruthy();
-      expect(getByText('Preferences')).toBeTruthy();
-      expect(getByText('Privacy Policy')).toBeTruthy();
-      expect(getByText('Save Settings')).toBeTruthy();
-      expect(getByText('Support')).toBeTruthy();
-      expect(getByText('Terms of Service')).toBeTruthy();
-      expect(getByText('Version: 1.2.3')).toBeTruthy();
-      fireEvent.press(getByText('Delete Account'));
-      fireEvent.press(getByText('Help Center'));
-      fireEvent.press(getByText('Privacy Policy'));
-      fireEvent.press(getByText('Save Settings'));
-      fireEvent.press(getByText('Terms of Service'));
-      getCurrentUser: jest.fn(() => ({
-      getUserSettings: jest.fn(() =>
-      location: false,
-      notifications: true,
-      onError: '#FFFFFF',
+      success: '#4CD964',
+      border: '#E0E0E0',
+      surface: '#F5F5F5',
+      textSecondary: '#757575',
       onPrimary: '#FFFFFF',
       onSecondary: '#FFFFFF',
       onSuccess: '#FFFFFF',
-      primary: '#007BFF',
-      return translations[key] || key;
-      secondary: '#6C757D',
-      success: '#4CD964',
-      surface: '#F5F5F5',
-      text: '#000000',
-      textSecondary: '#757575',
-      updateUserSettings: jest.fn(() => Promise.resolve()),
-      { cancelable: true }
-      })),
-      };
-    );
-    // Act
-    // Act
-    // Act
-    // Act
-    // Act
-    // Act & Assert
-    // Arrange
-    // Arrange
-    // Arrange
-    // Arrange
-    // Arrange
-    // Arrange
-    // Arrange
-    // Assert
-    // Assert
-    // Assert
-    // Assert
-    // Assert
-    // Assert
-    auth: {
-    await waitFor(() => {
-    await waitFor(() => {
-    await waitFor(() => {
-    await waitFor(() => {
-    await waitFor(() => {
-    await waitFor(() => {
-    colors: {
-    const { getByText } = render(<SettingsPage />);
-    const { getByText } = render(<SettingsPage />);
-    const { getByText } = render(<SettingsPage />);
-    const { getByText } = render(<SettingsPage />);
-    const { getByText } = render(<SettingsPage />);
-    const { getByText } = render(<SettingsPage />);
-    const { getByText } = render(<SettingsPage />);
-    error: {
-    expect(Alert.alert).toHaveBeenCalledWith(
-    expect(Alert.alert).toHaveBeenCalledWith('Success', 'Settings saved successfully');
-    expect(Linking.openURL).toHaveBeenCalledWith('https://aisportsedge.app/help');
-    expect(Linking.openURL).toHaveBeenCalledWith('https://aisportsedge.app/privacy');
-    expect(Linking.openURL).toHaveBeenCalledWith('https://aisportsedge.app/terms');
-    expect(firebaseService.firestore.updateUserSettings).toHaveBeenCalledWith('test-uid', {
-    expect(getByText('Loading...')).toBeTruthy();
-    firestore: {
-    jest.clearAllMocks();
-    locale: 'en',
-    navigate: jest.fn(),
-    setLocale: jest.fn(),
-    setTheme: jest.fn(),
-    t: jest.fn(key => {
-    theme: 'light',
-    version: '1.2.3',
-    }),
-    });
-    });
-    });
-    });
-    });
-    });
-    });
+      onError: '#FFFFFF',
     },
-    },
-    },
-    },
-  MainLayout: ({ children }) => <>{children}</>,
-  beforeEach(() => {
-  firebaseService: {
-  it('handles delete account confirmation', async () => {
-  it('handles opening help center', async () => {
-  it('handles opening privacy policy', async () => {
-  it('handles opening terms of service', async () => {
-  it('handles save settings', async () => {
-  it('renders loading state initially', () => {
-  it('renders settings after loading', async () => {
-  manifest: {
-  monitoringService: {
-  openURL: jest.fn(),
-  useI18n: jest.fn(() => ({
-  useNavigation: () => ({
-  useTheme: jest.fn(() => ({
   })),
-  })),
-  }),
-  });
-  });
-  });
-  });
-  });
-  });
-  });
-  });
-  },
-  },
-  },
- *
- * Settings Page Tests
- * Tests for the Settings Page component.
- */
-/**
-// Mock Alert
-// Mock dependencies
-describe('SettingsPage', () => {
-global.Alert = { alert: jest.fn() };
-jest.mock('../../../atomic/molecules/i18nContext', () => ({
-jest.mock('../../../atomic/molecules/themeContext', () => ({
-jest.mock('../../../atomic/organisms', () => ({
-jest.mock('../../../atomic/templates', () => ({
-jest.mock('@react-navigation/native', () => ({
-jest.mock('expo-constants', () => ({
-jest.mock('expo-linking', () => ({
 }));
-}));
-}));
-}));
-}));
-}));
-}));
-});
 
+jest.mock('../../../atomic/molecules/i18nContext', () => ({
+  useI18n: jest.fn(() => ({
+    t: jest.fn(key => {
+      const translations = {
+        'common.loading': 'Loading...',
+        'common.success': 'Success',
+        'common.error': 'Error',
+        'settings.notifications': 'Notifications',
+        'settings.analytics': 'Analytics',
+        'settings.location': 'Location Services',
+        'settings.theme': 'Theme',
+        'settings.language': 'Language',
+        'settings.account': 'Account',
+        'settings.deleteAccount': 'Delete Account',
+        'settings.privacy': 'Privacy Settings',
+        'settings.about': 'About',
+        'settings.version': 'Version',
+        'settings.alerts.accountDeleted': 'Account successfully deleted',
+        'settings.alerts.settingsSaved': 'Settings saved successfully',
+      };
+      return translations[key] || key;
+    }),
+  })),
+}));
+
+jest.mock('../../../atomic/templates', () => ({
+  MainLayout: ({ children }) => <>{children}</>,
+}));
+
+jest.mock('../../../atomic/organisms', () => ({
+  firebaseService: {
+    auth: {
+      getCurrentUser: jest.fn(() => ({
+        uid: 'test-uid',
+        email: 'test@example.com',
+        displayName: 'Test User',
+      })),
+      deleteUser: jest.fn(() => Promise.resolve()),
+    },
+    firestore: {
+      getUserSettings: jest.fn(() => Promise.resolve({
+        notifications: true,
+        analytics: true,
+        location: false,
+      })),
+      updateUserSettings: jest.fn(() => Promise.resolve()),
+    },
+  },
+  monitoringService: {
+    error: {
+      captureException: jest.fn(),
+    },
+  },
+}));
+
+describe('SettingsPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders loading state initially', () => {
+    const { getByText } = render(<SettingsPage />);
+    expect(getByText('Loading...')).toBeTruthy();
+  });
+
+  it('renders settings options after loading', async () => {
+    const { getByText } = render(<SettingsPage />);
+
+    await waitFor(() => {
+      expect(getByText('Notifications')).toBeTruthy();
+      expect(getByText('Analytics')).toBeTruthy();
+      expect(getByText('Location Services')).toBeTruthy();
+      expect(getByText('Theme')).toBeTruthy();
+      expect(getByText('Language')).toBeTruthy();
+      expect(getByText('Account')).toBeTruthy();
+      expect(getByText('Privacy Settings')).toBeTruthy();
+      expect(getByText('About')).toBeTruthy();
+    });
+  });
+
+  it('handles notification toggle', async () => {
+    const { getByText } = render(<SettingsPage />);
+    const firebaseService = require('../../../atomic/organisms').firebaseService;
+
+    await waitFor(() => {
+      fireEvent.press(getByText('Notifications'));
+      expect(firebaseService.firestore.updateUserSettings).toHaveBeenCalledWith({
+        notifications: false,
+        analytics: true,
+        location: false,
+      });
+    });
+  });
+
+  it('handles analytics toggle', async () => {
+    const { getByText } = render(<SettingsPage />);
+    const firebaseService = require('../../../atomic/organisms').firebaseService;
+
+    await waitFor(() => {
+      fireEvent.press(getByText('Analytics'));
+      expect(firebaseService.firestore.updateUserSettings).toHaveBeenCalledWith({
+        notifications: true,
+        analytics: false,
+        location: false,
+      });
+    });
+  });
+
+  it('handles location toggle', async () => {
+    const { getByText } = render(<SettingsPage />);
+    const firebaseService = require('../../../atomic/organisms').firebaseService;
+
+    await waitFor(() => {
+      fireEvent.press(getByText('Location Services'));
+      expect(firebaseService.firestore.updateUserSettings).toHaveBeenCalledWith({
+        notifications: true,
+        analytics: true,
+        location: true,
+      });
+    });
+  });
+
+  it('handles account deletion', async () => {
+    const { getByText } = render(<SettingsPage />);
+    const navigation = require('@react-navigation/native').useNavigation();
+    const firebaseService = require('../../../atomic/organisms').firebaseService;
+
+    // Mock Alert.alert to simulate user confirmation
+    Alert.alert.mockImplementation((title, message, buttons) => {
+      // Simulate pressing the "Delete" button
+      buttons[1].onPress();
+    });
+
+    await waitFor(() => {
+      fireEvent.press(getByText('Delete Account'));
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Delete Account',
+        'Are you sure you want to delete your account? This action cannot be undone.',
+        expect.arrayContaining([
+          expect.objectContaining({ style: 'cancel' }),
+          expect.objectContaining({ style: 'destructive', onPress: expect.any(Function) }),
+        ])
+      );
+      expect(firebaseService.auth.deleteUser).toHaveBeenCalled();
+      expect(navigation.navigate).toHaveBeenCalledWith('Login');
+    });
+  });
+
+  it('handles navigation to privacy settings', async () => {
+    const { getByText } = render(<SettingsPage />);
+    const navigation = require('@react-navigation/native').useNavigation();
+
+    await waitFor(() => {
+      fireEvent.press(getByText('Privacy Settings'));
+      expect(navigation.navigate).toHaveBeenCalledWith('PrivacySettings');
+    });
+  });
+
+  it('handles navigation to about page', async () => {
+    const { getByText } = render(<SettingsPage />);
+    const navigation = require('@react-navigation/native').useNavigation();
+
+    await waitFor(() => {
+      fireEvent.press(getByText('About'));
+      expect(navigation.navigate).toHaveBeenCalledWith('About');
+    });
+  });
+});

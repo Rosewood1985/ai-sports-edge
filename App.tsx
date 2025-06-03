@@ -113,7 +113,7 @@ export default function App() {
 
   // Error boundary component
   const ErrorBoundary = React.memo(({ children }: { children: React.ReactNode }) => {
-    const [hasError, setHasError] = React.useState(false);
+    const [, setHasError] = React.useState(false);
 
     React.useEffect(() => {
       const originalConsoleError = console.error;

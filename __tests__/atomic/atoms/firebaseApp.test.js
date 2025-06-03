@@ -4,7 +4,7 @@
  */
 
 // External imports
-import { getApp, initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 
 // Internal imports
 import { getFirebaseApp, initializeFirebaseApp } from '../../../atomic/atoms/firebaseApp';
