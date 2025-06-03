@@ -38,7 +38,7 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         
       - name: Check for Jest dependencies script
         id: check-jest-script
@@ -57,7 +57,7 @@ jobs:
       - name: Install basic Jest dependencies (fallback)
         if: steps.check-jest-script.outputs.jest_script_exists == 'false'
         run: |
-          npm install --save-dev @testing-library/react-native @testing-library/jest-native jest-expo
+          npm install --save-dev @testing-library/react-native @testing-library/jest-native jest-expo --legacy-peer-deps
           echo "✅ Installed basic Jest dependencies"
           
       - name: Check for accessibility tests
@@ -116,10 +116,10 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         
       - name: Install Puppeteer and Axe
-        run: npm install --save-dev puppeteer @axe-core/puppeteer
+        run: npm install --save-dev puppeteer @axe-core/puppeteer --legacy-peer-deps
         
       - name: Check package.json for web script
         id: check-web-script
