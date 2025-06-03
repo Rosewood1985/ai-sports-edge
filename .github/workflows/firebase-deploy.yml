@@ -37,10 +37,30 @@ jobs:
             grep -A 3 ":root" public/styles.css | head -5
           fi
           
-      - name: Deploy to Firebase
+      - name: Deploy to Firebase (Method 1)
         uses: FirebaseExtended/action-hosting-deploy@v0
+        continue-on-error: true
+        id: firebase_deploy_1
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_SPORTS_EDGE }}'
           projectId: ai-sports-edge
-          channelId: live
+          
+      - name: Setup Node.js (Fallback)
+        if: steps.firebase_deploy_1.outcome == 'failure'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install Firebase CLI (Fallback)
+        if: steps.firebase_deploy_1.outcome == 'failure'
+        run: npm install -g firebase-tools
+        
+      - name: Deploy to Firebase (Method 2)
+        if: steps.firebase_deploy_1.outcome == 'failure'
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          echo "🚀 Deploying to Firebase using CLI..."
+          firebase use ai-sports-edge --token "$FIREBASE_TOKEN"
+          firebase deploy --only hosting --token "$FIREBASE_TOKEN"
