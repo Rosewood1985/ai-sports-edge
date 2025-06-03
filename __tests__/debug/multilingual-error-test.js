@@ -6,7 +6,7 @@
 
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth';
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert } from 'react-native';
 
 import { LanguageProvider, useLanguage } from '../../../atomic/organisms/i18n/LanguageContext';

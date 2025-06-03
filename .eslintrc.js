@@ -14,9 +14,13 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
+      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx', '*.test.js', '*.spec.js'],
       env: {
         jest: true,
+        browser: true,
+      },
+      globals: {
+        WebSocket: 'readonly',
       },
       rules: {
         'no-console': 'off',

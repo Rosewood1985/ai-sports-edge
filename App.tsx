@@ -30,14 +30,17 @@ export default function App() {
       sentryService.initialize(sentryConfig);
       sentryNavigationInstrumentation.initialize();
 
+      // eslint-disable-next-line no-console
       console.log(`[Sentry] Initialized for ${environment} environment`);
     } else {
+      // eslint-disable-next-line no-console
       console.log('[Sentry] DSN not configured - error tracking disabled');
     }
 
     // Initialize optimization services
     const initOptimizations = async () => {
       try {
+        // eslint-disable-next-line no-console
         console.log('🚀 Initializing optimization services...');
 
         // Initialize optimization orchestrator
@@ -46,12 +49,14 @@ export default function App() {
         // Enable lazy loading for images
         advancedImageOptimizationService.enableLazyLoading();
 
+        // eslint-disable-next-line no-console
         console.log('✅ Optimization services activated');
 
         if (sentryService.isActive()) {
           sentryService.addBreadcrumb('Optimization services initialized', 'optimization', 'info');
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('❌ Failed to initialize optimizations:', error);
 
         if (sentryService.isActive()) {
@@ -98,6 +103,7 @@ export default function App() {
 
   // Handle app errors
   const handleError = React.useCallback((error: Error, errorInfo?: any) => {
+    // eslint-disable-next-line no-console
     console.error('App Error:', error);
 
     if (sentryService.isActive()) {
@@ -116,8 +122,10 @@ export default function App() {
     const [, setHasError] = React.useState(false);
 
     React.useEffect(() => {
+      // eslint-disable-next-line no-console
       const originalConsoleError = console.error;
 
+      // eslint-disable-next-line no-console
       console.error = (...args) => {
         const error = args[0];
         if (error instanceof Error) {
@@ -127,6 +135,7 @@ export default function App() {
       };
 
       return () => {
+        // eslint-disable-next-line no-console
         console.error = originalConsoleError;
       };
     }, []);
