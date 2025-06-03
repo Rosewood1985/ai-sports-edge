@@ -1,6 +1,20 @@
-import { auth } from '../config/firebase';
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+  arrayUnion,
+  arrayRemove,
+} from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+
+import { auth } from '../config/firebase';
 import { STRIPE_PRICE_IDS } from '../config/stripe';
 
 // Initialize Firestore and Functions
@@ -28,7 +42,9 @@ export const createGroupSubscription = async (
   try {
     // Validate member count
     if (memberEmails && memberEmails.length > MAX_GROUP_MEMBERS - 1) {
-      throw new Error(`Group subscription can have a maximum of ${MAX_GROUP_MEMBERS} members (including owner)`);
+      throw new Error(
+        `Group subscription can have a maximum of ${MAX_GROUP_MEMBERS} members (including owner)`
+      );
     }
 
     // Call the Cloud Function to create the group subscription
@@ -36,7 +52,7 @@ export const createGroupSubscription = async (
     const result = await createGroupSubscriptionFn({
       paymentMethodId,
       priceId: STRIPE_PRICE_IDS.GROUP_PRO_MONTHLY,
-      memberEmails
+      memberEmails,
     });
 
     // Return the group subscription data
@@ -57,14 +73,14 @@ export const getGroupSubscription = async (groupId: string): Promise<any> => {
     // Get the group subscription document
     const groupSubscriptionRef = doc(firestore, 'groupSubscriptions', groupId);
     const groupSubscriptionDoc = await getDoc(groupSubscriptionRef);
-    
+
     if (!groupSubscriptionDoc.exists()) {
       return null;
     }
-    
+
     return {
       id: groupSubscriptionDoc.id,
-      ...groupSubscriptionDoc.data()
+      ...groupSubscriptionDoc.data(),
     };
   } catch (error) {
     console.error('Error getting group subscription:', error);
@@ -83,16 +99,16 @@ export const getOwnedGroupSubscriptions = async (userId: string): Promise<any[]>
     const groupSubscriptionsRef = collection(firestore, 'groupSubscriptions');
     const q = query(groupSubscriptionsRef, where('ownerId', '==', userId));
     const querySnapshot = await getDocs(q);
-    
+
     // Convert query snapshot to array of group subscriptions
     const groupSubscriptions: any[] = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       groupSubscriptions.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       });
     });
-    
+
     return groupSubscriptions;
   } catch (error) {
     console.error('Error getting owned group subscriptions:', error);
@@ -111,16 +127,16 @@ export const getMemberGroupSubscriptions = async (userEmail: string): Promise<an
     const groupSubscriptionsRef = collection(firestore, 'groupSubscriptions');
     const q = query(groupSubscriptionsRef, where('members', 'array-contains', userEmail));
     const querySnapshot = await getDocs(q);
-    
+
     // Convert query snapshot to array of group subscriptions
     const groupSubscriptions: any[] = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       groupSubscriptions.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       });
     });
-    
+
     return groupSubscriptions;
   } catch (error) {
     console.error('Error getting member group subscriptions:', error);
@@ -138,12 +154,12 @@ export const isPartOfActiveGroupSubscription = async (userEmail: string): Promis
     // Query active group subscriptions where the user is a member
     const groupSubscriptionsRef = collection(firestore, 'groupSubscriptions');
     const q = query(
-      groupSubscriptionsRef, 
+      groupSubscriptionsRef,
       where('members', 'array-contains', userEmail),
       where('status', '==', 'active')
     );
     const querySnapshot = await getDocs(q);
-    
+
     return !querySnapshot.empty;
   } catch (error) {
     console.error('Error checking group subscription membership:', error);
@@ -168,9 +184,9 @@ export const addGroupMember = async (
     const addGroupMemberFn = httpsCallable(functions, 'addGroupMember');
     const result = await addGroupMemberFn({
       groupId,
-      memberEmail
+      memberEmail,
     });
-    
+
     // Return the updated group subscription data
     return result.data;
   } catch (error: any) {
@@ -196,9 +212,9 @@ export const removeGroupMember = async (
     const removeGroupMemberFn = httpsCallable(functions, 'removeGroupMember');
     const result = await removeGroupMemberFn({
       groupId,
-      memberEmail
+      memberEmail,
     });
-    
+
     // Return the updated group subscription data
     return result.data;
   } catch (error: any) {
@@ -213,17 +229,14 @@ export const removeGroupMember = async (
  * @param ownerId User ID of the group owner (for verification)
  * @returns Result of the cancellation
  */
-export const cancelGroupSubscription = async (
-  groupId: string,
-  ownerId: string
-): Promise<any> => {
+export const cancelGroupSubscription = async (groupId: string, ownerId: string): Promise<any> => {
   try {
     // Call the Cloud Function to cancel the group subscription
     const cancelGroupSubscriptionFn = httpsCallable(functions, 'cancelGroupSubscription');
     const result = await cancelGroupSubscriptionFn({
-      groupId
+      groupId,
     });
-    
+
     // Return the cancellation result
     return result.data;
   } catch (error: any) {
@@ -264,9 +277,9 @@ export const transferGroupOwnership = async (
     const transferGroupOwnershipFn = httpsCallable(functions, 'transferGroupOwnership');
     const result = await transferGroupOwnershipFn({
       groupId,
-      newOwnerEmail
+      newOwnerEmail,
     });
-    
+
     // Return the updated group subscription data
     return result.data;
   } catch (error: any) {

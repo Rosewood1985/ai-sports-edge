@@ -1,10 +1,12 @@
 /**
  * Analytics Dashboard Screen
- * 
+ *
  * A comprehensive dashboard for monitoring microtransaction and cookie performance.
  * Features animated neon headings and real-time data visualization.
  */
 
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -18,11 +20,13 @@ import {
   Platform,
   SafeAreaView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
-import { LinearGradient } from 'expo-linear-gradient';
 
+import Colors from '../constants/Colors';
+import { useThemeColor } from '../hooks/useThemeColor';
 import { enhancedAnalyticsService } from '../services/enhancedAnalyticsService';
+
+// Production analytics service integration
 
 // Define TIME_PERIODS directly in this file since the constants file might not be properly imported
 const TIME_PERIODS = {
@@ -34,10 +38,6 @@ const TIME_PERIODS = {
   LAST_MONTH: 'last_month',
   CUSTOM: 'custom',
 };
-
-// Production analytics service integration
-import { useThemeColor } from '../hooks/useThemeColor';
-import Colors from '../constants/Colors';
 
 // Get screen dimensions
 const { width } = Dimensions.get('window');
@@ -53,7 +53,7 @@ const NeonText: React.FC<{
 }> = ({ text, color = Colors.neon.blue, fontSize = 24, style }) => {
   // Animation value for glow effect
   const glowAnim = useRef(new Animated.Value(0)).current;
-  
+
   // Set up animation
   useEffect(() => {
     Animated.loop(
@@ -71,13 +71,13 @@ const NeonText: React.FC<{
       ])
     ).start();
   }, []);
-  
+
   // Calculate shadow opacity based on animation
   const textShadowOpacity = glowAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0.5, 0.9],
   });
-  
+
   return (
     <Animated.Text
       style={[
@@ -107,11 +107,11 @@ const MetricCard: React.FC<{
   color?: string;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string | number;
-}> = ({ 
-  title, 
-  value, 
-  subtitle, 
-  icon = 'analytics', 
+}> = ({
+  title,
+  value,
+  subtitle,
+  icon = 'analytics',
   color = Colors.neon.blue,
   trend,
   trendValue,
@@ -119,11 +119,11 @@ const MetricCard: React.FC<{
   // Get theme colors
   const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A1A' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text');
-  
+
   // Determine trend icon and color
   let trendIcon = 'remove';
   let trendColor = '#888888';
-  
+
   if (trend === 'up') {
     trendIcon = 'arrow-up';
     trendColor = '#4CAF50';
@@ -131,26 +131,22 @@ const MetricCard: React.FC<{
     trendIcon = 'arrow-down';
     trendColor = '#F44336';
   }
-  
+
   return (
     <View style={[styles.metricCard, { backgroundColor }]}>
       <View style={styles.metricHeader}>
         <Ionicons name={icon as any} size={24} color={color} />
         <Text style={[styles.metricTitle, { color: textColor }]}>{title}</Text>
       </View>
-      
+
       <Text style={[styles.metricValue, { color }]}>{value}</Text>
-      
-      {subtitle && (
-        <Text style={[styles.metricSubtitle, { color: textColor }]}>{subtitle}</Text>
-      )}
-      
+
+      {subtitle && <Text style={[styles.metricSubtitle, { color: textColor }]}>{subtitle}</Text>}
+
       {trend && (
         <View style={styles.trendContainer}>
           <Ionicons name={trendIcon as any} size={16} color={trendColor} />
-          <Text style={[styles.trendValue, { color: trendColor }]}>
-            {trendValue}
-          </Text>
+          <Text style={[styles.trendValue, { color: trendColor }]}>{trendValue}</Text>
         </View>
       )}
     </View>
@@ -166,25 +162,20 @@ const ChartCard: React.FC<{
   data: any;
   color?: string;
   height?: number;
-}> = ({ 
-  title, 
-  type, 
-  data, 
-  color = Colors.neon.blue,
-  height = 220,
-}) => {
+}> = ({ title, type, data, color = Colors.neon.blue, height = 220 }) => {
   // Get theme colors
   const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A1A' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text');
   const isDarkMode = textColor === '#FFFFFF';
-  
+
   // Chart config
   const chartConfig = {
-    backgroundColor: backgroundColor,
+    backgroundColor,
     backgroundGradientFrom: backgroundColor,
     backgroundGradientTo: backgroundColor,
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(${color === Colors.neon.blue ? '0, 123, 255' : '255, 99, 132'}, ${opacity})`,
+    color: (opacity = 1) =>
+      `rgba(${color === Colors.neon.blue ? '0, 123, 255' : '255, 99, 132'}, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(${isDarkMode ? '255, 255, 255' : '0, 0, 0'}, ${opacity})`,
     style: {
       borderRadius: 16,
@@ -195,7 +186,7 @@ const ChartCard: React.FC<{
       stroke: color,
     },
   };
-  
+
   // Render chart based on type
   const renderChart = () => {
     switch (type) {
@@ -240,7 +231,7 @@ const ChartCard: React.FC<{
         return null;
     }
   };
-  
+
   return (
     <View style={[styles.chartCard, { backgroundColor }]}>
       <Text style={[styles.chartTitle, { color: textColor }]}>{title}</Text>
@@ -259,7 +250,7 @@ const TimePeriodSelector: React.FC<{
   // Get theme colors
   const backgroundColor = useThemeColor({ light: '#F5F5F5', dark: '#2A2A2A' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text');
-  
+
   // Time period options
   const periods = [
     { key: TIME_PERIODS.TODAY, label: 'Today' },
@@ -268,7 +259,7 @@ const TimePeriodSelector: React.FC<{
     { key: TIME_PERIODS.LAST_30_DAYS, label: 'Last 30 Days' },
     { key: TIME_PERIODS.THIS_MONTH, label: 'This Month' },
   ];
-  
+
   return (
     <ScrollView
       horizontal
@@ -276,7 +267,7 @@ const TimePeriodSelector: React.FC<{
       style={styles.periodSelector}
       contentContainerStyle={styles.periodSelectorContent}
     >
-      {periods.map((period) => (
+      {periods.map(period => (
         <TouchableOpacity
           key={period.key}
           style={[
@@ -310,16 +301,16 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Get theme colors
   const backgroundColor = useThemeColor({ light: '#F8F8F8', dark: '#121212' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text');
-  
+
   // Load dashboard data
   useEffect(() => {
     loadDashboardData();
   }, [selectedPeriod]);
-  
+
   // Load dashboard data
   const loadDashboardData = async () => {
     try {
@@ -333,17 +324,17 @@ const AnalyticsDashboardScreen: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
+
   // Handle period selection
   const handlePeriodSelect = (period: string) => {
     setSelectedPeriod(period);
   };
-  
+
   // Handle tab selection
   const handleTabSelect = (tab: string) => {
     setActiveTab(tab);
   };
-  
+
   // Prepare revenue chart data
   const prepareRevenueChartData = () => {
     if (!dashboardData || !dashboardData.revenue || !dashboardData.revenue.daily_data) {
@@ -352,21 +343,21 @@ const AnalyticsDashboardScreen: React.FC = () => {
         datasets: [{ data: [] }],
       };
     }
-    
+
     const dailyData = dashboardData.revenue.daily_data;
     const labels = Object.keys(dailyData).map(date => {
       const parts = date.split('-');
       return `${parts[1]}/${parts[2]}`;
     });
-    
+
     const data = Object.values(dailyData);
-    
+
     return {
       labels,
       datasets: [{ data }],
     };
   };
-  
+
   // Prepare conversion funnel data
   const prepareConversionFunnelData = () => {
     if (!dashboardData || !dashboardData.user_journey || !dashboardData.user_journey.stages) {
@@ -375,9 +366,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
         datasets: [{ data: [] }],
       };
     }
-    
+
     const stages = dashboardData.user_journey.stages;
-    
+
     return {
       labels: ['Impressions', 'Clicks', 'Purchases', 'Redirects', 'Conversions'],
       datasets: [
@@ -393,13 +384,17 @@ const AnalyticsDashboardScreen: React.FC = () => {
       ],
     };
   };
-  
+
   // Prepare microtransaction type data
   const prepareMicrotransactionTypeData = () => {
-    if (!dashboardData || !dashboardData.microtransactions || !dashboardData.microtransactions.by_type) {
+    if (
+      !dashboardData ||
+      !dashboardData.microtransactions ||
+      !dashboardData.microtransactions.by_type
+    ) {
       return [];
     }
-    
+
     const byType = dashboardData.microtransactions.by_type;
     const colors = [
       Colors.neon.blue,
@@ -408,7 +403,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
       Colors.neon.orange,
       Colors.neon.purple,
     ];
-    
+
     return Object.entries(byType).map(([type, data]: [string, any], index) => ({
       name: type,
       value: data.revenue || 0,
@@ -417,7 +412,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
       legendFontSize: 12,
     }));
   };
-  
+
   // Render loading state
   if (isLoading) {
     return (
@@ -427,7 +422,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
       </View>
     );
   }
-  
+
   // Render overview tab
   const renderOverviewTab = () => {
     return (
@@ -446,7 +441,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
             color={Colors.neon.blue}
           />
         </View>
-        
+
         <View style={styles.metricsRow}>
           <MetricCard
             title="Cookie Success"
@@ -461,33 +456,33 @@ const AnalyticsDashboardScreen: React.FC = () => {
             color={Colors.neon.purple}
           />
         </View>
-        
+
         <ChartCard
           title="Revenue Trend"
           type="line"
           data={prepareRevenueChartData()}
           color={Colors.neon.green}
         />
-        
+
         <ChartCard
           title="Conversion Funnel"
           type="bar"
           data={prepareConversionFunnelData()}
           color={Colors.neon.blue}
         />
-        
-        <ChartCard
-          title="Revenue by Type"
-          type="pie"
-          data={prepareMicrotransactionTypeData()}
-        />
+
+        <ChartCard title="Revenue by Type" type="pie" data={prepareMicrotransactionTypeData()} />
       </View>
     );
   };
-  
+
   // Render microtransactions tab
   const renderMicrotransactionsTab = () => {
-    if (!dashboardData || !dashboardData.microtransactions || !dashboardData.microtransactions.by_type) {
+    if (
+      !dashboardData ||
+      !dashboardData.microtransactions ||
+      !dashboardData.microtransactions.by_type
+    ) {
       return (
         <View style={styles.emptyState}>
           <Ionicons name="alert-circle" size={48} color={Colors.neon.orange} />
@@ -497,9 +492,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
         </View>
       );
     }
-    
+
     const byType = dashboardData.microtransactions.by_type;
-    
+
     return (
       <View style={styles.tabContent}>
         <MetricCard
@@ -508,64 +503,72 @@ const AnalyticsDashboardScreen: React.FC = () => {
           icon="cash"
           color={Colors.neon.green}
         />
-        
-        <ChartCard
-          title="Revenue by Type"
-          type="pie"
-          data={prepareMicrotransactionTypeData()}
-        />
-        
+
+        <ChartCard title="Revenue by Type" type="pie" data={prepareMicrotransactionTypeData()} />
+
         <NeonText
           text="Microtransaction Performance"
           fontSize={20}
           color={Colors.neon.blue}
           style={styles.sectionTitle}
         />
-        
+
         {Object.entries(byType).map(([type, data]: [string, any]) => (
           <View key={type} style={[styles.microtransactionCard, { backgroundColor }]}>
             <Text style={[styles.microtransactionTitle, { color: textColor }]}>{type}</Text>
-            
+
             <View style={styles.microtransactionMetrics}>
               <View style={styles.microtransactionMetric}>
-                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>Impressions</Text>
+                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>
+                  Impressions
+                </Text>
                 <Text style={[styles.microtransactionMetricValue, { color: Colors.neon.blue }]}>
                   {data.impressions || 0}
                 </Text>
               </View>
-              
+
               <View style={styles.microtransactionMetric}>
-                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>Clicks</Text>
+                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>
+                  Clicks
+                </Text>
                 <Text style={[styles.microtransactionMetricValue, { color: Colors.neon.blue }]}>
                   {data.clicks || 0}
                 </Text>
               </View>
-              
+
               <View style={styles.microtransactionMetric}>
-                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>Purchases</Text>
+                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>
+                  Purchases
+                </Text>
                 <Text style={[styles.microtransactionMetricValue, { color: Colors.neon.blue }]}>
                   {data.purchases || 0}
                 </Text>
               </View>
-              
+
               <View style={styles.microtransactionMetric}>
-                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>Revenue</Text>
+                <Text style={[styles.microtransactionMetricLabel, { color: textColor }]}>
+                  Revenue
+                </Text>
                 <Text style={[styles.microtransactionMetricValue, { color: Colors.neon.green }]}>
                   ${data.revenue?.toFixed(2) || '0.00'}
                 </Text>
               </View>
             </View>
-            
+
             <View style={styles.microtransactionRates}>
               <View style={styles.microtransactionRate}>
-                <Text style={[styles.microtransactionRateLabel, { color: textColor }]}>Click Rate</Text>
+                <Text style={[styles.microtransactionRateLabel, { color: textColor }]}>
+                  Click Rate
+                </Text>
                 <Text style={[styles.microtransactionRateValue, { color: Colors.neon.orange }]}>
                   {data.click_rate?.toFixed(2) || '0.00'}%
                 </Text>
               </View>
-              
+
               <View style={styles.microtransactionRate}>
-                <Text style={[styles.microtransactionRateLabel, { color: textColor }]}>Conversion Rate</Text>
+                <Text style={[styles.microtransactionRateLabel, { color: textColor }]}>
+                  Conversion Rate
+                </Text>
                 <Text style={[styles.microtransactionRateValue, { color: Colors.neon.orange }]}>
                   {data.conversion_rate?.toFixed(2) || '0.00'}%
                 </Text>
@@ -576,7 +579,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render cookies tab
   const renderCookiesTab = () => {
     if (!dashboardData || !dashboardData.cookies) {
@@ -589,9 +592,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
         </View>
       );
     }
-    
+
     const cookies = dashboardData.cookies;
-    
+
     // Prepare cookie performance chart data
     const cookiePerformanceData = {
       labels: ['Inits', 'Persists', 'Redirects', 'Conversions'],
@@ -606,7 +609,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
         },
       ],
     };
-    
+
     return (
       <View style={styles.tabContent}>
         <View style={styles.metricsRow}>
@@ -623,45 +626,49 @@ const AnalyticsDashboardScreen: React.FC = () => {
             color={Colors.neon.blue}
           />
         </View>
-        
+
         <ChartCard
           title="Cookie Performance"
           type="bar"
           data={cookiePerformanceData}
           color={Colors.neon.orange}
         />
-        
+
         <NeonText
           text="Cookie Metrics"
           fontSize={20}
           color={Colors.neon.orange}
           style={styles.sectionTitle}
         />
-        
+
         <View style={[styles.cookieMetricsCard, { backgroundColor }]}>
           <View style={styles.cookieMetric}>
-            <Text style={[styles.cookieMetricLabel, { color: textColor }]}>Cookie Initializations</Text>
+            <Text style={[styles.cookieMetricLabel, { color: textColor }]}>
+              Cookie Initializations
+            </Text>
             <Text style={[styles.cookieMetricValue, { color: Colors.neon.blue }]}>
               {cookies.cookie_inits || 0}
             </Text>
           </View>
-          
+
           <View style={styles.cookieMetric}>
             <Text style={[styles.cookieMetricLabel, { color: textColor }]}>Cookie Persists</Text>
             <Text style={[styles.cookieMetricValue, { color: Colors.neon.blue }]}>
               {cookies.cookie_persists || 0}
             </Text>
           </View>
-          
+
           <View style={styles.cookieMetric}>
             <Text style={[styles.cookieMetricLabel, { color: textColor }]}>FanDuel Redirects</Text>
             <Text style={[styles.cookieMetricValue, { color: Colors.neon.blue }]}>
               {cookies.redirects || 0}
             </Text>
           </View>
-          
+
           <View style={styles.cookieMetric}>
-            <Text style={[styles.cookieMetricLabel, { color: textColor }]}>FanDuel Conversions</Text>
+            <Text style={[styles.cookieMetricLabel, { color: textColor }]}>
+              FanDuel Conversions
+            </Text>
             <Text style={[styles.cookieMetricValue, { color: Colors.neon.blue }]}>
               {cookies.conversions || 0}
             </Text>
@@ -670,7 +677,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render user journey tab
   const renderUserJourneyTab = () => {
     if (!dashboardData || !dashboardData.user_journey) {
@@ -683,9 +690,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
         </View>
       );
     }
-    
+
     const journey = dashboardData.user_journey;
-    
+
     return (
       <View style={styles.tabContent}>
         <MetricCard
@@ -694,25 +701,27 @@ const AnalyticsDashboardScreen: React.FC = () => {
           icon="flag"
           color={Colors.neon.green}
         />
-        
+
         <ChartCard
           title="Conversion Funnel"
           type="bar"
           data={prepareConversionFunnelData()}
           color={Colors.neon.blue}
         />
-        
+
         <NeonText
           text="Drop-off Analysis"
           fontSize={20}
           color={Colors.neon.pink}
           style={styles.sectionTitle}
         />
-        
+
         <View style={[styles.dropoffCard, { backgroundColor }]}>
           <View style={styles.dropoffStage}>
             <View style={styles.dropoffStageHeader}>
-              <Text style={[styles.dropoffStageLabel, { color: textColor }]}>Impression → Click</Text>
+              <Text style={[styles.dropoffStageLabel, { color: textColor }]}>
+                Impression → Click
+              </Text>
               <Text style={[styles.dropoffStageValue, { color: Colors.neon.pink }]}>
                 {journey.dropoff_rates.impression_to_click?.toFixed(2) || '0.00'}%
               </Text>
@@ -729,7 +738,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
               />
             </View>
           </View>
-          
+
           <View style={styles.dropoffStage}>
             <View style={styles.dropoffStageHeader}>
               <Text style={[styles.dropoffStageLabel, { color: textColor }]}>Click → Purchase</Text>
@@ -749,10 +758,12 @@ const AnalyticsDashboardScreen: React.FC = () => {
               />
             </View>
           </View>
-          
+
           <View style={styles.dropoffStage}>
             <View style={styles.dropoffStageHeader}>
-              <Text style={[styles.dropoffStageLabel, { color: textColor }]}>Purchase → Redirect</Text>
+              <Text style={[styles.dropoffStageLabel, { color: textColor }]}>
+                Purchase → Redirect
+              </Text>
               <Text style={[styles.dropoffStageValue, { color: Colors.neon.pink }]}>
                 {journey.dropoff_rates.purchase_to_redirect?.toFixed(2) || '0.00'}%
               </Text>
@@ -769,10 +780,12 @@ const AnalyticsDashboardScreen: React.FC = () => {
               />
             </View>
           </View>
-          
+
           <View style={styles.dropoffStage}>
             <View style={styles.dropoffStageHeader}>
-              <Text style={[styles.dropoffStageLabel, { color: textColor }]}>Redirect → Conversion</Text>
+              <Text style={[styles.dropoffStageLabel, { color: textColor }]}>
+                Redirect → Conversion
+              </Text>
               <Text style={[styles.dropoffStageValue, { color: Colors.neon.pink }]}>
                 {journey.dropoff_rates.redirect_to_conversion?.toFixed(2) || '0.00'}%
               </Text>
@@ -793,7 +806,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render active tab content
   const renderTabContent = () => {
     switch (activeTab) {
@@ -809,7 +822,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
         return renderOverviewTab();
     }
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
@@ -819,23 +832,17 @@ const AnalyticsDashboardScreen: React.FC = () => {
           fontSize={28}
           style={styles.headerTitle}
         />
-        
+
         <TouchableOpacity style={styles.refreshButton} onPress={loadDashboardData}>
           <Ionicons name="refresh" size={24} color={Colors.neon.blue} />
         </TouchableOpacity>
       </View>
-      
-      <TimePeriodSelector
-        selectedPeriod={selectedPeriod}
-        onSelectPeriod={handlePeriodSelect}
-      />
-      
+
+      <TimePeriodSelector selectedPeriod={selectedPeriod} onSelectPeriod={handlePeriodSelect} />
+
       <View style={styles.tabs}>
         <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'overview' && styles.activeTab,
-          ]}
+          style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
           onPress={() => handleTabSelect('overview')}
         >
           <Ionicons
@@ -853,12 +860,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
             Overview
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'microtransactions' && styles.activeTab,
-          ]}
+          style={[styles.tab, activeTab === 'microtransactions' && styles.activeTab]}
           onPress={() => handleTabSelect('microtransactions')}
         >
           <Ionicons
@@ -876,12 +880,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
             Microtransactions
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'cookies' && styles.activeTab,
-          ]}
+          style={[styles.tab, activeTab === 'cookies' && styles.activeTab]}
           onPress={() => handleTabSelect('cookies')}
         >
           <Ionicons
@@ -899,12 +900,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
             Cookies
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'user_journey' && styles.activeTab,
-          ]}
+          style={[styles.tab, activeTab === 'user_journey' && styles.activeTab]}
           onPress={() => handleTabSelect('user_journey')}
         >
           <Ionicons
@@ -923,7 +921,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}

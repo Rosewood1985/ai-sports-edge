@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { View, StyleSheet, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+
 import { useTheme } from '../molecules/themeContext';
 
 /**

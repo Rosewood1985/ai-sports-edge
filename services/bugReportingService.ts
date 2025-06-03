@@ -1,13 +1,13 @@
 import { Platform } from 'react-native';
-import { captureException, captureMessage } from './errorTrackingService';
-import { info, LogCategory } from './loggingService';
-import { error as logError } from './loggingService';
+
 import { logEvent, AnalyticsEvent } from './analyticsService';
+import { captureException, captureMessage } from './errorTrackingService';
 import { BugReport, FeedbackType, FeedbackPriority, submitBugReport } from './feedbackService';
+import { info, LogCategory, error as logError } from './loggingService';
 
 /**
  * Bug Reporting Service
- * 
+ *
  * This service provides functionality for reporting and tracking bugs in the app.
  */
 
@@ -91,7 +91,7 @@ export const reportBug = async (
 ): Promise<DetailedBugReport> => {
   try {
     info(LogCategory.APP, 'Reporting bug', { title, severity, category });
-    
+
     // Map severity to priority
     const priorityMap: Record<BugSeverity, FeedbackPriority> = {
       [BugSeverity.LOW]: FeedbackPriority.LOW,
@@ -99,16 +99,16 @@ export const reportBug = async (
       [BugSeverity.HIGH]: FeedbackPriority.HIGH,
       [BugSeverity.CRITICAL]: FeedbackPriority.CRITICAL,
     };
-    
+
     // Collect device information
     const deviceInfo = await collectDeviceInfo(options);
-    
+
     // Collect logs
     const logs = await collectLogs(options);
-    
+
     // Collect screenshots
     const screenshots = options.includeScreenshot ? await captureScreenshot() : [];
-    
+
     // Prepare bug report
     const bugReport: DetailedBugReport = {
       userId,
@@ -133,22 +133,22 @@ export const reportBug = async (
       networkLog: logs.networkLog,
       screenshots,
     };
-    
+
     // Submit bug report
     const submittedBugReport = await submitBugReport(bugReport);
-    
+
     // Log bug report event
     logEvent(AnalyticsEvent.CUSTOM, {
       event_name: 'bug_reported',
       bug_severity: severity,
       bug_category: category,
     });
-    
+
     // Capture bug in Sentry for critical and high severity bugs
     if (severity === BugSeverity.CRITICAL || severity === BugSeverity.HIGH) {
       captureMessage(`Bug Report: ${title}`, 'error');
     }
-    
+
     return submittedBugReport as DetailedBugReport;
   } catch (err) {
     logError(LogCategory.APP, 'Failed to report bug', err as Error);
@@ -171,10 +171,10 @@ export const reportCrash = async (
 ): Promise<DetailedBugReport> => {
   try {
     info(LogCategory.APP, 'Reporting crash', { error: error.message });
-    
+
     // Capture exception in Sentry
     captureException(error, { extra: context });
-    
+
     // Prepare bug report
     const bugReport: DetailedBugReport = {
       userId,
@@ -193,17 +193,17 @@ export const reportCrash = async (
       actualBehavior: 'App crashed',
       reproducibility: 'once',
     };
-    
+
     // Submit bug report
     const submittedBugReport = await submitBugReport(bugReport);
-    
+
     // Log crash event
     logEvent(AnalyticsEvent.CUSTOM, {
       event_name: 'crash_reported',
       error_name: error.name,
       error_message: error.message,
     });
-    
+
     return submittedBugReport as DetailedBugReport;
   } catch (err) {
     const errorObj = err as Error;
@@ -240,10 +240,10 @@ const collectDeviceInfo = async (
         deviceModel: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
       };
     }
-    
+
     // In a real implementation, this would collect actual device information
     // For now, we'll just return mock data
-    
+
     return {
       appVersion: '1.0.0', // Replace with actual app version
       osVersion: Platform.Version.toString(),
@@ -254,12 +254,13 @@ const collectDeviceInfo = async (
       screenResolution: '1170x2532',
       locale: 'en_US',
       timezone: 'America/New_York',
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1',
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1',
     };
   } catch (err) {
     logError(LogCategory.APP, 'Failed to collect device information', err as Error);
     captureException(err as Error);
-    
+
     // Return basic device information
     return {
       appVersion: '1.0.0', // Replace with actual app version
@@ -287,7 +288,7 @@ const collectLogs = async (
       consoleLog?: string[];
       networkLog?: string[];
     } = {};
-    
+
     // Collect console logs
     if (options.includeConsoleLogs) {
       // In a real implementation, this would collect actual console logs
@@ -298,7 +299,7 @@ const collectLogs = async (
         '2025-03-23T12:00:02.000Z [ERROR] Failed to load data',
       ];
     }
-    
+
     // Collect network logs
     if (options.includeNetworkLogs) {
       // In a real implementation, this would collect actual network logs
@@ -308,12 +309,12 @@ const collectLogs = async (
         '2025-03-23T12:00:02.000Z [POST] https://api.example.com/auth (401)',
       ];
     }
-    
+
     return logs;
   } catch (err) {
     logError(LogCategory.APP, 'Failed to collect logs', err as Error);
     captureException(err as Error);
-    
+
     // Return empty logs
     return {};
   }
@@ -327,12 +328,12 @@ const captureScreenshot = async (): Promise<string[]> => {
   try {
     // In a real implementation, this would capture an actual screenshot
     // For now, we'll just return a mock URL
-    
+
     return ['https://example.com/screenshot.png'];
   } catch (err) {
     logError(LogCategory.APP, 'Failed to capture screenshot', err as Error);
     captureException(err as Error);
-    
+
     // Return empty array
     return [];
   }
@@ -346,10 +347,10 @@ const captureScreenshot = async (): Promise<string[]> => {
 export const getBugReportById = async (bugReportId: string): Promise<DetailedBugReport | null> => {
   try {
     info(LogCategory.APP, 'Getting bug report by ID', { bugReportId });
-    
+
     // In a real implementation, this would fetch the bug report from a server
     // For now, we'll just return a mock response
-    
+
     // Mock bug report
     const mockBugReport: DetailedBugReport = {
       id: bugReportId,
@@ -363,19 +364,14 @@ export const getBugReportById = async (bugReportId: string): Promise<DetailedBug
       appVersion: '1.0.0',
       osVersion: '15.0',
       deviceModel: 'iPhone 13 Pro',
-      steps: [
-        'Open the app',
-        'Go to the Games tab',
-        'Select NFL',
-        'App crashes',
-      ],
+      steps: ['Open the app', 'Go to the Games tab', 'Select NFL', 'App crashes'],
       expectedBehavior: 'App should show NFL predictions',
       actualBehavior: 'App crashes',
       reproducibility: 'always',
       createdAt: '2025-03-01T12:00:00Z',
       updatedAt: '2025-03-02T14:30:00Z',
     };
-    
+
     return mockBugReport;
   } catch (err) {
     logError(LogCategory.APP, 'Failed to get bug report by ID', err as Error);
@@ -392,10 +388,10 @@ export const getBugReportById = async (bugReportId: string): Promise<DetailedBug
 export const getUserBugReports = async (userId: string): Promise<DetailedBugReport[]> => {
   try {
     info(LogCategory.APP, 'Getting user bug reports', { userId });
-    
+
     // In a real implementation, this would fetch the user's bug reports from a server
     // For now, we'll just return a mock response
-    
+
     // Mock bug reports
     const mockBugReports: DetailedBugReport[] = [
       {
@@ -410,12 +406,7 @@ export const getUserBugReports = async (userId: string): Promise<DetailedBugRepo
         appVersion: '1.0.0',
         osVersion: '15.0',
         deviceModel: 'iPhone 13 Pro',
-        steps: [
-          'Open the app',
-          'Go to the Games tab',
-          'Select NFL',
-          'App crashes',
-        ],
+        steps: ['Open the app', 'Go to the Games tab', 'Select NFL', 'App crashes'],
         expectedBehavior: 'App should show NFL predictions',
         actualBehavior: 'App crashes',
         reproducibility: 'always',
@@ -447,7 +438,7 @@ export const getUserBugReports = async (userId: string): Promise<DetailedBugRepo
         updatedAt: '2025-03-05T09:15:00Z',
       },
     ];
-    
+
     return mockBugReports;
   } catch (err) {
     logError(LogCategory.APP, 'Failed to get user bug reports', err as Error);

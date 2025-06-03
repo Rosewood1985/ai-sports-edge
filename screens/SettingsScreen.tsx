@@ -1,15 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { ThemeToggle } from 'atomic/molecules/theme';
 import React from 'react';
 import { View, StyleSheet, ScrollView, Switch, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import { LanguageSelector } from '../atomic/molecules';
-import { ThemeToggle } from 'atomic/molecules/theme';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
@@ -150,7 +149,7 @@ const SettingsScreen = () => {
               onValueChange={setPushNotifications}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
-              accessible={true}
+              accessible
               accessibilityLabel={t('settings.push_notifications')}
               accessibilityRole="switch"
               accessibilityState={{ checked: pushNotifications }}
@@ -178,7 +177,7 @@ const SettingsScreen = () => {
               onValueChange={setEmailNotifications}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
-              accessible={true}
+              accessible
               accessibilityLabel={t('settings.email_notifications')}
               accessibilityRole="switch"
               accessibilityState={{ checked: emailNotifications }}
@@ -216,7 +215,7 @@ const SettingsScreen = () => {
               onValueChange={setDownloadOverWifi}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
-              accessible={true}
+              accessible
               accessibilityLabel={t('settings.download_over_wifi')}
               accessibilityRole="switch"
               accessibilityState={{ checked: downloadOverWifi }}
@@ -244,7 +243,7 @@ const SettingsScreen = () => {
               onValueChange={setAutoPlayVideos}
               trackColor={{ false: '#767577', true: colors.primary }}
               thumbColor="#f4f3f4"
-              accessible={true}
+              accessible
               accessibilityLabel={t('settings.auto_play_videos')}
               accessibilityRole="switch"
               accessibilityState={{ checked: autoPlayVideos }}

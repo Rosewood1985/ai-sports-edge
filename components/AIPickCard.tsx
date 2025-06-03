@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { useTheme } from '../src/contexts/ThemeContext';
 import { formatDate } from '../utils/dateUtils';
 
@@ -21,7 +22,7 @@ interface AIPickCardProps {
 
 /**
  * AIPickCard Component
- * 
+ *
  * Displays an AI pick with team matchup, confidence, and insight text
  */
 const AIPickCard: React.FC<AIPickCardProps> = ({
@@ -36,18 +37,18 @@ const AIPickCard: React.FC<AIPickCardProps> = ({
   league,
   startTime,
   predictedWinner,
-  onFollow
+  onFollow,
 }) => {
   const { theme, themePreset } = useTheme();
   const isDark = themePreset === 'dark';
-  
+
   // Determine confidence level color
   const getConfidenceColor = () => {
     if (confidence >= 80) return theme.success;
     if (confidence >= 60) return theme.warning;
     return theme.error;
   };
-  
+
   // Determine momentum indicator
   const getMomentumIndicator = () => {
     if (momentumScore >= 15) return '🔥 Hot';
@@ -56,124 +57,111 @@ const AIPickCard: React.FC<AIPickCardProps> = ({
     if (momentumScore <= -5) return '📉 Falling';
     return '➖ Neutral';
   };
-  
+
   // Format the game time
   const formattedTime = startTime ? formatDate(startTime.toDate()) : 'TBD';
-  
+
   // Determine which team is predicted to win
   const winner = predictedWinner || (teamA.includes(predictedWinner || '') ? teamA : teamB);
   const loser = winner === teamA ? teamB : teamA;
-  
+
   return (
-    <View style={[
-      styles.container, 
-      { backgroundColor: theme.cardBackground },
-      isAIPickOfDay && styles.pickOfDayContainer
-    ]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.cardBackground },
+        isAIPickOfDay && styles.pickOfDayContainer,
+      ]}
+    >
       {/* Pick of the Day Badge */}
       {isAIPickOfDay && (
         <View style={styles.pickOfDayBadge}>
           <Text style={styles.pickOfDayText}>AI PICK OF THE DAY</Text>
         </View>
       )}
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
           <Text style={[styles.sportText, { color: theme.text }]}>
             {sport} {league ? `• ${league}` : ''}
           </Text>
-          <Text style={[styles.timeText, { color: theme.textSecondary }]}>
-            {formattedTime}
-          </Text>
+          <Text style={[styles.timeText, { color: theme.textSecondary }]}>{formattedTime}</Text>
         </View>
-        
+
         {/* Confidence Indicator */}
         <View style={styles.confidenceContainer}>
           <Text style={[styles.confidenceText, { color: getConfidenceColor() }]}>
             {confidence}% Confidence
           </Text>
-          <View 
+          <View
             style={[
-              styles.confidenceBar, 
-              { backgroundColor: isDark ? theme.background : theme.background }
+              styles.confidenceBar,
+              { backgroundColor: isDark ? theme.background : theme.background },
             ]}
           >
-            <View 
+            <View
               style={[
-                styles.confidenceFill, 
-                { 
-                  width: `${confidence}%`, 
-                  backgroundColor: getConfidenceColor() 
-                }
-              ]} 
+                styles.confidenceFill,
+                {
+                  width: `${confidence}%`,
+                  backgroundColor: getConfidenceColor(),
+                },
+              ]}
             />
           </View>
         </View>
       </View>
-      
+
       {/* Teams */}
       <View style={styles.teamsContainer}>
         <View style={styles.teamContainer}>
-          <Text 
-            style={[
-              styles.teamName, 
-              { color: theme.text },
-              winner === teamA && styles.winnerText
-            ]}
+          <Text
+            style={[styles.teamName, { color: theme.text }, winner === teamA && styles.winnerText]}
           >
             {teamA}
             {winner === teamA && <Text style={styles.winnerIndicator}> ✓</Text>}
           </Text>
         </View>
-        
+
         <Text style={[styles.vsText, { color: theme.textSecondary }]}>vs</Text>
-        
+
         <View style={styles.teamContainer}>
-          <Text 
-            style={[
-              styles.teamName, 
-              { color: theme.text },
-              winner === teamB && styles.winnerText
-            ]}
+          <Text
+            style={[styles.teamName, { color: theme.text }, winner === teamB && styles.winnerText]}
           >
             {teamB}
             {winner === teamB && <Text style={styles.winnerIndicator}> ✓</Text>}
           </Text>
         </View>
       </View>
-      
+
       {/* Momentum */}
       <View style={styles.momentumContainer}>
-        <Text style={[styles.momentumLabel, { color: theme.textSecondary }]}>
-          Momentum:
-        </Text>
-        <Text style={[styles.momentumText, { color: theme.text }]}>
-          {getMomentumIndicator()}
-        </Text>
+        <Text style={[styles.momentumLabel, { color: theme.textSecondary }]}>Momentum:</Text>
+        <Text style={[styles.momentumText, { color: theme.text }]}>{getMomentumIndicator()}</Text>
       </View>
-      
+
       {/* AI Insight */}
       <View style={styles.insightContainer}>
         <View style={styles.insightHeader}>
-          <Ionicons 
-            name="bulb-outline" 
-            size={16} 
-            color={theme.primary} 
-            style={styles.insightIcon} 
+          <Ionicons
+            name="bulb-outline"
+            size={16}
+            color={theme.primary}
+            style={styles.insightIcon}
           />
-          <Text style={[styles.insightLabel, { color: theme.primary }]}>
-            AI INSIGHT
-          </Text>
+          <Text style={[styles.insightLabel, { color: theme.primary }]}>AI INSIGHT</Text>
         </View>
         <Text style={[styles.insightText, { color: theme.text }]}>
-          {aiInsightText || `Our AI model predicts ${winner} to win against ${loser} with ${confidence}% confidence.`}
+          {aiInsightText ||
+            `Our AI model predicts ${winner} to win against ${loser} with ${confidence}% confidence.`}
         </Text>
       </View>
-      
+
       {/* Follow Button */}
       {onFollow && (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.followButton, { backgroundColor: theme.primary }]}
           onPress={() => onFollow(gameId)}
         >

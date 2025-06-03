@@ -5,9 +5,9 @@
  * It converts React Native accessibility props to a format that axe-core can understand.
  */
 
-import { ReactElement } from 'react';
 import { render } from '@testing-library/react-native';
 import { configureAxe } from 'jest-axe';
+import { ReactElement } from 'react';
 
 // Custom rules for React Native
 const reactNativeRules = {

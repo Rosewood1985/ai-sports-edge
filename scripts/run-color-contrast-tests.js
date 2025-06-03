@@ -10,6 +10,8 @@
 
 const fs = require('fs');
 const path = require('path');
+
+const Colors = require('../constants/Colors');
 const {
   calculateContrastRatio,
   meetsWCAGAA,
@@ -18,7 +20,6 @@ const {
 } = require('../utils/accessibilityTestUtils');
 
 // Import theme colors
-const Colors = require('../constants/Colors');
 
 // Results storage
 const results = {

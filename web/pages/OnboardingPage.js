@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { markOnboardingCompleted } from '../services/onboardingService';
+import { useNavigate } from 'react-router-dom';
+
 import ConfirmationModal from '../components/ConfirmationModal';
+import { markOnboardingCompleted } from '../services/onboardingService';
 
 /**
  * OnboardingPage component for web
@@ -64,11 +65,11 @@ const OnboardingPage = () => {
           setConfirmationData({
             title: t('onboarding:groupSubscription.title'),
             message: t('onboarding:groupSubscription.timeRequirement'),
-            onConfirm: () => navigate(`${languagePrefix}/group-subscription`)
+            onConfirm: () => navigate(`${languagePrefix}/group-subscription`),
           });
           setShowConfirmModal(true);
-        }
-      }
+        },
+      },
     },
     {
       id: 'getStarted',
@@ -104,37 +105,37 @@ const OnboardingPage = () => {
       if (!success) {
         // Show an error message but still allow navigation
         console.error('Failed to save onboarding status');
-        
+
         // Set confirmation data for the error modal
         setConfirmationData({
           title: t('common:error'),
           message: t('onboarding:errors.saveFailed', {
-            defaultValue: 'We couldn\'t save your onboarding progress. Some features may ask you to complete onboarding again.'
+            defaultValue:
+              "We couldn't save your onboarding progress. Some features may ask you to complete onboarding again.",
           }),
-          onConfirm: () => navigate(`${languagePrefix}/`)
+          onConfirm: () => navigate(`${languagePrefix}/`),
         });
         setShowConfirmModal(true);
         return; // Don't navigate yet, let the modal handle it
       }
-      
+
       // Success case - navigate to home
       navigate(`${languagePrefix}/`);
     } catch (error) {
       // Sanitize error message to prevent XSS
-      const sanitizedError = error?.message ?
-        error.message.replace(/[<>]/g, '') :
-        'Unknown error';
-      
+      const sanitizedError = error?.message ? error.message.replace(/[<>]/g, '') : 'Unknown error';
+
       console.error('Error completing onboarding:', sanitizedError);
-      
+
       // Show error modal with sanitized message
       setConfirmationData({
         title: t('common:error'),
         message: t('onboarding:errors.generalError', {
-          defaultValue: 'There was a problem completing the onboarding process. You can try again later.',
-          error: sanitizedError
+          defaultValue:
+            'There was a problem completing the onboarding process. You can try again later.',
+          error: sanitizedError,
         }),
-        onConfirm: () => navigate(`${languagePrefix}/`)
+        onConfirm: () => navigate(`${languagePrefix}/`),
       });
       setShowConfirmModal(true);
     }
@@ -144,25 +145,25 @@ const OnboardingPage = () => {
   useEffect(() => {
     // Set page title
     document.title = t('onboarding:pageTitle');
-    
+
     // Update meta description
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', t('onboarding:metaDescription'));
     }
-    
+
     // Update Open Graph meta tags
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const ogDescription = document.querySelector('meta[property="og:description"]');
-    
+
     if (ogTitle) {
       ogTitle.setAttribute('content', t('onboarding:pageTitle'));
     }
-    
+
     if (ogDescription) {
       ogDescription.setAttribute('content', t('onboarding:metaDescription'));
     }
-    
+
     // Update canonical and hreflang links
     const canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
@@ -173,15 +174,15 @@ const OnboardingPage = () => {
     } else {
       canonicalLink.href = `https://aisportsedge.app${languagePrefix}/onboarding`;
     }
-    
+
     // Update hreflang links
     const hreflangEn = document.querySelector('link[hreflang="en"]');
     const hreflangEs = document.querySelector('link[hreflang="es"]');
-    
+
     if (hreflangEn) {
       hreflangEn.href = 'https://aisportsedge.app/onboarding';
     }
-    
+
     if (hreflangEs) {
       hreflangEs.href = 'https://aisportsedge.app/es/onboarding';
     }
@@ -220,9 +221,11 @@ const OnboardingPage = () => {
             aria-hidden="true" // Decorative image, main content is in the text
           />
         </div>
-        
+
         <div className="onboarding-text">
-          <h1 id={`onboarding-step-${currentStep + 1}`} tabIndex="-1">{currentStepData.title}</h1>
+          <h1 id={`onboarding-step-${currentStep + 1}`} tabIndex="-1">
+            {currentStepData.title}
+          </h1>
           <p>{currentStepData.description}</p>
           {currentStepData.actionButton && (
             <button
@@ -234,8 +237,12 @@ const OnboardingPage = () => {
             </button>
           )}
         </div>
-        
-        <div className="onboarding-progress" role="navigation" aria-label={t('onboarding:progressNav')}>
+
+        <div
+          className="onboarding-progress"
+          role="navigation"
+          aria-label={t('onboarding:progressNav')}
+        >
           {steps.map((step, index) => (
             <div
               key={step.id}
@@ -243,9 +250,9 @@ const OnboardingPage = () => {
               role="button"
               tabIndex={index === currentStep ? 0 : -1}
               aria-label={`${t('onboarding:step')} ${index + 1} ${index === currentStep ? t('onboarding:current') : index < currentStep ? t('onboarding:completed') : ''}`}
-              aria-current={index === currentStep ? "step" : undefined}
+              aria-current={index === currentStep ? 'step' : undefined}
               onClick={() => setCurrentStep(index)}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   setCurrentStep(index);
                   e.preventDefault();
@@ -254,7 +261,7 @@ const OnboardingPage = () => {
             />
           ))}
         </div>
-        
+
         <div className="onboarding-buttons">
           {currentStep < steps.length - 1 ? (
             <>

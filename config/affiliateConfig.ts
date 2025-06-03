@@ -11,20 +11,20 @@ import {
   ENABLE_MICROTRANSACTIONS,
   ENABLE_AFFILIATE_LINKS,
   ENABLE_AB_TESTING,
-  ENABLE_GAME_URL_INTEGRATION
+  ENABLE_GAME_URL_INTEGRATION,
 } from '@env';
 
 // FanDuel Affiliate Configuration
 export const FANDUEL_CONFIG = {
   // Affiliate ID loaded from environment variables
   AFFILIATE_ID: FANDUEL_AFFILIATE_ID || 'PLACEHOLDER_AFFILIATE_ID',
-  
+
   // Base URL for FanDuel
   BASE_URL: 'https://sportsbook.fanduel.com/',
-  
+
   // Affiliate link from environment variable
   AFFILIATE_URL: FANDUEL_AFFILIATE_LINK || 'https://fndl.co/lr9jbkg',
-  
+
   // Default tracking parameters
   TRACKING_PARAMS: {
     utm_source: 'aisportsedge',
@@ -37,10 +37,10 @@ export const FANDUEL_CONFIG = {
 export const STRIPE_CONFIG = {
   // Stripe configuration is now in config/stripe.ts
   // and loaded from environment variables
-  
+
   // Merchant identifier
   MERCHANT_IDENTIFIER: 'merchant.com.aisportsedge',
-  
+
   // Default product pricing (in cents)
   PRICING: {
     ODDS_ACCESS: 199, // $1.99 for odds access
@@ -51,7 +51,7 @@ export const STRIPE_CONFIG = {
 export const API_CONFIG = {
   // Base URL for your API - loaded from environment variables
   BASE_URL: API_BASE_URL || 'https://ai-sports-edge.firebaseapp.com/api',
-  
+
   // API endpoints
   ENDPOINTS: {
     CREATE_PAYMENT: '/create-payment',

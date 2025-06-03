@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { EnhancedWidget } from '../widgets/EnhancedWidget';
-import { Button } from '../../ui/Button';
-import { Card } from '../../ui/Card';
-import { Badge } from '../../ui/Badge';
-import { useContentItem, useContentTemplates, useContentTags, useMediaAssets } from '../../../hooks/useContentManagement';
+
+import {
+  useContentItem,
+  useContentTemplates,
+  useContentTags,
+  useMediaAssets,
+} from '../../../hooks/useContentManagement';
 import {
   ContentItem,
   ContentCreateRequest,
@@ -14,6 +16,10 @@ import {
   ContentTag,
   ContentTemplate,
 } from '../../../types/contentManagement';
+import { Badge } from '../../ui/Badge';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { EnhancedWidget } from '../widgets/EnhancedWidget';
 
 export interface ContentEditorProps {
   contentId?: string;
@@ -25,14 +31,9 @@ export interface ContentEditorProps {
 /**
  * Content Editor component for creating and editing content
  */
-export function ContentEditor({
-  contentId,
-  onSave,
-  onCancel,
-  className = '',
-}: ContentEditorProps) {
+export function ContentEditor({ contentId, onSave, onCancel, className = '' }: ContentEditorProps) {
   const isEditing = !!contentId;
-  
+
   // Form state
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -51,7 +52,12 @@ export function ContentEditor({
   const [allowComments, setAllowComments] = useState(true);
 
   // Hooks
-  const { data: contentData, createContent, updateContent, isLoading: isContentLoading } = useContentItem(contentId);
+  const {
+    data: contentData,
+    createContent,
+    updateContent,
+    isLoading: isContentLoading,
+  } = useContentItem(contentId);
   const { data: templates } = useContentTemplates();
   const { data: tags, createTag } = useContentTags();
   const { uploadAsset, isUploading } = useMediaAssets();
@@ -145,15 +151,13 @@ export function ContentEditor({
 
   const handleTagToggle = (tagId: string) => {
     setSelectedTags(prev =>
-      prev.includes(tagId)
-        ? prev.filter(id => id !== tagId)
-        : [...prev, tagId]
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
     );
   };
 
   const handleNewTag = async (tagName: string) => {
     if (!tagName.trim()) return;
-    
+
     try {
       const newTag = await createTag({
         name: tagName.trim(),
@@ -204,7 +208,9 @@ export function ContentEditor({
                   className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 >
                   <h4 className="font-medium text-gray-900 dark:text-white">{template.name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{template.description}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {template.description}
+                  </p>
                   <Badge className="mt-2 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                     {template.type}
                   </Badge>
@@ -222,7 +228,7 @@ export function ContentEditor({
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Basic Information
               </h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -231,7 +237,7 @@ export function ContentEditor({
                   <input
                     type="text"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={e => setTitle(e.target.value)}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="Enter content title"
                     required
@@ -244,7 +250,7 @@ export function ContentEditor({
                   </label>
                   <textarea
                     value={excerpt}
-                    onChange={(e) => setExcerpt(e.target.value)}
+                    onChange={e => setExcerpt(e.target.value)}
                     rows={3}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="Brief description or excerpt"
@@ -257,7 +263,7 @@ export function ContentEditor({
                   </label>
                   <textarea
                     value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    onChange={e => setContent(e.target.value)}
                     rows={20}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono text-sm"
                     placeholder="Write your content here... (Supports HTML and Markdown)"
@@ -275,7 +281,7 @@ export function ContentEditor({
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 SEO Metadata
               </h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -284,7 +290,7 @@ export function ContentEditor({
                   <input
                     type="text"
                     value={metaTitle}
-                    onChange={(e) => setMetaTitle(e.target.value)}
+                    onChange={e => setMetaTitle(e.target.value)}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="SEO title (defaults to main title)"
                   />
@@ -296,7 +302,7 @@ export function ContentEditor({
                   </label>
                   <textarea
                     value={metaDescription}
-                    onChange={(e) => setMetaDescription(e.target.value)}
+                    onChange={e => setMetaDescription(e.target.value)}
                     rows={3}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="SEO description (defaults to excerpt)"
@@ -310,7 +316,14 @@ export function ContentEditor({
                   <input
                     type="text"
                     value={metaKeywords.join(', ')}
-                    onChange={(e) => setMetaKeywords(e.target.value.split(',').map(k => k.trim()).filter(k => k))}
+                    onChange={e =>
+                      setMetaKeywords(
+                        e.target.value
+                          .split(',')
+                          .map(k => k.trim())
+                          .filter(k => k)
+                      )
+                    }
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="keyword1, keyword2, keyword3"
                   />
@@ -326,10 +339,8 @@ export function ContentEditor({
           <div className="space-y-6">
             {/* Publishing Options */}
             <Card className="p-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Publishing
-              </h3>
-              
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Publishing</h3>
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -337,7 +348,7 @@ export function ContentEditor({
                   </label>
                   <select
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as ContentStatus)}
+                    onChange={e => setStatus(e.target.value as ContentStatus)}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
                     <option value={ContentStatus.DRAFT}>Draft</option>
@@ -346,9 +357,7 @@ export function ContentEditor({
                     <option value={ContentStatus.ARCHIVED}>Archived</option>
                   </select>
                   <div className="mt-2">
-                    <Badge className={getStatusColor(status)}>
-                      {status}
-                    </Badge>
+                    <Badge className={getStatusColor(status)}>{status}</Badge>
                   </div>
                 </div>
 
@@ -358,7 +367,7 @@ export function ContentEditor({
                   </label>
                   <select
                     value={type}
-                    onChange={(e) => setType(e.target.value as ContentType)}
+                    onChange={e => setType(e.target.value as ContentType)}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
                     <option value={ContentType.ARTICLE}>Article</option>
@@ -376,7 +385,7 @@ export function ContentEditor({
                   </label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value as ContentCategory)}
+                    onChange={e => setCategory(e.target.value as ContentCategory)}
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
                     <option value={ContentCategory.BETTING_GUIDE}>Betting Guide</option>
@@ -396,7 +405,7 @@ export function ContentEditor({
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Featured Image
               </h3>
-              
+
               <div className="space-y-3">
                 {featuredImage && (
                   <div className="relative">
@@ -410,12 +419,16 @@ export function ContentEditor({
                       className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </button>
                   </div>
                 )}
-                
+
                 <div>
                   <input
                     type="file"
@@ -424,19 +437,15 @@ export function ContentEditor({
                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     disabled={isUploading}
                   />
-                  {isUploading && (
-                    <p className="text-sm text-blue-600 mt-1">Uploading...</p>
-                  )}
+                  {isUploading && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
                 </div>
               </div>
             </Card>
 
             {/* Tags */}
             <Card className="p-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Tags
-              </h3>
-              
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Tags</h3>
+
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
                   {tags?.map(tag => (
@@ -453,13 +462,13 @@ export function ContentEditor({
                     </button>
                   ))}
                 </div>
-                
+
                 <div>
                   <input
                     type="text"
                     placeholder="Create new tag..."
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    onKeyPress={(e) => {
+                    onKeyPress={e => {
                       if (e.key === 'Enter') {
                         handleNewTag(e.currentTarget.value);
                         e.currentTarget.value = '';
@@ -478,13 +487,13 @@ export function ContentEditor({
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Advanced Options
               </h3>
-              
+
               <div className="space-y-3">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={isSticky}
-                    onChange={(e) => setIsSticky(e.target.checked)}
+                    onChange={e => setIsSticky(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -496,7 +505,7 @@ export function ContentEditor({
                   <input
                     type="checkbox"
                     checked={requiresAuth}
-                    onChange={(e) => setRequiresAuth(e.target.checked)}
+                    onChange={e => setRequiresAuth(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -508,7 +517,7 @@ export function ContentEditor({
                   <input
                     type="checkbox"
                     checked={premiumContent}
-                    onChange={(e) => setPremiumContent(e.target.checked)}
+                    onChange={e => setPremiumContent(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -520,7 +529,7 @@ export function ContentEditor({
                   <input
                     type="checkbox"
                     checked={allowComments}
-                    onChange={(e) => setAllowComments(e.target.checked)}
+                    onChange={e => setAllowComments(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -537,9 +546,9 @@ export function ContentEditor({
           <Button onClick={onCancel} variant="secondary">
             Cancel
           </Button>
-          <Button 
-            onClick={handleSave} 
-            variant="primary" 
+          <Button
+            onClick={handleSave}
+            variant="primary"
             isLoading={isContentLoading}
             disabled={!title.trim() || !content.trim()}
           >

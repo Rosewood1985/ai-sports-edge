@@ -1,10 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import Colors from '../constants/Colors';
+
 import { ThemedText } from './ThemedText';
+import Colors from '../constants/Colors';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface DataSeries {
   label: string;
@@ -45,16 +46,16 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
   // State
   const [activeSeries, setActiveSeries] = useState<string[]>(series.map(s => s.label));
   const [chartWidth, setChartWidth] = useState(Dimensions.get('window').width - 64);
-  
+
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateAnim = useRef(new Animated.Value(20)).current;
-  
+
   // Get theme colors
   const { colors, isDark } = useTheme();
   const backgroundColor = isDark ? '#1A1A1A' : '#FFFFFF';
   const textColor = isDark ? '#FFFFFF' : '#000000';
-  
+
   // Animate chart entrance
   useEffect(() => {
     Animated.parallel([
@@ -70,12 +71,13 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
       }),
     ]).start();
   }, []);
-  
+
   // Toggle series visibility
   const toggleSeries = (label: string) => {
     if (activeSeries.includes(label)) {
       // Remove if already active
-      if (activeSeries.length > 1) { // Keep at least one series visible
+      if (activeSeries.length > 1) {
+        // Keep at least one series visible
         setActiveSeries(activeSeries.filter(s => s !== label));
       }
     } else {
@@ -83,7 +85,7 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
       setActiveSeries([...activeSeries, label]);
     }
   };
-  
+
   // Memoized hex to RGB conversion function
   const hexToRgb = useCallback((hex: string | undefined) => {
     const safeHex = hex || Colors.neon.blue;
@@ -96,12 +98,12 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
         }
       : { r: 0, g: 123, b: 255 }; // Default to blue
   }, []);
-  
+
   // Memoized chart data preparation
   const chartData = useMemo(() => {
     // Filter to only active series
     const filteredSeries = series.filter(s => activeSeries.includes(s.label));
-    
+
     return {
       labels,
       datasets: filteredSeries.map(s => ({
@@ -115,14 +117,14 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
       legend: filteredSeries.map(s => s.label),
     };
   }, [series, activeSeries, labels, hexToRgb]);
-  
+
   // Memoized chart configuration
   const chartConfig = useMemo(() => {
     return {
-      backgroundColor: backgroundColor,
+      backgroundColor,
       backgroundGradientFrom: backgroundColor,
       backgroundGradientTo: backgroundColor,
-      decimalPlaces: decimalPlaces,
+      decimalPlaces,
       color: (opacity = 1) => `rgba(${isDark ? '255, 255, 255' : '0, 0, 0'}, ${opacity})`,
       labelColor: (opacity = 1) => `rgba(${isDark ? '255, 255, 255' : '0, 0, 0'}, ${opacity})`,
       style: {
@@ -141,7 +143,7 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
       },
     };
   }, [backgroundColor, decimalPlaces, isDark, showDataPoints]);
-  
+
   return (
     <Animated.View
       style={[
@@ -155,14 +157,14 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
     >
       <View style={styles.header}>
         <ThemedText style={styles.title}>{title}</ThemedText>
-        
+
         {onPress && (
           <TouchableOpacity style={styles.expandButton} onPress={onPress}>
             <Ionicons name="expand" size={20} color={Colors.neon.blue} />
           </TouchableOpacity>
         )}
       </View>
-      
+
       <LineChart
         data={chartData}
         width={chartWidth}
@@ -170,24 +172,24 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
         chartConfig={chartConfig}
         bezier={bezier}
         style={styles.chart}
-        withInnerLines={true}
+        withInnerLines
         withOuterLines={false}
         withShadow={false}
         withDots={showDataPoints}
         withVerticalLines={false}
-        withHorizontalLines={true}
-        withVerticalLabels={true}
-        withHorizontalLabels={true}
+        withHorizontalLines
+        withVerticalLabels
+        withHorizontalLabels
         fromZero={false}
         yAxisInterval={1}
         yAxisSuffix={yAxisSuffix}
         yAxisLabel={yAxisPrefix}
         hidePointsAtIndex={showDataPoints ? [] : labels.map((_, i) => i)}
       />
-      
+
       {showLegend && (
         <View style={styles.legendContainer}>
-          {series.map((s) => (
+          {series.map(s => (
             <TouchableOpacity
               key={s.label}
               style={styles.legendItem}
@@ -204,10 +206,7 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({
                 ]}
               />
               <ThemedText
-                style={[
-                  styles.legendText,
-                  { opacity: activeSeries.includes(s.label) ? 1 : 0.3 },
-                ]}
+                style={[styles.legendText, { opacity: activeSeries.includes(s.label) ? 1 : 0.3 }]}
               >
                 {s.label}
               </ThemedText>

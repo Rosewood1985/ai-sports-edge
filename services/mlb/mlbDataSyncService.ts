@@ -3,9 +3,10 @@
 // Deep Focus Architecture with Real Data Integration Points
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
+
+import { firestore as db } from '../../config/firebase';
 import { getWeatherApiKey } from '../../utils/apiKeys';
 
 export class MLBDataSyncService {
@@ -64,7 +65,7 @@ export class MLBDataSyncService {
       });
 
       const teamsResponse = await this.fetchFromMLBAPI('/teams');
-      
+
       if (!this.validateTeamsResponse(teamsResponse)) {
         throw new Error('Invalid teams API response structure');
       }
@@ -94,16 +95,20 @@ export class MLBDataSyncService {
             name: team.division?.name,
           },
           // Venue information
-          venue: team.venue ? {
-            id: team.venue.id,
-            name: team.venue.name,
-            location: team.venue.location,
-          } : null,
+          venue: team.venue
+            ? {
+                id: team.venue.id,
+                name: team.venue.name,
+                location: team.venue.location,
+              }
+            : null,
           // Spring training venues
-          springVenue: team.springVenue ? {
-            id: team.springVenue.id,
-            name: team.springVenue.name,
-          } : null,
+          springVenue: team.springVenue
+            ? {
+                id: team.springVenue.id,
+                name: team.springVenue.name,
+              }
+            : null,
           // Team colors and branding
           teamCode: team.teamCode,
           fileCode: team.fileCode,
@@ -114,7 +119,7 @@ export class MLBDataSyncService {
         };
 
         await setDoc(doc(teamsCollection, team.id.toString()), teamData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced team: ${team.name}`,
           category: 'mlb.sync.teams.detail',
@@ -144,7 +149,7 @@ export class MLBDataSyncService {
       // Get current active players - we'll sync team rosters
       const teamsResponse = await this.fetchFromMLBAPI('/teams');
       const teams = teamsResponse.teams || [];
-      
+
       const playersCollection = collection(db, 'mlb_players');
       let totalPlayersSynced = 0;
 
@@ -154,7 +159,7 @@ export class MLBDataSyncService {
         try {
           // Get team roster
           const rosterResponse = await this.fetchFromMLBAPI(`/teams/${team.id}/roster`);
-          
+
           if (!this.validateRosterResponse(rosterResponse)) {
             Sentry.addBreadcrumb({
               message: `Invalid roster response for team ${team.name}`,
@@ -186,12 +191,14 @@ export class MLBDataSyncService {
                 name: team.name,
               },
               // Position information
-              primaryPosition: playerDetail.primaryPosition ? {
-                code: playerDetail.primaryPosition.code,
-                name: playerDetail.primaryPosition.name,
-                type: playerDetail.primaryPosition.type,
-                abbreviation: playerDetail.primaryPosition.abbreviation,
-              } : null,
+              primaryPosition: playerDetail.primaryPosition
+                ? {
+                    code: playerDetail.primaryPosition.code,
+                    name: playerDetail.primaryPosition.name,
+                    type: playerDetail.primaryPosition.type,
+                    abbreviation: playerDetail.primaryPosition.abbreviation,
+                  }
+                : null,
               // Physical attributes
               height: playerDetail.height,
               weight: playerDetail.weight,
@@ -200,14 +207,18 @@ export class MLBDataSyncService {
               birthStateProvince: playerDetail.birthStateProvince,
               birthCountry: playerDetail.birthCountry,
               // Batting/Throwing
-              batSide: playerDetail.batSide ? {
-                code: playerDetail.batSide.code,
-                description: playerDetail.batSide.description,
-              } : null,
-              pitchHand: playerDetail.pitchHand ? {
-                code: playerDetail.pitchHand.code,
-                description: playerDetail.pitchHand.description,
-              } : null,
+              batSide: playerDetail.batSide
+                ? {
+                    code: playerDetail.batSide.code,
+                    description: playerDetail.batSide.description,
+                  }
+                : null,
+              pitchHand: playerDetail.pitchHand
+                ? {
+                    code: playerDetail.pitchHand.code,
+                    description: playerDetail.pitchHand.description,
+                  }
+                : null,
               // Career info
               mlbDebutDate: playerDetail.mlbDebutDate,
               // Jersey and roster info
@@ -226,7 +237,9 @@ export class MLBDataSyncService {
               syncStatus: 'completed',
             };
 
-            await setDoc(doc(playersCollection, playerDetail.id.toString()), playerData, { merge: true });
+            await setDoc(doc(playersCollection, playerDetail.id.toString()), playerData, {
+              merge: true,
+            });
             totalPlayersSynced++;
 
             if (totalPlayersSynced % 50 === 0) {
@@ -271,14 +284,14 @@ export class MLBDataSyncService {
       const today = new Date();
       const endDate = new Date(today);
       endDate.setDate(today.getDate() + 7);
-      
+
       const startDateStr = today.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
-      
+
       const scheduleResponse = await this.fetchFromMLBAPI(
         `/schedule?startDate=${startDateStr}&endDate=${endDateStr}&sportId=1&hydrate=team,venue,weather,lineups,probablePitcher`
       );
-      
+
       if (!this.validateScheduleResponse(scheduleResponse)) {
         throw new Error('Invalid schedule API response structure');
       }
@@ -288,7 +301,7 @@ export class MLBDataSyncService {
 
       for (const dateEntry of scheduleResponse.dates) {
         const games = dateEntry.games || [];
-        
+
         for (const game of games) {
           const gameData = {
             gamePk: game.gamePk,
@@ -319,11 +332,13 @@ export class MLBDataSyncService {
               },
             },
             // Venue information
-            venue: game.venue ? {
-              id: game.venue.id,
-              name: game.venue.name,
-              location: game.venue.location,
-            } : null,
+            venue: game.venue
+              ? {
+                  id: game.venue.id,
+                  name: game.venue.name,
+                  location: game.venue.location,
+                }
+              : null,
             // Weather information (if available)
             weather: game.weather,
             // Game status
@@ -359,7 +374,7 @@ export class MLBDataSyncService {
 
           await setDoc(doc(gamesCollection, game.gamePk.toString()), gameData, { merge: true });
           totalGamesSynced++;
-          
+
           if (totalGamesSynced % 10 === 0) {
             Sentry.addBreadcrumb({
               message: `Synced ${totalGamesSynced} games so far`,
@@ -391,9 +406,9 @@ export class MLBDataSyncService {
 
       // Stats are already synced as part of player sync
       // This method could be used for historical stats or league leaders
-      
+
       const currentYear = new Date().getFullYear();
-      
+
       // Sync league leaders for current season
       const leaderResponse = await this.fetchFromMLBAPI(
         `/stats/leaders?leaderCategories=homeRuns,rbi,battingAverage,era,wins,strikeouts&season=${currentYear}&sportId=1`
@@ -401,7 +416,7 @@ export class MLBDataSyncService {
 
       if (leaderResponse.leagueLeaders) {
         const statsCollection = collection(db, 'mlb_league_leaders');
-        
+
         for (const category of leaderResponse.leagueLeaders) {
           const categoryData = {
             category: category.leaderCategory,
@@ -433,7 +448,7 @@ export class MLBDataSyncService {
   private async syncWeatherData(): Promise<void> {
     try {
       Sentry.addBreadcrumb({
-        message: 'Starting weather data sync for today\'s games',
+        message: "Starting weather data sync for today's games",
         category: 'mlb.sync.weather',
         level: 'info',
       });
@@ -453,9 +468,14 @@ export class MLBDataSyncService {
 
       for (const dateEntry of scheduleResponse.dates) {
         const games = dateEntry.games || [];
-        
+
         for (const game of games) {
-          if (game.venue && game.venue.location && game.venue.location.latitude && game.venue.location.longitude) {
+          if (
+            game.venue &&
+            game.venue.location &&
+            game.venue.location.latitude &&
+            game.venue.location.longitude
+          ) {
             try {
               const weatherData = await this.fetchWeatherData(
                 game.venue.location.latitude,
@@ -479,7 +499,9 @@ export class MLBDataSyncService {
                   dataSource: 'openweather_api',
                 };
 
-                await setDoc(doc(weatherCollection, game.gamePk.toString()), gameWeatherData, { merge: true });
+                await setDoc(doc(weatherCollection, game.gamePk.toString()), gameWeatherData, {
+                  merge: true,
+                });
                 weatherDataSynced++;
               }
             } catch (weatherError) {
@@ -516,10 +538,10 @@ export class MLBDataSyncService {
       // MLB Stats API doesn't have a dedicated injuries endpoint
       // Injury information is typically found in roster status
       // We'll check disabled list and transaction data
-      
+
       const teamsResponse = await this.fetchFromMLBAPI('/teams');
       const teams = teamsResponse.teams || [];
-      
+
       const injuriesCollection = collection(db, 'mlb_injuries');
       let totalInjuriesSynced = 0;
 
@@ -534,11 +556,12 @@ export class MLBDataSyncService {
 
           if (transactionsResponse.transactions) {
             for (const transaction of transactionsResponse.transactions) {
-              if (transaction.typeDesc && 
-                  (transaction.typeDesc.includes('Placed on') || 
-                   transaction.typeDesc.includes('IL') ||
-                   transaction.typeDesc.includes('disabled'))) {
-                
+              if (
+                transaction.typeDesc &&
+                (transaction.typeDesc.includes('Placed on') ||
+                  transaction.typeDesc.includes('IL') ||
+                  transaction.typeDesc.includes('disabled'))
+              ) {
                 const injuryData = {
                   transactionId: transaction.id,
                   playerId: transaction.player?.id,
@@ -566,7 +589,7 @@ export class MLBDataSyncService {
                   injuryData,
                   { merge: true }
                 );
-                
+
                 totalInjuriesSynced++;
               }
             }
@@ -617,93 +640,92 @@ export class MLBDataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       Sentry.addBreadcrumb({
         message: `Making MLB API request: ${url}`,
         category: 'mlb.api.request',
         level: 'debug',
-        data: { endpoint, retryCount }
+        data: { endpoint, retryCount },
       });
 
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         // Note: timeout is handled by AbortController in production environments
       });
 
       if (!response.ok) {
         const errorMessage = `MLB API error: ${response.status} ${response.statusText}`;
-        
+
         // Handle rate limiting
         if (response.status === 429) {
           const retryAfter = response.headers.get('Retry-After');
           const delay = retryAfter ? parseInt(retryAfter) * 1000 : 60000; // Default to 1 minute
-          
+
           Sentry.addBreadcrumb({
             message: `Rate limited, waiting ${delay}ms before retry`,
             category: 'mlb.api.rate_limit',
             level: 'warning',
           });
-          
+
           await this.sleep(delay);
-          
+
           if (retryCount < this.maxRetries) {
             return this.fetchFromMLBAPI(endpoint, retryCount + 1);
           }
         }
-        
+
         // Handle server errors with retry
         if (response.status >= 500 && retryCount < this.maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-          
+
           Sentry.addBreadcrumb({
             message: `Server error ${response.status}, retrying in ${delay}ms`,
             category: 'mlb.api.server_error',
             level: 'warning',
           });
-          
+
           await this.sleep(delay);
           return this.fetchFromMLBAPI(endpoint, retryCount + 1);
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
-      
+
       Sentry.addBreadcrumb({
         message: `MLB API request successful: ${url}`,
         category: 'mlb.api.success',
         level: 'debug',
-        data: { 
-          endpoint, 
+        data: {
+          endpoint,
           dataSize: JSON.stringify(data).length,
-          retryCount 
-        }
+          retryCount,
+        },
       });
 
       this.requestCount++;
       return data;
-      
     } catch (error) {
       Sentry.captureException(error);
-      
+
       // Retry on network errors
       if (retryCount < this.maxRetries && (error as any).name === 'TypeError') {
         const delay = Math.pow(2, retryCount) * 1000;
-        
+
         Sentry.addBreadcrumb({
           message: `Network error, retrying in ${delay}ms`,
           category: 'mlb.api.network_error',
           level: 'warning',
         });
-        
+
         await this.sleep(delay);
         return this.fetchFromMLBAPI(endpoint, retryCount + 1);
       }
-      
+
       throw new Error(`MLB API request failed: ${(error as Error).message}`);
     }
   }
@@ -711,12 +733,12 @@ export class MLBDataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       const delay = this.rateLimitDelay - timeSinceLastRequest;
       await this.sleep(delay);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -738,7 +760,7 @@ export class MLBDataSyncService {
       await this.enforceRateLimit(); // Apply rate limiting to weather requests too
 
       const url = `${this.weatherBaseUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.weatherApiKey}&units=imperial`;
-      
+
       Sentry.addBreadcrumb({
         message: `Fetching weather data for coordinates: ${lat}, ${lon}`,
         category: 'mlb.weather.request',
@@ -752,15 +774,15 @@ export class MLBDataSyncService {
       }
 
       const weatherData = await response.json();
-      
+
       Sentry.addBreadcrumb({
         message: `Weather API request successful for coordinates: ${lat}, ${lon}`,
         category: 'mlb.weather.success',
         level: 'debug',
-        data: { 
+        data: {
           temperature: weatherData.main?.temp,
-          conditions: weatherData.weather?.[0]?.description 
-        }
+          conditions: weatherData.weather?.[0]?.description,
+        },
       });
 
       return weatherData;
@@ -796,20 +818,22 @@ export class MLBDataSyncService {
   private async getPlayerCurrentStats(playerId: number): Promise<any> {
     try {
       const currentYear = new Date().getFullYear();
-      const statsResponse = await this.fetchFromMLBAPI(`/people/${playerId}/stats?stats=season&season=${currentYear}`);
-      
+      const statsResponse = await this.fetchFromMLBAPI(
+        `/people/${playerId}/stats?stats=season&season=${currentYear}`
+      );
+
       if (!statsResponse.stats || statsResponse.stats.length === 0) {
         return null;
       }
 
       const stats = {};
-      
+
       // Process each stat group (hitting, pitching, fielding)
       for (const statGroup of statsResponse.stats) {
         if (statGroup.splits && statGroup.splits.length > 0) {
           const statData = statGroup.splits[0].stat;
           const groupName = statGroup.group?.displayName?.toLowerCase() || 'unknown';
-          
+
           (stats as any)[groupName] = {
             ...statData,
             season: currentYear,
@@ -857,7 +881,7 @@ export class MLBDataSyncService {
   private calculateAdvancedMetrics(stat: any): any {
     // Calculate advanced baseball metrics
     const stats = stat.stats || {};
-    
+
     return {
       war: this.calculateWAR(stats),
       wrc_plus: this.calculateWRCPlus(stats),
@@ -873,7 +897,7 @@ export class MLBDataSyncService {
     const batting = (stats.onBasePlusSlugging || 0) * 0.1;
     const fielding = (stats.fieldingPercentage || 0) * 0.05;
     const baserunning = (stats.stolenBases || 0) * 0.02;
-    
+
     return Math.max(0, batting + fielding + baserunning - 2.0);
   }
 
@@ -889,7 +913,7 @@ export class MLBDataSyncService {
     const atBats = stats.atBats || 1;
     const strikeouts = stats.strikeOuts || 0;
     const sacrificeFlies = stats.sacrificeFlies || 0;
-    
+
     const ballsInPlay = atBats - strikeouts - homeRuns + sacrificeFlies;
     return ballsInPlay > 0 ? (hits - homeRuns) / ballsInPlay : 0;
   }
@@ -926,19 +950,24 @@ export class MLBDataSyncService {
     };
   }
 
-  private calculateHomeRunFactor(temp: number, humidity: number, windSpeed: number, windDirection: number): number {
+  private calculateHomeRunFactor(
+    temp: number,
+    humidity: number,
+    windSpeed: number,
+    windDirection: number
+  ): number {
     let factor = 1.0;
-    
+
     // Temperature effect (higher temp = more carry)
     factor += (temp - 70) * 0.002;
-    
+
     // Humidity effect (lower humidity = more carry)
     factor -= (humidity - 50) * 0.001;
-    
+
     // Wind effect (tailwind helps, headwind hurts)
-    const windFactor = Math.cos((windDirection - 90) * Math.PI / 180);
+    const windFactor = Math.cos(((windDirection - 90) * Math.PI) / 180);
     factor += windSpeed * windFactor * 0.01;
-    
+
     return Math.max(0.8, Math.min(1.2, factor));
   }
 
@@ -946,7 +975,7 @@ export class MLBDataSyncService {
     const baseFactor = 1.0;
     const tempFactor = (temp - 70) * 0.003;
     const humidityFactor = (50 - humidity) * 0.002;
-    
+
     return baseFactor + tempFactor + humidityFactor;
   }
 
@@ -966,25 +995,31 @@ export class MLBDataSyncService {
   private calculateInjuryImpact(injury: any): string {
     const injuryType = injury.injuryType?.toLowerCase() || '';
     const status = injury.status?.toLowerCase() || '';
-    
+
     if (status.includes('disabled') || status.includes('il')) return 'High';
-    if (injuryType.includes('shoulder') || injuryType.includes('elbow') || injuryType.includes('knee')) return 'Medium';
+    if (
+      injuryType.includes('shoulder') ||
+      injuryType.includes('elbow') ||
+      injuryType.includes('knee')
+    )
+      return 'Medium';
     if (status.includes('day-to-day')) return 'Low';
-    
+
     return 'Unknown';
   }
 
   private validateGameData(game: any): boolean {
     const requiredFields = ['gamePk', 'gameDate', 'teams', 'status'];
     const hasRequiredFields = requiredFields.every(field => game[field] !== undefined);
-    
+
     // Additional validation for team data
-    const hasValidTeams = game.teams && 
-                         game.teams.home && 
-                         game.teams.away && 
-                         game.teams.home.team && 
-                         game.teams.away.team;
-    
+    const hasValidTeams =
+      game.teams &&
+      game.teams.home &&
+      game.teams.away &&
+      game.teams.home.team &&
+      game.teams.away.team;
+
     return hasRequiredFields && hasValidTeams;
   }
 
@@ -1003,11 +1038,15 @@ export class MLBDataSyncService {
   async updateSyncStatus(status: any): Promise<void> {
     try {
       const statusDoc = doc(db, 'sync_status', 'mlb_data_sync');
-      
-      await setDoc(statusDoc, {
-        ...status,
-        lastUpdated: new Date(),
-      }, { merge: true });
+
+      await setDoc(
+        statusDoc,
+        {
+          ...status,
+          lastUpdated: new Date(),
+        },
+        { merge: true }
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw error;

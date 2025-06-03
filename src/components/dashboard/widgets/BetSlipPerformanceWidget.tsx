@@ -1,7 +1,8 @@
 import React from 'react';
+
 import { EnhancedWidget } from './EnhancedWidget';
-import { MetricCard } from '../metrics/MetricCard';
 import { HorizontalBarChart } from '../charts/HorizontalBarChart';
+import { MetricCard } from '../metrics/MetricCard';
 
 // Import the TrendDirection type
 import { TrendDirection } from '../metrics/MetricCard';
@@ -162,8 +163,8 @@ export function BetSlipPerformanceWidget() {
                     error.severity === 'high'
                       ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
                       : error.severity === 'medium'
-                      ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-                      : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                        ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                        : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                   }`}
                 >
                   <div className="flex justify-between">

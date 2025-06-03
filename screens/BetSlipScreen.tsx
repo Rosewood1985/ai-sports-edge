@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
@@ -10,15 +11,15 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { TIER_CONFIG } from '../config/sportsbook';
-import { useHaptics, useOfflineStorage } from '../hooks/useMobile';
-import { BetSlipValidator } from '../utils/betting';
+
 import MobileButton from '../atomic/atoms/mobile/MobileButton';
 import MobileCard from '../atomic/atoms/mobile/MobileCard';
 import MobileInput from '../atomic/atoms/mobile/MobileInput';
 import MobileQuickBet from '../atomic/organisms/mobile/MobileQuickBet';
+import { TIER_CONFIG } from '../config/sportsbook';
+import { useHaptics, useOfflineStorage } from '../hooks/useMobile';
 import { BetSlipAPI } from '../services/betSlipService';
+import { BetSlipValidator } from '../utils/betting';
 
 // Sports data for quick entry
 const SPORTS_DATA = [

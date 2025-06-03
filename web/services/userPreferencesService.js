@@ -1,5 +1,6 @@
-import { db, auth } from '../../config/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+
+import { db, auth } from '../../config/firebase';
 
 /**
  * Service for managing user preferences
@@ -12,13 +13,13 @@ class UserPreferencesService {
   async getUserPreferences() {
     try {
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         return this.getDefaultPreferences();
       }
-      
+
       const userPrefsDoc = await getDoc(doc(db, 'userPreferences', userId));
-      
+
       if (userPrefsDoc.exists()) {
         return userPrefsDoc.data();
       } else {
@@ -32,7 +33,7 @@ class UserPreferencesService {
       return this.getDefaultPreferences();
     }
   }
-  
+
   /**
    * Save user preferences
    * @param {Object} preferences - User preferences to save
@@ -41,26 +42,26 @@ class UserPreferencesService {
   async saveUserPreferences(preferences) {
     try {
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      
+
       const userPrefsRef = doc(db, 'userPreferences', userId);
       const userPrefsDoc = await getDoc(userPrefsRef);
-      
+
       if (userPrefsDoc.exists()) {
         // Update existing preferences
         await updateDoc(userPrefsRef, {
           ...preferences,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
       } else {
         // Create new preferences
         await setDoc(userPrefsRef, {
           ...preferences,
           createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
       }
     } catch (error) {
@@ -68,7 +69,7 @@ class UserPreferencesService {
       throw error;
     }
   }
-  
+
   /**
    * Get default preferences
    * @returns {Object} Default preferences
@@ -78,7 +79,7 @@ class UserPreferencesService {
       sports: ['football', 'basketball', 'baseball', 'hockey'],
       bettingContentOnly: false,
       favoriteTeams: [],
-      maxNewsItems: 20
+      maxNewsItems: 20,
     };
   }
 }

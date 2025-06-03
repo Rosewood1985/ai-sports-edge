@@ -1,7 +1,8 @@
 import React from 'react';
+
 import { User } from '../../../types/userManagement';
-import { Card, CardContent } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
+import { Card, CardContent } from '../../ui/Card';
 
 interface UserDetailsProps {
   user: User;

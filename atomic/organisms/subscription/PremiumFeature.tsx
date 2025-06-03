@@ -3,19 +3,14 @@
  * Complex component that wraps premium content with subscription state management
  * Location: /atomic/organisms/subscription/PremiumFeature.tsx
  */
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+
+import { useUITheme } from '../../../components/UIThemeProvider';
 import { auth } from '../../../config/firebase';
 import { hasActiveSubscription } from '../../../services/subscriptionService';
-import { useUITheme } from '../../../components/UIThemeProvider';
 import { useI18n } from '../i18n/I18nContext';
 
 interface PremiumFeatureProps {
@@ -35,7 +30,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   children,
   teaser = false,
   message = 'This feature requires a premium subscription',
-  onUpgrade
+  onUpgrade,
 }) => {
   const [hasPremium, setHasPremium] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,19 +41,19 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   // Check if user has premium access
   useEffect(() => {
     let isMounted = true; // Flag to prevent state updates after unmount
-    
+
     const checkPremiumAccess = async () => {
       if (!isMounted) return;
-      
+
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           if (isMounted) setHasPremium(false);
           return;
         }
-        
+
         const premium = await hasActiveSubscription(userId);
         if (isMounted) setHasPremium(premium);
       } catch (error) {
@@ -68,23 +63,23 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         if (isMounted) setLoading(false);
       }
     };
-    
+
     checkPremiumAccess();
-    
+
     // Listen for auth state changes - but don't create nested calls
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       // Only check premium if auth state actually changed to a logged in user
       if (user && isMounted) {
         checkPremiumAccess();
       }
     });
-    
+
     return () => {
       isMounted = false; // Prevent state updates after unmount
       unsubscribe();
     };
   }, []); // Empty dependency array is correct here
-  
+
   // Navigate to subscription screen
   const handleUpgrade = () => {
     if (onUpgrade) {
@@ -157,7 +152,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       fontWeight: theme.typography.fontWeight.semiBold as '600',
     },
   });
-  
+
   // If loading, show loading indicator
   if (loading) {
     return (
@@ -166,38 +161,32 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       </View>
     );
   }
-  
+
   // If user has premium access, show the children
   if (hasPremium) {
     return <>{children}</>;
   }
-  
+
   // If teaser is true, show a preview of the content with an upgrade button
   if (teaser) {
     return (
       <View
         style={styles.container}
-        accessible={true}
+        accessible
         accessibilityRole="alert"
         accessibilityLabel={message}
       >
         <View style={styles.teaserContent}>
           {children}
-          <View
-            style={styles.teaserOverlay}
-            importantForAccessibility="yes"
-          >
+          <View style={styles.teaserOverlay} importantForAccessibility="yes">
             <Ionicons name="lock-closed" size={32} color={theme.colors.primary} />
-            <Text
-              style={styles.teaserText}
-              accessibilityRole="text"
-            >
+            <Text style={styles.teaserText} accessibilityRole="text">
               {message}
             </Text>
             <TouchableOpacity
               style={styles.upgradeButton}
               onPress={handleUpgrade}
-              accessible={true}
+              accessible
               accessibilityRole="button"
               accessibilityLabel={t('premium.upgradeNow')}
               accessibilityHint={t('premium.upgradeHint')}
@@ -209,26 +198,23 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       </View>
     );
   }
-  
+
   // Otherwise, show a locked message with an upgrade button
   return (
     <View
       style={styles.container}
-      accessible={true}
+      accessible
       accessibilityRole="alert"
       accessibilityLabel={message}
     >
       <Ionicons name="lock-closed" size={32} color={theme.colors.primary} />
-      <Text
-        style={styles.lockedText}
-        accessibilityRole="text"
-      >
+      <Text style={styles.lockedText} accessibilityRole="text">
         {message}
       </Text>
       <TouchableOpacity
         style={styles.upgradeButton}
         onPress={handleUpgrade}
-        accessible={true}
+        accessible
         accessibilityRole="button"
         accessibilityLabel={t('premium.upgradeNow')}
         accessibilityHint={t('premium.upgradeHint')}

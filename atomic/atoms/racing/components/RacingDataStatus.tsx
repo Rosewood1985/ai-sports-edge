@@ -6,8 +6,9 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ThemedText } from '../../ThemedText';
+
 import { ThemedView } from '../../../../components/ThemedView';
+import { ThemedText } from '../../ThemedText';
 
 export interface RacingDataStatusProps {
   sport: 'nascar' | 'horse_racing';
@@ -22,25 +23,35 @@ export const RacingDataStatus: React.FC<RacingDataStatusProps> = ({
   status,
   lastUpdate,
   source,
-  recordCount
+  recordCount,
 }) => {
   const getStatusColor = () => {
     switch (status) {
-      case 'connected': return '#4CAF50';
-      case 'disconnected': return '#FF9800';
-      case 'error': return '#F44336';
-      case 'loading': return '#2196F3';
-      default: return '#757575';
+      case 'connected':
+        return '#4CAF50';
+      case 'disconnected':
+        return '#FF9800';
+      case 'error':
+        return '#F44336';
+      case 'loading':
+        return '#2196F3';
+      default:
+        return '#757575';
     }
   };
 
   const getStatusText = () => {
     switch (status) {
-      case 'connected': return 'Connected';
-      case 'disconnected': return 'Disconnected';
-      case 'error': return 'Error';
-      case 'loading': return 'Loading...';
-      default: return 'Unknown';
+      case 'connected':
+        return 'Connected';
+      case 'disconnected':
+        return 'Disconnected';
+      case 'error':
+        return 'Error';
+      case 'loading':
+        return 'Loading...';
+      default:
+        return 'Unknown';
     }
   };
 
@@ -51,28 +62,20 @@ export const RacingDataStatus: React.FC<RacingDataStatusProps> = ({
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText style={styles.sportName}>
-          {formatSportName(sport)}
-        </ThemedText>
+        <ThemedText style={styles.sportName}>{formatSportName(sport)}</ThemedText>
         <View style={[styles.statusIndicator, { backgroundColor: getStatusColor() }]} />
         <ThemedText style={[styles.statusText, { color: getStatusColor() }]}>
           {getStatusText()}
         </ThemedText>
       </View>
-      
+
       <View style={styles.details}>
-        {source && (
-          <ThemedText style={styles.detailText}>
-            Source: {source}
-          </ThemedText>
-        )}
-        
+        {source && <ThemedText style={styles.detailText}>Source: {source}</ThemedText>}
+
         {recordCount !== undefined && (
-          <ThemedText style={styles.detailText}>
-            Records: {recordCount.toLocaleString()}
-          </ThemedText>
+          <ThemedText style={styles.detailText}>Records: {recordCount.toLocaleString()}</ThemedText>
         )}
-        
+
         {lastUpdate && (
           <ThemedText style={styles.detailText}>
             Last Updated: {new Date(lastUpdate).toLocaleString()}

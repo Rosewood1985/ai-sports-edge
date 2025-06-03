@@ -6,172 +6,177 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const GameSchema = new Schema({
-  sport: {
-    type: String,
-    required: true,
-    enum: ['NBA', 'NFL', 'MLB', 'NHL', 'WNBA', 'NCAA', 'F1', 'UFC', 'SOCCER'],
-    index: true
-  },
-  date: {
-    type: Date,
-    required: true,
-    index: true
-  },
-  homeTeam: {
-    id: {
+const GameSchema = new Schema(
+  {
+    sport: {
       type: String,
-      required: true
+      required: true,
+      enum: ['NBA', 'NFL', 'MLB', 'NHL', 'WNBA', 'NCAA', 'F1', 'UFC', 'SOCCER'],
+      index: true,
     },
-    name: {
-      type: String,
-      required: true
-    },
-    stats: {
-      recentForm: [Number], // Last N games results (1 for win, 0 for loss)
-      homeRecord: {
-        wins: Number,
-        losses: Number
-      },
-      offensiveRating: Number,
-      defensiveRating: Number,
-      pace: Number,
-      strengthOfSchedule: Number
-    }
-  },
-  awayTeam: {
-    id: {
-      type: String,
-      required: true
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    stats: {
-      recentForm: [Number], // Last N games results (1 for win, 0 for loss)
-      awayRecord: {
-        wins: Number,
-        losses: Number
-      },
-      offensiveRating: Number,
-      defensiveRating: Number,
-      pace: Number,
-      strengthOfSchedule: Number
-    }
-  },
-  odds: {
-    opening: {
-      spread: Number,
-      overUnder: Number,
-      homeMoneyline: Number,
-      awayMoneyline: Number
-    },
-    closing: {
-      spread: Number,
-      overUnder: Number,
-      homeMoneyline: Number,
-      awayMoneyline: Number
-    },
-    movement: {
-      spread: Number, // Difference between opening and closing
-      overUnder: Number,
-      homeMoneyline: Number,
-      awayMoneyline: Number
-    },
-    source: {
-      type: String,
-      default: 'The Odds API'
-    },
-    lastUpdated: {
+    date: {
       type: Date,
-      default: Date.now
-    }
-  },
-  result: {
-    homeScore: Number,
-    awayScore: Number,
-    spreadResult: {
-      type: String,
-      enum: ['home', 'away', 'push', null],
-      default: null
+      required: true,
+      index: true,
     },
-    totalResult: {
-      type: String,
-      enum: ['over', 'under', 'push', null],
-      default: null
-    },
-    moneylineResult: {
-      type: String,
-      enum: ['home', 'away', null],
-      default: null
-    },
-    completed: {
-      type: Boolean,
-      default: false
-    }
-  },
-  factors: {
-    injuries: [{
-      team: {
+    homeTeam: {
+      id: {
         type: String,
-        enum: ['home', 'away']
+        required: true,
       },
-      playerId: String,
-      playerName: String,
-      position: String,
-      impact: {
+      name: {
         type: String,
-        enum: ['high', 'medium', 'low']
-      }
-    }],
-    weather: {
-      condition: String,
-      temperature: Number,
-      windSpeed: Number,
-      precipitation: Number,
-      impact: {
+        required: true,
+      },
+      stats: {
+        recentForm: [Number], // Last N games results (1 for win, 0 for loss)
+        homeRecord: {
+          wins: Number,
+          losses: Number,
+        },
+        offensiveRating: Number,
+        defensiveRating: Number,
+        pace: Number,
+        strengthOfSchedule: Number,
+      },
+    },
+    awayTeam: {
+      id: {
         type: String,
-        enum: ['high', 'medium', 'low', 'none']
-      }
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      stats: {
+        recentForm: [Number], // Last N games results (1 for win, 0 for loss)
+        awayRecord: {
+          wins: Number,
+          losses: Number,
+        },
+        offensiveRating: Number,
+        defensiveRating: Number,
+        pace: Number,
+        strengthOfSchedule: Number,
+      },
     },
-    travelDistance: {
-      home: Number,
-      away: Number
+    odds: {
+      opening: {
+        spread: Number,
+        overUnder: Number,
+        homeMoneyline: Number,
+        awayMoneyline: Number,
+      },
+      closing: {
+        spread: Number,
+        overUnder: Number,
+        homeMoneyline: Number,
+        awayMoneyline: Number,
+      },
+      movement: {
+        spread: Number, // Difference between opening and closing
+        overUnder: Number,
+        homeMoneyline: Number,
+        awayMoneyline: Number,
+      },
+      source: {
+        type: String,
+        default: 'The Odds API',
+      },
+      lastUpdated: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    restDays: {
-      home: Number,
-      away: Number
+    result: {
+      homeScore: Number,
+      awayScore: Number,
+      spreadResult: {
+        type: String,
+        enum: ['home', 'away', 'push', null],
+        default: null,
+      },
+      totalResult: {
+        type: String,
+        enum: ['over', 'under', 'push', null],
+        default: null,
+      },
+      moneylineResult: {
+        type: String,
+        enum: ['home', 'away', null],
+        default: null,
+      },
+      completed: {
+        type: Boolean,
+        default: false,
+      },
     },
-    backToBack: {
-      home: Boolean,
-      away: Boolean
-    }
+    factors: {
+      injuries: [
+        {
+          team: {
+            type: String,
+            enum: ['home', 'away'],
+          },
+          playerId: String,
+          playerName: String,
+          position: String,
+          impact: {
+            type: String,
+            enum: ['high', 'medium', 'low'],
+          },
+        },
+      ],
+      weather: {
+        condition: String,
+        temperature: Number,
+        windSpeed: Number,
+        precipitation: Number,
+        impact: {
+          type: String,
+          enum: ['high', 'medium', 'low', 'none'],
+        },
+      },
+      travelDistance: {
+        home: Number,
+        away: Number,
+      },
+      restDays: {
+        home: Number,
+        away: Number,
+      },
+      backToBack: {
+        home: Boolean,
+        away: Boolean,
+      },
+    },
+    metadata: {
+      season: String,
+      week: Number,
+      tournament: String,
+      venue: String,
+      attendance: Number,
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
   },
-  metadata: {
-    season: String,
-    week: Number,
-    tournament: String,
-    venue: String,
-    attendance: Number,
-    createdAt: {
-      type: Date,
-      default: Date.now
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 // Indexes for efficient querying
-GameSchema.index({ 'sport': 1, 'date': 1 });
+GameSchema.index({ sport: 1, date: 1 });
 GameSchema.index({ 'homeTeam.name': 1, 'awayTeam.name': 1 });
 GameSchema.index({ 'result.completed': 1 });
 
 // Virtual for margin of victory
-GameSchema.virtual('marginOfVictory').get(function() {
+GameSchema.virtual('marginOfVictory').get(function () {
   if (this.result.homeScore !== undefined && this.result.awayScore !== undefined) {
     return this.result.homeScore - this.result.awayScore;
   }
@@ -179,13 +184,17 @@ GameSchema.virtual('marginOfVictory').get(function() {
 });
 
 // Method to check if a game is in the past
-GameSchema.methods.isPast = function() {
+GameSchema.methods.isPast = function () {
   return new Date() > this.date;
 };
 
 // Method to calculate the result after the game is completed
-GameSchema.methods.calculateResult = function() {
-  if (!this.result.completed || this.result.homeScore === undefined || this.result.awayScore === undefined) {
+GameSchema.methods.calculateResult = function () {
+  if (
+    !this.result.completed ||
+    this.result.homeScore === undefined ||
+    this.result.awayScore === undefined
+  ) {
     return;
   }
 
@@ -218,16 +227,20 @@ GameSchema.methods.calculateResult = function() {
 };
 
 // Pre-save hook to update the result
-GameSchema.pre('save', function(next) {
-  if (this.isModified('result.homeScore') || this.isModified('result.awayScore') || this.isModified('result.completed')) {
+GameSchema.pre('save', function (next) {
+  if (
+    this.isModified('result.homeScore') ||
+    this.isModified('result.awayScore') ||
+    this.isModified('result.completed')
+  ) {
     if (this.result.completed) {
       this.calculateResult();
     }
   }
-  
+
   // Update the updatedAt timestamp
   this.metadata.updatedAt = new Date();
-  
+
   next();
 });
 

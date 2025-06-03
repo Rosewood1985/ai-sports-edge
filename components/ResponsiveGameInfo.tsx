@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+
 import ResponsiveTeamLogo from './ResponsiveTeamLogo';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Game } from '../types/odds';
 
 interface ResponsiveGameInfoProps {
@@ -11,21 +12,17 @@ interface ResponsiveGameInfoProps {
   style?: any;
 }
 
-const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
-  game,
-  sportKey,
-  style
-}) => {
+const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({ game, sportKey, style }) => {
   const { colors, isDark } = useTheme();
   const { t } = useI18n();
-  
+
   // Get screen dimensions for responsive sizing
   const { width: screenWidth } = Dimensions.get('window');
   const isSmallScreen = screenWidth < 375; // iPhone SE or similar small device
-  
+
   // Determine logo size based on screen size
   const logoSize = isSmallScreen ? 32 : 40;
-  
+
   // Format date and time
   const formatGameDateTime = (date: string, time: string) => {
     try {
@@ -34,7 +31,7 @@ const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
       return `${date} at ${time}`;
     }
   };
-  
+
   // If no game is selected, show placeholder
   if (!game) {
     return (
@@ -45,7 +42,7 @@ const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
       </View>
     );
   }
-  
+
   return (
     <View style={[styles.container, style, { backgroundColor: isDark ? '#222' : '#f5f5f5' }]}>
       <View style={styles.teamsContainer}>
@@ -56,7 +53,7 @@ const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
             sport={sportKey}
             size={logoSize}
           />
-          <Text 
+          <Text
             style={[styles.teamName, { color: colors.text }]}
             numberOfLines={2}
             ellipsizeMode="tail"
@@ -64,13 +61,11 @@ const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
             {game.away_team}
           </Text>
         </View>
-        
+
         <View style={styles.vsContainer}>
-          <Text style={[styles.vsText, { color: colors.text }]}>
-            {t('oddsComparison.versus')}
-          </Text>
+          <Text style={[styles.vsText, { color: colors.text }]}>{t('oddsComparison.versus')}</Text>
         </View>
-        
+
         <View style={styles.teamContainer}>
           <ResponsiveTeamLogo
             teamId={game.home_team}
@@ -78,7 +73,7 @@ const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
             sport={sportKey}
             size={logoSize}
           />
-          <Text 
+          <Text
             style={[styles.teamName, { color: colors.text }]}
             numberOfLines={2}
             ellipsizeMode="tail"
@@ -87,11 +82,14 @@ const ResponsiveGameInfo: React.FC<ResponsiveGameInfoProps> = ({
           </Text>
         </View>
       </View>
-      
+
       <Text style={[styles.gameTime, { color: colors.text }]}>
         {formatGameDateTime(
           new Date(game.commence_time).toLocaleDateString(),
-          new Date(game.commence_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          new Date(game.commence_time).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
         )}
       </Text>
     </View>
@@ -139,7 +137,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     padding: 16,
-  }
+  },
 });
 
 export default ResponsiveGameInfo;

@@ -5,9 +5,9 @@
  * and updates them to use the new atomic structure.
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 // Backup directory
 const backupDir = path.join(

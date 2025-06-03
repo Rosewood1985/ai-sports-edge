@@ -3,8 +3,9 @@
 // Deep Focus Architecture with Real Data Integration Points
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class UFCDataSyncService {
   private readonly apiKey = process.env.UFC_API_KEY;

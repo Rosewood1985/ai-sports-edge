@@ -4,6 +4,7 @@
  * Location: /atomic/organisms/reporting/useReportTemplates.ts
  */
 import { useState, useCallback, useEffect } from 'react';
+
 import { ReportTemplate } from '../../../src/types/reporting';
 
 /**
@@ -44,7 +45,7 @@ export function useReportTemplates() {
           filters: [],
           format: 'excel' as any,
           isSystem: false,
-        }
+        },
       ];
       setTemplates(mockTemplates);
     } catch (err) {
@@ -66,13 +67,13 @@ export function useReportTemplates() {
         description: template.description || '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        type: template.type || 'standard' as any,
+        type: template.type || ('standard' as any),
         widgets: template.widgets || [],
         filters: template.filters || [],
-        format: template.format || 'pdf' as any,
+        format: template.format || ('pdf' as any),
         isSystem: false,
       };
-      
+
       setTemplates(prev => [...prev, newTemplate]);
       return newTemplate;
     } catch (err) {
@@ -89,11 +90,13 @@ export function useReportTemplates() {
     setError(null);
     try {
       // Mock implementation - replace with actual API call
-      setTemplates(prev => prev.map(template => 
-        template.id === id 
-          ? { ...template, ...updates, updatedAt: new Date().toISOString() }
-          : template
-      ));
+      setTemplates(prev =>
+        prev.map(template =>
+          template.id === id
+            ? { ...template, ...updates, updatedAt: new Date().toISOString() }
+            : template
+        )
+      );
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to update report template'));
       console.error('Error updating report template:', err);

@@ -6,9 +6,9 @@
  * and racing-specific functionality.
  */
 
-const admin = require('firebase-admin');
-const { spawn } = require('child_process');
-const fs = require('fs');
+const admin = require("firebase-admin");
+const { spawn } = require("child_process");
+const fs = require("fs");
 
 // Initialize Firebase Admin (if not already initialized)
 try {
@@ -21,27 +21,27 @@ try {
  * Check if all required Sentry files exist
  */
 function checkSentryFiles() {
-  console.log('🔍 Checking Sentry integration files...\n');
+  console.log("🔍 Checking Sentry integration files...\n");
   
   const requiredFiles = [
-    'sentryConfig.js',
-    'sentryTest.js',
-    'sentry-source-maps.js',
-    '.sentryclirc',
-    'upload-sourcemaps.sh',
-    'SENTRY_SOURCE_MAPS.md'
+    "sentryConfig.js",
+    "sentryTest.js",
+    "sentry-source-maps.js",
+    ".sentryclirc",
+    "upload-sourcemaps.sh",
+    "SENTRY_SOURCE_MAPS.md"
   ];
 
   const results = [];
   
   requiredFiles.forEach(file => {
     const exists = fs.existsSync(file);
-    console.log(`${exists ? '✅' : '❌'} ${file}`);
+    console.log(`${exists ? "✅" : "❌"} ${file}`);
     results.push({ file, exists });
   });
   
   const allExist = results.every(r => r.exists);
-  console.log(`\nFiles check: ${allExist ? '✅ PASSED' : '❌ FAILED'}\n`);
+  console.log(`\nFiles check: ${allExist ? "✅ PASSED" : "❌ FAILED"}\n`);
   
   return allExist;
 }
@@ -50,40 +50,40 @@ function checkSentryFiles() {
  * Verify package.json has been updated with Sentry dependencies and scripts
  */
 function checkPackageJson() {
-  console.log('📦 Checking package.json updates...\n');
+  console.log("📦 Checking package.json updates...\n");
   
-  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
   
   const checks = [
     {
-      name: '@sentry/google-cloud-serverless dependency',
-      check: () => packageJson.dependencies && packageJson.dependencies['@sentry/google-cloud-serverless']
+      name: "@sentry/google-cloud-serverless dependency",
+      check: () => packageJson.dependencies && packageJson.dependencies["@sentry/google-cloud-serverless"]
     },
     {
-      name: '@sentry/cli dev dependency',
-      check: () => packageJson.devDependencies && packageJson.devDependencies['@sentry/cli']
+      name: "@sentry/cli dev dependency",
+      check: () => packageJson.devDependencies && packageJson.devDependencies["@sentry/cli"]
     },
     {
-      name: 'sentry:sourcemaps script',
-      check: () => packageJson.scripts && packageJson.scripts['sentry:sourcemaps']
+      name: "sentry:sourcemaps script",
+      check: () => packageJson.scripts && packageJson.scripts["sentry:sourcemaps"]
     },
     {
-      name: 'build:sentry script',
-      check: () => packageJson.scripts && packageJson.scripts['build:sentry']
+      name: "build:sentry script",
+      check: () => packageJson.scripts && packageJson.scripts["build:sentry"]
     },
     {
-      name: 'deploy:sentry script',
-      check: () => packageJson.scripts && packageJson.scripts['deploy:sentry']
+      name: "deploy:sentry script",
+      check: () => packageJson.scripts && packageJson.scripts["deploy:sentry"]
     }
   ];
   
   checks.forEach(({ name, check }) => {
     const passed = check();
-    console.log(`${passed ? '✅' : '❌'} ${name}`);
+    console.log(`${passed ? "✅" : "❌"} ${name}`);
   });
   
   const allPassed = checks.every(({ check }) => check());
-  console.log(`\nPackage.json check: ${allPassed ? '✅ PASSED' : '❌ FAILED'}\n`);
+  console.log(`\nPackage.json check: ${allPassed ? "✅ PASSED" : "❌ FAILED"}\n`);
   
   return allPassed;
 }
@@ -92,37 +92,37 @@ function checkPackageJson() {
  * Check if TypeScript configuration is properly set up for source maps
  */
 function checkTypeScriptConfig() {
-  console.log('📝 Checking TypeScript configuration...\n');
+  console.log("📝 Checking TypeScript configuration...\n");
   
-  if (!fs.existsSync('tsconfig.json')) {
-    console.log('⚠️  tsconfig.json not found (not required if using pure JavaScript)\n');
+  if (!fs.existsSync("tsconfig.json")) {
+    console.log("⚠️  tsconfig.json not found (not required if using pure JavaScript)\n");
     return true;
   }
   
-  const tsConfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
+  const tsConfig = JSON.parse(fs.readFileSync("tsconfig.json", "utf8"));
   
   const checks = [
     {
-      name: 'sourceMap enabled',
+      name: "sourceMap enabled",
       check: () => tsConfig.compilerOptions && tsConfig.compilerOptions.sourceMap === true
     },
     {
-      name: 'inlineSourceMap disabled',
+      name: "inlineSourceMap disabled",
       check: () => tsConfig.compilerOptions && tsConfig.compilerOptions.inlineSourceMap === false
     },
     {
-      name: 'sourceRoot configured',
+      name: "sourceRoot configured",
       check: () => tsConfig.compilerOptions && tsConfig.compilerOptions.sourceRoot
     }
   ];
   
   checks.forEach(({ name, check }) => {
     const passed = check();
-    console.log(`${passed ? '✅' : '❌'} ${name}`);
+    console.log(`${passed ? "✅" : "❌"} ${name}`);
   });
   
   const allPassed = checks.every(({ check }) => check());
-  console.log(`\nTypeScript config check: ${allPassed ? '✅ PASSED' : '❌ FAILED'}\n`);
+  console.log(`\nTypeScript config check: ${allPassed ? "✅ PASSED" : "❌ FAILED"}\n`);
   
   return allPassed;
 }
@@ -131,49 +131,49 @@ function checkTypeScriptConfig() {
  * Verify Sentry configuration is properly set up
  */
 function checkSentryConfig() {
-  console.log('⚙️  Checking Sentry configuration...\n');
+  console.log("⚙️  Checking Sentry configuration...\n");
   
   try {
-    const sentryConfig = require('./sentryConfig');
+    const sentryConfig = require("./sentryConfig");
     
     const checks = [
       {
-        name: 'Sentry module imports',
+        name: "Sentry module imports",
         check: () => sentryConfig.Sentry !== undefined
       },
       {
-        name: 'initSentry function',
-        check: () => typeof sentryConfig.initSentry === 'function'
+        name: "initSentry function",
+        check: () => typeof sentryConfig.initSentry === "function"
       },
       {
-        name: 'wrapHttpFunction',
-        check: () => typeof sentryConfig.wrapHttpFunction === 'function'
+        name: "wrapHttpFunction",
+        check: () => typeof sentryConfig.wrapHttpFunction === "function"
       },
       {
-        name: 'wrapEventFunction',
-        check: () => typeof sentryConfig.wrapEventFunction === 'function'
+        name: "wrapEventFunction",
+        check: () => typeof sentryConfig.wrapEventFunction === "function"
       },
       {
-        name: 'trackRacingFunction',
-        check: () => typeof sentryConfig.trackRacingFunction === 'function'
+        name: "trackRacingFunction",
+        check: () => typeof sentryConfig.trackRacingFunction === "function"
       },
       {
-        name: 'trackMLFunction',
-        check: () => typeof sentryConfig.trackMLFunction === 'function'
+        name: "trackMLFunction",
+        check: () => typeof sentryConfig.trackMLFunction === "function"
       },
       {
-        name: 'captureCloudFunctionError',
-        check: () => typeof sentryConfig.captureCloudFunctionError === 'function'
+        name: "captureCloudFunctionError",
+        check: () => typeof sentryConfig.captureCloudFunctionError === "function"
       }
     ];
     
     checks.forEach(({ name, check }) => {
       const passed = check();
-      console.log(`${passed ? '✅' : '❌'} ${name}`);
+      console.log(`${passed ? "✅" : "❌"} ${name}`);
     });
     
     const allPassed = checks.every(({ check }) => check());
-    console.log(`\nSentry config check: ${allPassed ? '✅ PASSED' : '❌ FAILED'}\n`);
+    console.log(`\nSentry config check: ${allPassed ? "✅ PASSED" : "❌ FAILED"}\n`);
     
     return allPassed;
   } catch (error) {
@@ -186,48 +186,48 @@ function checkSentryConfig() {
  * Check if index.js properly initializes Sentry and exports test functions
  */
 function checkIndexJs() {
-  console.log('📄 Checking index.js integration...\n');
+  console.log("📄 Checking index.js integration...\n");
   
-  const indexContent = fs.readFileSync('index.js', 'utf8');
+  const indexContent = fs.readFileSync("index.js", "utf8");
   
   const checks = [
     {
-      name: 'Sentry import',
+      name: "Sentry import",
       check: () => indexContent.includes("require('./sentryConfig')")
     },
     {
-      name: 'Sentry initialization',
-      check: () => indexContent.includes('initSentry()')
+      name: "Sentry initialization",
+      check: () => indexContent.includes("initSentry()")
     },
     {
-      name: 'Wrapped HTTP functions',
-      check: () => indexContent.includes('wrapHttpFunction')
+      name: "Wrapped HTTP functions",
+      check: () => indexContent.includes("wrapHttpFunction")
     },
     {
-      name: 'Wrapped event functions',
-      check: () => indexContent.includes('wrapEventFunction')
+      name: "Wrapped event functions",
+      check: () => indexContent.includes("wrapEventFunction")
     },
     {
-      name: 'Test functions exported',
-      check: () => indexContent.includes('sentryTest') && indexContent.includes('exports.sentryTest')
+      name: "Test functions exported",
+      check: () => indexContent.includes("sentryTest") && indexContent.includes("exports.sentryTest")
     },
     {
-      name: 'Error tracking calls',
-      check: () => indexContent.includes('captureCloudFunctionError')
+      name: "Error tracking calls",
+      check: () => indexContent.includes("captureCloudFunctionError")
     },
     {
-      name: 'Performance tracking',
-      check: () => indexContent.includes('trackFunctionPerformance')
+      name: "Performance tracking",
+      check: () => indexContent.includes("trackFunctionPerformance")
     }
   ];
   
   checks.forEach(({ name, check }) => {
     const passed = check();
-    console.log(`${passed ? '✅' : '❌'} ${name}`);
+    console.log(`${passed ? "✅" : "❌"} ${name}`);
   });
   
   const allPassed = checks.every(({ check }) => check());
-  console.log(`\nIndex.js check: ${allPassed ? '✅ PASSED' : '❌ FAILED'}\n`);
+  console.log(`\nIndex.js check: ${allPassed ? "✅ PASSED" : "❌ FAILED"}\n`);
   
   return allPassed;
 }
@@ -236,12 +236,12 @@ function checkIndexJs() {
  * Check if individual Cloud Function files are properly wrapped
  */
 function checkCloudFunctionFiles() {
-  console.log('🔧 Checking individual Cloud Function files...\n');
+  console.log("🔧 Checking individual Cloud Function files...\n");
   
   const functionFiles = [
-    'generateReferralCode.js',
-    'rewardReferrer.js',
-    'database-consistency-triggers.js'
+    "generateReferralCode.js",
+    "rewardReferrer.js",
+    "database-consistency-triggers.js"
   ];
   
   const results = [];
@@ -252,26 +252,26 @@ function checkCloudFunctionFiles() {
       return;
     }
     
-    const content = fs.readFileSync(file, 'utf8');
+    const content = fs.readFileSync(file, "utf8");
     
     const hasImport = content.includes("require('./sentryConfig')");
-    const hasWrapper = content.includes('wrapEventFunction') || content.includes('wrapHttpFunction');
-    const hasTracking = content.includes('track') && content.includes('Function');
-    const hasErrorHandling = content.includes('captureCloudFunctionError');
+    const hasWrapper = content.includes("wrapEventFunction") || content.includes("wrapHttpFunction");
+    const hasTracking = content.includes("track") && content.includes("Function");
+    const hasErrorHandling = content.includes("captureCloudFunctionError");
     
     console.log(`${file}:`);
-    console.log(`  ${hasImport ? '✅' : '❌'} Sentry import`);
-    console.log(`  ${hasWrapper ? '✅' : '❌'} Function wrapper`);
-    console.log(`  ${hasTracking ? '✅' : '❌'} Event tracking`);
-    console.log(`  ${hasErrorHandling ? '✅' : '❌'} Error handling`);
+    console.log(`  ${hasImport ? "✅" : "❌"} Sentry import`);
+    console.log(`  ${hasWrapper ? "✅" : "❌"} Function wrapper`);
+    console.log(`  ${hasTracking ? "✅" : "❌"} Event tracking`);
+    console.log(`  ${hasErrorHandling ? "✅" : "❌"} Error handling`);
     
     const passed = hasImport && hasWrapper && hasTracking && hasErrorHandling;
     results.push({ file, passed });
-    console.log(`  ${passed ? '✅ PASSED' : '❌ FAILED'}\n`);
+    console.log(`  ${passed ? "✅ PASSED" : "❌ FAILED"}\n`);
   });
   
   const allPassed = results.every(r => r.passed);
-  console.log(`Function files check: ${allPassed ? '✅ PASSED' : '❌ FAILED'}\n`);
+  console.log(`Function files check: ${allPassed ? "✅ PASSED" : "❌ FAILED"}\n`);
   
   return allPassed;
 }
@@ -280,7 +280,7 @@ function checkCloudFunctionFiles() {
  * Create a deployment test script
  */
 function createDeploymentTest() {
-  console.log('🚀 Creating deployment test script...\n');
+  console.log("🚀 Creating deployment test script...\n");
   
   const testScript = `#!/bin/bash
 
@@ -348,24 +348,24 @@ echo ""
 echo "Sentry Dashboard: https://sentry.io/organizations/ai-sports-edge/projects/cloud-functions/"
 `;
 
-  fs.writeFileSync('test-deployment.sh', testScript);
-  fs.chmodSync('test-deployment.sh', '755');
-  console.log('✅ Created test-deployment.sh script\n');
+  fs.writeFileSync("test-deployment.sh", testScript);
+  fs.chmodSync("test-deployment.sh", "755");
+  console.log("✅ Created test-deployment.sh script\n");
 }
 
 /**
  * Generate comprehensive verification report
  */
 function generateVerificationReport() {
-  console.log('📊 Generating verification report...\n');
+  console.log("📊 Generating verification report...\n");
   
   const checks = [
-    { name: 'Sentry Files', check: checkSentryFiles },
-    { name: 'Package.json', check: checkPackageJson },
-    { name: 'TypeScript Config', check: checkTypeScriptConfig },
-    { name: 'Sentry Config', check: checkSentryConfig },
-    { name: 'Index.js Integration', check: checkIndexJs },
-    { name: 'Cloud Function Files', check: checkCloudFunctionFiles }
+    { name: "Sentry Files", check: checkSentryFiles },
+    { name: "Package.json", check: checkPackageJson },
+    { name: "TypeScript Config", check: checkTypeScriptConfig },
+    { name: "Sentry Config", check: checkSentryConfig },
+    { name: "Index.js Integration", check: checkIndexJs },
+    { name: "Cloud Function Files", check: checkCloudFunctionFiles }
   ];
   
   const results = checks.map(({ name, check }) => ({
@@ -373,29 +373,29 @@ function generateVerificationReport() {
     passed: check()
   }));
   
-  console.log('📋 VERIFICATION SUMMARY');
-  console.log('====================\n');
+  console.log("📋 VERIFICATION SUMMARY");
+  console.log("====================\n");
   
   results.forEach(({ name, passed }) => {
-    console.log(`${passed ? '✅' : '❌'} ${name}`);
+    console.log(`${passed ? "✅" : "❌"} ${name}`);
   });
   
   const allPassed = results.every(r => r.passed);
   
-  console.log('\n' + '='.repeat(50));
-  console.log(`🎯 OVERALL STATUS: ${allPassed ? '✅ PASSED' : '❌ FAILED'}`);
-  console.log('='.repeat(50) + '\n');
+  console.log("\n" + "=".repeat(50));
+  console.log(`🎯 OVERALL STATUS: ${allPassed ? "✅ PASSED" : "❌ FAILED"}`);
+  console.log("=".repeat(50) + "\n");
   
   if (allPassed) {
-    console.log('🎉 Sentry integration is ready!');
-    console.log('');
-    console.log('Next steps:');
-    console.log('1. Set SENTRY_AUTH_TOKEN environment variable');
-    console.log('2. Run: ./test-deployment.sh (to test in live environment)');
-    console.log('3. Check Sentry dashboard for events');
-    console.log('4. Remove test functions after verification');
+    console.log("🎉 Sentry integration is ready!");
+    console.log("");
+    console.log("Next steps:");
+    console.log("1. Set SENTRY_AUTH_TOKEN environment variable");
+    console.log("2. Run: ./test-deployment.sh (to test in live environment)");
+    console.log("3. Check Sentry dashboard for events");
+    console.log("4. Remove test functions after verification");
   } else {
-    console.log('❌ Some checks failed. Please review the issues above.');
+    console.log("❌ Some checks failed. Please review the issues above.");
   }
   
   return allPassed;
@@ -403,8 +403,8 @@ function generateVerificationReport() {
 
 // Main execution
 if (require.main === module) {
-  console.log('🚀 SENTRY CLOUD FUNCTIONS INTEGRATION VERIFICATION');
-  console.log('================================================\n');
+  console.log("🚀 SENTRY CLOUD FUNCTIONS INTEGRATION VERIFICATION");
+  console.log("================================================\n");
   
   createDeploymentTest();
   const passed = generateVerificationReport();

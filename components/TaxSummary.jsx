@@ -3,9 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 
 /**
  * TaxSummary Component
- * 
+ *
  * Displays a summary of tax information for a transaction
- * 
+ *
  * @param {Object} props
  * @param {number} props.subtotal - Subtotal amount (pre-tax)
  * @param {number} props.taxAmount - Tax amount
@@ -15,48 +15,46 @@ import { View, Text, StyleSheet } from 'react-native';
 const TaxSummary = ({ subtotal, taxAmount, taxBreakdown = [], currency = 'USD' }) => {
   // Calculate total
   const total = subtotal + taxAmount;
-  
+
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
+      currency,
     }).format(amount);
   };
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tax Summary</Text>
-      
+
       <View style={styles.row}>
         <Text style={styles.label}>Subtotal:</Text>
         <Text style={styles.value}>{formatCurrency(subtotal)}</Text>
       </View>
-      
+
       <View style={styles.row}>
         <Text style={styles.label}>Tax:</Text>
         <Text style={styles.value}>{formatCurrency(taxAmount)}</Text>
       </View>
-      
+
       <View style={styles.divider} />
-      
+
       <View style={styles.row}>
         <Text style={styles.totalLabel}>Total:</Text>
         <Text style={styles.totalValue}>{formatCurrency(total)}</Text>
       </View>
-      
+
       {taxBreakdown.length > 0 && (
         <View style={styles.breakdownContainer}>
           <Text style={styles.breakdownTitle}>Tax Breakdown</Text>
-          
+
           {taxBreakdown.map((item, index) => (
             <View key={index} style={styles.breakdownRow}>
               <Text style={styles.breakdownLabel}>
                 {item.jurisdiction_name} ({item.tax_rate_percentage}%):
               </Text>
-              <Text style={styles.breakdownValue}>
-                {formatCurrency(item.tax_amount / 100)}
-              </Text>
+              <Text style={styles.breakdownValue}>{formatCurrency(item.tax_amount / 100)}</Text>
             </View>
           ))}
         </View>

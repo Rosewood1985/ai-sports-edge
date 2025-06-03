@@ -1,8 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ViewProps } from 'react-native';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import { Ionicons } from '@expo/vector-icons';
 import networkService, { ConnectionStatus } from '../services/networkService';
 
 /**
@@ -13,48 +14,48 @@ interface OfflineAwareViewProps extends ViewProps {
    * Content to display when online
    */
   children: React.ReactNode;
-  
+
   /**
    * Optional custom content to display when offline
    */
   offlineContent?: React.ReactNode;
-  
+
   /**
    * Whether to show a message when offline
    * @default true
    */
   showOfflineMessage?: boolean;
-  
+
   /**
    * Custom offline message
    * @default "You're offline. Some features may be limited."
    */
   offlineMessage?: string;
-  
+
   /**
    * Whether to show an icon when offline
    * @default true
    */
   showOfflineIcon?: boolean;
-  
+
   /**
    * Whether to completely hide content when offline
    * @default false
    */
   hideWhenOffline?: boolean;
-  
+
   /**
    * Whether to fade content when offline
    * @default false
    */
   fadeWhenOffline?: boolean;
-  
+
   /**
    * Whether this component requires network connectivity
    * @default true
    */
   requiresConnectivity?: boolean;
-  
+
   /**
    * Callback when network status changes
    */
@@ -79,39 +80,39 @@ const OfflineAwareView: React.FC<OfflineAwareViewProps> = ({
   ...props
 }) => {
   const [isConnected, setIsConnected] = useState<boolean>(true);
-  
+
   // Subscribe to network status changes
   useEffect(() => {
     // Initialize network service if not already initialized
     networkService.initialize();
-    
+
     // Get initial connection status
     const initialConnectionInfo = networkService.getCurrentConnectionInfo();
     const initialIsConnected = initialConnectionInfo?.status === ConnectionStatus.CONNECTED;
     setIsConnected(initialIsConnected);
-    
+
     // Notify callback if provided
     if (onNetworkStatusChange) {
       onNetworkStatusChange(initialIsConnected);
     }
-    
+
     // Subscribe to network status changes
-    const unsubscribe = networkService.addListener((info) => {
+    const unsubscribe = networkService.addListener(info => {
       const connected = info.status === ConnectionStatus.CONNECTED;
       setIsConnected(connected);
-      
+
       // Notify callback if provided
       if (onNetworkStatusChange) {
         onNetworkStatusChange(connected);
       }
     });
-    
+
     // Clean up on unmount
     return () => {
       unsubscribe();
     };
   }, [onNetworkStatusChange]);
-  
+
   // If connected or doesn't require connectivity, render children normally
   if (isConnected || !requiresConnectivity) {
     return (
@@ -120,7 +121,7 @@ const OfflineAwareView: React.FC<OfflineAwareViewProps> = ({
       </View>
     );
   }
-  
+
   // If offline and should hide content, render nothing or offline content
   if (hideWhenOffline) {
     if (offlineContent) {
@@ -130,7 +131,7 @@ const OfflineAwareView: React.FC<OfflineAwareViewProps> = ({
         </View>
       );
     }
-    
+
     if (showOfflineMessage) {
       return (
         <View style={[styles.container, styles.offlineContainer, style]} {...props}>
@@ -141,23 +142,26 @@ const OfflineAwareView: React.FC<OfflineAwareViewProps> = ({
         </View>
       );
     }
-    
+
     return null;
   }
-  
+
   // If offline and should fade content, render children with overlay
   if (fadeWhenOffline) {
     return (
       <View style={[styles.container, style]} {...props}>
-        <View style={styles.contentContainer}>
-          {children}
-        </View>
-        
+        <View style={styles.contentContainer}>{children}</View>
+
         <View style={styles.offlineOverlay}>
           {offlineContent || (
             <View style={styles.offlineMessageContainer}>
               {showOfflineIcon && (
-                <Ionicons name="cloud-offline" size={24} color="#F44336" style={styles.offlineIcon} />
+                <Ionicons
+                  name="cloud-offline"
+                  size={24}
+                  color="#F44336"
+                  style={styles.offlineIcon}
+                />
               )}
               {showOfflineMessage && (
                 <ThemedText style={styles.offlineText}>{offlineMessage}</ThemedText>
@@ -168,28 +172,31 @@ const OfflineAwareView: React.FC<OfflineAwareViewProps> = ({
       </View>
     );
   }
-  
+
   // If offline and has custom offline content, render that
   if (offlineContent) {
     return (
       <View style={[styles.container, style]} {...props}>
         {children}
-        <View style={styles.offlineContentContainer}>
-          {offlineContent}
-        </View>
+        <View style={styles.offlineContentContainer}>{offlineContent}</View>
       </View>
     );
   }
-  
+
   // Otherwise, render children with offline message
   return (
     <View style={[styles.container, style]} {...props}>
       {children}
-      
+
       {showOfflineMessage && (
         <View style={styles.offlineMessageBanner}>
           {showOfflineIcon && (
-            <Ionicons name="cloud-offline" size={16} color="#fff" style={styles.offlineBannerIcon} />
+            <Ionicons
+              name="cloud-offline"
+              size={16}
+              color="#fff"
+              style={styles.offlineBannerIcon}
+            />
           )}
           <ThemedText style={styles.offlineBannerText}>{offlineMessage}</ThemedText>
         </View>

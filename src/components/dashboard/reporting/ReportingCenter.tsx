@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Tabs } from '../../ui/Tabs';
-import { ReportTemplateList } from './ReportTemplateList';
-import { ScheduledReportsList } from './ScheduledReportsList';
+
 import { ExportManager } from './ExportManager';
 import { ReportBuilder } from './ReportBuilder';
+import { ReportTemplateList } from './ReportTemplateList';
+import { ScheduledReportsList } from './ScheduledReportsList';
 import { ReportHistoryList } from './organisms/ReportHistoryList';
-import { Button } from '../../ui/Button';
 import { ReportTemplate } from '../../../types/reporting';
+import { Button } from '../../ui/Button';
+import { Tabs } from '../../ui/Tabs';
 
 /**
  * Main component for the reporting center with enhanced mobile support
@@ -73,12 +74,7 @@ export function ReportingCenter() {
 
       {/* Mobile-optimized tabs */}
       <div className="overflow-x-auto">
-        <Tabs 
-          tabs={tabs} 
-          activeTab={activeTab} 
-          onChange={setActiveTab}
-          className="min-w-max"
-        />
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} className="min-w-max" />
       </div>
 
       {/* Content area with responsive padding */}
@@ -97,9 +93,7 @@ export function ReportingCenter() {
           </div>
         )}
 
-        {activeTab === 'templates' && (
-          <ReportTemplateList onEditTemplate={handleEditTemplate} />
-        )}
+        {activeTab === 'templates' && <ReportTemplateList onEditTemplate={handleEditTemplate} />}
         {activeTab === 'builder' && (
           <ReportBuilder
             initialTemplate={editingTemplate}

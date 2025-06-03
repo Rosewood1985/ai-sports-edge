@@ -1,11 +1,12 @@
 import { Platform } from 'react-native';
+
+import { captureMessage } from './errorTrackingService';
 import { safeErrorCapture } from './errorUtils';
 import { info, error as logError, LogCategory } from './loggingService';
-import { captureMessage } from './errorTrackingService';
 
 /**
  * Alerting Service
- * 
+ *
  * This service provides alerting functionality for critical issues.
  * It integrates with various alerting channels to notify developers and operations teams.
  */
@@ -88,7 +89,7 @@ export const initAlerting = () => {
     // Set up alerting integrations
     // Note: Sentry is already set up in errorTrackingService.ts
     console.log('initAlerting: Setting up integrations');
-    
+
     console.log('initAlerting: Initialization completed successfully');
     info(LogCategory.APP, 'Alerting service initialized successfully');
     return true;
@@ -119,7 +120,7 @@ export const sendAlert = (
   try {
     // Get alert configuration
     const config = alertConfigs[category];
-    
+
     // Check if alerting is enabled
     if (!config.enabled) {
       if (__DEV__) {
@@ -127,7 +128,7 @@ export const sendAlert = (
       }
       return false;
     }
-    
+
     // Check if severity meets minimum threshold
     if (!isSeverityAtLeast(severity, config.minSeverity)) {
       if (__DEV__) {
@@ -135,7 +136,7 @@ export const sendAlert = (
       }
       return false;
     }
-    
+
     // Check if alert is throttled
     const alertKey = `${category}:${title}`;
     if (isAlertThrottled(alertKey, config.throttleMs)) {
@@ -144,15 +145,15 @@ export const sendAlert = (
       }
       return false;
     }
-    
+
     // Send alert to each channel
-    const results = config.channels.map(channel => 
+    const results = config.channels.map(channel =>
       sendAlertToChannel(channel, title, message, severity, category, data)
     );
-    
+
     // Update throttle timestamp
     alertThrottles[alertKey] = Date.now();
-    
+
     // Return true if at least one channel succeeded
     return results.some(result => result);
   } catch (error) {
@@ -277,7 +278,7 @@ const sendAlertToChannel = (
       platform: Platform.OS,
       ...data,
     };
-    
+
     // Send alert to the appropriate channel
     switch (channel) {
       case AlertChannel.SENTRY:
@@ -317,14 +318,14 @@ const sendAlertToSentry = (
   try {
     // Map severity to Sentry level
     const level = mapSeverityToSentryLevel(severity);
-    
+
     // Log the alert
     console.log(`sendAlertToSentry: Sending alert "${title}: ${message}" with level ${level}`);
-    
+
     // Capture message in Sentry - note that we can't pass the level directly
     // since captureMessage only takes a message parameter
     captureMessage(`${title}: ${message}`);
-    
+
     // Log the alert in our logging system
     switch (severity) {
       case AlertSeverity.INFO:
@@ -338,11 +339,11 @@ const sendAlertToSentry = (
         logError(LogCategory.APP, `Alert: ${title}`, new Error(message), data);
         break;
     }
-    
+
     if (__DEV__) {
       console.log(`Alert sent to Sentry: ${title}`);
     }
-    
+
     return true;
   } catch (error) {
     console.error('Failed to send alert to Sentry:', error);
@@ -373,7 +374,7 @@ const sendAlertToEmail = (
   if (__DEV__) {
     console.log(`Alert would be sent to email: ${title}`);
   }
-  
+
   return true;
 };
 
@@ -398,7 +399,7 @@ const sendAlertToSlack = (
   if (__DEV__) {
     console.log(`Alert would be sent to Slack: ${title}`);
   }
-  
+
   return true;
 };
 
@@ -423,7 +424,7 @@ const sendAlertToPagerDuty = (
   if (__DEV__) {
     console.log(`Alert would be sent to PagerDuty: ${title}`);
   }
-  
+
   return true;
 };
 
@@ -433,20 +434,17 @@ const sendAlertToPagerDuty = (
  * @param minSeverity Minimum severity
  * @returns Whether the severity is at least the minimum
  */
-const isSeverityAtLeast = (
-  severity: AlertSeverity,
-  minSeverity: AlertSeverity
-): boolean => {
+const isSeverityAtLeast = (severity: AlertSeverity, minSeverity: AlertSeverity): boolean => {
   const severityOrder = [
     AlertSeverity.INFO,
     AlertSeverity.WARNING,
     AlertSeverity.ERROR,
     AlertSeverity.CRITICAL,
   ];
-  
+
   const severityIndex = severityOrder.indexOf(severity);
   const minSeverityIndex = severityOrder.indexOf(minSeverity);
-  
+
   return severityIndex >= minSeverityIndex;
 };
 
@@ -459,7 +457,7 @@ const isSeverityAtLeast = (
 const isAlertThrottled = (alertKey: string, throttleMs: number): boolean => {
   const lastAlertTime = alertThrottles[alertKey] || 0;
   const now = Date.now();
-  
+
   return now - lastAlertTime < throttleMs;
 };
 

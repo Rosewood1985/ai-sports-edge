@@ -5,8 +5,9 @@
  */
 
 import React from 'react';
-import { AIInsight } from '../../../../types/aiml';
+
 import { useInsights } from '../../../../hooks/useAIML';
+import { AIInsight } from '../../../../types/aiml';
 
 interface AIInsightsWidgetProps {
   insights: AIInsight[];
@@ -66,7 +67,7 @@ export function AIInsightsWidget({ insights, className = '' }: AIInsightsWidgetP
     await markAsRead(insightId, userId);
   };
 
-  const unreadInsights = insights.filter(insight => !(insight.readBy?.length));
+  const unreadInsights = insights.filter(insight => !insight.readBy?.length);
   const actionableInsights = insights.filter(insight => insight.actionable);
 
   return (
@@ -74,9 +75,7 @@ export function AIInsightsWidget({ insights, className = '' }: AIInsightsWidgetP
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              AI Insights
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">AI Insights</h3>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               AI-generated insights and pattern analysis
             </p>
@@ -139,8 +138,8 @@ export function AIInsightsWidget({ insights, className = '' }: AIInsightsWidgetP
             </div>
           ) : (
             <div className="space-y-3">
-              {insights.slice(0, 5).map((insight) => {
-                const isUnread = !(insight.readBy?.length);
+              {insights.slice(0, 5).map(insight => {
+                const isUnread = !insight.readBy?.length;
                 return (
                   <div
                     key={insight.id}
@@ -208,7 +207,7 @@ export function AIInsightsWidget({ insights, className = '' }: AIInsightsWidgetP
                               key={index}
                               className="flex items-center text-xs text-gray-700 dark:text-gray-300"
                             >
-                              <span className="w-1 h-1 bg-gray-400 rounded-full mr-2"></span>
+                              <span className="w-1 h-1 bg-gray-400 rounded-full mr-2" />
                               {action}
                             </div>
                           ))}

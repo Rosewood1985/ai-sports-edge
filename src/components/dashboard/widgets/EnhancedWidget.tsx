@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
+
 import { Button } from '../../ui/Button';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
 
 export type WidgetSize = 'small' | 'medium' | 'large' | 'extra-large';
 

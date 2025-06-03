@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
-import { logger } from 'firebase-functions';
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+import { logger } from "firebase-functions";
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -31,10 +31,10 @@ interface Game {
  */
 // Use a fixed schedule for now to ensure compatibility
 export const markAIPickOfDay = functions.pubsub
-  .schedule('every day 09:00') // More compatible format
-  .timeZone('America/New_York')
+  .schedule("every day 09:00") // More compatible format
+  .timeZone("America/New_York")
   .onRun(async (context) => {
-    logger.info('Starting markAIPickOfDay function');
+    logger.info("Starting markAIPickOfDay function");
     
     try {
       // Get today's date
@@ -52,16 +52,16 @@ export const markAIPickOfDay = functions.pubsub
       logger.info(`Fetching games scheduled between ${today.toISOString()} and ${tomorrow.toISOString()}`);
       
       // Query games scheduled for today that have AI predictions
-      const gamesRef = firestore.collection('games');
+      const gamesRef = firestore.collection("games");
       const gamesQuery = gamesRef
-        .where('startTime', '>=', todayTimestamp)
-        .where('startTime', '<', tomorrowTimestamp)
-        .where('aiConfidence', '>', 0); // Only games with predictions
+        .where("startTime", ">=", todayTimestamp)
+        .where("startTime", "<", tomorrowTimestamp)
+        .where("aiConfidence", ">", 0); // Only games with predictions
       
       const gamesSnapshot = await gamesQuery.get();
       
       if (gamesSnapshot.empty) {
-        logger.info('No games with predictions found for today');
+        logger.info("No games with predictions found for today");
         return null;
       }
       
@@ -79,7 +79,7 @@ export const markAIPickOfDay = functions.pubsub
       );
       
       // Get minimum confidence threshold from environment or use default
-      const minConfidenceThreshold = parseInt(process.env.FUNCTIONS_CONFIG_MIN_CONFIDENCE_THRESHOLD || '65', 10);
+      const minConfidenceThreshold = parseInt(process.env.FUNCTIONS_CONFIG_MIN_CONFIDENCE_THRESHOLD || "65", 10);
       
       logger.info(`Using minimum confidence threshold: ${minConfidenceThreshold}%`);
       
@@ -89,7 +89,7 @@ export const markAIPickOfDay = functions.pubsub
       );
       
       if (topPicks.length === 0) {
-        logger.info('No games with confidence >= 65% found for today');
+        logger.info("No games with confidence >= 65% found for today");
         return null;
       }
       
@@ -102,12 +102,12 @@ export const markAIPickOfDay = functions.pubsub
       const batch = firestore.batch();
       
       for (const game of games) {
-        const gameRef = firestore.collection('games').doc(game.id);
+        const gameRef = firestore.collection("games").doc(game.id);
         batch.update(gameRef, { isAIPickOfDay: false });
       }
       
       // Set the top pick as Pick of the Day
-      const pickOfDayRef = firestore.collection('games').doc(pickOfDay.id);
+      const pickOfDayRef = firestore.collection("games").doc(pickOfDay.id);
       batch.update(pickOfDayRef, { 
         isAIPickOfDay: true,
         pickOfDayTimestamp: admin.firestore.FieldValue.serverTimestamp()
@@ -119,7 +119,7 @@ export const markAIPickOfDay = functions.pubsub
       logger.info(`Successfully marked game ${pickOfDay.id} as AI Pick of the Day`);
       
       // Also save to a separate collection for historical tracking
-      await firestore.collection('aiPicksOfDay').add({
+      await firestore.collection("aiPicksOfDay").add({
         gameId: pickOfDay.id,
         teamA: pickOfDay.teamA,
         teamB: pickOfDay.teamB,
@@ -128,11 +128,11 @@ export const markAIPickOfDay = functions.pubsub
         startTime: pickOfDay.startTime,
         aiConfidence: pickOfDay.aiConfidence,
         aiInsightText: pickOfDay.aiInsightText,
-        date: today.toISOString().split('T')[0],
+        date: today.toISOString().split("T")[0],
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
       
-      logger.info('Added entry to aiPicksOfDay collection');
+      logger.info("Added entry to aiPicksOfDay collection");
       
       // Return the pick of the day
       return {
@@ -140,10 +140,10 @@ export const markAIPickOfDay = functions.pubsub
         teamA: pickOfDay.teamA,
         teamB: pickOfDay.teamB,
         aiConfidence: pickOfDay.aiConfidence,
-        date: today.toISOString().split('T')[0]
+        date: today.toISOString().split("T")[0]
       };
     } catch (error: any) {
-      logger.error('Error in markAIPickOfDay function:', error);
+      logger.error("Error in markAIPickOfDay function:", error);
       throw error;
     }
   });

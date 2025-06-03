@@ -1,3 +1,4 @@
+import { FirebaseError } from 'firebase/app';
 import { getAuth, updateProfile } from 'firebase/auth';
 import {
   getFirestore,
@@ -13,12 +14,12 @@ import {
   getDocs,
   writeBatch,
   FieldValue,
-  increment as firestoreIncrement
+  increment as firestoreIncrement,
 } from 'firebase/firestore';
-import { info, error as logError, LogCategory } from './loggingService';
-import { safeErrorCapture } from './errorUtils';
-import { FirebaseError } from 'firebase/app';
+
 import { enhancedCacheService, CacheStrategy } from './enhancedCacheService';
+import { safeErrorCapture } from './errorUtils';
+import { info, error as logError, LogCategory } from './loggingService';
 import { auth, firestore } from '../config/firebase';
 
 /**
@@ -33,7 +34,7 @@ export interface OptimizedUserData {
   phoneNumber?: string;
   createdAt?: any; // Firestore timestamp
   updatedAt?: any; // Firestore timestamp
-  
+
   // Embedded preferences (previously in separate collection)
   preferences?: {
     theme?: {
@@ -51,7 +52,7 @@ export interface OptimizedUserData {
       injuryUpdates: boolean;
     };
   };
-  
+
   // Embedded verification data (previously scattered across user document)
   verifications?: {
     ageVerification?: {
@@ -84,7 +85,7 @@ export interface OptimizedUserData {
     };
     [key: string]: any; // Allow any verification type
   };
-  
+
   // Embedded streak data (for quick access)
   streaks?: {
     current: number;
@@ -92,13 +93,16 @@ export interface OptimizedUserData {
     lastActiveDate: any; // Firestore timestamp
     availableRewards: number;
   };
-  
+
   // Embedded followed picks (limited to recent/active)
-  followedPicks?: Record<string, {
-    followedAt: any; // Firestore timestamp
-    notificationEnabled: boolean;
-  }>;
-  
+  followedPicks?: Record<
+    string,
+    {
+      followedAt: any; // Firestore timestamp
+      notificationEnabled: boolean;
+    }
+  >;
+
   // Metadata
   isPremium?: boolean;
   premiumExpiresAt?: any; // Firestore timestamp
@@ -110,7 +114,7 @@ export interface OptimizedUserData {
  */
 const defaultPreferences = {
   theme: {
-    preset: 'light' as const
+    preset: 'light' as const,
   },
   favoriteTeams: [],
   favoriteSports: ['basketball', 'football', 'baseball'],
@@ -120,8 +124,8 @@ const defaultPreferences = {
     highImpactNews: true,
     favoriteTeamNews: true,
     bettingOpportunities: true,
-    injuryUpdates: true
-  }
+    injuryUpdates: true,
+  },
 };
 
 /**
@@ -148,15 +152,15 @@ export const getUserData = async (
   try {
     // Get user ID
     const uid = userId || getCurrentUserId();
-    
+
     if (!uid) {
       console.warn('optimizedUserService: No user ID provided or user not authenticated');
       return null;
     }
-    
+
     // Cache key
     const cacheKey = `user:${uid}`;
-    
+
     // Get user data with caching
     const result = await enhancedCacheService.get<OptimizedUserData>(
       cacheKey,
@@ -164,7 +168,7 @@ export const getUserData = async (
         // Fetch from Firestore
         const userRef = doc(firestore, 'users', uid);
         const userDoc = await getDoc(userRef);
-        
+
         if (!userDoc.exists()) {
           console.log(`optimizedUserService: User document does not exist for ${uid}`);
           // Return empty user data structure instead of null
@@ -176,27 +180,27 @@ export const getUserData = async (
               current: 0,
               longest: 0,
               lastActiveDate: serverTimestamp(),
-              availableRewards: 0
+              availableRewards: 0,
             },
-            followedPicks: {}
+            followedPicks: {},
           };
         }
-        
+
         const userData = userDoc.data() as OptimizedUserData;
-        
+
         // Add ID to data
         userData.id = uid;
-        
+
         // Fetch preferences if not embedded yet (for backward compatibility)
         if (!userData.preferences) {
           try {
             const prefsDocRef = doc(collection(userRef, 'preferences'), 'sports');
             const prefsDoc = await getDoc(prefsDocRef);
-            
+
             if (prefsDoc.exists()) {
               userData.preferences = {
                 ...defaultPreferences,
-                ...prefsDoc.data()
+                ...prefsDoc.data(),
               };
             } else {
               userData.preferences = defaultPreferences;
@@ -206,16 +210,16 @@ export const getUserData = async (
             userData.preferences = defaultPreferences;
           }
         }
-        
+
         return userData;
       },
       {
         strategy: options?.strategy || CacheStrategy.CACHE_FIRST,
         forceRefresh: options?.forceRefresh || false,
-        expiration: 1000 * 60 * 5 // 5 minutes
+        expiration: 1000 * 60 * 5, // 5 minutes
       }
     );
-    
+
     return result.data;
   } catch (error) {
     console.error('optimizedUserService: Error getting user data:', error);
@@ -249,7 +253,7 @@ export const updateUserData = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     if (!data || Object.keys(data).length === 0) {
       const error = new Error('Update data is required');
       console.error('optimizedUserService: Empty update data');
@@ -257,22 +261,22 @@ export const updateUserData = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     const userRef = doc(firestore, 'users', userId);
-    
+
     // Add updatedAt timestamp
     const updateData = {
       ...data,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     };
-    
+
     // Check if user document exists
     const userDoc = await getDoc(userRef);
-    
+
     if (userDoc.exists()) {
       console.log(`optimizedUserService: Updating existing user document for ${userId}`);
       info(LogCategory.USER, 'Updating existing user document', { userId });
-      
+
       // Update existing document
       if (options?.merge !== false) {
         await updateDoc(userRef, updateData);
@@ -283,24 +287,24 @@ export const updateUserData = async (
     } else {
       console.log(`optimizedUserService: Creating new user document for ${userId}`);
       info(LogCategory.USER, 'Creating new user document', { userId });
-      
+
       // Create new document
       await setDoc(userRef, {
         ...updateData,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
     }
-    
+
     // Invalidate cache if requested
     if (options?.invalidateCache !== false) {
       await enhancedCacheService.invalidate(`user:${userId}`);
     }
-    
+
     console.log(`optimizedUserService: User document updated successfully for ${userId}`);
     info(LogCategory.USER, 'User document updated successfully', { userId });
   } catch (error) {
     console.error('optimizedUserService: Error updating user data:', error);
-    
+
     // Log the error with our logging service
     if (error instanceof FirebaseError) {
       console.error(`optimizedUserService: Firebase error code: ${error.code}`);
@@ -308,10 +312,10 @@ export const updateUserData = async (
     } else {
       logError(LogCategory.USER, 'Error updating user data', error as Error);
     }
-    
+
     // Track the error with our error tracking service
     safeErrorCapture(error as Error);
-    
+
     // Re-throw the error for the caller to handle
     throw error;
   }
@@ -330,27 +334,27 @@ export const updateUserPreferences = async (
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData) {
       throw new Error('User not found');
     }
-    
+
     // Merge with existing preferences
     const updatedPreferences = {
       ...userData.preferences,
-      ...preferences
+      ...preferences,
     };
-    
+
     // Update user document with new preferences
     await updateUserData(userId, {
-      preferences: updatedPreferences
+      preferences: updatedPreferences,
     });
-    
+
     // For backward compatibility, also update the preferences subcollection
     try {
       const userRef = doc(firestore, 'users', userId);
       const prefsDocRef = doc(collection(userRef, 'preferences'), 'sports');
-      
+
       await setDoc(prefsDocRef, updatedPreferences, { merge: true });
     } catch (prefsError) {
       console.error('optimizedUserService: Error updating preferences subcollection:', prefsError);
@@ -373,20 +377,20 @@ export const addFavoriteTeam = async (userId: string, teamName: string): Promise
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData || !userData.preferences) {
       throw new Error('User preferences not found');
     }
-    
+
     // Check if team is already in favorites
     const favoriteTeams = userData.preferences.favoriteTeams || [];
     if (!favoriteTeams.includes(teamName)) {
       // Add team to favorites
       favoriteTeams.push(teamName);
-      
+
       // Update user preferences
       await updateUserPreferences(userId, {
-        favoriteTeams
+        favoriteTeams,
       });
     }
   } catch (error) {
@@ -406,22 +410,22 @@ export const removeFavoriteTeam = async (userId: string, teamName: string): Prom
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData || !userData.preferences) {
       throw new Error('User preferences not found');
     }
-    
+
     // Check if team is in favorites
     const favoriteTeams = userData.preferences.favoriteTeams || [];
     const index = favoriteTeams.indexOf(teamName);
-    
+
     if (index !== -1) {
       // Remove team from favorites
       favoriteTeams.splice(index, 1);
-      
+
       // Update user preferences
       await updateUserPreferences(userId, {
-        favoriteTeams
+        favoriteTeams,
       });
     }
   } catch (error) {
@@ -446,40 +450,47 @@ export const saveVerificationData = async (
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData) {
       throw new Error('User not found');
     }
-    
+
     // Create verifications object if it doesn't exist
     const verifications = userData.verifications || {};
-    
+
     // Update verification data with type assertion
     verifications[verificationType as string] = {
       ...data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     // Update user document
     await updateUserData(userId, {
-      verifications
+      verifications,
     });
-    
+
     // For audit purposes, also log to a separate collection
     try {
-      const verificationRef = doc(firestore, 'verifications', `${userId}_${verificationType}_${Date.now()}`);
-      
+      const verificationRef = doc(
+        firestore,
+        'verifications',
+        `${userId}_${verificationType}_${Date.now()}`
+      );
+
       await setDoc(verificationRef, {
         userId,
         verificationType,
         data: {
           ...data,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
     } catch (auditError) {
-      console.error('optimizedUserService: Error logging verification data to audit collection:', auditError);
+      console.error(
+        'optimizedUserService: Error logging verification data to audit collection:',
+        auditError
+      );
       // Don't throw here, as the main update was successful
     }
   } catch (error) {
@@ -503,18 +514,18 @@ export const hasCompletedVerification = async (
   try {
     // Get user data
     const userData = await getUserData(userId);
-    
+
     if (!userData || !userData.verifications) {
       return false;
     }
-    
+
     // Check verification status
     const verification = userData.verifications[verificationType];
-    
+
     if (!verification) {
       return false;
     }
-    
+
     // Check specific verification types with type assertions
     switch (verificationType) {
       case 'ageVerification':
@@ -552,33 +563,36 @@ export const updateUserStreak = async (
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData) {
       throw new Error('User not found');
     }
-    
+
     // Merge with existing streak data
     const currentStreaks = userData.streaks || {
       current: 0,
       longest: 0,
       lastActiveDate: serverTimestamp(),
-      availableRewards: 0
+      availableRewards: 0,
     };
-    
+
     const updatedStreaks = {
       ...currentStreaks,
       ...streakData,
       // Ensure all required properties are present
-      current: (streakData.current !== undefined) ? streakData.current : currentStreaks.current,
-      longest: (streakData.longest !== undefined) ? streakData.longest : currentStreaks.longest,
-      availableRewards: (streakData.availableRewards !== undefined) ? streakData.availableRewards : currentStreaks.availableRewards,
-      lastActiveDate: serverTimestamp()
+      current: streakData.current !== undefined ? streakData.current : currentStreaks.current,
+      longest: streakData.longest !== undefined ? streakData.longest : currentStreaks.longest,
+      availableRewards:
+        streakData.availableRewards !== undefined
+          ? streakData.availableRewards
+          : currentStreaks.availableRewards,
+      lastActiveDate: serverTimestamp(),
     };
-    
+
     // Update user document
     await updateUserData(userId, {
       streaks: updatedStreaks,
-      lastActive: serverTimestamp()
+      lastActive: serverTimestamp(),
     });
   } catch (error) {
     console.error('optimizedUserService: Error updating user streak:', error);
@@ -602,31 +616,31 @@ export const followPick = async (
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData) {
       throw new Error('User not found');
     }
-    
+
     // Create followedPicks object if it doesn't exist
     const followedPicks = userData.followedPicks || {};
-    
+
     // Add pick to followed picks
     followedPicks[pickId] = {
       followedAt: serverTimestamp(),
-      notificationEnabled
+      notificationEnabled,
     };
-    
+
     // Update user document
     await updateUserData(userId, {
-      followedPicks
+      followedPicks,
     });
-    
+
     // Update pick followers count
     try {
       const pickRef = doc(firestore, 'aiPicks', pickId);
-      
+
       await updateDoc(pickRef, {
-        followers: firestoreIncrement(1)
+        followers: firestoreIncrement(1),
       });
     } catch (pickError) {
       console.error('optimizedUserService: Error updating pick followers count:', pickError);
@@ -645,35 +659,32 @@ export const followPick = async (
  * @param userId User ID
  * @param pickId Pick ID
  */
-export const unfollowPick = async (
-  userId: string,
-  pickId: string
-): Promise<void> => {
+export const unfollowPick = async (userId: string, pickId: string): Promise<void> => {
   try {
     // Get current user data
     const userData = await getUserData(userId);
-    
+
     if (!userData || !userData.followedPicks) {
       throw new Error('User followed picks not found');
     }
-    
+
     // Check if pick is followed
     if (userData.followedPicks[pickId]) {
       // Create new followed picks object without the pick
       const followedPicks = { ...userData.followedPicks };
       delete followedPicks[pickId];
-      
+
       // Update user document
       await updateUserData(userId, {
-        followedPicks
+        followedPicks,
       });
-      
+
       // Update pick followers count
       try {
         const pickRef = doc(firestore, 'aiPicks', pickId);
-        
+
         await updateDoc(pickRef, {
-          followers: firestoreIncrement(-1)
+          followers: firestoreIncrement(-1),
         });
       } catch (pickError) {
         console.error('optimizedUserService: Error updating pick followers count:', pickError);
@@ -695,18 +706,21 @@ export const unfollowPick = async (
  */
 export const getFollowedPicks = async (
   userId: string
-): Promise<Record<string, {
-  followedAt: any;
-  notificationEnabled: boolean;
-}> | null> => {
+): Promise<Record<
+  string,
+  {
+    followedAt: any;
+    notificationEnabled: boolean;
+  }
+> | null> => {
   try {
     // Get user data
     const userData = await getUserData(userId);
-    
+
     if (!userData) {
       return null;
     }
-    
+
     return userData.followedPicks || {};
   } catch (error) {
     console.error('optimizedUserService: Error getting followed picks:', error);
@@ -716,7 +730,6 @@ export const getFollowedPicks = async (
   }
 };
 
-
 /**
  * Migrate existing user data to the denormalized structure
  * @param userId User ID
@@ -725,19 +738,19 @@ export const migrateUserData = async (userId: string): Promise<void> => {
   try {
     console.log(`optimizedUserService: Migrating user data for ${userId}`);
     info(LogCategory.USER, 'Migrating user data', { userId });
-    
+
     const userRef = doc(firestore, 'users', userId);
-    
+
     // Get user document
     const userDoc = await getDoc(userRef);
-    
+
     if (!userDoc.exists()) {
       console.log(`optimizedUserService: User document does not exist for ${userId}`);
       return;
     }
-    
+
     const userData = userDoc.data() as any;
-    
+
     // Create optimized user data
     const optimizedData: OptimizedUserData = {
       id: userId,
@@ -747,7 +760,7 @@ export const migrateUserData = async (userId: string): Promise<void> => {
       phoneNumber: userData.phoneNumber,
       createdAt: userData.createdAt,
       updatedAt: serverTimestamp(),
-      
+
       // Initialize embedded objects
       preferences: {},
       verifications: {},
@@ -755,24 +768,27 @@ export const migrateUserData = async (userId: string): Promise<void> => {
         current: 0,
         longest: 0,
         lastActiveDate: userData.lastActive || serverTimestamp(),
-        availableRewards: 0
+        availableRewards: 0,
       },
-      followedPicks: {} as Record<string, {
-        followedAt: any;
-        notificationEnabled: boolean;
-      }>,
-      
+      followedPicks: {} as Record<
+        string,
+        {
+          followedAt: any;
+          notificationEnabled: boolean;
+        }
+      >,
+
       // Metadata
       isPremium: userData.isPremium || false,
       premiumExpiresAt: userData.premiumExpiresAt,
-      lastActive: userData.lastActive || serverTimestamp()
+      lastActive: userData.lastActive || serverTimestamp(),
     };
-    
+
     // Migrate preferences
     try {
       const prefsDocRef = doc(collection(userRef, 'preferences'), 'sports');
       const prefsDoc = await getDoc(prefsDocRef);
-      
+
       if (prefsDoc.exists()) {
         optimizedData.preferences = prefsDoc.data() as any;
       } else {
@@ -782,7 +798,7 @@ export const migrateUserData = async (userId: string): Promise<void> => {
       console.error('optimizedUserService: Error migrating preferences:', prefsError);
       optimizedData.preferences = defaultPreferences;
     }
-    
+
     // Migrate verifications
     optimizedData.verifications = {
       ageVerification: userData.ageVerification,
@@ -790,33 +806,33 @@ export const migrateUserData = async (userId: string): Promise<void> => {
       responsibleGamblingAcknowledgment: userData.responsibleGamblingAcknowledgment,
       waiverAcceptance: userData.waiverAcceptance,
       gdprConsent: userData.gdprConsent,
-      cookieConsent: userData.cookieConsent
+      cookieConsent: userData.cookieConsent,
     };
-    
+
     // Migrate streaks
     try {
       const streaksRef = doc(firestore, 'userStreaks', userId);
       const streaksDoc = await getDoc(streaksRef);
-      
+
       if (streaksDoc.exists()) {
         const streaksData = streaksDoc.data();
         optimizedData.streaks = {
           current: streaksData.currentStreak || 0,
           longest: streaksData.longestStreak || 0,
           lastActiveDate: streaksData.lastActiveDate || serverTimestamp(),
-          availableRewards: streaksData.rewards?.availableRewards || 0
+          availableRewards: streaksData.rewards?.availableRewards || 0,
         };
       }
     } catch (streaksError) {
       console.error('optimizedUserService: Error migrating streaks:', streaksError);
     }
-    
+
     // Migrate followed picks
     try {
       const userPicksRef = collection(firestore, 'userPicks');
       const userPicksQuery = query(userPicksRef, where('userId', '==', userId));
       const userPicksSnapshot = await getDocs(userPicksQuery);
-      
+
       if (!userPicksSnapshot.empty) {
         userPicksSnapshot.forEach(doc => {
           const pickData = doc.data();
@@ -824,20 +840,20 @@ export const migrateUserData = async (userId: string): Promise<void> => {
           if (!optimizedData.followedPicks) {
             optimizedData.followedPicks = {};
           }
-          
+
           optimizedData.followedPicks[pickData.pickId] = {
             followedAt: pickData.followedAt,
-            notificationEnabled: pickData.notificationEnabled || true
+            notificationEnabled: pickData.notificationEnabled || true,
           };
         });
       }
     } catch (picksError) {
       console.error('optimizedUserService: Error migrating followed picks:', picksError);
     }
-    
+
     // Update user document with optimized data
     await setDoc(userRef, optimizedData, { merge: true });
-    
+
     console.log(`optimizedUserService: User data migration completed for ${userId}`);
     info(LogCategory.USER, 'User data migration completed', { userId });
   } catch (error) {
@@ -860,5 +876,5 @@ export default {
   followPick,
   unfollowPick,
   getFollowedPicks,
-  migrateUserData
+  migrateUserData,
 };

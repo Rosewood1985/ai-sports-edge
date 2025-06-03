@@ -1,17 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
+import { auth } from '../config/firebase';
+import Colors from '../constants/Colors';
 import { useTheme } from '../contexts/ThemeContext';
+import { hasPremiumAccess } from '../services/firebaseSubscriptionService';
 import { Game } from '../types/odds';
 // Import the necessary modules
-import { hasPremiumAccess } from '../services/firebaseSubscriptionService';
 
 // Helper functions
 const americanToDecimal = (americanOdds: number): number => {
   if (americanOdds > 0) {
-    return (americanOdds / 100) + 1;
+    return americanOdds / 100 + 1;
   } else {
-    return (100 / Math.abs(americanOdds)) + 1;
+    return 100 / Math.abs(americanOdds) + 1;
   }
 };
 
@@ -19,8 +22,6 @@ const calculatePotentialPayout = (odds: number, betAmount: number): number => {
   const decimalOdds = americanToDecimal(odds);
   return decimalOdds * betAmount;
 };
-import { auth } from '../config/firebase';
-import Colors from '../constants/Colors';
 
 interface ParlayOddsCardProps {
   games: Game[];
@@ -42,7 +43,7 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
   betType,
   odds,
   onPurchase,
-  onBetNow
+  onBetNow,
 }) => {
   const { colors, isDark } = useTheme();
   const [hasPremium, setHasPremium] = useState<boolean>(false);
@@ -54,16 +55,16 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const checkParlayAccess = async () => {
       if (!isMounted) return;
-      
+
       const userId = auth.currentUser?.uid;
       if (!userId) {
         if (isMounted) setHasPremium(false);
         return;
       }
-      
+
       try {
         // Check if user has premium access
         const hasAccess = await hasPremiumAccess(userId);
@@ -75,9 +76,9 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
         if (isMounted) setLoading(false);
       }
     };
-    
+
     checkParlayAccess();
-    
+
     return () => {
       isMounted = false;
     };
@@ -97,10 +98,8 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
     return (
       <View style={[styles.container, { backgroundColor: colors.card }]}>
         <View style={styles.blurredContent}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Live Parlay Odds
-          </Text>
-          
+          <Text style={[styles.title, { color: colors.text }]}>Live Parlay Odds</Text>
+
           <View style={styles.teamsContainer}>
             {games.map((game, index) => (
               <View key={index} style={styles.teamRow}>
@@ -108,14 +107,12 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
                   {game.home_team} vs {game.away_team}
                 </Text>
                 <View style={styles.blurredOdds}>
-                  <Text style={[styles.blurredText, { color: colors.text }]}>
-                    +XXX
-                  </Text>
+                  <Text style={[styles.blurredText, { color: colors.text }]}>+XXX</Text>
                 </View>
               </View>
             ))}
           </View>
-          
+
           <View style={styles.payoutContainer}>
             <Text style={[styles.payoutLabel, { color: colors.text }]}>
               Potential Payouts (Blurred)
@@ -123,33 +120,25 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
             <View style={styles.payoutRow}>
               {betAmounts.map((amount, index) => (
                 <View key={index} style={styles.payoutItem}>
-                  <Text style={[styles.betAmount, { color: colors.text }]}>
-                    ${amount}
-                  </Text>
+                  <Text style={[styles.betAmount, { color: colors.text }]}>${amount}</Text>
                   <View style={styles.blurredPayout}>
-                    <Text style={[styles.blurredText, { color: colors.text }]}>
-                      $XXX.XX
-                    </Text>
+                    <Text style={[styles.blurredText, { color: colors.text }]}>$XXX.XX</Text>
                   </View>
                 </View>
               ))}
             </View>
           </View>
-          
+
           <TouchableOpacity
             style={[styles.purchaseButton, { backgroundColor: Colors.neon.blue }]}
             onPress={onPurchase}
             activeOpacity={0.8}
           >
-            <Text style={styles.purchaseButtonText}>
-              Unlock Live Parlay Odds
-            </Text>
+            <Text style={styles.purchaseButtonText}>Unlock Live Parlay Odds</Text>
             <Ionicons name="lock-open" size={18} color="#FFFFFF" />
           </TouchableOpacity>
-          
-          <Text style={styles.pricingText}>
-            Starting at $2.99 for 24-hour access
-          </Text>
+
+          <Text style={styles.pricingText}>Starting at $2.99 for 24-hour access</Text>
         </View>
       </View>
     );
@@ -159,10 +148,8 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
   const renderFullContent = () => {
     return (
       <View style={[styles.container, { backgroundColor: colors.card }]}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Live Parlay Odds
-        </Text>
-        
+        <Text style={[styles.title, { color: colors.text }]}>Live Parlay Odds</Text>
+
         <View style={styles.teamsContainer}>
           {games.map((game, index) => (
             <View key={index} style={styles.teamRow}>
@@ -171,7 +158,9 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
                   <Text style={{ fontWeight: 'bold' }}>{game.home_team}</Text>
                 ) : (
                   game.home_team
-                )} vs {selections[index] === game.away_team ? (
+                )}{' '}
+                vs{' '}
+                {selections[index] === game.away_team ? (
                   <Text style={{ fontWeight: 'bold' }}>{game.away_team}</Text>
                 ) : (
                   game.away_team
@@ -183,7 +172,7 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
             </View>
           ))}
         </View>
-        
+
         <View style={styles.combinedOddsContainer}>
           <Text style={[styles.combinedOddsLabel, { color: colors.text }]}>
             Combined Parlay Odds:
@@ -192,17 +181,13 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
             {odds > 0 ? `+${odds}` : `${odds}`}
           </Text>
         </View>
-        
+
         <View style={styles.payoutContainer}>
-          <Text style={[styles.payoutLabel, { color: colors.text }]}>
-            Potential Payouts
-          </Text>
+          <Text style={[styles.payoutLabel, { color: colors.text }]}>Potential Payouts</Text>
           <View style={styles.payoutRow}>
             {betAmounts.map((amount, index) => (
               <View key={index} style={styles.payoutItem}>
-                <Text style={[styles.betAmount, { color: colors.text }]}>
-                  ${amount}
-                </Text>
+                <Text style={[styles.betAmount, { color: colors.text }]}>${amount}</Text>
                 <Text style={[styles.payoutAmount, { color: Colors.neon.green }]}>
                   ${calculatePotentialPayout(odds, amount).toFixed(2)}
                 </Text>
@@ -210,27 +195,23 @@ const ParlayOddsCard: React.FC<ParlayOddsCardProps> = ({
             ))}
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={[
             styles.betNowButton,
             { backgroundColor: Colors.neon.green },
-            isHovered && styles.betNowButtonHovered
+            isHovered && styles.betNowButtonHovered,
           ]}
           onPress={onBetNow}
           activeOpacity={0.8}
           onPressIn={() => setIsHovered(true)}
           onPressOut={() => setIsHovered(false)}
         >
-          <Text style={styles.betNowButtonText}>
-            Bet Now on FanDuel
-          </Text>
+          <Text style={styles.betNowButtonText}>Bet Now on FanDuel</Text>
           <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
         </TouchableOpacity>
-        
-        <Text style={styles.disclaimerText}>
-          Odds update in real-time. Bet responsibly.
-        </Text>
+
+        <Text style={styles.disclaimerText}>Odds update in real-time. Bet responsibly.</Text>
       </View>
     );
   };

@@ -1,3 +1,4 @@
+import { FontAwesome } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -9,12 +10,12 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import { useTranslation } from '../i18n/mock';
-import { useTheme } from '../contexts/ThemeContext';
+
 import AIPickCard from '../components/AIPickCard';
-import { aiPickSelector, AIPickData } from '../services/aiPickSelector';
 import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../i18n/mock';
+import { aiPickSelector, AIPickData } from '../services/aiPickSelector';
 
 /**
  * AIPickOfDayScreen component
@@ -23,7 +24,7 @@ import { auth } from '../config/firebase';
 const AIPickOfDayScreen: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  
+
   // State
   const [pickOfDay, setPickOfDay] = useState<AIPickData | null>(null);
   const [topPicks, setTopPicks] = useState<AIPickData[]>([]);
@@ -31,13 +32,13 @@ const AIPickOfDayScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [followedPicks, setFollowedPicks] = useState<Record<string, boolean>>({});
   const [isPremium, setIsPremium] = useState(false);
-  
+
   // Load data on mount
   useEffect(() => {
     loadData();
     checkPremiumStatus();
   }, []);
-  
+
   // Check if user has premium subscription
   const checkPremiumStatus = async () => {
     try {
@@ -48,33 +49,31 @@ const AIPickOfDayScreen: React.FC = () => {
       console.error('Error checking premium status:', error);
     }
   };
-  
+
   // Load data from services
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       // Get Pick of the Day
       const pickOfDayData = await aiPickSelector.getPickOfTheDay();
       setPickOfDay(pickOfDayData);
-      
+
       // Get top picks (excluding Pick of the Day)
       const topPicksData = await aiPickSelector.getTopPicks(3);
       if (pickOfDayData) {
         // Filter out the Pick of the Day from top picks
-        const filteredTopPicks = topPicksData.filter(
-          (pick) => pick.gameId !== pickOfDayData.gameId
-        );
+        const filteredTopPicks = topPicksData.filter(pick => pick.gameId !== pickOfDayData.gameId);
         setTopPicks(filteredTopPicks);
       } else {
         setTopPicks(topPicksData);
       }
-      
+
       // Check which picks are followed
       if (auth.currentUser) {
         const userId = auth.currentUser.uid;
         const followed: Record<string, boolean> = {};
-        
+
         // Check Pick of the Day
         if (pickOfDayData) {
           followed[pickOfDayData.gameId] = await aiPickSelector.isFollowingPick(
@@ -82,15 +81,12 @@ const AIPickOfDayScreen: React.FC = () => {
             pickOfDayData.gameId
           );
         }
-        
+
         // Check top picks
         for (const pick of topPicksData) {
-          followed[pick.gameId] = await aiPickSelector.isFollowingPick(
-            userId,
-            pick.gameId
-          );
+          followed[pick.gameId] = await aiPickSelector.isFollowingPick(userId, pick.gameId);
         }
-        
+
         setFollowedPicks(followed);
       }
     } catch (error) {
@@ -100,13 +96,13 @@ const AIPickOfDayScreen: React.FC = () => {
       setRefreshing(false);
     }
   };
-  
+
   // Handle refresh
   const handleRefresh = () => {
     setRefreshing(true);
     loadData();
   };
-  
+
   // Handle follow pick
   const handleFollowPick = async (gameId: string) => {
     try {
@@ -115,20 +111,16 @@ const AIPickOfDayScreen: React.FC = () => {
         console.log('User not logged in');
         return;
       }
-      
+
       const userId = auth.currentUser.uid;
       const isFollowing = followedPicks[gameId] || false;
-      
+
       // Toggle follow status
-      const success = await aiPickSelector.toggleFollowPick(
-        userId,
-        gameId,
-        !isFollowing
-      );
-      
+      const success = await aiPickSelector.toggleFollowPick(userId, gameId, !isFollowing);
+
       if (success) {
         // Update local state
-        setFollowedPicks((prev) => ({
+        setFollowedPicks(prev => ({
           ...prev,
           [gameId]: !isFollowing,
         }));
@@ -137,7 +129,7 @@ const AIPickOfDayScreen: React.FC = () => {
       console.error('Error following pick:', error);
     }
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -151,24 +143,20 @@ const AIPickOfDayScreen: React.FC = () => {
       </SafeAreaView>
     );
   }
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
       >
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>
-            {t('AI Sports Edge')}
-          </Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>{t('AI Sports Edge')}</Text>
           <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
             {t('Powered by advanced machine learning')}
           </Text>
         </View>
-        
+
         {/* Pick of the Day */}
         {pickOfDay ? (
           <View style={styles.pickOfDayContainer}>
@@ -192,15 +180,13 @@ const AIPickOfDayScreen: React.FC = () => {
             </Text>
           </View>
         )}
-        
+
         {/* Top Picks Section */}
         {topPicks.length > 0 && (
           <View style={styles.topPicksSection}>
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>
-              {t('More Top Picks')}
-            </Text>
-            
-            {topPicks.map((pick) => (
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>{t('More Top Picks')}</Text>
+
+            {topPicks.map(pick => (
               <View key={pick.gameId} style={styles.topPickItem}>
                 <AIPickCard
                   gameId={pick.gameId}
@@ -217,11 +203,13 @@ const AIPickOfDayScreen: React.FC = () => {
             ))}
           </View>
         )}
-        
+
         {/* Disclaimer */}
         <View style={styles.disclaimerContainer}>
           <Text style={[styles.disclaimerText, { color: theme.textSecondary }]}>
-            {t('Disclaimer: Sports predictions are for entertainment purposes only. Please gamble responsibly.')}
+            {t(
+              'Disclaimer: Sports predictions are for entertainment purposes only. Please gamble responsibly.'
+            )}
           </Text>
         </View>
       </ScrollView>

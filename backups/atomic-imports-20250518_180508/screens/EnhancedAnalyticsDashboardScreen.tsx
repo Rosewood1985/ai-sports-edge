@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -10,14 +12,15 @@ import {
   Platform,
   Dimensions,
   Modal,
-  TextInput
+  TextInput,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import DateRangeSelector from '../components/DateRangeSelector';
+import { useTheme } from '../contexts/ThemeContext';
 import { enhancedAnalyticsService } from '../services/enhancedAnalyticsService';
 import {
   AnalyticsTimePeriod,
@@ -26,14 +29,12 @@ import {
   BetType,
   SportType,
   PlatformType,
-  AnalyticsDashboardData
+  AnalyticsDashboardData,
 } from '../types/enhancedAnalytics';
-import { useTheme } from '../contexts/ThemeContext';
-import DateRangeSelector from '../components/DateRangeSelector';
 
 /**
  * Enhanced Analytics Dashboard Screen
- * 
+ *
  * This screen provides an admin dashboard for monitoring app usage, popular bets,
  * and user engagement metrics.
  */
@@ -43,12 +44,16 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [dashboardData, setDashboardData] = useState<AnalyticsDashboardData | null>(null);
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState<AnalyticsTimePeriod>(AnalyticsTimePeriod.LAST_30_DAYS);
-  const [customDateRange, setCustomDateRange] = useState<{ startDate: number; endDate: number } | undefined>(undefined);
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState<AnalyticsTimePeriod>(
+    AnalyticsTimePeriod.LAST_30_DAYS
+  );
+  const [customDateRange, setCustomDateRange] = useState<
+    { startDate: number; endDate: number } | undefined
+  >(undefined);
 
   // Screen dimensions
   const screenWidth = Dimensions.get('window').width;
-  
+
   // Colors for the dashboard
   const backgroundColor = colors.background;
   const cardBackgroundColor = isDark ? '#1E1E1E' : '#FFFFFF';
@@ -57,16 +62,27 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
   const primaryColor = colors.primary;
   const secondaryColor = colors.secondary;
   const chartColors = [
-    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-    '#FF9F40', '#8AC24A', '#00BCD4', '#FF5722', '#607D8B'
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56',
+    '#4BC0C0',
+    '#9966FF',
+    '#FF9F40',
+    '#8AC24A',
+    '#00BCD4',
+    '#FF5722',
+    '#607D8B',
   ];
 
   // Load dashboard data
   const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
-      
-      const data = await enhancedAnalyticsService.getDashboardData(selectedTimePeriod, customDateRange);
+
+      const data = await enhancedAnalyticsService.getDashboardData(
+        selectedTimePeriod,
+        customDateRange
+      );
       setDashboardData(data);
     } catch (error) {
       console.error('Error loading analytics dashboard data:', error);
@@ -190,7 +206,7 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
     setSelectedTimePeriod(AnalyticsTimePeriod.CUSTOM);
     setCustomDateRange({
       startDate: start.getTime(),
-      endDate: end.getTime()
+      endDate: end.getTime(),
     });
   };
 
@@ -229,42 +245,42 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
   // Render user engagement metrics
   const renderUserEngagementMetrics = () => {
     if (!dashboardData) return null;
-    
+
     const { userEngagement } = dashboardData;
-    
+
     const cards = [
       {
         title: 'Total Users',
         value: formatNumber(userEngagement.totalUsers),
-        icon: 'people'
+        icon: 'people',
       },
       {
         title: 'Daily Active Users',
         value: formatNumber(userEngagement.activeUsers.daily),
-        icon: 'today'
+        icon: 'today',
       },
       {
         title: 'Monthly Active Users',
         value: formatNumber(userEngagement.activeUsers.monthly),
-        icon: 'calendar'
+        icon: 'calendar',
       },
       {
         title: 'New Users',
         value: formatNumber(userEngagement.newUsers),
-        icon: 'person-add'
+        icon: 'person-add',
       },
       {
         title: 'Retention Rate (30d)',
         value: formatPercentage(userEngagement.retentionRate.day30),
-        icon: 'repeat'
+        icon: 'repeat',
       },
       {
         title: 'Churn Rate',
         value: formatPercentage(userEngagement.churnRate),
-        icon: 'exit'
-      }
+        icon: 'exit',
+      },
     ];
-    
+
     return (
       <View style={styles.metricsSection}>
         <ThemedText style={styles.sectionTitle}>User Engagement</ThemedText>
@@ -276,17 +292,13 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
                 styles.metricCard,
                 {
                   backgroundColor: cardBackgroundColor,
-                  borderColor: cardBorderColor
-                }
+                  borderColor: cardBorderColor,
+                },
               ]}
             >
               <View style={styles.metricCardHeader}>
                 <ThemedText style={styles.metricCardTitle}>{card.title}</ThemedText>
-                <Ionicons
-                  name={card.icon as any}
-                  size={24}
-                  color={primaryColor}
-                />
+                <Ionicons name={card.icon as any} size={24} color={primaryColor} />
               </View>
               <ThemedText style={styles.metricCardValue}>{card.value}</ThemedText>
             </View>
@@ -314,11 +326,9 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
         <ThemedText style={styles.title}>Enhanced Analytics</ThemedText>
         <ThemedText style={styles.subtitle}>Admin Dashboard</ThemedText>
       </View>
-      
+
       <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Time period selector */}
@@ -326,12 +336,16 @@ const EnhancedAnalyticsDashboardScreen: React.FC = () => {
           selectedPeriod={mapTimePeriod()}
           onSelectPeriod={handleTimePeriodSelect}
           onSelectCustomRange={handleCustomRangeSelect}
-          customDateRange={customDateRange ? {
-            start: new Date(customDateRange.startDate),
-            end: new Date(customDateRange.endDate)
-          } : undefined}
+          customDateRange={
+            customDateRange
+              ? {
+                  start: new Date(customDateRange.startDate),
+                  end: new Date(customDateRange.endDate),
+                }
+              : undefined
+          }
         />
-        
+
         {/* User engagement metrics */}
         {renderUserEngagementMetrics()}
       </ScrollView>
@@ -422,7 +436,7 @@ const styles = StyleSheet.create({
   chart: {
     borderRadius: 8,
     marginVertical: 8,
-  }
+  },
 });
 
 export default EnhancedAnalyticsDashboardScreen;

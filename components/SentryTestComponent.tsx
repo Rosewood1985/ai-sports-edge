@@ -1,7 +1,7 @@
 /**
  * Sentry Test Component
  * Component for testing Sentry error reporting and monitoring
- * 
+ *
  * This component provides a UI to test various Sentry features including:
  * - Error capture
  * - Racing operation tracking
@@ -20,6 +20,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+
 import { sentryService } from '../services/sentryService';
 import { sentryNavigationInstrumentation } from '../utils/sentryNavigationInstrumentation';
 
@@ -218,27 +219,17 @@ export const SentryTestComponent: React.FC = () => {
       });
 
       // Add breadcrumbs
-      sentryService.addBreadcrumb(
-        'Test breadcrumb for racing feature',
-        'racing',
-        'info',
-        {
-          feature: 'nascar_predictions',
-          action: 'view_predictions',
-          testMode: true,
-        }
-      );
+      sentryService.addBreadcrumb('Test breadcrumb for racing feature', 'racing', 'info', {
+        feature: 'nascar_predictions',
+        action: 'view_predictions',
+        testMode: true,
+      });
 
-      sentryService.addBreadcrumb(
-        'Test breadcrumb for ML operation',
-        'ml',
-        'info',
-        {
-          model: 'xgboost',
-          operation: 'prediction',
-          testMode: true,
-        }
-      );
+      sentryService.addBreadcrumb('Test breadcrumb for ML operation', 'ml', 'info', {
+        model: 'xgboost',
+        operation: 'prediction',
+        testMode: true,
+      });
 
       addTestResult(
         'User Context & Breadcrumbs',
@@ -373,9 +364,7 @@ export const SentryTestComponent: React.FC = () => {
 
       <View style={styles.statusCard}>
         <Text style={styles.statusTitle}>📊 Sentry Status</Text>
-        <Text style={styles.statusText}>
-          Active: {status.isActive ? '✅ Yes' : '❌ No'}
-        </Text>
+        <Text style={styles.statusText}>Active: {status.isActive ? '✅ Yes' : '❌ No'}</Text>
         <Text style={styles.statusText}>Environment: {status.environment}</Text>
         <Text style={styles.statusText}>Debug: {status.debug ? 'Yes' : 'No'}</Text>
         <Text style={styles.statusText}>Sample Rate: {status.sampleRate * 100}%</Text>
@@ -403,7 +392,7 @@ export const SentryTestComponent: React.FC = () => {
 
       <View style={styles.individualTests}>
         <Text style={styles.sectionTitle}>🧪 Individual Tests</Text>
-        
+
         <TouchableOpacity style={styles.testButton} onPress={testBasicErrorCapture}>
           <Text style={styles.testButtonText}>❌ Test Error Capture</Text>
         </TouchableOpacity>
@@ -442,9 +431,7 @@ export const SentryTestComponent: React.FC = () => {
                 {result.success ? '✅' : '❌'} {result.test}
               </Text>
               <Text style={styles.resultMessage}>{result.message}</Text>
-              <Text style={styles.resultTime}>
-                {result.timestamp.toLocaleTimeString()}
-              </Text>
+              <Text style={styles.resultTime}>{result.timestamp.toLocaleTimeString()}</Text>
             </View>
           ))
         )}

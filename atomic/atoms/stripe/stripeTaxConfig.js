@@ -5,8 +5,8 @@
  * It provides tax-related constants and configuration settings.
  */
 
-const logger = require('../../../utils/logger');
 const { getStripe } = require('./stripeConfig');
+const logger = require('../../../utils/logger');
 
 /**
  * Default tax behavior

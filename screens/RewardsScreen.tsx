@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,20 +9,18 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+
+import { Header } from '../atomic/organisms';
+import AchievementBadge from '../components/AchievementBadge';
+import LoyaltyBadge from '../components/LoyaltyBadge';
+import ReferralLeaderboard from '../components/ReferralLeaderboard';
 import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { trackScreenView } from '../services/analyticsService';
 import { rewardsService } from '../services/rewardsService';
 import { UserRewards, Achievement, RewardTier, LoyaltyLevel } from '../types/rewards';
-import { Header } from '../atomic/organisms';
-import LoyaltyBadge from '../components/LoyaltyBadge';
-import AchievementBadge from '../components/AchievementBadge';
-import ReferralLeaderboard from '../components/ReferralLeaderboard';
-import { trackScreenView } from '../services/analyticsService';
 
 const LOYALTY_TIERS: RewardTier[] = [
   {
@@ -29,8 +30,8 @@ const LOYALTY_TIERS: RewardTier[] = [
       aiPickDiscount: 0,
       exclusiveContent: false,
       prioritySupport: false,
-      freeAIPredictions: 0
-    }
+      freeAIPredictions: 0,
+    },
   },
   {
     level: 'Silver',
@@ -39,8 +40,8 @@ const LOYALTY_TIERS: RewardTier[] = [
       aiPickDiscount: 5, // 5% off
       exclusiveContent: false,
       prioritySupport: false,
-      freeAIPredictions: 1
-    }
+      freeAIPredictions: 1,
+    },
   },
   {
     level: 'Gold',
@@ -49,8 +50,8 @@ const LOYALTY_TIERS: RewardTier[] = [
       aiPickDiscount: 10, // 10% off
       exclusiveContent: true,
       prioritySupport: false,
-      freeAIPredictions: 2
-    }
+      freeAIPredictions: 2,
+    },
   },
   {
     level: 'Platinum',
@@ -59,9 +60,9 @@ const LOYALTY_TIERS: RewardTier[] = [
       aiPickDiscount: 15, // 15% off
       exclusiveContent: true,
       prioritySupport: true,
-      freeAIPredictions: 3
-    }
-  }
+      freeAIPredictions: 3,
+    },
+  },
 ];
 
 type RootStackParamList = {
@@ -74,30 +75,32 @@ type RewardsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Refe
 const RewardsScreen: React.FC = () => {
   const [rewards, setRewards] = useState<UserRewards | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'loyalty' | 'achievements' | 'streaks' | 'referrals'>('loyalty');
+  const [activeTab, setActiveTab] = useState<'loyalty' | 'achievements' | 'streaks' | 'referrals'>(
+    'loyalty'
+  );
   const { colors, isDark } = useTheme();
   const navigation = useNavigation<RewardsScreenNavigationProp>();
-  
+
   // Track screen view
   useEffect(() => {
     trackScreenView('RewardsScreen');
   }, []);
-  
+
   // Load user rewards
   useEffect(() => {
     const loadRewards = async () => {
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           Alert.alert('Error', 'You must be logged in to view rewards');
           setLoading(false);
           return;
         }
-        
+
         const userRewards = await rewardsService.getUserRewards(userId);
-        
+
         if (!userRewards) {
           // Initialize rewards if they don't exist
           const initializedRewards = await rewardsService.initializeUserRewards(userId);
@@ -112,76 +115,65 @@ const RewardsScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadRewards();
   }, []);
-  
+
   // Get current tier
   const getCurrentTier = (): RewardTier | undefined => {
     if (!rewards) return undefined;
     return LOYALTY_TIERS.find(tier => tier.level === rewards.loyaltyLevel);
   };
-  
+
   // Get next tier
   const getNextTier = (): RewardTier | undefined => {
     if (!rewards) return undefined;
-    
-    const currentTierIndex = LOYALTY_TIERS.findIndex(
-      tier => tier.level === rewards.loyaltyLevel
-    );
-    
+
+    const currentTierIndex = LOYALTY_TIERS.findIndex(tier => tier.level === rewards.loyaltyLevel);
+
     if (currentTierIndex < LOYALTY_TIERS.length - 1) {
       return LOYALTY_TIERS[currentTierIndex + 1];
     }
-    
+
     return undefined;
   };
-  
+
   // Calculate progress to next tier
   const getProgressToNextTier = (): number => {
     if (!rewards) return 0;
-    
+
     const nextTier = getNextTier();
     if (!nextTier) return 100; // Already at max tier
-    
+
     const currentTier = getCurrentTier();
     if (!currentTier) return 0;
-    
+
     const totalBetsNeeded = nextTier.requiredBets - currentTier.requiredBets;
     const betsCompleted = rewards.betCount - currentTier.requiredBets;
-    
+
     return Math.min(100, Math.max(0, (betsCompleted / totalBetsNeeded) * 100));
   };
-  
+
   // Render loading state
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header
-          title="Rewards & Achievements"
-          onRefresh={() => {}}
-          isLoading={loading}
-        />
+        <Header title="Rewards & Achievements" onRefresh={() => {}} isLoading={loading} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            Loading your rewards...
-          </Text>
+          <Text style={[styles.loadingText, { color: colors.text }]}>Loading your rewards...</Text>
         </View>
       </View>
     );
   }
-  
+
   // Render tabs
   const renderTabs = () => (
     <View style={styles.tabContainer}>
       <TouchableOpacity
         style={[
           styles.tab,
-          activeTab === 'loyalty' && [
-            styles.activeTab,
-            { borderBottomColor: colors.primary }
-          ]
+          activeTab === 'loyalty' && [styles.activeTab, { borderBottomColor: colors.primary }],
         ]}
         onPress={() => setActiveTab('loyalty')}
       >
@@ -193,20 +185,17 @@ const RewardsScreen: React.FC = () => {
         <Text
           style={[
             styles.tabText,
-            { color: activeTab === 'loyalty' ? colors.primary : colors.text }
+            { color: activeTab === 'loyalty' ? colors.primary : colors.text },
           ]}
         >
           Loyalty
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[
           styles.tab,
-          activeTab === 'achievements' && [
-            styles.activeTab,
-            { borderBottomColor: colors.primary }
-          ]
+          activeTab === 'achievements' && [styles.activeTab, { borderBottomColor: colors.primary }],
         ]}
         onPress={() => setActiveTab('achievements')}
       >
@@ -218,20 +207,17 @@ const RewardsScreen: React.FC = () => {
         <Text
           style={[
             styles.tabText,
-            { color: activeTab === 'achievements' ? colors.primary : colors.text }
+            { color: activeTab === 'achievements' ? colors.primary : colors.text },
           ]}
         >
           Achievements
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[
           styles.tab,
-          activeTab === 'streaks' && [
-            styles.activeTab,
-            { borderBottomColor: colors.primary }
-          ]
+          activeTab === 'streaks' && [styles.activeTab, { borderBottomColor: colors.primary }],
         ]}
         onPress={() => setActiveTab('streaks')}
       >
@@ -243,20 +229,17 @@ const RewardsScreen: React.FC = () => {
         <Text
           style={[
             styles.tabText,
-            { color: activeTab === 'streaks' ? colors.primary : colors.text }
+            { color: activeTab === 'streaks' ? colors.primary : colors.text },
           ]}
         >
           Streaks
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[
           styles.tab,
-          activeTab === 'referrals' && [
-            styles.activeTab,
-            { borderBottomColor: colors.primary }
-          ]
+          activeTab === 'referrals' && [styles.activeTab, { borderBottomColor: colors.primary }],
         ]}
         onPress={() => setActiveTab('referrals')}
       >
@@ -268,7 +251,7 @@ const RewardsScreen: React.FC = () => {
         <Text
           style={[
             styles.tabText,
-            { color: activeTab === 'referrals' ? colors.primary : colors.text }
+            { color: activeTab === 'referrals' ? colors.primary : colors.text },
           ]}
         >
           Referrals
@@ -276,37 +259,32 @@ const RewardsScreen: React.FC = () => {
       </TouchableOpacity>
     </View>
   );
-  
+
   // Render loyalty tab content
   const renderLoyaltyContent = () => {
     if (!rewards) return null;
-    
+
     const currentTier = getCurrentTier();
     const nextTier = getNextTier();
     const progress = getProgressToNextTier();
-    
+
     return (
       <View style={styles.tabContent}>
         <View style={styles.loyaltyHeader}>
           <LoyaltyBadge level={rewards.loyaltyLevel} size="large" />
           <View style={styles.pointsContainer}>
-            <Text style={[styles.pointsLabel, { color: colors.text }]}>
-              Loyalty Points
-            </Text>
+            <Text style={[styles.pointsLabel, { color: colors.text }]}>Loyalty Points</Text>
             <Text style={[styles.pointsValue, { color: colors.primary }]}>
               {rewards.loyaltyPoints}
             </Text>
           </View>
         </View>
-        
-        <View style={[
-          styles.tierInfoContainer,
-          { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }
-        ]}>
-          <Text style={[styles.tierTitle, { color: colors.text }]}>
-            Current Tier Benefits
-          </Text>
-          
+
+        <View
+          style={[styles.tierInfoContainer, { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }]}
+        >
+          <Text style={[styles.tierTitle, { color: colors.text }]}>Current Tier Benefits</Text>
+
           {currentTier && (
             <View style={styles.benefitsList}>
               <View style={styles.benefitItem}>
@@ -315,7 +293,7 @@ const RewardsScreen: React.FC = () => {
                   {currentTier.benefits.aiPickDiscount}% off AI picks
                 </Text>
               </View>
-              
+
               {currentTier.benefits.exclusiveContent && (
                 <View style={styles.benefitItem}>
                   <Ionicons name="lock-open" size={18} color={colors.primary} />
@@ -324,7 +302,7 @@ const RewardsScreen: React.FC = () => {
                   </Text>
                 </View>
               )}
-              
+
               {currentTier.benefits.prioritySupport && (
                 <View style={styles.benefitItem}>
                   <Ionicons name="headset" size={18} color={colors.primary} />
@@ -333,7 +311,7 @@ const RewardsScreen: React.FC = () => {
                   </Text>
                 </View>
               )}
-              
+
               <View style={styles.benefitItem}>
                 <Ionicons name="analytics" size={18} color={colors.primary} />
                 <Text style={[styles.benefitText, { color: colors.text }]}>
@@ -343,7 +321,7 @@ const RewardsScreen: React.FC = () => {
             </View>
           )}
         </View>
-        
+
         {nextTier && (
           <>
             <View style={styles.progressContainer}>
@@ -355,34 +333,35 @@ const RewardsScreen: React.FC = () => {
                   {rewards.betCount}/{nextTier.requiredBets} bets
                 </Text>
               </View>
-              
-              <View style={[
-                styles.progressBar,
-                { backgroundColor: isDark ? '#444444' : '#E0E0E0' }
-              ]}>
+
+              <View
+                style={[styles.progressBar, { backgroundColor: isDark ? '#444444' : '#E0E0E0' }]}
+              >
                 <View
                   style={[
                     styles.progressFill,
-                    { 
+                    {
                       backgroundColor: colors.primary,
-                      width: `${progress}%`
-                    }
+                      width: `${progress}%`,
+                    },
                   ]}
                 />
               </View>
             </View>
-            
-            <View style={[
-              styles.nextTierContainer,
-              { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }
-            ]}>
+
+            <View
+              style={[
+                styles.nextTierContainer,
+                { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' },
+              ]}
+            >
               <View style={styles.nextTierHeader}>
                 <LoyaltyBadge level={nextTier.level} size="medium" />
                 <Text style={[styles.nextTierTitle, { color: colors.text }]}>
                   Next Tier Benefits
                 </Text>
               </View>
-              
+
               <View style={styles.benefitsList}>
                 <View style={styles.benefitItem}>
                   <Ionicons name="pricetag" size={18} color={colors.primary} />
@@ -390,7 +369,7 @@ const RewardsScreen: React.FC = () => {
                     {nextTier.benefits.aiPickDiscount}% off AI picks
                   </Text>
                 </View>
-                
+
                 {nextTier.benefits.exclusiveContent && (
                   <View style={styles.benefitItem}>
                     <Ionicons name="lock-open" size={18} color={colors.primary} />
@@ -399,7 +378,7 @@ const RewardsScreen: React.FC = () => {
                     </Text>
                   </View>
                 )}
-                
+
                 {nextTier.benefits.prioritySupport && (
                   <View style={styles.benefitItem}>
                     <Ionicons name="headset" size={18} color={colors.primary} />
@@ -408,7 +387,7 @@ const RewardsScreen: React.FC = () => {
                     </Text>
                   </View>
                 )}
-                
+
                 <View style={styles.benefitItem}>
                   <Ionicons name="analytics" size={18} color={colors.primary} />
                   <Text style={[styles.benefitText, { color: colors.text }]}>
@@ -419,22 +398,21 @@ const RewardsScreen: React.FC = () => {
             </View>
           </>
         )}
-        
+
         <View style={styles.tierLevelsContainer}>
-          <Text style={[styles.tierLevelsTitle, { color: colors.text }]}>
-            All Loyalty Tiers
-          </Text>
-          
+          <Text style={[styles.tierLevelsTitle, { color: colors.text }]}>All Loyalty Tiers</Text>
+
           {LOYALTY_TIERS.map((tier, index) => (
-            <View 
+            <View
               key={tier.level}
               style={[
                 styles.tierLevelItem,
-                { 
+                {
                   backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
-                  borderLeftColor: rewards.loyaltyLevel === tier.level ? colors.primary : 'transparent',
+                  borderLeftColor:
+                    rewards.loyaltyLevel === tier.level ? colors.primary : 'transparent',
                   borderLeftWidth: rewards.loyaltyLevel === tier.level ? 4 : 0,
-                }
+                },
               ]}
             >
               <LoyaltyBadge level={tier.level} size="small" />
@@ -447,14 +425,14 @@ const RewardsScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render achievements tab content
   const renderAchievementsContent = () => {
     if (!rewards) return null;
-    
+
     const unlockedAchievements = rewards.achievements.filter(a => a.isUnlocked);
     const lockedAchievements = rewards.achievements.filter(a => !a.isUnlocked);
-    
+
     return (
       <View style={styles.tabContent}>
         <View style={styles.achievementsSummary}>
@@ -462,74 +440,60 @@ const RewardsScreen: React.FC = () => {
             <Text style={[styles.achievementsSummaryValue, { color: colors.primary }]}>
               {unlockedAchievements.length}
             </Text>
-            <Text style={[styles.achievementsSummaryLabel, { color: colors.text }]}>
-              Unlocked
-            </Text>
+            <Text style={[styles.achievementsSummaryLabel, { color: colors.text }]}>Unlocked</Text>
           </View>
-          
+
           <View style={styles.achievementsSummaryItem}>
             <Text style={[styles.achievementsSummaryValue, { color: colors.text }]}>
               {lockedAchievements.length}
             </Text>
-            <Text style={[styles.achievementsSummaryLabel, { color: colors.text }]}>
-              Locked
-            </Text>
+            <Text style={[styles.achievementsSummaryLabel, { color: colors.text }]}>Locked</Text>
           </View>
-          
+
           <View style={styles.achievementsSummaryItem}>
             <Text style={[styles.achievementsSummaryValue, { color: colors.primary }]}>
               {Math.round((unlockedAchievements.length / rewards.achievements.length) * 100)}%
             </Text>
-            <Text style={[styles.achievementsSummaryLabel, { color: colors.text }]}>
-              Complete
-            </Text>
+            <Text style={[styles.achievementsSummaryLabel, { color: colors.text }]}>Complete</Text>
           </View>
         </View>
-        
+
         {unlockedAchievements.length > 0 && (
           <>
             <Text style={[styles.achievementsTitle, { color: colors.text }]}>
               Unlocked Achievements
             </Text>
-            
+
             {unlockedAchievements.map(achievement => (
-              <AchievementBadge
-                key={achievement.id}
-                achievement={achievement}
-              />
+              <AchievementBadge key={achievement.id} achievement={achievement} />
             ))}
           </>
         )}
-        
+
         {lockedAchievements.length > 0 && (
           <>
             <Text style={[styles.achievementsTitle, { color: colors.text }]}>
               Locked Achievements
             </Text>
-            
+
             {lockedAchievements.map(achievement => (
-              <AchievementBadge
-                key={achievement.id}
-                achievement={achievement}
-              />
+              <AchievementBadge key={achievement.id} achievement={achievement} />
             ))}
           </>
         )}
       </View>
     );
   };
-  
+
   // Render referrals tab content
   const renderReferralsContent = () => {
     if (!rewards) return null;
-    
+
     return (
       <View style={styles.tabContent}>
         <View style={styles.referralInfoContainer}>
-          <Text style={[styles.referralTitle, { color: colors.text }]}>
-            Your Referrals
-          </Text>
-          
+          <Text style={[styles.referralTitle, { color: colors.text }]}>Your Referrals</Text>
+
           <View style={styles.referralStatsContainer}>
             <View style={styles.referralStatItem}>
               <Text style={[styles.referralStatValue, { color: colors.primary }]}>
@@ -539,7 +503,7 @@ const RewardsScreen: React.FC = () => {
                 Total Referrals
               </Text>
             </View>
-            
+
             {rewards.subscriptionExtensions && (
               <View style={styles.referralStatItem}>
                 <Text style={[styles.referralStatValue, { color: colors.primary }]}>
@@ -552,74 +516,62 @@ const RewardsScreen: React.FC = () => {
             )}
           </View>
         </View>
-        
+
         <ReferralLeaderboard
           limit={10}
-          showViewAll={true}
+          showViewAll
           onViewAllPress={() => navigation.navigate('ReferralLeaderboard')}
         />
       </View>
     );
   };
-  
+
   // Render streaks tab content
   const renderStreaksContent = () => {
     if (!rewards) return null;
-    
+
     return (
       <View style={styles.tabContent}>
-        <View style={[
-          styles.streakCard,
-          { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }
-        ]}>
+        <View style={[styles.streakCard, { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }]}>
           <View style={styles.streakHeader}>
             <Ionicons name="flame" size={24} color="#FF9800" />
-            <Text style={[styles.streakTitle, { color: colors.text }]}>
-              Current Streak
-            </Text>
+            <Text style={[styles.streakTitle, { color: colors.text }]}>Current Streak</Text>
           </View>
-          
+
           <Text style={[styles.streakValue, { color: colors.primary }]}>
             {rewards.currentStreak} days
           </Text>
-          
+
           <Text style={[styles.streakDescription, { color: colors.text }]}>
             Keep logging in daily to maintain your streak!
           </Text>
         </View>
-        
-        <View style={[
-          styles.streakCard,
-          { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }
-        ]}>
+
+        <View style={[styles.streakCard, { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }]}>
           <View style={styles.streakHeader}>
             <Ionicons name="trophy" size={24} color="#FFC107" />
-            <Text style={[styles.streakTitle, { color: colors.text }]}>
-              Longest Streak
-            </Text>
+            <Text style={[styles.streakTitle, { color: colors.text }]}>Longest Streak</Text>
           </View>
-          
+
           <Text style={[styles.streakValue, { color: colors.primary }]}>
             {rewards.longestStreak} days
           </Text>
         </View>
-        
-        <Text style={[styles.streakRewardsTitle, { color: colors.text }]}>
-          Streak Rewards
-        </Text>
-        
-        <View style={[
-          styles.streakRewardCard,
-          { 
-            backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
-            borderLeftColor: rewards.currentStreak >= 7 ? '#4CAF50' : colors.border,
-            opacity: rewards.currentStreak >= 7 ? 1 : 0.7
-          }
-        ]}>
+
+        <Text style={[styles.streakRewardsTitle, { color: colors.text }]}>Streak Rewards</Text>
+
+        <View
+          style={[
+            styles.streakRewardCard,
+            {
+              backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
+              borderLeftColor: rewards.currentStreak >= 7 ? '#4CAF50' : colors.border,
+              opacity: rewards.currentStreak >= 7 ? 1 : 0.7,
+            },
+          ]}
+        >
           <View style={styles.streakRewardHeader}>
-            <Text style={[styles.streakRewardDays, { color: colors.text }]}>
-              7 Days
-            </Text>
+            <Text style={[styles.streakRewardDays, { color: colors.text }]}>7 Days</Text>
             {rewards.currentStreak >= 7 && (
               <View style={styles.streakRewardUnlocked}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
@@ -627,7 +579,7 @@ const RewardsScreen: React.FC = () => {
               </View>
             )}
           </View>
-          
+
           <View style={styles.streakRewardContent}>
             <View style={styles.streakRewardItem}>
               <Ionicons name="analytics" size={16} color={colors.primary} />
@@ -635,7 +587,7 @@ const RewardsScreen: React.FC = () => {
                 1 Free AI Prediction
               </Text>
             </View>
-            
+
             <View style={styles.streakRewardItem}>
               <Ionicons name="star" size={16} color={colors.primary} />
               <Text style={[styles.streakRewardText, { color: colors.text }]}>
@@ -644,19 +596,19 @@ const RewardsScreen: React.FC = () => {
             </View>
           </View>
         </View>
-        
-        <View style={[
-          styles.streakRewardCard,
-          { 
-            backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
-            borderLeftColor: rewards.currentStreak >= 20 ? '#4CAF50' : colors.border,
-            opacity: rewards.currentStreak >= 20 ? 1 : 0.7
-          }
-        ]}>
+
+        <View
+          style={[
+            styles.streakRewardCard,
+            {
+              backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
+              borderLeftColor: rewards.currentStreak >= 20 ? '#4CAF50' : colors.border,
+              opacity: rewards.currentStreak >= 20 ? 1 : 0.7,
+            },
+          ]}
+        >
           <View style={styles.streakRewardHeader}>
-            <Text style={[styles.streakRewardDays, { color: colors.text }]}>
-              20 Days
-            </Text>
+            <Text style={[styles.streakRewardDays, { color: colors.text }]}>20 Days</Text>
             {rewards.currentStreak >= 20 && (
               <View style={styles.streakRewardUnlocked}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
@@ -664,7 +616,7 @@ const RewardsScreen: React.FC = () => {
               </View>
             )}
           </View>
-          
+
           <View style={styles.streakRewardContent}>
             <View style={styles.streakRewardItem}>
               <Ionicons name="analytics" size={16} color={colors.primary} />
@@ -672,7 +624,7 @@ const RewardsScreen: React.FC = () => {
                 2 Free AI Predictions
               </Text>
             </View>
-            
+
             <View style={styles.streakRewardItem}>
               <Ionicons name="star" size={16} color={colors.primary} />
               <Text style={[styles.streakRewardText, { color: colors.text }]}>
@@ -681,19 +633,19 @@ const RewardsScreen: React.FC = () => {
             </View>
           </View>
         </View>
-        
-        <View style={[
-          styles.streakRewardCard,
-          { 
-            backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
-            borderLeftColor: rewards.currentStreak >= 30 ? '#4CAF50' : colors.border,
-            opacity: rewards.currentStreak >= 30 ? 1 : 0.7
-          }
-        ]}>
+
+        <View
+          style={[
+            styles.streakRewardCard,
+            {
+              backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5',
+              borderLeftColor: rewards.currentStreak >= 30 ? '#4CAF50' : colors.border,
+              opacity: rewards.currentStreak >= 30 ? 1 : 0.7,
+            },
+          ]}
+        >
           <View style={styles.streakRewardHeader}>
-            <Text style={[styles.streakRewardDays, { color: colors.text }]}>
-              30 Days
-            </Text>
+            <Text style={[styles.streakRewardDays, { color: colors.text }]}>30 Days</Text>
             {rewards.currentStreak >= 30 && (
               <View style={styles.streakRewardUnlocked}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
@@ -701,7 +653,7 @@ const RewardsScreen: React.FC = () => {
               </View>
             )}
           </View>
-          
+
           <View style={styles.streakRewardContent}>
             <View style={styles.streakRewardItem}>
               <Ionicons name="analytics" size={16} color={colors.primary} />
@@ -709,7 +661,7 @@ const RewardsScreen: React.FC = () => {
                 3 Free AI Predictions
               </Text>
             </View>
-            
+
             <View style={styles.streakRewardItem}>
               <Ionicons name="star" size={16} color={colors.primary} />
               <Text style={[styles.streakRewardText, { color: colors.text }]}>
@@ -721,17 +673,13 @@ const RewardsScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
-        title="Rewards & Achievements"
-        onRefresh={() => {}}
-        isLoading={loading}
-      />
-      
+      <Header title="Rewards & Achievements" onRefresh={() => {}} isLoading={loading} />
+
       {renderTabs()}
-      
+
       <ScrollView style={styles.scrollView}>
         {activeTab === 'loyalty' && renderLoyaltyContent()}
         {activeTab === 'achievements' && renderAchievementsContent()}

@@ -1,16 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, RefreshControl, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { usePersonalization } from '../contexts/PersonalizationContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
-import { useTheme } from '../contexts/ThemeContext';
-import LoadingIndicator from '../components/LoadingIndicator';
 import BetNowButton from '../components/BetNowButton';
 import BetNowPopup from '../components/BetNowPopup';
+import LoadingIndicator from '../components/LoadingIndicator';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
+import { usePersonalization } from '../contexts/PersonalizationContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 /**
  * Personalized Home Screen
@@ -51,20 +52,22 @@ const PersonalizedHomeScreen = () => {
   const handleRefresh = async () => {
     setRefreshing(true);
     await refreshPersonalizedContent();
-    
+
     // Also refresh personalized data
     try {
       const userId = userProfile?.uid || 'default-user';
-      const response = await fetch(`https://us-central1-ai-sports-edge.cloudfunctions.net/personalizedRecommendations?userId=${userId}`);
+      const response = await fetch(
+        `https://us-central1-ai-sports-edge.cloudfunctions.net/personalizedRecommendations?userId=${userId}`
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         setPersonalizedData(data.data);
       }
     } catch (error) {
       console.error('Error refreshing personalized data:', error);
     }
-    
+
     setRefreshing(false);
   };
 
@@ -281,7 +284,7 @@ const PersonalizedHomeScreen = () => {
   const [personalizedData, setPersonalizedData] = useState({
     recommendedBets: [],
     upcomingGames: [],
-    news: []
+    news: [],
   });
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -290,14 +293,16 @@ const PersonalizedHomeScreen = () => {
     const loadPersonalizedData = async () => {
       try {
         setDataLoading(true);
-        
+
         // Get user ID from userProfile or use default
         const userId = userProfile?.uid || 'default-user';
-        
+
         // Fetch personalized data from Firebase function
-        const response = await fetch(`https://us-central1-ai-sports-edge.cloudfunctions.net/personalizedRecommendations?userId=${userId}`);
+        const response = await fetch(
+          `https://us-central1-ai-sports-edge.cloudfunctions.net/personalizedRecommendations?userId=${userId}`
+        );
         const data = await response.json();
-        
+
         if (data.success) {
           setPersonalizedData(data.data);
         } else {
@@ -309,7 +314,7 @@ const PersonalizedHomeScreen = () => {
         setPersonalizedData({
           recommendedBets: [],
           upcomingGames: [],
-          news: []
+          news: [],
         });
       } finally {
         setDataLoading(false);

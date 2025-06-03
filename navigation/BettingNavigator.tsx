@@ -1,7 +1,8 @@
-import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import BetSlipScreen from '../screens/BetSlipScreen';
+import React from 'react';
+
 import MobileCameraCapture from '../atomic/organisms/mobile/MobileCameraCapture';
+import BetSlipScreen from '../screens/BetSlipScreen';
 
 // Define the param list for type safety
 type BettingStackParamList = {

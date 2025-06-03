@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
+
 import { FAQQuestion, approveQuestion, rejectQuestion, editQuestion } from '../services/faqService';
 
 interface PendingQuestionItemProps {
@@ -20,9 +21,9 @@ interface PendingQuestionItemProps {
  * @param {PendingQuestionItemProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const PendingQuestionItem = ({ 
-  question, 
-  onQuestionUpdated 
+const PendingQuestionItem = ({
+  question,
+  onQuestionUpdated,
 }: PendingQuestionItemProps): JSX.Element => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedQuestion, setEditedQuestion] = useState(question.question);
@@ -77,30 +78,26 @@ const PendingQuestionItem = ({
   };
 
   const handleReject = async () => {
-    Alert.alert(
-      'Confirm Rejection',
-      'Are you sure you want to reject this question?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Reject', 
-          style: 'destructive',
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              await rejectQuestion(question.id!);
-              Alert.alert('Success', 'Question rejected');
-              onQuestionUpdated();
-            } catch (error) {
-              console.error('Error rejecting question:', error);
-              Alert.alert('Error', 'Failed to reject question');
-            } finally {
-              setIsLoading(false);
-            }
+    Alert.alert('Confirm Rejection', 'Are you sure you want to reject this question?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Reject',
+        style: 'destructive',
+        onPress: async () => {
+          setIsLoading(true);
+          try {
+            await rejectQuestion(question.id!);
+            Alert.alert('Success', 'Question rejected');
+            onQuestionUpdated();
+          } catch (error) {
+            console.error('Error rejecting question:', error);
+            Alert.alert('Error', 'Failed to reject question');
+          } finally {
+            setIsLoading(false);
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   return (
@@ -110,16 +107,12 @@ const PendingQuestionItem = ({
           <ActivityIndicator size="large" color="#3498db" />
         </View>
       )}
-      
+
       <View style={styles.header}>
-        <Text style={styles.submittedBy}>
-          Submitted by: {question.userEmail || 'Anonymous'}
-        </Text>
-        <Text style={styles.date}>
-          {question.createdAt?.toDate().toLocaleDateString()}
-        </Text>
+        <Text style={styles.submittedBy}>Submitted by: {question.userEmail || 'Anonymous'}</Text>
+        <Text style={styles.date}>{question.createdAt?.toDate().toLocaleDateString()}</Text>
       </View>
-      
+
       {isEditing ? (
         <View style={styles.editContainer}>
           <TextInput
@@ -130,16 +123,13 @@ const PendingQuestionItem = ({
             numberOfLines={3}
           />
           <View style={styles.editButtonsRow}>
-            <TouchableOpacity 
-              style={[styles.editButton, styles.cancelButton]} 
+            <TouchableOpacity
+              style={[styles.editButton, styles.cancelButton]}
               onPress={handleCancelEdit}
             >
               <Text style={styles.editButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.editButton} 
-              onPress={handleSaveEdit}
-            >
+            <TouchableOpacity style={styles.editButton} onPress={handleSaveEdit}>
               <Text style={styles.editButtonText}>Save</Text>
             </TouchableOpacity>
           </View>
@@ -147,15 +137,12 @@ const PendingQuestionItem = ({
       ) : (
         <View style={styles.questionContainer}>
           <Text style={styles.questionText}>{question.question}</Text>
-          <TouchableOpacity 
-            style={styles.editIconButton} 
-            onPress={handleEdit}
-          >
+          <TouchableOpacity style={styles.editIconButton} onPress={handleEdit}>
             <Text style={styles.editIcon}>✏️</Text>
           </TouchableOpacity>
         </View>
       )}
-      
+
       <TextInput
         style={styles.answerInput}
         placeholder="Write an answer..."
@@ -164,20 +151,13 @@ const PendingQuestionItem = ({
         multiline
         numberOfLines={4}
       />
-      
+
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity 
-          style={[styles.button, styles.rejectButton]} 
-          onPress={handleReject}
-        >
+        <TouchableOpacity style={[styles.button, styles.rejectButton]} onPress={handleReject}>
           <Text style={styles.buttonText}>Reject</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[
-            styles.button, 
-            styles.approveButton,
-            !answer.trim() && styles.disabledButton
-          ]} 
+        <TouchableOpacity
+          style={[styles.button, styles.approveButton, !answer.trim() && styles.disabledButton]}
           onPress={handleApprove}
           disabled={!answer.trim()}
         >

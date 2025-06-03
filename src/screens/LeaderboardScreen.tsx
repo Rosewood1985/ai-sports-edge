@@ -1,3 +1,15 @@
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  Timestamp,
+  QueryDocumentSnapshot,
+  DocumentData,
+} from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,21 +20,10 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { useTranslation } from '../i18n/mock';
-import { useTheme } from '../contexts/ThemeContext';
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-  Timestamp,
-  QueryDocumentSnapshot,
-  DocumentData
-} from 'firebase/firestore';
+
 import { firestore } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../i18n/mock';
 
 // Define time periods for filtering
 enum TimePeriod {
@@ -58,28 +59,28 @@ interface LeaderboardEntry {
 const LeaderboardScreen: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  
+
   // State
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>(TimePeriod.WEEK);
   const [sortOption, setSortOption] = useState<SortOption>(SortOption.CONFIDENCE);
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
-  
+
   // Fetch leaderboard data
   useEffect(() => {
     fetchLeaderboardData();
   }, [timePeriod, sortOption, selectedSport]);
-  
+
   // Fetch leaderboard data from Firestore
   const fetchLeaderboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Calculate date range based on time period
       const endDate = new Date();
       const startDate = new Date();
-      
+
       if (timePeriod === TimePeriod.WEEK) {
         startDate.setDate(startDate.getDate() - 7);
       } else if (timePeriod === TimePeriod.MONTH) {
@@ -88,11 +89,11 @@ const LeaderboardScreen: React.FC = () => {
         // All time - set to a year ago as default
         startDate.setFullYear(startDate.getFullYear() - 1);
       }
-      
+
       // Convert to Firestore timestamps
       const startTimestamp = Timestamp.fromDate(startDate);
       const endTimestamp = Timestamp.fromDate(endDate);
-      
+
       // Build query
       let predictionsQuery = query(
         collection(firestore, 'predictions'),
@@ -100,40 +101,28 @@ const LeaderboardScreen: React.FC = () => {
         where('date', '<=', endTimestamp),
         where('result', 'in', ['win', 'loss']) // Only include completed predictions
       );
-      
+
       // Add sport filter if selected
       if (selectedSport) {
-        predictionsQuery = query(
-          predictionsQuery,
-          where('sport', '==', selectedSport)
-        );
+        predictionsQuery = query(predictionsQuery, where('sport', '==', selectedSport));
       }
-      
+
       // Add sorting
       if (sortOption === SortOption.CONFIDENCE) {
-        predictionsQuery = query(
-          predictionsQuery,
-          orderBy('confidence', 'desc')
-        );
+        predictionsQuery = query(predictionsQuery, orderBy('confidence', 'desc'));
       } else {
-        predictionsQuery = query(
-          predictionsQuery,
-          orderBy('date', 'desc')
-        );
+        predictionsQuery = query(predictionsQuery, orderBy('date', 'desc'));
       }
-      
+
       // Limit to 50 results
-      predictionsQuery = query(
-        predictionsQuery,
-        limit(50)
-      );
-      
+      predictionsQuery = query(predictionsQuery, limit(50));
+
       // Execute query
       const querySnapshot = await getDocs(predictionsQuery);
-      
+
       // Process results
       const leaderboardEntries: LeaderboardEntry[] = [];
-      
+
       // Convert to array and add rank
       querySnapshot.docs.forEach((doc, index) => {
         const data = doc.data();
@@ -150,7 +139,7 @@ const LeaderboardScreen: React.FC = () => {
           rank: index + 1,
         });
       });
-      
+
       setEntries(leaderboardEntries);
     } catch (error) {
       console.error('Error fetching leaderboard data:', error);
@@ -158,7 +147,7 @@ const LeaderboardScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   // Render time period selector
   const renderTimePeriodSelector = () => {
     return (
@@ -167,7 +156,7 @@ const LeaderboardScreen: React.FC = () => {
           style={[
             styles.filterButton,
             timePeriod === TimePeriod.WEEK && styles.filterButtonActive,
-            { borderColor: theme.border }
+            { borderColor: theme.border },
           ]}
           onPress={() => setTimePeriod(TimePeriod.WEEK)}
         >
@@ -175,18 +164,18 @@ const LeaderboardScreen: React.FC = () => {
             style={[
               styles.filterButtonText,
               timePeriod === TimePeriod.WEEK && styles.filterButtonTextActive,
-              { color: timePeriod === TimePeriod.WEEK ? theme.primary : theme.textSecondary }
+              { color: timePeriod === TimePeriod.WEEK ? theme.primary : theme.textSecondary },
             ]}
           >
             {t('Last 7 Days')}
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.filterButton,
             timePeriod === TimePeriod.MONTH && styles.filterButtonActive,
-            { borderColor: theme.border }
+            { borderColor: theme.border },
           ]}
           onPress={() => setTimePeriod(TimePeriod.MONTH)}
         >
@@ -194,18 +183,18 @@ const LeaderboardScreen: React.FC = () => {
             style={[
               styles.filterButtonText,
               timePeriod === TimePeriod.MONTH && styles.filterButtonTextActive,
-              { color: timePeriod === TimePeriod.MONTH ? theme.primary : theme.textSecondary }
+              { color: timePeriod === TimePeriod.MONTH ? theme.primary : theme.textSecondary },
             ]}
           >
             {t('Last 30 Days')}
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.filterButton,
             timePeriod === TimePeriod.ALL && styles.filterButtonActive,
-            { borderColor: theme.border }
+            { borderColor: theme.border },
           ]}
           onPress={() => setTimePeriod(TimePeriod.ALL)}
         >
@@ -213,7 +202,7 @@ const LeaderboardScreen: React.FC = () => {
             style={[
               styles.filterButtonText,
               timePeriod === TimePeriod.ALL && styles.filterButtonTextActive,
-              { color: timePeriod === TimePeriod.ALL ? theme.primary : theme.textSecondary }
+              { color: timePeriod === TimePeriod.ALL ? theme.primary : theme.textSecondary },
             ]}
           >
             {t('All Time')}
@@ -222,15 +211,13 @@ const LeaderboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render sort options
   const renderSortOptions = () => {
     return (
       <View style={styles.sortContainer}>
-        <Text style={[styles.sortLabel, { color: theme.textSecondary }]}>
-          {t('Sort by')}:
-        </Text>
-        
+        <Text style={[styles.sortLabel, { color: theme.textSecondary }]}>{t('Sort by')}:</Text>
+
         <TouchableOpacity
           style={styles.sortButton}
           onPress={() => setSortOption(SortOption.CONFIDENCE)}
@@ -239,7 +226,7 @@ const LeaderboardScreen: React.FC = () => {
             style={[
               styles.sortButtonText,
               sortOption === SortOption.CONFIDENCE && styles.sortButtonTextActive,
-              { color: sortOption === SortOption.CONFIDENCE ? theme.primary : theme.textSecondary }
+              { color: sortOption === SortOption.CONFIDENCE ? theme.primary : theme.textSecondary },
             ]}
           >
             {t('Confidence Level')}
@@ -248,16 +235,13 @@ const LeaderboardScreen: React.FC = () => {
             <MaterialIcons name="check" size={16} color={theme.primary} />
           )}
         </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={styles.sortButton}
-          onPress={() => setSortOption(SortOption.DATE)}
-        >
+
+        <TouchableOpacity style={styles.sortButton} onPress={() => setSortOption(SortOption.DATE)}>
           <Text
             style={[
               styles.sortButtonText,
               sortOption === SortOption.DATE && styles.sortButtonTextActive,
-              { color: sortOption === SortOption.DATE ? theme.primary : theme.textSecondary }
+              { color: sortOption === SortOption.DATE ? theme.primary : theme.textSecondary },
             ]}
           >
             {t('Date')}
@@ -269,7 +253,7 @@ const LeaderboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render leaderboard entry
   const renderLeaderboardEntry = ({ item }: { item: LeaderboardEntry }) => {
     return (
@@ -277,7 +261,7 @@ const LeaderboardScreen: React.FC = () => {
         <View style={styles.rankContainer}>
           <Text style={[styles.rankText, { color: theme.text }]}>{item.rank}</Text>
         </View>
-        
+
         <View style={styles.gameContainer}>
           <Text style={[styles.gameText, { color: theme.text }]}>
             {item.teamA} vs {item.teamB}
@@ -286,13 +270,13 @@ const LeaderboardScreen: React.FC = () => {
             {item.sport} - {item.league}
           </Text>
         </View>
-        
+
         <View style={styles.confidenceContainer}>
           <Text style={[styles.confidenceText, { color: theme.text }]}>
             {Math.round(item.confidence)}%
           </Text>
         </View>
-        
+
         <View style={styles.resultContainer}>
           {item.result === 'win' ? (
             <View style={[styles.resultBadge, { backgroundColor: theme.success }]}>
@@ -309,18 +293,16 @@ const LeaderboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: theme.text }]}>
-          {t('Leaderboard')}
-        </Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>{t('Leaderboard')}</Text>
       </View>
-      
+
       {renderTimePeriodSelector()}
       {renderSortOptions()}
-      
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.primary} />
@@ -329,7 +311,7 @@ const LeaderboardScreen: React.FC = () => {
         <FlatList
           data={entries}
           renderItem={renderLeaderboardEntry}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>

@@ -1,11 +1,12 @@
 import React from 'react';
+
 import { EnhancedWidget } from './EnhancedWidget';
-import { MetricCard } from '../metrics/MetricCard';
-import { HorizontalBarChart } from '../charts/HorizontalBarChart';
-import { LineChart } from '../charts/LineChart';
 import { Tooltip } from '../../../components/ui/Tooltip';
 import { useSystemHealthData, SystemHealthData } from '../../../services/adminDashboardService';
 import { DataStatusIndicator } from '../atoms/DataStatusIndicator';
+import { HorizontalBarChart } from '../charts/HorizontalBarChart';
+import { LineChart } from '../charts/LineChart';
+import { MetricCard } from '../metrics/MetricCard';
 
 // Process status badge component
 interface ProcessStatusBadgeProps {
@@ -110,7 +111,7 @@ export function SystemHealthMonitoringWidget() {
           <a href="/admin/system-health" className="text-blue-500 hover:underline text-sm">
             View detailed system health metrics
           </a>
-          <DataStatusIndicator 
+          <DataStatusIndicator
             isRealTime={isRealTime || false}
             lastUpdated={new Date().toISOString()}
             connectionStatus={!error}

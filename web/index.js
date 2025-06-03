@@ -1,60 +1,54 @@
-import "../../src/config/firebase";
+import '../../src/config/firebase';
 
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
-import "./i18n"; // Import i18n configuration
-import App from "./App";
-import "./styles/global.css";
-import "./styles/fix-overlay.css"; // Import the fix for overlay issues
-import "./styles/notification-banner.css"; // Import notification banner styles
-import "./styles/onboarding.css"; // Import onboarding and feature tour styles
-import "./styles/enhanced-homepage.css"; // Import enhanced homepage styles
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
+import { BrowserRouter as Router } from 'react-router-dom';
+
+import './i18n'; // Import i18n configuration
+import App from './App';
+import './styles/global.css';
+import './styles/fix-overlay.css'; // Import the fix for overlay issues
+import './styles/notification-banner.css'; // Import notification banner styles
+import './styles/onboarding.css'; // Import onboarding and feature tour styles
+import './styles/enhanced-homepage.css'; // Import enhanced homepage styles
 
 // Initialize required global services
-console.log("[Web] Initializing cross-platform services");
+console.log('[Web] Initializing cross-platform services');
 
 // Cross-platform sync service for managing purchased odds
 window.crossPlatformSyncService = {
-  hasPurchasedOdds: (gameId) => {
+  hasPurchasedOdds: gameId => {
     try {
-      const purchases = JSON.parse(
-        localStorage.getItem("purchasedOdds") || "[]"
-      );
+      const purchases = JSON.parse(localStorage.getItem('purchasedOdds') || '[]');
       console.log(
-        "[CrossPlatformSync] Checking if game is purchased:",
+        '[CrossPlatformSync] Checking if game is purchased:',
         gameId,
         purchases.includes(gameId)
       );
       return purchases.includes(gameId);
     } catch (error) {
-      console.error(
-        "[CrossPlatformSync] Error checking purchased odds:",
-        error
-      );
+      console.error('[CrossPlatformSync] Error checking purchased odds:', error);
       return false;
     }
   },
-  recordOddsPurchase: (gameId) => {
+  recordOddsPurchase: gameId => {
     try {
-      const purchases = JSON.parse(
-        localStorage.getItem("purchasedOdds") || "[]"
-      );
+      const purchases = JSON.parse(localStorage.getItem('purchasedOdds') || '[]');
       if (!purchases.includes(gameId)) {
         purchases.push(gameId);
-        localStorage.setItem("purchasedOdds", JSON.stringify(purchases));
-        console.log("[CrossPlatformSync] Recorded purchase for game:", gameId);
+        localStorage.setItem('purchasedOdds', JSON.stringify(purchases));
+        console.log('[CrossPlatformSync] Recorded purchase for game:', gameId);
 
         // Dispatch event to notify other components
         window.dispatchEvent(
-          new CustomEvent("purchasedOddsUpdated", {
-            detail: { purchasedOdds: purchases.map((id) => ({ gameId: id })) },
+          new CustomEvent('purchasedOddsUpdated', {
+            detail: { purchasedOdds: purchases.map(id => ({ gameId: id })) },
           })
         );
       }
     } catch (error) {
-      console.error("[CrossPlatformSync] Error recording purchase:", error);
+      console.error('[CrossPlatformSync] Error recording purchase:', error);
     }
   },
 };
@@ -87,27 +81,27 @@ window.bettingAffiliateService = {
     console.log(`[Affiliate] Conversion:`, { type, value, userId });
     // In a real implementation, this would send data to an affiliate tracking service
   },
-  getButtonColors: (teamId) => {
+  getButtonColors: teamId => {
     // Simple implementation that returns default colors
     return {
-      backgroundColor: "#0066ff",
-      textColor: "#ffffff",
-      glowColor: "#4d94ff",
-      hoverColor: "#0052cc",
+      backgroundColor: '#0066ff',
+      textColor: '#ffffff',
+      glowColor: '#4d94ff',
+      hoverColor: '#0052cc',
     };
   },
 };
 
 // Add global handler for odds button clicks
 window.handleOddsButtonClick = function (gameId) {
-  console.log("[Web] Odds button clicked for game:", gameId);
+  console.log('[Web] Odds button clicked for game:', gameId);
   // Redirect to the appropriate page or show a modal
   if (gameId) {
     window.location.href = `/odds/${gameId}`;
   }
 };
 
-const container = document.getElementById("root");
+const container = document.getElementById('root');
 const root = createRoot(container);
 
 root.render(

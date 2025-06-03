@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -9,25 +11,24 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { Container, Grid } from '../atomic/molecules/layout/ResponsiveLayout';
-import { DeviceType, getDeviceType, responsiveSpacing } from '../utils/responsiveUtils';
-import { useResponsiveStyles } from '../hooks/useResponsiveStyles';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { UFCEvent, UFCFighter, UFCFight } from '../types/ufc';
-import { ufcService } from '../services/ufcService';
 // import { analyticsService } from '../services/analyticsService';
-import LoadingIndicator from '../components/LoadingIndicator';
-import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import ErrorMessage from '../components/ErrorMessage';
+import LoadingIndicator from '../components/LoadingIndicator';
 import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { useResponsiveStyles } from '../hooks/useResponsiveStyles';
+import { rewardsService } from '../services/rewardsService';
+import { ufcService } from '../services/ufcService';
+import { UFCEvent, UFCFighter, UFCFight } from '../types/ufc';
+import { DeviceType, getDeviceType, responsiveSpacing } from '../utils/responsiveUtils';
 // Cast auth to any to avoid type errors
 const firebaseAuth = auth as any;
-import { rewardsService } from '../services/rewardsService';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
-import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
-import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 // Key for storing favorite fighters
 const FAVORITE_FIGHTERS_KEY = 'favorite_fighters';
@@ -795,7 +796,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
           keyExtractor={item => item.id}
           contentContainerStyle={[styles.eventsList, responsiveStyles.eventsList]}
           showsHorizontalScrollIndicator={false}
-          accessible={true}
+          accessible
           accessibilityLabel="UFC events list"
           accessibilityHint="Scroll horizontally to view all events"
         />
@@ -803,7 +804,7 @@ const UFCScreen: React.FC<UFCScreenProps> = ({ navigation }) => {
         {selectedEvent && (
           <ScrollView
             style={styles.eventDetailsContainer}
-            accessible={true}
+            accessible
             accessibilityLabel="Event details"
           >
             <AccessibleThemedText

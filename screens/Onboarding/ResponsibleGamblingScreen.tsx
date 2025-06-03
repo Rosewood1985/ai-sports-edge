@@ -1,18 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
 import { useLanguage } from '../../../atomic/organisms/i18n/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 
 type ResponsibleGamblingScreenNavigationProp = StackNavigationProp<
   OnboardingStackParamList,
@@ -25,137 +22,102 @@ const ResponsibleGamblingScreen = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [acknowledged, setAcknowledged] = useState(false);
-  
+
   const handleContinue = async () => {
     if (!user) {
-      Alert.alert(
-        t('common.error'),
-        t('common.not_authenticated'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('common.not_authenticated'), [{ text: t('common.ok') }]);
       return;
     }
-    
+
     if (!acknowledged) {
-      Alert.alert(
-        t('responsible_gambling.alert_title'),
-        t('responsible_gambling.alert_message'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('responsible_gambling.alert_title'), t('responsible_gambling.alert_message'), [
+        { text: t('common.ok') },
+      ]);
       return;
     }
-    
+
     try {
       // Save acknowledgment to user profile
       await saveVerificationData(user.uid, 'responsibleGamblingAcknowledgment', {
-        acknowledged: true
+        acknowledged: true,
       });
-      
+
       // Navigate to next screen
       navigation.navigate('LiabilityWaiver');
     } catch (error) {
       console.error('Error saving responsible gambling acknowledgment:', error);
-      Alert.alert(
-        t('common.error'),
-        t('responsible_gambling.save_error'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('responsible_gambling.save_error'), [
+        { text: t('common.ok') },
+      ]);
     }
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          {t('responsible_gambling.title')}
-        </ThemedText>
-        
-        <ThemedText style={styles.description}>
-          {t('responsible_gambling.description')}
-        </ThemedText>
-        
+        <ThemedText style={styles.title}>{t('responsible_gambling.title')}</ThemedText>
+
+        <ThemedText style={styles.description}>{t('responsible_gambling.description')}</ThemedText>
+
         <TouchableOpacity
           style={styles.checkboxContainer}
           onPress={() => setAcknowledged(!acknowledged)}
-          accessible={true}
+          accessible
           accessibilityLabel={t('responsible_gambling.acknowledgment')}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: acknowledged }}
         >
-          <View style={[
-            styles.checkbox,
-            { borderColor: colors.text }
-          ]}>
-            {acknowledged && (
-              <Ionicons
-                name="checkmark"
-                size={18}
-                color={colors.primary}
-              />
-            )}
+          <View style={[styles.checkbox, { borderColor: colors.text }]}>
+            {acknowledged && <Ionicons name="checkmark" size={18} color={colors.primary} />}
           </View>
           <ThemedText style={styles.checkboxLabel}>
             {t('responsible_gambling.acknowledgment')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <View style={styles.tipsContainer}>
-          <ThemedText style={styles.tipsTitle}>
-            {t('responsible_gambling.tips_title')}
-          </ThemedText>
-          
+          <ThemedText style={styles.tipsTitle}>{t('responsible_gambling.tips_title')}</ThemedText>
+
           <View style={styles.tipItem}>
             <Ionicons name="time-outline" size={20} color={colors.text} />
-            <ThemedText style={styles.tipText}>
-              {t('responsible_gambling.tip_1')}
-            </ThemedText>
+            <ThemedText style={styles.tipText}>{t('responsible_gambling.tip_1')}</ThemedText>
           </View>
-          
+
           <View style={styles.tipItem}>
             <Ionicons name="trending-down-outline" size={20} color={colors.text} />
-            <ThemedText style={styles.tipText}>
-              {t('responsible_gambling.tip_2')}
-            </ThemedText>
+            <ThemedText style={styles.tipText}>{t('responsible_gambling.tip_2')}</ThemedText>
           </View>
-          
+
           <View style={styles.tipItem}>
             <Ionicons name="happy-outline" size={20} color={colors.text} />
-            <ThemedText style={styles.tipText}>
-              {t('responsible_gambling.tip_3')}
-            </ThemedText>
+            <ThemedText style={styles.tipText}>{t('responsible_gambling.tip_3')}</ThemedText>
           </View>
-          
+
           <View style={styles.tipItem}>
             <Ionicons name="calendar-outline" size={20} color={colors.text} />
-            <ThemedText style={styles.tipText}>
-              {t('responsible_gambling.tip_4')}
-            </ThemedText>
+            <ThemedText style={styles.tipText}>{t('responsible_gambling.tip_4')}</ThemedText>
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={[
             styles.continueButton,
             {
               backgroundColor: colors.primary,
-              opacity: acknowledged ? 1 : 0.5
-            }
+              opacity: acknowledged ? 1 : 0.5,
+            },
           ]}
           onPress={handleContinue}
           disabled={!acknowledged}
-          accessible={true}
+          accessible
           accessibilityLabel={t('common.continue')}
           accessibilityRole="button"
           accessibilityState={{ disabled: !acknowledged }}
         >
-          <Text style={styles.continueButtonText}>
-            {t('common.continue')}
-          </Text>
+          <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
         </TouchableOpacity>
-        
-        <ThemedText style={styles.helpline}>
-          {t('responsible_gambling.helpline')}
-        </ThemedText>
+
+        <ThemedText style={styles.helpline}>{t('responsible_gambling.helpline')}</ThemedText>
       </View>
     </ThemedView>
   );

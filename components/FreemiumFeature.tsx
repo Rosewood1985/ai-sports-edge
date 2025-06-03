@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -5,13 +7,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  ImageBackground
+  ImageBackground,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+
 import { auth } from '../config/firebase';
-import { hasPremiumAccess, hasViewedAdToday, markAdAsViewed } from '../services/subscriptionService';
 import { useTheme } from '../contexts/ThemeContext';
+import {
+  hasPremiumAccess,
+  hasViewedAdToday,
+  markAdAsViewed,
+} from '../services/subscriptionService';
 
 interface FreemiumFeatureProps {
   children: React.ReactNode;
@@ -37,7 +42,7 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
   adRequired = false,
   timeBasedUnlock = false,
   unlockTime = 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-  onAdRequested
+  onAdRequested,
 }) => {
   const [hasPremium, setHasPremium] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -50,14 +55,14 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
   // Check if user has premium access
   useEffect(() => {
     let isMounted = true; // Flag to prevent state updates after unmount
-    
+
     const checkPremiumAccess = async () => {
       if (!isMounted) return;
-      
+
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           if (isMounted) {
             setHasPremium(false);
@@ -65,10 +70,10 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
           }
           return;
         }
-        
+
         const premium = await hasPremiumAccess(userId);
         if (isMounted) setHasPremium(premium);
-        
+
         // Check if user has viewed an ad today (for free features)
         if (adRequired && !premium) {
           const viewedAd = await hasViewedAdToday(userId);
@@ -77,7 +82,7 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
             setShowAdButton(!viewedAd);
           }
         }
-        
+
         // Check time-based unlock if applicable
         if (timeBasedUnlock && !premium) {
           // In a real app, this would check when the feature was last used
@@ -95,43 +100,43 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
         if (isMounted) setLoading(false);
       }
     };
-    
+
     checkPremiumAccess();
-    
+
     // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       // Only check premium if auth state actually changed to a logged in user
       if (user && isMounted) {
         checkPremiumAccess();
       }
     });
-    
+
     return () => {
       isMounted = false; // Prevent state updates after unmount
       unsubscribe();
     };
   }, [adRequired, timeBasedUnlock, unlockTime]);
-  
+
   // Format time remaining
   const formatTimeRemaining = () => {
     const hours = Math.floor(timeRemaining / (60 * 60 * 1000));
     const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000));
     return `${hours}h ${minutes}m`;
   };
-  
+
   // Navigate to subscription screen
   const handleUpgrade = () => {
     // @ts-ignore - Navigation typing issue
     navigation.navigate('Subscription');
   };
-  
+
   // Handle ad viewing
   const handleViewAd = async () => {
     if (!onAdRequested) return;
-    
+
     try {
       const adViewed = await onAdRequested();
-      
+
       if (adViewed) {
         const userId = auth.currentUser?.uid;
         if (userId) {
@@ -144,7 +149,7 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
       console.error('Error viewing ad:', error);
     }
   };
-  
+
   // If loading, show loading indicator
   if (loading) {
     return (
@@ -153,12 +158,12 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
       </View>
     );
   }
-  
+
   // If user has premium access, show the children
   if (hasPremium) {
     return <>{children}</>;
   }
-  
+
   // Handle different types of freemium content
   switch (type) {
     case 'free':
@@ -181,7 +186,7 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
           </View>
         );
       }
-      
+
       // Time-based unlock
       if (timeBasedUnlock && timeRemaining > 0) {
         return (
@@ -199,30 +204,24 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
           </View>
         );
       }
-      
+
       // Free content available
       return <>{children}</>;
-      
+
     case 'blurred':
       // Blurred content with upgrade prompt
       return (
         <View style={styles.blurContainer}>
-          <View style={styles.contentContainer}>
-            {children}
-          </View>
-          <View style={[
-            styles.blurOverlay,
-            { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)' }
-          ]}>
-            {freeContent && (
-              <View style={styles.freeContentContainer}>
-                {freeContent}
-              </View>
-            )}
+          <View style={styles.contentContainer}>{children}</View>
+          <View
+            style={[
+              styles.blurOverlay,
+              { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)' },
+            ]}
+          >
+            {freeContent && <View style={styles.freeContentContainer}>{freeContent}</View>}
             <Ionicons name="lock-closed" size={32} color={colors.primary} />
-            <Text style={[styles.message, { color: colors.text }]}>
-              {message}
-            </Text>
+            <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: colors.primary }]}
               onPress={handleUpgrade}
@@ -232,21 +231,21 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
           </View>
         </View>
       );
-      
+
     case 'teaser':
       // Teaser content with partial visibility
       return (
         <View style={styles.teaserContainer}>
           <View style={styles.teaserContent}>
             {children}
-            <View style={[
-              styles.teaserOverlay,
-              { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.7)' : 'rgba(255, 255, 255, 0.7)' }
-            ]}>
+            <View
+              style={[
+                styles.teaserOverlay,
+                { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.7)' : 'rgba(255, 255, 255, 0.7)' },
+              ]}
+            >
               <Ionicons name="lock-closed" size={32} color={colors.primary} />
-              <Text style={[styles.message, { color: colors.text }]}>
-                {message}
-              </Text>
+              <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
               <TouchableOpacity
                 style={[styles.button, { backgroundColor: colors.primary }]}
                 onPress={handleUpgrade}
@@ -257,16 +256,14 @@ const FreemiumFeature: React.FC<FreemiumFeatureProps> = ({
           </View>
         </View>
       );
-      
+
     case 'locked':
     default:
       // Fully locked content
       return (
         <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
           <Ionicons name="lock-closed" size={32} color={colors.primary} />
-          <Text style={[styles.message, { color: colors.text }]}>
-            {message}
-          </Text>
+          <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: colors.primary }]}
             onPress={handleUpgrade}

@@ -1,19 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
   TextInput,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+
 import CachedPlayerImage from './CachedPlayerImage';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 import { usePersonalization } from '../contexts/PersonalizationContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Player data interface
 interface Player {
@@ -32,13 +33,13 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
   const { colors, isDark } = useTheme();
   const { t } = useI18n();
   const { preferences, updatePreferences } = usePersonalization();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<Player[]>([]);
   const [favoritePlayers, setFavoritePlayers] = useState<Player[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('all');
-  
+
   // Sports list
   const sportsList = [
     { key: 'all', name: t('personalization.favoritePlayers.allSports') },
@@ -50,33 +51,35 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
     { key: 'soccer_epl', name: t('sports.soccer_epl') },
     { key: 'soccer_mls', name: t('sports.soccer_mls') },
     { key: 'soccer_womens_nwsl', name: t('sports.soccer_womens_nwsl') },
-    { key: 'soccer_laliga', name: t('sports.soccer_laliga') }
+    { key: 'soccer_laliga', name: t('sports.soccer_laliga') },
   ];
-  
+
   // Load favorite players from preferences
   useEffect(() => {
     if (preferences.favoritePlayers) {
       setFavoritePlayers(preferences.favoritePlayers);
     }
   }, [preferences.favoritePlayers]);
-  
+
   // Search for players
   const searchPlayers = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
       return;
     }
-    
+
     setIsSearching(true);
-    
+
     try {
       // Filter by sport if needed
       const sportFilter = selectedSport !== 'all' ? `&sport=${selectedSport}` : '';
-      
+
       // Call the player search API
-      const response = await fetch(`/api/players/search?q=${encodeURIComponent(query)}${sportFilter}`);
+      const response = await fetch(
+        `/api/players/search?q=${encodeURIComponent(query)}${sportFilter}`
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         setSearchResults(data.players);
       } else {
@@ -90,7 +93,7 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
       setIsSearching(false);
     }
   };
-  
+
   // Add player to favorites
   const addToFavorites = (player: Player) => {
     // Check if player is already in favorites
@@ -102,17 +105,17 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
       );
       return;
     }
-    
+
     // Add to favorites
     const updatedFavorites = [...favoritePlayers, player];
     setFavoritePlayers(updatedFavorites);
-    
+
     // Update preferences
     updatePreferences({
       ...preferences,
-      favoritePlayers: updatedFavorites
+      favoritePlayers: updatedFavorites,
     });
-    
+
     // Show confirmation
     Alert.alert(
       t('personalization.favoritePlayers.added.title'),
@@ -120,14 +123,14 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
       [{ text: t('personalization.alerts.ok') }]
     );
   };
-  
+
   // Remove player from favorites
   const removeFromFavorites = (playerId: string) => {
     // Find player name for alert
     const player = favoritePlayers.find(p => p.id === playerId);
-    
+
     if (!player) return;
-    
+
     // Confirm removal
     Alert.alert(
       t('personalization.favoritePlayers.remove.title'),
@@ -135,7 +138,7 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
       [
         {
           text: t('personalization.alerts.cancel'),
-          style: 'cancel'
+          style: 'cancel',
         },
         {
           text: t('personalization.favoritePlayers.remove.confirm'),
@@ -144,26 +147,28 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
             // Remove from favorites
             const updatedFavorites = favoritePlayers.filter(p => p.id !== playerId);
             setFavoritePlayers(updatedFavorites);
-            
+
             // Update preferences
             updatePreferences({
               ...preferences,
-              favoritePlayers: updatedFavorites
+              favoritePlayers: updatedFavorites,
             });
-          }
-        }
+          },
+        },
       ]
     );
   };
-  
+
   // Render player item in search results
   const renderSearchResultItem = ({ item }: { item: Player }) => (
     <TouchableOpacity
       style={[styles.playerItem, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
       onPress={() => addToFavorites(item)}
-      accessible={true}
+      accessible
       accessibilityRole="button"
-      accessibilityLabel={t('personalization.favoritePlayers.accessibility.addPlayer', { playerName: item.name })}
+      accessibilityLabel={t('personalization.favoritePlayers.accessibility.addPlayer', {
+        playerName: item.name,
+      })}
       accessibilityHint={t('personalization.favoritePlayers.accessibility.addPlayerHint')}
     >
       <CachedPlayerImage
@@ -182,15 +187,17 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
       <Ionicons name="add-circle" size={24} color={colors.primary} />
     </TouchableOpacity>
   );
-  
+
   // Render favorite player item
   const renderFavoritePlayerItem = ({ item }: { item: Player }) => (
     <TouchableOpacity
       style={[styles.playerItem, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
       onPress={() => removeFromFavorites(item.id)}
-      accessible={true}
+      accessible
       accessibilityRole="button"
-      accessibilityLabel={t('personalization.favoritePlayers.accessibility.removePlayer', { playerName: item.name })}
+      accessibilityLabel={t('personalization.favoritePlayers.accessibility.removePlayer', {
+        playerName: item.name,
+      })}
       accessibilityHint={t('personalization.favoritePlayers.accessibility.removePlayerHint')}
     >
       <CachedPlayerImage
@@ -209,31 +216,31 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
       <Ionicons name="close-circle" size={24} color="#FF6347" />
     </TouchableOpacity>
   );
-  
+
   // Render sport filter item
-  const renderSportFilterItem = ({ item }: { item: { key: string, name: string } }) => (
+  const renderSportFilterItem = ({ item }: { item: { key: string; name: string } }) => (
     <TouchableOpacity
       style={[
         styles.sportFilterItem,
-        selectedSport === item.key && [styles.sportFilterItemActive, { backgroundColor: colors.primary }]
+        selectedSport === item.key && [
+          styles.sportFilterItemActive,
+          { backgroundColor: colors.primary },
+        ],
       ]}
       onPress={() => setSelectedSport(item.key)}
-      accessible={true}
+      accessible
       accessibilityRole="radio"
       accessibilityState={{ checked: selectedSport === item.key }}
       accessibilityLabel={item.name}
     >
       <Text
-        style={[
-          styles.sportFilterText,
-          selectedSport === item.key && styles.sportFilterTextActive
-        ]}
+        style={[styles.sportFilterText, selectedSport === item.key && styles.sportFilterTextActive]}
       >
         {item.name}
       </Text>
     </TouchableOpacity>
   );
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -244,7 +251,7 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
           <TouchableOpacity
             onPress={onClose}
             style={styles.closeButton}
-            accessible={true}
+            accessible
             accessibilityRole="button"
             accessibilityLabel={t('personalization.accessibility.closeButton')}
           >
@@ -252,20 +259,20 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
           </TouchableOpacity>
         )}
       </View>
-      
+
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
         {t('personalization.favoritePlayers.filterBySport')}
       </Text>
-      
+
       <FlatList
         data={sportsList}
         renderItem={renderSportFilterItem}
         keyExtractor={item => item.key}
-        horizontal={true}
+        horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.sportFilterList}
       />
-      
+
       <View style={[styles.searchContainer, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}>
         <Ionicons name="search" size={20} color={colors.text} style={styles.searchIcon} />
         <TextInput
@@ -277,7 +284,7 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
             setSearchQuery(text);
             searchPlayers(text);
           }}
-          accessible={true}
+          accessible
           accessibilityLabel={t('personalization.favoritePlayers.accessibility.searchInput')}
           accessibilityHint={t('personalization.favoritePlayers.accessibility.searchInputHint')}
         />
@@ -287,7 +294,7 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
               setSearchQuery('');
               setSearchResults([]);
             }}
-            accessible={true}
+            accessible
             accessibilityRole="button"
             accessibilityLabel={t('personalization.favoritePlayers.accessibility.clearSearch')}
           >
@@ -295,7 +302,7 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
           </TouchableOpacity>
         )}
       </View>
-      
+
       {isSearching && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color={colors.primary} />
@@ -304,13 +311,13 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
           </Text>
         </View>
       )}
-      
+
       {searchQuery.length > 0 && !isSearching && (
         <>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {t('personalization.favoritePlayers.searchResults')}
           </Text>
-          
+
           {searchResults.length > 0 ? (
             <FlatList
               data={searchResults}
@@ -325,15 +332,15 @@ const FavoritePlayerPicker: React.FC<FavoritePlayerPickerProps> = ({ onClose }) 
           )}
         </>
       )}
-      
+
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
         {t('personalization.favoritePlayers.yourFavorites')}
       </Text>
-      
+
       {favoritePlayers.length > 0 ? (
         <FlatList
-          data={favoritePlayers.filter(player => 
-            selectedSport === 'all' || player.sport === selectedSport
+          data={favoritePlayers.filter(
+            player => selectedSport === 'all' || player.sport === selectedSport
           )}
           renderItem={renderFavoritePlayerItem}
           keyExtractor={item => item.id}
@@ -447,7 +454,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 16,
     fontSize: 14,
-  }
+  },
 });
 
 export default FavoritePlayerPicker;

@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { personalizationService, UserPreferences, Player } from '../services/personalizationService';
+
 import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
+import {
+  personalizationService,
+  UserPreferences,
+  Player,
+} from '../services/personalizationService';
 
 // Context interface
 interface PersonalizationContextType {
@@ -18,8 +23,12 @@ interface PersonalizationContextType {
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   hideSportsbook: (sportsbook: 'draftkings' | 'fanduel') => Promise<void>;
   showSportsbook: (sportsbook: 'draftkings' | 'fanduel') => Promise<void>;
-  setNotificationPreferences: (preferences: Partial<UserPreferences['notificationPreferences']>) => Promise<void>;
-  setDisplayPreferences: (preferences: Partial<UserPreferences['displayPreferences']>) => Promise<void>;
+  setNotificationPreferences: (
+    preferences: Partial<UserPreferences['notificationPreferences']>
+  ) => Promise<void>;
+  setDisplayPreferences: (
+    preferences: Partial<UserPreferences['displayPreferences']>
+  ) => Promise<void>;
   resetPreferences: () => Promise<void>;
 }
 
@@ -41,7 +50,7 @@ const PersonalizationContext = createContext<PersonalizationContextType>({
   showSportsbook: async () => {},
   setNotificationPreferences: async () => {},
   setDisplayPreferences: async () => {},
-  resetPreferences: async () => {}
+  resetPreferences: async () => {},
 });
 
 // Provider props interface
@@ -53,20 +62,20 @@ interface PersonalizationProviderProps {
 export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = ({ children }) => {
   const [preferences, setPreferences] = useState<UserPreferences>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   // Initialize personalization service and load preferences
   useEffect(() => {
     const initializePersonalization = async () => {
       try {
         setIsLoading(true);
-        
+
         // Initialize personalization service
         await personalizationService.initialize();
-        
+
         // Load user preferences
         const userPreferences = await personalizationService.getUserPreferences();
         setPreferences(userPreferences);
-        
+
         // Track personalization loaded event
         await analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
           event_name: 'personalization_loaded',
@@ -74,7 +83,7 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
           has_default_sportsbook: !!userPreferences.defaultSportsbook,
           favorite_teams_count: userPreferences.favoriteTeams?.length || 0,
           favorite_leagues_count: userPreferences.favoriteLeagues?.length || 0,
-          favorite_players_count: userPreferences.favoritePlayers?.length || 0
+          favorite_players_count: userPreferences.favoritePlayers?.length || 0,
         });
       } catch (error) {
         console.error('Error initializing personalization:', error);
@@ -82,135 +91,137 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
         setIsLoading(false);
       }
     };
-    
+
     initializePersonalization();
   }, []);
-  
+
   // Set default sport
   const setDefaultSport = async (sport: string) => {
     try {
       await personalizationService.setDefaultSport(sport);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        defaultSport: sport
+        defaultSport: sport,
       }));
     } catch (error) {
       console.error('Error setting default sport:', error);
     }
   };
-  
+
   // Set default sportsbook
   const setDefaultSportsbook = async (sportsbook: 'draftkings' | 'fanduel' | null) => {
     try {
       await personalizationService.setDefaultSportsbook(sportsbook);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        defaultSportsbook: sportsbook
+        defaultSportsbook: sportsbook,
       }));
     } catch (error) {
       console.error('Error setting default sportsbook:', error);
     }
   };
-  
+
   // Add favorite team
   const addFavoriteTeam = async (team: string) => {
     try {
       await personalizationService.addFavoriteTeam(team);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoriteTeams: [...(prev.favoriteTeams || []), team]
+        favoriteTeams: [...(prev.favoriteTeams || []), team],
       }));
     } catch (error) {
       console.error('Error adding favorite team:', error);
     }
   };
-  
+
   // Remove favorite team
   const removeFavoriteTeam = async (team: string) => {
     try {
       await personalizationService.removeFavoriteTeam(team);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoriteTeams: (prev.favoriteTeams || []).filter(t => t !== team)
+        favoriteTeams: (prev.favoriteTeams || []).filter(t => t !== team),
       }));
     } catch (error) {
       console.error('Error removing favorite team:', error);
     }
   };
-  
+
   // Add favorite league
   const addFavoriteLeague = async (league: string) => {
     try {
       await personalizationService.addFavoriteLeague(league);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoriteLeagues: [...(prev.favoriteLeagues || []), league]
+        favoriteLeagues: [...(prev.favoriteLeagues || []), league],
       }));
     } catch (error) {
       console.error('Error adding favorite league:', error);
     }
   };
-  
+
   // Remove favorite league
   const removeFavoriteLeague = async (league: string) => {
     try {
       await personalizationService.removeFavoriteLeague(league);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoriteLeagues: (prev.favoriteLeagues || []).filter(l => l !== league)
+        favoriteLeagues: (prev.favoriteLeagues || []).filter(l => l !== league),
       }));
     } catch (error) {
       console.error('Error removing favorite league:', error);
     }
   };
-  
+
   // Hide sportsbook
   const hideSportsbook = async (sportsbook: 'draftkings' | 'fanduel') => {
     try {
       await personalizationService.hideSportsbook(sportsbook);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        hiddenSportsbooks: [...(prev.hiddenSportsbooks || []), sportsbook]
+        hiddenSportsbooks: [...(prev.hiddenSportsbooks || []), sportsbook],
       }));
     } catch (error) {
       console.error('Error hiding sportsbook:', error);
     }
   };
-  
+
   // Show sportsbook
   const showSportsbook = async (sportsbook: 'draftkings' | 'fanduel') => {
     try {
       await personalizationService.showSportsbook(sportsbook);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        hiddenSportsbooks: (prev.hiddenSportsbooks || []).filter(s => s !== sportsbook)
+        hiddenSportsbooks: (prev.hiddenSportsbooks || []).filter(s => s !== sportsbook),
       }));
     } catch (error) {
       console.error('Error showing sportsbook:', error);
     }
   };
-  
+
   // Set notification preferences
-  const setNotificationPreferences = async (notificationPrefs: Partial<UserPreferences['notificationPreferences']>) => {
+  const setNotificationPreferences = async (
+    notificationPrefs: Partial<UserPreferences['notificationPreferences']>
+  ) => {
     try {
       await personalizationService.setNotificationPreferences(notificationPrefs);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
@@ -219,21 +230,23 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
             oddsMovements: true,
             gameStart: true,
             gameEnd: true,
-            specialOffers: true
+            specialOffers: true,
           }),
-          ...notificationPrefs
-        }
+          ...notificationPrefs,
+        },
       }));
     } catch (error) {
       console.error('Error setting notification preferences:', error);
     }
   };
-  
+
   // Set display preferences
-  const setDisplayPreferences = async (displayPrefs: Partial<UserPreferences['displayPreferences']>) => {
+  const setDisplayPreferences = async (
+    displayPrefs: Partial<UserPreferences['displayPreferences']>
+  ) => {
     try {
       await personalizationService.setDisplayPreferences(displayPrefs);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
@@ -241,21 +254,21 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
           ...(prev.displayPreferences || {
             darkMode: false,
             compactView: false,
-            showBetterOddsHighlight: true
+            showBetterOddsHighlight: true,
           }),
-          ...displayPrefs
-        }
+          ...displayPrefs,
+        },
       }));
     } catch (error) {
       console.error('Error setting display preferences:', error);
     }
   };
-  
+
   // Reset preferences
   const resetPreferences = async () => {
     try {
       await personalizationService.resetPreferences();
-      
+
       // Load updated preferences
       const userPreferences = await personalizationService.getUserPreferences();
       setPreferences(userPreferences);
@@ -263,61 +276,61 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
       console.error('Error resetting preferences:', error);
     }
   };
-  
+
   // Add favorite player
   const addFavoritePlayer = async (player: Player) => {
     try {
       await personalizationService.addFavoritePlayer(player);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoritePlayers: [...(prev.favoritePlayers || []), player]
+        favoritePlayers: [...(prev.favoritePlayers || []), player],
       }));
     } catch (error) {
       console.error('Error adding favorite player:', error);
     }
   };
-  
+
   // Remove favorite player
   const removeFavoritePlayer = async (playerId: string) => {
     try {
       await personalizationService.removeFavoritePlayer(playerId);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoritePlayers: (prev.favoritePlayers || []).filter(p => p.id !== playerId)
+        favoritePlayers: (prev.favoritePlayers || []).filter(p => p.id !== playerId),
       }));
     } catch (error) {
       console.error('Error removing favorite player:', error);
     }
   };
-  
+
   // Update favorite players
   const updateFavoritePlayers = async (players: Player[]) => {
     try {
       await personalizationService.updateFavoritePlayers(players);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        favoritePlayers: players
+        favoritePlayers: players,
       }));
     } catch (error) {
       console.error('Error updating favorite players:', error);
     }
   };
-  
+
   // Update preferences directly
   const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
     try {
       await personalizationService.setUserPreferences(newPreferences);
-      
+
       // Update local state
       setPreferences(prev => ({
         ...prev,
-        ...newPreferences
+        ...newPreferences,
       }));
     } catch (error) {
       console.error('Error updating preferences:', error);
@@ -342,9 +355,9 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
     showSportsbook,
     setNotificationPreferences,
     setDisplayPreferences,
-    resetPreferences
+    resetPreferences,
   };
-  
+
   return (
     <PersonalizationContext.Provider value={contextValue}>
       {children}

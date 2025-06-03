@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import { AIMLService } from '../services/aimlService';
 import {
   MLModel,
@@ -32,42 +33,51 @@ export function useMLModels(filters?: MLFilters) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadModels = useCallback(async (page = 1, limit = 20) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await AIMLService.getModels(filters, page, limit);
-      setModels(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load models');
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+  const loadModels = useCallback(
+    async (page = 1, limit = 20) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await AIMLService.getModels(filters, page, limit);
+        setModels(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load models');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters]
+  );
 
-  const deployModel = useCallback(async (modelId: string) => {
-    try {
-      await AIMLService.deployModel(modelId);
-      // Refresh models after deployment
-      await loadModels();
-      return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to deploy model');
-      return false;
-    }
-  }, [loadModels]);
+  const deployModel = useCallback(
+    async (modelId: string) => {
+      try {
+        await AIMLService.deployModel(modelId);
+        // Refresh models after deployment
+        await loadModels();
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to deploy model');
+        return false;
+      }
+    },
+    [loadModels]
+  );
 
-  const retireModel = useCallback(async (modelId: string) => {
-    try {
-      await AIMLService.retireModel(modelId);
-      // Refresh models after retirement
-      await loadModels();
-      return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to retire model');
-      return false;
-    }
-  }, [loadModels]);
+  const retireModel = useCallback(
+    async (modelId: string) => {
+      try {
+        await AIMLService.retireModel(modelId);
+        // Refresh models after retirement
+        await loadModels();
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to retire model');
+        return false;
+      }
+    },
+    [loadModels]
+  );
 
   useEffect(() => {
     loadModels();
@@ -132,11 +142,7 @@ export function usePredictions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPredictions = useCallback(async (
-    filters?: PredictionFilters,
-    page = 1,
-    limit = 20
-  ) => {
+  const loadPredictions = useCallback(async (filters?: PredictionFilters, page = 1, limit = 20) => {
     try {
       setLoading(true);
       setError(null);
@@ -164,22 +170,22 @@ export function usePredictions() {
     }
   }, []);
 
-  const makeBatchPredictions = useCallback(async (
-    modelId: string,
-    inputs: Array<Record<string, any>>
-  ) => {
-    try {
-      setError(null);
-      const response = await AIMLService.makeBatchPredictions({
-        modelId,
-        inputs,
-      });
-      return response;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to make batch predictions');
-      return null;
-    }
-  }, []);
+  const makeBatchPredictions = useCallback(
+    async (modelId: string, inputs: Record<string, any>[]) => {
+      try {
+        setError(null);
+        const response = await AIMLService.makeBatchPredictions({
+          modelId,
+          inputs,
+        });
+        return response;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to make batch predictions');
+        return null;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     loadPredictions();
@@ -220,28 +226,27 @@ export function useForecasting() {
     }
   }, []);
 
-  const generateForecast = useCallback(async (
-    metric: string,
-    horizon: number,
-    confidence = 0.9
-  ) => {
-    try {
-      setError(null);
-      const forecast = await AIMLService.generateForecast({
-        metric,
-        horizon,
-        confidence,
-        includeHistory: true,
-      });
-      
-      // Add to existing forecasts
-      setForecasts(prev => [forecast, ...prev.filter(f => f.metric !== metric)]);
-      return forecast;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate forecast');
-      return null;
-    }
-  }, []);
+  const generateForecast = useCallback(
+    async (metric: string, horizon: number, confidence = 0.9) => {
+      try {
+        setError(null);
+        const forecast = await AIMLService.generateForecast({
+          metric,
+          horizon,
+          confidence,
+          includeHistory: true,
+        });
+
+        // Add to existing forecasts
+        setForecasts(prev => [forecast, ...prev.filter(f => f.metric !== metric)]);
+        return forecast;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to generate forecast');
+        return null;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     loadForecasts();
@@ -268,18 +273,21 @@ export function useInsights(filters?: InsightFilters) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadInsights = useCallback(async (page = 1, limit = 20) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await AIMLService.getInsights(filters, page, limit);
-      setInsights(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load insights');
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+  const loadInsights = useCallback(
+    async (page = 1, limit = 20) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await AIMLService.getInsights(filters, page, limit);
+        setInsights(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load insights');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters]
+  );
 
   const markAsRead = useCallback(async (insightId: string, userId: string) => {
     try {
@@ -337,24 +345,22 @@ export function useRecommendations() {
     }
   }, []);
 
-  const provideFeedback = useCallback(async (
-    recommendationId: string,
-    feedback: 'helpful' | 'notHelpful' | 'irrelevant'
-  ) => {
-    try {
-      await AIMLService.provideRecommendationFeedback(recommendationId, feedback);
-      // Update local state
-      setRecommendations(prev =>
-        prev.map(rec =>
-          rec.id === recommendationId ? { ...rec, feedback } : rec
-        )
-      );
-      return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to provide feedback');
-      return false;
-    }
-  }, []);
+  const provideFeedback = useCallback(
+    async (recommendationId: string, feedback: 'helpful' | 'notHelpful' | 'irrelevant') => {
+      try {
+        await AIMLService.provideRecommendationFeedback(recommendationId, feedback);
+        // Update local state
+        setRecommendations(prev =>
+          prev.map(rec => (rec.id === recommendationId ? { ...rec, feedback } : rec))
+        );
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to provide feedback');
+        return false;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     loadRecommendations();
@@ -534,10 +540,11 @@ export function useAIMLDashboard() {
   const stats = {
     totalModels: models?.total || 0,
     deployedModels: models?.items.filter(m => m.status === 'deployed').length || 0,
-    activeInsights: insights?.items.filter(i => !(i.readBy?.length)).length || 0,
+    activeInsights: insights?.items.filter(i => !i.readBy?.length).length || 0,
     criticalAnomalies: anomalies.filter(a => !a.resolved && a.severity === 'critical').length,
     runningJobs: jobs.filter(j => j.status === 'running').length,
-    avgModelAccuracy: models?.items.reduce((sum, m) => sum + m.accuracy, 0) / (models?.items.length || 1) || 0,
+    avgModelAccuracy:
+      models?.items.reduce((sum, m) => sum + m.accuracy, 0) / (models?.items.length || 1) || 0,
   };
 
   return {

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../../ui/Button';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
-import { Card } from '../../ui/Card';
+
+import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
 import { AdminDashboardService } from '../../../services/adminDashboardService';
 import { ScheduledReport } from '../../../types/reporting';
-import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
 
 /**
  * Component for displaying and managing scheduled reports
@@ -110,11 +111,11 @@ export function ScheduledReportsList() {
     const now = new Date();
     const diffMs = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
     if (diffDays < 7) return `In ${diffDays} days`;
-    
+
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -124,9 +125,8 @@ export function ScheduledReportsList() {
   };
 
   // Filter reports based on status
-  const filteredReports = filter === 'all' 
-    ? reports 
-    : reports.filter(report => report.status === filter);
+  const filteredReports =
+    filter === 'all' ? reports : reports.filter(report => report.status === filter);
 
   if (loading) {
     return (
@@ -164,9 +164,7 @@ export function ScheduledReportsList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Scheduled Reports
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Scheduled Reports</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Automated report generation and delivery
           </p>
@@ -220,7 +218,9 @@ export function ScheduledReportsList() {
                       </p>
                     )}
                   </div>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(report.status)}`}>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(report.status)}`}
+                  >
                     <span className="mr-1">{getStatusIcon(report.status)}</span>
                     {report.status}
                   </span>
@@ -233,11 +233,13 @@ export function ScheduledReportsList() {
                     <div className="flex items-center mt-1">
                       <span className="mr-1">{getFrequencyIcon(report.schedule.frequency)}</span>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        {report.schedule.frequency.charAt(0).toUpperCase() + report.schedule.frequency.slice(1)}
+                        {report.schedule.frequency.charAt(0).toUpperCase() +
+                          report.schedule.frequency.slice(1)}
                       </span>
                     </div>
                     <div className="text-gray-500 dark:text-gray-400 mt-1">
-                      {report.schedule.hour || '00'}:{(report.schedule.minute || 0).toString().padStart(2, '0')}
+                      {report.schedule.hour || '00'}:
+                      {(report.schedule.minute || 0).toString().padStart(2, '0')}
                     </div>
                   </div>
                   <div>
@@ -249,7 +251,8 @@ export function ScheduledReportsList() {
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Recipients:</span>
                     <div className="font-medium text-gray-900 dark:text-white mt-1">
-                      {report.recipients.length} recipient{report.recipients.length !== 1 ? 's' : ''}
+                      {report.recipients.length} recipient
+                      {report.recipients.length !== 1 ? 's' : ''}
                     </div>
                   </div>
                   <div>
@@ -337,21 +340,26 @@ export function ScheduledReportsList() {
                       <span className="mr-2">{getFrequencyIcon(report.schedule.frequency)}</span>
                       <div>
                         <div className="text-sm text-gray-900 dark:text-white">
-                          {report.schedule.frequency.charAt(0).toUpperCase() + report.schedule.frequency.slice(1)}
+                          {report.schedule.frequency.charAt(0).toUpperCase() +
+                            report.schedule.frequency.slice(1)}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {report.schedule.hour || '00'}:{(report.schedule.minute || 0).toString().padStart(2, '0')}
+                          {report.schedule.hour || '00'}:
+                          {(report.schedule.minute || 0).toString().padStart(2, '0')}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {report.recipients.length} recipient{report.recipients.length !== 1 ? 's' : ''}
+                      {report.recipients.length} recipient
+                      {report.recipients.length !== 1 ? 's' : ''}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(report.status)}`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(report.status)}`}
+                    >
                       <span className="mr-1">{getStatusIcon(report.status)}</span>
                       {report.status}
                     </span>

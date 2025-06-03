@@ -1,3 +1,4 @@
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,12 +8,12 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { LanguageSelector } from '../atomic/molecules';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 
 // Dynamic featured games from real sports API
 const useFeaturedGames = () => {

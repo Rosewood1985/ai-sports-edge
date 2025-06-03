@@ -1,11 +1,12 @@
+import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { Button } from 'react-native-paper';
-import { useTheme } from '../contexts/ThemeContext';
-import ValueBetsCard from '../components/ml-sports-edge/ValueBetsCard';
-import PredictionsTable from '../components/ml-sports-edge/PredictionsTable';
+
 import ModelPerformance from '../components/ml-sports-edge/ModelPerformance';
+import PredictionsTable from '../components/ml-sports-edge/PredictionsTable';
+import ValueBetsCard from '../components/ml-sports-edge/ValueBetsCard';
+import { useTheme } from '../contexts/ThemeContext';
 import MLSportsEdgeService from '../services/ml-sports-edge/MLSportsEdgeService';
 
 const sports = [
@@ -16,15 +17,9 @@ const sports = [
 ];
 
 const leagues = {
-  basketball: [
-    { label: 'NBA', value: 'nba' },
-  ],
-  football: [
-    { label: 'NFL', value: 'nfl' },
-  ],
-  baseball: [
-    { label: 'MLB', value: 'mlb' },
-  ],
+  basketball: [{ label: 'NBA', value: 'nba' }],
+  football: [{ label: 'NFL', value: 'nfl' }],
+  baseball: [{ label: 'MLB', value: 'mlb' }],
   soccer: [
     { label: 'English Premier League', value: 'epl' },
     { label: 'La Liga', value: 'laliga' },
@@ -52,9 +47,9 @@ const MLSportsEdgeScreen = () => {
     try {
       setLoading(true);
       setMessage('Running ML pipeline...');
-      
+
       const result = await MLSportsEdgeService.runPipeline(sport, league);
-      
+
       setMessage('ML pipeline completed successfully!');
     } catch (error) {
       setMessage('Error running ML pipeline. Please try again.');
@@ -82,7 +77,7 @@ const MLSportsEdgeScreen = () => {
             style={[styles.picker, { color: theme.colors.text }]}
             dropdownIconColor={theme.colors.text}
           >
-            {sports.map((item) => (
+            {sports.map(item => (
               <Picker.Item key={item.value} label={item.label} value={item.value} />
             ))}
           </Picker>
@@ -96,7 +91,7 @@ const MLSportsEdgeScreen = () => {
             style={[styles.picker, { color: theme.colors.text }]}
             dropdownIconColor={theme.colors.text}
           >
-            {leagues[sport as keyof typeof leagues].map((item) => (
+            {leagues[sport as keyof typeof leagues].map(item => (
               <Picker.Item key={item.value} label={item.label} value={item.value} />
             ))}
           </Picker>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
+
+import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
 import { useReportTemplates } from '../../../hooks/useReporting';
 import { ReportTemplate, ReportType } from '../../../types/reporting';
-import { EnhancedWidget } from '../widgets/EnhancedWidget';
 import { Button } from '../../ui/Button';
-import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
+import { EnhancedWidget } from '../widgets/EnhancedWidget';
 
 export interface ReportBuilderProps {
   initialTemplate?: ReportTemplate | null;
@@ -133,13 +134,16 @@ export function ReportBuilder({
   };
 
   // Drag and drop handlers
-  const handleDragStart = useCallback((e: React.DragEvent, widgetId: string) => {
-    if (isMobile) return; // Disable drag on mobile
-    
-    setDraggedWidget(widgetId);
-    e.dataTransfer.setData('text/plain', widgetId);
-    e.dataTransfer.effectAllowed = 'copy';
-  }, [isMobile]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent, widgetId: string) => {
+      if (isMobile) return; // Disable drag on mobile
+
+      setDraggedWidget(widgetId);
+      e.dataTransfer.setData('text/plain', widgetId);
+      e.dataTransfer.effectAllowed = 'copy';
+    },
+    [isMobile]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -152,17 +156,20 @@ export function ReportBuilder({
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const widgetId = e.dataTransfer.getData('text/plain');
-    
-    if (widgetId && !selectedWidgets.includes(widgetId)) {
-      setSelectedWidgets(prev => [...prev, widgetId]);
-    }
-    
-    setDraggedWidget(null);
-    setIsDragOver(false);
-  }, [selectedWidgets]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const widgetId = e.dataTransfer.getData('text/plain');
+
+      if (widgetId && !selectedWidgets.includes(widgetId)) {
+        setSelectedWidgets(prev => [...prev, widgetId]);
+      }
+
+      setDraggedWidget(null);
+      setIsDragOver(false);
+    },
+    [selectedWidgets]
+  );
 
   const handleDragEnd = useCallback(() => {
     setDraggedWidget(null);
@@ -171,72 +178,75 @@ export function ReportBuilder({
 
   // Enhanced widget data with categories and descriptions
   const availableWidgets = [
-    { 
-      id: 'bet-slip-performance', 
+    {
+      id: 'bet-slip-performance',
       name: 'Bet Slip Performance',
       category: 'Analytics',
       description: 'OCR success rates, processing times, and error analysis',
-      icon: '🎯'
+      icon: '🎯',
     },
-    { 
-      id: 'subscription-analytics', 
+    {
+      id: 'subscription-analytics',
       name: 'Subscription Analytics',
       category: 'Business',
       description: 'Revenue forecasting, churn analysis, and growth metrics',
-      icon: '📊'
+      icon: '📊',
     },
-    { 
-      id: 'system-health', 
+    {
+      id: 'system-health',
       name: 'System Health',
       category: 'Technical',
       description: 'API performance, database metrics, and infrastructure costs',
-      icon: '⚙️'
+      icon: '⚙️',
     },
-    { 
-      id: 'conversion-funnel', 
+    {
+      id: 'conversion-funnel',
       name: 'Conversion Funnel',
       category: 'Business',
       description: 'User journey analysis and conversion optimization',
-      icon: '📈'
+      icon: '📈',
     },
-    { 
-      id: 'fraud-detection', 
+    {
+      id: 'fraud-detection',
       name: 'Fraud Detection',
       category: 'Security',
       description: 'Risk analysis and fraud prevention metrics',
-      icon: '🔒'
+      icon: '🔒',
     },
     {
       id: 'user-engagement',
       name: 'User Engagement',
       category: 'Analytics',
       description: 'Session duration, feature usage, and retention metrics',
-      icon: '👥'
+      icon: '👥',
     },
     {
       id: 'revenue-breakdown',
       name: 'Revenue Breakdown',
       category: 'Business',
       description: 'Revenue by source, plan type, and geographic region',
-      icon: '💰'
+      icon: '💰',
     },
     {
       id: 'performance-metrics',
       name: 'Performance Metrics',
       category: 'Technical',
       description: 'Response times, throughput, and error rates',
-      icon: '⚡'
-    }
+      icon: '⚡',
+    },
   ];
 
   // Group widgets by category
-  const widgetsByCategory = availableWidgets.reduce((acc, widget) => {
-    if (!acc[widget.category]) {
-      acc[widget.category] = [];
-    }
-    acc[widget.category].push(widget);
-    return acc;
-  }, {} as Record<string, typeof availableWidgets>);
+  const widgetsByCategory = availableWidgets.reduce(
+    (acc, widget) => {
+      if (!acc[widget.category]) {
+        acc[widget.category] = [];
+      }
+      acc[widget.category].push(widget);
+      return acc;
+    },
+    {} as Record<string, typeof availableWidgets>
+  );
 
   return (
     <EnhancedWidget
@@ -319,18 +329,22 @@ export function ReportBuilder({
         {/* Enhanced Widgets Selection with Drag & Drop */}
         <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Report Widgets</h3>
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
+              Report Widgets
+            </h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-              {isMobile ? 'Tap to select widgets' : 'Drag widgets to the selected area or click to toggle'}
+              {isMobile
+                ? 'Tap to select widgets'
+                : 'Drag widgets to the selected area or click to toggle'}
             </p>
           </div>
           <div className="px-4 py-5 sm:p-6">
             {/* Selected Widgets Drop Zone */}
             {!isMobile && (
-              <div 
+              <div
                 className={`mb-6 p-4 border-2 border-dashed rounded-lg transition-colors min-h-[120px] ${
-                  isDragOver 
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                  isDragOver
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                 }`}
                 onDragOver={handleDragOver}
@@ -358,7 +372,7 @@ export function ReportBuilder({
                             {widget.name}
                             <button
                               type="button"
-                              onClick={(e) => {
+                              onClick={e => {
                                 e.stopPropagation();
                                 handleWidgetToggle(widgetId);
                               }}
@@ -384,9 +398,11 @@ export function ReportBuilder({
                   </span>
                   <span className="text-gray-500 dark:text-gray-400">({widgets.length})</span>
                 </h4>
-                <div className={`grid gap-3 ${
-                  isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                }`}>
+                <div
+                  className={`grid gap-3 ${
+                    isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                  }`}
+                >
                   {widgets.map(widget => (
                     <div
                       key={widget.id}
@@ -413,7 +429,7 @@ export function ReportBuilder({
                                   checked={selectedWidgets.includes(widget.id)}
                                   onChange={() => {}}
                                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:border-gray-600 mr-2"
-                                  onClick={(e) => e.stopPropagation()}
+                                  onClick={e => e.stopPropagation()}
                                 />
                                 <h5 className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                   {widget.name}
@@ -426,9 +442,7 @@ export function ReportBuilder({
                           </div>
                           {!isMobile && (
                             <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <span className="text-xs text-gray-400 dark:text-gray-500">
-                                ☰
-                              </span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">☰</span>
                             </div>
                           )}
                         </div>
@@ -548,17 +562,15 @@ export function ReportBuilder({
         </div>
 
         {/* Mobile-optimized Actions */}
-        <div className={`flex ${isMobile ? 'flex-col-reverse space-y-reverse space-y-3' : 'justify-end space-x-3'}`}>
-          <Button 
-            onClick={handleCancel} 
-            variant="secondary"
-            className={isMobile ? 'w-full' : ''}
-          >
+        <div
+          className={`flex ${isMobile ? 'flex-col-reverse space-y-reverse space-y-3' : 'justify-end space-x-3'}`}
+        >
+          <Button onClick={handleCancel} variant="secondary" className={isMobile ? 'w-full' : ''}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleSave} 
-            variant="primary" 
+          <Button
+            onClick={handleSave}
+            variant="primary"
             isLoading={isLoading}
             className={`${isMobile ? 'w-full' : ''} bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700`}
           >

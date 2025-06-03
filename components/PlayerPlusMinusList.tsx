@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import { ThemedText } from './ThemedText';
-import PlayerPlusMinusCard from './PlayerPlusMinusCard';
-import { PlayerPlusMinus, getGamePlusMinus, listenToPlayerPlusMinus } from '../services/playerStatsService';
-import { useThemeColor } from '../hooks/useThemeColor';
+
 import EmptyState from './EmptyState';
 import ErrorMessage from './ErrorMessage';
+import PlayerPlusMinusCard from './PlayerPlusMinusCard';
+import { ThemedText } from './ThemedText';
+import { useThemeColor } from '../hooks/useThemeColor';
+import {
+  PlayerPlusMinus,
+  getGamePlusMinus,
+  listenToPlayerPlusMinus,
+} from '../services/playerStatsService';
 
 interface PlayerPlusMinusListProps {
   gameId: string;
@@ -19,7 +24,7 @@ interface PlayerPlusMinusListProps {
 const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
   gameId,
   title = 'Player Plus/Minus',
-  onPlayerPress
+  onPlayerPress,
 }) => {
   const [players, setPlayers] = useState<PlayerPlusMinus[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,11 +33,11 @@ const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
 
   useEffect(() => {
     let isMounted = true; // Flag to prevent state updates after unmount
-    
+
     // Initial fetch of player data
     const fetchPlayers = async () => {
       if (!isMounted) return;
-      
+
       try {
         if (isMounted) setLoading(true);
         const playerData = await getGamePlusMinus(gameId);
@@ -51,7 +56,7 @@ const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
     fetchPlayers();
 
     // Set up real-time listener for updates
-    const unsubscribe = listenToPlayerPlusMinus(gameId, (updatedPlayers) => {
+    const unsubscribe = listenToPlayerPlusMinus(gameId, updatedPlayers => {
       if (isMounted) setPlayers(updatedPlayers);
     });
 
@@ -87,9 +92,7 @@ const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
     return (
       <View style={[styles.container, { backgroundColor }]}>
         <ThemedText style={styles.title}>{title}</ThemedText>
-        <EmptyState
-          message="No player statistics available. Check back during or after the game."
-        />
+        <EmptyState message="No player statistics available. Check back during or after the game." />
       </View>
     );
   }
@@ -97,13 +100,13 @@ const PlayerPlusMinusList: React.FC<PlayerPlusMinusListProps> = ({
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <ThemedText style={styles.title}>{title}</ThemedText>
-      
+
       <FlatList
         data={sortedPlayers}
-        keyExtractor={(item) => `${item.gameId}_${item.playerId}`}
+        keyExtractor={item => `${item.gameId}_${item.playerId}`}
         renderItem={({ item }) => (
-          <PlayerPlusMinusCard 
-            playerData={item} 
+          <PlayerPlusMinusCard
+            playerData={item}
             onPress={onPlayerPress ? () => onPlayerPress(item) : undefined}
           />
         )}

@@ -1,6 +1,7 @@
 import React, { ReactNode, useState, useEffect } from 'react';
-import { Sidebar } from './Sidebar';
+
 import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 import { useCrossPlatform } from '../../hooks/useCrossPlatform';
 
 interface AdminLayoutProps {
@@ -21,7 +22,7 @@ const MobileTabNavigation: React.FC<{ currentSection: string }> = ({ currentSect
           { id: 'analytics', label: 'Analytics', icon: '📈' },
           { id: 'users', label: 'Users', icon: '👥' },
           { id: 'reports', label: 'Reports', icon: '📋' },
-        ].map((tab) => (
+        ].map(tab => (
           <button
             key={tab.id}
             className={`flex flex-col items-center py-2 px-1 text-xs ${
@@ -43,7 +44,7 @@ const MobileTabNavigation: React.FC<{ currentSection: string }> = ({ currentSect
 const CrossPlatformLoader: React.FC = () => (
   <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
     <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
       <p className="text-gray-600 dark:text-gray-400">Loading admin dashboard...</p>
     </div>
   </div>
@@ -52,16 +53,22 @@ const CrossPlatformLoader: React.FC = () => (
 /**
  * Enhanced Cross-Platform Admin Layout
  */
-export function AdminLayout({ children, title, description, showBackButton, onBack }: AdminLayoutProps) {
+export function AdminLayout({
+  children,
+  title,
+  description,
+  showBackButton,
+  onBack,
+}: AdminLayoutProps) {
   const { isMobile } = useCrossPlatform();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const useTabNavigation = isMobile;
   const showFullSidebar = !isMobile;
-  
+
   // Simplified auth state - in a real app this would connect to your auth service
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
-  
+
   const [currentSection, setCurrentSection] = useState('dashboard');
 
   const pageTitle = title ? `${title} | AI Sports Edge Admin` : 'AI Sports Edge Admin';
@@ -101,26 +108,23 @@ export function AdminLayout({ children, title, description, showBackButton, onBa
 
   return (
     <>
-
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Mobile-optimized header */}
-        <Header 
+        <Header
           showMenuButton={isMobile}
           onMenuClick={() => setSidebarOpen(!sidebarOpen)}
           showBackButton={showBackButton && isMobile}
           onBack={onBack}
         />
-        
+
         <div className="flex">
           {/* Desktop sidebar or mobile overlay */}
-          {showFullSidebar && (
-            <Sidebar />
-          )}
-          
+          {showFullSidebar && <Sidebar />}
+
           {/* Mobile sidebar overlay */}
           {isMobile && sidebarOpen && (
             <>
-              <div 
+              <div
                 className="fixed inset-0 bg-black bg-opacity-50 z-40"
                 onClick={() => setSidebarOpen(false)}
               />
@@ -129,11 +133,13 @@ export function AdminLayout({ children, title, description, showBackButton, onBa
               </div>
             </>
           )}
-          
+
           {/* Main content */}
-          <main className={`flex-1 transition-all duration-200 ${
-            isMobile ? 'p-4 pb-20' : 'p-6'
-          } ${showFullSidebar && !isMobile ? 'ml-0' : ''}`}>
+          <main
+            className={`flex-1 transition-all duration-200 ${
+              isMobile ? 'p-4 pb-20' : 'p-6'
+            } ${showFullSidebar && !isMobile ? 'ml-0' : ''}`}
+          >
             {/* Mobile-optimized header */}
             {title && (
               <div className={`mb-6 ${isMobile ? 'mb-4' : ''}`}>
@@ -147,15 +153,19 @@ export function AdminLayout({ children, title, description, showBackButton, onBa
                     </button>
                   )}
                   <div>
-                    <h1 className={`font-semibold text-gray-900 dark:text-white ${
-                      isMobile ? 'text-xl' : 'text-2xl'
-                    }`}>
+                    <h1
+                      className={`font-semibold text-gray-900 dark:text-white ${
+                        isMobile ? 'text-xl' : 'text-2xl'
+                      }`}
+                    >
                       {title}
                     </h1>
                     {description && (
-                      <p className={`mt-1 text-gray-500 dark:text-gray-400 ${
-                        isMobile ? 'text-xs' : 'text-sm'
-                      }`}>
+                      <p
+                        className={`mt-1 text-gray-500 dark:text-gray-400 ${
+                          isMobile ? 'text-xs' : 'text-sm'
+                        }`}
+                      >
                         {description}
                       </p>
                     )}
@@ -163,18 +173,14 @@ export function AdminLayout({ children, title, description, showBackButton, onBa
                 </div>
               </div>
             )}
-            
+
             {/* Responsive content container */}
-            <div className={isMobile ? 'space-y-4' : 'space-y-6'}>
-              {children}
-            </div>
+            <div className={isMobile ? 'space-y-4' : 'space-y-6'}>{children}</div>
           </main>
         </div>
-        
+
         {/* Mobile tab navigation */}
-        {useTabNavigation && (
-          <MobileTabNavigation currentSection={currentSection} />
-        )}
+        {useTabNavigation && <MobileTabNavigation currentSection={currentSection} />}
       </div>
     </>
   );

@@ -1,32 +1,39 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, SafeAreaView, Linking, ScrollView } from 'react-native';
-import { useSearch } from '../hooks/useSearch';
+
 import SearchBar from '../components/search/SearchBar';
 import SearchResults from '../components/search/SearchResults';
-import { SearchFilters, NewsSearchResult, TeamSearchResult, PlayerSearchResult, OddsSearchResult } from '../services/searchService';
+import { useSearch } from '../hooks/useSearch';
+import {
+  SearchFilters,
+  NewsSearchResult,
+  TeamSearchResult,
+  PlayerSearchResult,
+  OddsSearchResult,
+} from '../services/searchService';
 
 /**
  * SearchScreen component for searching content
  */
 const SearchScreen: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
-  
-  const { 
-    query, 
-    setQuery, 
-    filters, 
-    setFilters, 
-    newsResults, 
-    teamsResults, 
-    playersResults, 
-    oddsResults, 
+
+  const {
+    query,
+    setQuery,
+    filters,
+    setFilters,
+    newsResults,
+    teamsResults,
+    playersResults,
+    oddsResults,
     totalResults,
     isLoading,
-    search
+    search,
   } = useSearch({
     initialFilters: {
-      contentTypes: ['news', 'teams', 'players', 'odds']
-    }
+      contentTypes: ['news', 'teams', 'players', 'odds'],
+    },
   });
 
   // Handle search
@@ -75,11 +82,11 @@ const SearchScreen: React.FC = () => {
         <SearchBar
           onSearch={handleSearch}
           placeholder="Search sports, teams, players..."
-          showHistory={true}
+          showHistory
           autoFocus={false}
         />
       </View>
-      
+
       <ScrollView style={styles.content}>
         <SearchResults
           isLoading={isLoading}

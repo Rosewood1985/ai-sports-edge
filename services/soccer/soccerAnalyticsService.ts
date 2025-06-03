@@ -1,6 +1,14 @@
-import * as admin from 'firebase-admin';
 import * as Sentry from '@sentry/node';
-import { SoccerMatch, SoccerTeam, SoccerPlayer, TeamStats, PlayerStats, TacticalFormation } from './soccerInterfaces';
+import * as admin from 'firebase-admin';
+
+import {
+  SoccerMatch,
+  SoccerTeam,
+  SoccerPlayer,
+  TeamStats,
+  PlayerStats,
+  TacticalFormation,
+} from './soccerInterfaces';
 
 interface ExpectedGoalsModel {
   xG: number;
@@ -166,7 +174,7 @@ export class SoccerAnalyticsService {
   async analyzeMatch(matchId: string): Promise<MatchPrediction> {
     const transaction = Sentry.startTransaction({
       name: 'soccer-match-analysis',
-      op: 'analytics'
+      op: 'analytics',
     });
 
     try {
@@ -177,12 +185,12 @@ export class SoccerAnalyticsService {
 
       const [homeTeamStats, awayTeamStats] = await Promise.all([
         this.getTeamStats(match.homeTeam.teamId, match.competition),
-        this.getTeamStats(match.awayTeam.teamId, match.competition)
+        this.getTeamStats(match.awayTeam.teamId, match.competition),
       ]);
 
       const [homeForm, awayForm] = await Promise.all([
         this.analyzeForm(match.homeTeam.teamId, match.competition),
-        this.analyzeForm(match.awayTeam.teamId, match.competition)
+        this.analyzeForm(match.awayTeam.teamId, match.competition),
       ]);
 
       const headToHead = await this.analyzeHeadToHead(
@@ -214,10 +222,9 @@ export class SoccerAnalyticsService {
       );
 
       await this.storePrediction(matchId, prediction);
-      
+
       transaction.setStatus('ok');
       return prediction;
-
     } catch (error) {
       transaction.setStatus('internal_error');
       Sentry.captureException(error);
@@ -229,7 +236,7 @@ export class SoccerAnalyticsService {
 
   private async getMatchData(matchId: string): Promise<SoccerMatch | null> {
     const matchDoc = await this.db.collection('soccer_matches').doc(matchId).get();
-    return matchDoc.exists ? matchDoc.data() as SoccerMatch : null;
+    return matchDoc.exists ? (matchDoc.data() as SoccerMatch) : null;
   }
 
   private async getTeamStats(teamId: string, competition: string): Promise<TeamStats> {
@@ -256,15 +263,17 @@ export class SoccerAnalyticsService {
 
     const teamMatches = recentMatches.docs
       .map(doc => doc.data() as SoccerMatch)
-      .filter(match => 
-        match.homeTeam.teamId === teamId || match.awayTeam.teamId === teamId
-      );
+      .filter(match => match.homeTeam.teamId === teamId || match.awayTeam.teamId === teamId);
 
     const last5 = teamMatches.slice(0, 5);
     const last10 = teamMatches;
 
     const analyzeGames = (games: SoccerMatch[]) => {
-      let wins = 0, draws = 0, losses = 0, goalsFor = 0, goalsAgainst = 0;
+      let wins = 0,
+        draws = 0,
+        losses = 0,
+        goalsFor = 0,
+        goalsAgainst = 0;
 
       games.forEach(match => {
         const isHome = match.homeTeam.teamId === teamId;
@@ -303,7 +312,7 @@ export class SoccerAnalyticsService {
       last5Games: last5Analysis,
       last10Games: last10Analysis,
       formTrend,
-      momentumScore
+      momentumScore,
     };
   }
 
@@ -322,17 +331,23 @@ export class SoccerAnalyticsService {
 
     const relevantMatches = h2hMatches.docs
       .map(doc => doc.data() as SoccerMatch)
-      .filter(match => 
-        (match.homeTeam.teamId === homeTeamId && match.awayTeam.teamId === awayTeamId) ||
-        (match.homeTeam.teamId === awayTeamId && match.awayTeam.teamId === homeTeamId)
+      .filter(
+        match =>
+          (match.homeTeam.teamId === homeTeamId && match.awayTeam.teamId === awayTeamId) ||
+          (match.homeTeam.teamId === awayTeamId && match.awayTeam.teamId === homeTeamId)
       );
 
     const last5Meetings = relevantMatches.slice(0, 5);
-    
-    let homeTeamWins = 0, awayTeamWins = 0, draws = 0;
-    let homeTeamWinsAtVenue = 0, awayTeamWinsAtVenue = 0, drawsAtVenue = 0;
+
+    let homeTeamWins = 0,
+      awayTeamWins = 0,
+      draws = 0;
+    let homeTeamWinsAtVenue = 0,
+      awayTeamWinsAtVenue = 0,
+      drawsAtVenue = 0;
     let totalGoals = 0;
-    let over2_5Count = 0, bttsCount = 0;
+    let over2_5Count = 0,
+      bttsCount = 0;
 
     relevantMatches.forEach(match => {
       const homeScore = match.homeScore || 0;
@@ -343,7 +358,7 @@ export class SoccerAnalyticsService {
       if (homeScore > 0 && awayScore > 0) bttsCount++;
 
       const isCurrentHomeTeamHome = match.homeTeam.teamId === homeTeamId;
-      
+
       if (homeScore > awayScore) {
         if (isCurrentHomeTeamHome) {
           homeTeamWins++;
@@ -367,14 +382,17 @@ export class SoccerAnalyticsService {
     });
 
     // Analyze last 5 meetings
-    let last5HomeWins = 0, last5AwayWins = 0, last5Draws = 0, last5Goals = 0;
+    let last5HomeWins = 0,
+      last5AwayWins = 0,
+      last5Draws = 0,
+      last5Goals = 0;
     last5Meetings.forEach(match => {
       const homeScore = match.homeScore || 0;
       const awayScore = match.awayScore || 0;
       last5Goals += homeScore + awayScore;
 
       const isCurrentHomeTeamHome = match.homeTeam.teamId === homeTeamId;
-      
+
       if (homeScore > awayScore) {
         if (isCurrentHomeTeamHome) last5HomeWins++;
         else last5AwayWins++;
@@ -395,19 +413,20 @@ export class SoccerAnalyticsService {
         homeTeamWins: last5HomeWins,
         awayTeamWins: last5AwayWins,
         draws: last5Draws,
-        averageGoals: last5Meetings.length > 0 ? last5Goals / last5Meetings.length : 0
+        averageGoals: last5Meetings.length > 0 ? last5Goals / last5Meetings.length : 0,
       },
       venueRecord: {
         homeTeamWinsAtVenue,
         awayTeamWinsAtVenue,
-        drawsAtVenue
+        drawsAtVenue,
       },
       goalTrends: {
         averageHomeGoals: 0, // Calculate based on historical data
         averageAwayGoals: 0, // Calculate based on historical data
-        over2_5Frequency: relevantMatches.length > 0 ? (over2_5Count / relevantMatches.length) * 100 : 0,
-        bttsFrequency: relevantMatches.length > 0 ? (bttsCount / relevantMatches.length) * 100 : 0
-      }
+        over2_5Frequency:
+          relevantMatches.length > 0 ? (over2_5Count / relevantMatches.length) * 100 : 0,
+        bttsFrequency: relevantMatches.length > 0 ? (bttsCount / relevantMatches.length) * 100 : 0,
+      },
     };
   }
 
@@ -418,12 +437,12 @@ export class SoccerAnalyticsService {
   ): Promise<AdvancedMetrics> {
     const [homeStats, awayStats] = await Promise.all([
       this.getTeamAdvancedStats(homeTeamId, competition),
-      this.getTeamAdvancedStats(awayTeamId, competition)
+      this.getTeamAdvancedStats(awayTeamId, competition),
     ]);
 
     return {
       homeTeam: homeStats,
-      awayTeam: awayStats
+      awayTeam: awayStats,
     };
   }
 
@@ -459,7 +478,7 @@ export class SoccerAnalyticsService {
       interceptionsPerGame: 12,
       cornersPerGame: 5.5,
       yellowCardsPerGame: 2.1,
-      redCardsPerGame: 0.1
+      redCardsPerGame: 0.1,
     };
   }
 
@@ -470,7 +489,7 @@ export class SoccerAnalyticsService {
       homeTeamAdvantage: 'Moderate',
       awayTeamAdvantage: 'Slight',
       keyBattles: ['Midfield dominance', 'Wing play vs full-backs'],
-      tacticalEdge: 'Home team'
+      tacticalEdge: 'Home team',
     };
   }
 
@@ -485,15 +504,25 @@ export class SoccerAnalyticsService {
     tacticalAnalysis: any
   ): Promise<MatchPrediction> {
     // ML-based prediction algorithm
-    const homeStrength = this.calculateTeamStrength(homeStats, homeForm, advancedMetrics.homeTeam, true);
-    const awayStrength = this.calculateTeamStrength(awayStats, awayForm, advancedMetrics.awayTeam, false);
+    const homeStrength = this.calculateTeamStrength(
+      homeStats,
+      homeForm,
+      advancedMetrics.homeTeam,
+      true
+    );
+    const awayStrength = this.calculateTeamStrength(
+      awayStats,
+      awayForm,
+      advancedMetrics.awayTeam,
+      false
+    );
 
     // Apply head-to-head adjustments
     const h2hAdjustment = this.calculateH2HAdjustment(headToHead);
-    
+
     // Calculate base probabilities
     const strengthDiff = homeStrength - awayStrength + h2hAdjustment;
-    
+
     // Use sigmoid function to convert strength difference to probabilities
     const homeWinProb = this.sigmoid(strengthDiff + 0.3); // Home advantage
     const awayWinProb = this.sigmoid(-strengthDiff - 0.1);
@@ -506,15 +535,22 @@ export class SoccerAnalyticsService {
     const awayWinProbability = Math.round((awayWinProb / total) * 100) / 100;
 
     // Expected goals calculation
-    const homeExpectedGoals = Math.max(0.1, advancedMetrics.homeTeam.xG * (1 + homeForm.momentumScore / 200));
-    const awayExpectedGoals = Math.max(0.1, advancedMetrics.awayTeam.xG * (1 + awayForm.momentumScore / 200));
+    const homeExpectedGoals = Math.max(
+      0.1,
+      advancedMetrics.homeTeam.xG * (1 + homeForm.momentumScore / 200)
+    );
+    const awayExpectedGoals = Math.max(
+      0.1,
+      advancedMetrics.awayTeam.xG * (1 + awayForm.momentumScore / 200)
+    );
 
     // Other market predictions
     const totalExpectedGoals = homeExpectedGoals + awayExpectedGoals;
     const over2_5Probability = this.poissonProbability(totalExpectedGoals, 2.5, 'over');
     const over3_5Probability = this.poissonProbability(totalExpectedGoals, 3.5, 'over');
-    const bttsYesProbability = (1 - this.poissonProbability(homeExpectedGoals, 0, 'equal')) * 
-                               (1 - this.poissonProbability(awayExpectedGoals, 0, 'equal'));
+    const bttsYesProbability =
+      (1 - this.poissonProbability(homeExpectedGoals, 0, 'equal')) *
+      (1 - this.poissonProbability(awayExpectedGoals, 0, 'equal'));
 
     // Clean sheet probabilities
     const homeCleanSheetProbability = this.poissonProbability(awayExpectedGoals, 0, 'equal');
@@ -546,26 +582,26 @@ export class SoccerAnalyticsService {
       awayWinProbability,
       expectedGoals: {
         home: Math.round(homeExpectedGoals * 100) / 100,
-        away: Math.round(awayExpectedGoals * 100) / 100
+        away: Math.round(awayExpectedGoals * 100) / 100,
       },
       bttsYesProbability: Math.round(bttsYesProbability * 100) / 100,
       over2_5Probability: Math.round(over2_5Probability * 100) / 100,
       over3_5Probability: Math.round(over3_5Probability * 100) / 100,
       cleanSheetProbabilities: {
         home: Math.round(homeCleanSheetProbability * 100) / 100,
-        away: Math.round(awayCleanSheetProbability * 100) / 100
+        away: Math.round(awayCleanSheetProbability * 100) / 100,
       },
       cornersPrediction: {
         total: 10,
         home: 5.5,
-        away: 4.5
+        away: 4.5,
       },
       cardsPrediction: {
         totalYellow: 4.2,
-        totalRed: 0.2
+        totalRed: 0.2,
       },
       confidence: Math.round(confidence * 100) / 100,
-      keyFactors
+      keyFactors,
     };
   }
 
@@ -575,7 +611,7 @@ export class SoccerAnalyticsService {
     advancedStats: any,
     isHome: boolean
   ): number {
-    const baseStrength = (stats.points / stats.matchesPlayed) / 3; // Points per game as ratio
+    const baseStrength = stats.points / stats.matchesPlayed / 3; // Points per game as ratio
     const formBonus = form.momentumScore / 100;
     const xGDiffBonus = advancedStats.xGDiff / 5; // Normalize xG difference
     const homeAdvantage = isHome ? 0.1 : 0;
@@ -588,7 +624,7 @@ export class SoccerAnalyticsService {
 
     const homeWinRate = headToHead.homeTeamWins / headToHead.totalMeetings;
     const awayWinRate = headToHead.awayTeamWins / headToHead.totalMeetings;
-    
+
     return (homeWinRate - awayWinRate) * 0.1; // Small adjustment based on historical performance
   }
 
@@ -605,7 +641,8 @@ export class SoccerAnalyticsService {
         prob += this.poissonProbability(lambda, i, 'equal');
       }
       return prob;
-    } else { // under
+    } else {
+      // under
       let prob = 0;
       for (let i = 0; i <= Math.floor(k); i++) {
         prob += this.poissonProbability(lambda, i, 'equal');
@@ -632,12 +669,13 @@ export class SoccerAnalyticsService {
     const probabilityConfidence = maxProb;
 
     // Higher confidence with more recent form data
-    const formConfidence = (homeForm.last5Games.wins + homeForm.last5Games.draws + homeForm.last5Games.losses) / 5;
+    const formConfidence =
+      (homeForm.last5Games.wins + homeForm.last5Games.draws + homeForm.last5Games.losses) / 5;
 
     // Higher confidence with more head-to-head data
     const h2hConfidence = Math.min(headToHead.totalMeetings / 10, 1);
 
-    return (probabilityConfidence * 0.5 + formConfidence * 0.3 + h2hConfidence * 0.2);
+    return probabilityConfidence * 0.5 + formConfidence * 0.3 + h2hConfidence * 0.2;
   }
 
   private identifyKeyFactors(
@@ -655,29 +693,34 @@ export class SoccerAnalyticsService {
     if (awayForm.formTrend === 'Declining') factors.push('Away team struggling recently');
 
     // Statistical factors
-    if (advancedMetrics.homeTeam.xGDiff > 0.5) factors.push('Home team creates high-quality chances');
+    if (advancedMetrics.homeTeam.xGDiff > 0.5)
+      factors.push('Home team creates high-quality chances');
     if (advancedMetrics.awayTeam.xGA < 1.0) factors.push('Away team has strong defensive record');
 
     // Head-to-head factors
     if (headToHead.totalMeetings >= 5) {
       const homeH2HWinRate = headToHead.homeTeamWins / headToHead.totalMeetings;
       if (homeH2HWinRate > 0.6) factors.push('Home team dominates historical matchups');
-      if (headToHead.goalTrends.bttsFrequency > 70) factors.push('Both teams typically score in this fixture');
+      if (headToHead.goalTrends.bttsFrequency > 70)
+        factors.push('Both teams typically score in this fixture');
     }
 
     return factors.slice(0, 5); // Return top 5 factors
   }
 
-  async predictPlayerPerformance(matchId: string, playerId: string): Promise<PlayerPerformancePrediction> {
+  async predictPlayerPerformance(
+    matchId: string,
+    playerId: string
+  ): Promise<PlayerPerformancePrediction> {
     const transaction = Sentry.startTransaction({
       name: 'soccer-player-prediction',
-      op: 'analytics'
+      op: 'analytics',
     });
 
     try {
       const [match, playerStats] = await Promise.all([
         this.getMatchData(matchId),
-        this.getPlayerStats(playerId)
+        this.getPlayerStats(playerId),
       ]);
 
       if (!match || !playerStats) {
@@ -698,12 +741,11 @@ export class SoccerAnalyticsService {
         redCardProbability: this.calculateRedCardProbability(playerStats, match),
         minutesPrediction: this.predictMinutes(playerStats, match),
         toScoreAnytimeProbability: this.calculateGoalProbability(playerStats, match),
-        toScoreFirstProbability: this.calculateFirstGoalProbability(playerStats, match)
+        toScoreFirstProbability: this.calculateFirstGoalProbability(playerStats, match),
       };
 
       transaction.setStatus('ok');
       return prediction;
-
     } catch (error) {
       transaction.setStatus('internal_error');
       Sentry.captureException(error);
@@ -761,16 +803,19 @@ export class SoccerAnalyticsService {
   }
 
   private async storePrediction(matchId: string, prediction: MatchPrediction): Promise<void> {
-    await this.db.collection('soccer_predictions').doc(matchId).set({
-      ...prediction,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
+    await this.db
+      .collection('soccer_predictions')
+      .doc(matchId)
+      .set({
+        ...prediction,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
   }
 
   async getMatchPrediction(matchId: string): Promise<MatchPrediction | null> {
     const predictionDoc = await this.db.collection('soccer_predictions').doc(matchId).get();
-    return predictionDoc.exists ? predictionDoc.data() as MatchPrediction : null;
+    return predictionDoc.exists ? (predictionDoc.data() as MatchPrediction) : null;
   }
 
   async updateLivePrediction(matchId: string, liveData: any): Promise<void> {
@@ -779,24 +824,30 @@ export class SoccerAnalyticsService {
 
     // Adjust predictions based on live match events
     const adjustedPrediction = this.adjustPredictionForLiveEvents(currentPrediction, liveData);
-    
-    await this.db.collection('soccer_predictions').doc(matchId).update({
-      ...adjustedPrediction,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      isLive: true
-    });
+
+    await this.db
+      .collection('soccer_predictions')
+      .doc(matchId)
+      .update({
+        ...adjustedPrediction,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        isLive: true,
+      });
   }
 
-  private adjustPredictionForLiveEvents(prediction: MatchPrediction, liveData: any): MatchPrediction {
+  private adjustPredictionForLiveEvents(
+    prediction: MatchPrediction,
+    liveData: any
+  ): MatchPrediction {
     // Adjust probabilities based on current score, time, events, etc.
     // This is a simplified version - production would have sophisticated live modeling
-    
+
     const adjustedPrediction = { ...prediction };
-    
+
     if (liveData.currentScore) {
       const { homeScore, awayScore } = liveData.currentScore;
       const minute = liveData.minute || 0;
-      
+
       // Adjust win probabilities based on current score and time remaining
       if (homeScore > awayScore) {
         adjustedPrediction.homeWinProbability = Math.min(0.95, prediction.homeWinProbability * 1.5);
@@ -806,7 +857,7 @@ export class SoccerAnalyticsService {
         adjustedPrediction.homeWinProbability = Math.max(0.05, prediction.homeWinProbability * 0.5);
       }
     }
-    
+
     return adjustedPrediction;
   }
 }

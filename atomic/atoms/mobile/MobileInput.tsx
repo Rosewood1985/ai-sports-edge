@@ -9,6 +9,7 @@ import {
   TextStyle,
   TextInputProps,
 } from 'react-native';
+
 import { useHaptics } from '../../../hooks/useMobile';
 
 interface MobileInputProps extends TextInputProps {
@@ -102,7 +103,7 @@ export const MobileInput: React.FC<MobileInputProps> = ({
           alignItems: multiline ? 'flex-start' : 'center',
           backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
           borderWidth: 2,
-          borderColor: borderColor,
+          borderColor,
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: multiline ? 12 : 16,

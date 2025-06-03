@@ -1,3 +1,6 @@
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
@@ -8,16 +11,14 @@ import {
   findNodeHandle,
   AccessibilityRole,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
-import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
-import { auth } from '../config/firebase';
-import { useI18n } from '../atomic/organisms/i18n/I18nContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useI18n } from '../atomic/organisms/i18n/I18nContext';
+import { auth } from '../config/firebase';
 import accessibilityService from '../services/accessibilityService';
+import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -303,13 +304,13 @@ const PaymentScreen = (): JSX.Element => {
 
         <View
           ref={cardFieldRef}
-          accessible={true}
+          accessible
           accessibilityLabel={t('payment.cardFieldAccessibility')}
           accessibilityHint={t('payment.cardFieldHint')}
           importantForAccessibility="yes"
         >
           <CardField
-            postalCodeEnabled={true}
+            postalCodeEnabled
             placeholders={{
               number: '4242 4242 4242 4242',
             }}

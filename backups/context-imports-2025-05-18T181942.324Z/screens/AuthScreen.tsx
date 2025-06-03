@@ -1,3 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { FirebaseError } from 'firebase/app';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  AuthError,
+  Auth,
+  getAuth,
+} from 'firebase/auth';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -10,24 +21,13 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedView } from '../atomic/atoms/ThemedView';
+
 import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import LegalLinks from '../components/LegalLinks';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-  AuthError,
-  Auth,
-  getAuth,
-} from 'firebase/auth';
-import { info, error as logError, LogCategory } from '../services/loggingService';
+import { useLanguage } from '../contexts/LanguageContext';
 import { safeErrorCapture } from '../services/errorUtils';
-import { FirebaseError } from 'firebase/app';
+import { info, error as logError, LogCategory } from '../services/loggingService';
 
 // Password validation function
 const validatePassword = (
@@ -451,14 +451,14 @@ const AuthScreen = () => {
                             passwordStrength === 'weak'
                               ? '33%'
                               : passwordStrength === 'medium'
-                              ? '66%'
-                              : '100%',
+                                ? '66%'
+                                : '100%',
                           backgroundColor:
                             passwordStrength === 'weak'
                               ? '#FF3B30'
                               : passwordStrength === 'medium'
-                              ? '#FFCC00'
-                              : '#34C759',
+                                ? '#FFCC00'
+                                : '#34C759',
                         },
                       ]}
                     />
@@ -471,16 +471,16 @@ const AuthScreen = () => {
                           passwordStrength === 'weak'
                             ? '#FF3B30'
                             : passwordStrength === 'medium'
-                            ? '#FFCC00'
-                            : '#34C759',
+                              ? '#FFCC00'
+                              : '#34C759',
                       },
                     ]}
                   >
                     {passwordStrength === 'weak'
                       ? t('auth.weak')
                       : passwordStrength === 'medium'
-                      ? t('auth.medium')
-                      : t('auth.strong')}
+                        ? t('auth.medium')
+                        : t('auth.strong')}
                   </ThemedText>
                 </View>
               </>
@@ -621,7 +621,7 @@ const AuthScreen = () => {
 
             {/* Legal links - show title only on sign up screen */}
             <View style={styles.legalLinksContainer}>
-              <LegalLinks showTitle={!isLogin} horizontal={true} textSize="small" />
+              <LegalLinks showTitle={!isLogin} horizontal textSize="small" />
             </View>
           </View>
         </ScrollView>

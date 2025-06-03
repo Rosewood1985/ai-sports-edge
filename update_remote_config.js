@@ -1,6 +1,6 @@
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 // Path to the Remote Config template file
 const remoteConfigPath = path.join(__dirname, 'remoteconfig.template.json');
@@ -23,50 +23,50 @@ if (!remoteConfig.parameters) {
 // Update parameters while preserving existing ones
 remoteConfig.parameters.ml_model_path = {
   defaultValue: {
-    value: 'https://ai-sports-edge-com.web.app/models/model.pkl'
+    value: 'https://ai-sports-edge-com.web.app/models/model.pkl',
   },
   description: 'Path to the ML model file',
-  valueType: 'STRING'
+  valueType: 'STRING',
 };
 
 // Ensure other parameters exist with default values if not already present
 if (!remoteConfig.parameters.ai_pick_of_day_enabled) {
   remoteConfig.parameters.ai_pick_of_day_enabled = {
     defaultValue: {
-      value: 'true'
+      value: 'true',
     },
     description: 'Whether the AI Pick of the Day feature is enabled',
-    valueType: 'STRING'
+    valueType: 'STRING',
   };
 }
 
 if (!remoteConfig.parameters.min_confidence_threshold) {
   remoteConfig.parameters.min_confidence_threshold = {
     defaultValue: {
-      value: '65'
+      value: '65',
     },
     description: 'Minimum confidence threshold for Pick of the Day',
-    valueType: 'STRING'
+    valueType: 'STRING',
   };
 }
 
 if (!remoteConfig.parameters.prediction_schedule) {
   remoteConfig.parameters.prediction_schedule = {
     defaultValue: {
-      value: '0 10 * * *'
+      value: '0 10 * * *',
     },
     description: 'Cron schedule for the predictTodayGames function',
-    valueType: 'STRING'
+    valueType: 'STRING',
   };
 }
 
 if (!remoteConfig.parameters.pick_of_day_schedule) {
   remoteConfig.parameters.pick_of_day_schedule = {
     defaultValue: {
-      value: '0 9 * * *'
+      value: '0 9 * * *',
     },
     description: 'Cron schedule for the markAIPickOfDay function',
-    valueType: 'STRING'
+    valueType: 'STRING',
   };
 }
 
@@ -84,9 +84,9 @@ remoteConfig.version = {
   versionNumber: String(parseInt(remoteConfig.version?.versionNumber || '0') + 1),
   updateTime: new Date().toISOString(),
   updateUser: {
-    email: 'admin@ai-sports-edge.com'
+    email: 'admin@ai-sports-edge.com',
   },
-  description: 'Updated Remote Config parameters'
+  description: 'Updated Remote Config parameters',
 };
 
 // Deploy the updated Remote Config
@@ -94,7 +94,7 @@ try {
   console.log('Deploying Remote Config...');
   execSync('firebase deploy --only remoteconfig', { stdio: 'inherit' });
   console.log('Remote Config deployed successfully!');
-  
+
   // Also update the main remoteconfig.json file to keep it in sync
   const mainConfigPath = path.join(__dirname, 'remoteconfig.json');
   fs.writeFileSync(mainConfigPath, JSON.stringify(remoteConfig, null, 2), 'utf8');

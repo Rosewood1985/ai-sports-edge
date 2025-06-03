@@ -16,6 +16,7 @@ import {
   updateEmail,
   updatePassword,
 } from 'firebase/auth';
+
 import { getFirebaseApp } from '../atoms/firebaseApp';
 
 // Firebase Auth instance (singleton)

@@ -3,11 +3,12 @@
 // Comprehensive NCAA Basketball and March Madness System Integration
 // =============================================================================
 
-import { NCAABasketballDataSyncService } from './ncaaBasketballDataSyncService';
+import * as admin from 'firebase-admin';
+
 import { NCAABasketballAnalyticsService } from './ncaaBasketballAnalyticsService';
+import { NCAABasketballDataSyncService } from './ncaaBasketballDataSyncService';
 import { NCAABasketballMLPredictionService } from './ncaaBasketballMLPredictionService';
 import { initSentry } from '../sentryConfig';
-import * as admin from 'firebase-admin';
 
 // Initialize Sentry for monitoring
 const Sentry = initSentry();
@@ -56,7 +57,16 @@ export interface NCAASystemStatus {
   };
   marchMadnessMode: {
     enabled: boolean;
-    currentPhase: 'off-season' | 'selection-sunday' | 'first-four' | 'first-round' | 'second-round' | 'sweet-sixteen' | 'elite-eight' | 'final-four' | 'championship';
+    currentPhase:
+      | 'off-season'
+      | 'selection-sunday'
+      | 'first-four'
+      | 'first-round'
+      | 'second-round'
+      | 'sweet-sixteen'
+      | 'elite-eight'
+      | 'final-four'
+      | 'championship';
     bracketLocked: boolean;
     realTimeUpdates: boolean;
   };
@@ -205,9 +215,9 @@ export class NCAABasketballIntegrationService {
   private async startScheduledProcesses(): Promise<void> {
     try {
       // Data sync frequency based on season
-      const syncFrequency = this.options.enableMarchMadnessMode ? 
-        10 * 60 * 1000 : // 10 minutes during March Madness
-        30 * 60 * 1000;  // 30 minutes regular season
+      const syncFrequency = this.options.enableMarchMadnessMode
+        ? 10 * 60 * 1000 // 10 minutes during March Madness
+        : 30 * 60 * 1000; // 30 minutes regular season
 
       this.syncInterval = setInterval(async () => {
         try {
@@ -219,9 +229,9 @@ export class NCAABasketballIntegrationService {
       }, syncFrequency);
 
       // Analytics update every 2 hours (more frequent during tournament)
-      const analyticsFrequency = this.options.enableMarchMadnessMode ? 
-        60 * 60 * 1000 : // 1 hour during March Madness
-        2 * 60 * 60 * 1000; // 2 hours regular season
+      const analyticsFrequency = this.options.enableMarchMadnessMode
+        ? 60 * 60 * 1000 // 1 hour during March Madness
+        : 2 * 60 * 60 * 1000; // 2 hours regular season
 
       this.analyticsInterval = setInterval(async () => {
         try {
@@ -233,9 +243,9 @@ export class NCAABasketballIntegrationService {
       }, analyticsFrequency);
 
       // Predictions update frequency
-      const predictionsFrequency = this.options.enableMarchMadnessMode ? 
-        30 * 60 * 1000 : // 30 minutes during March Madness
-        60 * 60 * 1000;  // 1 hour regular season
+      const predictionsFrequency = this.options.enableMarchMadnessMode
+        ? 30 * 60 * 1000 // 30 minutes during March Madness
+        : 60 * 60 * 1000; // 1 hour regular season
 
       this.predictionsInterval = setInterval(async () => {
         try {
@@ -264,14 +274,17 @@ export class NCAABasketballIntegrationService {
       });
 
       // High-frequency updates during active tournament games
-      this.marchMadnessInterval = setInterval(async () => {
-        try {
-          await this.updateMarchMadnessData();
-        } catch (error) {
-          Sentry.captureException(error);
-          console.error('March Madness update error:', error.message);
-        }
-      }, 2 * 60 * 1000); // 2 minutes during active games
+      this.marchMadnessInterval = setInterval(
+        async () => {
+          try {
+            await this.updateMarchMadnessData();
+          } catch (error) {
+            Sentry.captureException(error);
+            console.error('March Madness update error:', error.message);
+          }
+        },
+        2 * 60 * 1000
+      ); // 2 minutes during active games
 
       console.log('March Madness mode activated');
     } catch (error) {
@@ -334,7 +347,12 @@ export class NCAABasketballIntegrationService {
       const upcomingGames = await this.dataSyncService.getUpcomingGames(7); // Next 7 days
 
       const predictionPromises = upcomingGames.map(game =>
-        this.mlPredictionService.predictGame(game.homeTeam, game.awayTeam, game.date, game.tournamentInfo)
+        this.mlPredictionService.predictGame(
+          game.homeTeam,
+          game.awayTeam,
+          game.date,
+          game.tournamentInfo
+        )
       );
 
       const predictions = await Promise.all(predictionPromises);
@@ -374,18 +392,18 @@ export class NCAABasketballIntegrationService {
   private async updateMarchMadnessData(): Promise<void> {
     try {
       const currentPhase = this.getCurrentTournamentPhase();
-      
+
       if (currentPhase !== 'off-season') {
         // Update bracket data
         await this.dataSyncService.syncMarchMadnessBrackets();
-        
+
         // Update live game scores
         await this.dataSyncService.syncTournamentGames();
-        
+
         // Update predictions based on new results
         const currentYear = new Date().getFullYear();
         await this.mlPredictionService.predictMarchMadnessBracket(currentYear);
-        
+
         // Update analytics
         await this.analyticsService.generateMarchMadnessAnalytics(currentYear);
       }
@@ -431,14 +449,8 @@ export class NCAABasketballIntegrationService {
   async getComprehensiveTeamData(teamId: string): Promise<NCAAComprehensiveTeamData> {
     try {
       const currentSeason = new Date().getFullYear();
-      
-      const [
-        team,
-        analytics,
-        upcomingGames,
-        players,
-        tournamentHistory
-      ] = await Promise.all([
+
+      const [team, analytics, upcomingGames, players, tournamentHistory] = await Promise.all([
         this.dataSyncService.getTeamById(teamId),
         this.analyticsService.getTeamAnalytics(teamId, currentSeason),
         this.dataSyncService.getUpcomingGames(5),
@@ -459,7 +471,7 @@ export class NCAABasketballIntegrationService {
       // Get bracket position if in tournament
       let bracketPosition = null;
       let matchupAnalysis = null;
-      
+
       if (this.options.enableMarchMadnessMode) {
         bracketPosition = await this.getBracketPosition(teamId);
         if (bracketPosition) {
@@ -470,7 +482,9 @@ export class NCAABasketballIntegrationService {
       return {
         team,
         analytics,
-        upcomingGames: upcomingGames.filter(game => game.homeTeam === teamId || game.awayTeam === teamId),
+        upcomingGames: upcomingGames.filter(
+          game => game.homeTeam === teamId || game.awayTeam === teamId
+        ),
         predictions,
         players,
         tournamentHistory,
@@ -490,7 +504,7 @@ export class NCAABasketballIntegrationService {
   async getMarchMadnessInsights(date: Date = new Date()): Promise<MarchMadnessInsights> {
     try {
       const phase = this.getCurrentTournamentPhase();
-      
+
       if (phase === 'off-season') {
         return {
           date,
@@ -506,17 +520,13 @@ export class NCAABasketballIntegrationService {
         };
       }
 
-      const [
-        todaysGames,
-        upsetPredictions,
-        cinderellaTeams,
-        championshipFavorites
-      ] = await Promise.all([
-        this.getTodaysTournamentGames(date),
-        this.mlPredictionService.getUpsetPredictions(date.getFullYear(), 0.4),
-        this.mlPredictionService.getCinderellaTeams(date.getFullYear()),
-        this.mlPredictionService.getChampionshipFavorites(date.getFullYear()),
-      ]);
+      const [todaysGames, upsetPredictions, cinderellaTeams, championshipFavorites] =
+        await Promise.all([
+          this.getTodaysTournamentGames(date),
+          this.mlPredictionService.getUpsetPredictions(date.getFullYear(), 0.4),
+          this.mlPredictionService.getCinderellaTeams(date.getFullYear()),
+          this.mlPredictionService.getChampionshipFavorites(date.getFullYear()),
+        ]);
 
       const bracketBusters = await this.identifyBracketBusters(date);
       const finalFourUpdate = await this.getFinalFourUpdate();
@@ -544,7 +554,7 @@ export class NCAABasketballIntegrationService {
   /**
    * Helper methods for status checks and utilities
    */
-  
+
   private isMarchMadnessSeason(): boolean {
     const now = new Date();
     const month = now.getMonth() + 1; // 1-12
@@ -562,10 +572,10 @@ export class NCAABasketballIntegrationService {
     if (month === 3 && day >= 18 && day <= 21) return 'first-round';
     if (month === 3 && day >= 22 && day <= 24) return 'second-round';
     if (month === 3 && day >= 25 && day <= 28) return 'sweet-sixteen';
-    if (month === 3 && day >= 29 || (month === 4 && day <= 1)) return 'elite-eight';
+    if ((month === 3 && day >= 29) || (month === 4 && day <= 1)) return 'elite-eight';
     if (month === 4 && day >= 2 && day <= 6) return 'final-four';
     if (month === 4 && day >= 7 && day <= 10) return 'championship';
-    
+
     return 'off-season';
   }
 
@@ -579,8 +589,11 @@ export class NCAABasketballIntegrationService {
       ]);
 
       const lastSync = await this.getLastSyncTime('data');
-      const nextSync = this.syncInterval ? 
-        new Date(Date.now() + (this.options.enableMarchMadnessMode ? 10 * 60 * 1000 : 30 * 60 * 1000)) : null;
+      const nextSync = this.syncInterval
+        ? new Date(
+            Date.now() + (this.options.enableMarchMadnessMode ? 10 * 60 * 1000 : 30 * 60 * 1000)
+          )
+        : null;
 
       return {
         status: 'active',
@@ -607,11 +620,12 @@ export class NCAABasketballIntegrationService {
 
   private async getAnalyticsStatus(): Promise<NCAASystemStatus['analytics']> {
     try {
-      const [teamAnalyticsCount, playerAnalyticsCount, marchMadnessAnalyticsCount] = await Promise.all([
-        this.getCollectionCount('ncaa_team_analytics'),
-        this.getCollectionCount('ncaa_player_analytics'),
-        this.getCollectionCount('march_madness_analytics'),
-      ]);
+      const [teamAnalyticsCount, playerAnalyticsCount, marchMadnessAnalyticsCount] =
+        await Promise.all([
+          this.getCollectionCount('ncaa_team_analytics'),
+          this.getCollectionCount('ncaa_player_analytics'),
+          this.getCollectionCount('march_madness_analytics'),
+        ]);
 
       const lastUpdate = await this.getLastSyncTime('analytics');
 
@@ -642,7 +656,9 @@ export class NCAABasketballIntegrationService {
       ]);
 
       const lastUpdate = await this.getLastSyncTime('predictions');
-      const accuracy = await this.mlPredictionService.validateTournamentAccuracy(new Date().getFullYear());
+      const accuracy = await this.mlPredictionService.validateTournamentAccuracy(
+        new Date().getFullYear()
+      );
       const tournamentAccuracy = accuracy; // Same for now
 
       return {
@@ -735,7 +751,7 @@ export class NCAABasketballIntegrationService {
   private async updateUpcomingPredictions(): Promise<void> {
     try {
       const upcomingGames = await this.dataSyncService.getUpcomingGames(2); // Next 2 days
-      
+
       // Only update predictions that are stale
       const cacheTimeout = this.options.cacheTimeouts?.predictions || 600000;
       const cutoffTime = new Date(Date.now() - cacheTimeout);
@@ -743,24 +759,30 @@ export class NCAABasketballIntegrationService {
       const gamesToUpdate = [];
       for (const game of upcomingGames) {
         const gameId = `${game.homeTeam}_${game.awayTeam}_${game.date.getTime()}`;
-        const existingPrediction = await this.db
-          .collection('ncaa_predictions')
-          .doc(gameId)
-          .get();
+        const existingPrediction = await this.db.collection('ncaa_predictions').doc(gameId).get();
 
-        if (!existingPrediction.exists || 
-            existingPrediction.data()?.lastUpdated?.toDate() < cutoffTime) {
+        if (
+          !existingPrediction.exists ||
+          existingPrediction.data()?.lastUpdated?.toDate() < cutoffTime
+        ) {
           gamesToUpdate.push(game);
         }
       }
 
       if (gamesToUpdate.length > 0) {
         const predictionPromises = gamesToUpdate.map(game =>
-          this.mlPredictionService.predictGame(game.homeTeam, game.awayTeam, game.date, game.tournamentInfo)
+          this.mlPredictionService.predictGame(
+            game.homeTeam,
+            game.awayTeam,
+            game.date,
+            game.tournamentInfo
+          )
         );
 
         await Promise.all(predictionPromises);
-        console.log(`Updated predictions for ${gamesToUpdate.length} upcoming NCAA Basketball games`);
+        console.log(
+          `Updated predictions for ${gamesToUpdate.length} upcoming NCAA Basketball games`
+        );
       }
     } catch (error) {
       Sentry.captureException(error);
@@ -769,16 +791,36 @@ export class NCAABasketballIntegrationService {
   }
 
   // Placeholder implementations for complex functionality
-  private async isBracketLocked(): Promise<boolean> { return false; }
-  private async getTeamPlayers(teamId: string): Promise<any[]> { return []; }
-  private async getTournamentHistory(teamId: string): Promise<any> { return {}; }
-  private async getBracketPosition(teamId: string): Promise<any> { return null; }
-  private async getMatchupAnalysis(teamId: string, bracketPosition: any): Promise<any> { return null; }
-  private async getTodaysTournamentGames(date: Date): Promise<any[]> { return []; }
-  private async identifyBracketBusters(date: Date): Promise<any[]> { return []; }
-  private async getFinalFourUpdate(): Promise<any> { return null; }
-  private async generateKeyStorylines(date: Date): Promise<string[]> { return []; }
-  private identifyMustWatchGames(games: any[], upsets: any[]): any[] { return []; }
+  private async isBracketLocked(): Promise<boolean> {
+    return false;
+  }
+  private async getTeamPlayers(teamId: string): Promise<any[]> {
+    return [];
+  }
+  private async getTournamentHistory(teamId: string): Promise<any> {
+    return {};
+  }
+  private async getBracketPosition(teamId: string): Promise<any> {
+    return null;
+  }
+  private async getMatchupAnalysis(teamId: string, bracketPosition: any): Promise<any> {
+    return null;
+  }
+  private async getTodaysTournamentGames(date: Date): Promise<any[]> {
+    return [];
+  }
+  private async identifyBracketBusters(date: Date): Promise<any[]> {
+    return [];
+  }
+  private async getFinalFourUpdate(): Promise<any> {
+    return null;
+  }
+  private async generateKeyStorylines(date: Date): Promise<string[]> {
+    return [];
+  }
+  private identifyMustWatchGames(games: any[], upsets: any[]): any[] {
+    return [];
+  }
 
   /**
    * Shutdown the integration service

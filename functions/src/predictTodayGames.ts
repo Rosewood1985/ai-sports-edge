@@ -1,13 +1,13 @@
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import * as admin from 'firebase-admin';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as os from 'os';
-import { spawn } from 'child_process';
-import { logger } from 'firebase-functions/v2';
-import * as https from 'https';
-import * as http from 'http';
-import { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } from '../sentryCronConfig';
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import * as admin from "firebase-admin";
+import * as path from "path";
+import * as fs from "fs";
+import * as os from "os";
+import { spawn } from "child_process";
+import { logger } from "firebase-functions/v2";
+import * as https from "https";
+import * as http from "http";
+import { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } from "../sentryCronConfig";
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -21,13 +21,13 @@ const firestore = admin.firestore();
  * using the trained ML model.
  */
 export const predictTodayGames = onSchedule({
-  schedule: process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *',
-  timeZone: 'America/New_York'
+  schedule: process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || "0 10 * * *",
+  timeZone: "America/New_York"
 }, wrapScheduledFunction(
-  'predictTodayGames',
-  process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || '0 10 * * *',
+  "predictTodayGames",
+  process.env.FUNCTIONS_CONFIG_PREDICTION_SCHEDULE || "0 10 * * *",
   async (event) => {
-    logger.info('Starting predictTodayGames function');
+    logger.info("Starting predictTodayGames function");
     
     try {
       // Get today's date
@@ -45,18 +45,18 @@ export const predictTodayGames = onSchedule({
       logger.info(`Fetching games scheduled between ${today.toISOString()} and ${tomorrow.toISOString()}`);
       
       // Query games scheduled for today
-      const gamesRef = firestore.collection('games');
+      const gamesRef = firestore.collection("games");
       const gamesQuery = gamesRef
-        .where('startTime', '>=', todayTimestamp)
-        .where('startTime', '<', tomorrowTimestamp);
+        .where("startTime", ">=", todayTimestamp)
+        .where("startTime", "<", tomorrowTimestamp);
       
       const gamesSnapshot = await trackDatabaseOperation(
-        'query_games_for_prediction',
+        "query_games_for_prediction",
         () => gamesQuery.get()
       );
       
       if (gamesSnapshot.empty) {
-        logger.info('No games scheduled for today');
+        logger.info("No games scheduled for today");
         return null;
       }
       
@@ -93,7 +93,7 @@ export const predictTodayGames = onSchedule({
           if (prediction) {
             // Update game document with prediction
             await trackDatabaseOperation(
-              'update_game_with_prediction',
+              "update_game_with_prediction",
               () => gameDoc.ref.update({
                 aiPredictedWinner: prediction.predictedWinner,
                 aiConfidence: prediction.adjustedConfidence,
@@ -125,18 +125,18 @@ export const predictTodayGames = onSchedule({
       
       // Save prediction summary to Firestore
       await trackDatabaseOperation(
-        'save_prediction_summary',
-        () => firestore.collection('predictionLogs').add({
+        "save_prediction_summary",
+        () => firestore.collection("predictionLogs").add({
           timestamp: admin.firestore.FieldValue.serverTimestamp(),
           totalGames: gamesSnapshot.size,
           processedGames: validPredictions.length,
-          date: today.toISOString().split('T')[0]
+          date: today.toISOString().split("T")[0]
         })
       );
       
       return validPredictions;
     } catch (error) {
-      logger.error('Error in predictTodayGames function:', error);
+      logger.error("Error in predictTodayGames function:", error);
       throw error;
     }
   }));
@@ -173,19 +173,19 @@ async function predictWithPythonScript(gameData: any): Promise<any> {
     fs.writeFileSync(tempFilePath, JSON.stringify(gameData));
     
     // Get model path from environment or use default
-    const modelUrl = process.env.FUNCTIONS_CONFIG_ML_MODEL_PATH || 'https://ai-sports-edge-com.web.app/models/model.pkl';
+    const modelUrl = process.env.FUNCTIONS_CONFIG_ML_MODEL_PATH || "https://ai-sports-edge-com.web.app/models/model.pkl";
     
     logger.info(`Using ML model from: ${modelUrl}`);
     
     // Download the model to a temporary file
-    const modelPath = path.join(tempDir, 'model.pkl');
+    const modelPath = path.join(tempDir, "model.pkl");
     await trackApiCall(
-      'download_ml_model',
+      "download_ml_model",
       () => downloadFile(modelUrl, modelPath)
     );
     
     // Path to the Python script
-    const scriptPath = path.join(__dirname, '../../ml/inference/predict_outcome.py');
+    const scriptPath = path.join(__dirname, "../../ml/inference/predict_outcome.py");
     
     // Check if script exists
     if (!fs.existsSync(scriptPath)) {
@@ -195,27 +195,27 @@ async function predictWithPythonScript(gameData: any): Promise<any> {
     // Run the Python script
     return new Promise((resolve, reject) => {
       // Command to run the Python script
-      const pythonProcess = spawn('python3', [
+      const pythonProcess = spawn("python3", [
         scriptPath,
-        '--model', modelPath,
-        '--input', tempFilePath
+        "--model", modelPath,
+        "--input", tempFilePath
       ]);
       
-      let output = '';
-      let errorOutput = '';
+      let output = "";
+      let errorOutput = "";
       
       // Collect output
-      pythonProcess.stdout.on('data', (data) => {
+      pythonProcess.stdout.on("data", (data) => {
         output += data.toString();
       });
       
       // Collect error output
-      pythonProcess.stderr.on('data', (data) => {
+      pythonProcess.stderr.on("data", (data) => {
         errorOutput += data.toString();
       });
       
       // Handle process completion
-      pythonProcess.on('close', (code) => {
+      pythonProcess.on("close", (code) => {
         // Clean up temporary file
         try {
           fs.unlinkSync(tempFilePath);
@@ -243,7 +243,7 @@ async function predictWithPythonScript(gameData: any): Promise<any> {
       });
     });
   } catch (error) {
-    logger.error('Error in predictWithPythonScript:', error);
+    logger.error("Error in predictWithPythonScript:", error);
     throw error;
   }
 }
@@ -263,7 +263,7 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
     const file = fs.createWriteStream(destPath);
     
     // Determine protocol (http or https)
-    const protocol = url.startsWith('https') ? https : http;
+    const protocol = url.startsWith("https") ? https : http;
     
     // Make the request
     const request = protocol.get(url, (response) => {
@@ -277,7 +277,7 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
       response.pipe(file);
       
       // Handle file completion
-      file.on('finish', () => {
+      file.on("finish", () => {
         file.close();
         logger.info(`Successfully downloaded file to ${destPath}`);
         resolve();
@@ -285,13 +285,13 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
     });
     
     // Handle request errors
-    request.on('error', (err) => {
+    request.on("error", (err) => {
       fs.unlink(destPath, () => {}); // Delete the file if it exists
       reject(err);
     });
     
     // Handle file errors
-    file.on('error', (err) => {
+    file.on("error", (err) => {
       fs.unlink(destPath, () => {}); // Delete the file if it exists
       reject(err);
     });

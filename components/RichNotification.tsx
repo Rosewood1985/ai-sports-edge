@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, Animated, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '../hooks/useThemeColor';
@@ -14,54 +15,54 @@ interface RichNotificationProps {
    * Notification ID
    */
   id: string;
-  
+
   /**
    * Notification title
    */
   title: string;
-  
+
   /**
    * Notification body
    */
   body: string;
-  
+
   /**
    * Notification category
    */
   category: string;
-  
+
   /**
    * Notification image URL
    */
   imageUrl?: string;
-  
+
   /**
    * Deep link URL
    */
   deepLink?: string;
-  
+
   /**
    * Additional data
    */
   data?: Record<string, any>;
-  
+
   /**
    * Auto hide duration in milliseconds
    * @default 5000
    */
   autoHideDuration?: number;
-  
+
   /**
    * Whether to show close button
    * @default true
    */
   showCloseButton?: boolean;
-  
+
   /**
    * Callback when notification is closed
    */
   onClose?: (id: string) => void;
-  
+
   /**
    * Callback when notification is pressed
    */
@@ -82,45 +83,45 @@ const RichNotification: React.FC<RichNotificationProps> = ({
   autoHideDuration = 5000,
   showCloseButton = true,
   onClose,
-  onPress
+  onPress,
 }) => {
   const [slideAnim] = useState(new Animated.Value(-200));
   const [fadeAnim] = useState(new Animated.Value(0));
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
-  
+
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
-  
+
   // Get screen width
   const screenWidth = Dimensions.get('window').width;
-  
+
   // Show notification on mount
   useEffect(() => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 300,
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 300,
-        useNativeDriver: true
-      })
+        useNativeDriver: true,
+      }),
     ]).start();
-    
+
     // Auto hide after duration
     if (autoHideDuration > 0) {
       const timer = setTimeout(() => {
         handleClose();
       }, autoHideDuration);
-      
+
       return () => clearTimeout(timer);
     }
   }, []);
-  
+
   /**
    * Handle notification press
    */
@@ -130,10 +131,10 @@ const RichNotification: React.FC<RichNotificationProps> = ({
     } else if (deepLink) {
       deepLinkingService.openDeepLink(deepLink);
     }
-    
+
     handleClose();
   };
-  
+
   /**
    * Handle notification close
    */
@@ -142,20 +143,20 @@ const RichNotification: React.FC<RichNotificationProps> = ({
       Animated.timing(slideAnim, {
         toValue: -200,
         duration: 300,
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 300,
-        useNativeDriver: true
-      })
+        useNativeDriver: true,
+      }),
     ]).start(() => {
       if (onClose) {
         onClose(id);
       }
     });
   };
-  
+
   /**
    * Get category icon
    */
@@ -183,7 +184,7 @@ const RichNotification: React.FC<RichNotificationProps> = ({
         return 'notifications';
     }
   };
-  
+
   /**
    * Get category color
    */
@@ -211,21 +212,21 @@ const RichNotification: React.FC<RichNotificationProps> = ({
         return '#0a7ea4';
     }
   };
-  
+
   /**
    * Handle image load
    */
   const handleImageLoad = () => {
     setImageLoaded(true);
   };
-  
+
   /**
    * Handle image error
    */
   const handleImageError = () => {
     setImageError(true);
   };
-  
+
   /**
    * Render notification content
    */
@@ -237,12 +238,16 @@ const RichNotification: React.FC<RichNotificationProps> = ({
             <Ionicons name={getCategoryIcon() as any} size={24} color="#fff" />
           </View>
         </View>
-        
+
         <View style={styles.textContainer}>
-          <ThemedText style={styles.title} numberOfLines={1}>{title}</ThemedText>
-          <ThemedText style={styles.body} numberOfLines={2}>{body}</ThemedText>
+          <ThemedText style={styles.title} numberOfLines={1}>
+            {title}
+          </ThemedText>
+          <ThemedText style={styles.body} numberOfLines={2}>
+            {body}
+          </ThemedText>
         </View>
-        
+
         {showCloseButton && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
             <Ionicons name="close" size={20} color="#999" />
@@ -251,7 +256,7 @@ const RichNotification: React.FC<RichNotificationProps> = ({
       </View>
     );
   };
-  
+
   /**
    * Render notification with image
    */
@@ -259,14 +264,11 @@ const RichNotification: React.FC<RichNotificationProps> = ({
     return (
       <View style={styles.container}>
         {renderContent()}
-        
+
         {imageUrl && !imageError && (
           <Image
             source={{ uri: imageUrl }}
-            style={[
-              styles.image,
-              { opacity: imageLoaded ? 1 : 0 }
-            ]}
+            style={[styles.image, { opacity: imageLoaded ? 1 : 0 }]}
             onLoad={handleImageLoad}
             onError={handleImageError}
             resizeMode="cover"
@@ -275,7 +277,7 @@ const RichNotification: React.FC<RichNotificationProps> = ({
       </View>
     );
   };
-  
+
   return (
     <Animated.View
       style={[
@@ -283,18 +285,12 @@ const RichNotification: React.FC<RichNotificationProps> = ({
         {
           transform: [{ translateY: slideAnim }],
           opacity: fadeAnim,
-          width: screenWidth - 32
-        }
+          width: screenWidth - 32,
+        },
       ]}
     >
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={handlePress}
-        style={styles.touchable}
-      >
-        <ThemedView style={styles.notificationContainer}>
-          {renderWithImage()}
-        </ThemedView>
+      <TouchableOpacity activeOpacity={0.9} onPress={handlePress} style={styles.touchable}>
+        <ThemedView style={styles.notificationContainer}>{renderWithImage()}</ThemedView>
       </TouchableOpacity>
     </Animated.View>
   );

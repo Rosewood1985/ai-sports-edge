@@ -1,6 +1,6 @@
 /**
  * Analytics Constants
- * 
+ *
  * Constants used for analytics tracking and dashboard display.
  */
 

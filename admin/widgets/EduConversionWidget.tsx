@@ -1,3 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  Timestamp,
+} from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,11 +17,10 @@ import {
   ActivityIndicator,
   RefreshControl,
   Dimensions,
-  useColorScheme
+  useColorScheme,
 } from 'react-native';
-import { collection, query, where, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
+
 import { firestore } from '../../config/firebase';
-import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 const isTablet = width > 768;
@@ -54,12 +63,15 @@ const EduConversionWidget: React.FC = () => {
     // Set up real-time listener
     const unsubscribe = onSnapshot(
       logsQuery,
-      (snapshot) => {
+      snapshot => {
         try {
-          const conversionLogs: EduConversionLog[] = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          } as EduConversionLog));
+          const conversionLogs: EduConversionLog[] = snapshot.docs.map(
+            doc =>
+              ({
+                id: doc.id,
+                ...doc.data(),
+              }) as EduConversionLog
+          );
 
           setLogs(conversionLogs);
           setLoading(false);
@@ -72,7 +84,7 @@ const EduConversionWidget: React.FC = () => {
           setRefreshing(false);
         }
       },
-      (err) => {
+      err => {
         console.error('Error in real-time listener:', err);
         setError('Real-time updates unavailable');
         setLoading(false);
@@ -88,7 +100,7 @@ const EduConversionWidget: React.FC = () => {
     if (!timestamp || !timestamp.toDate) {
       return 'Unknown';
     }
-    
+
     const date = timestamp.toDate();
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -100,15 +112,12 @@ const EduConversionWidget: React.FC = () => {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
-    
+
     return date.toLocaleDateString();
   };
 
   const formatPlanName = (plan: string): string => {
-    return plan
-      .replace('price_', '')
-      .replace(/_/g, ' ')
-      .toUpperCase();
+    return plan.replace('price_', '').replace(/_/g, ' ').toUpperCase();
   };
 
   const getPlanBadgeColor = (plan: string): string => {
@@ -121,10 +130,14 @@ const EduConversionWidget: React.FC = () => {
 
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'payment_successful': return '#10B981';
-      case 'session_created': return '#F59E0B';
-      case 'payment_failed': return '#EF4444';
-      default: return '#6B7280';
+      case 'payment_successful':
+        return '#10B981';
+      case 'session_created':
+        return '#F59E0B';
+      case 'payment_failed':
+        return '#EF4444';
+      default:
+        return '#6B7280';
     }
   };
 
@@ -139,10 +152,10 @@ const EduConversionWidget: React.FC = () => {
       {/* Header with email and timestamp */}
       <View style={styles.cardHeader}>
         <View style={styles.emailContainer}>
-          <Ionicons 
-            name="school" 
-            size={16} 
-            color={isDark ? '#60A5FA' : '#3B82F6'} 
+          <Ionicons
+            name="school"
+            size={16}
+            color={isDark ? '#60A5FA' : '#3B82F6'}
             style={styles.eduIcon}
           />
           <Text style={[styles.email, isDark && styles.emailDark]} numberOfLines={1}>
@@ -157,15 +170,11 @@ const EduConversionWidget: React.FC = () => {
       {/* Plan and status badges */}
       <View style={styles.badgeContainer}>
         <View style={[styles.badge, { backgroundColor: getPlanBadgeColor(item.plan) }]}>
-          <Text style={styles.badgeText}>
-            {formatPlanName(item.plan)}
-          </Text>
+          <Text style={styles.badgeText}>{formatPlanName(item.plan)}</Text>
         </View>
-        
+
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-          <Text style={styles.badgeText}>
-            {item.status.replace('_', ' ').toUpperCase()}
-          </Text>
+          <Text style={styles.badgeText}>{item.status.replace('_', ' ').toUpperCase()}</Text>
         </View>
 
         {item.planType === 'one-time' && (
@@ -205,9 +214,7 @@ const EduConversionWidget: React.FC = () => {
     return (
       <View style={[styles.container, isDark && styles.containerDark]}>
         <View style={styles.header}>
-          <Text style={[styles.title, isDark && styles.titleDark]}>
-            🎓 .EDU Conversions
-          </Text>
+          <Text style={[styles.title, isDark && styles.titleDark]}>🎓 .EDU Conversions</Text>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={isDark ? '#60A5FA' : '#3B82F6'} />
@@ -223,18 +230,14 @@ const EduConversionWidget: React.FC = () => {
     <View style={[styles.container, isDark && styles.containerDark]}>
       {/* Widget Header */}
       <View style={styles.header}>
-        <Text style={[styles.title, isDark && styles.titleDark]}>
-          🎓 .EDU Conversions
-        </Text>
+        <Text style={[styles.title, isDark && styles.titleDark]}>🎓 .EDU Conversions</Text>
         <View style={styles.headerRight}>
           <View style={styles.countBadge}>
             <Text style={styles.countText}>{logs.length}</Text>
           </View>
           <View style={[styles.liveBadge, { opacity: error ? 0.5 : 1 }]}>
             <View style={[styles.liveDot, { backgroundColor: error ? '#EF4444' : '#10B981' }]} />
-            <Text style={styles.liveText}>
-              {error ? 'OFFLINE' : 'LIVE'}
-            </Text>
+            <Text style={styles.liveText}>{error ? 'OFFLINE' : 'LIVE'}</Text>
           </View>
         </View>
       </View>
@@ -251,7 +254,7 @@ const EduConversionWidget: React.FC = () => {
       <FlatList
         data={logs}
         renderItem={renderConversionItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+
 import { InsightFilters, EnhancedInsight } from '../../../../types/enhancedInsights';
 
 interface InsightFiltersPanelProps {
@@ -18,7 +19,7 @@ export function InsightFiltersPanel({
   filters,
   onFiltersChange,
   onApply,
-  onClear
+  onClear,
 }: InsightFiltersPanelProps) {
   const updateFilter = (key: keyof InsightFilters, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -40,7 +41,15 @@ export function InsightFiltersPanel({
           <select
             multiple
             value={filters.types || []}
-            onChange={(e) => updateFilter('types', Array.from(e.target.selectedOptions, option => option.value) as EnhancedInsight['type'][])}
+            onChange={e =>
+              updateFilter(
+                'types',
+                Array.from(
+                  e.target.selectedOptions,
+                  option => option.value
+                ) as EnhancedInsight['type'][]
+              )
+            }
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
           >
             <option value="opportunity">Opportunity</option>
@@ -60,7 +69,15 @@ export function InsightFiltersPanel({
           <select
             multiple
             value={filters.categories || []}
-            onChange={(e) => updateFilter('categories', Array.from(e.target.selectedOptions, option => option.value) as EnhancedInsight['category'][])}
+            onChange={e =>
+              updateFilter(
+                'categories',
+                Array.from(
+                  e.target.selectedOptions,
+                  option => option.value
+                ) as EnhancedInsight['category'][]
+              )
+            }
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
           >
             <option value="user_behavior">User Behavior</option>
@@ -80,7 +97,15 @@ export function InsightFiltersPanel({
           <select
             multiple
             value={filters.severities || []}
-            onChange={(e) => updateFilter('severities', Array.from(e.target.selectedOptions, option => option.value) as EnhancedInsight['severity'][])}
+            onChange={e =>
+              updateFilter(
+                'severities',
+                Array.from(
+                  e.target.selectedOptions,
+                  option => option.value
+                ) as EnhancedInsight['severity'][]
+              )
+            }
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
           >
             <option value="critical">Critical</option>
@@ -98,7 +123,15 @@ export function InsightFiltersPanel({
           <select
             multiple
             value={filters.statuses || []}
-            onChange={(e) => updateFilter('statuses', Array.from(e.target.selectedOptions, option => option.value) as EnhancedInsight['status'][])}
+            onChange={e =>
+              updateFilter(
+                'statuses',
+                Array.from(
+                  e.target.selectedOptions,
+                  option => option.value
+                ) as EnhancedInsight['status'][]
+              )
+            }
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
           >
             <option value="new">New</option>
@@ -119,7 +152,12 @@ export function InsightFiltersPanel({
             min="0"
             max="100"
             value={filters.minConfidence ? filters.minConfidence * 100 : ''}
-            onChange={(e) => updateFilter('minConfidence', e.target.value ? parseInt(e.target.value) / 100 : undefined)}
+            onChange={e =>
+              updateFilter(
+                'minConfidence',
+                e.target.value ? parseInt(e.target.value) / 100 : undefined
+              )
+            }
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
             placeholder="0-100"
           />
@@ -137,7 +175,15 @@ export function InsightFiltersPanel({
             <input
               type="text"
               value={filters.keywords?.join(', ') || ''}
-              onChange={(e) => updateFilter('keywords', e.target.value.split(',').map(k => k.trim()).filter(k => k))}
+              onChange={e =>
+                updateFilter(
+                  'keywords',
+                  e.target.value
+                    .split(',')
+                    .map(k => k.trim())
+                    .filter(k => k)
+                )
+              }
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
               placeholder="Enter keywords separated by commas"
             />
@@ -152,13 +198,17 @@ export function InsightFiltersPanel({
               <input
                 type="date"
                 value={filters.dateRange?.start || ''}
-                onChange={(e) => updateFilter('dateRange', { ...filters.dateRange, start: e.target.value })}
+                onChange={e =>
+                  updateFilter('dateRange', { ...filters.dateRange, start: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
               />
               <input
                 type="date"
                 value={filters.dateRange?.end || ''}
-                onChange={(e) => updateFilter('dateRange', { ...filters.dateRange, end: e.target.value })}
+                onChange={e =>
+                  updateFilter('dateRange', { ...filters.dateRange, end: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
               />
             </div>
@@ -174,7 +224,7 @@ export function InsightFiltersPanel({
                 <input
                   type="checkbox"
                   checked={filters.hasRecommendations || false}
-                  onChange={(e) => updateFilter('hasRecommendations', e.target.checked)}
+                  onChange={e => updateFilter('hasRecommendations', e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">

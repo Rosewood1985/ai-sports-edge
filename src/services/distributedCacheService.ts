@@ -56,7 +56,7 @@ export class DistributedCacheService {
   private isConnected = false;
   private connectionAttempts = 0;
   private readonly maxConnectionAttempts = 5;
-  
+
   private config: RedisConfig = {
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -108,10 +108,10 @@ export class DistributedCacheService {
       // Redis client initialization would go here
       // For now, simulate connection
       console.log('Initializing Redis connection...');
-      
+
       // Simulate connection delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       if (process.env.NODE_ENV !== 'test') {
         // In a real implementation, you'd use:
         // const Redis = require('ioredis');
@@ -119,7 +119,7 @@ export class DistributedCacheService {
         console.log('Redis connection simulated (would connect in production)');
         this.isConnected = true;
       }
-      
+
       this.setupRedisEventHandlers();
     } catch (error) {
       console.error('Failed to connect to Redis:', error);
@@ -154,7 +154,7 @@ export class DistributedCacheService {
         if (redisData) {
           this.metrics.redisHits++;
           this.updateNetworkLatency(performance.now() - startTime);
-          
+
           // Cache locally for faster subsequent access
           await this.localCache.set(key, redisData, { dataType });
           return redisData;
@@ -206,7 +206,7 @@ export class DistributedCacheService {
     if (this.isConnected) {
       try {
         await this.setInRedis(key, data, ttl, version);
-        
+
         // Replicate to other nodes if configured
         if (replicateToNodes && this.replicationConfig.enabled) {
           await this.replicateToNodes(key, data, ttl, version);
@@ -232,10 +232,10 @@ export class DistributedCacheService {
       try {
         // Use Redis pipeline for batch operations
         const redisResults = await this.getBatchFromRedis<T>(keys);
-        
+
         for (const [key, value] of redisResults) {
           results.set(key, value);
-          
+
           // Cache locally for faster access
           if (value) {
             await this.localCache.set(key, value, { dataType: options.dataType });
@@ -267,10 +267,13 @@ export class DistributedCacheService {
   /**
    * Invalidate cache with pattern support
    */
-  async invalidate(pattern: string | RegExp, options: { 
-    includeRedis?: boolean;
-    includeNodes?: boolean;
-  } = {}): Promise<number> {
+  async invalidate(
+    pattern: string | RegExp,
+    options: {
+      includeRedis?: boolean;
+      includeNodes?: boolean;
+    } = {}
+  ): Promise<number> {
     const { includeRedis = true, includeNodes = false } = options;
     let totalInvalidated = 0;
 
@@ -299,11 +302,13 @@ export class DistributedCacheService {
   /**
    * Synchronize data between local and distributed cache
    */
-  async sync(options: {
-    direction?: 'local-to-redis' | 'redis-to-local' | 'bidirectional';
-    patterns?: string[];
-    dryRun?: boolean;
-  } = {}): Promise<{
+  async sync(
+    options: {
+      direction?: 'local-to-redis' | 'redis-to-local' | 'bidirectional';
+      patterns?: string[];
+      dryRun?: boolean;
+    } = {}
+  ): Promise<{
     synchronized: number;
     conflicts: number;
     errors: number;
@@ -355,10 +360,11 @@ export class DistributedCacheService {
       node => node.status === 'active'
     ).length;
 
-    const averageLag = this.replicationConfig.nodes.length > 0
-      ? this.replicationConfig.nodes.reduce((sum, node) => sum + node.lag, 0) 
-        / this.replicationConfig.nodes.length
-      : 0;
+    const averageLag =
+      this.replicationConfig.nodes.length > 0
+        ? this.replicationConfig.nodes.reduce((sum, node) => sum + node.lag, 0) /
+          this.replicationConfig.nodes.length
+        : 0;
 
     return {
       ...this.metrics,
@@ -378,7 +384,7 @@ export class DistributedCacheService {
    */
   configureReplication(config: Partial<ReplicationConfig>): void {
     this.replicationConfig = { ...this.replicationConfig, ...config };
-    
+
     if (config.enabled && config.nodes) {
       this.initializeReplicationNodes();
     }
@@ -392,23 +398,18 @@ export class DistributedCacheService {
     try {
       // Simulate Redis GET operation
       const redisKey = this.config.keyPrefix + key;
-      
+
       // In real implementation:
       // const data = await this.redisClient.get(redisKey);
       // return data ? JSON.parse(data) : null;
-      
+
       return null; // Simulated response
     } catch (error) {
       throw new Error(`Redis GET failed for key ${key}: ${error}`);
     }
   }
 
-  private async setInRedis<T>(
-    key: string,
-    data: T,
-    ttl: number,
-    version: string
-  ): Promise<void> {
+  private async setInRedis<T>(key: string, data: T, ttl: number, version: string): Promise<void> {
     if (!this.isConnected) return;
 
     try {
@@ -424,7 +425,7 @@ export class DistributedCacheService {
 
       // In real implementation:
       // await this.redisClient.setex(redisKey, Math.floor(ttl / 1000), JSON.stringify(entry));
-      
+
       console.log(`Would set ${redisKey} in Redis with TTL ${ttl}ms`);
     } catch (error) {
       throw new Error(`Redis SET failed for key ${key}: ${error}`);
@@ -433,20 +434,20 @@ export class DistributedCacheService {
 
   private async getBatchFromRedis<T>(keys: string[]): Promise<Map<string, T | null>> {
     const results = new Map<string, T | null>();
-    
+
     if (!this.isConnected) return results;
 
     try {
       const redisKeys = keys.map(key => this.config.keyPrefix + key);
-      
+
       // In real implementation:
       // const pipeline = this.redisClient.pipeline();
       // redisKeys.forEach(key => pipeline.get(key));
       // const responses = await pipeline.exec();
-      
+
       // For now, simulate empty results
       keys.forEach(key => results.set(key, null));
-      
+
       return results;
     } catch (error) {
       throw new Error(`Redis batch GET failed: ${error}`);
@@ -464,7 +465,7 @@ export class DistributedCacheService {
       //   await this.redisClient.del(...matchingKeys);
       // }
       // return matchingKeys.length;
-      
+
       console.log(`Would invalidate Redis keys matching pattern: ${pattern}`);
       return 0; // Simulated response
     } catch (error) {
@@ -499,9 +500,9 @@ export class DistributedCacheService {
 
     if (this.connectionAttempts < this.maxConnectionAttempts) {
       const delay = Math.pow(2, this.connectionAttempts) * 1000; // Exponential backoff
-      
+
       console.log(`Retrying Redis connection in ${delay}ms (attempt ${this.connectionAttempts})`);
-      
+
       setTimeout(() => {
         this.initializeRedisConnection();
       }, delay);
@@ -512,12 +513,12 @@ export class DistributedCacheService {
 
   private handleRedisError(error: any): void {
     console.error('Redis operation error:', error);
-    
+
     // Implement circuit breaker pattern
     if (this.metrics.redisErrors > 10) {
       console.warn('Too many Redis errors, temporarily disabling Redis operations');
       this.isConnected = false;
-      
+
       // Re-enable after timeout
       setTimeout(() => {
         this.metrics.redisErrors = 0;
@@ -527,7 +528,7 @@ export class DistributedCacheService {
   }
 
   private updateNetworkLatency(latency: number): void {
-    this.metrics.networkLatency = (this.metrics.networkLatency * 0.9) + (latency * 0.1);
+    this.metrics.networkLatency = this.metrics.networkLatency * 0.9 + latency * 0.1;
   }
 
   private async replicateToNodes<T>(

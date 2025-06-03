@@ -1,5 +1,5 @@
-import { auth, firestore } from '../config/firebase';
 import { hasPremiumAccess } from './firebaseSubscriptionService';
+import { auth, firestore } from '../config/firebase';
 
 /**
  * Rugby match data interface
@@ -101,7 +101,7 @@ export const getUpcomingMatches = async (): Promise<RugbyMatch[]> => {
         time: '16:45:00Z',
         venue: 'Twickenham Stadium',
         round: 1,
-        status: 'scheduled'
+        status: 'scheduled',
       },
       {
         id: 'match-2025-2',
@@ -112,7 +112,7 @@ export const getUpcomingMatches = async (): Promise<RugbyMatch[]> => {
         time: '15:00:00Z',
         venue: 'Aviva Stadium',
         round: 1,
-        status: 'scheduled'
+        status: 'scheduled',
       },
       {
         id: 'match-2025-3',
@@ -123,8 +123,8 @@ export const getUpcomingMatches = async (): Promise<RugbyMatch[]> => {
         time: '08:35:00Z',
         venue: 'Orangetheory Stadium',
         round: 1,
-        status: 'scheduled'
-      }
+        status: 'scheduled',
+      },
     ];
   } catch (error) {
     console.error('Error fetching Rugby matches:', error);
@@ -157,7 +157,7 @@ export const getTeamStandings = async (competition: string): Promise<RugbyTeam[]
           pointsAgainst: 84,
           pointsDiff: 81,
           tries: 24,
-          tablePoints: 24
+          tablePoints: 24,
         },
         {
           id: 'team-2',
@@ -173,7 +173,7 @@ export const getTeamStandings = async (competition: string): Promise<RugbyTeam[]
           pointsAgainst: 86,
           pointsDiff: 62,
           tries: 18,
-          tablePoints: 18
+          tablePoints: 18,
         },
         {
           id: 'team-3',
@@ -189,11 +189,11 @@ export const getTeamStandings = async (competition: string): Promise<RugbyTeam[]
           pointsAgainst: 107,
           pointsDiff: 14,
           tries: 14,
-          tablePoints: 14
-        }
+          tablePoints: 14,
+        },
       ];
     }
-    
+
     // Return empty array for other competitions
     return [];
   } catch (error) {
@@ -223,7 +223,7 @@ export const getPlayerStats = async (teamId: string): Promise<RugbyPlayer[]> => 
           weight: 92,
           caps: 113,
           tries: 15,
-          points: 1050
+          points: 1050,
         },
         {
           id: 'player-2',
@@ -235,7 +235,7 @@ export const getPlayerStats = async (teamId: string): Promise<RugbyPlayer[]> => 
           weight: 105,
           caps: 20,
           tries: 12,
-          points: 60
+          points: 60,
         },
         {
           id: 'player-3',
@@ -247,11 +247,11 @@ export const getPlayerStats = async (teamId: string): Promise<RugbyPlayer[]> => 
           weight: 126,
           caps: 65,
           tries: 5,
-          points: 25
-        }
+          points: 25,
+        },
       ];
     }
-    
+
     // Return empty array for other teams
     return [];
   } catch (error) {
@@ -273,23 +273,25 @@ export const getMatchPrediction = async (
   try {
     // Check if user has premium access or has purchased this prediction
     const hasPremium = await hasPremiumAccess(userId);
-    
+
     if (!hasPremium) {
       // Check if user has purchased this specific prediction
       const db = firestore;
-      const purchasesSnapshot = await db.collection('users').doc(userId)
+      const purchasesSnapshot = await db
+        .collection('users')
+        .doc(userId)
         .collection('purchases')
         .where('productId', '==', 'rugby-match-prediction')
         .where('matchId', '==', matchId)
         .where('status', '==', 'succeeded')
         .limit(1)
         .get();
-      
+
       if (purchasesSnapshot.empty) {
         return null; // User doesn't have access
       }
     }
-    
+
     // In a real implementation, this would call the Rugby API or a machine learning service
     // For now, we'll return mock data
     return {
@@ -298,52 +300,52 @@ export const getMatchPrediction = async (
       awayTeam: 'France',
       winProbability: {
         home: 0.55,
-        away: 0.40,
-        draw: 0.05
+        away: 0.4,
+        draw: 0.05,
       },
       predictedScore: {
         home: 24,
         away: 21,
-        confidence: 0.65
+        confidence: 0.65,
       },
       tryScorerPredictions: [
         {
           player: 'Anthony Watson',
           team: 'England',
-          probability: 0.35
+          probability: 0.35,
         },
         {
           player: 'Damian Penaud',
           team: 'France',
-          probability: 0.30
+          probability: 0.3,
         },
         {
           player: 'Maro Itoje',
           team: 'England',
-          probability: 0.15
-        }
+          probability: 0.15,
+        },
       ],
       keyMatchups: [
         {
           position: 'Fly-half',
           homePlayer: 'Owen Farrell',
           awayPlayer: 'Romain Ntamack',
-          advantage: 'home'
+          advantage: 'home',
         },
         {
           position: 'Scrum-half',
           homePlayer: 'Ben Youngs',
           awayPlayer: 'Antoine Dupont',
-          advantage: 'away'
+          advantage: 'away',
         },
         {
           position: 'Number 8',
           homePlayer: 'Billy Vunipola',
           awayPlayer: 'Gregory Alldritt',
-          advantage: 'even'
-        }
+          advantage: 'even',
+        },
       ],
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Error fetching Rugby match prediction:', error);
@@ -364,52 +366,49 @@ export const getTeamAnalysis = async (
   try {
     // Check if user has premium access or has purchased this analysis
     const hasPremium = await hasPremiumAccess(userId);
-    
+
     if (!hasPremium) {
       // Check if user has purchased this specific analysis
       const db = firestore;
-      const purchasesSnapshot = await db.collection('users').doc(userId)
+      const purchasesSnapshot = await db
+        .collection('users')
+        .doc(userId)
         .collection('purchases')
         .where('productId', '==', 'rugby-team-analysis')
         .where('teamId', '==', teamId)
         .where('status', '==', 'succeeded')
         .limit(1)
         .get();
-      
+
       if (purchasesSnapshot.empty) {
         return null; // User doesn't have access
       }
     }
-    
+
     // In a real implementation, this would call the Rugby API or a machine learning service
     // For now, we'll return mock data
     return {
       teamId,
       teamName: 'Ireland',
-      strengths: [
-        'Set piece dominance',
-        'Defensive organization',
-        'Attacking variety'
-      ],
-      weaknesses: [
-        'Vulnerability to counter-attack',
-        'Discipline under pressure'
-      ],
+      strengths: ['Set piece dominance', 'Defensive organization', 'Attacking variety'],
+      weaknesses: ['Vulnerability to counter-attack', 'Discipline under pressure'],
       keyPlayers: [
         {
           name: 'Johnny Sexton',
           role: 'Playmaker and goal-kicker',
-          importance: 'Critical'
+          importance: 'Critical',
         },
         {
           name: 'Tadhg Furlong',
           role: 'Scrum anchor',
-          importance: 'High'
-        }
+          importance: 'High',
+        },
       ],
-      playstyle: 'Ireland employs a balanced approach with strong set-piece fundamentals and a varied attacking game. They excel at maintaining possession through multiple phases and creating pressure through territorial kicking.',
-      upcomingMatchStrategy: 'Expect Ireland to target Wales\' lineout and use their superior kicking game to pin Wales in their own half.',
-      generatedAt: new Date().toISOString()
+      playstyle:
+        'Ireland employs a balanced approach with strong set-piece fundamentals and a varied attacking game. They excel at maintaining possession through multiple phases and creating pressure through territorial kicking.',
+      upcomingMatchStrategy:
+        "Expect Ireland to target Wales' lineout and use their superior kicking game to pin Wales in their own half.",
+      generatedAt: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Error fetching Rugby team analysis:', error);
@@ -422,5 +421,5 @@ export default {
   getTeamStandings,
   getPlayerStats,
   getMatchPrediction,
-  getTeamAnalysis
+  getTeamAnalysis,
 };

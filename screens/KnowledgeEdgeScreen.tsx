@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import {
   View,
   ScrollView,
@@ -8,14 +10,13 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+
+import { NeonBorderView } from '../atomic/atoms';
+import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
-import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
-import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
-import { NeonBorderView } from '../atomic/atoms';
 import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 
 // Define types for the component props and state

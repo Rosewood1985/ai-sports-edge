@@ -1,11 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext'; // Keep for backward compatibility
-import { useI18n } from '../contexts/I18nContext';
-import { Ionicons } from '@expo/vector-icons';
-import { useUITheme } from './UIThemeProvider'; // Import the new theme hook
+
 import { ThemedText } from './ThemedText'; // Import ThemedText
 import { ThemedView } from './ThemedView'; // Import ThemedView
+import { useUITheme } from './UIThemeProvider'; // Import the new theme hook
+import { useI18n } from '../contexts/I18nContext';
+import { useTheme } from '../contexts/ThemeContext'; // Keep for backward compatibility
 
 export interface HeaderProps {
   title: string;
@@ -19,16 +20,11 @@ export interface HeaderProps {
  * @param {HeaderProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const Header = ({
-  title,
-  onRefresh,
-  isLoading,
-  accessibilityHint
-}: HeaderProps): JSX.Element => {
+const Header = ({ title, onRefresh, isLoading, accessibilityHint }: HeaderProps): JSX.Element => {
   const { colors, isDark } = useTheme(); // Keep for backward compatibility
   const { theme } = useUITheme(); // Use the new theme
   const { t } = useI18n();
-  
+
   return (
     <ThemedView
       background="surface" // Use surface background from theme
@@ -40,9 +36,9 @@ const Header = ({
           borderRadius: theme.borderRadius.sm,
           marginHorizontal: Platform.OS === 'web' ? 0 : theme.spacing.sm,
           marginTop: theme.spacing.sm,
-        }
+        },
       ]}
-      accessible={true}
+      accessible
       accessibilityRole="header"
     >
       <ThemedText
@@ -61,11 +57,11 @@ const Header = ({
             paddingVertical: theme.spacing.sm,
             paddingHorizontal: theme.spacing.md,
           },
-          isLoading && styles.refreshButtonDisabled
+          isLoading && styles.refreshButtonDisabled,
         ]}
         onPress={onRefresh}
         disabled={isLoading}
-        accessible={true}
+        accessible
         accessibilityRole="button"
         accessibilityLabel={t('oddsComparison.refresh')}
         accessibilityHint={accessibilityHint || t('oddsComparison.accessibility.refreshButtonHint')}
@@ -75,14 +71,14 @@ const Header = ({
           <ActivityIndicator size="small" color={theme.colors.primaryText} />
         ) : (
           <>
-            <Ionicons 
-              name="refresh" 
-              size={16} 
-              color={theme.colors.primaryText} 
-              style={[styles.refreshIcon, { marginRight: theme.spacing.xs }]} 
+            <Ionicons
+              name="refresh"
+              size={16}
+              color={theme.colors.primaryText}
+              style={[styles.refreshIcon, { marginRight: theme.spacing.xs }]}
             />
-            <ThemedText 
-              type="button" 
+            <ThemedText
+              type="button"
               color="primary" // Use primary text color
               style={styles.refreshButtonText}
             >
@@ -118,7 +114,7 @@ const styles = StyleSheet.create({
   },
   refreshButtonText: {
     // Color, font weight, and font size now handled by ThemedText
-  }
+  },
 });
 
 export default Header;

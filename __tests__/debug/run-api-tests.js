@@ -1,6 +1,6 @@
 /**
  * Run API Service Tests
- * 
+ *
  * This script runs the API service tests and outputs the results.
  * It can be used to validate the improvements made to the API service.
  */
@@ -18,7 +18,7 @@ const colors = {
   blink: '\x1b[5m',
   reverse: '\x1b[7m',
   hidden: '\x1b[8m',
-  
+
   black: '\x1b[30m',
   red: '\x1b[31m',
   green: '\x1b[32m',
@@ -27,7 +27,7 @@ const colors = {
   magenta: '\x1b[35m',
   cyan: '\x1b[36m',
   white: '\x1b[37m',
-  
+
   bgBlack: '\x1b[40m',
   bgRed: '\x1b[41m',
   bgGreen: '\x1b[42m',
@@ -35,7 +35,7 @@ const colors = {
   bgBlue: '\x1b[44m',
   bgMagenta: '\x1b[45m',
   bgCyan: '\x1b[46m',
-  bgWhite: '\x1b[47m'
+  bgWhite: '\x1b[47m',
 };
 
 // Output directory for test results
@@ -58,34 +58,37 @@ console.log();
 try {
   // Run the tests
   console.log(`${colors.yellow}Running tests...${colors.reset}`);
-  
+
   // Capture the output of the test command
-  const output = execSync('npx jest --config=jest.config.js __tests__/debug/api-service-test.js --verbose', { 
-    encoding: 'utf8',
-    stdio: 'pipe'
-  });
-  
+  const output = execSync(
+    'npx jest --config=jest.config.js __tests__/debug/api-service-test.js --verbose',
+    {
+      encoding: 'utf8',
+      stdio: 'pipe',
+    }
+  );
+
   // Write the output to the file
   fs.writeFileSync(outputFile, output);
-  
+
   // Parse the output to determine if tests passed
   const passed = !output.includes('FAIL');
-  
+
   if (passed) {
     console.log(`${colors.green}All tests passed!${colors.reset}`);
   } else {
     console.log(`${colors.red}Some tests failed. See ${outputFile} for details.${colors.reset}`);
   }
-  
+
   // Log the test results
   console.log();
   console.log(`${colors.bright}Test Results:${colors.reset}`);
   console.log(output);
-  
+
   // Log the output file location
   console.log();
   console.log(`${colors.bright}Test results saved to:${colors.reset} ${outputFile}`);
-  
+
   // Generate a summary of the improvements
   console.log();
   console.log(`${colors.bright}${colors.cyan}Summary of API Service Improvements:${colors.reset}`);
@@ -110,13 +113,12 @@ try {
   console.log(`   - Added logging of response status and timing`);
   console.log(`   - Added structured logging for API operations`);
   console.log();
-  
 } catch (error) {
   console.error(`${colors.red}Error running tests:${colors.reset}`, error.message);
-  
+
   // Write the error to the file
   fs.writeFileSync(outputFile, `Error running tests: ${error.message}\n\n${error.stack}`);
-  
+
   // Log the output file location
   console.log();
   console.log(`${colors.bright}Error details saved to:${colors.reset} ${outputFile}`);

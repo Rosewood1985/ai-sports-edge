@@ -5,15 +5,19 @@
  */
 
 import React from 'react';
-import { AIRecommendation } from '../../../../types/aiml';
+
 import { useRecommendations } from '../../../../hooks/useAIML';
+import { AIRecommendation } from '../../../../types/aiml';
 
 interface RecommendationsWidgetProps {
   recommendations: AIRecommendation[];
   className?: string;
 }
 
-export function RecommendationsWidget({ recommendations, className = '' }: RecommendationsWidgetProps) {
+export function RecommendationsWidget({
+  recommendations,
+  className = '',
+}: RecommendationsWidgetProps) {
   const { provideFeedback } = useRecommendations();
 
   const getPriorityColor = (priority: AIRecommendation['priority']) => {
@@ -46,7 +50,10 @@ export function RecommendationsWidget({ recommendations, className = '' }: Recom
     }
   };
 
-  const handleFeedback = async (recommendationId: string, feedback: 'helpful' | 'notHelpful' | 'irrelevant') => {
+  const handleFeedback = async (
+    recommendationId: string,
+    feedback: 'helpful' | 'notHelpful' | 'irrelevant'
+  ) => {
     await provideFeedback(recommendationId, feedback);
   };
 
@@ -113,7 +120,7 @@ export function RecommendationsWidget({ recommendations, className = '' }: Recom
             </div>
           ) : (
             <div className="space-y-4">
-              {recommendations.slice(0, 3).map((recommendation) => (
+              {recommendations.slice(0, 3).map(recommendation => (
                 <div
                   key={recommendation.id}
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -137,14 +144,16 @@ export function RecommendationsWidget({ recommendations, className = '' }: Recom
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                           {recommendation.description}
                         </p>
-                        
+
                         {/* Impact and Confidence */}
                         <div className="flex items-center space-x-4 mb-3">
                           <div className="text-xs text-gray-500 dark:text-gray-500">
-                            <span className="font-medium">Impact:</span> {recommendation.estimatedImpact}
+                            <span className="font-medium">Impact:</span>{' '}
+                            {recommendation.estimatedImpact}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-500">
-                            <span className="font-medium">Confidence:</span> {(recommendation.confidence * 100).toFixed(0)}%
+                            <span className="font-medium">Confidence:</span>{' '}
+                            {(recommendation.confidence * 100).toFixed(0)}%
                           </div>
                         </div>
 
@@ -155,7 +164,7 @@ export function RecommendationsWidget({ recommendations, className = '' }: Recom
                               Recommended Actions:
                             </div>
                             <div className="space-y-2">
-                              {recommendation.actions.slice(0, 2).map((action) => (
+                              {recommendation.actions.slice(0, 2).map(action => (
                                 <div
                                   key={action.id}
                                   className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded"
@@ -172,11 +181,15 @@ export function RecommendationsWidget({ recommendations, className = '' }: Recom
                                     <div className="text-xs text-gray-500 dark:text-gray-500">
                                       {action.estimated_time}
                                     </div>
-                                    <div className={`text-xs font-medium ${
-                                      action.impact === 'high' ? 'text-green-600 dark:text-green-400' :
-                                      action.impact === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
-                                      'text-gray-600 dark:text-gray-400'
-                                    }`}>
+                                    <div
+                                      className={`text-xs font-medium ${
+                                        action.impact === 'high'
+                                          ? 'text-green-600 dark:text-green-400'
+                                          : action.impact === 'medium'
+                                            ? 'text-yellow-600 dark:text-yellow-400'
+                                            : 'text-gray-600 dark:text-gray-400'
+                                      }`}
+                                    >
                                       {action.impact} impact
                                     </div>
                                   </div>
@@ -215,9 +228,12 @@ export function RecommendationsWidget({ recommendations, className = '' }: Recom
 
                         {recommendation.feedback && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
-                            Feedback: {recommendation.feedback === 'helpful' ? '👍 Helpful' : 
-                                     recommendation.feedback === 'notHelpful' ? '👎 Not helpful' : 
-                                     '❌ Irrelevant'}
+                            Feedback:{' '}
+                            {recommendation.feedback === 'helpful'
+                              ? '👍 Helpful'
+                              : recommendation.feedback === 'notHelpful'
+                                ? '👎 Not helpful'
+                                : '❌ Irrelevant'}
                           </div>
                         )}
                       </div>

@@ -3,25 +3,26 @@
 // Advanced Query Optimization, Caching, and Performance Monitoring
 // =============================================================================
 
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
-  startAfter, 
-  QuerySnapshot, 
+import * as Sentry from '@sentry/react-native';
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  startAfter,
+  QuerySnapshot,
   DocumentSnapshot,
   QueryConstraint,
   enableNetwork,
   disableNetwork,
-  connectFirestoreEmulator
+  connectFirestoreEmulator,
 } from 'firebase/firestore';
+
 import { firestore as db } from '../config/firebase';
-import * as Sentry from '@sentry/react-native';
 
 // =============================================================================
 // INTERFACES
@@ -77,7 +78,7 @@ export class FirebaseOptimizationService {
   private cache = new Map<string, QueryCacheItem>();
   private queryMetrics: QueryMetrics[] = [];
   private pendingQueries = new Map<string, Promise<any>>();
-  
+
   private readonly defaultCacheConfig: CacheConfig = {
     ttl: 5 * 60 * 1000, // 5 minutes
     maxSize: 500,
@@ -103,19 +104,18 @@ export class FirebaseOptimizationService {
     try {
       // Setup cache cleanup interval
       this.setupCacheCleanup();
-      
+
       // Setup metrics collection
       this.setupMetricsCollection();
-      
+
       // Load persisted cache if enabled
       await this.loadPersistedCache();
-      
+
       Sentry.addBreadcrumb({
         message: 'Firebase Optimization Service initialized',
         category: 'firebase.optimization.init',
         level: 'info',
       });
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error initializing Firebase Optimization Service:', error);
@@ -170,7 +170,7 @@ export class FirebaseOptimizationService {
       this.pendingQueries.set(queryKey, queryPromise);
 
       const result = await queryPromise;
-      
+
       // Cache result if enabled
       if (options.useCache !== false) {
         this.setCacheResult(queryKey, result, options.cacheTtl);
@@ -191,7 +191,6 @@ export class FirebaseOptimizationService {
 
       this.pendingQueries.delete(queryKey);
       return result;
-
     } catch (error) {
       this.pendingQueries.delete(queryKey);
       Sentry.captureException(error);
@@ -229,7 +228,7 @@ export class FirebaseOptimizationService {
 
       // Execute query
       const result = await this.executeDocumentQuery<T>(documentPath);
-      
+
       // Cache result
       if (options.useCache !== false && result) {
         this.setCacheResult(queryKey, result, options.cacheTtl);
@@ -247,7 +246,6 @@ export class FirebaseOptimizationService {
       });
 
       return result;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Optimized document query failed for ${documentPath}: ${error.message}`);
@@ -266,11 +264,11 @@ export class FirebaseOptimizationService {
   ): Promise<{ data: T[]; lastDoc: DocumentSnapshot | null; hasMore: boolean }> {
     try {
       const paginationConstraints = [...constraints];
-      
+
       if (lastDoc) {
         paginationConstraints.push(startAfter(lastDoc));
       }
-      
+
       paginationConstraints.push(limit(pageSize + 1)); // +1 to check if there are more
 
       const queryKey = this.generateQueryKey(collectionPath, paginationConstraints);
@@ -279,7 +277,7 @@ export class FirebaseOptimizationService {
       // Execute query
       const queryRef = query(collection(db, collectionPath), ...paginationConstraints);
       const snapshot = await getDocs(queryRef);
-      
+
       const docs = snapshot.docs;
       const hasMore = docs.length > pageSize;
       const data = docs.slice(0, pageSize).map(doc => ({ id: doc.id, ...doc.data() }) as T);
@@ -301,7 +299,6 @@ export class FirebaseOptimizationService {
         lastDoc: newLastDoc,
         hasMore,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Paginated query failed for ${collectionPath}: ${error.message}`);
@@ -329,17 +326,14 @@ export class FirebaseOptimizationService {
       // Process batches with concurrency control
       for (let i = 0; i < batches.length; i += batchConfig.maxConcurrentBatches) {
         const currentBatches = batches.slice(i, i + batchConfig.maxConcurrentBatches);
-        
+
         const batchPromises = currentBatches.map(async (batch, index) => {
           // Add delay between batches to avoid rate limiting
           if (i + index > 0) {
             await this.delay(batchConfig.delayBetweenBatches);
           }
-          
-          return await this.executeWithRetry(
-            () => operationFn(batch),
-            batchConfig.retryAttempts
-          );
+
+          return await this.executeWithRetry(() => operationFn(batch), batchConfig.retryAttempts);
         });
 
         const batchResults = await Promise.all(batchPromises);
@@ -347,7 +341,6 @@ export class FirebaseOptimizationService {
       }
 
       return results;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Batch operation failed: ${error.message}`);
@@ -363,7 +356,7 @@ export class FirebaseOptimizationService {
    */
   private getCachedResult<T>(queryKey: string): T | null {
     const cached = this.cache.get(queryKey);
-    
+
     if (!cached) {
       return null;
     }
@@ -406,9 +399,7 @@ export class FirebaseOptimizationService {
       return;
     }
 
-    const keysToDelete = Array.from(this.cache.keys()).filter(key => 
-      key.includes(pattern)
-    );
+    const keysToDelete = Array.from(this.cache.keys()).filter(key => key.includes(pattern));
 
     keysToDelete.forEach(key => this.cache.delete(key));
 
@@ -423,11 +414,12 @@ export class FirebaseOptimizationService {
    * Cleanup oldest cache entries
    */
   private cleanupOldestCacheEntries(): void {
-    const entries = Array.from(this.cache.entries())
-      .sort(([, a], [, b]) => a.timestamp - b.timestamp);
+    const entries = Array.from(this.cache.entries()).sort(
+      ([, a], [, b]) => a.timestamp - b.timestamp
+    );
 
     const toDelete = Math.ceil(this.cache.size * 0.2); // Delete 20% of oldest entries
-    
+
     for (let i = 0; i < toDelete; i++) {
       this.cache.delete(entries[i][0]);
     }
@@ -460,11 +452,14 @@ export class FirebaseOptimizationService {
   ): Promise<T[]> {
     const queryRef = query(collection(db, collectionPath), ...constraints);
     const snapshot = await getDocs(queryRef);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }) as T);
+
+    return snapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as T
+    );
   }
 
   /**
@@ -473,7 +468,7 @@ export class FirebaseOptimizationService {
   private async executeDocumentQuery<T>(documentPath: string): Promise<T | null> {
     const docRef = doc(db, documentPath);
     const snapshot = await getDoc(docRef);
-    
+
     if (!snapshot.exists()) {
       return null;
     }
@@ -492,19 +487,13 @@ export class FirebaseOptimizationService {
     retryAttempts: number,
     timeoutMs: number
   ): Promise<T> {
-    return this.executeWithRetry(
-      () => this.withTimeout(queryFn(), timeoutMs),
-      retryAttempts
-    );
+    return this.executeWithRetry(() => this.withTimeout(queryFn(), timeoutMs), retryAttempts);
   }
 
   /**
    * Execute function with retry logic
    */
-  private async executeWithRetry<T>(
-    fn: () => Promise<T>,
-    retryAttempts: number
-  ): Promise<T> {
+  private async executeWithRetry<T>(fn: () => Promise<T>, retryAttempts: number): Promise<T> {
     let lastError: Error;
 
     for (let attempt = 0; attempt <= retryAttempts; attempt++) {
@@ -512,7 +501,7 @@ export class FirebaseOptimizationService {
         return await fn();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < retryAttempts) {
           const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
           await this.delay(delay);
@@ -586,10 +575,11 @@ export class FirebaseOptimizationService {
     }
 
     const totalQueries = this.queryMetrics.length;
-    const averageQueryTime = this.queryMetrics.reduce((sum, m) => sum + m.executionTime, 0) / totalQueries;
+    const averageQueryTime =
+      this.queryMetrics.reduce((sum, m) => sum + m.executionTime, 0) / totalQueries;
     const cacheHits = this.queryMetrics.filter(m => m.cacheHit).length;
     const cacheHitRate = (cacheHits / totalQueries) * 100;
-    
+
     const slowQueries = this.queryMetrics
       .filter(m => m.executionTime > 500)
       .sort((a, b) => b.executionTime - a.executionTime);
@@ -612,18 +602,21 @@ export class FirebaseOptimizationService {
    */
   private setupMetricsCollection(): void {
     // Send metrics to Sentry every 5 minutes
-    setInterval(() => {
-      const analytics = this.getQueryAnalytics();
-      
-      if (analytics.totalQueries > 0) {
-        Sentry.addBreadcrumb({
-          message: 'Firebase query analytics',
-          category: 'firebase.optimization.analytics',
-          level: 'info',
-          data: analytics,
-        });
-      }
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        const analytics = this.getQueryAnalytics();
+
+        if (analytics.totalQueries > 0) {
+          Sentry.addBreadcrumb({
+            message: 'Firebase query analytics',
+            category: 'firebase.optimization.analytics',
+            level: 'info',
+            data: analytics,
+          });
+        }
+      },
+      5 * 60 * 1000
+    );
   }
 
   // =============================================================================
@@ -634,10 +627,12 @@ export class FirebaseOptimizationService {
    * Generate unique query key for caching
    */
   private generateQueryKey(collectionPath: string, constraints: QueryConstraint[]): string {
-    const constraintStrings = constraints.map(constraint => {
-      // Convert constraint to string representation
-      return constraint.toString();
-    }).sort(); // Sort to ensure consistent keys regardless of constraint order
+    const constraintStrings = constraints
+      .map(constraint => {
+        // Convert constraint to string representation
+        return constraint.toString();
+      })
+      .sort(); // Sort to ensure consistent keys regardless of constraint order
 
     return `${collectionPath}_${constraintStrings.join('_')}`;
   }
@@ -673,7 +668,7 @@ export class FirebaseOptimizationService {
     this.cache.clear();
     this.queryMetrics = [];
     this.pendingQueries.clear();
-    
+
     Sentry.addBreadcrumb({
       message: 'All caches cleared',
       category: 'firebase.optimization.cache',
@@ -692,7 +687,7 @@ export class FirebaseOptimizationService {
   } {
     const now = Date.now();
     const cacheEntries = Array.from(this.cache.values());
-    
+
     if (cacheEntries.length === 0) {
       return {
         size: 0,

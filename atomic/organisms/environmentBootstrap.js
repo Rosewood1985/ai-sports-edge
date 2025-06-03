@@ -8,25 +8,24 @@
 // External imports
 
 // Internal imports
-import { 
-  validateEnvironment, 
-  validateServiceConfig, 
-  logEnvironmentInfo 
-} from '../molecules/environmentValidator';
-
-import { 
-  firebaseConfig, 
-  sentryConfig, 
-  stripeConfig, 
-  mlConfig, 
-  oneSignalConfig, 
-  sportsDataConfig 
+import {
+  firebaseConfig,
+  sentryConfig,
+  stripeConfig,
+  mlConfig,
+  oneSignalConfig,
+  sportsDataConfig,
 } from '../atoms/serviceConfig';
+import {
+  validateEnvironment,
+  validateServiceConfig,
+  logEnvironmentInfo,
+} from '../molecules/environmentValidator';
 
 /**
  * Bootstrap environment configuration
  * Validates all required environment variables and service configurations
- * 
+ *
  * @param {Object} options - Bootstrap options
  * @param {boolean} options.exitOnError - Whether to exit the process on error
  * @param {boolean} options.logEnvironmentInfo - Whether to log environment information
@@ -72,12 +71,10 @@ export function bootstrapEnvironment(options = {}) {
   );
 
   // Validate Sentry configuration
-  result.services.sentry = validateServiceConfig(
-    sentryConfig, 
-    ['dsn', 'environment'], 
-    'Sentry', 
-    { exitOnError: false, logResults: options.logResults }
-  );
+  result.services.sentry = validateServiceConfig(sentryConfig, ['dsn', 'environment'], 'Sentry', {
+    exitOnError: false,
+    logResults: options.logResults,
+  });
 
   // Validate Stripe configuration
   result.services.stripe = validateServiceConfig(
@@ -134,7 +131,7 @@ export function bootstrapEnvironment(options = {}) {
 /**
  * Get environment status summary
  * Useful for displaying environment status in admin panels or logs
- * 
+ *
  * @param {Object} bootstrapResult - Result from bootstrapEnvironment
  * @returns {Object} Environment status
  */
@@ -151,7 +148,7 @@ export function getEnvironmentStatus(bootstrapResult) {
 /**
  * Initialize environment
  * Convenience function that bootstraps the environment and returns the status
- * 
+ *
  * @param {Object} options - Bootstrap options
  * @returns {Object} Environment status summary
  */

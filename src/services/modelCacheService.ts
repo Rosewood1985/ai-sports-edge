@@ -45,7 +45,7 @@ export class ModelCacheService {
     averageLoadTime: 0,
     hitRate: 0,
   };
-  
+
   // Configuration
   private readonly MAX_MEMORY_SIZE = 100 * 1024 * 1024; // 100MB
   private readonly MAX_PREDICTION_CACHE_SIZE = 10000;
@@ -88,7 +88,7 @@ export class ModelCacheService {
         // Load into memory cache
         const modelData = new Uint8Array(persistedData).buffer;
         const loadTime = performance.now() - startTime;
-        
+
         const entry: ModelCacheEntry = {
           modelId,
           modelData,
@@ -116,11 +116,7 @@ export class ModelCacheService {
   /**
    * Store model in cache with size management
    */
-  async setModel(
-    modelId: string, 
-    version: string, 
-    modelData: ArrayBuffer
-  ): Promise<void> {
+  async setModel(modelId: string, version: string, modelData: ArrayBuffer): Promise<void> {
     const cacheKey = `${modelId}_${version}`;
     const loadTime = performance.now();
 
@@ -154,7 +150,7 @@ export class ModelCacheService {
   getCachedPrediction(inputs: any, modelId: string, version: string): any | null {
     const inputHash = this.hashInputs(inputs);
     const cacheKey = `${modelId}_${version}_${inputHash}`;
-    
+
     const cached = this.predictionCache.get(cacheKey);
     if (cached && this.isValidPrediction(cached)) {
       this.metrics.hits++;
@@ -171,9 +167,9 @@ export class ModelCacheService {
    * Cache prediction result
    */
   setCachedPrediction(
-    inputs: any, 
-    outputs: any, 
-    modelId: string, 
+    inputs: any,
+    outputs: any,
+    modelId: string,
     version: string,
     confidence: number = 1.0
   ): void {
@@ -197,7 +193,7 @@ export class ModelCacheService {
   /**
    * Preload frequently used models
    */
-  async preloadModels(modelConfigs: Array<{id: string, version: string, url: string}>): Promise<void> {
+  async preloadModels(modelConfigs: { id: string; version: string; url: string }[]): Promise<void> {
     const promises = modelConfigs.map(async config => {
       try {
         // Check if already cached
@@ -212,7 +208,7 @@ export class ModelCacheService {
 
         const modelData = await response.arrayBuffer();
         await this.setModel(config.id, config.version, modelData);
-        
+
         console.log(`Preloaded model ${config.id} v${config.version}`);
       } catch (error) {
         console.error(`Failed to preload model ${config.id}:`, error);
@@ -234,7 +230,7 @@ export class ModelCacheService {
    */
   async clearModel(modelId: string, version?: string): Promise<void> {
     const pattern = version ? `${modelId}_${version}` : modelId;
-    
+
     // Clear from memory
     for (const [key, entry] of this.memoryCache.entries()) {
       if (key.includes(pattern)) {
@@ -246,10 +242,10 @@ export class ModelCacheService {
     // Clear from storage
     try {
       const keys = await AsyncStorage.getAllKeys();
-      const modelKeys = keys.filter(key => 
-        key.startsWith(this.STORAGE_KEY_PREFIX) && key.includes(pattern)
+      const modelKeys = keys.filter(
+        key => key.startsWith(this.STORAGE_KEY_PREFIX) && key.includes(pattern)
       );
-      
+
       if (modelKeys.length > 0) {
         await AsyncStorage.multiRemove(modelKeys);
       }
@@ -285,7 +281,7 @@ export class ModelCacheService {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const modelKeys = keys.filter(key => key.startsWith(this.STORAGE_KEY_PREFIX));
-      
+
       if (modelKeys.length > 0) {
         await AsyncStorage.multiRemove(modelKeys);
       }
@@ -319,7 +315,10 @@ export class ModelCacheService {
   }
 
   private async ensureCapacity(newEntrySize: number): Promise<void> {
-    while (this.metrics.totalSize + newEntrySize > this.MAX_MEMORY_SIZE && this.memoryCache.size > 0) {
+    while (
+      this.metrics.totalSize + newEntrySize > this.MAX_MEMORY_SIZE &&
+      this.memoryCache.size > 0
+    ) {
       await this.evictLRU();
     }
   }
@@ -375,7 +374,7 @@ export class ModelCacheService {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString(36);
@@ -404,14 +403,14 @@ export class ModelCacheService {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const modelKeys = keys.filter(key => key.startsWith(this.STORAGE_KEY_PREFIX));
-      
+
       // Load a subset to avoid overwhelming memory
       const priorityKeys = modelKeys.slice(0, 5);
-      
+
       for (const key of priorityKeys) {
         const modelKey = key.replace(this.STORAGE_KEY_PREFIX, '');
         const [modelId, version] = modelKey.split('_');
-        
+
         if (modelId && version) {
           // Load asynchronously to avoid blocking
           this.getModel(modelId, version).catch(error => {

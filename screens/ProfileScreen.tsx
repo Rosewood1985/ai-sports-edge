@@ -1,12 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, FlatList, SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '../hooks';
-import { useTheme } from '../contexts/ThemeContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../hooks';
 
 // Define types for the component props and state
 interface FollowedPick {

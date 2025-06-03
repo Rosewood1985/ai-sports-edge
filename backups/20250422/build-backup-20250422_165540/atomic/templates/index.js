@@ -1,6 +1,6 @@
 /**
  * Templates Index
- * 
+ *
  * This file exports all template components for easier imports.
  */
 

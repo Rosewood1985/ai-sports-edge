@@ -3,7 +3,7 @@
  * Handles interactions with Firebase for cross-platform data synchronization
  */
 
-import { Platform } from 'react-native';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   doc,
   getDoc,
@@ -14,9 +14,10 @@ import {
   where,
   getDocs,
   Timestamp,
-  serverTimestamp
+  serverTimestamp,
 } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { Platform } from 'react-native';
+
 import { app, auth, firestore as db } from '../config/firebase';
 
 // Define types
@@ -57,7 +58,7 @@ class FirebaseService {
     try {
       // Set up auth state listener if auth is available
       if (auth) {
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, user => {
           if (user) {
             this.userId = user.uid;
           } else {
@@ -109,7 +110,7 @@ class FirebaseService {
         const purchasedOddsSnapshot = await getDocs(purchasedOddsQuery);
         const purchasedOdds: PurchasedOdds[] = [];
 
-        purchasedOddsSnapshot.forEach((doc) => {
+        purchasedOddsSnapshot.forEach(doc => {
           const data = doc.data();
           purchasedOdds.push({
             gameId: doc.id,
@@ -143,14 +144,14 @@ class FirebaseService {
           size: 'medium',
           animation: 'pulse',
           position: 'inline',
-          style: 'default'
+          style: 'default',
         },
         affiliateEnabled: true,
         affiliateCode: 'MOCK_CODE',
         lastUpdated: Date.now(),
-        lastPlatform: Platform.OS
+        lastPlatform: Platform.OS,
       },
-      lastSyncTimestamp: Date.now()
+      lastSyncTimestamp: Date.now(),
     };
   }
 
@@ -195,11 +196,15 @@ class FirebaseService {
       if (data.purchasedOdds && data.purchasedOdds.length > 0) {
         for (const purchase of data.purchasedOdds) {
           const purchaseDocRef = doc(db, 'users', userId, 'purchasedOdds', purchase.gameId);
-          await setDoc(purchaseDocRef, {
-            timestamp: purchase.timestamp,
-            platform: purchase.platform,
-            updatedAt: serverTimestamp(),
-          }, { merge: true });
+          await setDoc(
+            purchaseDocRef,
+            {
+              timestamp: purchase.timestamp,
+              platform: purchase.platform,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
         }
       }
 

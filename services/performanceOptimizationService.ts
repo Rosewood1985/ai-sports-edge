@@ -3,9 +3,9 @@
 // React Native Performance Enhancement and Monitoring
 // =============================================================================
 
+import * as Sentry from '@sentry/react-native';
 import React from 'react';
 import { InteractionManager, DeviceEventEmitter } from 'react-native';
-import * as Sentry from '@sentry/react-native';
 
 // =============================================================================
 // INTERFACES
@@ -123,7 +123,6 @@ export class PerformanceOptimizationService {
         level: 'info',
         data: this.config,
       });
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error initializing Performance Optimization Service:', error);
@@ -156,7 +155,7 @@ export class PerformanceOptimizationService {
     try {
       // In React Native, we can approximate memory usage
       const memoryInfo = this.getMemoryInfo();
-      
+
       this.performanceMetrics = {
         ...this.performanceMetrics,
         ...memoryInfo,
@@ -165,11 +164,12 @@ export class PerformanceOptimizationService {
       };
 
       // Check for memory pressure
-      if (this.performanceMetrics.memoryWarningLevel === 'high' || 
-          this.performanceMetrics.memoryWarningLevel === 'critical') {
+      if (
+        this.performanceMetrics.memoryWarningLevel === 'high' ||
+        this.performanceMetrics.memoryWarningLevel === 'critical'
+      ) {
         this.triggerMemoryOptimization();
       }
-
     } catch (error) {
       console.error('Error updating memory metrics:', error);
     }
@@ -178,11 +178,14 @@ export class PerformanceOptimizationService {
   /**
    * Get memory information
    */
-  private getMemoryInfo(): Pick<PerformanceMetrics, 'jsHeapSizeUsed' | 'jsHeapSizeTotal' | 'jsHeapSizeLimit' | 'usedJSHeapSize' | 'totalJSHeapSize'> {
+  private getMemoryInfo(): Pick<
+    PerformanceMetrics,
+    'jsHeapSizeUsed' | 'jsHeapSizeTotal' | 'jsHeapSizeLimit' | 'usedJSHeapSize' | 'totalJSHeapSize'
+  > {
     // Simulate memory metrics - in production, would use actual React Native APIs
     const usedMB = Math.random() * 150 + 50; // 50-200 MB
     const totalMB = 512; // 512 MB total
-    
+
     return {
       jsHeapSizeUsed: usedMB * 1024 * 1024,
       jsHeapSizeTotal: totalMB * 1024 * 1024,
@@ -195,9 +198,11 @@ export class PerformanceOptimizationService {
   /**
    * Calculate memory warning level
    */
-  private calculateMemoryWarningLevel(usedMemory: number): PerformanceMetrics['memoryWarningLevel'] {
+  private calculateMemoryWarningLevel(
+    usedMemory: number
+  ): PerformanceMetrics['memoryWarningLevel'] {
     const usedMB = usedMemory / (1024 * 1024);
-    
+
     if (usedMB > 200) return 'critical';
     if (usedMB > 150) return 'high';
     if (usedMB > 100) return 'medium';
@@ -216,7 +221,7 @@ export class PerformanceOptimizationService {
     });
 
     this.triggerMemoryOptimization();
-    
+
     // Notify listeners
     this.memoryPressureListeners.forEach(listener => {
       try {
@@ -253,7 +258,7 @@ export class PerformanceOptimizationService {
   private optimizeMemoryUsage(): void {
     // Clear old component metrics
     const cutoffTime = Date.now() - 60000; // 1 minute ago
-    
+
     this.componentMetrics.forEach((metrics, componentName) => {
       if (metrics.lastRenderTime.getTime() < cutoffTime) {
         this.componentMetrics.delete(componentName);
@@ -270,7 +275,7 @@ export class PerformanceOptimizationService {
   private optimizeImageMemory(): void {
     // In production, this would integrate with image caching libraries
     console.log('Optimizing image memory usage');
-    
+
     Sentry.addBreadcrumb({
       message: 'Image memory optimization triggered',
       category: 'performance.memory.images',
@@ -306,7 +311,9 @@ export class PerformanceOptimizationService {
         updateCount: existing.updateCount + 1,
         rerenderCount: renderTime > 0 ? existing.rerenderCount + 1 : existing.rerenderCount,
         lastRenderTime: now,
-        averageRenderTime: (existing.averageRenderTime * existing.updateCount + renderTime) / (existing.updateCount + 1),
+        averageRenderTime:
+          (existing.averageRenderTime * existing.updateCount + renderTime) /
+          (existing.updateCount + 1),
       };
 
       this.componentMetrics.set(componentName, newMetrics);
@@ -359,7 +366,7 @@ export class PerformanceOptimizationService {
     totalComponents: number;
   } {
     const components = Array.from(this.componentMetrics.values());
-    
+
     if (components.length === 0) {
       return {
         slowestComponents: [],
@@ -377,7 +384,8 @@ export class PerformanceOptimizationService {
       .sort((a, b) => b.updateCount - a.updateCount)
       .slice(0, 10);
 
-    const averageRenderTime = components.reduce((sum, c) => sum + c.averageRenderTime, 0) / components.length;
+    const averageRenderTime =
+      components.reduce((sum, c) => sum + c.averageRenderTime, 0) / components.length;
 
     return {
       slowestComponents,
@@ -397,7 +405,7 @@ export class PerformanceOptimizationService {
   private startNetworkOptimization(): void {
     // Monitor network requests
     this.setupNetworkInterceptors();
-    
+
     // Update network metrics every 10 seconds
     setInterval(() => {
       this.updateNetworkMetrics();
@@ -417,20 +425,22 @@ export class PerformanceOptimizationService {
    */
   recordNetworkRequest(url: string, responseTime: number, cached: boolean, size: number): void {
     this.networkMetrics.requestCount++;
-    this.networkMetrics.averageResponseTime = 
-      (this.networkMetrics.averageResponseTime * (this.networkMetrics.requestCount - 1) + responseTime) / 
+    this.networkMetrics.averageResponseTime =
+      (this.networkMetrics.averageResponseTime * (this.networkMetrics.requestCount - 1) +
+        responseTime) /
       this.networkMetrics.requestCount;
-    
+
     if (cached) {
-      this.networkMetrics.cacheHitRate = 
-        ((this.networkMetrics.cacheHitRate * (this.networkMetrics.requestCount - 1)) + 1) / 
+      this.networkMetrics.cacheHitRate =
+        (this.networkMetrics.cacheHitRate * (this.networkMetrics.requestCount - 1) + 1) /
         this.networkMetrics.requestCount;
     }
 
     this.networkMetrics.totalBandwidthUsed += size;
 
     // Alert on slow network requests
-    if (responseTime > 5000) { // 5 seconds
+    if (responseTime > 5000) {
+      // 5 seconds
       this.alertSlowNetworkRequest(url, responseTime);
     }
   }
@@ -440,7 +450,7 @@ export class PerformanceOptimizationService {
    */
   recordFailedNetworkRequest(url: string, error: Error): void {
     this.networkMetrics.failedRequests++;
-    
+
     Sentry.addBreadcrumb({
       message: 'Network request failed',
       category: 'performance.network.failed',
@@ -467,9 +477,11 @@ export class PerformanceOptimizationService {
   private updateNetworkMetrics(): void {
     // Calculate cache hit rate as percentage
     this.networkMetrics.cacheHitRate = Math.round(this.networkMetrics.cacheHitRate * 100);
-    
+
     // Calculate compression savings (simulated)
-    this.networkMetrics.compressionSavings = Math.round(this.networkMetrics.totalBandwidthUsed * 0.3);
+    this.networkMetrics.compressionSavings = Math.round(
+      this.networkMetrics.totalBandwidthUsed * 0.3
+    );
   }
 
   // =============================================================================
@@ -509,7 +521,7 @@ export class PerformanceOptimizationService {
    */
   private reportPerformanceMetrics(): void {
     const componentAnalytics = this.getComponentPerformanceAnalytics();
-    
+
     Sentry.addBreadcrumb({
       message: 'Performance metrics report',
       category: 'performance.report',
@@ -535,7 +547,7 @@ export class PerformanceOptimizationService {
           failedRequests: this.networkMetrics.failedRequests,
         },
         bundle: {
-          sizeMB: Math.round(this.bundleMetrics.bundleSize / (1024 * 1024) * 100) / 100,
+          sizeMB: Math.round((this.bundleMetrics.bundleSize / (1024 * 1024)) * 100) / 100,
           compressionRatio: this.bundleMetrics.compressionRatio,
           lazyComponents: this.bundleMetrics.lazyLoadedComponents,
         },
@@ -576,7 +588,7 @@ export class PerformanceOptimizationService {
    */
   addMemoryPressureListener(listener: () => void): () => void {
     this.memoryPressureListeners.add(listener);
-    
+
     // Return cleanup function
     return () => {
       this.memoryPressureListeners.delete(listener);
@@ -599,7 +611,7 @@ export class PerformanceOptimizationService {
   stopMonitoring(): void {
     this.isMonitoring = false;
     this.memoryPressureListeners.clear();
-    
+
     if (this.performanceObserver) {
       this.performanceObserver.disconnect();
     }
@@ -654,7 +666,7 @@ export class PerformanceOptimizationService {
   private cleanupComponentMetrics(): void {
     // Keep only metrics from the last 5 minutes for active monitoring
     const cutoffTime = Date.now() - 5 * 60 * 1000;
-    
+
     this.componentMetrics.forEach((metrics, componentName) => {
       if (metrics.lastRenderTime.getTime() < cutoffTime) {
         this.componentMetrics.delete(componentName);
@@ -672,7 +684,7 @@ export class PerformanceOptimizationService {
  */
 export function usePerformanceMonitoring(componentName: string) {
   const startTime = Date.now();
-  
+
   return {
     recordRender: () => {
       const renderTime = Date.now() - startTime;
@@ -684,19 +696,19 @@ export function usePerformanceMonitoring(componentName: string) {
 /**
  * HOC for automatic performance monitoring
  */
-export function withPerformanceMonitoring<P extends {}>(
+export function withPerformanceMonitoring<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName?: string
 ) {
   const displayName = componentName || WrappedComponent.displayName || WrappedComponent.name;
-  
+
   return React.memo((props: P) => {
     const { recordRender } = usePerformanceMonitoring(displayName);
-    
+
     React.useEffect(() => {
       recordRender();
     });
-    
+
     return React.createElement(WrappedComponent, props);
   });
 }
@@ -729,7 +741,7 @@ export function debounce<T extends (...args: any[]) => any>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
@@ -744,7 +756,7 @@ export function throttle<T extends (...args: any[]) => any>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let lastExecution = 0;
-  
+
   return (...args: Parameters<T>) => {
     const now = Date.now();
     if (now - lastExecution >= delay) {

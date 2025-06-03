@@ -1,16 +1,26 @@
 /**
  * API Service Test Script
- * 
+ *
  * This script tests the API service with enhanced logging and error handling.
  * It validates the improvements made to the API service.
  */
 
-import { getGames, getGameDetails, getTrendingTopics, getUserStats, purchaseMicrotransaction, clearCache, ApiErrorType, ApiError } from '../../services/apiService';
-import { info, error as logError, LogCategory } from '../../services/loggingService';
-import { safeErrorCapture } from '../../services/errorUtils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {
+  getGames,
+  getGameDetails,
+  getTrendingTopics,
+  getUserStats,
+  purchaseMicrotransaction,
+  clearCache,
+  ApiErrorType,
+  ApiError,
+} from '../../services/apiService';
+import { safeErrorCapture } from '../../services/errorUtils';
+import { info, error as logError, LogCategory } from '../../services/loggingService';
 
 // Mock the Firebase auth functions
 jest.mock('firebase/auth', () => ({
@@ -50,7 +60,7 @@ describe('API Service', () => {
   beforeEach(() => {
     // Clear all mocks
     jest.clearAllMocks();
-    
+
     // Mock successful auth
     getAuth.mockReturnValue({
       currentUser: {
@@ -58,12 +68,12 @@ describe('API Service', () => {
         getIdToken: jest.fn().mockResolvedValue('test-token'),
       },
     });
-    
+
     // Mock AsyncStorage
     AsyncStorage.getItem.mockResolvedValue(null);
     AsyncStorage.setItem.mockResolvedValue(undefined);
     AsyncStorage.getAllKeys.mockResolvedValue([]);
-    
+
     // Mock successful fetch
     global.fetch.mockResolvedValue({
       ok: true,
@@ -79,24 +89,24 @@ describe('API Service', () => {
       status: 200,
       json: jest.fn().mockResolvedValue({ games: [{ id: 'game1' }] }),
     });
-    
+
     // Call the API
     await getGames();
-    
+
     // Verify that the request was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
       'Making GET request',
       expect.objectContaining({ endpoint: '/games?type=all', method: 'GET' })
     );
-    
+
     // Verify that the response was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
       'Response received',
-      expect.objectContaining({ 
-        endpoint: '/games?type=all', 
-        status: 200 
+      expect.objectContaining({
+        endpoint: '/games?type=all',
+        status: 200,
       })
     );
   });
@@ -108,17 +118,17 @@ describe('API Service', () => {
       status: 404,
       json: jest.fn().mockResolvedValue({ message: 'Game not found' }),
     });
-    
+
     // Call the API and expect it to throw
     await expect(getGameDetails('nonexistent-game')).rejects.toThrow();
-    
+
     // Verify that the error was logged
     expect(logError).toHaveBeenCalledWith(
       LogCategory.API,
       'HTTP error 404 (not_found)',
       expect.any(ApiError)
     );
-    
+
     // Verify that the error was captured
     expect(safeErrorCapture).toHaveBeenCalled();
   });
@@ -132,27 +142,23 @@ describe('API Service', () => {
       status: 200,
       json: jest.fn().mockResolvedValue({ trending: [{ id: 'trend1' }] }),
     });
-    
+
     // Call the API
     await getTrendingTopics();
-    
+
     // Verify that the error was logged
-    expect(logError).toHaveBeenCalledWith(
-      LogCategory.API,
-      'Network or server error',
-      networkError
-    );
-    
+    expect(logError).toHaveBeenCalledWith(LogCategory.API, 'Network or server error', networkError);
+
     // Verify that the retry was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
       'Retrying request after error',
-      expect.objectContaining({ 
+      expect.objectContaining({
         endpoint: '/trending',
-        retriesLeft: 2
+        retriesLeft: 2,
       })
     );
-    
+
     // Verify that the error was captured
     expect(safeErrorCapture).toHaveBeenCalled();
   });
@@ -160,7 +166,7 @@ describe('API Service', () => {
   test('logs authentication status for requests', async () => {
     // Call the API
     await getUserStats('test-user-id');
-    
+
     // Verify that the authentication was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
@@ -177,17 +183,17 @@ describe('API Service', () => {
         getIdToken: jest.fn().mockRejectedValue(new Error('Auth token error')),
       },
     });
-    
+
     // Call the API
     await getUserStats('test-user-id');
-    
+
     // Verify that the error was logged
     expect(logError).toHaveBeenCalledWith(
       LogCategory.API,
       'Failed to get authentication token',
       expect.any(Error)
     );
-    
+
     // Verify that the error was captured
     expect(safeErrorCapture).toHaveBeenCalled();
   });
@@ -199,17 +205,17 @@ describe('API Service', () => {
       status: 200,
       json: jest.fn().mockRejectedValue(new SyntaxError('Unexpected token')),
     });
-    
+
     // Call the API and expect it to throw
     await expect(getGames()).rejects.toThrow();
-    
+
     // Verify that the error was logged
     expect(logError).toHaveBeenCalledWith(
       LogCategory.API,
       'Error parsing JSON response',
       expect.any(SyntaxError)
     );
-    
+
     // Verify that the error was captured
     expect(safeErrorCapture).toHaveBeenCalled();
   });
@@ -221,31 +227,31 @@ describe('API Service', () => {
       status: 200,
       json: jest.fn().mockResolvedValue({ purchase: { id: 'purchase1' } }),
     });
-    
+
     // Call the API
     await purchaseMicrotransaction('product1', 'payment1');
-    
+
     // Verify that the purchase initiation was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
       'Initiating microtransaction purchase',
       expect.objectContaining({ productId: 'product1' })
     );
-    
+
     // Verify that the authentication was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
       'User authenticated for purchase',
       expect.objectContaining({ userId: 'test-user-id' })
     );
-    
+
     // Verify that the purchase success was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.API,
       'Microtransaction purchase successful',
-      expect.objectContaining({ 
+      expect.objectContaining({
         productId: 'product1',
-        purchaseId: 'purchase1'
+        purchaseId: 'purchase1',
       })
     );
   });
@@ -255,31 +261,33 @@ describe('API Service', () => {
     getAuth.mockReturnValueOnce({
       currentUser: null,
     });
-    
+
     // Call the API and expect it to throw
     await expect(purchaseMicrotransaction('product1', 'payment1')).rejects.toThrow();
-    
+
     // Verify that the error was logged
     expect(logError).toHaveBeenCalledWith(
       LogCategory.API,
       'User not authenticated for purchase',
       expect.any(ApiError)
     );
-    
+
     // Verify that the error was captured
     expect(safeErrorCapture).toHaveBeenCalled();
   });
 
   test('logs cache operations', async () => {
     // Mock cache hit
-    AsyncStorage.getItem.mockResolvedValueOnce(JSON.stringify({
-      data: [{ id: 'game1' }],
-      timestamp: Date.now(),
-    }));
-    
+    AsyncStorage.getItem.mockResolvedValueOnce(
+      JSON.stringify({
+        data: [{ id: 'game1' }],
+        timestamp: Date.now(),
+      })
+    );
+
     // Call the API with cache enabled
     await getGames('all', true);
-    
+
     // Verify that no fetch was made (cache hit)
     expect(global.fetch).not.toHaveBeenCalled();
   });
@@ -287,14 +295,17 @@ describe('API Service', () => {
   test('logs cache clearing', async () => {
     // Mock cache keys
     AsyncStorage.getAllKeys.mockResolvedValueOnce(['api_cache_games_all', 'api_cache_trending']);
-    
+
     // Clear cache
     await clearCache();
-    
+
     // Verify that the cache keys were retrieved
     expect(AsyncStorage.getAllKeys).toHaveBeenCalled();
-    
+
     // Verify that the cache was cleared
-    expect(AsyncStorage.multiRemove).toHaveBeenCalledWith(['api_cache_games_all', 'api_cache_trending']);
+    expect(AsyncStorage.multiRemove).toHaveBeenCalledWith([
+      'api_cache_games_all',
+      'api_cache_trending',
+    ]);
   });
 });

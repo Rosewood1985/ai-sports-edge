@@ -1,9 +1,10 @@
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+
 import NewsTicker from '../components/NewsTicker';
 import ThemeToggle from '../components/ThemeToggle';
+import { auth } from '../firebase';
 import '../styles/login.css';
 import '../components/NewsTicker.css';
 
@@ -20,7 +21,7 @@ const LoginPage = () => {
 
   // Check if user is already logged in
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         navigate('/dashboard');
       }
@@ -30,7 +31,7 @@ const LoginPage = () => {
   }, [navigate]);
 
   // Handle login form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -40,7 +41,7 @@ const LoginPage = () => {
       navigate('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
-      
+
       // Provide user-friendly error messages
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setError('Invalid email or password. Please try again.');
@@ -62,72 +63,68 @@ const LoginPage = () => {
       <div className="login-news-ticker">
         <NewsTicker
           maxItems={10}
-          showSource={true}
-          autoScroll={true}
+          showSource
+          autoScroll
           scrollSpeed={50}
-          pauseOnHover={true}
+          pauseOnHover
           userPreferences={{
             bettingContentOnly: false,
-            maxNewsItems: 20
+            maxNewsItems: 20,
           }}
         />
       </div>
-      
+
       <div className="login-content">
         <div className="login-form-container">
           <div className="login-logo">
             <img src="/assets/logo.png" alt="AI Sports Edge Logo" />
             <h1>AI Sports Edge</h1>
           </div>
-          
+
           <form className="login-form" onSubmit={handleSubmit}>
             <h2>Sign In</h2>
-            
+
             {error && <div className="login-error">{error}</div>}
-            
+
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
               />
             </div>
-            
-            <button 
-              type="submit" 
-              className="login-button" 
-              disabled={loading}
-            >
+
+            <button type="submit" className="login-button" disabled={loading}>
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
-            
+
             <div className="login-links">
               <Link to="/forgot-password">Forgot Password?</Link>
               <Link to="/signup">Create Account</Link>
             </div>
           </form>
-          
+
           {/* Theme Toggle */}
           <div className="login-theme-toggle">
             <ThemeToggle />
           </div>
-          
+
           <div className="login-footer">
             <p>Get the latest sports predictions powered by AI</p>
             <div className="app-download-links">
@@ -140,39 +137,48 @@ const LoginPage = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="login-features">
           <h2>Why Choose AI Sports Edge?</h2>
-          
+
           <div className="feature">
             <div className="feature-icon">📊</div>
             <div className="feature-text">
               <h3>AI-Powered Predictions</h3>
-              <p>Our advanced machine learning models analyze thousands of data points to provide accurate predictions.</p>
+              <p>
+                Our advanced machine learning models analyze thousands of data points to provide
+                accurate predictions.
+              </p>
             </div>
           </div>
-          
+
           <div className="feature">
             <div className="feature-icon">📱</div>
             <div className="feature-text">
               <h3>Real-Time Updates</h3>
-              <p>Get instant notifications and live updates for all your favorite sports and teams.</p>
+              <p>
+                Get instant notifications and live updates for all your favorite sports and teams.
+              </p>
             </div>
           </div>
-          
+
           <div className="feature">
             <div className="feature-icon">🏆</div>
             <div className="feature-text">
               <h3>Comprehensive Coverage</h3>
-              <p>From major leagues to niche sports, we've got you covered with in-depth analysis.</p>
+              <p>
+                From major leagues to niche sports, we've got you covered with in-depth analysis.
+              </p>
             </div>
           </div>
-          
+
           <div className="feature">
             <div className="feature-icon">📈</div>
             <div className="feature-text">
               <h3>Advanced Analytics</h3>
-              <p>Access in-depth sports analytics and performance metrics to gain valuable insights.</p>
+              <p>
+                Access in-depth sports analytics and performance metrics to gain valuable insights.
+              </p>
             </div>
           </div>
         </div>

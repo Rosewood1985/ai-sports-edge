@@ -4,29 +4,29 @@
  * Central orchestrator for all caching systems with intelligent routing
  */
 
-import { RealTimeDataCacheService } from './realTimeDataCacheService';
+import { cacheService } from './cacheService';
 import { DistributedCacheService } from './distributedCacheService';
 import { ModelCacheService } from './modelCacheService';
-import { cacheService } from './cacheService';
+import { RealTimeDataCacheService } from './realTimeDataCacheService';
 
 export interface CacheOptions {
   // Data classification
   dataType?: 'live' | 'recent' | 'historical' | 'analytics' | 'model' | 'prediction';
-  
+
   // Performance tuning
   priority?: number; // 1-10, higher = more important
   ttl?: number; // Time to live in milliseconds
-  
+
   // Distribution settings
   useDistributed?: boolean;
   replicateToNodes?: boolean;
   consistencyLevel?: 'eventual' | 'strong' | 'weak';
-  
+
   // Optimization flags
   preload?: boolean;
   compress?: boolean;
   useLocalOnly?: boolean;
-  
+
   // Metadata
   version?: string;
   source?: string;
@@ -68,12 +68,12 @@ export interface CacheHandler {
  */
 export class UnifiedCacheService {
   private static instance: UnifiedCacheService;
-  
+
   // Cache service instances
   private realTimeCache: RealTimeDataCacheService;
   private distributedCache: DistributedCacheService;
   private modelCache: ModelCacheService;
-  
+
   // Statistics and monitoring
   private stats: CacheStats = {
     totalRequests: 0,
@@ -103,7 +103,7 @@ export class UnifiedCacheService {
     this.realTimeCache = RealTimeDataCacheService.getInstance();
     this.distributedCache = DistributedCacheService.getInstance();
     this.modelCache = ModelCacheService.getInstance();
-    
+
     this.initializeStrategies();
     this.startPerformanceMonitoring();
   }
@@ -125,10 +125,10 @@ export class UnifiedCacheService {
     try {
       // Select appropriate strategy
       const strategy = this.selectStrategy(key, options);
-      
+
       // Execute strategy
       let result = await strategy.handler.get<T>(key, options);
-      
+
       // Try fallback if primary fails
       if (!result && strategy.fallbackHandler) {
         result = await strategy.fallbackHandler.get<T>(key, options);
@@ -137,7 +137,7 @@ export class UnifiedCacheService {
       // Record performance metrics
       const latency = performance.now() - startTime;
       this.recordLatency(latency);
-      
+
       if (result) {
         this.recordHit(strategy.name);
       }
@@ -156,13 +156,12 @@ export class UnifiedCacheService {
     try {
       // Select appropriate strategy
       const strategy = this.selectStrategy(key, options);
-      
+
       // Execute primary strategy
       await strategy.handler.set(key, data, options);
-      
+
       // Execute additional strategies based on options
       await this.executeAdditionalStrategies(key, data, options);
-      
     } catch (error) {
       console.error(`Cache set error for key ${key}:`, error);
     }
@@ -171,33 +170,24 @@ export class UnifiedCacheService {
   /**
    * Batch operations for improved performance
    */
-  async getBatch<T>(
-    keys: string[],
-    options: CacheOptions = {}
-  ): Promise<Map<string, T | null>> {
+  async getBatch<T>(keys: string[], options: CacheOptions = {}): Promise<Map<string, T | null>> {
     const results = new Map<string, T | null>();
-    
+
     // Group keys by strategy
     const strategyGroups = this.groupKeysByStrategy(keys, options);
-    
+
     // Execute batch operations for each strategy
-    const promises = Array.from(strategyGroups.entries()).map(
-      async ([strategy, strategyKeys]) => {
-        try {
-          const batchResults = await this.executeBatchStrategy<T>(
-            strategy,
-            strategyKeys,
-            options
-          );
-          
-          for (const [key, value] of batchResults) {
-            results.set(key, value);
-          }
-        } catch (error) {
-          console.error(`Batch operation failed for strategy ${strategy.name}:`, error);
+    const promises = Array.from(strategyGroups.entries()).map(async ([strategy, strategyKeys]) => {
+      try {
+        const batchResults = await this.executeBatchStrategy<T>(strategy, strategyKeys, options);
+
+        for (const [key, value] of batchResults) {
+          results.set(key, value);
         }
+      } catch (error) {
+        console.error(`Batch operation failed for strategy ${strategy.name}:`, error);
       }
-    );
+    });
 
     await Promise.all(promises);
     return results;
@@ -214,11 +204,7 @@ export class UnifiedCacheService {
       includeLocal?: boolean;
     } = {}
   ): Promise<number> {
-    const {
-      includeDistributed = true,
-      includeModels = true,
-      includeLocal = true,
-    } = options;
+    const { includeDistributed = true, includeModels = true, includeLocal = true } = options;
 
     let totalInvalidated = 0;
 
@@ -241,7 +227,7 @@ export class UnifiedCacheService {
       }
 
       const results = await Promise.allSettled(promises);
-      
+
       results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
           totalInvalidated += result.value;
@@ -249,7 +235,6 @@ export class UnifiedCacheService {
           console.error(`Invalidation failed for cache system ${index}:`, result.reason);
         }
       });
-
     } catch (error) {
       console.error('Cache invalidation error:', error);
     }
@@ -261,11 +246,11 @@ export class UnifiedCacheService {
    * Preload frequently accessed data
    */
   async preload(
-    entries: Array<{
+    entries: {
       key: string;
       loader: () => Promise<any>;
       options?: CacheOptions;
-    }>
+    }[]
   ): Promise<void> {
     // Sort by priority
     const sortedEntries = entries.sort(
@@ -276,7 +261,7 @@ export class UnifiedCacheService {
     const batchSize = 10;
     for (let i = 0; i < sortedEntries.length; i += batchSize) {
       const batch = sortedEntries.slice(i, i + batchSize);
-      
+
       const promises = batch.map(async ({ key, loader, options = {} }) => {
         try {
           // Check if already cached
@@ -286,7 +271,7 @@ export class UnifiedCacheService {
           // Load and cache
           const data = await loader();
           await this.set(key, data, { ...options, preload: true });
-          
+
           console.log(`Preloaded ${key} with priority ${options.priority || 5}`);
         } catch (error) {
           console.error(`Failed to preload ${key}:`, error);
@@ -333,11 +318,14 @@ export class UnifiedCacheService {
       distributed: any;
       model: any;
     };
-    strategyPerformance: Record<string, {
-      uses: number;
-      averageLatency: number;
-      hitRate: number;
-    }>;
+    strategyPerformance: Record<
+      string,
+      {
+        uses: number;
+        averageLatency: number;
+        hitRate: number;
+      }
+    >;
   } {
     return {
       ...this.stats,
@@ -374,7 +362,7 @@ export class UnifiedCacheService {
 
     const healthySystems = Object.values(systems).filter(Boolean).length;
     const totalSystems = Object.keys(systems).length;
-    
+
     let overall: 'healthy' | 'degraded' | 'unhealthy';
     if (healthySystems === totalSystems) {
       overall = 'healthy';
@@ -415,7 +403,7 @@ export class UnifiedCacheService {
       // Model and prediction data strategy
       {
         name: 'model',
-        condition: (key, options) => 
+        condition: (key, options) =>
           options.dataType === 'model' || options.dataType === 'prediction',
         handler: {
           get: async <T>(key: string, options: CacheOptions) => {
@@ -449,7 +437,7 @@ export class UnifiedCacheService {
             return this.realTimeCache.get<T>(key, 'live');
           },
           set: async <T>(key: string, data: T, options: CacheOptions) => {
-            await this.realTimeCache.set(key, data, { 
+            await this.realTimeCache.set(key, data, {
               dataType: 'live',
               priority: options.priority,
               version: options.version,
@@ -475,9 +463,8 @@ export class UnifiedCacheService {
       // Distributed data strategy
       {
         name: 'distributed',
-        condition: (key, options) => 
-          options.useDistributed || 
-          ['historical', 'analytics'].includes(options.dataType || ''),
+        condition: (key, options) =>
+          options.useDistributed || ['historical', 'analytics'].includes(options.dataType || ''),
         handler: {
           get: async <T>(key: string, options: CacheOptions) => {
             return this.distributedCache.get<T>(key, {
@@ -503,7 +490,7 @@ export class UnifiedCacheService {
             return this.realTimeCache.get<T>(key, options.dataType as any);
           },
           set: async <T>(key: string, data: T, options: CacheOptions) => {
-            await this.realTimeCache.set(key, data, { 
+            await this.realTimeCache.set(key, data, {
               dataType: options.dataType as any,
               priority: options.priority,
               version: options.version,
@@ -524,7 +511,7 @@ export class UnifiedCacheService {
             return this.realTimeCache.get<T>(key, options.dataType as any);
           },
           set: async <T>(key: string, data: T, options: CacheOptions) => {
-            await this.realTimeCache.set(key, data, { 
+            await this.realTimeCache.set(key, data, {
               dataType: options.dataType as any,
               priority: options.priority,
               version: options.version,
@@ -544,7 +531,7 @@ export class UnifiedCacheService {
         return strategy;
       }
     }
-    
+
     // Return default strategy
     return this.strategies[this.strategies.length - 1];
   }
@@ -581,19 +568,16 @@ export class UnifiedCacheService {
     await Promise.allSettled(promises);
   }
 
-  private groupKeysByStrategy(
-    keys: string[],
-    options: CacheOptions
-  ): Map<CacheStrategy, string[]> {
+  private groupKeysByStrategy(keys: string[], options: CacheOptions): Map<CacheStrategy, string[]> {
     const groups = new Map<CacheStrategy, string[]>();
 
     for (const key of keys) {
       const strategy = this.selectStrategy(key, options);
-      
+
       if (!groups.has(strategy)) {
         groups.set(strategy, []);
       }
-      
+
       groups.get(strategy)!.push(key);
     }
 
@@ -619,7 +603,7 @@ export class UnifiedCacheService {
     }
 
     // Fallback to individual gets
-    const promises = keys.map(async (key) => {
+    const promises = keys.map(async key => {
       const value = await strategy.handler.get<T>(key, options);
       results.set(key, value);
     });
@@ -648,13 +632,13 @@ export class UnifiedCacheService {
 
   private recordLatency(latency: number): void {
     this.latencyHistory.push(latency);
-    
+
     if (this.latencyHistory.length > this.MAX_LATENCY_SAMPLES) {
       this.latencyHistory = this.latencyHistory.slice(-this.MAX_LATENCY_SAMPLES / 2);
     }
 
-    this.stats.averageLatency = this.latencyHistory.reduce((sum, l) => sum + l, 0) 
-      / this.latencyHistory.length;
+    this.stats.averageLatency =
+      this.latencyHistory.reduce((sum, l) => sum + l, 0) / this.latencyHistory.length;
   }
 
   private recordHit(strategyName: string): void {
@@ -670,38 +654,41 @@ export class UnifiedCacheService {
         break;
     }
 
-    const totalHits = Object.values(this.stats.distributionStats)
-      .reduce((sum, hits) => sum + hits, 0);
-    
-    this.stats.hitRate = this.stats.totalRequests > 0 
-      ? totalHits / this.stats.totalRequests 
-      : 0;
+    const totalHits = Object.values(this.stats.distributionStats).reduce(
+      (sum, hits) => sum + hits,
+      0
+    );
+
+    this.stats.hitRate = this.stats.totalRequests > 0 ? totalHits / this.stats.totalRequests : 0;
   }
 
   private calculateStrategyPerformance(): Record<string, any> {
     // Would track strategy-specific performance metrics
-    return this.strategies.reduce((acc, strategy) => {
-      acc[strategy.name] = {
-        uses: 0,
-        averageLatency: 0,
-        hitRate: 0,
-      };
-      return acc;
-    }, {} as Record<string, any>);
+    return this.strategies.reduce(
+      (acc, strategy) => {
+        acc[strategy.name] = {
+          uses: 0,
+          averageLatency: 0,
+          hitRate: 0,
+        };
+        return acc;
+      },
+      {} as Record<string, any>
+    );
   }
 
   private startPerformanceMonitoring(): void {
     setInterval(() => {
       // Update data freshness metrics
       const realTimeMetrics = this.realTimeCache.getMetrics();
-      
+
       // Update freshness based on cache hit rates and data age
       // This would be calculated based on actual data timestamps
       this.stats.dataFreshness = {
         live: 0.95, // 95% fresh
         recent: 0.85,
         historical: 0.75,
-        analytics: 0.90,
+        analytics: 0.9,
       };
     }, 30000); // Update every 30 seconds
   }

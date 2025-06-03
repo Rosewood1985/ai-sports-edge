@@ -1,7 +1,8 @@
 import * as Sentry from '@sentry/node';
+
 import { firebaseService } from '../firebaseService';
-import { UFCDataSyncService } from './ufcDataSyncService';
 import { UFCAnalyticsService } from './ufcAnalyticsService';
+import { UFCDataSyncService } from './ufcDataSyncService';
 import { UFCMLPredictionService } from './ufcMLPredictionService';
 
 interface BettingOpportunity {

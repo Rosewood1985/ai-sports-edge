@@ -1,3 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { FirebaseError } from 'firebase/app';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  AuthError,
+  Auth,
+  getAuth,
+} from 'firebase/auth';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -9,25 +20,14 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 import LegalLinks from '../components/LegalLinks';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-  AuthError,
-  Auth,
-  getAuth,
-} from 'firebase/auth';
-import { info, error as logError, LogCategory } from '../services/loggingService';
 import { safeErrorCapture } from '../services/errorUtils';
-import { FirebaseError } from 'firebase/app';
+import { info, error as logError, LogCategory } from '../services/loggingService';
 
 // Password validation function
 const validatePassword = (
@@ -397,7 +397,7 @@ const AuthScreen = () => {
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
-                  accessible={true}
+                  accessible
                   accessibilityLabel={t('auth.username_input')}
                   accessibilityHint={t('auth.username_input_hint')}
                 />
@@ -435,7 +435,7 @@ const AuthScreen = () => {
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
-                accessible={true}
+                accessible
                 accessibilityLabel={t('auth.email_input')}
                 accessibilityHint={t('auth.email_input_hint')}
               />
@@ -471,7 +471,7 @@ const AuthScreen = () => {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                accessible={true}
+                accessible
                 accessibilityLabel={t('auth.password_input')}
                 accessibilityHint={t('auth.password_input_hint')}
               />
@@ -507,14 +507,14 @@ const AuthScreen = () => {
                             passwordStrength === 'weak'
                               ? '33%'
                               : passwordStrength === 'medium'
-                              ? '66%'
-                              : '100%',
+                                ? '66%'
+                                : '100%',
                           backgroundColor:
                             passwordStrength === 'weak'
                               ? '#FF3B30'
                               : passwordStrength === 'medium'
-                              ? '#FFCC00'
-                              : '#34C759',
+                                ? '#FFCC00'
+                                : '#34C759',
                         },
                       ]}
                     />
@@ -527,23 +527,23 @@ const AuthScreen = () => {
                           passwordStrength === 'weak'
                             ? '#FF3B30'
                             : passwordStrength === 'medium'
-                            ? '#FFCC00'
-                            : '#34C759',
+                              ? '#FFCC00'
+                              : '#34C759',
                       },
                     ]}
                     accessibilityLabel={
                       passwordStrength === 'weak'
                         ? t('auth.password_strength_weak')
                         : passwordStrength === 'medium'
-                        ? t('auth.password_strength_medium')
-                        : t('auth.password_strength_strong')
+                          ? t('auth.password_strength_medium')
+                          : t('auth.password_strength_strong')
                     }
                   >
                     {passwordStrength === 'weak'
                       ? t('auth.weak')
                       : passwordStrength === 'medium'
-                      ? t('auth.medium')
-                      : t('auth.strong')}
+                        ? t('auth.medium')
+                        : t('auth.strong')}
                   </AccessibleThemedText>
                 </View>
               </>
@@ -575,7 +575,7 @@ const AuthScreen = () => {
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry
-                    accessible={true}
+                    accessible
                     accessibilityLabel={t('auth.confirm_password_input')}
                     accessibilityHint={t('auth.confirm_password_input_hint')}
                   />
@@ -738,7 +738,7 @@ const AuthScreen = () => {
 
             {/* Legal links - show title only on sign up screen */}
             <View style={styles.legalLinksContainer} accessibilityLabel={t('auth.legal_links')}>
-              <LegalLinks showTitle={!isLogin} horizontal={true} textSize="small" />
+              <LegalLinks showTitle={!isLogin} horizontal textSize="small" />
             </View>
           </View>
         </ScrollView>

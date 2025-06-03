@@ -163,12 +163,12 @@ export interface DetectedPattern {
 export interface PatternVisualization {
   type: 'time_series' | 'scatter' | 'heatmap' | 'network';
   data: any;
-  annotations: Array<{
+  annotations: {
     x: number;
     y: number;
     text: string;
     type: 'peak' | 'trough' | 'anomaly' | 'change_point';
-  }>;
+  }[];
 }
 
 // Correlation analysis
@@ -284,11 +284,11 @@ export interface InsightAnalytics {
   byStatus: Record<string, number>;
   averageConfidence: number;
   averageResolutionTime: number;
-  topTopics: Array<{
+  topTopics: {
     topic: string;
     count: number;
     trend: 'up' | 'down' | 'stable';
-  }>;
+  }[];
   sentimentDistribution: Record<string, number>;
   impactAnalysis: {
     totalEstimatedValue: number;
@@ -308,10 +308,10 @@ export interface InsightBatchResult {
   insights: EnhancedInsight[];
   patterns: PatternDetection[];
   correlations: CorrelationAnalysis[];
-  errors: Array<{
+  errors: {
     record: number;
     error: string;
-  }>;
+  }[];
   summary: InsightAnalytics;
 }
 

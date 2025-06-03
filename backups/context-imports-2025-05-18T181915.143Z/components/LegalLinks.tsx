@@ -1,8 +1,9 @@
+import { useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTheme, useNavigation } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
+
 import { ThemedText } from './ThemedComponents';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LegalLinksProps {
   showTitle?: boolean;
@@ -18,7 +19,7 @@ interface LegalLinksProps {
 const LegalLinks: React.FC<LegalLinksProps> = ({
   showTitle = true,
   horizontal = false,
-  textSize = 'medium'
+  textSize = 'medium',
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
@@ -28,7 +29,7 @@ const LegalLinks: React.FC<LegalLinksProps> = ({
   const fontSize = {
     small: 12,
     medium: 14,
-    large: 16
+    large: 16,
   }[textSize];
 
   // Open the Privacy Policy
@@ -52,23 +53,23 @@ const LegalLinks: React.FC<LegalLinksProps> = ({
           {t('legal.legal_information')}
         </ThemedText>
       )}
-      
+
       <View style={horizontal ? styles.linksHorizontal : styles.linksVertical}>
         <TouchableOpacity onPress={openPrivacyPolicy}>
           <ThemedText style={[styles.link, { color: colors.primary, fontSize }]}>
             {t('legal.privacy_policy')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         {horizontal && <ThemedText style={{ fontSize }}>•</ThemedText>}
-        
+
         <TouchableOpacity onPress={openTermsOfService}>
           <ThemedText style={[styles.link, { color: colors.primary, fontSize }]}>
             {t('legal.terms_of_service')}
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
+
       <ThemedText style={[styles.disclaimer, { fontSize: fontSize - 2 }]}>
         {t('legal.by_using_app')}
       </ThemedText>
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     opacity: 0.7,
     textAlign: 'center',
-  }
+  },
 });
 
 export default LegalLinks;

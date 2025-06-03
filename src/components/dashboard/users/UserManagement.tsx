@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { User } from '../../../types/userManagement';
-import UserList from './UserList';
-import UserForm from './UserForm';
+
 import UserDetails from './UserDetails';
-import { Card, CardHeader, CardContent } from '../../ui/Card';
-import { Button } from '../../ui/Button';
+import UserForm from './UserForm';
+import UserList from './UserList';
 import { useUserManagement } from '../../../services/adminDashboardService';
+import { User } from '../../../types/userManagement';
+import { Button } from '../../ui/Button';
+import { Card, CardHeader, CardContent } from '../../ui/Card';
 
 type ViewMode = 'list' | 'create' | 'edit' | 'view';
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+
 import { usePatternDetection } from '../../../../hooks/useEnhancedInsights';
 import { PatternInsight, PatternType } from '../../../../types/enhancedInsights';
-import LoadingIndicator from '../../../LoadingIndicator';
 import ErrorMessage from '../../../ErrorMessage';
+import LoadingIndicator from '../../../LoadingIndicator';
 
 interface PatternDetectionWidgetProps {
   dateRange: [Date, Date];
@@ -12,15 +13,15 @@ interface PatternDetectionWidgetProps {
 
 export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
   dateRange,
-  patternTypes
+  patternTypes,
 }) => {
   const [selectedPatternType, setSelectedPatternType] = useState<PatternType | 'all'>('all');
   const [selectedPattern, setSelectedPattern] = useState<PatternInsight | null>(null);
-  
+
   const { patterns, isLoading, error, detectPatterns } = usePatternDetection({
     startDate: dateRange[0],
     endDate: dateRange[1],
-    types: patternTypes
+    types: patternTypes,
   });
 
   useEffect(() => {
@@ -30,9 +31,8 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
   if (isLoading) return <LoadingIndicator />;
   if (error) return <ErrorMessage message={error} />;
 
-  const filteredPatterns = selectedPatternType === 'all' 
-    ? patterns 
-    : patterns.filter(p => p.type === selectedPatternType);
+  const filteredPatterns =
+    selectedPatternType === 'all' ? patterns : patterns.filter(p => p.type === selectedPatternType);
 
   const getPatternTypeColor = (type: PatternType): string => {
     const colors = {
@@ -41,7 +41,7 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
       trending: '#96CEB4',
       anomalous: '#FFEAA7',
       correlation: '#DDA0DD',
-      behavioral: '#98D8C8'
+      behavioral: '#98D8C8',
     };
     return colors[type] || '#95A5A6';
   };
@@ -73,44 +73,46 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
 
   const renderPatternCard = ({ item: pattern }: { item: PatternInsight }) => (
     <TouchableOpacity
-      style={[
-        styles.patternCard,
-        selectedPattern?.id === pattern.id && styles.selectedCard
-      ]}
+      style={[styles.patternCard, selectedPattern?.id === pattern.id && styles.selectedCard]}
       onPress={() => setSelectedPattern(pattern)}
     >
       <View style={styles.patternHeader}>
-        <View style={[
-          styles.patternTypeTag,
-          { backgroundColor: getPatternTypeColor(pattern.type) }
-        ]}>
+        <View
+          style={[styles.patternTypeTag, { backgroundColor: getPatternTypeColor(pattern.type) }]}
+        >
           <Text style={styles.patternTypeText}>{pattern.type.toUpperCase()}</Text>
         </View>
         <Text style={styles.patternStrength}>
           {getPatternStrengthIcon(pattern.strength)} {(pattern.strength * 100).toFixed(1)}%
         </Text>
       </View>
-      
+
       <Text style={styles.patternTitle}>{pattern.name}</Text>
       <Text style={styles.patternDescription} numberOfLines={2}>
         {getPatternDescription(pattern)}
       </Text>
-      
+
       <View style={styles.patternFooter}>
-        <Text style={styles.patternMetric}>
-          📊 Samples: {pattern.sampleSize}
-        </Text>
+        <Text style={styles.patternMetric}>📊 Samples: {pattern.sampleSize}</Text>
         <Text style={styles.patternMetric}>
           📅 {new Date(pattern.detectedAt).toLocaleDateString()}
         </Text>
       </View>
-      
+
       {pattern.significance && (
-        <View style={[
-          styles.significanceTag,
-          { backgroundColor: pattern.significance === 'high' ? '#FF6B6B' : 
-                          pattern.significance === 'medium' ? '#4ECDC4' : '#95A5A6' }
-        ]}>
+        <View
+          style={[
+            styles.significanceTag,
+            {
+              backgroundColor:
+                pattern.significance === 'high'
+                  ? '#FF6B6B'
+                  : pattern.significance === 'medium'
+                    ? '#4ECDC4'
+                    : '#95A5A6',
+            },
+          ]}
+        >
           <Text style={styles.significanceText}>
             {pattern.significance.toUpperCase()} SIGNIFICANCE
           </Text>
@@ -123,9 +125,7 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
     if (!selectedPattern) {
       return (
         <View style={styles.noSelectionContainer}>
-          <Text style={styles.noSelectionText}>
-            Select a pattern to view detailed analysis
-          </Text>
+          <Text style={styles.noSelectionText}>Select a pattern to view detailed analysis</Text>
         </View>
       );
     }
@@ -133,13 +133,11 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
     return (
       <ScrollView style={styles.detailsContainer}>
         <Text style={styles.detailsTitle}>{selectedPattern.name}</Text>
-        
+
         <View style={styles.detailsSection}>
           <Text style={styles.sectionTitle}>Pattern Analysis</Text>
-          <Text style={styles.sectionContent}>
-            {getPatternDescription(selectedPattern)}
-          </Text>
-          
+          <Text style={styles.sectionContent}>{getPatternDescription(selectedPattern)}</Text>
+
           {selectedPattern.metadata && (
             <View style={styles.metadataContainer}>
               <Text style={styles.metadataTitle}>Additional Insights:</Text>
@@ -169,7 +167,9 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
             </View>
             <View style={styles.metricItem}>
               <Text style={styles.metricValue}>
-                {selectedPattern.confidence ? (selectedPattern.confidence * 100).toFixed(1) + '%' : 'N/A'}
+                {selectedPattern.confidence
+                  ? (selectedPattern.confidence * 100).toFixed(1) + '%'
+                  : 'N/A'}
               </Text>
               <Text style={styles.metricLabel}>Confidence</Text>
             </View>
@@ -198,43 +198,33 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Pattern Detection</Text>
-        <Text style={styles.subtitle}>
-          {filteredPatterns.length} patterns detected
-        </Text>
+        <Text style={styles.subtitle}>{filteredPatterns.length} patterns detected</Text>
       </View>
 
       {/* Pattern Type Filters */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
         <TouchableOpacity
-          style={[
-            styles.filterButton,
-            selectedPatternType === 'all' && styles.activeFilter
-          ]}
+          style={[styles.filterButton, selectedPatternType === 'all' && styles.activeFilter]}
           onPress={() => setSelectedPatternType('all')}
         >
-          <Text style={[
-            styles.filterText,
-            selectedPatternType === 'all' && styles.activeFilterText
-          ]}>
+          <Text
+            style={[styles.filterText, selectedPatternType === 'all' && styles.activeFilterText]}
+          >
             All ({patterns.length})
           </Text>
         </TouchableOpacity>
-        
+
         {patternTypes.map(type => {
           const count = patterns.filter(p => p.type === type).length;
           return (
             <TouchableOpacity
               key={type}
-              style={[
-                styles.filterButton,
-                selectedPatternType === type && styles.activeFilter
-              ]}
+              style={[styles.filterButton, selectedPatternType === type && styles.activeFilter]}
               onPress={() => setSelectedPatternType(type)}
             >
-              <Text style={[
-                styles.filterText,
-                selectedPatternType === type && styles.activeFilterText
-              ]}>
+              <Text
+                style={[styles.filterText, selectedPatternType === type && styles.activeFilterText]}
+              >
                 {type} ({count})
               </Text>
             </TouchableOpacity>
@@ -248,16 +238,14 @@ export const PatternDetectionWidget: React.FC<PatternDetectionWidgetProps> = ({
           <FlatList
             data={filteredPatterns}
             renderItem={renderPatternCard}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
             style={styles.patternList}
           />
         </View>
 
         {/* Pattern Details */}
-        <View style={styles.detailsPane}>
-          {renderPatternDetails()}
-        </View>
+        <View style={styles.detailsPane}>{renderPatternDetails()}</View>
       </View>
     </View>
   );

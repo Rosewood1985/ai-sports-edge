@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { ContentItem } from '../../../types/contentManagement';
+
 import { useContentManagement } from '../../../hooks/useContentManagement';
-import { Button } from '../../ui/Button';
-import { Badge } from '../../ui/Badge';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { ContentItem } from '../../../types/contentManagement';
 import { formatDateTime } from '../../../utils/dateUtils';
+import { Badge } from '../../ui/Badge';
+import { Button } from '../../ui/Button';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
 
 interface ContentDetailsProps {
   contentId: string;

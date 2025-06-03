@@ -18,15 +18,15 @@ interface AdminFirestore {
 const admin: AdminFirestore = {
   firestore: {
     FieldValue: {
-      increment: (value: number) => ({ _increment: value })
-    }
-  }
+      increment: (value: number) => ({ _increment: value }),
+    },
+  },
 };
 
 // Simple Sentry placeholder for monitoring
 const Sentry = {
   addBreadcrumb: (options: any) => console.log('Sentry breadcrumb:', options.message),
-  captureException: (error: any) => console.error('Sentry error:', error)
+  captureException: (error: any) => console.error('Sentry error:', error),
 };
 
 // Helper function to safely get error message
@@ -199,19 +199,19 @@ export class BoxingDataSyncService {
         doc: (id: string) => ({
           set: (data: any, options?: any) => Promise.resolve(),
           get: () => Promise.resolve({ exists: false, data: () => null }),
-          update: (data: any) => Promise.resolve()
+          update: (data: any) => Promise.resolve(),
         }),
         where: (field: string, op: string, value: any) => ({
           where: (field2: string, op2: string, value2: any) => ({
             orderBy: (field3: string) => ({
-              get: () => Promise.resolve({ docs: [] })
+              get: () => Promise.resolve({ docs: [] }),
             }),
-            get: () => Promise.resolve({ docs: [] })
+            get: () => Promise.resolve({ docs: [] }),
           }),
-          get: () => Promise.resolve({ docs: [] })
+          get: () => Promise.resolve({ docs: [] }),
         }),
-        get: () => Promise.resolve({ docs: [] })
-      })
+        get: () => Promise.resolve({ docs: [] }),
+      }),
     };
   }
 
@@ -279,65 +279,69 @@ export class BoxingDataSyncService {
 
       // Get top fighters from multiple weight classes in batches
       const fightersData = await this.fetchWithRateLimit('/fighters/active');
-      
+
       const fightersCollection = this.db.collection('boxing_fighters');
-      
+
       // Process fighters in smaller chunks to avoid memory issues
       const fighters = fightersData.fighters || [];
       const chunkSize = 50; // Process 50 fighters at a time
-      
+
       for (let i = 0; i < fighters.length; i += chunkSize) {
         const chunk = fighters.slice(i, i + chunkSize);
-        console.log(`Processing fighters batch ${Math.floor(i/chunkSize) + 1}/${Math.ceil(fighters.length/chunkSize)}`);
-        
+        console.log(
+          `Processing fighters batch ${Math.floor(i / chunkSize) + 1}/${Math.ceil(fighters.length / chunkSize)}`
+        );
+
         for (const fighterData of chunk) {
-        const fighter: BoxingFighter = {
-          id: fighterData.id,
-          name: fighterData.name,
-          nickname: fighterData.nickname,
-          record: {
-            wins: fighterData.record?.wins || 0,
-            losses: fighterData.record?.losses || 0,
-            draws: fighterData.record?.draws || 0,
-            knockouts: fighterData.record?.knockouts || 0,
-            technicalKnockouts: fighterData.record?.technicalKnockouts || 0,
-          },
-          physicalStats: {
-            height: fighterData.height || 'N/A',
-            reach: fighterData.reach || 'N/A',
-            weight: fighterData.weight || 0,
-            stance: fighterData.stance || 'Orthodox',
-            age: fighterData.age || 0,
-          },
-          weightClass: fighterData.weightClass || 'Heavyweight',
-          rankings: {
-            wba: fighterData.rankings?.wba,
-            wbc: fighterData.rankings?.wbc,
-            ibf: fighterData.rankings?.ibf,
-            wbo: fighterData.rankings?.wbo,
-            ring: fighterData.rankings?.ring,
-            boxrec: fighterData.rankings?.boxrec,
-          },
-          nationality: fighterData.nationality || 'Unknown',
-          turnedPro: fighterData.turnedPro ? new Date(fighterData.turnedPro) : new Date(),
-          lastFight: fighterData.lastFight ? new Date(fighterData.lastFight) : new Date(),
-          careerEarnings: fighterData.careerEarnings || 0,
-          promoter: fighterData.promoter,
-          manager: fighterData.manager,
-          trainer: fighterData.trainer,
-          gym: fighterData.gym,
-        };
+          const fighter: BoxingFighter = {
+            id: fighterData.id,
+            name: fighterData.name,
+            nickname: fighterData.nickname,
+            record: {
+              wins: fighterData.record?.wins || 0,
+              losses: fighterData.record?.losses || 0,
+              draws: fighterData.record?.draws || 0,
+              knockouts: fighterData.record?.knockouts || 0,
+              technicalKnockouts: fighterData.record?.technicalKnockouts || 0,
+            },
+            physicalStats: {
+              height: fighterData.height || 'N/A',
+              reach: fighterData.reach || 'N/A',
+              weight: fighterData.weight || 0,
+              stance: fighterData.stance || 'Orthodox',
+              age: fighterData.age || 0,
+            },
+            weightClass: fighterData.weightClass || 'Heavyweight',
+            rankings: {
+              wba: fighterData.rankings?.wba,
+              wbc: fighterData.rankings?.wbc,
+              ibf: fighterData.rankings?.ibf,
+              wbo: fighterData.rankings?.wbo,
+              ring: fighterData.rankings?.ring,
+              boxrec: fighterData.rankings?.boxrec,
+            },
+            nationality: fighterData.nationality || 'Unknown',
+            turnedPro: fighterData.turnedPro ? new Date(fighterData.turnedPro) : new Date(),
+            lastFight: fighterData.lastFight ? new Date(fighterData.lastFight) : new Date(),
+            careerEarnings: fighterData.careerEarnings || 0,
+            promoter: fighterData.promoter,
+            manager: fighterData.manager,
+            trainer: fighterData.trainer,
+            gym: fighterData.gym,
+          };
 
           await fightersCollection.doc(fighter.id).set(fighter, { merge: true });
         }
-        
+
         // Add a small delay between chunks to prevent overwhelming the system
         if (i + chunkSize < fighters.length) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
 
-      console.log(`Synced ${fighters.length} active fighters in ${Math.ceil(fighters.length/chunkSize)} batches`);
+      console.log(
+        `Synced ${fighters.length} active fighters in ${Math.ceil(fighters.length / chunkSize)} batches`
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Fighter sync failed: ${getErrorMessage(error)}`);
@@ -355,7 +359,7 @@ export class BoxingDataSyncService {
       });
 
       const eventsData = await this.fetchWithRateLimit('/events/upcoming?days=90');
-      
+
       const eventsCollection = this.db.collection('boxing_events');
       const fightsCollection = this.db.collection('boxing_fights');
 
@@ -430,7 +434,7 @@ export class BoxingDataSyncService {
       });
 
       const resultsData = await this.fetchWithRateLimit('/fights/recent?days=30');
-      
+
       const fightsCollection = this.db.collection('boxing_fights');
 
       for (const fightData of resultsData.fights || []) {
@@ -484,9 +488,12 @@ export class BoxingDataSyncService {
         if (rankingsData.wba) {
           for (let i = 0; i < rankingsData.wba.length; i++) {
             const fighterId = rankingsData.wba[i].fighterId;
-            await fightersCollection.doc(fighterId).set({
-              rankings: { wba: i + 1 }
-            }, { merge: true });
+            await fightersCollection.doc(fighterId).set(
+              {
+                rankings: { wba: i + 1 },
+              },
+              { merge: true }
+            );
           }
         }
 
@@ -495,9 +502,12 @@ export class BoxingDataSyncService {
           if (rankingsData[org]) {
             for (let i = 0; i < rankingsData[org].length; i++) {
               const fighterId = rankingsData[org][i].fighterId;
-              await fightersCollection.doc(fighterId).set({
-                [`rankings.${org}`]: i + 1
-              }, { merge: true });
+              await fightersCollection.doc(fighterId).set(
+                {
+                  [`rankings.${org}`]: i + 1,
+                },
+                { merge: true }
+              );
             }
           }
         }
@@ -521,12 +531,12 @@ export class BoxingDataSyncService {
       });
 
       const championsData = await this.fetchWithRateLimit('/champions/current');
-      
+
       const weightClassesCollection = this.db.collection('boxing_weight_classes');
 
       for (const weightClass of this.WEIGHT_CLASSES) {
         const championData = championsData[weightClass.name] || {};
-        
+
         const updatedWeightClass: WeightClass = {
           ...weightClass,
           champions: {
@@ -560,18 +570,21 @@ export class BoxingDataSyncService {
       });
 
       const oddsData = await this.fetchWithRateLimit('/odds/upcoming');
-      
+
       const fightsCollection = this.db.collection('boxing_fights');
 
       for (const odds of oddsData.odds || []) {
-        await fightsCollection.doc(odds.fightId).set({
-          betting: {
-            fighter1Odds: odds.fighter1Odds,
-            fighter2Odds: odds.fighter2Odds,
-            totalRounds: odds.totalRounds,
-            methodOdds: odds.methodOdds,
-          }
-        }, { merge: true });
+        await fightsCollection.doc(odds.fightId).set(
+          {
+            betting: {
+              fighter1Odds: odds.fighter1Odds,
+              fighter2Odds: odds.fighter2Odds,
+              totalRounds: odds.totalRounds,
+              methodOdds: odds.methodOdds,
+            },
+          },
+          { merge: true }
+        );
       }
 
       console.log(`Synced odds for ${oddsData.odds?.length || 0} fights`);
@@ -592,7 +605,7 @@ export class BoxingDataSyncService {
       });
 
       const promotionsData = await this.fetchWithRateLimit('/promotions');
-      
+
       const promotionsCollection = this.db.collection('boxing_promotions');
 
       for (const promotionData of promotionsData.promotions || []) {
@@ -644,12 +657,9 @@ export class BoxingDataSyncService {
    */
   async getFighterById(fighterId: string): Promise<BoxingFighter | null> {
     try {
-      const doc = await this.db
-        .collection('boxing_fighters')
-        .doc(fighterId)
-        .get();
+      const doc = await this.db.collection('boxing_fighters').doc(fighterId).get();
 
-      return doc.exists ? doc.data() as BoxingFighter : null;
+      return doc.exists ? (doc.data() as BoxingFighter) : null;
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get fighter: ${getErrorMessage(error)}`);
@@ -678,12 +688,9 @@ export class BoxingDataSyncService {
    */
   async getFightById(fightId: string): Promise<BoxingFight | null> {
     try {
-      const doc = await this.db
-        .collection('boxing_fights')
-        .doc(fightId)
-        .get();
+      const doc = await this.db.collection('boxing_fights').doc(fightId).get();
 
-      return doc.exists ? doc.data() as BoxingFight : null;
+      return doc.exists ? (doc.data() as BoxingFight) : null;
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get fight: ${getErrorMessage(error)}`);
@@ -694,14 +701,14 @@ export class BoxingDataSyncService {
    * Update fighter record after a fight
    */
   private async updateFighterRecord(
-    fighter1Id: string, 
-    fighter2Id: string, 
+    fighter1Id: string,
+    fighter2Id: string,
     result: any
   ): Promise<void> {
     try {
       const winner = result.winner;
       const method = result.method;
-      
+
       const fightersCollection = this.db.collection('boxing_fighters');
 
       // Update winner's record
@@ -761,9 +768,7 @@ export class BoxingDataSyncService {
     const timeSinceLastRequest = now - this.lastRequestTime;
 
     if (timeSinceLastRequest < this.rateLimitDelay) {
-      await new Promise(resolve => 
-        setTimeout(resolve, this.rateLimitDelay - timeSinceLastRequest)
-      );
+      await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay - timeSinceLastRequest));
     }
 
     this.lastRequestTime = Date.now();
@@ -772,7 +777,7 @@ export class BoxingDataSyncService {
       // Placeholder for actual API call
       // In production, replace with actual boxing API endpoints
       console.log(`Fetching boxing data from ${endpoint}`);
-      
+
       // Mock data for demonstration
       return this.getMockData(endpoint);
     } catch (error) {
@@ -807,7 +812,7 @@ export class BoxingDataSyncService {
             careerEarnings: 250000000,
           },
           // Add more mock fighters...
-        ]
+        ],
       };
     }
 
@@ -844,7 +849,7 @@ export class BoxingDataSyncService {
             ],
             mainEvent: 'canelo_vs_benavidez_main',
           },
-        ]
+        ],
       };
     }
 

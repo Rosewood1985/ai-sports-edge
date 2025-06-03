@@ -28,6 +28,7 @@ import {
   Timestamp,
   writeBatch,
 } from 'firebase/firestore';
+
 import { getFirebaseApp } from '../atoms/firebaseApp';
 
 // Firebase Firestore instance (singleton)

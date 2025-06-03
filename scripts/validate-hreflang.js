@@ -16,10 +16,10 @@
  */
 
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const { parse } = require('node-html-parser');
 const { program } = require('commander');
+const fs = require('fs');
+const { parse } = require('node-html-parser');
+const path = require('path');
 
 // Import SEO config
 const seoConfig = require('../config/seo');

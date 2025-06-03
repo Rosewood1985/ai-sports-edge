@@ -4,8 +4,8 @@
  */
 
 const { spawn } = require('child_process');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 // Cache directory for ESPN API responses
 const CACHE_DIR = path.join(__dirname, 'cache', 'espn');
@@ -35,26 +35,26 @@ class ESPNApiWrapper {
   async _runPythonClient(args) {
     return new Promise((resolve, reject) => {
       const pythonProcess = spawn('python3', [this.pythonScript, ...args]);
-      
+
       let dataString = '';
       let errorString = '';
-      
-      pythonProcess.stdout.on('data', (data) => {
+
+      pythonProcess.stdout.on('data', data => {
         dataString += data.toString();
       });
-      
-      pythonProcess.stderr.on('data', (data) => {
+
+      pythonProcess.stderr.on('data', data => {
         errorString += data.toString();
       });
-      
-      pythonProcess.on('close', (code) => {
+
+      pythonProcess.on('close', code => {
         if (code !== 0) {
           console.error(`Python process exited with code ${code}`);
           console.error(`Error: ${errorString}`);
           reject(new Error(`Python process exited with code ${code}: ${errorString}`));
           return;
         }
-        
+
         try {
           const jsonData = JSON.parse(dataString);
           resolve(jsonData);
@@ -186,50 +186,51 @@ class ESPNApiWrapper {
     try {
       // Get scoreboard data
       const scoreboard = await this.getScoreboard(sport, league);
-      
+
       // Get standings data
       const standings = await this.getStandings(sport, league);
-      
+
       // Calculate odds for each game
       const calculatedOdds = [];
-      
+
       if (scoreboard && scoreboard.events) {
         for (const event of scoreboard.events) {
           // Skip games that have already started or finished
           if (event.status && event.status.type && event.status.type.state !== 'pre') {
             continue;
           }
-          
+
           const homeTeam = event.competitions[0]?.competitors?.find(c => c.homeAway === 'home');
           const awayTeam = event.competitions[0]?.competitors?.find(c => c.homeAway === 'away');
-          
+
           if (!homeTeam || !awayTeam) {
             continue;
           }
-          
+
           // Get team records from standings
           const homeTeamRecord = this._getTeamRecord(standings, homeTeam.id);
           const awayTeamRecord = this._getTeamRecord(standings, awayTeam.id);
-          
+
           // Calculate win probability based on team records
           const homeWinPct = homeTeamRecord?.winPercentage || 0.5;
           const awayWinPct = awayTeamRecord?.winPercentage || 0.5;
-          
+
           // Apply home field advantage (5% boost)
           const homeAdvantage = 0.05;
-          const homeWinProb = (homeWinPct + homeAdvantage) / (homeWinPct + awayWinPct + homeAdvantage);
+          const homeWinProb =
+            (homeWinPct + homeAdvantage) / (homeWinPct + awayWinPct + homeAdvantage);
           const awayWinProb = 1 - homeWinProb;
-          
+
           // Convert probabilities to American odds
           const homeOdds = this._probToAmericanOdds(homeWinProb);
           const awayOdds = this._probToAmericanOdds(awayWinProb);
-          
+
           // Calculate spread
           const spread = this._calculateSpread(homeWinProb, sport);
-          
+
           // Calculate over/under
           const overUnder = this._calculateOverUnder(sport, league, homeTeam, awayTeam);
-          
+
           calculatedOdds.push({
             gameId: event.id,
             date: event.date,
@@ -237,29 +238,29 @@ class ESPNApiWrapper {
               id: homeTeam.id,
               name: homeTeam.team.displayName,
               abbreviation: homeTeam.team.abbreviation,
-              logo: homeTeam.team.logo
+              logo: homeTeam.team.logo,
             },
             awayTeam: {
               id: awayTeam.id,
               name: awayTeam.team.displayName,
               abbreviation: awayTeam.team.abbreviation,
-              logo: awayTeam.team.logo
+              logo: awayTeam.team.logo,
             },
             odds: {
               homeMoneyline: homeOdds,
               awayMoneyline: awayOdds,
-              spread: spread,
+              spread,
               homeSpreadOdds: -110,
               awaySpreadOdds: -110,
-              overUnder: overUnder,
+              overUnder,
               overOdds: -110,
-              underOdds: -110
+              underOdds: -110,
             },
-            espnGameLink: `https://www.espn.com/${sport}/${league}/game/_/gameId/${event.id}`
+            espnGameLink: `https://www.espn.com/${sport}/${league}/game/_/gameId/${event.id}`,
           });
         }
       }
-      
+
       return calculatedOdds;
     } catch (error) {
       console.error('Error calculating odds:', error);
@@ -277,27 +278,27 @@ class ESPNApiWrapper {
     if (!standings || !standings.standings) {
       return null;
     }
-    
+
     for (const group of standings.standings) {
       for (const entry of group.entries) {
         if (entry.team.id === teamId) {
           const wins = entry.stats.find(s => s.name === 'wins')?.value || 0;
           const losses = entry.stats.find(s => s.name === 'losses')?.value || 0;
           const ties = entry.stats.find(s => s.name === 'ties')?.value || 0;
-          
+
           const totalGames = wins + losses + ties;
           const winPercentage = totalGames > 0 ? wins / totalGames : 0.5;
-          
+
           return {
             wins,
             losses,
             ties,
-            winPercentage
+            winPercentage,
           };
         }
       }
     }
-    
+
     return null;
   }
 
@@ -310,11 +311,11 @@ class ESPNApiWrapper {
     if (prob <= 0 || prob >= 1) {
       return 0;
     }
-    
+
     if (prob > 0.5) {
-      return Math.round(-100 * prob / (1 - prob));
+      return Math.round((-100 * prob) / (1 - prob));
     } else {
-      return Math.round(100 * (1 - prob) / prob);
+      return Math.round((100 * (1 - prob)) / prob);
     }
   }
 
@@ -327,7 +328,7 @@ class ESPNApiWrapper {
   _calculateSpread(homeWinProb, sport) {
     // Convert win probability to spread
     let spreadFactor;
-    
+
     switch (sport) {
       case 'basketball':
         spreadFactor = 20;
@@ -344,10 +345,10 @@ class ESPNApiWrapper {
       default:
         spreadFactor = 10;
     }
-    
+
     // Calculate raw spread
     const rawSpread = (homeWinProb - 0.5) * spreadFactor;
-    
+
     // Round to nearest 0.5
     return Math.round(rawSpread * 2) / 2;
   }
@@ -363,35 +364,35 @@ class ESPNApiWrapper {
   _calculateOverUnder(sport, league, homeTeam, awayTeam) {
     // Default over/under values by sport
     const defaultValues = {
-      'basketball': {
-        'nba': 220,
-        'wnba': 160,
-        'default': 140
+      basketball: {
+        nba: 220,
+        wnba: 160,
+        default: 140,
       },
-      'football': {
-        'nfl': 44,
-        'default': 50
+      football: {
+        nfl: 44,
+        default: 50,
       },
-      'baseball': {
-        'mlb': 8.5,
-        'default': 9
+      baseball: {
+        mlb: 8.5,
+        default: 9,
       },
-      'hockey': {
-        'nhl': 5.5,
-        'default': 5
-      }
+      hockey: {
+        nhl: 5.5,
+        default: 5,
+      },
     };
-    
+
     // Get default value for sport/league
     const sportDefaults = defaultValues[sport] || { default: 100 };
     const defaultValue = sportDefaults[league] || sportDefaults.default;
-    
+
     // Add some randomness to make it more realistic
-    const randomFactor = (Math.random() * 0.1 + 0.95); // 0.95 to 1.05
-    
+    const randomFactor = Math.random() * 0.1 + 0.95; // 0.95 to 1.05
+
     // Calculate over/under
     const overUnder = defaultValue * randomFactor;
-    
+
     // Round to nearest 0.5
     return Math.round(overUnder * 2) / 2;
   }

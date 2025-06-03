@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, ViewProps } from 'react-native';
+
 import { useUITheme } from './UIThemeProvider'; // Import the simplified theme hook
 
 // Define semantic background types based on theme.colors keys
 export type ThemedViewBackground =
-  | 'primary'   // Typically theme.colors.primaryBackground
-  | 'surface'   // Typically theme.colors.surfaceBackground
+  | 'primary' // Typically theme.colors.primaryBackground
+  | 'surface' // Typically theme.colors.surfaceBackground
   | 'transparent'; // Default, no background color applied
 
 export type ThemedViewProps = ViewProps & {

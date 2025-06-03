@@ -6,8 +6,9 @@
  * caching solution for all API calls.
  */
 
-import { cacheService } from '../../../services/cacheService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { cacheService } from '../../../services/cacheService';
 
 // API cache prefix
 const API_CACHE_PREFIX = 'api:';
@@ -66,10 +67,13 @@ export const generateCacheKey = (
     // Sort params by key to ensure consistent cache keys
     const sortedParams = Object.keys(params)
       .sort()
-      .reduce((result, key) => {
-        result[key] = params[key];
-        return result;
-      }, {} as Record<string, any>);
+      .reduce(
+        (result, key) => {
+          result[key] = params[key];
+          return result;
+        },
+        {} as Record<string, any>
+      );
 
     // Add params to key
     key += `:${JSON.stringify(sortedParams)}`;

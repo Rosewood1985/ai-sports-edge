@@ -17,7 +17,7 @@ export enum AnalyticsTimePeriod {
   LAST_6_MONTHS = 'last_6_months',
   YEAR_TO_DATE = 'year_to_date',
   LAST_YEAR = 'last_year',
-  CUSTOM = 'custom'
+  CUSTOM = 'custom',
 }
 
 /**
@@ -36,7 +36,7 @@ export enum UserActivityType {
   NOTIFICATION_RECEIVED = 'notification_received',
   NOTIFICATION_OPENED = 'notification_opened',
   REFERRAL_SENT = 'referral_sent',
-  REFERRAL_ACCEPTED = 'referral_accepted'
+  REFERRAL_ACCEPTED = 'referral_accepted',
 }
 
 /**
@@ -50,7 +50,7 @@ export enum UserSegment {
   LAPSED = 'lapsed',
   NEW = 'new',
   RETURNING = 'returning',
-  HIGH_VALUE = 'high_value'
+  HIGH_VALUE = 'high_value',
 }
 
 /**
@@ -63,7 +63,7 @@ export enum BetType {
   PROP = 'prop',
   PARLAY = 'parlay',
   FUTURES = 'futures',
-  LIVE = 'live'
+  LIVE = 'live',
 }
 
 /**
@@ -79,7 +79,7 @@ export enum SportType {
   MMA = 'mma',
   GOLF = 'golf',
   TENNIS = 'tennis',
-  MOTORSPORTS = 'motorsports'
+  MOTORSPORTS = 'motorsports',
 }
 
 /**
@@ -89,7 +89,7 @@ export enum PlatformType {
   ALL = 'all',
   IOS = 'ios',
   ANDROID = 'android',
-  WEB = 'web'
+  WEB = 'web',
 }
 
 /**

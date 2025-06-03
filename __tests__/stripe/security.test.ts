@@ -4,8 +4,9 @@
  * These tests verify the security aspects of the Stripe integration.
  */
 
-import { STRIPE_PUBLISHABLE_KEY } from '../../config/stripe';
 import axios from 'axios';
+
+import { STRIPE_PUBLISHABLE_KEY } from '../../config/stripe';
 import MLPredictionService from '../../web/services/MLPredictionService';
 
 // Mock axios
@@ -15,9 +16,9 @@ jest.mock('axios', () => ({
     post: jest.fn(),
     interceptors: {
       request: { use: jest.fn() },
-      response: { use: jest.fn() }
-    }
-  })
+      response: { use: jest.fn() },
+    },
+  }),
 }));
 
 // Mock MLPredictionService
@@ -30,13 +31,13 @@ jest.mock('../../web/services/MLPredictionService', () => ({
     getPredictionsBySport: jest.fn(),
     getTrendingPredictions: jest.fn(),
     submitPredictionFeedback: jest.fn(),
-    clearPredictionCache: jest.fn()
-  }
+    clearPredictionCache: jest.fn(),
+  },
 }));
 
 // Mock path and fs modules
 const mockPath = {
-  join: jest.fn((_, filePath) => filePath)
+  join: jest.fn((_, filePath) => filePath),
 };
 
 const mockFs = {
@@ -70,7 +71,7 @@ const mockFs = {
         res.status(500).send(\`Error: \${err.message}\`);
       }
     `;
-  })
+  }),
 };
 
 jest.mock('fs', () => mockFs);
@@ -83,7 +84,7 @@ describe('Stripe Security', () => {
       // Verify that the publishable key starts with 'pk_'
       expect(STRIPE_PUBLISHABLE_KEY).toBeDefined();
       expect(STRIPE_PUBLISHABLE_KEY.startsWith('pk_')).toBe(true);
-      
+
       // Verify that no secret key is exposed
       // This is a negative test - we're checking that there's no variable named STRIPE_SECRET_KEY
       // @ts-ignore - Intentionally checking for undefined variable
@@ -94,32 +95,32 @@ describe('Stripe Security', () => {
       // Create a mock API client
       const mockApiClient = {
         get: jest.fn().mockResolvedValue({ data: {} }),
-        post: jest.fn().mockResolvedValue({ data: {} })
+        post: jest.fn().mockResolvedValue({ data: {} }),
       };
-      
+
       // Create a mock axios instance
       const mockAxiosInstance = {
         get: jest.fn().mockResolvedValue({ data: {} }),
         post: jest.fn().mockResolvedValue({ data: {} }),
         interceptors: {
           request: { use: jest.fn() },
-          response: { use: jest.fn() }
-        }
+          response: { use: jest.fn() },
+        },
       };
       (axios.create as jest.Mock).mockReturnValue(mockAxiosInstance);
-      
+
       // Make a request
       await mockApiClient.get('/test');
-      
+
       // Verify that the request doesn't contain a secret key
       expect(mockApiClient.get).toHaveBeenCalledWith('/test');
-      
+
       // Check that no headers contain 'sk_'
       const calls = (axios.create as jest.Mock).mock.calls;
       for (const call of calls) {
         const config = call[0] || {};
         const headers = config.headers || {};
-        
+
         // Convert all header values to strings and check for 'sk_'
         const headerValues = Object.values(headers).map(v => String(v));
         for (const value of headerValues) {
@@ -134,7 +135,7 @@ describe('Stripe Security', () => {
     test('should verify webhook signatures in stripeWebhooks.js', () => {
       // Get the mock file content
       const stripeWebhooksContent = mockFs.readFileSync();
-      
+
       // Check that the file contains webhook signature verification code
       expect(stripeWebhooksContent).toContain('stripe-signature');
       expect(stripeWebhooksContent).toContain('constructEvent');
@@ -147,7 +148,7 @@ describe('Stripe Security', () => {
     test('should verify user authorization in subscription functions', () => {
       // Get the mock file content
       const groupSubscriptionsContent = mockFs.readFileSync();
-      
+
       // Check that the file contains user authorization checks
       expect(groupSubscriptionsContent).toContain('context.auth');
       expect(groupSubscriptionsContent).toContain('unauthenticated');
@@ -157,7 +158,7 @@ describe('Stripe Security', () => {
     test('should check ownership before modifying subscriptions', () => {
       // Get the mock file content
       const groupSubscriptionsContent = mockFs.readFileSync();
-      
+
       // Check that the file contains ownership verification
       expect(groupSubscriptionsContent).toContain('ownerId !== userId');
       expect(groupSubscriptionsContent).toContain('permission-denied');
@@ -168,7 +169,7 @@ describe('Stripe Security', () => {
     test('should load Stripe keys from environment variables', () => {
       // Get the mock file content
       const stripeContent = mockFs.readFileSync();
-      
+
       // Check that the file loads keys from environment variables
       expect(stripeContent).toContain('process.env.STRIPE_SECRET_KEY');
     });
@@ -178,14 +179,14 @@ describe('Stripe Security', () => {
     test('should not expose sensitive information in error responses', () => {
       // Get the mock file content
       const stripeWebhooksContent = mockFs.readFileSync();
-      
+
       // Check that error responses don't include sensitive information
       expect(stripeWebhooksContent).toContain('catch (err)');
       expect(stripeWebhooksContent).toContain('console.error');
-      
+
       // Check that error responses don't return the full error object
       expect(stripeWebhooksContent).toContain('err.message');
-      
+
       // The error response should not contain patterns like:
       // res.status(500).send(err);
       // Instead it should be something like:

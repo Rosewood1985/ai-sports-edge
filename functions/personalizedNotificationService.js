@@ -1,8 +1,8 @@
-const admin = require('firebase-admin');
-const functions = require('firebase-functions');
-const notificationService = require('./notificationService');
-const { getNotificationTemplate } = require('./notificationTemplates');
-const cloudGeolocationService = require('./cloudGeolocationService');
+const admin = require("firebase-admin");
+const functions = require("firebase-functions");
+const notificationService = require("./notificationService");
+const { getNotificationTemplate } = require("./notificationTemplates");
+const cloudGeolocationService = require("./cloudGeolocationService");
 
 /**
  * Personalized Notification Service for AI Sports Edge
@@ -24,7 +24,7 @@ class PersonalizedNotificationService {
     const now = new Date();
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
-    const currentTime = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+    const currentTime = `${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
     
     const startTime = quietHours.start;
     const endTime = quietHours.end;
@@ -49,9 +49,9 @@ class PersonalizedNotificationService {
     today.setHours(0, 0, 0, 0);
     
     const notificationsSnapshot = await admin.firestore()
-      .collection('notificationLogs')
-      .where('userId', '==', userId)
-      .where('timestamp', '>=', admin.firestore.Timestamp.fromDate(today))
+      .collection("notificationLogs")
+      .where("userId", "==", userId)
+      .where("timestamp", ">=", admin.firestore.Timestamp.fromDate(today))
       .get();
     
     return notificationsSnapshot.size >= maxPerDay;
@@ -128,7 +128,7 @@ class PersonalizedNotificationService {
     const { title, message, data } = baseContent;
     const { preferences, favorites } = userData;
     
-    let templateVariant = 'default';
+    let templateVariant = "default";
     const templateVariables = { ...data };
     
     // Check for favorite team
@@ -139,23 +139,23 @@ class PersonalizedNotificationService {
       );
       
       if (favoriteTeam) {
-        templateVariant = 'withFavorite';
+        templateVariant = "withFavorite";
         templateVariables.favoriteTeam = favoriteTeam;
       }
     }
     
     // Add odds information if user prefers it
     if (preferences.notifications && preferences.notifications.includeOdds && data.odds) {
-      if (templateVariant !== 'withFavorite') {
-        templateVariant = 'withOdds';
+      if (templateVariant !== "withFavorite") {
+        templateVariant = "withOdds";
       }
-      templateVariables.odds = this.formatOdds(data.odds, preferences.betting?.oddsFormat || 'american');
+      templateVariables.odds = this.formatOdds(data.odds, preferences.betting?.oddsFormat || "american");
     }
     
     // Add stats if user prefers them
     if (preferences.notifications && preferences.notifications.includeStats && data.stats) {
-      if (templateVariant !== 'withFavorite' && templateVariant !== 'withOdds') {
-        templateVariant = 'withStats';
+      if (templateVariant !== "withFavorite" && templateVariant !== "withOdds") {
+        templateVariant = "withStats";
       }
       templateVariables.stats = this.formatStats(data.stats);
     }
@@ -176,31 +176,31 @@ class PersonalizedNotificationService {
    * @param {string} format - Odds format (american, decimal, fractional)
    * @returns {string} Formatted odds
    */
-  formatOdds(odds, format = 'american') {
-    if (typeof odds !== 'number') return '';
+  formatOdds(odds, format = "american") {
+    if (typeof odds !== "number") return "";
     
     switch (format) {
-      case 'decimal':
-        // Convert American odds to decimal
-        if (odds > 0) {
-          return ((odds / 100) + 1).toFixed(2);
-        } else {
-          return (1 - (100 / odds)).toFixed(2);
-        }
-      case 'fractional':
-        // Convert American odds to fractional
-        if (odds > 0) {
-          const gcd = this.getGCD(odds, 100);
-          return `${odds / gcd}/${100 / gcd}`;
-        } else {
-          const absOdds = Math.abs(odds);
-          const gcd = this.getGCD(100, absOdds);
-          return `${100 / gcd}/${absOdds / gcd}`;
-        }
-      case 'american':
-      default:
-        // Return American odds with + or - sign
-        return odds > 0 ? `+${odds}` : odds.toString();
+    case "decimal":
+      // Convert American odds to decimal
+      if (odds > 0) {
+        return ((odds / 100) + 1).toFixed(2);
+      } else {
+        return (1 - (100 / odds)).toFixed(2);
+      }
+    case "fractional":
+      // Convert American odds to fractional
+      if (odds > 0) {
+        const gcd = this.getGCD(odds, 100);
+        return `${odds / gcd}/${100 / gcd}`;
+      } else {
+        const absOdds = Math.abs(odds);
+        const gcd = this.getGCD(100, absOdds);
+        return `${100 / gcd}/${absOdds / gcd}`;
+      }
+    case "american":
+    default:
+      // Return American odds with + or - sign
+      return odds > 0 ? `+${odds}` : odds.toString();
     }
   }
   
@@ -221,19 +221,19 @@ class PersonalizedNotificationService {
    * @returns {string} Formatted stats
    */
   formatStats(stats) {
-    if (!stats || typeof stats !== 'object') return '';
+    if (!stats || typeof stats !== "object") return "";
     
     // Format based on stats type
-    if (stats.type === 'player') {
+    if (stats.type === "player") {
       return `${stats.points || 0} pts, ${stats.rebounds || 0} reb, ${stats.assists || 0} ast`;
-    } else if (stats.type === 'team') {
+    } else if (stats.type === "team") {
       return `${stats.wins || 0}-${stats.losses || 0}`;
     } else {
       // Generic stats formatting
       return Object.entries(stats)
-        .filter(([key]) => key !== 'type')
+        .filter(([key]) => key !== "type")
         .map(([key, value]) => `${key}: ${value}`)
-        .join(', ');
+        .join(", ");
     }
   }
   
@@ -249,7 +249,7 @@ class PersonalizedNotificationService {
     const { userId, type, data } = options;
     
     // Get user data and preferences
-    const userDoc = await admin.firestore().collection('users').doc(userId).get();
+    const userDoc = await admin.firestore().collection("users").doc(userId).get();
     if (!userDoc.exists) {
       console.log(`User ${userId} not found`);
       return null;
@@ -279,8 +279,8 @@ class PersonalizedNotificationService {
     
     // Generate base content
     const baseContent = {
-      title: '',
-      message: '',
+      title: "",
+      message: "",
       data: {
         ...data,
         type
@@ -315,12 +315,12 @@ class PersonalizedNotificationService {
           priorityScore
         },
         userIds: [userId],
-        platform: 'all'
+        platform: "all"
       }));
     }
     
     // Log notification for analytics
-    await admin.firestore().collection('notificationLogs').add({
+    await admin.firestore().collection("notificationLogs").add({
       userId,
       type,
       content: personalizedContent,
@@ -343,7 +343,7 @@ class PersonalizedNotificationService {
     const { userIds, type, data } = options;
     
     if (!userIds || !userIds.length) {
-      console.log('No users provided for personalized notifications');
+      console.log("No users provided for personalized notifications");
       return null;
     }
     
@@ -371,13 +371,13 @@ class PersonalizedNotificationService {
     const { userId, referredUserId, type, data = {} } = options;
     
     if (!userId) {
-      console.log('No user ID provided for referral notification');
+      console.log("No user ID provided for referral notification");
       return null;
     }
     
     try {
       // Get referrer user data
-      const userDoc = await admin.firestore().collection('users').doc(userId).get();
+      const userDoc = await admin.firestore().collection("users").doc(userId).get();
       if (!userDoc.exists) {
         console.log(`User ${userId} not found`);
         return null;
@@ -388,7 +388,7 @@ class PersonalizedNotificationService {
       // Get referred user data if available
       let referredUserData = null;
       if (referredUserId) {
-        const referredUserDoc = await admin.firestore().collection('users').doc(referredUserId).get();
+        const referredUserDoc = await admin.firestore().collection("users").doc(referredUserId).get();
         if (referredUserDoc.exists) {
           referredUserData = referredUserDoc.data();
         }
@@ -403,7 +403,7 @@ class PersonalizedNotificationService {
       
       // Add referred user name if available
       if (referredUserData) {
-        notificationData.referredName = referredUserData.displayName || 'A new user';
+        notificationData.referredName = referredUserData.displayName || "A new user";
       }
       
       // Send the personalized notification
@@ -413,7 +413,7 @@ class PersonalizedNotificationService {
         data: notificationData
       });
     } catch (error) {
-      console.error('Error sending referral notification:', error);
+      console.error("Error sending referral notification:", error);
       return null;
     }
   }
@@ -427,7 +427,7 @@ class PersonalizedNotificationService {
    */
   async trackNotificationEngagement(notificationId, userId, action) {
     // Log the engagement
-    await admin.firestore().collection('notificationEngagements').add({
+    await admin.firestore().collection("notificationEngagements").add({
       notificationId,
       userId,
       action,
@@ -435,7 +435,7 @@ class PersonalizedNotificationService {
     });
     
     // Update user engagement rates
-    const userRef = admin.firestore().collection('users').doc(userId);
+    const userRef = admin.firestore().collection("users").doc(userId);
     
     return admin.firestore().runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
@@ -443,7 +443,7 @@ class PersonalizedNotificationService {
       
       const userData = userDoc.data();
       const notificationLog = await admin.firestore()
-        .collection('notificationLogs')
+        .collection("notificationLogs")
         .doc(notificationId)
         .get();
       
@@ -464,7 +464,7 @@ class PersonalizedNotificationService {
       
       // Calculate new engagement rate using exponential moving average
       const currentRate = userData.analytics.engagementRates[notificationType] || 0;
-      const engagementValue = action === 'open' || action === 'click' ? 1 : 0;
+      const engagementValue = action === "open" || action === "click" ? 1 : 0;
       const alpha = 0.3; // Weight for new data point
       const newRate = (alpha * engagementValue) + ((1 - alpha) * currentRate);
       
@@ -472,7 +472,7 @@ class PersonalizedNotificationService {
       
       // Update user document
       transaction.update(userRef, {
-        'analytics.engagementRates': userData.analytics.engagementRates
+        "analytics.engagementRates": userData.analytics.engagementRates
       });
     });
   }
@@ -502,18 +502,18 @@ class PersonalizedNotificationService {
     const { location, type, data } = options;
     
     if (!location || !location.city) {
-      console.log('No location provided for location-based notifications');
+      console.log("No location provided for location-based notifications");
       return null;
     }
     
     // Get users with location-based notifications enabled
     const usersSnapshot = await admin.firestore()
-      .collection('users')
-      .where('preferences.notifications.locationBased.enabled', '==', true)
+      .collection("users")
+      .where("preferences.notifications.locationBased.enabled", "==", true)
       .get();
     
     if (usersSnapshot.empty) {
-      console.log('No users have location-based notifications enabled');
+      console.log("No users have location-based notifications enabled");
       return null;
     }
     
@@ -561,7 +561,7 @@ class PersonalizedNotificationService {
    */
   async sendLocalTeamNotifications(location, localTeams) {
     if (!localTeams || !localTeams.length) {
-      console.log('No local teams to send notifications about');
+      console.log("No local teams to send notifications about");
       return null;
     }
     
@@ -572,7 +572,7 @@ class PersonalizedNotificationService {
       promises.push(
         this.sendLocationBasedNotifications({
           location,
-          type: 'localTeam',
+          type: "localTeam",
           data: {
             team,
             teams: [team],
@@ -593,7 +593,7 @@ class PersonalizedNotificationService {
    */
   async sendLocalGameNotifications(location, localGames) {
     if (!localGames || !localGames.length) {
-      console.log('No local games to send notifications about');
+      console.log("No local games to send notifications about");
       return null;
     }
     
@@ -604,7 +604,7 @@ class PersonalizedNotificationService {
       promises.push(
         this.sendLocationBasedNotifications({
           location,
-          type: 'localGame',
+          type: "localGame",
           data: {
             homeTeam: game.homeTeam,
             awayTeam: game.awayTeam,
@@ -628,7 +628,7 @@ class PersonalizedNotificationService {
    */
   async sendLocalOddsNotifications(location, localOdds) {
     if (!localOdds || !localOdds.length) {
-      console.log('No local odds to send notifications about');
+      console.log("No local odds to send notifications about");
       return null;
     }
     
@@ -639,7 +639,7 @@ class PersonalizedNotificationService {
       promises.push(
         this.sendLocationBasedNotifications({
           location,
-          type: 'localOdds',
+          type: "localOdds",
           data: {
             team: odds.team,
             teams: [odds.team],

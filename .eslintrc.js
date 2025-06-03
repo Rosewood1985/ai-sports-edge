@@ -41,6 +41,16 @@ module.exports = {
         'no-console': 'off',
       },
     },
+    {
+      files: ['web/**/*.js', 'public/**/*.js', 'utils/**/*.js'],
+      env: {
+        browser: true,
+        es6: true,
+      },
+      rules: {
+        'no-console': 'off',
+      },
+    },
   ],
   ignorePatterns: [
     'node_modules/',

@@ -3,10 +3,16 @@
  * Displays predictions from the ML Sports Edge API
  */
 
+import {
+  faChartLine,
+  faInfoCircle,
+  faThumbsUp,
+  faThumbsDown,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState, useEffect } from 'react';
 import { Card, Badge, Button, Collapse, Progress, Tooltip } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faInfoCircle, faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+
 import { getGamePredictionById, submitPredictionFeedback } from '../services/MLPredictionService';
 
 // Debug logging for React Bootstrap components
@@ -16,7 +22,7 @@ console.log('[MLPredictionCard] React Bootstrap components available:', {
   Button: !!Button,
   Collapse: !!Collapse,
   Progress: !!Progress,
-  Tooltip: !!Tooltip
+  Tooltip: !!Tooltip,
 });
 
 // Debug logging for FontAwesome
@@ -26,12 +32,12 @@ console.log('[MLPredictionCard] FontAwesome available:', {
     faChartLine: !!faChartLine,
     faInfoCircle: !!faInfoCircle,
     faThumbsUp: !!faThumbsUp,
-    faThumbsDown: !!faThumbsDown
-  }
+    faThumbsDown: !!faThumbsDown,
+  },
 });
 
 // Confidence level colors
-const getConfidenceColor = (confidence) => {
+const getConfidenceColor = confidence => {
   if (confidence >= 0.7) return 'success';
   if (confidence >= 0.6) return 'info';
   if (confidence >= 0.5) return 'warning';
@@ -39,7 +45,7 @@ const getConfidenceColor = (confidence) => {
 };
 
 // Format American odds
-const formatOdds = (odds) => {
+const formatOdds = odds => {
   if (!odds) return '';
   return odds > 0 ? `+${odds}` : odds;
 };
@@ -54,26 +60,26 @@ const formatOdds = (odds) => {
  * @param {Function} props.onFeedback - Callback for feedback submission
  * @returns {JSX.Element} - Rendered component
  */
-const MLPredictionCard = ({ 
-  prediction, 
-  type = 'game', 
-  detailed = false, 
+const MLPredictionCard = ({
+  prediction,
+  type = 'game',
+  detailed = false,
   interactive = true,
-  onFeedback = null
+  onFeedback = null,
 }) => {
   const [expandedDetails, setExpandedDetails] = useState(false);
   const [detailedPrediction, setDetailedPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
-  
+
   // Debug logging for props
-  console.log('[MLPredictionCard] Initialized with props:', { 
-    predictionId: prediction?.id, 
-    type, 
-    detailed, 
-    interactive 
+  console.log('[MLPredictionCard] Initialized with props:', {
+    predictionId: prediction?.id,
+    type,
+    detailed,
+    interactive,
   });
-  
+
   // Fetch detailed prediction if needed
   useEffect(() => {
     if (detailed && !detailedPrediction && prediction?.id) {
@@ -81,7 +87,10 @@ const MLPredictionCard = ({
       setLoading(true);
       getGamePredictionById(prediction.id)
         .then(data => {
-          console.log(`[MLPredictionCard] Received detailed prediction for ${prediction.id}:`, data);
+          console.log(
+            `[MLPredictionCard] Received detailed prediction for ${prediction.id}:`,
+            data
+          );
           setDetailedPrediction(data);
           setLoading(false);
         })
@@ -91,27 +100,27 @@ const MLPredictionCard = ({
         });
     }
   }, [detailed, detailedPrediction, prediction]);
-  
+
   // Handle feedback submission
-  const handleFeedback = (rating) => {
+  const handleFeedback = rating => {
     if (!prediction?.id) {
       console.warn('[MLPredictionCard] Cannot submit feedback: missing prediction ID');
       return;
     }
-    
+
     console.log(`[MLPredictionCard] Submitting feedback for ${prediction.id}:`, { rating });
-    
+
     const feedback = {
       predictionId: prediction.id,
       predictionType: type,
       rating: rating ? 5 : 1,
-      comments: rating ? 'Helpful prediction' : 'Unhelpful prediction'
+      comments: rating ? 'Helpful prediction' : 'Unhelpful prediction',
     };
-    
+
     // Get token from localStorage (in a real app, use a proper auth system)
     const token = localStorage.getItem('authToken');
     console.log('[MLPredictionCard] Auth token available:', !!token);
-    
+
     submitPredictionFeedback(feedback, token)
       .then(() => {
         console.log('[MLPredictionCard] Feedback submitted successfully');
@@ -122,7 +131,7 @@ const MLPredictionCard = ({
         console.error('[MLPredictionCard] Error submitting feedback:', error);
       });
   };
-  
+
   // Render different card based on prediction type
   const renderPredictionCard = () => {
     console.log(`[MLPredictionCard] Rendering prediction card of type: ${type}`);
@@ -139,7 +148,7 @@ const MLPredictionCard = ({
         return renderGamePrediction();
     }
   };
-  
+
   // Render game prediction
   const renderGamePrediction = () => {
     const data = detailedPrediction || prediction;
@@ -147,15 +156,15 @@ const MLPredictionCard = ({
       console.warn('[MLPredictionCard] No data available for game prediction');
       return null;
     }
-    
+
     console.log('[MLPredictionCard] Rendering game prediction:', {
       homeTeam: data.homeTeam?.name,
       awayTeam: data.awayTeam?.name,
-      hasPredictions: !!data.predictions
+      hasPredictions: !!data.predictions,
     });
-    
+
     const { homeTeam, awayTeam, predictions } = data;
-    
+
     return (
       <>
         <Card.Header>
@@ -178,69 +187,65 @@ const MLPredictionCard = ({
               <Badge bg="secondary">{homeTeam.abbreviation}</Badge>
             </div>
           </div>
-          
+
           {predictions && (
             <div className="prediction-details">
               {predictions.spread && (
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
                     <span>Spread</span>
-                    <Badge 
-                      bg={getConfidenceColor(predictions.spread.confidence)}
-                    >
-                      {predictions.spread.pick === 'home' ? homeTeam.name : awayTeam.name} {predictions.spread.line}
+                    <Badge bg={getConfidenceColor(predictions.spread.confidence)}>
+                      {predictions.spread.pick === 'home' ? homeTeam.name : awayTeam.name}{' '}
+                      {predictions.spread.line}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={predictions.spread.confidence * 100} 
-                    variant={getConfidenceColor(predictions.spread.confidence)} 
+                  <Progress
+                    now={predictions.spread.confidence * 100}
+                    variant={getConfidenceColor(predictions.spread.confidence)}
                     className="mt-1"
                   />
                 </div>
               )}
-              
+
               {predictions.moneyline && (
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
                     <span>Moneyline</span>
-                    <Badge 
-                      bg={getConfidenceColor(predictions.moneyline.confidence)}
-                    >
-                      {predictions.moneyline.pick === 'home' ? homeTeam.name : awayTeam.name} {formatOdds(predictions.moneyline.odds?.home)}
+                    <Badge bg={getConfidenceColor(predictions.moneyline.confidence)}>
+                      {predictions.moneyline.pick === 'home' ? homeTeam.name : awayTeam.name}{' '}
+                      {formatOdds(predictions.moneyline.odds?.home)}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={predictions.moneyline.confidence * 100} 
-                    variant={getConfidenceColor(predictions.moneyline.confidence)} 
+                  <Progress
+                    now={predictions.moneyline.confidence * 100}
+                    variant={getConfidenceColor(predictions.moneyline.confidence)}
                     className="mt-1"
                   />
                 </div>
               )}
-              
+
               {predictions.total && (
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
                     <span>Total</span>
-                    <Badge 
-                      bg={getConfidenceColor(predictions.total.confidence)}
-                    >
+                    <Badge bg={getConfidenceColor(predictions.total.confidence)}>
                       {predictions.total.pick.toUpperCase()} {predictions.total.line}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={predictions.total.confidence * 100} 
-                    variant={getConfidenceColor(predictions.total.confidence)} 
+                  <Progress
+                    now={predictions.total.confidence * 100}
+                    variant={getConfidenceColor(predictions.total.confidence)}
                     className="mt-1"
                   />
                 </div>
               )}
             </div>
           )}
-          
+
           {detailed && data.analysis && (
-            <Button 
-              variant="outline-secondary" 
-              size="sm" 
+            <Button
+              variant="outline-secondary"
+              size="sm"
               className="mt-3 w-100"
               onClick={() => {
                 console.log('[MLPredictionCard] Toggling expanded details:', !expandedDetails);
@@ -251,21 +256,21 @@ const MLPredictionCard = ({
             </Button>
           )}
         </Card.Body>
-        
+
         {detailed && data.analysis && (
           <Collapse in={expandedDetails}>
             <div>
               <Card.Footer>
                 <h6>Analysis</h6>
                 <p className="text-muted">{data.analysis.confidence.explanation}</p>
-                
+
                 <h6>Key Factors</h6>
                 <ul className="small">
                   {data.analysis.keyFactors.map((factor, index) => (
                     <li key={index}>{factor}</li>
                   ))}
                 </ul>
-                
+
                 <h6>Trends</h6>
                 <ul className="small">
                   {data.analysis.trends.map((trend, index) => (
@@ -279,7 +284,7 @@ const MLPredictionCard = ({
       </>
     );
   };
-  
+
   // Render player prediction
   const renderPlayerPrediction = () => {
     const data = detailedPrediction || prediction;
@@ -287,13 +292,13 @@ const MLPredictionCard = ({
       console.warn('[MLPredictionCard] No data available for player prediction');
       return null;
     }
-    
+
     console.log('[MLPredictionCard] Rendering player prediction:', {
       playerName: data.name,
       team: data.team,
-      hasPredictions: !!data.predictions
+      hasPredictions: !!data.predictions,
     });
-    
+
     return (
       <>
         <Card.Header>
@@ -308,56 +313,52 @@ const MLPredictionCard = ({
             <Badge bg="secondary">{data.team}</Badge>
             <div className="text-muted mt-1">vs {data.game.opponent}</div>
           </div>
-          
+
           {data.predictions && (
             <div className="prediction-details">
               {Object.entries(data.predictions).map(([stat, prediction]) => (
                 <div className="mb-2" key={stat}>
                   <div className="d-flex justify-content-between">
                     <span>{stat.charAt(0).toUpperCase() + stat.slice(1)}</span>
-                    <Badge 
-                      bg={getConfidenceColor(prediction.confidence)}
-                    >
+                    <Badge bg={getConfidenceColor(prediction.confidence)}>
                       {prediction.prediction} ({prediction.range[0]}-{prediction.range[1]})
                     </Badge>
                   </div>
-                  <Progress 
-                    now={prediction.confidence * 100} 
-                    variant={getConfidenceColor(prediction.confidence)} 
+                  <Progress
+                    now={prediction.confidence * 100}
+                    variant={getConfidenceColor(prediction.confidence)}
                     className="mt-1"
                   />
                 </div>
               ))}
             </div>
           )}
-          
+
           {data.propBets && data.propBets.length > 0 && (
             <>
               <h6 className="mt-3">Prop Bets</h6>
               {data.propBets.map((prop, index) => (
                 <div className="mb-2" key={index}>
                   <div className="d-flex justify-content-between">
-                    <span>{prop.type} {prop.line}</span>
-                    <Badge 
-                      bg={getConfidenceColor(prop.confidence)}
-                    >
-                      {prop.recommendation}
-                    </Badge>
+                    <span>
+                      {prop.type} {prop.line}
+                    </span>
+                    <Badge bg={getConfidenceColor(prop.confidence)}>{prop.recommendation}</Badge>
                   </div>
-                  <Progress 
-                    now={prop.confidence * 100} 
-                    variant={getConfidenceColor(prop.confidence)} 
+                  <Progress
+                    now={prop.confidence * 100}
+                    variant={getConfidenceColor(prop.confidence)}
                     className="mt-1"
                   />
                 </div>
               ))}
             </>
           )}
-          
+
           {detailed && data.analysis && (
-            <Button 
-              variant="outline-secondary" 
-              size="sm" 
+            <Button
+              variant="outline-secondary"
+              size="sm"
               className="mt-3 w-100"
               onClick={() => {
                 console.log('[MLPredictionCard] Toggling expanded details:', !expandedDetails);
@@ -368,7 +369,7 @@ const MLPredictionCard = ({
             </Button>
           )}
         </Card.Body>
-        
+
         {detailed && data.analysis && (
           <Collapse in={expandedDetails}>
             <div>
@@ -379,7 +380,7 @@ const MLPredictionCard = ({
                     <li key={index}>{factor}</li>
                   ))}
                 </ul>
-                
+
                 <h6>Trends</h6>
                 <ul className="small">
                   {data.analysis.trends.map((trend, index) => (
@@ -393,7 +394,7 @@ const MLPredictionCard = ({
       </>
     );
   };
-  
+
   // Render race prediction (Formula 1)
   const renderRacePrediction = () => {
     const data = detailedPrediction || prediction;
@@ -401,13 +402,13 @@ const MLPredictionCard = ({
       console.warn('[MLPredictionCard] No data available for race prediction');
       return null;
     }
-    
+
     console.log('[MLPredictionCard] Rendering race prediction:', {
       raceName: data.raceName,
       trackName: data.trackName,
-      hasPredictions: !!data.predictions
+      hasPredictions: !!data.predictions,
     });
-    
+
     return (
       <>
         <Card.Header>
@@ -422,7 +423,7 @@ const MLPredictionCard = ({
             <div className="text-muted">{data.trackName}</div>
             <div className="text-muted small">{data.location}</div>
           </div>
-          
+
           {data.predictions?.winner?.drivers && (
             <div className="prediction-details">
               <h6>Winner Prediction</h6>
@@ -430,15 +431,13 @@ const MLPredictionCard = ({
                 <div className="mb-2" key={index}>
                   <div className="d-flex justify-content-between">
                     <span>{driver.name}</span>
-                    <Badge 
-                      bg={getConfidenceColor(driver.confidence)}
-                    >
+                    <Badge bg={getConfidenceColor(driver.confidence)}>
                       {formatOdds(driver.odds)}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={driver.confidence * 100} 
-                    variant={getConfidenceColor(driver.confidence)} 
+                  <Progress
+                    now={driver.confidence * 100}
+                    variant={getConfidenceColor(driver.confidence)}
                     className="mt-1"
                   />
                   <div className="text-muted small">{driver.analysis}</div>
@@ -446,21 +445,21 @@ const MLPredictionCard = ({
               ))}
             </div>
           )}
-          
+
           {data.predictions?.podium && (
             <div className="mt-3">
               <h6>Podium Prediction</h6>
               <div className="d-flex justify-content-between">
                 <span>Podium</span>
-                <Badge 
-                  bg={getConfidenceColor(data.predictions.podium.confidence)}
-                >
+                <Badge bg={getConfidenceColor(data.predictions.podium.confidence)}>
                   {data.predictions.podium.confidence * 100}% Confidence
                 </Badge>
               </div>
               <ul className="small mt-2">
                 {data.predictions.podium.drivers.map((driver, index) => (
-                  <li key={index}>{index + 1}. {driver}</li>
+                  <li key={index}>
+                    {index + 1}. {driver}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -469,7 +468,7 @@ const MLPredictionCard = ({
       </>
     );
   };
-  
+
   // Render fight prediction (UFC)
   const renderFightPrediction = () => {
     const data = detailedPrediction || prediction;
@@ -477,14 +476,14 @@ const MLPredictionCard = ({
       console.warn('[MLPredictionCard] No data available for fight prediction');
       return null;
     }
-    
+
     console.log('[MLPredictionCard] Rendering fight prediction:', {
       eventName: data.eventName,
       fighter1: data.fighter1?.name,
       fighter2: data.fighter2?.name,
-      hasPredictions: !!data.predictions
+      hasPredictions: !!data.predictions,
     });
-    
+
     return (
       <>
         <Card.Header>
@@ -497,9 +496,13 @@ const MLPredictionCard = ({
           <div className="text-center mb-3">
             <h5>{data.eventName}</h5>
             <Badge bg="secondary">{data.weightClass}</Badge>
-            {data.isMainEvent && <Badge bg="danger" className="ms-2">Main Event</Badge>}
+            {data.isMainEvent && (
+              <Badge bg="danger" className="ms-2">
+                Main Event
+              </Badge>
+            )}
           </div>
-          
+
           <div className="d-flex justify-content-between mb-3">
             <div className="text-center">
               <h5>{data.fighter1.name}</h5>
@@ -513,60 +516,54 @@ const MLPredictionCard = ({
               <div className="text-muted small">{data.fighter2.record}</div>
             </div>
           </div>
-          
+
           {data.predictions && (
             <div className="prediction-details">
               {data.predictions.winner && (
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
                     <span>Winner</span>
-                    <Badge 
-                      bg={getConfidenceColor(data.predictions.winner.confidence)}
-                    >
+                    <Badge bg={getConfidenceColor(data.predictions.winner.confidence)}>
                       {data.predictions.winner.pick} {formatOdds(data.predictions.winner.odds)}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={data.predictions.winner.confidence * 100} 
-                    variant={getConfidenceColor(data.predictions.winner.confidence)} 
+                  <Progress
+                    now={data.predictions.winner.confidence * 100}
+                    variant={getConfidenceColor(data.predictions.winner.confidence)}
                     className="mt-1"
                   />
                   <div className="text-muted small">{data.predictions.winner.analysis}</div>
                 </div>
               )}
-              
+
               {data.predictions.method && (
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
                     <span>Method</span>
-                    <Badge 
-                      bg={getConfidenceColor(data.predictions.method.confidence)}
-                    >
+                    <Badge bg={getConfidenceColor(data.predictions.method.confidence)}>
                       {data.predictions.method.pick}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={data.predictions.method.confidence * 100} 
-                    variant={getConfidenceColor(data.predictions.method.confidence)} 
+                  <Progress
+                    now={data.predictions.method.confidence * 100}
+                    variant={getConfidenceColor(data.predictions.method.confidence)}
                     className="mt-1"
                   />
                   <div className="text-muted small">{data.predictions.method.analysis}</div>
                 </div>
               )}
-              
+
               {data.predictions.round && (
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
                     <span>Round</span>
-                    <Badge 
-                      bg={getConfidenceColor(data.predictions.round.confidence)}
-                    >
+                    <Badge bg={getConfidenceColor(data.predictions.round.confidence)}>
                       {data.predictions.round.pick}
                     </Badge>
                   </div>
-                  <Progress 
-                    now={data.predictions.round.confidence * 100} 
-                    variant={getConfidenceColor(data.predictions.round.confidence)} 
+                  <Progress
+                    now={data.predictions.round.confidence * 100}
+                    variant={getConfidenceColor(data.predictions.round.confidence)}
                     className="mt-1"
                   />
                   <div className="text-muted small">{data.predictions.round.analysis}</div>
@@ -578,28 +575,24 @@ const MLPredictionCard = ({
       </>
     );
   };
-  
+
   return (
     <Card className="ml-prediction-card mb-3">
       {renderPredictionCard()}
-      
+
       {interactive && !feedbackSubmitted && (
         <Card.Footer className="d-flex justify-content-between">
           <Tooltip title="Was this prediction helpful?">
             <div>
-              <Button 
-                variant="outline-success" 
-                size="sm" 
+              <Button
+                variant="outline-success"
+                size="sm"
                 className="me-2"
                 onClick={() => handleFeedback(true)}
               >
                 <FontAwesomeIcon icon={faThumbsUp} />
               </Button>
-              <Button 
-                variant="outline-danger" 
-                size="sm"
-                onClick={() => handleFeedback(false)}
-              >
+              <Button variant="outline-danger" size="sm" onClick={() => handleFeedback(false)}>
                 <FontAwesomeIcon icon={faThumbsDown} />
               </Button>
             </div>
@@ -610,11 +603,9 @@ const MLPredictionCard = ({
           </div>
         </Card.Footer>
       )}
-      
+
       {interactive && feedbackSubmitted && (
-        <Card.Footer className="text-center text-muted">
-          Thanks for your feedback!
-        </Card.Footer>
+        <Card.Footer className="text-center text-muted">Thanks for your feedback!</Card.Footer>
       )}
     </Card>
   );

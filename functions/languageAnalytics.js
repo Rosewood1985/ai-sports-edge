@@ -3,9 +3,9 @@
  * AI Sports Edge - Track Spanish vs English user behavior separately
  */
 
-const { onRequest } = require('firebase-functions/v2/https');
-const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require('./sentryConfig');
-const admin = require('firebase-admin');
+const { onRequest } = require("firebase-functions/v2/https");
+const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require("./sentryConfig");
+const admin = require("firebase-admin");
 
 // Initialize Firestore
 const db = admin.firestore();
@@ -16,47 +16,47 @@ const db = admin.firestore();
 exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
   try {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
       return;
     }
 
     // Verify admin token
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace("Bearer ", "");
     if (!token) {
-      return res.status(401).json({ error: 'Authorization required' });
+      return res.status(401).json({ error: "Authorization required" });
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token);
     
     // Get time range from query parameters
-    const timeRange = req.query.timeRange || '30d';
+    const timeRange = req.query.timeRange || "30d";
     const endDate = new Date();
     const startDate = new Date();
     
     // Calculate start date based on time range
     switch (timeRange) {
-      case '7d':
-        startDate.setDate(endDate.getDate() - 7);
-        break;
-      case '30d':
-        startDate.setDate(endDate.getDate() - 30);
-        break;
-      case '90d':
-        startDate.setDate(endDate.getDate() - 90);
-        break;
-      default:
-        startDate.setDate(endDate.getDate() - 30);
+    case "7d":
+      startDate.setDate(endDate.getDate() - 7);
+      break;
+    case "30d":
+      startDate.setDate(endDate.getDate() - 30);
+      break;
+    case "90d":
+      startDate.setDate(endDate.getDate() - 90);
+      break;
+    default:
+      startDate.setDate(endDate.getDate() - 30);
     }
 
     // Fetch user analytics with language data
-    const analyticsSnapshot = await db.collection('user_analytics')
-      .where('timestamp', '>=', startDate)
-      .where('timestamp', '<=', endDate)
+    const analyticsSnapshot = await db.collection("user_analytics")
+      .where("timestamp", ">=", startDate)
+      .where("timestamp", "<=", endDate)
       .get();
 
     const languageMetrics = {
@@ -89,9 +89,9 @@ exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, 
     
     analyticsSnapshot.forEach(doc => {
       const data = doc.data();
-      const userLang = data.userLanguage || data.language || 'en';
-      const isSpanish = userLang.startsWith('es');
-      const langKey = isSpanish ? 'spanish' : 'english';
+      const userLang = data.userLanguage || data.language || "en";
+      const isSpanish = userLang.startsWith("es");
+      const langKey = isSpanish ? "spanish" : "english";
       
       // Track unique users
       if (!processedUsers.has(data.userId)) {
@@ -140,9 +140,9 @@ exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, 
     });
 
     // Fetch subscription data with language segmentation
-    const subscriptionsSnapshot = await db.collection('subscriptions')
-      .where('createdAt', '>=', startDate)
-      .where('createdAt', '<=', endDate)
+    const subscriptionsSnapshot = await db.collection("subscriptions")
+      .where("createdAt", ">=", startDate)
+      .where("createdAt", "<=", endDate)
       .get();
 
     const subscriptionUsers = new Set();
@@ -151,11 +151,11 @@ exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, 
       const subData = subDoc.data();
       
       // Get user language preference
-      const userDoc = await db.collection('users').doc(subData.userId).get();
+      const userDoc = await db.collection("users").doc(subData.userId).get();
       const userData = userDoc.data();
-      const userLang = userData?.languagePreference || userData?.language || 'en';
-      const isSpanish = userLang.startsWith('es');
-      const langKey = isSpanish ? 'spanish' : 'english';
+      const userLang = userData?.languagePreference || userData?.language || "en";
+      const isSpanish = userLang.startsWith("es");
+      const langKey = isSpanish ? "spanish" : "english";
       
       // Track subscriptions
       if (!subscriptionUsers.has(subData.userId)) {
@@ -193,18 +193,18 @@ exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, 
     // Additional Spanish-specific insights
     const spanishInsights = {
       marketPenetration: {
-        us: languageMetrics.spanish.geographicDistribution['US'] || 0,
-        mexico: languageMetrics.spanish.geographicDistribution['MX'] || 0,
-        spain: languageMetrics.spanish.geographicDistribution['ES'] || 0,
+        us: languageMetrics.spanish.geographicDistribution["US"] || 0,
+        mexico: languageMetrics.spanish.geographicDistribution["MX"] || 0,
+        spain: languageMetrics.spanish.geographicDistribution["ES"] || 0,
         other: Object.entries(languageMetrics.spanish.geographicDistribution)
-          .filter(([country]) => !['US', 'MX', 'ES'].includes(country))
+          .filter(([country]) => !["US", "MX", "ES"].includes(country))
           .reduce((sum, [, count]) => sum + count, 0)
       },
       contentPreferences: {
         // This would be enhanced with actual content analytics
-        soccerEngagement: languageMetrics.spanish.topFeatures['soccer'] || 0,
-        baseballEngagement: languageMetrics.spanish.topFeatures['baseball'] || 0,
-        footballEngagement: languageMetrics.spanish.topFeatures['football'] || 0
+        soccerEngagement: languageMetrics.spanish.topFeatures["soccer"] || 0,
+        baseballEngagement: languageMetrics.spanish.topFeatures["baseball"] || 0,
+        footballEngagement: languageMetrics.spanish.topFeatures["football"] || 0
       }
     };
 
@@ -222,22 +222,22 @@ exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, 
       }
     };
 
-    trackFunctionPerformance('languageSegmentedAnalytics', Date.now() - startTime, true);
+    trackFunctionPerformance("languageSegmentedAnalytics", Date.now() - startTime, true);
 
     res.status(200).json({
       status: 200,
-      message: 'Success',
+      message: "Success",
       data: result
     });
 
   } catch (error) {
-    console.error('Language analytics error:', error);
-    captureCloudFunctionError(error, 'languageSegmentedAnalytics');
-    trackFunctionPerformance('languageSegmentedAnalytics', Date.now() - startTime, false);
+    console.error("Language analytics error:", error);
+    captureCloudFunctionError(error, "languageSegmentedAnalytics");
+    trackFunctionPerformance("languageSegmentedAnalytics", Date.now() - startTime, false);
     
     res.status(500).json({
       status: 500,
-      message: 'Internal server error',
+      message: "Internal server error",
       error: error.message
     });
   }
@@ -248,12 +248,12 @@ exports.languageSegmentedAnalytics = wrapHttpFunction(onRequest({ cors: true }, 
  */
 exports.trackLanguageEvent = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   try {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
       return;
     }
 
@@ -261,27 +261,27 @@ exports.trackLanguageEvent = wrapHttpFunction(onRequest({ cors: true }, async (r
     
     if (!userId || !eventType || !language) {
       return res.status(400).json({ 
-        error: 'userId, eventType, and language are required' 
+        error: "userId, eventType, and language are required" 
       });
     }
 
     // Store the language-specific event
-    await db.collection('language_analytics').add({
+    await db.collection("language_analytics").add({
       userId,
       eventType,
       language,
       properties: properties || {},
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      isSpanish: language.startsWith('es')
+      isSpanish: language.startsWith("es")
     });
 
     res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error('Track language event error:', error);
-    captureCloudFunctionError(error, 'trackLanguageEvent');
-    res.status(500).json({ error: 'Failed to track event' });
+    console.error("Track language event error:", error);
+    captureCloudFunctionError(error, "trackLanguageEvent");
+    res.status(500).json({ error: "Failed to track event" });
   }
 }));
 
-console.log('Language Analytics module loaded successfully');
+console.log("Language Analytics module loaded successfully");

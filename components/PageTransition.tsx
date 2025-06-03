@@ -20,27 +20,27 @@ interface PageTransitionProps {
    * Children to be animated
    */
   children: React.ReactNode;
-  
+
   /**
    * Type of transition animation
    */
   type?: TransitionType;
-  
+
   /**
    * Duration of the animation in milliseconds
    */
   duration?: number;
-  
+
   /**
    * Whether the component is currently visible
    */
   visible?: boolean;
-  
+
   /**
    * Callback when animation completes
    */
   onAnimationComplete?: () => void;
-  
+
   /**
    * Additional styles for the container
    */
@@ -64,12 +64,12 @@ const PageTransition: React.FC<PageTransitionProps> = ({
   const translateYAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(visible ? 1 : 0.8)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  
+
   // Run animation when visibility changes
   useEffect(() => {
     // Create animations based on transition type and visibility
     const animations = [];
-    
+
     // Opacity animation for all types except 'none'
     if (type !== 'none') {
       animations.push(
@@ -80,7 +80,7 @@ const PageTransition: React.FC<PageTransitionProps> = ({
         })
       );
     }
-    
+
     // Add specific animation based on type
     switch (type) {
       case 'slideLeft':
@@ -138,7 +138,7 @@ const PageTransition: React.FC<PageTransitionProps> = ({
         );
         break;
     }
-    
+
     // Run animations in parallel
     Animated.parallel(animations).start(({ finished }) => {
       if (finished && onAnimationComplete) {
@@ -146,11 +146,11 @@ const PageTransition: React.FC<PageTransitionProps> = ({
       }
     });
   }, [visible, type, duration]);
-  
+
   // Calculate transform based on transition type
   const getTransform = () => {
     const transform = [];
-    
+
     switch (type) {
       case 'slideLeft':
       case 'slideRight':
@@ -172,15 +172,15 @@ const PageTransition: React.FC<PageTransitionProps> = ({
         });
         break;
     }
-    
+
     return transform;
   };
-  
+
   // If transition type is 'none', just render children without animation
   if (type === 'none') {
     return <>{children}</>;
   }
-  
+
   return (
     <Animated.View
       style={[

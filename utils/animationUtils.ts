@@ -1,10 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { Animated, Easing, ViewStyle, StyleProp } from 'react-native';
+
 import { getOptimizedGlowIntensity } from './deviceOptimization';
 
 /**
  * Animation Utilities
- * 
+ *
  * This file provides utilities for creating animations in the app.
  */
 
@@ -27,13 +28,13 @@ export const useNeonPulse = (
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: maxValue,
-          duration: duration,
+          duration,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: minValue,
-          duration: duration,
+          duration,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
@@ -53,7 +54,9 @@ export const useNeonPulse = (
  * @param {number} scaleAmount - Amount to scale on hover
  * @returns {Object} - Animated style and event handlers
  */
-export const useHoverEffect = (scaleAmount: number = 1.05): {
+export const useHoverEffect = (
+  scaleAmount: number = 1.05
+): {
   animatedStyle: StyleProp<ViewStyle>;
   onPressIn: () => void;
   onPressOut: () => void;
@@ -191,10 +194,7 @@ export const useGlowHoverEffect = (
  * @param {number} delay - Animation delay in milliseconds
  * @returns {Animated.Value} - Animated value for opacity
  */
-export const useFadeIn = (
-  duration: number = 500,
-  delay: number = 0
-): Animated.Value => {
+export const useFadeIn = (duration: number = 500, delay: number = 0): Animated.Value => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -228,8 +228,12 @@ export const useSlideIn = (
   direction: 'left' | 'right' | 'top' | 'bottom' = 'bottom',
   distance: number = 100
 ): StyleProp<ViewStyle> => {
-  const translateX = useRef(new Animated.Value(direction === 'left' ? -distance : direction === 'right' ? distance : 0)).current;
-  const translateY = useRef(new Animated.Value(direction === 'top' ? -distance : direction === 'bottom' ? distance : 0)).current;
+  const translateX = useRef(
+    new Animated.Value(direction === 'left' ? -distance : direction === 'right' ? distance : 0)
+  ).current;
+  const translateY = useRef(
+    new Animated.Value(direction === 'top' ? -distance : direction === 'bottom' ? distance : 0)
+  ).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -266,10 +270,7 @@ export const useSlideIn = (
 
   return {
     opacity,
-    transform: [
-      { translateX },
-      { translateY },
-    ],
+    transform: [{ translateX }, { translateY }],
   };
 };
 

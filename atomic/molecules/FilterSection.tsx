@@ -1,6 +1,7 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, ViewStyle, TextStyle, StyleProp, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+
 import { AccessibleThemedView, AccessibleThemedText } from '../atoms';
 import { useI18n } from '../organisms/i18n/I18nContext';
 

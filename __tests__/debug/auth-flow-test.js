@@ -1,17 +1,18 @@
 /**
  * Authentication Flow Test Script
- * 
+ *
  * This script tests the authentication flow with enhanced logging and error handling.
  * It validates the improvements made to the authentication process.
  */
 
-import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth';
+import React from 'react';
+import { Alert } from 'react-native';
+
 import AuthScreen from '../../screens/AuthScreen';
-import { info, error as logError, LogCategory } from '../../services/loggingService';
 import { safeErrorCapture } from '../../services/errorUtils';
+import { info, error as logError, LogCategory } from '../../services/loggingService';
 
 // Mock the Firebase auth functions
 jest.mock('firebase/auth', () => ({
@@ -54,7 +55,7 @@ jest.mock('@react-navigation/native', () => ({
 // Mock the language context
 jest.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key) => key,
+    t: key => key,
   }),
 }));
 
@@ -65,27 +66,27 @@ describe('AuthScreen', () => {
   beforeEach(() => {
     // Clear all mocks
     jest.clearAllMocks();
-    
+
     // Mock successful auth
     getAuth.mockReturnValue({});
-    createUserWithEmailAndPassword.mockResolvedValue({ 
-      user: { uid: 'test-uid', email: 'test@example.com' } 
+    createUserWithEmailAndPassword.mockResolvedValue({
+      user: { uid: 'test-uid', email: 'test@example.com' },
     });
     signInWithEmailAndPassword.mockResolvedValue({
-      user: { uid: 'test-uid', email: 'test@example.com' }
+      user: { uid: 'test-uid', email: 'test@example.com' },
     });
   });
 
   test('logs successful sign in', async () => {
     const { getByPlaceholderText, getByText } = render(<AuthScreen />);
-    
+
     // Fill in the form
     fireEvent.changeText(getByPlaceholderText('auth.email'), 'test@example.com');
     fireEvent.changeText(getByPlaceholderText('auth.password (min. 8 characters)'), 'Password123!');
-    
+
     // Submit the form
     fireEvent.press(getByText('auth.sign_in'));
-    
+
     // Wait for the sign in to complete
     await waitFor(() => {
       // Verify that the sign in function was called
@@ -94,7 +95,7 @@ describe('AuthScreen', () => {
         'test@example.com',
         'Password123!'
       );
-      
+
       // Verify that the success was logged
       expect(info).toHaveBeenCalledWith(
         LogCategory.AUTH,
@@ -109,16 +110,19 @@ describe('AuthScreen', () => {
     const authError = new Error('Invalid credentials');
     authError.code = 'auth/wrong-password';
     signInWithEmailAndPassword.mockRejectedValue(authError);
-    
+
     const { getByPlaceholderText, getByText } = render(<AuthScreen />);
-    
+
     // Fill in the form
     fireEvent.changeText(getByPlaceholderText('auth.email'), 'test@example.com');
-    fireEvent.changeText(getByPlaceholderText('auth.password (min. 8 characters)'), 'WrongPassword123!');
-    
+    fireEvent.changeText(
+      getByPlaceholderText('auth.password (min. 8 characters)'),
+      'WrongPassword123!'
+    );
+
     // Submit the form
     fireEvent.press(getByText('auth.sign_in'));
-    
+
     // Wait for the sign in to fail
     await waitFor(() => {
       // Verify that the error was logged
@@ -127,7 +131,7 @@ describe('AuthScreen', () => {
         expect.stringContaining('Authentication failed'),
         expect.anything()
       );
-      
+
       // Verify that the error was captured
       expect(safeErrorCapture).toHaveBeenCalled();
     });
@@ -135,19 +139,19 @@ describe('AuthScreen', () => {
 
   test('logs successful sign up', async () => {
     const { getByPlaceholderText, getByText } = render(<AuthScreen />);
-    
+
     // Switch to sign up mode
     fireEvent.press(getByText('auth.sign_up'));
-    
+
     // Fill in the form
     fireEvent.changeText(getByPlaceholderText('auth.username (3-20 characters)'), 'testuser');
     fireEvent.changeText(getByPlaceholderText('auth.email'), 'test@example.com');
     fireEvent.changeText(getByPlaceholderText('auth.password (min. 8 characters)'), 'Password123!');
     fireEvent.changeText(getByPlaceholderText('auth.confirm_password'), 'Password123!');
-    
+
     // Submit the form
     fireEvent.press(getByText('auth.sign_up'));
-    
+
     // Wait for the sign up to complete
     await waitFor(() => {
       // Verify that the sign up function was called
@@ -156,14 +160,14 @@ describe('AuthScreen', () => {
         'test@example.com',
         'Password123!'
       );
-      
+
       // Verify that the success was logged
       expect(info).toHaveBeenCalledWith(
         LogCategory.AUTH,
         'User account created',
-        expect.objectContaining({ 
+        expect.objectContaining({
           email: 'test@example.com',
-          userId: 'test-uid'
+          userId: 'test-uid',
         })
       );
     });
@@ -171,20 +175,20 @@ describe('AuthScreen', () => {
 
   test('logs forgot password request', async () => {
     const { getByPlaceholderText, getByText } = render(<AuthScreen />);
-    
+
     // Fill in the email
     fireEvent.changeText(getByPlaceholderText('auth.email'), 'test@example.com');
-    
+
     // Press forgot password
     fireEvent.press(getByText('auth.forgot_password'));
-    
+
     // Verify that the request was logged
     expect(info).toHaveBeenCalledWith(
       LogCategory.AUTH,
       'Password reset email requested',
       expect.objectContaining({ email: 'test@example.com' })
     );
-    
+
     // Verify that the alert was shown
     expect(Alert.alert).toHaveBeenCalledWith(
       'auth.password_reset',
@@ -195,17 +199,17 @@ describe('AuthScreen', () => {
 
   test('logs forgot password error when email is missing', async () => {
     const { getByText } = render(<AuthScreen />);
-    
+
     // Press forgot password without entering an email
     fireEvent.press(getByText('auth.forgot_password'));
-    
+
     // Verify that the error was logged
     expect(logError).toHaveBeenCalledWith(
       LogCategory.AUTH,
       'Password reset attempted without email',
       expect.anything()
     );
-    
+
     // Verify that the alert was shown
     expect(Alert.alert).toHaveBeenCalledWith(
       'auth.email_required',

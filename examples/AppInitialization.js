@@ -1,6 +1,6 @@
 /**
  * App Initialization Example
- * 
+ *
  * This example demonstrates how to initialize the app using the atomic architecture.
  */
 
@@ -14,7 +14,7 @@ const AppInitialization = () => {
   // State for initialization status
   const [isInitialized, setIsInitialized] = React.useState(false);
   const [error, setError] = React.useState(null);
-  
+
   // Initialize app on mount
   useEffect(() => {
     const initializeApp = async () => {
@@ -24,19 +24,19 @@ const AppInitialization = () => {
         if (!envResult.success) {
           throw new Error('Environment initialization failed');
         }
-        
+
         // Initialize monitoring
         const monitoringResult = await monitoringService.initialize();
         if (!monitoringResult.success) {
           throw new Error('Monitoring initialization failed');
         }
-        
+
         // Initialize Firebase
         const firebaseResult = await firebaseService.initialize();
         if (!firebaseResult.success) {
           throw new Error('Firebase initialization failed');
         }
-        
+
         // Set initialization status
         setIsInitialized(true);
       } catch (error) {
@@ -44,10 +44,10 @@ const AppInitialization = () => {
         monitoringService.error.captureException(error);
       }
     };
-    
+
     initializeApp();
   }, []);
-  
+
   // Render loading screen
   if (!isInitialized) {
     return (
@@ -58,13 +58,9 @@ const AppInitialization = () => {
       </View>
     );
   }
-  
+
   // Render app with ThemeProvider
-  return (
-    <ThemeProvider>
-      {/* App content */}
-    </ThemeProvider>
-  );
+  return <ThemeProvider>{/* App content */}</ThemeProvider>;
 };
 
 export default AppInitialization;

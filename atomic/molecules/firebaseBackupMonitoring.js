@@ -6,6 +6,7 @@
 
 import { initializeApp, getApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+
 import { backupConfig } from '../atoms/firebaseBackupConfig';
 import { formatError } from '../atoms/firebaseBackupUtils';
 

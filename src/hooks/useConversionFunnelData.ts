@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ConversionFunnelData } from '../types/conversionFunnel';
-import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import useSWR from 'swr';
+
+import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import { WebSocketService } from '../services/adminDashboardService';
+import { ConversionFunnelData } from '../types/conversionFunnel';
 
 // Mock data for development
 const mockConversionFunnelData: ConversionFunnelData = {
@@ -160,7 +161,7 @@ const fetcher = async <T>(url: string): Promise<T> => {
     } catch (error) {
       console.error(`API fetch attempt ${attempt} failed:`, error);
       lastError = error as Error;
-      
+
       if (attempt < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt - 1) * 1000));
       }
@@ -191,7 +192,7 @@ export function useConversionFunnelData(shouldFetch = true) {
     const wsService = WebSocketService.getInstance();
     wsService.connect();
 
-    const unsubscribe = wsService.subscribe('conversion-funnel', (newData) => {
+    const unsubscribe = wsService.subscribe('conversion-funnel', newData => {
       mutate({ data: newData, status: 200, message: 'Real-time update' } as any, false);
     });
 

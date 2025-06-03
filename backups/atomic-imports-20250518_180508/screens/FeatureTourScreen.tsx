@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -9,15 +10,15 @@ import {
   Dimensions,
   Animated,
   Alert,
-  Platform
+  Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useI18n } from '../contexts/I18nContext';
-import featureTourService, { FeatureTourStep } from '../services/featureTourService';
-import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import Header from '../components/Header';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+import { useI18n } from '../contexts/I18nContext';
+import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
+import featureTourService, { FeatureTourStep } from '../services/featureTourService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,7 +42,7 @@ const FeatureTourScreen: React.FC = () => {
         setLoading(true);
         const tourSteps = await featureTourService.getFeatureTourSteps();
         setSteps(tourSteps);
-        
+
         // Track screen view
         analyticsService.trackScreenView('feature_tour');
       } catch (error) {
@@ -51,7 +52,7 @@ const FeatureTourScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadSteps();
   }, []);
 
@@ -63,26 +64,26 @@ const FeatureTourScreen: React.FC = () => {
         Animated.timing(fadeAnim, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(slideAnim, {
           toValue: width,
           duration: 200,
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]).start(() => {
         // Fade in
         Animated.parallel([
           Animated.timing(fadeAnim, {
             toValue: 1,
             duration: 300,
-            useNativeDriver: true
+            useNativeDriver: true,
           }),
           Animated.timing(slideAnim, {
             toValue: 0,
             duration: 300,
-            useNativeDriver: true
-          })
+            useNativeDriver: true,
+          }),
         ]).start();
       });
     }
@@ -91,21 +92,21 @@ const FeatureTourScreen: React.FC = () => {
   // Handle completing the current step
   const handleCompleteStep = async () => {
     if (steps.length === 0) return;
-    
+
     const currentStep = steps[currentStepIndex];
-    
+
     try {
       // Mark step as completed
       await featureTourService.markFeatureTourStepCompleted(currentStep.id);
-      
+
       // Update local state
       const updatedSteps = [...steps];
       updatedSteps[currentStepIndex] = {
         ...currentStep,
-        completed: true
+        completed: true,
       };
       setSteps(updatedSteps);
-      
+
       // Move to next step or complete tour
       if (currentStepIndex < steps.length - 1) {
         setCurrentStepIndex(currentStepIndex + 1);
@@ -122,18 +123,14 @@ const FeatureTourScreen: React.FC = () => {
   const handleCompleteTour = async () => {
     try {
       await featureTourService.markFeatureTourCompleted();
-      
+
       // Show completion message
-      Alert.alert(
-        t('featureTour.completion.title'),
-        t('featureTour.completion.message'),
-        [
-          {
-            text: t('featureTour.completion.gotIt'),
-            onPress: () => navigation.navigate('Main' as never)
-          }
-        ]
-      );
+      Alert.alert(t('featureTour.completion.title'), t('featureTour.completion.message'), [
+        {
+          text: t('featureTour.completion.gotIt'),
+          onPress: () => navigation.navigate('Main' as never),
+        },
+      ]);
     } catch (error) {
       console.error('Error completing feature tour:', error);
       Alert.alert('Error', 'Failed to complete tour. Please try again.');
@@ -142,27 +139,23 @@ const FeatureTourScreen: React.FC = () => {
 
   // Handle skipping the tour
   const handleSkipTour = () => {
-    Alert.alert(
-      t('featureTour.skip.title'),
-      t('featureTour.skip.message'),
-      [
-        {
-          text: t('featureTour.skip.cancel'),
-          style: "cancel"
+    Alert.alert(t('featureTour.skip.title'), t('featureTour.skip.message'), [
+      {
+        text: t('featureTour.skip.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: t('featureTour.skipTour'),
+        onPress: () => {
+          analyticsService.trackEvent(AnalyticsEventType.FEATURE_USED, {
+            feature_name: 'feature_tour_skipped',
+            step_index: currentStepIndex,
+            step_id: steps[currentStepIndex]?.id,
+          });
+          navigation.navigate('Main' as never);
         },
-        {
-          text: t('featureTour.skipTour'),
-          onPress: () => {
-            analyticsService.trackEvent(AnalyticsEventType.FEATURE_USED, {
-              feature_name: 'feature_tour_skipped',
-              step_index: currentStepIndex,
-              step_id: steps[currentStepIndex]?.id
-            });
-            navigation.navigate('Main' as never);
-          }
-        }
-      ]
-    );
+      },
+    ]);
   };
 
   // Render current step content
@@ -176,32 +169,32 @@ const FeatureTourScreen: React.FC = () => {
     }
 
     const currentStep = steps[currentStepIndex];
-    
+
     return (
-      <Animated.View 
+      <Animated.View
         style={[
           styles.stepContent,
           {
             opacity: fadeAnim,
-            transform: [{ translateX: slideAnim }]
-          }
+            transform: [{ translateX: slideAnim }],
+          },
         ]}
       >
         <ThemedText style={styles.stepTitle}>{currentStep.title}</ThemedText>
         <ThemedText style={styles.stepDescription}>{currentStep.description}</ThemedText>
-        
+
         {/* Interactive demo area - would be customized for each feature */}
         <View style={styles.demoContainer}>
           <ThemedText style={styles.demoText}>
             [Interactive Demo: Tap to explore {currentStep.title}]
           </ThemedText>
-          
+
           {/* This would be replaced with actual interactive components */}
           <TouchableOpacity style={styles.demoButton}>
             <ThemedText style={styles.demoButtonText}>{t('featureTour.tryIt')}</ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         <ThemedText style={styles.stepHint}>
           Users who use this feature report better betting results!
         </ThemedText>
@@ -219,7 +212,7 @@ const FeatureTourScreen: React.FC = () => {
             style={[
               styles.progressDot,
               index === currentStepIndex && styles.activeDot,
-              step.completed && styles.completedDot
+              step.completed && styles.completedDot,
             ]}
           />
         ))}
@@ -229,39 +222,26 @@ const FeatureTourScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        title={t('featureTour.title')}
-        onRefresh={() => {}}
-        isLoading={loading}
-      />
-      
+      <Header title={t('featureTour.title')} onRefresh={() => {}} isLoading={loading} />
+
       <View style={styles.content}>
         {renderStepContent()}
-        
+
         {renderProgressIndicators()}
-        
+
         <View style={styles.buttonsContainer}>
           {currentStepIndex < steps.length - 1 ? (
             <>
-              <TouchableOpacity
-                style={styles.skipButton}
-                onPress={handleSkipTour}
-              >
+              <TouchableOpacity style={styles.skipButton} onPress={handleSkipTour}>
                 <ThemedText style={styles.skipButtonText}>{t('featureTour.skipTour')}</ThemedText>
               </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={styles.nextButton}
-                onPress={handleCompleteStep}
-              >
+
+              <TouchableOpacity style={styles.nextButton} onPress={handleCompleteStep}>
                 <ThemedText style={styles.nextButtonText}>{t('featureTour.next')}</ThemedText>
               </TouchableOpacity>
             </>
           ) : (
-            <TouchableOpacity
-              style={styles.finishButton}
-              onPress={handleCompleteStep}
-            >
+            <TouchableOpacity style={styles.finishButton} onPress={handleCompleteStep}>
               <ThemedText style={styles.finishButtonText}>{t('featureTour.finishTour')}</ThemedText>
             </TouchableOpacity>
           )}

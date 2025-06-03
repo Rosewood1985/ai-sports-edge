@@ -3,7 +3,7 @@
  */
 
 // Define all possible analytics event types
-export type AnalyticsEventType = 
+export type AnalyticsEventType =
   // Microtransaction events
   | 'microtransaction_interaction'
   | 'microtransaction_impression'
@@ -14,11 +14,11 @@ export type AnalyticsEventType =
   | 'microtransaction_purchase_failed'
   | 'microtransaction_purchase_error'
   | 'microtransaction_conversion'
-  
+
   // UI events
   | 'upgrade_prompt_displayed'
   | 'navigate_to_subscription'
-  
+
   // Subscription events
   | 'subscription_view'
   | 'subscription_select'
@@ -27,13 +27,13 @@ export type AnalyticsEventType =
   | 'subscription_purchase_failed'
   | 'subscription_cancel'
   | 'subscription_change'
-  
+
   // User events
   | 'user_login'
   | 'user_signup'
   | 'user_logout'
   | 'user_profile_update'
-  
+
   // Feature usage events
   | 'feature_view'
   | 'feature_use'
@@ -45,18 +45,18 @@ export type AnalyticsEventType =
   | 'purchase_player_comparison'
   | 'purchase_historical_trends'
   | 'purchase_premium_bundle'
-  
+
   // App lifecycle events
   | 'app_open'
   | 'app_close'
   | 'app_crash'
   | 'app_update'
-  
+
   // Navigation events
   | 'screen_view'
   | 'tab_change'
   | 'deep_link_open'
-  
+
   // Performance events
   | 'api_request'
   | 'api_response'
@@ -73,7 +73,7 @@ export interface AnalyticsService {
    * @returns Promise that resolves when the event is tracked
    */
   trackEvent(eventType: AnalyticsEventType, eventParams?: Record<string, any>): Promise<void>;
-  
+
   /**
    * Set user properties for analytics
    * @param userId User ID
@@ -81,7 +81,7 @@ export interface AnalyticsService {
    * @returns Promise that resolves when the properties are set
    */
   setUserProperties(userId: string, properties: Record<string, any>): Promise<void>;
-  
+
   /**
    * Get analytics metrics for a specific period
    * @param metricName Name of the metric to get

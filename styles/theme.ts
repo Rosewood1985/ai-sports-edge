@@ -17,20 +17,20 @@ export const typography = {
   // Font families (Ensure these fonts are loaded in the app via expo-font or similar)
   fontFamily: {
     heading: 'Orbitron', // Use Orbitron for headlines
-    body: 'Inter',       // Use Inter for body text and UI elements
+    body: 'Inter', // Use Inter for body text and UI elements
   },
 
   // Font sizes (Semantic scale based on design system)
   fontSize: {
     // Based on ui-ux-strategy.md (using approximate mid-points for web/iOS)
-    h1: 34,       // Screen Titles (Orbitron)
-    h2: 26,       // Section Titles (Orbitron)
-    h3: 21,       // Card Titles/Key Metrics (Orbitron)
-    bodyLg: 17,   // Key Descriptions (Inter)
-    bodyStd: 15,  // General Text (Inter)
-    button: 16,   // Button Text (Inter)
-    label: 13,    // Labels/Captions (Inter)
-    small: 12,    // Small Text/Metadata (Inter)
+    h1: 34, // Screen Titles (Orbitron)
+    h2: 26, // Section Titles (Orbitron)
+    h3: 21, // Card Titles/Key Metrics (Orbitron)
+    bodyLg: 17, // Key Descriptions (Inter)
+    bodyStd: 15, // General Text (Inter)
+    button: 16, // Button Text (Inter)
+    label: 13, // Labels/Captions (Inter)
+    small: 12, // Small Text/Metadata (Inter)
 
     // Retaining t-shirt sizes for potential generic use, map to semantic values
     xs: 12, // small
@@ -46,21 +46,21 @@ export const typography = {
   fontWeight: {
     light: '300',
     regular: '400', // Default for Inter body
-    medium: '500',  // Good for Orbitron H3, Inter Buttons/Labels
+    medium: '500', // Good for Orbitron H3, Inter Buttons/Labels
     semiBold: '600',
-    bold: '700',    // Good for Orbitron H1/H2
+    bold: '700', // Good for Orbitron H1/H2
   },
 
   // Line heights (Calculated based on fontSize and multipliers)
   lineHeight: {
-    h1: 40,       // ~1.18 * 34
-    h2: 32,       // ~1.23 * 26
-    h3: 28,       // ~1.33 * 21
-    bodyLg: 24,   // ~1.4 * 17
-    bodyStd: 21,  // ~1.4 * 15
-    button: 20,   // ~1.25 * 16 (Buttons often have tighter leading)
-    label: 18,    // ~1.38 * 13
-    small: 16,    // ~1.33 * 12
+    h1: 40, // ~1.18 * 34
+    h2: 32, // ~1.23 * 26
+    h3: 28, // ~1.33 * 21
+    bodyLg: 24, // ~1.4 * 17
+    bodyStd: 21, // ~1.4 * 15
+    button: 20, // ~1.25 * 16 (Buttons often have tighter leading)
+    label: 18, // ~1.38 * 13
+    small: 16, // ~1.33 * 12
 
     // T-shirt sizes mapped
     xs: 16, // small
@@ -75,13 +75,13 @@ export const typography = {
 
 // Spacing (8px base unit scale)
 export const spacing = {
-  xxs: 4,   // Half base unit
-  xs: 8,    // 1 * base unit
-  sm: 16,   // 2 * base unit
-  md: 24,   // 3 * base unit
-  lg: 32,   // 4 * base unit
-  xl: 40,   // 5 * base unit (Added for more flexibility)
-  xxl: 48,  // 6 * base unit
+  xxs: 4, // Half base unit
+  xs: 8, // 1 * base unit
+  sm: 16, // 2 * base unit
+  md: 24, // 3 * base unit
+  lg: 32, // 4 * base unit
+  xl: 40, // 5 * base unit (Added for more flexibility)
+  xxl: 48, // 6 * base unit
   xxxl: 64, // 8 * base unit
 };
 
@@ -89,7 +89,7 @@ export const spacing = {
 export const borderRadius = {
   none: 0,
   xs: 2,
-  sm: 4,    // Default for most elements like cards/buttons
+  sm: 4, // Default for most elements like cards/buttons
   md: 8,
   lg: 16,
   xl: 24,

@@ -75,7 +75,7 @@ export class EnhancedInsightsService extends AIMLService {
     }
   ): Promise<InsightBatchResult> {
     const startTime = performance.now();
-    
+
     try {
       // Use optimized inference for insight generation
       const inferenceRequest = {
@@ -85,23 +85,21 @@ export class EnhancedInsightsService extends AIMLService {
         inputs: { dataSource, options },
         priority: 'medium' as const,
       };
-      
+
       this.performanceMonitor.recordCounter('insight_generation_requests');
-      
+
       const result = await this.inferenceService.predict(inferenceRequest);
-      
-      this.performanceMonitor.recordTiming(
-        'insight_generation',
-        startTime,
-        { dataSource, fromCache: result.fromCache.toString() }
-      );
-      
+
+      this.performanceMonitor.recordTiming('insight_generation', startTime, {
+        dataSource,
+        fromCache: result.fromCache.toString(),
+      });
+
       if (result.error) {
         throw new Error(result.error);
       }
-      
+
       return this.processInferenceResult(result, dataSource);
-      
     } catch (error) {
       this.performanceMonitor.recordCounter('insight_generation_errors');
       console.warn('Insight generation failed, using fallback:', error);
@@ -293,7 +291,7 @@ export class EnhancedInsightsService extends AIMLService {
 
       // Mock streaming with periodic insights
       this.simulateInsightStream(stream);
-      
+
       return stream;
     } catch (error) {
       console.error('Failed to start insight stream:', error);
@@ -322,14 +320,17 @@ export class EnhancedInsightsService extends AIMLService {
   /**
    * Get insight analytics and metrics
    */
-  static async getInsightAnalytics(
-    timeRange?: { start: string; end: string }
-  ): Promise<InsightAnalytics> {
+  static async getInsightAnalytics(timeRange?: {
+    start: string;
+    end: string;
+  }): Promise<InsightAnalytics> {
     try {
-      const params = timeRange ? new URLSearchParams({
-        start: timeRange.start,
-        end: timeRange.end,
-      }) : '';
+      const params = timeRange
+        ? new URLSearchParams({
+            start: timeRange.start,
+            end: timeRange.end,
+          })
+        : '';
 
       return await this.request(`${this.INSIGHTS_ENDPOINT}/analytics?${params}`);
     } catch (error) {
@@ -347,7 +348,7 @@ export class EnhancedInsightsService extends AIMLService {
     const insights = this.extractInsightsFromResult(result.outputs);
     const patterns = this.extractPatternsFromResult(result.outputs);
     const correlations = this.extractCorrelationsFromResult(result.outputs);
-    
+
     return {
       batchId: `batch_${Date.now()}`,
       status: 'completed',
@@ -365,7 +366,7 @@ export class EnhancedInsightsService extends AIMLService {
 
   private static extractInsightsFromResult(outputs: any): EnhancedInsight[] {
     if (!outputs || !outputs.insights) return [];
-    
+
     return outputs.insights.map((insight: any, index: number) => ({
       id: `insight_${Date.now()}_${index}`,
       type: insight.type || 'trend',
@@ -416,7 +417,7 @@ export class EnhancedInsightsService extends AIMLService {
 
   private static extractPatternsFromResult(outputs: any): PatternDetection[] {
     if (!outputs || !outputs.patterns) return [];
-    
+
     return outputs.patterns.map((pattern: any, index: number) => ({
       id: `pattern_${Date.now()}_${index}`,
       type: pattern.type || 'trending',
@@ -445,7 +446,7 @@ export class EnhancedInsightsService extends AIMLService {
 
   private static extractCorrelationsFromResult(outputs: any): CorrelationAnalysis[] {
     if (!outputs || !outputs.correlations) return [];
-    
+
     return outputs.correlations.map((corr: any, index: number) => ({
       id: `correlation_${Date.now()}_${index}`,
       metrics: {
@@ -483,7 +484,7 @@ export class EnhancedInsightsService extends AIMLService {
     limit = 20
   ): { insights: EnhancedInsight[]; analytics: InsightAnalytics; total: number } {
     const mockInsights = this.generateMockInsights();
-    
+
     // Apply filters
     let filteredInsights = mockInsights;
     if (filters) {
@@ -516,7 +517,8 @@ export class EnhancedInsightsService extends AIMLService {
         type: 'opportunity',
         category: 'user_behavior',
         title: 'Significant Increase in User Engagement During Peak Hours',
-        description: 'Analysis shows a 34% increase in user engagement between 2-4 PM EST, suggesting optimal timing for content releases and notifications.',
+        description:
+          'Analysis shows a 34% increase in user engagement between 2-4 PM EST, suggesting optimal timing for content releases and notifications.',
         nlpSummary: {
           keyPhrases: ['user engagement', 'peak hours', '34% increase', 'optimal timing'],
           sentiment: 'positive',
@@ -525,8 +527,18 @@ export class EnhancedInsightsService extends AIMLService {
             { text: '2-4 PM EST', type: 'DATE', confidence: 0.92, startOffset: 67, endOffset: 77 },
           ],
           topics: [
-            { name: 'User Engagement', confidence: 0.89, keywords: ['engagement', 'users', 'activity'], relatedInsights: [] },
-            { name: 'Content Strategy', confidence: 0.76, keywords: ['content', 'timing', 'notifications'], relatedInsights: [] },
+            {
+              name: 'User Engagement',
+              confidence: 0.89,
+              keywords: ['engagement', 'users', 'activity'],
+              relatedInsights: [],
+            },
+            {
+              name: 'Content Strategy',
+              confidence: 0.76,
+              keywords: ['content', 'timing', 'notifications'],
+              relatedInsights: [],
+            },
           ],
           readabilityScore: 82,
           urgencyIndicators: ['significant', 'optimal'],
@@ -557,7 +569,8 @@ export class EnhancedInsightsService extends AIMLService {
           {
             id: 'rec_001',
             title: 'Optimize Content Release Schedule',
-            description: 'Schedule high-priority content and notifications during 2-4 PM EST window',
+            description:
+              'Schedule high-priority content and notifications during 2-4 PM EST window',
             priority: 'high',
             category: 'immediate',
             effort: 'low',
@@ -565,14 +578,25 @@ export class EnhancedInsightsService extends AIMLService {
             expectedOutcome: {
               description: 'Increase overall engagement by 15-20%',
               metrics: [
-                { name: 'engagement_rate', currentValue: 25, expectedValue: 30, unit: '%', confidence: 0.78 },
+                {
+                  name: 'engagement_rate',
+                  currentValue: 25,
+                  expectedValue: 30,
+                  unit: '%',
+                  confidence: 0.78,
+                },
               ],
               confidence: 0.78,
             },
             prerequisites: ['Content calendar review', 'Notification system update'],
             risks: ['Potential notification fatigue', 'Time zone considerations'],
             alternatives: [
-              { title: 'A/B test timing', description: 'Test different time windows', effort: 'medium', expectedImpact: 70 },
+              {
+                title: 'A/B test timing',
+                description: 'Test different time windows',
+                effort: 'medium',
+                expectedImpact: 70,
+              },
             ],
           },
         ],
@@ -693,8 +717,20 @@ export class EnhancedInsightsService extends AIMLService {
           horizon: '30 days',
         },
         factors: [
-          { name: 'User Growth', impact: 45, confidence: 0.89, description: 'Increasing user base', controllable: true },
-          { name: 'Seasonality', impact: 23, confidence: 0.92, description: 'Seasonal patterns', controllable: false },
+          {
+            name: 'User Growth',
+            impact: 45,
+            confidence: 0.89,
+            description: 'Increasing user base',
+            controllable: true,
+          },
+          {
+            name: 'Seasonality',
+            impact: 23,
+            confidence: 0.92,
+            description: 'Seasonal patterns',
+            controllable: false,
+          },
         ],
         scenarios: [
           {
@@ -735,7 +771,12 @@ export class EnhancedInsightsService extends AIMLService {
         { text: '34%', type: 'PERCENTAGE', confidence: 0.95, startOffset: 0, endOffset: 3 },
       ],
       topics: [
-        { name: 'User Behavior', confidence: 0.85, keywords: ['users', 'behavior', 'patterns'], relatedInsights: [] },
+        {
+          name: 'User Behavior',
+          confidence: 0.85,
+          keywords: ['users', 'behavior', 'patterns'],
+          relatedInsights: [],
+        },
       ],
       readabilityScore: 78,
       urgencyIndicators: ['significant', 'critical'],

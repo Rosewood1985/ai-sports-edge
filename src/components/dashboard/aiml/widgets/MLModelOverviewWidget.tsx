@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+
 import { MLModel } from '../../../../types/aiml';
 
 interface MLModelOverviewWidgetProps {
@@ -97,11 +98,9 @@ export function MLModelOverviewWidget({ models, className = '' }: MLModelOvervie
 
         {/* Recent Models */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
-            Recent Models
-          </h4>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Recent Models</h4>
           <div className="space-y-3">
-            {models.slice(0, 5).map((model) => (
+            {models.slice(0, 5).map(model => (
               <div
                 key={model.id}
                 className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -122,9 +121,7 @@ export function MLModelOverviewWidget({ models, className = '' }: MLModelOvervie
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {(model.accuracy * 100).toFixed(1)}%
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      accuracy
-                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">accuracy</div>
                   </div>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(

@@ -8,11 +8,12 @@ import {
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
-import { submitQuestion } from '../services/faqService';
+
 import { auth } from '../config/firebase';
 import { useI18n } from '../contexts/I18nContext';
+import { submitQuestion } from '../services/faqService';
 
 interface QuestionSubmissionFormProps {
   onQuestionSubmitted?: () => void;
@@ -24,7 +25,7 @@ interface QuestionSubmissionFormProps {
  * @returns {JSX.Element} - Rendered component
  */
 const QuestionSubmissionForm = ({
-  onQuestionSubmitted
+  onQuestionSubmitted,
 }: QuestionSubmissionFormProps): JSX.Element => {
   const { t } = useI18n();
   const [question, setQuestion] = useState('');
@@ -40,19 +41,17 @@ const QuestionSubmissionForm = ({
     try {
       // Get current user email if logged in
       const userEmail = auth.currentUser?.email || undefined;
-      
+
       await submitQuestion(question, userEmail);
-      
+
       // Show success alert
-      Alert.alert(
-        t('faq.form.successTitle'),
-        t('faq.form.successMessage'),
-        [{ text: t('personalization.alerts.ok') }]
-      );
-      
+      Alert.alert(t('faq.form.successTitle'), t('faq.form.successMessage'), [
+        { text: t('personalization.alerts.ok') },
+      ]);
+
       // Clear form
       setQuestion('');
-      
+
       // Notify parent component
       if (onQuestionSubmitted) {
         onQuestionSubmitted();
@@ -71,10 +70,8 @@ const QuestionSubmissionForm = ({
       style={styles.container}
     >
       <Text style={styles.title}>{t('faq.form.title')}</Text>
-      <Text style={styles.subtitle}>
-        {t('faq.form.subtitle')}
-      </Text>
-      
+      <Text style={styles.subtitle}>{t('faq.form.subtitle')}</Text>
+
       <TextInput
         style={styles.input}
         placeholder={t('faq.form.placeholder')}
@@ -83,23 +80,20 @@ const QuestionSubmissionForm = ({
         multiline
         numberOfLines={3}
         maxLength={300}
-        accessible={true}
+        accessible
         accessibilityLabel={t('faq.accessibility.questionInput')}
         accessibilityHint={t('faq.accessibility.questionInputHint')}
       />
-      
+
       <Text style={styles.charCount}>
         {question.length}/300 {t('faq.form.charCount')}
       </Text>
-      
+
       <TouchableOpacity
-        style={[
-          styles.submitButton,
-          (!question.trim() || isSubmitting) && styles.disabledButton
-        ]}
+        style={[styles.submitButton, (!question.trim() || isSubmitting) && styles.disabledButton]}
         onPress={handleSubmit}
         disabled={!question.trim() || isSubmitting}
-        accessible={true}
+        accessible
         accessibilityRole="button"
         accessibilityLabel={t('faq.accessibility.submitButton')}
         accessibilityHint={t('faq.accessibility.submitButtonHint')}
@@ -111,10 +105,8 @@ const QuestionSubmissionForm = ({
           <Text style={styles.submitButtonText}>{t('faq.form.submit')}</Text>
         )}
       </TouchableOpacity>
-      
-      <Text style={styles.disclaimer}>
-        {t('faq.form.disclaimer')}
-      </Text>
+
+      <Text style={styles.disclaimer}>{t('faq.form.disclaimer')}</Text>
     </KeyboardAvoidingView>
   );
 };

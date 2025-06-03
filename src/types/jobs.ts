@@ -129,10 +129,10 @@ export type JobUnion = ReportGenerationJob | ReportExportJob | ReportPreviewJob;
 export type JobCreationParams<T extends JobType> = T extends JobType.REPORT_GENERATE
   ? Omit<ReportGenerationJob['params'], 'id'>
   : T extends JobType.REPORT_EXPORT
-  ? Omit<ReportExportJob['params'], 'id'>
-  : T extends JobType.REPORT_PREVIEW
-  ? Omit<ReportPreviewJob['params'], 'id'>
-  : never;
+    ? Omit<ReportExportJob['params'], 'id'>
+    : T extends JobType.REPORT_PREVIEW
+      ? Omit<ReportPreviewJob['params'], 'id'>
+      : never;
 
 /**
  * Job update params

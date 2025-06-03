@@ -5,6 +5,7 @@
  * in a React component.
  */
 
+import { apiService } from 'atomic/organisms';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -14,7 +15,6 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import { apiService } from 'atomic/organisms';
 
 /**
  * GamesList Component

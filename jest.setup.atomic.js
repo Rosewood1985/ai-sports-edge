@@ -77,49 +77,65 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 // Mock NetInfo - using a simple mock to avoid dependency issues
-jest.mock('@react-native-community/netinfo', () => {
-  return {
-    addEventListener: jest.fn(() => jest.fn()),
-    fetch: jest.fn(() => Promise.resolve({ isConnected: true }))
-  };
-}, { virtual: true });
+jest.mock(
+  '@react-native-community/netinfo',
+  () => {
+    return {
+      addEventListener: jest.fn(() => jest.fn()),
+      fetch: jest.fn(() => Promise.resolve({ isConnected: true })),
+    };
+  },
+  { virtual: true }
+);
 
 // Mock Expo modules with virtual mocks to avoid dependency issues
-jest.mock('expo-constants', () => ({
-  default: {
-    manifest: {
-      extra: {
-        firebaseApiKey: 'mock-api-key',
-        firebaseAuthDomain: 'mock-auth-domain',
-        firebaseProjectId: 'mock-project-id',
-        firebaseStorageBucket: 'mock-storage-bucket',
-        firebaseMessagingSenderId: 'mock-messaging-sender-id',
-        firebaseAppId: 'mock-app-id',
+jest.mock(
+  'expo-constants',
+  () => ({
+    default: {
+      manifest: {
+        extra: {
+          firebaseApiKey: 'mock-api-key',
+          firebaseAuthDomain: 'mock-auth-domain',
+          firebaseProjectId: 'mock-project-id',
+          firebaseStorageBucket: 'mock-storage-bucket',
+          firebaseMessagingSenderId: 'mock-messaging-sender-id',
+          firebaseAppId: 'mock-app-id',
+        },
       },
     },
-  },
-}), { virtual: true });
+  }),
+  { virtual: true }
+);
 
 // Mock Expo Device
-jest.mock('expo-device', () => ({
-  isDevice: true,
-  brand: 'Apple',
-  manufacturer: 'Apple',
-  modelName: 'iPhone',
-  modelId: 'iPhone12,1',
-  deviceYearClass: 2019,
-  totalMemory: 4000000000,
-  osName: 'iOS',
-  osVersion: '14.0',
-}), { virtual: true });
+jest.mock(
+  'expo-device',
+  () => ({
+    isDevice: true,
+    brand: 'Apple',
+    manufacturer: 'Apple',
+    modelName: 'iPhone',
+    modelId: 'iPhone12,1',
+    deviceYearClass: 2019,
+    totalMemory: 4000000000,
+    osName: 'iOS',
+    osVersion: '14.0',
+  }),
+  { virtual: true }
+);
 
 // Mock Expo Notifications
-jest.mock('expo-notifications', () => ({
-  requestPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
-  getPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
-  getExpoPushTokenAsync: jest.fn(() => Promise.resolve({ data: 'mock-push-token' })),
-  setNotificationHandler: jest.fn(),
-}), { virtual: true });
+jest.mock(
+  'expo-notifications',
+  () => ({
+    requestPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
+    getPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
+    getExpoPushTokenAsync: jest.fn(() => Promise.resolve({ data: 'mock-push-token' })),
+    setNotificationHandler: jest.fn(),
+  }),
+  { virtual: true }
+);
 
 // Global setup
 global.console = {

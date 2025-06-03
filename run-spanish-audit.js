@@ -21,8 +21,8 @@ const PLACEHOLDER_PATTERNS = [
   /{{.*}}/g, // Template placeholders
   /sample/i,
   /temporal/i, // Spanish equivalent of "temporary"
-  /prueba/i,  // Spanish for "test"
-  /ejemplo/i  // Spanish for "example"
+  /prueba/i, // Spanish for "test"
+  /ejemplo/i, // Spanish for "example"
 ];
 
 // Files to audit
@@ -30,7 +30,7 @@ const SPANISH_FILES = [
   './atomic/atoms/translations/es.json',
   './atomic/atoms/translations/es-error-updates.json',
   './atomic/atoms/translations/odds-comparison-es.json',
-  './public/locales/es/features.json'
+  './public/locales/es/features.json',
 ];
 
 /**
@@ -41,7 +41,7 @@ function checkFileForPlaceholders(filePath) {
     file: filePath,
     exists: false,
     issues: [],
-    content: null
+    content: null,
   };
 
   try {
@@ -57,9 +57,9 @@ function checkFileForPlaceholders(filePath) {
           matches.forEach(match => {
             results.issues.push({
               pattern: pattern.toString(),
-              match: match,
+              match,
               line: findLineNumber(content, match),
-              severity: determineSeverity(match)
+              severity: determineSeverity(match),
             });
           });
         }
@@ -91,15 +91,15 @@ function findLineNumber(content, match) {
 function determineSeverity(match) {
   const criticalPatterns = ['TODO', 'FIXME', 'placeholder', 'example'];
   const mediumPatterns = ['demo', 'test', 'sample'];
-  
+
   const lowerMatch = match.toLowerCase();
-  
+
   if (criticalPatterns.some(pattern => lowerMatch.includes(pattern.toLowerCase()))) {
     return 'high';
   } else if (mediumPatterns.some(pattern => lowerMatch.includes(pattern.toLowerCase()))) {
     return 'medium';
   }
-  
+
   return 'low';
 }
 
@@ -108,7 +108,7 @@ function determineSeverity(match) {
  */
 async function runSpanishContentAudit() {
   console.log('🔍 Starting Spanish Content Audit...\n');
-  
+
   const auditResults = {
     timestamp: new Date().toISOString(),
     auditId: `spanish_content_audit_${Date.now()}`,
@@ -119,13 +119,13 @@ async function runSpanishContentAudit() {
       totalIssues: 0,
       criticalIssues: 0,
       mediumIssues: 0,
-      lowIssues: 0
+      lowIssues: 0,
     },
     productionReadiness: {
       score: 0,
       status: 'pending',
-      criticalIssues: []
-    }
+      criticalIssues: [],
+    },
   };
 
   // Check each Spanish file
@@ -133,18 +133,18 @@ async function runSpanishContentAudit() {
     console.log(`📁 Checking: ${filePath}`);
     const fileResult = checkFileForPlaceholders(filePath);
     auditResults.files.push(fileResult);
-    
+
     if (fileResult.exists) {
       auditResults.summary.totalFiles++;
-      
+
       if (fileResult.issues.length > 0) {
         auditResults.summary.filesWithIssues++;
         auditResults.summary.totalIssues += fileResult.issues.length;
-        
+
         console.log(`  ⚠️  Found ${fileResult.issues.length} issues:`);
         fileResult.issues.forEach(issue => {
           console.log(`    - Line ${issue.line}: "${issue.match}" (${issue.severity})`);
-          
+
           if (issue.severity === 'high') auditResults.summary.criticalIssues++;
           else if (issue.severity === 'medium') auditResults.summary.mediumIssues++;
           else auditResults.summary.lowIssues++;
@@ -177,7 +177,7 @@ async function runSpanishContentAudit() {
     criticalIssues: auditResults.files
       .flatMap(f => f.issues)
       .filter(i => i.severity === 'high')
-      .map(i => i.match)
+      .map(i => i.match),
   };
 
   // Print summary

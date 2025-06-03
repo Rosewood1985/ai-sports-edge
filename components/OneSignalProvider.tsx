@@ -1,11 +1,12 @@
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { getDoc, doc } from 'firebase/firestore';
 import React, { useEffect } from 'react';
 import { OneSignal } from 'react-native-onesignal';
-import { useNavigation } from '@react-navigation/native';
-import { auth, firestore } from '../config/firebase';
-import { getDoc, doc } from 'firebase/firestore';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { NotificationClickEvent } from 'react-native-onesignal/dist/models/NotificationEvents';
 import NotificationWillDisplayEvent from 'react-native-onesignal/dist/events/NotificationWillDisplayEvent';
+import { NotificationClickEvent } from 'react-native-onesignal/dist/models/NotificationEvents';
+
+import { auth, firestore } from '../config/firebase';
 
 interface OneSignalProviderProps {
   children: React.ReactNode;
@@ -42,23 +43,23 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
     // Initialize OneSignal
     // Replace with your actual OneSignal App ID
     const ONESIGNAL_APP_ID = 'YOUR_ONESIGNAL_MOBILE_APP_ID';
-    
+
     // Initialize OneSignal
     OneSignal.initialize(ONESIGNAL_APP_ID);
-    
+
     // Request permission to send notifications
-    OneSignal.Notifications.requestPermission(true).then((accepted) => {
+    OneSignal.Notifications.requestPermission(true).then(accepted => {
       console.log('User accepted notifications:', accepted);
     });
-    
+
     // Handle notification opened
     const handleNotificationClick = (event: NotificationClickEvent) => {
       console.log('Notification clicked:', event);
-      
+
       // Handle deep linking based on notification data
       if (event.notification.additionalData) {
         const data = event.notification.additionalData as NotificationAdditionalData;
-        
+
         // Navigate to the specified screen
         if (data.screen) {
           switch (data.screen) {
@@ -69,7 +70,7 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
               if (data.gameId) {
                 navigation.navigate('PlayerStats', {
                   gameId: data.gameId,
-                  gameTitle: data.gameTitle || 'Player Statistics'
+                  gameTitle: data.gameTitle || 'Player Statistics',
                 });
               }
               break;
@@ -83,20 +84,23 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
         }
       }
     };
-    
+
     // Handle notifications received while app is in foreground
     const handleNotificationWillDisplay = (event: NotificationWillDisplayEvent) => {
       console.log('Notification received in foreground:', event);
-      
+
       // Display the notification
       event.preventDefault();
       event.notification.display();
     };
-    
+
     // Add event listeners
     OneSignal.Notifications.addEventListener('click', handleNotificationClick);
-    OneSignal.Notifications.addEventListener('foregroundWillDisplay', handleNotificationWillDisplay);
-    
+    OneSignal.Notifications.addEventListener(
+      'foregroundWillDisplay',
+      handleNotificationWillDisplay
+    );
+
     // Set external user ID when user logs in
     const setExternalUserId = async () => {
       try {
@@ -104,13 +108,13 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
         const user = auth?.currentUser;
         if (user && firestore) {
           OneSignal.login(user.uid);
-          
+
           // Set user tags for personalization
           const userDoc = await getDoc(doc(firestore, 'users', user.uid));
-          
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            
+
             // Set user tags based on preferences
             if (userData.preferences) {
               // Set sports preferences
@@ -121,7 +125,7 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
                   }
                 });
               }
-              
+
               // Set notification preferences
               if (userData.preferences.notifications) {
                 Object.entries(userData.preferences.notifications).forEach(([type, enabled]) => {
@@ -129,7 +133,7 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
                 });
               }
             }
-            
+
             // Set subscription status
             if (userData.subscription && userData.subscription.status) {
               OneSignal.User.addTag('subscription_status', userData.subscription.status);
@@ -143,16 +147,19 @@ const OneSignalProvider: React.FC<OneSignalProviderProps> = ({ children }) => {
         console.error('Error setting external user ID:', error);
       }
     };
-    
+
     setExternalUserId();
-    
+
     return () => {
       // Clean up OneSignal listeners
       OneSignal.Notifications.removeEventListener('click', handleNotificationClick);
-      OneSignal.Notifications.removeEventListener('foregroundWillDisplay', handleNotificationWillDisplay);
+      OneSignal.Notifications.removeEventListener(
+        'foregroundWillDisplay',
+        handleNotificationWillDisplay
+      );
     };
   }, [navigation]);
-  
+
   return <>{children}</>;
 };
 

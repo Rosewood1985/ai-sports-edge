@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -20,37 +20,37 @@ exports.updateSubscription = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is updating their own subscription
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only update their own subscriptions.'
+      "permission-denied",
+      "Users can only update their own subscriptions."
     );
   }
 
   // Validate required fields
   if (!data.subscriptionId || !data.newPriceId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Subscription ID and new price ID are required.'
+      "invalid-argument",
+      "Subscription ID and new price ID are required."
     );
   }
 
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(data.userId);
-    const subscriptionRef = userRef.collection('subscriptions').doc(data.subscriptionId);
+    const userRef = db.collection("users").doc(data.userId);
+    const subscriptionRef = userRef.collection("subscriptions").doc(data.subscriptionId);
     const subscriptionDoc = await subscriptionRef.get();
 
     if (!subscriptionDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'Subscription not found.'
+        "not-found",
+        "Subscription not found."
       );
     }
 
@@ -61,18 +61,18 @@ exports.updateSubscription = functions.https.onCall(async (data, context) => {
     if (currentPriceId === data.newPriceId) {
       return {
         updated: false,
-        message: 'New plan is the same as current plan'
+        message: "New plan is the same as current plan"
       };
     }
 
     // Get the price details
     const price = await stripe.prices.retrieve(data.newPriceId, {
-      expand: ['product']
+      expand: ["product"]
     });
 
     // Update the subscription
     const updateParams = {
-      proration_behavior: data.immediate ? 'create_prorations' : 'none',
+      proration_behavior: data.immediate ? "create_prorations" : "none",
       items: [{
         id: (await stripe.subscriptions.retrieve(data.subscriptionId)).items.data[0].id,
         price: data.newPriceId
@@ -99,8 +99,8 @@ exports.updateSubscription = functions.https.onCall(async (data, context) => {
       newPlanName: price.product.name
     };
   } catch (error) {
-    console.error('Error updating subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error updating subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -116,37 +116,37 @@ exports.pauseSubscription = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is pausing their own subscription
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only pause their own subscriptions.'
+      "permission-denied",
+      "Users can only pause their own subscriptions."
     );
   }
 
   // Validate required fields
   if (!data.subscriptionId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Subscription ID is required.'
+      "invalid-argument",
+      "Subscription ID is required."
     );
   }
 
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(data.userId);
-    const subscriptionRef = userRef.collection('subscriptions').doc(data.subscriptionId);
+    const userRef = db.collection("users").doc(data.userId);
+    const subscriptionRef = userRef.collection("subscriptions").doc(data.subscriptionId);
     const subscriptionDoc = await subscriptionRef.get();
 
     if (!subscriptionDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'Subscription not found.'
+        "not-found",
+        "Subscription not found."
       );
     }
 
@@ -160,7 +160,7 @@ exports.pauseSubscription = functions.https.onCall(async (data, context) => {
       data.subscriptionId,
       {
         pause_collection: {
-          behavior: 'void',
+          behavior: "void",
           resumes_at: Math.floor(resumeDate.getTime() / 1000)
         }
       }
@@ -168,7 +168,7 @@ exports.pauseSubscription = functions.https.onCall(async (data, context) => {
 
     // Update subscription in Firestore
     await subscriptionRef.update({
-      status: 'paused',
+      status: "paused",
       pausedAt: admin.firestore.FieldValue.serverTimestamp(),
       resumesAt: admin.firestore.Timestamp.fromDate(resumeDate),
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -176,7 +176,7 @@ exports.pauseSubscription = functions.https.onCall(async (data, context) => {
 
     // Update user's subscription status
     await userRef.update({
-      subscriptionStatus: 'paused',
+      subscriptionStatus: "paused",
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
@@ -186,8 +186,8 @@ exports.pauseSubscription = functions.https.onCall(async (data, context) => {
       resumesAt: Math.floor(resumeDate.getTime() / 1000)
     };
   } catch (error) {
-    console.error('Error pausing subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error pausing subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -202,37 +202,37 @@ exports.resumeSubscription = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is resuming their own subscription
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only resume their own subscriptions.'
+      "permission-denied",
+      "Users can only resume their own subscriptions."
     );
   }
 
   // Validate required fields
   if (!data.subscriptionId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Subscription ID is required.'
+      "invalid-argument",
+      "Subscription ID is required."
     );
   }
 
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(data.userId);
-    const subscriptionRef = userRef.collection('subscriptions').doc(data.subscriptionId);
+    const userRef = db.collection("users").doc(data.userId);
+    const subscriptionRef = userRef.collection("subscriptions").doc(data.subscriptionId);
     const subscriptionDoc = await subscriptionRef.get();
 
     if (!subscriptionDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'Subscription not found.'
+        "not-found",
+        "Subscription not found."
       );
     }
 
@@ -240,7 +240,7 @@ exports.resumeSubscription = functions.https.onCall(async (data, context) => {
     const subscription = await stripe.subscriptions.update(
       data.subscriptionId,
       {
-        pause_collection: ''
+        pause_collection: ""
       }
     );
 
@@ -264,8 +264,8 @@ exports.resumeSubscription = functions.https.onCall(async (data, context) => {
       status: subscription.status
     };
   } catch (error) {
-    console.error('Error resuming subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error resuming subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 

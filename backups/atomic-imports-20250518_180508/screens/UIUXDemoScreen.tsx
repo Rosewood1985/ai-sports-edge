@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -10,14 +11,14 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { useUITheme, UIThemeProvider, UIThemeType } from '../components/UIThemeProvider';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import AnimatedTransition from '../components/AnimatedTransition';
 import PageTransition from '../components/PageTransition';
+import { useUITheme, UIThemeProvider, UIThemeType } from '../components/UIThemeProvider';
 import Colors from '../constants/Colors';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+import { useTheme } from '../contexts/ThemeContext';
 
 /**
  * Demo Card component to showcase UI theme
@@ -29,7 +30,7 @@ const DemoCard: React.FC<{
   index: number;
 }> = ({ title, description, icon, index }) => {
   const { cardStyle, spacing, textStyle } = useUITheme();
-  
+
   return (
     <AnimatedTransition
       type="slideUp"
@@ -59,15 +60,9 @@ const DemoButton: React.FC<{
   index: number;
 }> = ({ title, icon, onPress, primary = true, index }) => {
   const { buttonStyle, spacing } = useUITheme();
-  
+
   return (
-    <AnimatedTransition
-      type="scale"
-      duration={400}
-      delay={200}
-      index={index}
-      staggerDelay={100}
-    >
+    <AnimatedTransition type="scale" duration={400} delay={200} index={index} staggerDelay={100}>
       <TouchableOpacity
         style={[
           styles.button,
@@ -77,7 +72,14 @@ const DemoButton: React.FC<{
         onPress={onPress}
         activeOpacity={0.7}
       >
-        {icon && <Ionicons name={icon as any} size={20} color="#FFFFFF" style={{ marginRight: spacing.sm }} />}
+        {icon && (
+          <Ionicons
+            name={icon as any}
+            size={20}
+            color="#FFFFFF"
+            style={{ marginRight: spacing.sm }}
+          />
+        )}
         <Text style={styles.buttonText}>{title}</Text>
       </TouchableOpacity>
     </AnimatedTransition>
@@ -90,14 +92,14 @@ const DemoButton: React.FC<{
 const ThemeSelector: React.FC = () => {
   const { uiTheme, setUITheme } = useUITheme();
   const { isDark } = useTheme();
-  
+
   const themes: { key: UIThemeType; label: string; icon: string }[] = [
     { key: 'neon', label: 'Neon', icon: 'flash' },
     { key: 'minimal', label: 'Minimal', icon: 'remove' },
     { key: 'classic', label: 'Classic', icon: 'albums' },
     { key: 'default', label: 'Default', icon: 'options' },
   ];
-  
+
   return (
     <View style={styles.themeSelector}>
       <ThemedText style={styles.themeSelectorTitle}>Select Theme</ThemedText>
@@ -122,7 +124,7 @@ const ThemeSelector: React.FC = () => {
               <Ionicons
                 name={theme.icon as any}
                 size={24}
-                color={uiTheme === theme.key ? Colors.neon.blue : (isDark ? '#FFFFFF' : '#333333')}
+                color={uiTheme === theme.key ? Colors.neon.blue : isDark ? '#FFFFFF' : '#333333'}
               />
               <ThemedText style={styles.themeOptionLabel}>{theme.label}</ThemedText>
             </TouchableOpacity>
@@ -142,14 +144,9 @@ const DemoSection: React.FC<{
   index: number;
 }> = ({ title, children, index }) => {
   const { textStyle } = useUITheme();
-  
+
   return (
-    <AnimatedTransition
-      type="slideUp"
-      duration={500}
-      delay={100 * index}
-      style={styles.section}
-    >
+    <AnimatedTransition type="slideUp" duration={500} delay={100 * index} style={styles.section}>
       <ThemedText style={[styles.sectionTitle, textStyle]}>{title}</ThemedText>
       {children}
     </AnimatedTransition>
@@ -164,33 +161,33 @@ const UIUXDemoScreen: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<'main' | 'details'>('main');
   const [transitionType, setTransitionType] = useState<'fade' | 'slideLeft' | 'slideRight'>('fade');
   const [darkMode, setDarkMode] = useState(false);
-  
+
   // Get theme colors
   const { isDark, setTheme } = useTheme();
-  
+
   // Update dark mode state when theme changes
   useEffect(() => {
     setDarkMode(isDark);
   }, [isDark]);
-  
+
   // Toggle dark mode
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     setTheme(newMode ? 'dark' : 'light');
   };
-  
+
   // Navigate to details page
   const goToDetails = (type: 'fade' | 'slideLeft' | 'slideRight') => {
     setTransitionType(type);
     setCurrentPage('details');
   };
-  
+
   // Navigate back to main page
   const goBack = () => {
     setCurrentPage('main');
   };
-  
+
   // Render main page
   const renderMainPage = () => (
     <ScrollView
@@ -201,7 +198,7 @@ const UIUXDemoScreen: React.FC = () => {
       <DemoSection title="UI Theme Showcase" index={0}>
         <ThemeSelector />
       </DemoSection>
-      
+
       <DemoSection title="Card Components" index={1}>
         <DemoCard
           title="Animated Cards"
@@ -222,7 +219,7 @@ const UIUXDemoScreen: React.FC = () => {
           index={2}
         />
       </DemoSection>
-      
+
       <DemoSection title="Page Transitions" index={2}>
         <View style={styles.buttonRow}>
           <DemoButton
@@ -245,7 +242,7 @@ const UIUXDemoScreen: React.FC = () => {
           />
         </View>
       </DemoSection>
-      
+
       <DemoSection title="Theme Settings" index={3}>
         <View style={styles.settingRow}>
           <ThemedText>Dark Mode</ThemedText>
@@ -259,7 +256,7 @@ const UIUXDemoScreen: React.FC = () => {
       </DemoSection>
     </ScrollView>
   );
-  
+
   // Render details page
   const renderDetailsPage = () => (
     <View style={styles.detailsContainer}>
@@ -272,36 +269,33 @@ const UIUXDemoScreen: React.FC = () => {
           <ThemedText style={styles.detailsTitle}>Transition Demo</ThemedText>
         </View>
       </AnimatedTransition>
-      
+
       <View style={styles.detailsContent}>
         <AnimatedTransition type="fade" duration={800} delay={300}>
           <ThemedView style={styles.detailsCard}>
             <Ionicons name="information-circle" size={48} color={Colors.neon.blue} />
             <ThemedText style={styles.detailsCardTitle}>
-              {transitionType === 'fade' ? 'Fade Transition' : 
-               transitionType === 'slideLeft' ? 'Slide Left Transition' : 
-               'Slide Right Transition'}
+              {transitionType === 'fade'
+                ? 'Fade Transition'
+                : transitionType === 'slideLeft'
+                  ? 'Slide Left Transition'
+                  : 'Slide Right Transition'}
             </ThemedText>
             <ThemedText style={styles.detailsCardDescription}>
-              This page demonstrates the {transitionType} transition effect.
-              Smooth transitions between screens enhance the user experience by providing
-              visual continuity and reducing the jarring effect of abrupt screen changes.
+              This page demonstrates the {transitionType} transition effect. Smooth transitions
+              between screens enhance the user experience by providing visual continuity and
+              reducing the jarring effect of abrupt screen changes.
             </ThemedText>
           </ThemedView>
         </AnimatedTransition>
-        
+
         <View style={styles.buttonRow}>
-          <DemoButton
-            title="Go Back"
-            icon="arrow-back"
-            onPress={goBack}
-            index={0}
-          />
+          <DemoButton title="Go Back" icon="arrow-back" onPress={goBack} index={0} />
         </View>
       </View>
     </View>
   );
-  
+
   return (
     <UIThemeProvider>
       <SafeAreaView style={styles.container}>
@@ -309,11 +303,11 @@ const UIUXDemoScreen: React.FC = () => {
           barStyle={isDark ? 'light-content' : 'dark-content'}
           backgroundColor={isDark ? '#121212' : '#F8F8F8'}
         />
-        
+
         <View style={styles.header}>
           <ThemedText style={styles.headerTitle}>UI/UX Showcase</ThemedText>
         </View>
-        
+
         <PageTransition
           type={currentPage === 'main' ? 'fade' : transitionType}
           visible={currentPage === 'main'}
@@ -321,7 +315,7 @@ const UIUXDemoScreen: React.FC = () => {
         >
           {renderMainPage()}
         </PageTransition>
-        
+
         <PageTransition
           type={currentPage === 'details' ? transitionType : 'fade'}
           visible={currentPage === 'details'}

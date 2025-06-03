@@ -3,25 +3,26 @@
  * Integration with Firebase Stripe Extension for subscription management
  */
 
-import { 
-  doc, 
-  collection, 
-  addDoc, 
-  onSnapshot, 
-  updateDoc, 
-  query, 
-  where, 
-  getDocs,
-  Timestamp 
-} from 'firebase/firestore';
-import { db, auth } from '../config/firebase';
 import { User } from 'firebase/auth';
+import {
+  doc,
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+} from 'firebase/firestore';
+
+import { db, auth } from '../config/firebase';
 
 // Configured Price IDs from Stripe
 export const PRICE_IDS = {
   INSIGHT: 'price_1RTpnOBpGzv2zgRcutbfCICB',
-  ANALYST: 'price_1RTpnpBpGzv2zgRccFtbSsgl', 
-  EDGE_COLLECTIVE: 'price_1RTpomBpGzv2zgRc72MCfG7F'
+  ANALYST: 'price_1RTpnpBpGzv2zgRccFtbSsgl',
+  EDGE_COLLECTIVE: 'price_1RTpomBpGzv2zgRc72MCfG7F',
 } as const;
 
 export interface StripeCustomer {
@@ -32,7 +33,14 @@ export interface StripeCustomer {
 
 export interface StripeSubscription {
   id: string;
-  status: 'active' | 'canceled' | 'past_due' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'unpaid';
+  status:
+    | 'active'
+    | 'canceled'
+    | 'past_due'
+    | 'incomplete'
+    | 'incomplete_expired'
+    | 'trialing'
+    | 'unpaid';
   current_period_start: Timestamp;
   current_period_end: Timestamp;
   cancel_at_period_end: boolean;
@@ -77,7 +85,7 @@ export class StripeExtensionService {
 
   constructor() {
     // Listen for auth state changes
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(user => {
       this.currentUser = user;
     });
   }
@@ -97,25 +105,25 @@ export class StripeExtensionService {
    */
   async createCheckoutSession(sessionData: CheckoutSessionData): Promise<string> {
     const userId = this.requireAuth();
-    
+
     try {
       const checkoutSessionRef = collection(db, 'customers', userId, 'checkout_sessions');
-      
+
       const docRef = await addDoc(checkoutSessionRef, {
         ...sessionData,
-        created: Timestamp.now()
+        created: Timestamp.now(),
       });
 
       // Listen for the checkout session URL
       return new Promise((resolve, reject) => {
-        const unsubscribe = onSnapshot(docRef, (snap) => {
+        const unsubscribe = onSnapshot(docRef, snap => {
           const data = snap.data();
-          
+
           if (data?.url) {
             unsubscribe();
             resolve(data.url);
           }
-          
+
           if (data?.error) {
             unsubscribe();
             reject(new Error(data.error.message));
@@ -139,15 +147,18 @@ export class StripeExtensionService {
    */
   async getSubscriptions(): Promise<StripeSubscription[]> {
     const userId = this.requireAuth();
-    
+
     try {
       const subscriptionsRef = collection(db, 'customers', userId, 'subscriptions');
       const querySnapshot = await getDocs(subscriptionsRef);
-      
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as StripeSubscription));
+
+      return querySnapshot.docs.map(
+        doc =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as StripeSubscription
+      );
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
       throw error;
@@ -167,12 +178,12 @@ export class StripeExtensionService {
    */
   async cancelSubscription(subscriptionId: string): Promise<void> {
     const userId = this.requireAuth();
-    
+
     try {
       const subscriptionRef = doc(db, 'customers', userId, 'subscriptions', subscriptionId);
-      
+
       await updateDoc(subscriptionRef, {
-        cancel_at_period_end: true
+        cancel_at_period_end: true,
       });
     } catch (error) {
       console.error('Error canceling subscription:', error);
@@ -185,12 +196,12 @@ export class StripeExtensionService {
    */
   async reactivateSubscription(subscriptionId: string): Promise<void> {
     const userId = this.requireAuth();
-    
+
     try {
       const subscriptionRef = doc(db, 'customers', userId, 'subscriptions', subscriptionId);
-      
+
       await updateDoc(subscriptionRef, {
-        cancel_at_period_end: false
+        cancel_at_period_end: false,
       });
     } catch (error) {
       console.error('Error reactivating subscription:', error);
@@ -203,16 +214,19 @@ export class StripeExtensionService {
    */
   async getPaymentHistory(): Promise<StripePayment[]> {
     const userId = this.requireAuth();
-    
+
     try {
       const paymentsRef = collection(db, 'customers', userId, 'payments');
       const querySnapshot = await getDocs(paymentsRef);
-      
+
       return querySnapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as StripePayment))
+        .map(
+          doc =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as StripePayment
+        )
         .sort((a, b) => b.created.seconds - a.created.seconds);
     } catch (error) {
       console.error('Error fetching payment history:', error);
@@ -225,22 +239,25 @@ export class StripeExtensionService {
    */
   async getSubscriptionPayments(subscriptionId: string): Promise<StripePayment[]> {
     const userId = this.requireAuth();
-    
+
     try {
       const paymentsRef = collection(db, 'customers', userId, 'payments');
       const q = query(
-        paymentsRef, 
+        paymentsRef,
         where('subscription', '==', subscriptionId),
         where('status', '==', 'succeeded')
       );
-      
+
       const querySnapshot = await getDocs(q);
-      
+
       return querySnapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as StripePayment))
+        .map(
+          doc =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as StripePayment
+        )
         .sort((a, b) => b.created.seconds - a.created.seconds);
     } catch (error) {
       console.error('Error fetching subscription payments:', error);
@@ -251,17 +268,22 @@ export class StripeExtensionService {
   /**
    * Listen to subscription changes in real-time
    */
-  subscribeToSubscriptionChanges(callback: (subscriptions: StripeSubscription[]) => void): () => void {
+  subscribeToSubscriptionChanges(
+    callback: (subscriptions: StripeSubscription[]) => void
+  ): () => void {
     const userId = this.requireAuth();
-    
+
     const subscriptionsRef = collection(db, 'customers', userId, 'subscriptions');
-    
-    return onSnapshot(subscriptionsRef, (snapshot) => {
-      const subscriptions = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as StripeSubscription));
-      
+
+    return onSnapshot(subscriptionsRef, snapshot => {
+      const subscriptions = snapshot.docs.map(
+        doc =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as StripeSubscription
+      );
+
       callback(subscriptions);
     });
   }
@@ -271,17 +293,20 @@ export class StripeExtensionService {
    */
   subscribeToPaymentUpdates(callback: (payments: StripePayment[]) => void): () => void {
     const userId = this.requireAuth();
-    
+
     const paymentsRef = collection(db, 'customers', userId, 'payments');
-    
-    return onSnapshot(paymentsRef, (snapshot) => {
+
+    return onSnapshot(paymentsRef, snapshot => {
       const payments = snapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as StripePayment))
+        .map(
+          doc =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as StripePayment
+        )
         .sort((a, b) => b.created.seconds - a.created.seconds);
-      
+
       callback(payments);
     });
   }
@@ -291,25 +316,25 @@ export class StripeExtensionService {
    */
   async createCustomerPortalSession(returnUrl: string): Promise<string> {
     const userId = this.requireAuth();
-    
+
     try {
       const portalSessionRef = collection(db, 'customers', userId, 'portal_sessions');
-      
+
       const docRef = await addDoc(portalSessionRef, {
         return_url: returnUrl,
-        created: Timestamp.now()
+        created: Timestamp.now(),
       });
 
       // Listen for the portal session URL
       return new Promise((resolve, reject) => {
-        const unsubscribe = onSnapshot(docRef, (snap) => {
+        const unsubscribe = onSnapshot(docRef, snap => {
           const data = snap.data();
-          
+
           if (data?.url) {
             unsubscribe();
             resolve(data.url);
           }
-          
+
           if (data?.error) {
             unsubscribe();
             reject(new Error(data.error.message));
@@ -335,28 +360,28 @@ export class StripeExtensionService {
     try {
       const productsRef = collection(db, 'products');
       const querySnapshot = await getDocs(productsRef);
-      
+
       const products = [];
-      
+
       for (const productDoc of querySnapshot.docs) {
         const productData = productDoc.data();
-        
+
         // Get prices for this product
         const pricesRef = collection(db, 'products', productDoc.id, 'prices');
         const pricesSnapshot = await getDocs(pricesRef);
-        
+
         const prices = pricesSnapshot.docs.map(priceDoc => ({
           id: priceDoc.id,
-          ...priceDoc.data()
+          ...priceDoc.data(),
         }));
-        
+
         products.push({
           id: productDoc.id,
           ...productData,
-          prices
+          prices,
         });
       }
-      
+
       return products;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -368,7 +393,7 @@ export class StripeExtensionService {
    * Create subscription checkout for specific price
    */
   async createSubscriptionCheckout(
-    priceId: string, 
+    priceId: string,
     options: {
       trialPeriodDays?: number;
       allowPromotionCodes?: boolean;
@@ -383,7 +408,7 @@ export class StripeExtensionService {
       automatic_tax: options.automaticTax ?? true,
       tax_id_collection: true,
       allow_promotion_codes: options.allowPromotionCodes ?? true,
-      metadata: options.metadata
+      metadata: options.metadata,
     };
 
     if (options.trialPeriodDays) {
@@ -407,7 +432,7 @@ export class StripeExtensionService {
       success_url: `${window.location.origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${window.location.origin}/payment/cancel`,
       automatic_tax: true,
-      metadata: options.metadata
+      metadata: options.metadata,
     };
 
     return this.createCheckoutSession(checkoutData);

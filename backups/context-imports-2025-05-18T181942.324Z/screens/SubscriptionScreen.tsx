@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -5,16 +7,15 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSubscriptionService';
-import { auth } from '../config/firebase';
+
 import ReferralProgramCard from '../components/ReferralProgramCard';
-import { analyticsService } from '../services';
+import { auth } from '../config/firebase';
 import { useI18n } from '../contexts/I18nContext';
+import { analyticsService } from '../services';
 import { AnalyticsEventType } from '../services/analyticsService';
+import { SUBSCRIPTION_PLANS, getUserSubscription } from '../services/firebaseSubscriptionService';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -59,9 +60,9 @@ const SubscriptionScreen = (): JSX.Element => {
     // Track subscription started event
     analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_STARTED, {
       plan_id: planId,
-      plan_name: SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name || 'Unknown'
+      plan_name: SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name || 'Unknown',
     });
-    
+
     navigation.navigate('Payment', { planId });
   };
 
@@ -77,15 +78,11 @@ const SubscriptionScreen = (): JSX.Element => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>{t('subscription.title')}</Text>
-      <Text style={styles.subtitle}>
-        {t('subscription.subtitle')}
-      </Text>
+      <Text style={styles.subtitle}>{t('subscription.subtitle')}</Text>
 
       {hasSubscription && (
         <View style={styles.infoBox}>
-          <Text style={styles.infoText}>
-            {t('subscription.alreadySubscribed')}
-          </Text>
+          <Text style={styles.infoText}>{t('subscription.alreadySubscribed')}</Text>
           <TouchableOpacity
             style={styles.manageButton}
             onPress={() => navigation.navigate('SubscriptionManagement')}
@@ -95,7 +92,7 @@ const SubscriptionScreen = (): JSX.Element => {
         </View>
       )}
 
-      {SUBSCRIPTION_PLANS.map((plan) => (
+      {SUBSCRIPTION_PLANS.map(plan => (
         <TouchableOpacity
           key={plan.id}
           style={styles.planCard}
@@ -110,9 +107,9 @@ const SubscriptionScreen = (): JSX.Element => {
               </Text>
             </Text>
           </View>
-          
+
           <Text style={styles.planDescription}>{plan.description}</Text>
-          
+
           <View style={styles.featuresContainer}>
             <Text style={styles.featuresTitle}>{t('subscription.features')}:</Text>
             {plan.features.map((feature, index) => (
@@ -121,32 +118,23 @@ const SubscriptionScreen = (): JSX.Element => {
               </View>
             ))}
           </View>
-          
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => handleSelectPlan(plan.id)}
-          >
+
+          <TouchableOpacity style={styles.selectButton} onPress={() => handleSelectPlan(plan.id)}>
             <Text style={styles.selectButtonText}>{t('subscription.selectPlan')}</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       ))}
 
-      {!hasSubscription && (
-        <ReferralProgramCard />
-      )}
+      {!hasSubscription && <ReferralProgramCard />}
 
       <View style={styles.groupSubscriptionCard}>
         <Text style={styles.groupTitle}>{t('subscription.group.title')}</Text>
-        <Text style={styles.groupDescription}>
-          {t('subscription.group.description')}
-        </Text>
+        <Text style={styles.groupDescription}>{t('subscription.group.description')}</Text>
         <TouchableOpacity
           style={styles.groupButton}
           onPress={() => navigation.navigate('GroupSubscription')}
         >
-          <Text style={styles.groupButtonText}>
-            {t('subscription.group.createButton')}
-          </Text>
+          <Text style={styles.groupButtonText}>{t('subscription.group.createButton')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -155,18 +143,14 @@ const SubscriptionScreen = (): JSX.Element => {
           style={styles.giftButton}
           onPress={() => navigation.navigate('GiftRedemption')}
         >
-          <Text style={styles.giftButtonText}>
-            {t('subscription.gift.redeemButton')}
-          </Text>
+          <Text style={styles.giftButtonText}>{t('subscription.gift.redeemButton')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.policyLink}
           onPress={() => navigation.navigate('RefundPolicy')}
         >
-          <Text style={styles.policyLinkText}>
-            {t('subscription.refundPolicy')}
-          </Text>
+          <Text style={styles.policyLinkText}>{t('subscription.refundPolicy')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

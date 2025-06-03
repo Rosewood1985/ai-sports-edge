@@ -60,30 +60,42 @@ export class OptimizedInferenceService {
   };
 
   private readonly batchConfigs = new Map<string, BatchConfig>([
-    ['sports_prediction', {
-      maxBatchSize: 32,
-      maxWaitTime: 100, // ms
-      minBatchSize: 4,
-      priorityGrouping: true,
-    }],
-    ['player_analysis', {
-      maxBatchSize: 16,
-      maxWaitTime: 200,
-      minBatchSize: 2,
-      priorityGrouping: true,
-    }],
-    ['real_time_odds', {
-      maxBatchSize: 64,
-      maxWaitTime: 50,
-      minBatchSize: 8,
-      priorityGrouping: false,
-    }],
-    ['default', {
-      maxBatchSize: 16,
-      maxWaitTime: 150,
-      minBatchSize: 2,
-      priorityGrouping: true,
-    }],
+    [
+      'sports_prediction',
+      {
+        maxBatchSize: 32,
+        maxWaitTime: 100, // ms
+        minBatchSize: 4,
+        priorityGrouping: true,
+      },
+    ],
+    [
+      'player_analysis',
+      {
+        maxBatchSize: 16,
+        maxWaitTime: 200,
+        minBatchSize: 2,
+        priorityGrouping: true,
+      },
+    ],
+    [
+      'real_time_odds',
+      {
+        maxBatchSize: 64,
+        maxWaitTime: 50,
+        minBatchSize: 8,
+        priorityGrouping: false,
+      },
+    ],
+    [
+      'default',
+      {
+        maxBatchSize: 16,
+        maxWaitTime: 150,
+        minBatchSize: 2,
+        priorityGrouping: true,
+      },
+    ],
   ]);
 
   private constructor() {
@@ -118,7 +130,7 @@ export class OptimizedInferenceService {
         this.metrics.cacheHits++;
         const processingTime = performance.now() - startTime;
         this.updateLatency(processingTime);
-        
+
         return {
           id: request.id,
           outputs: cachedResult,
@@ -132,13 +144,12 @@ export class OptimizedInferenceService {
       const result = await this.addToBatch(request);
       const processingTime = performance.now() - startTime;
       this.updateLatency(processingTime);
-      
-      return result;
 
+      return result;
     } catch (error) {
       this.metrics.errorRate++;
       const processingTime = performance.now() - startTime;
-      
+
       return {
         id: request.id,
         outputs: null,
@@ -157,10 +168,10 @@ export class OptimizedInferenceService {
    */
   async predictBatch(requests: InferenceRequest[]): Promise<InferenceResult[]> {
     const startTime = performance.now();
-    
+
     // Group by model for efficient processing
     const modelGroups = new Map<string, InferenceRequest[]>();
-    
+
     for (const request of requests) {
       const modelKey = `${request.modelId}_${request.modelVersion}`;
       if (!modelGroups.has(modelKey)) {
@@ -171,14 +182,14 @@ export class OptimizedInferenceService {
 
     // Process each model group
     const resultPromises: Promise<InferenceResult[]>[] = [];
-    
+
     for (const [modelKey, modelRequests] of modelGroups) {
       resultPromises.push(this.processBatch(modelKey, modelRequests));
     }
 
     const allResults = await Promise.all(resultPromises);
     const flatResults = allResults.flat();
-    
+
     // Maintain original order
     const orderedResults: InferenceResult[] = [];
     for (const request of requests) {
@@ -190,7 +201,7 @@ export class OptimizedInferenceService {
 
     const totalTime = performance.now() - startTime;
     this.updateLatency(totalTime / requests.length);
-    
+
     return orderedResults;
   }
 
@@ -225,9 +236,10 @@ export class OptimizedInferenceService {
       batchEfficiency: number;
     };
   } {
-    const batchEfficiency = this.metrics.totalRequests > 0 
-      ? this.metrics.batchedRequests / this.metrics.totalRequests 
-      : 0;
+    const batchEfficiency =
+      this.metrics.totalRequests > 0
+        ? this.metrics.batchedRequests / this.metrics.totalRequests
+        : 0;
 
     return {
       inference: this.getMetrics(),
@@ -272,7 +284,7 @@ export class OptimizedInferenceService {
         const timer = setTimeout(() => {
           this.processBatchNow(modelKey);
         }, config.maxWaitTime);
-        
+
         this.batchTimers.set(modelKey, timer);
       }
     });
@@ -292,63 +304,68 @@ export class OptimizedInferenceService {
     this.pendingRequests.set(modelKey, []);
 
     // Process asynchronously
-    this.processBatch(modelKey, batch).then(results => {
-      // Notify all callbacks
-      for (let i = 0; i < batch.length; i++) {
-        const request = batch[i];
-        const result = results[i];
-        if (request.callback) {
-          request.callback(result);
+    this.processBatch(modelKey, batch)
+      .then(results => {
+        // Notify all callbacks
+        for (let i = 0; i < batch.length; i++) {
+          const request = batch[i];
+          const result = results[i];
+          if (request.callback) {
+            request.callback(result);
+          }
         }
-      }
-    }).catch(error => {
-      // Notify all callbacks of error
-      for (const request of batch) {
-        if (request.callback) {
-          request.callback({
-            id: request.id,
-            outputs: null,
-            confidence: 0,
-            processingTime: 0,
-            fromCache: false,
-            error: error.message,
-          });
+      })
+      .catch(error => {
+        // Notify all callbacks of error
+        for (const request of batch) {
+          if (request.callback) {
+            request.callback({
+              id: request.id,
+              outputs: null,
+              confidence: 0,
+              processingTime: 0,
+              fromCache: false,
+              error: error.message,
+            });
+          }
         }
-      }
-    });
+      });
   }
 
-  private async processBatch(modelKey: string, batch: InferenceRequest[]): Promise<InferenceResult[]> {
+  private async processBatch(
+    modelKey: string,
+    batch: InferenceRequest[]
+  ): Promise<InferenceResult[]> {
     const [modelId, modelVersion] = modelKey.split('_');
     const batchId = `batch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     this.metrics.batchedRequests += batch.length;
 
     try {
       // Load model if not in cache
       let modelData = await this.modelCache.getModel(modelId, modelVersion);
-      
+
       if (!modelData) {
         // Try to fetch model from remote
         const modelUrl = await this.getModelUrl(modelId, modelVersion);
         const response = await fetch(modelUrl);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch model ${modelId}: ${response.statusText}`);
         }
-        
+
         modelData = await response.arrayBuffer();
         await this.modelCache.setModel(modelId, modelVersion, modelData);
       }
 
       // Process batch inference
       const results = await this.runBatchInference(modelData, batch, batchId);
-      
+
       // Cache results
       for (let i = 0; i < batch.length; i++) {
         const request = batch[i];
         const result = results[i];
-        
+
         if (result.outputs && result.confidence > 0.5) {
           this.modelCache.setCachedPrediction(
             request.inputs,
@@ -361,10 +378,9 @@ export class OptimizedInferenceService {
       }
 
       return results;
-
     } catch (error) {
       console.error(`Batch processing failed for ${modelKey}:`, error);
-      
+
       // Return error results for all requests
       return batch.map(request => ({
         id: request.id,
@@ -379,24 +395,24 @@ export class OptimizedInferenceService {
   }
 
   private async runBatchInference(
-    modelData: ArrayBuffer, 
-    batch: InferenceRequest[], 
+    modelData: ArrayBuffer,
+    batch: InferenceRequest[],
     batchId: string
   ): Promise<InferenceResult[]> {
     const startTime = performance.now();
-    
+
     // Simulated batch inference - replace with actual ML framework
     // This would use TensorFlow.js, ONNX.js, or similar for real inference
     const results: InferenceResult[] = [];
-    
+
     for (const request of batch) {
       const inferenceStart = performance.now();
-      
+
       try {
         // Simulate model inference based on input type
         const outputs = await this.simulateInference(request.inputs, modelData);
         const processingTime = performance.now() - inferenceStart;
-        
+
         results.push({
           id: request.id,
           outputs,
@@ -405,7 +421,6 @@ export class OptimizedInferenceService {
           fromCache: false,
           batchId,
         });
-        
       } catch (error) {
         results.push({
           id: request.id,
@@ -418,14 +433,14 @@ export class OptimizedInferenceService {
         });
       }
     }
-    
+
     return results;
   }
 
   private async simulateInference(inputs: any, modelData: ArrayBuffer): Promise<any> {
     // Real implementation would use actual ML framework
     // This simulates different types of sports predictions
-    
+
     if (inputs.type === 'game_prediction') {
       return {
         homeWinProbability: 0.45 + Math.random() * 0.1,
@@ -437,7 +452,7 @@ export class OptimizedInferenceService {
         },
       };
     }
-    
+
     if (inputs.type === 'player_performance') {
       return {
         expectedPoints: 15 + Math.random() * 20,
@@ -446,7 +461,7 @@ export class OptimizedInferenceService {
         performanceRating: 0.6 + Math.random() * 0.4,
       };
     }
-    
+
     if (inputs.type === 'odds_movement') {
       return {
         direction: Math.random() > 0.5 ? 'up' : 'down',
@@ -455,7 +470,7 @@ export class OptimizedInferenceService {
         timeframe: '1h',
       };
     }
-    
+
     // Default prediction
     return {
       prediction: Math.random(),
@@ -472,9 +487,10 @@ export class OptimizedInferenceService {
 
   private updateLatency(latency: number): void {
     const alpha = 0.1; // Exponential moving average factor
-    this.metrics.averageLatency = this.metrics.averageLatency === 0 
-      ? latency 
-      : this.metrics.averageLatency * (1 - alpha) + latency * alpha;
+    this.metrics.averageLatency =
+      this.metrics.averageLatency === 0
+        ? latency
+        : this.metrics.averageLatency * (1 - alpha) + latency * alpha;
   }
 
   private updateCurrentLoad(delta: number): void {
@@ -483,7 +499,7 @@ export class OptimizedInferenceService {
 
   private calculateAverageBatchSize(): number {
     if (this.metrics.batchedRequests === 0) return 0;
-    
+
     // Estimate based on processed batches
     const estimatedBatches = Math.ceil(this.metrics.batchedRequests / 8); // Assume avg 8 per batch
     return estimatedBatches > 0 ? this.metrics.batchedRequests / estimatedBatches : 0;
@@ -497,11 +513,11 @@ export class OptimizedInferenceService {
         this.lastMetricsUpdate = now;
         return;
       }
-      
+
       const timeDelta = (now - this.lastMetricsUpdate) / 1000;
       this.metrics.throughput = this.metrics.totalRequests / timeDelta;
       this.lastMetricsUpdate = now;
-      
+
       // Reset counters periodically
       if (this.metrics.totalRequests > 10000) {
         this.metrics.totalRequests = Math.floor(this.metrics.totalRequests * 0.9);

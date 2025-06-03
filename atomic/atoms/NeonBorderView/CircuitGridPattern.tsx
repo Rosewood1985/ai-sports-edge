@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
+
 import { useNeonPulse } from '../../../utils/animationUtils';
 
 /**
@@ -87,7 +88,7 @@ const generateCircuitPattern = (
     lines.push({
       x: 0,
       y,
-      width: width,
+      width,
       height: lineThickness,
     });
   }
@@ -99,7 +100,7 @@ const generateCircuitPattern = (
       x,
       y: 0,
       width: lineThickness,
-      height: height,
+      height,
     });
   }
 

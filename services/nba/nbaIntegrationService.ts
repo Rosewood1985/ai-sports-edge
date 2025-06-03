@@ -3,12 +3,13 @@
 // Comprehensive NBA System Integration and Orchestration
 // =============================================================================
 
-import { NBADataSyncService } from './nbaDataSyncService';
+import * as admin from 'firebase-admin';
+
 import { NBAAnalyticsService } from './nbaAnalyticsService';
+import { NBADataSyncService } from './nbaDataSyncService';
 import { NBAMLPredictionService } from './nbaMLPredictionService';
 import { NBAParlayAnalyticsService } from './nbaParlayAnalyticsService';
 import { initSentry } from '../sentryConfig';
-import * as admin from 'firebase-admin';
 
 // Initialize Sentry for monitoring
 const Sentry = initSentry();
@@ -186,34 +187,43 @@ export class NBAIntegrationService {
   private async startScheduledProcesses(): Promise<void> {
     try {
       // Data sync every 30 minutes during season
-      this.syncInterval = setInterval(async () => {
-        try {
-          await this.performIncrementalSync();
-        } catch (error) {
-          Sentry.captureException(error);
-          console.error('Scheduled data sync error:', error.message);
-        }
-      }, 30 * 60 * 1000); // 30 minutes
+      this.syncInterval = setInterval(
+        async () => {
+          try {
+            await this.performIncrementalSync();
+          } catch (error) {
+            Sentry.captureException(error);
+            console.error('Scheduled data sync error:', error.message);
+          }
+        },
+        30 * 60 * 1000
+      ); // 30 minutes
 
       // Analytics update every 2 hours
-      this.analyticsInterval = setInterval(async () => {
-        try {
-          await this.updateRecentAnalytics();
-        } catch (error) {
-          Sentry.captureException(error);
-          console.error('Scheduled analytics update error:', error.message);
-        }
-      }, 2 * 60 * 60 * 1000); // 2 hours
+      this.analyticsInterval = setInterval(
+        async () => {
+          try {
+            await this.updateRecentAnalytics();
+          } catch (error) {
+            Sentry.captureException(error);
+            console.error('Scheduled analytics update error:', error.message);
+          }
+        },
+        2 * 60 * 60 * 1000
+      ); // 2 hours
 
       // Predictions update every hour
-      this.predictionsInterval = setInterval(async () => {
-        try {
-          await this.updateUpcomingPredictions();
-        } catch (error) {
-          Sentry.captureException(error);
-          console.error('Scheduled predictions update error:', error.message);
-        }
-      }, 60 * 60 * 1000); // 1 hour
+      this.predictionsInterval = setInterval(
+        async () => {
+          try {
+            await this.updateUpcomingPredictions();
+          } catch (error) {
+            Sentry.captureException(error);
+            console.error('Scheduled predictions update error:', error.message);
+          }
+        },
+        60 * 60 * 1000
+      ); // 1 hour
 
       console.log('NBA scheduled processes started');
     } catch (error) {
@@ -240,7 +250,7 @@ export class NBAIntegrationService {
 
       // Update injury reports
       // Note: This would be implemented in the data sync service
-      
+
       console.log('NBA incremental sync completed');
     } catch (error) {
       Sentry.captureException(error);
@@ -339,7 +349,7 @@ export class NBAIntegrationService {
   private async updateUpcomingPredictions(): Promise<void> {
     try {
       const upcomingGames = await this.dataSyncService.getUpcomingGames(2); // Next 2 days
-      
+
       // Only update predictions that are stale
       const cacheTimeout = this.options.cacheTimeouts?.predictions || 600000;
       const cutoffTime = new Date(Date.now() - cacheTimeout);
@@ -351,8 +361,10 @@ export class NBAIntegrationService {
           .doc(`${game.homeTeam}_${game.awayTeam}_${game.date.getTime()}`)
           .get();
 
-        if (!existingPrediction.exists || 
-            existingPrediction.data()?.lastUpdated?.toDate() < cutoffTime) {
+        if (
+          !existingPrediction.exists ||
+          existingPrediction.data()?.lastUpdated?.toDate() < cutoffTime
+        ) {
           gamesToUpdate.push(game);
         }
       }
@@ -376,12 +388,13 @@ export class NBAIntegrationService {
    */
   async getSystemStatus(): Promise<NBASystemStatus> {
     try {
-      const [dataSyncStatus, analyticsStatus, predictionsStatus, parlayAnalyticsStatus] = await Promise.all([
-        this.getDataSyncStatus(),
-        this.getAnalyticsStatus(),
-        this.getPredictionsStatus(),
-        this.getParlayAnalyticsStatus(),
-      ]);
+      const [dataSyncStatus, analyticsStatus, predictionsStatus, parlayAnalyticsStatus] =
+        await Promise.all([
+          this.getDataSyncStatus(),
+          this.getAnalyticsStatus(),
+          this.getPredictionsStatus(),
+          this.getParlayAnalyticsStatus(),
+        ]);
 
       return {
         dataSync: dataSyncStatus,
@@ -401,14 +414,8 @@ export class NBAIntegrationService {
   async getComprehensiveTeamData(teamId: string): Promise<NBAComprehensiveTeamData> {
     try {
       const currentSeason = new Date().getFullYear();
-      
-      const [
-        team,
-        analytics,
-        upcomingGames,
-        keyPlayers,
-        parlayOpportunities
-      ] = await Promise.all([
+
+      const [team, analytics, upcomingGames, keyPlayers, parlayOpportunities] = await Promise.all([
         this.dataSyncService.getTeamById(teamId),
         this.analyticsService.getTeamAnalytics(teamId, currentSeason),
         this.dataSyncService.getTeamUpcomingGames(teamId, 5),
@@ -450,12 +457,13 @@ export class NBAIntegrationService {
     try {
       const startOfDay = new Date(date);
       startOfDay.setHours(0, 0, 0, 0);
-      
+
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
 
       // Get games for the day
-      const gamesQuery = this.db.collection('nba_games')
+      const gamesQuery = this.db
+        .collection('nba_games')
         .where('date', '>=', startOfDay)
         .where('date', '<=', endOfDay);
 
@@ -480,8 +488,10 @@ export class NBAIntegrationService {
         parlayOpportunities: parlayOpportunities.slice(0, 10), // Top 10
         totalGames: games.length,
         highConfidencePicks: predictions.filter(p => p.confidence.overall >= 0.8).length,
-        bestParlayValue: parlayOpportunities.length > 0 ? 
-          Math.max(...parlayOpportunities.map(p => p.expectedValue)) : 0,
+        bestParlayValue:
+          parlayOpportunities.length > 0
+            ? Math.max(...parlayOpportunities.map(p => p.expectedValue))
+            : 0,
       };
     } catch (error) {
       Sentry.captureException(error);
@@ -494,11 +504,7 @@ export class NBAIntegrationService {
    */
   async validateSystemPerformance(): Promise<any> {
     try {
-      const [
-        predictionAccuracy,
-        parlayPerformance,
-        dataFreshness
-      ] = await Promise.all([
+      const [predictionAccuracy, parlayPerformance, dataFreshness] = await Promise.all([
         this.mlPredictionService.validatePredictionAccuracy(),
         this.validateParlayPerformance(),
         this.validateDataFreshness(),
@@ -511,9 +517,14 @@ export class NBAIntegrationService {
         predictionAccuracy,
         parlayPerformance,
         dataFreshness,
-        status: overallScore >= 75 ? 'excellent' : 
-                overallScore >= 60 ? 'good' : 
-                overallScore >= 40 ? 'fair' : 'needs-improvement',
+        status:
+          overallScore >= 75
+            ? 'excellent'
+            : overallScore >= 60
+              ? 'good'
+              : overallScore >= 40
+                ? 'fair'
+                : 'needs-improvement',
         lastValidated: new Date(),
       };
     } catch (error) {
@@ -525,7 +536,7 @@ export class NBAIntegrationService {
   /**
    * Helper methods for status checks
    */
-  
+
   private async getDataSyncStatus(): Promise<NBASystemStatus['dataSync']> {
     try {
       const [teamsCount, playersCount, gamesCount] = await Promise.all([
@@ -535,8 +546,7 @@ export class NBAIntegrationService {
       ]);
 
       const lastSync = await this.getLastSyncTime('data');
-      const nextSync = this.syncInterval ? 
-        new Date(Date.now() + 30 * 60 * 1000) : null;
+      const nextSync = this.syncInterval ? new Date(Date.now() + 30 * 60 * 1000) : null;
 
       return {
         status: 'active',
@@ -691,9 +701,7 @@ export class NBAIntegrationService {
   private async getTeamParlayOpportunities(teamId: string): Promise<any[]> {
     try {
       const opportunities = await this.parlayAnalyticsService.getParlayOpportunities(20);
-      return opportunities.filter(opp => 
-        opp.legs.some(leg => leg.selection.includes(teamId))
-      );
+      return opportunities.filter(opp => opp.legs.some(leg => leg.selection.includes(teamId)));
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -703,8 +711,8 @@ export class NBAIntegrationService {
   private async calculateRecentPerformance(teamId: string): Promise<any> {
     try {
       const recentGames = await this.dataSyncService.getRecentGames(10);
-      const teamGames = recentGames.filter(game => 
-        game.homeTeam === teamId || game.awayTeam === teamId
+      const teamGames = recentGames.filter(
+        game => game.homeTeam === teamId || game.awayTeam === teamId
       );
 
       let wins = 0;
@@ -727,13 +735,16 @@ export class NBAIntegrationService {
         record: { wins, losses: teamGames.length - wins },
         avgPointsFor: teamGames.length > 0 ? totalPointsFor / teamGames.length : 0,
         avgPointsAgainst: teamGames.length > 0 ? totalPointsAgainst / teamGames.length : 0,
-        form: teamGames.slice(-5).map(game => {
-          if (!game.scores) return null;
-          const isHome = game.homeTeam === teamId;
-          const teamScore = isHome ? game.scores.home : game.scores.away;
-          const opponentScore = isHome ? game.scores.away : game.scores.home;
-          return teamScore > opponentScore ? 'W' : 'L';
-        }).filter(result => result !== null),
+        form: teamGames
+          .slice(-5)
+          .map(game => {
+            if (!game.scores) return null;
+            const isHome = game.homeTeam === teamId;
+            const teamScore = isHome ? game.scores.home : game.scores.away;
+            const opponentScore = isHome ? game.scores.away : game.scores.home;
+            return teamScore > opponentScore ? 'W' : 'L';
+          })
+          .filter(result => result !== null),
       };
     } catch (error) {
       Sentry.captureException(error);
@@ -766,7 +777,7 @@ export class NBAIntegrationService {
       if (!lastSync) return 0;
 
       const hoursSinceSync = (Date.now() - lastSync.getTime()) / (1000 * 60 * 60);
-      
+
       // Score based on freshness (100% if < 1 hour, decreasing linearly)
       return Math.max(0, Math.min(100, 100 - (hoursSinceSync - 1) * 10));
     } catch (error) {

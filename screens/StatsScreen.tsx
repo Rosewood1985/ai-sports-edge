@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  ActivityIndicator 
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../src/contexts/ThemeContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+
+import { useTheme } from '../src/contexts/ThemeContext';
 
 // Define interfaces
 interface ConfidenceTierStats {
@@ -62,50 +63,50 @@ type TimePeriod = '7days' | '30days' | 'alltime';
 
 /**
  * StatsScreen Component
- * 
+ *
  * Displays AI win percentage breakdown by confidence tier
  */
 const StatsScreen: React.FC = () => {
   const { theme, themePreset } = useTheme();
   const isDark = themePreset === 'dark';
   const db = getFirestore();
-  
+
   // State
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('7days');
-  
+
   // Fetch stats data
   useEffect(() => {
     fetchStatsData();
   }, []);
-  
+
   const fetchStatsData = async () => {
     try {
       setLoading(true);
-      
+
       // Get stats document
       const statsRef = doc(db, 'stats', 'aiPicks');
       const statsDoc = await getDoc(statsRef);
-      
+
       if (statsDoc.exists()) {
         const statsData = statsDoc.data() as StatsData;
         setStats(statsData);
       } else {
         console.log('No stats document found');
       }
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Error fetching stats data:', error);
       setLoading(false);
     }
   };
-  
+
   // Get current time range stats based on selected period
   const getCurrentTimeRangeStats = (): TimeRangeStats | null => {
     if (!stats) return null;
-    
+
     if (timePeriod === '7days') {
       return stats.timeRanges.last7Days;
     } else if (timePeriod === '30days') {
@@ -114,7 +115,7 @@ const StatsScreen: React.FC = () => {
       return stats.timeRanges.allTime;
     }
   };
-  
+
   // Render time period tabs
   const renderTimePeriodTabs = () => {
     return (
@@ -122,49 +123,40 @@ const StatsScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.tab,
-            timePeriod === '7days' && [styles.activeTab, { backgroundColor: theme.primary }]
+            timePeriod === '7days' && [styles.activeTab, { backgroundColor: theme.primary }],
           ]}
           onPress={() => setTimePeriod('7days')}
         >
           <Text
-            style={[
-              styles.tabText,
-              { color: timePeriod === '7days' ? '#FFFFFF' : theme.text }
-            ]}
+            style={[styles.tabText, { color: timePeriod === '7days' ? '#FFFFFF' : theme.text }]}
           >
             7 Days
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            timePeriod === '30days' && [styles.activeTab, { backgroundColor: theme.primary }]
+            timePeriod === '30days' && [styles.activeTab, { backgroundColor: theme.primary }],
           ]}
           onPress={() => setTimePeriod('30days')}
         >
           <Text
-            style={[
-              styles.tabText,
-              { color: timePeriod === '30days' ? '#FFFFFF' : theme.text }
-            ]}
+            style={[styles.tabText, { color: timePeriod === '30days' ? '#FFFFFF' : theme.text }]}
           >
             30 Days
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            timePeriod === 'alltime' && [styles.activeTab, { backgroundColor: theme.primary }]
+            timePeriod === 'alltime' && [styles.activeTab, { backgroundColor: theme.primary }],
           ]}
           onPress={() => setTimePeriod('alltime')}
         >
           <Text
-            style={[
-              styles.tabText,
-              { color: timePeriod === 'alltime' ? '#FFFFFF' : theme.text }
-            ]}
+            style={[styles.tabText, { color: timePeriod === 'alltime' ? '#FFFFFF' : theme.text }]}
           >
             All Time
           </Text>
@@ -172,19 +164,17 @@ const StatsScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render overall stats
   const renderOverallStats = () => {
     const timeRangeStats = getCurrentTimeRangeStats();
-    
+
     if (!timeRangeStats) return null;
-    
+
     return (
       <View style={[styles.overallStatsContainer, { backgroundColor: theme.cardBackground }]}>
-        <Text style={[styles.overallStatsTitle, { color: theme.text }]}>
-          Overall Performance
-        </Text>
-        
+        <Text style={[styles.overallStatsTitle, { color: theme.text }]}>Overall Performance</Text>
+
         <View style={styles.overallStatsContent}>
           <View style={styles.winPercentageContainer}>
             <Text style={[styles.winPercentageValue, { color: theme.text }]}>
@@ -194,70 +184,60 @@ const StatsScreen: React.FC = () => {
               Win Rate
             </Text>
           </View>
-          
+
           <View style={styles.statsBreakdown}>
             <View style={styles.statItem}>
               <Text style={[styles.statValue, { color: theme.success }]}>
                 {timeRangeStats.wins}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                Wins
-              </Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Wins</Text>
             </View>
-            
+
             <View style={styles.statItem}>
               <Text style={[styles.statValue, { color: theme.error }]}>
                 {timeRangeStats.losses}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                Losses
-              </Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Losses</Text>
             </View>
-            
+
             <View style={styles.statItem}>
               <Text style={[styles.statValue, { color: theme.text }]}>
                 {timeRangeStats.totalPicks}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                Total
-              </Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Total</Text>
             </View>
           </View>
         </View>
       </View>
     );
   };
-  
+
   // Render confidence tier stats
   const renderConfidenceTierStats = () => {
     if (!stats) return null;
-    
+
     return (
       <View style={[styles.confidenceTiersContainer, { backgroundColor: theme.cardBackground }]}>
         <Text style={[styles.confidenceTiersTitle, { color: theme.text }]}>
           Performance by Confidence
         </Text>
-        
-        {stats.confidenceTiers.map((tier) => {
+
+        {stats.confidenceTiers.map(tier => {
           // Determine tier color
           let tierColor = theme.primary;
           if (tier.tier === 'high') tierColor = theme.success;
           else if (tier.tier === 'medium') tierColor = theme.warning;
           else if (tier.tier === 'low') tierColor = theme.error;
-          
+
           return (
             <View key={tier.tier} style={styles.confidenceTierItem}>
               <View style={styles.tierHeader}>
                 <View style={[styles.tierBadge, { backgroundColor: tierColor }]}>
-                  <Text style={styles.tierBadgeText}>
-                    {tier.tier.toUpperCase()}
-                  </Text>
+                  <Text style={styles.tierBadgeText}>{tier.tier.toUpperCase()}</Text>
                 </View>
-                <Text style={[styles.tierRange, { color: theme.textSecondary }]}>
-                  {tier.range}
-                </Text>
+                <Text style={[styles.tierRange, { color: theme.textSecondary }]}>{tier.range}</Text>
               </View>
-              
+
               <View style={styles.tierStats}>
                 <View style={styles.tierWinPercentage}>
                   <Text style={[styles.tierWinPercentageValue, { color: theme.text }]}>
@@ -267,24 +247,24 @@ const StatsScreen: React.FC = () => {
                     Win Rate
                   </Text>
                 </View>
-                
+
                 <View style={styles.tierBreakdown}>
                   <Text style={[styles.tierBreakdownText, { color: theme.textSecondary }]}>
                     {tier.wins} W - {tier.losses} L ({tier.totalPicks} total)
                   </Text>
                 </View>
               </View>
-              
+
               {/* Win percentage bar */}
               <View style={[styles.winPercentageBar, { backgroundColor: theme.border }]}>
-                <View 
+                <View
                   style={[
-                    styles.winPercentageFill, 
-                    { 
-                      width: `${tier.winPercentage}%`, 
-                      backgroundColor: tierColor 
-                    }
-                  ]} 
+                    styles.winPercentageFill,
+                    {
+                      width: `${tier.winPercentage}%`,
+                      backgroundColor: tierColor,
+                    },
+                  ]}
                 />
               </View>
             </View>
@@ -293,44 +273,40 @@ const StatsScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render sport stats
   const renderSportStats = () => {
     if (!stats) return null;
-    
+
     return (
       <View style={[styles.sportStatsContainer, { backgroundColor: theme.cardBackground }]}>
-        <Text style={[styles.sportStatsTitle, { color: theme.text }]}>
-          Performance by Sport
-        </Text>
-        
-        {stats.sportStats.map((sport) => (
+        <Text style={[styles.sportStatsTitle, { color: theme.text }]}>Performance by Sport</Text>
+
+        {stats.sportStats.map(sport => (
           <View key={sport.sport} style={styles.sportStatItem}>
             <View style={styles.sportHeader}>
-              <Text style={[styles.sportName, { color: theme.text }]}>
-                {sport.sport}
-              </Text>
+              <Text style={[styles.sportName, { color: theme.text }]}>{sport.sport}</Text>
               <Text style={[styles.sportWinPercentage, { color: theme.text }]}>
                 {sport.winPercentage}%
               </Text>
             </View>
-            
+
             <View style={styles.sportBreakdown}>
               <Text style={[styles.sportBreakdownText, { color: theme.textSecondary }]}>
                 {sport.wins} W - {sport.losses} L ({sport.totalPicks} total)
               </Text>
             </View>
-            
+
             {/* Win percentage bar */}
             <View style={[styles.winPercentageBar, { backgroundColor: theme.border }]}>
-              <View 
+              <View
                 style={[
-                  styles.winPercentageFill, 
-                  { 
-                    width: `${sport.winPercentage}%`, 
-                    backgroundColor: theme.primary 
-                  }
-                ]} 
+                  styles.winPercentageFill,
+                  {
+                    width: `${sport.winPercentage}%`,
+                    backgroundColor: theme.primary,
+                  },
+                ]}
               />
             </View>
           </View>
@@ -338,13 +314,13 @@ const StatsScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.title, { color: theme.text }]}>AI Performance Stats</Text>
-      
+
       {renderTimePeriodTabs()}
-      
+
       {loading ? (
         <ActivityIndicator size="large" color={theme.primary} style={styles.loader} />
       ) : stats ? (
@@ -352,7 +328,7 @@ const StatsScreen: React.FC = () => {
           {renderOverallStats()}
           {renderConfidenceTierStats()}
           {renderSportStats()}
-          
+
           <Text style={[styles.lastUpdated, { color: theme.textSecondary }]}>
             Last updated: {stats.lastUpdated ? stats.lastUpdated.toDate().toLocaleString() : 'N/A'}
           </Text>

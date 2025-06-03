@@ -1,6 +1,12 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { DeviceType, grid, responsiveSpacing, useResponsiveDimensions } from '../utils/responsiveUtils';
+
+import {
+  DeviceType,
+  grid,
+  responsiveSpacing,
+  useResponsiveDimensions,
+} from '../utils/responsiveUtils';
 
 interface RowProps {
   children: React.ReactNode;
@@ -27,7 +33,7 @@ interface ContainerProps {
 export const Container: React.FC<ContainerProps> = ({ children, style, fluid = false }) => {
   const { deviceType } = useResponsiveDimensions();
   const isTablet = deviceType === DeviceType.TABLET;
-  
+
   return (
     <View
       style={[
@@ -56,7 +62,7 @@ export const Row: React.FC<RowProps> = ({ children, style, gutter = 16 }) => {
         style,
       ]}
     >
-      {React.Children.map(children, (child) => {
+      {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             ...child.props,
@@ -72,25 +78,25 @@ export const Row: React.FC<RowProps> = ({ children, style, gutter = 16 }) => {
 /**
  * Responsive column component for grid layout
  */
-export const Column: React.FC<ColumnProps> = ({ 
-  children, 
-  size = 1, 
-  offset = 0, 
+export const Column: React.FC<ColumnProps> = ({
+  children,
+  size = 1,
+  offset = 0,
   style,
   ...props
 }) => {
   // @ts-ignore - gutter is passed from Row
   const gutter = props.gutter || 16;
   const totalColumns = grid.getColumns();
-  
+
   // Ensure size doesn't exceed total columns
   const safeSize = Math.min(size, totalColumns);
   const safeOffset = Math.min(offset, totalColumns - safeSize);
-  
+
   // Calculate width percentage
   const widthPercent = (safeSize / totalColumns) * 100;
   const marginLeftPercent = offset > 0 ? (safeOffset / totalColumns) * 100 : undefined;
-  
+
   return (
     <View
       style={[
@@ -131,24 +137,24 @@ export const Grid: React.FC<GridProps> = ({
   const isTablet = deviceType === DeviceType.TABLET;
   const defaultColumns = isTablet ? 3 : 2;
   const cols = numColumns || defaultColumns;
-  
+
   // Group items into rows
   const rows = [];
   for (let i = 0; i < data.length; i += cols) {
     rows.push(data.slice(i, i + cols));
   }
-  
+
   return (
     <View style={[styles.grid, style]}>
       {rows.map((row, rowIndex) => (
-        <View 
-          key={`row-${rowIndex}`} 
+        <View
+          key={`row-${rowIndex}`}
           style={[
             styles.gridRow,
-            { 
+            {
               marginBottom: rowIndex < rows.length - 1 ? rowGap : 0,
-              marginHorizontal: -columnGap / 2 
-            }
+              marginHorizontal: -columnGap / 2,
+            },
           ]}
         >
           {row.map((item, colIndex) => (
@@ -157,27 +163,28 @@ export const Grid: React.FC<GridProps> = ({
               style={[
                 styles.gridColumn,
                 {
-                  width: `${(100 / cols)}%`,
-                  paddingHorizontal: columnGap / 2
-                }
+                  width: `${100 / cols}%`,
+                  paddingHorizontal: columnGap / 2,
+                },
               ]}
             >
               {renderItem(item, rowIndex * cols + colIndex)}
             </View>
           ))}
-          
+
           {/* Add empty columns to fill the row */}
-          {row.length < cols && Array(cols - row.length)
-            .fill(null)
-            .map((_, index) => (
-              <View
-                key={`empty-${rowIndex}-${index}`}
-                style={[
-                  styles.gridColumn,
-                  { width: `${(100 / cols)}%`, paddingHorizontal: columnGap / 2 }
-                ]}
-              />
-            ))}
+          {row.length < cols &&
+            Array(cols - row.length)
+              .fill(null)
+              .map((_, index) => (
+                <View
+                  key={`empty-${rowIndex}-${index}`}
+                  style={[
+                    styles.gridColumn,
+                    { width: `${100 / cols}%`, paddingHorizontal: columnGap / 2 },
+                  ]}
+                />
+              ))}
         </View>
       ))}
     </View>
@@ -196,15 +203,9 @@ interface SectionProps {
 export const Section: React.FC<SectionProps> = ({ children, title, style }) => {
   const { deviceType } = useResponsiveDimensions();
   const isTablet = deviceType === DeviceType.TABLET;
-  
+
   return (
-    <View
-      style={[
-        styles.section,
-        isTablet ? styles.sectionTablet : styles.sectionPhone,
-        style,
-      ]}
-    >
+    <View style={[styles.section, isTablet ? styles.sectionTablet : styles.sectionPhone, style]}>
       {title && (
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{title}</Text>

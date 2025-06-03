@@ -1,5 +1,3 @@
-import { auth, firestore, functions } from '../config/firebase';
-import { trackEvent } from './analyticsService';
 import {
   collection,
   doc,
@@ -8,9 +6,12 @@ import {
   where,
   Timestamp,
   DocumentData,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { httpsCallable, HttpsCallableResult } from 'firebase/functions';
+
+import { trackEvent } from './analyticsService';
+import { auth, firestore, functions } from '../config/firebase';
 
 /**
  * Interface for subscription analytics report
@@ -51,17 +52,17 @@ export const generateSubscriptionReport = async (
     // Call the Firebase function to generate the report
     const generateReportFunc = httpsCallable(functions, 'generateSubscriptionReport');
     const result = await generateReportFunc({
-      timeRange
+      timeRange,
     });
-    
+
     // Track the event
     await trackEvent('subscription_report_generated', {
-      time_range: timeRange
+      time_range: timeRange,
     });
-    
+
     // Format the data if needed
     const reportData = result.data as SubscriptionAnalyticsReport;
-    
+
     // Ensure all required fields are present
     const formattedReport: SubscriptionAnalyticsReport = {
       activeSubscriptions: reportData.activeSubscriptions || 0,
@@ -71,13 +72,13 @@ export const generateSubscriptionReport = async (
       conversionRate: reportData.conversionRate || 0,
       subscriptionsByPlan: reportData.subscriptionsByPlan || [],
       revenueByMonth: reportData.revenueByMonth || [],
-      subscriptionsByStatus: reportData.subscriptionsByStatus || []
+      subscriptionsByStatus: reportData.subscriptionsByStatus || [],
     };
-    
+
     return formattedReport;
   } catch (error) {
     console.error('Error generating subscription report:', error);
-    
+
     // For development or when errors occur, return mock data
     // In production, you might want to show an error message instead
     return getMockAnalyticsData();
@@ -98,7 +99,7 @@ const getMockAnalyticsData = (): SubscriptionAnalyticsReport => {
     subscriptionsByPlan: [
       { name: 'Basic Monthly', count: 0, percentage: 0 },
       { name: 'Premium Monthly', count: 1, percentage: 100 },
-      { name: 'Premium Annual', count: 0, percentage: 0 }
+      { name: 'Premium Annual', count: 0, percentage: 0 },
     ],
     revenueByMonth: [
       { month: 'Jan', revenue: 0 },
@@ -106,13 +107,13 @@ const getMockAnalyticsData = (): SubscriptionAnalyticsReport => {
       { month: 'Mar', revenue: 9.99 },
       { month: 'Apr', revenue: 9.99 },
       { month: 'May', revenue: 9.99 },
-      { month: 'Jun', revenue: 0 }
+      { month: 'Jun', revenue: 0 },
     ],
     subscriptionsByStatus: [
       { status: 'Active', count: 1, percentage: 100 },
       { status: 'Canceled', count: 0, percentage: 0 },
-      { status: 'Past Due', count: 0, percentage: 0 }
-    ]
+      { status: 'Past Due', count: 0, percentage: 0 },
+    ],
   };
 };
 
@@ -148,40 +149,44 @@ interface PurchaseData {
  * @param userId User ID
  * @returns User subscription metrics
  */
-export const getUserSubscriptionMetrics = async (userId: string): Promise<UserSubscriptionMetrics> => {
+export const getUserSubscriptionMetrics = async (
+  userId: string
+): Promise<UserSubscriptionMetrics> => {
   try {
     // Get user's subscriptions
     const userDocRef = doc(firestore, 'users', userId);
     const subscriptionsCollectionRef = collection(userDocRef, 'subscriptions');
     const subscriptionsSnapshot = await getDocs(subscriptionsCollectionRef);
-    
+
     const subscriptions: SubscriptionData[] = [];
     subscriptionsSnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data() as SubscriptionData;
       subscriptions.push(data);
     });
-    
+
     // Get user's purchases
     const purchasesCollectionRef = collection(userDocRef, 'purchases');
     const purchasesSnapshot = await getDocs(purchasesCollectionRef);
-    
+
     const purchases: PurchaseData[] = [];
     purchasesSnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data() as PurchaseData;
       purchases.push(data);
     });
-    
+
     // Calculate metrics
     const activeSubscription = subscriptions.find(sub => sub.status === 'active');
-    const totalSpent = purchases.reduce((total: number, purchase: PurchaseData) =>
-      total + (purchase.amount || 0) / 100, 0);
-    
+    const totalSpent = purchases.reduce(
+      (total: number, purchase: PurchaseData) => total + (purchase.amount || 0) / 100,
+      0
+    );
+
     return {
       hasActiveSubscription: !!activeSubscription,
       subscriptionPlan: activeSubscription?.planName || null,
       subscriptionStatus: activeSubscription?.status || null,
       currentPeriodEnd: activeSubscription?.currentPeriodEnd || null,
-      totalSpent
+      totalSpent,
     };
   } catch (error) {
     console.error('Error getting user subscription metrics:', error);
@@ -190,12 +195,12 @@ export const getUserSubscriptionMetrics = async (userId: string): Promise<UserSu
       subscriptionPlan: null,
       subscriptionStatus: null,
       currentPeriodEnd: null,
-      totalSpent: 0
+      totalSpent: 0,
     };
   }
 };
 
 export default {
   generateSubscriptionReport,
-  getUserSubscriptionMetrics
+  getUserSubscriptionMetrics,
 };

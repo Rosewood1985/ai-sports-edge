@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+
 import { auth } from '../config/firebase';
-import { hasUsedFreeDailyPick, getNextUnlockTime } from '../services/subscriptionService';
-import { getFreeDailyPick } from '../services/aiPredictionService';
-import { Game, AIPrediction } from '../types/odds';
 import { useTheme } from '../contexts/ThemeContext';
+import { getFreeDailyPick } from '../services/aiPredictionService';
+import { hasUsedFreeDailyPick, getNextUnlockTime } from '../services/subscriptionService';
+import { Game, AIPrediction } from '../types/odds';
 
 interface DailyFreePickProps {
   games: Game[];
@@ -37,14 +31,14 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
   // Check if user has used their free daily pick
   useEffect(() => {
     let isMounted = true;
-    
+
     const checkFreePick = async () => {
       if (!isMounted) return;
-      
+
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           if (isMounted) {
             setHasUsedPick(false);
@@ -52,11 +46,11 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
           }
           return;
         }
-        
+
         // Check if user has used their free daily pick
         const usedPick = await hasUsedFreeDailyPick(userId);
         if (isMounted) setHasUsedPick(usedPick);
-        
+
         // If user has used their pick, get time until next unlock
         if (usedPick) {
           const nextUnlockTime = await getNextUnlockTime(userId, 'free_daily_pick');
@@ -72,27 +66,27 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
         if (isMounted) setLoading(false);
       }
     };
-    
+
     checkFreePick();
-    
+
     return () => {
       isMounted = false;
     };
   }, [games, adViewed]);
-  
+
   // Format time remaining
   const formatTimeRemaining = () => {
     const hours = Math.floor(timeRemaining / (60 * 60 * 1000));
     const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000));
     return `${hours}h ${minutes}m`;
   };
-  
+
   // Navigate to subscription screen
   const handleUpgrade = () => {
     // @ts-ignore - Navigation typing issue
     navigation.navigate('Subscription');
   };
-  
+
   // Handle ad viewing
   const handleViewAd = async () => {
     try {
@@ -104,7 +98,7 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
       console.error('Error viewing ad:', error);
     }
   };
-  
+
   // Get confidence color based on level
   const getConfidenceColor = (level: string): string => {
     switch (level) {
@@ -118,7 +112,7 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
         return '#757575'; // Gray
     }
   };
-  
+
   // If loading, show loading indicator
   if (loading) {
     return (
@@ -130,15 +124,13 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
       </View>
     );
   }
-  
+
   // If user has used their pick, show time until next unlock
   if (hasUsedPick) {
     return (
       <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
         <Ionicons name="time-outline" size={32} color={colors.primary} />
-        <Text style={[styles.title, { color: colors.text }]}>
-          You've used your free daily pick
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>You've used your free daily pick</Text>
         <Text style={[styles.subtitle, { color: colors.text }]}>
           Next pick available in {formatTimeRemaining()}
         </Text>
@@ -151,15 +143,13 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
       </View>
     );
   }
-  
+
   // If ad is required but not viewed, show ad button
   if (!adViewed && !freePick) {
     return (
       <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
         <Ionicons name="gift-outline" size={32} color={colors.primary} />
-        <Text style={[styles.title, { color: colors.text }]}>
-          Your Free Daily AI Pick
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>Your Free Daily AI Pick</Text>
         <Text style={[styles.subtitle, { color: colors.text }]}>
           Watch a short ad to unlock your free AI prediction
         </Text>
@@ -172,15 +162,13 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
       </View>
     );
   }
-  
+
   // If no free pick is available, show message
   if (!freePick) {
     return (
       <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
         <Ionicons name="alert-circle-outline" size={32} color={colors.primary} />
-        <Text style={[styles.title, { color: colors.text }]}>
-          No Free Pick Available
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>No Free Pick Available</Text>
         <Text style={[styles.subtitle, { color: colors.text }]}>
           There are no games available for a free pick right now
         </Text>
@@ -193,51 +181,50 @@ const DailyFreePick: React.FC<DailyFreePickProps> = ({ games, onAdRequested }) =
       </View>
     );
   }
-  
+
   // Show free pick
   const prediction = freePick.ai_prediction as AIPrediction;
-  
+
   return (
     <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
       <View style={styles.header}>
         <Ionicons name="gift-outline" size={24} color={colors.primary} />
-        <Text style={[styles.headerText, { color: colors.text }]}>
-          Your Free Daily AI Pick
-        </Text>
+        <Text style={[styles.headerText, { color: colors.text }]}>Your Free Daily AI Pick</Text>
       </View>
-      
+
       <View style={styles.matchupContainer}>
         <Text style={[styles.matchupText, { color: colors.text }]}>
           {freePick.home_team} vs {freePick.away_team}
         </Text>
         <Text style={[styles.timeText, { color: colors.text }]}>
-          {new Date(freePick.commence_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(freePick.commence_time).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
         </Text>
       </View>
-      
+
       <View style={styles.predictionContainer}>
-        <Text style={[styles.predictionLabel, { color: colors.text }]}>
-          AI Prediction:
-        </Text>
+        <Text style={[styles.predictionLabel, { color: colors.text }]}>AI Prediction:</Text>
         <Text style={[styles.predictionText, { color: colors.primary }]}>
           {prediction.predicted_winner}
         </Text>
-        <View style={[
-          styles.confidenceTag,
-          { backgroundColor: getConfidenceColor(prediction.confidence) }
-        ]}>
+        <View
+          style={[
+            styles.confidenceTag,
+            { backgroundColor: getConfidenceColor(prediction.confidence) },
+          ]}
+        >
           <Text style={styles.confidenceText}>
             {prediction.confidence.toUpperCase()} CONFIDENCE
           </Text>
         </View>
       </View>
-      
+
       <View style={styles.reasoningContainer}>
-        <Text style={[styles.reasoningText, { color: colors.text }]}>
-          {prediction.reasoning}
-        </Text>
+        <Text style={[styles.reasoningText, { color: colors.text }]}>{prediction.reasoning}</Text>
       </View>
-      
+
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors.primary }]}
         onPress={handleUpgrade}

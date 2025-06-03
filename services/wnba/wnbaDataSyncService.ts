@@ -4,9 +4,10 @@
 // Following MLB Pattern Exactly for Consistency
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
+
+import { firestore as db } from '../../config/firebase';
 import { getWeatherApiKey } from '../../utils/apiKeys';
 
 export class WNBADataSyncService {
@@ -66,7 +67,7 @@ export class WNBADataSyncService {
       });
 
       const teamsResponse = await this.fetchFromWNBAAPI('/teams');
-      
+
       if (!this.validateTeamsResponse(teamsResponse)) {
         throw new Error('Invalid teams API response structure');
       }
@@ -90,35 +91,41 @@ export class WNBADataSyncService {
             abbreviation: team.conference?.abbreviation,
           },
           // Arena information - important for weather analysis
-          venue: team.venue ? {
-            id: team.venue.id,
-            name: team.venue.name,
-            capacity: team.venue.capacity,
-            indoor: team.venue.indoor || true, // Most WNBA arenas are indoor
-            location: {
-              latitude: team.venue.location?.latitude,
-              longitude: team.venue.location?.longitude,
-              city: team.venue.location?.city,
-              state: team.venue.location?.state,
-            },
-          } : null,
+          venue: team.venue
+            ? {
+                id: team.venue.id,
+                name: team.venue.name,
+                capacity: team.venue.capacity,
+                indoor: team.venue.indoor || true, // Most WNBA arenas are indoor
+                location: {
+                  latitude: team.venue.location?.latitude,
+                  longitude: team.venue.location?.longitude,
+                  city: team.venue.location?.city,
+                  state: team.venue.location?.state,
+                },
+              }
+            : null,
           // Team performance data
-          record: team.record ? {
-            wins: team.record.wins,
-            losses: team.record.losses,
-            percentage: team.record.percentage,
-            pointsFor: team.record.pointsFor,
-            pointsAgainst: team.record.pointsAgainst,
-            pointDifferential: team.record.pointsFor - team.record.pointsAgainst,
-            homeRecord: team.record.homeRecord,
-            awayRecord: team.record.awayRecord,
-          } : null,
+          record: team.record
+            ? {
+                wins: team.record.wins,
+                losses: team.record.losses,
+                percentage: team.record.percentage,
+                pointsFor: team.record.pointsFor,
+                pointsAgainst: team.record.pointsAgainst,
+                pointDifferential: team.record.pointsFor - team.record.pointsAgainst,
+                homeRecord: team.record.homeRecord,
+                awayRecord: team.record.awayRecord,
+              }
+            : null,
           // Coaching staff
-          coach: team.coach ? {
-            id: team.coach.id,
-            name: team.coach.displayName,
-            experience: team.coach.experience,
-          } : null,
+          coach: team.coach
+            ? {
+                id: team.coach.id,
+                name: team.coach.displayName,
+                experience: team.coach.experience,
+              }
+            : null,
           // Team analytics
           offensiveRankings: await this.getTeamOffensiveRankings(team.id),
           defensiveRankings: await this.getTeamDefensiveRankings(team.id),
@@ -130,7 +137,7 @@ export class WNBADataSyncService {
         };
 
         await setDoc(doc(teamsCollection, team.id.toString()), teamData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced team: ${team.displayName}`,
           category: 'wnba.sync.teams.detail',
@@ -156,60 +163,59 @@ export class WNBADataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       Sentry.addBreadcrumb({
         message: `Making WNBA API request: ${url}`,
         category: 'wnba.api.request',
         level: 'debug',
-        data: { endpoint, retryCount }
+        data: { endpoint, retryCount },
       });
 
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
       if (!response.ok) {
         const errorMessage = `WNBA API error: ${response.status} ${response.statusText}`;
-        
+
         // Handle rate limiting
         if (response.status === 429) {
           const retryAfter = response.headers.get('Retry-After');
           const delay = retryAfter ? parseInt(retryAfter) * 1000 : 60000;
-          
+
           await this.sleep(delay);
-          
+
           if (retryCount < this.maxRetries) {
             return this.fetchFromWNBAAPI(endpoint, retryCount + 1);
           }
         }
-        
+
         // Handle server errors with retry
         if (response.status >= 500 && retryCount < this.maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000;
           await this.sleep(delay);
           return this.fetchFromWNBAAPI(endpoint, retryCount + 1);
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
       this.requestCount++;
       return data;
-      
     } catch (error) {
       Sentry.captureException(error);
-      
+
       // Retry on network errors
       if (retryCount < this.maxRetries && (error as any).name === 'TypeError') {
         const delay = Math.pow(2, retryCount) * 1000;
         await this.sleep(delay);
         return this.fetchFromWNBAAPI(endpoint, retryCount + 1);
       }
-      
+
       throw new Error(`WNBA API request failed: ${(error as Error).message}`);
     }
   }
@@ -217,12 +223,12 @@ export class WNBADataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       const delay = this.rateLimitDelay - timeSinceLastRequest;
       await this.sleep(delay);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -305,11 +311,15 @@ export class WNBADataSyncService {
   async updateSyncStatus(status: any): Promise<void> {
     try {
       const statusDoc = doc(db, 'sync_status', 'wnba_data_sync');
-      
-      await setDoc(statusDoc, {
-        ...status,
-        lastUpdated: new Date(),
-      }, { merge: true });
+
+      await setDoc(
+        statusDoc,
+        {
+          ...status,
+          lastUpdated: new Date(),
+        },
+        { merge: true }
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw error;
@@ -373,7 +383,7 @@ export class WNBADataSyncService {
       });
 
       const teamsResponse = await this.fetchFromWNBAAPI('/teams.json');
-      
+
       if (!this.validateTeamsResponse(teamsResponse)) {
         throw new Error('Invalid teams API response structure');
       }
@@ -395,12 +405,14 @@ export class WNBADataSyncService {
             name: team.confName,
           },
           // Venue information
-          venue: team.venue ? {
-            name: team.venue.name,
-            city: team.venue.city,
-            state: team.venue.state,
-            capacity: team.venue.capacity,
-          } : null,
+          venue: team.venue
+            ? {
+                name: team.venue.name,
+                city: team.venue.city,
+                state: team.venue.state,
+                capacity: team.venue.capacity,
+              }
+            : null,
           // Team colors and branding
           primaryColor: team.primaryColor,
           secondaryColor: team.secondaryColor,
@@ -416,7 +428,7 @@ export class WNBADataSyncService {
         };
 
         await setDoc(doc(teamsCollection, team.teamId.toString()), teamData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced team: ${team.teamName}`,
           category: 'wnba.sync.teams.detail',
@@ -444,7 +456,7 @@ export class WNBADataSyncService {
       });
 
       const playersResponse = await this.fetchFromWNBAAPI('/players.json');
-      
+
       if (!this.validatePlayersResponse(playersResponse)) {
         throw new Error('Invalid players API response structure');
       }
@@ -470,8 +482,10 @@ export class WNBADataSyncService {
           position: player.pos,
           jerseyNumber: player.jersey,
           // Physical attributes
-          height: player.heightFeet && player.heightInches ? 
-            `${player.heightFeet}'${player.heightInches}"` : null,
+          height:
+            player.heightFeet && player.heightInches
+              ? `${player.heightFeet}'${player.heightInches}"`
+              : null,
           weight: player.weightPounds,
           // Career info
           birthDate: player.dateOfBirthUTC,
@@ -495,7 +509,9 @@ export class WNBADataSyncService {
           syncStatus: 'completed',
         };
 
-        await setDoc(doc(playersCollection, player.personId.toString()), playerData, { merge: true });
+        await setDoc(doc(playersCollection, player.personId.toString()), playerData, {
+          merge: true,
+        });
         totalPlayersSynced++;
 
         if (totalPlayersSynced % 25 === 0) {
@@ -530,12 +546,14 @@ export class WNBADataSyncService {
       const today = new Date();
       const endDate = new Date(today);
       endDate.setDate(today.getDate() + 7);
-      
+
       const startDateStr = today.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
-      
-      const scheduleResponse = await this.fetchFromWNBAAPI(`/schedule.json?startDate=${startDateStr}&endDate=${endDateStr}`);
-      
+
+      const scheduleResponse = await this.fetchFromWNBAAPI(
+        `/schedule.json?startDate=${startDateStr}&endDate=${endDateStr}`
+      );
+
       if (!this.validateScheduleResponse(scheduleResponse)) {
         throw new Error('Invalid schedule API response structure');
       }
@@ -544,7 +562,7 @@ export class WNBADataSyncService {
       let totalGamesSynced = 0;
 
       const games = scheduleResponse.league?.games || [];
-      
+
       for (const game of games) {
         const gameData = {
           gameId: game.gameId,
@@ -568,11 +586,13 @@ export class WNBADataSyncService {
           // Game details
           period: game.period,
           clock: game.clock,
-          venue: game.arena ? {
-            name: game.arena.name,
-            city: game.arena.city,
-            state: game.arena.state,
-          } : null,
+          venue: game.arena
+            ? {
+                name: game.arena.name,
+                city: game.arena.city,
+                state: game.arena.state,
+              }
+            : null,
           // Weather conditions (for outdoor events)
           weatherConditions: await this.getWeatherForGame(game),
           // Analysis flags
@@ -587,7 +607,7 @@ export class WNBADataSyncService {
 
         await setDoc(doc(gamesCollection, game.gameId.toString()), gameData, { merge: true });
         totalGamesSynced++;
-        
+
         if (totalGamesSynced % 10 === 0) {
           Sentry.addBreadcrumb({
             message: `Synced ${totalGamesSynced} games so far`,
@@ -617,13 +637,13 @@ export class WNBADataSyncService {
       });
 
       const currentYear = new Date().getFullYear();
-      
+
       // Sync league leaders for current season
       const leadersResponse = await this.fetchFromWNBAAPI(`/leaders.json?season=${currentYear}`);
 
       if (leadersResponse.league?.leaders) {
         const statsCollection = collection(db, 'wnba_league_leaders');
-        
+
         for (const category of leadersResponse.league.leaders) {
           const categoryData = {
             category: category.statType,
@@ -633,11 +653,9 @@ export class WNBADataSyncService {
             dataSource: 'wnba_official_api',
           };
 
-          await setDoc(
-            doc(statsCollection, `${currentYear}_${category.statType}`),
-            categoryData,
-            { merge: true }
-          );
+          await setDoc(doc(statsCollection, `${currentYear}_${category.statType}`), categoryData, {
+            merge: true,
+          });
         }
       }
 
@@ -655,7 +673,7 @@ export class WNBADataSyncService {
   private async syncWeatherData(): Promise<void> {
     try {
       Sentry.addBreadcrumb({
-        message: 'Starting weather data sync for today\'s games',
+        message: "Starting weather data sync for today's games",
         category: 'wnba.sync.weather',
         level: 'info',
       });
@@ -672,7 +690,7 @@ export class WNBADataSyncService {
       let weatherDataSynced = 0;
 
       const games = scheduleResponse.league?.games || [];
-      
+
       for (const game of games) {
         // Most WNBA games are indoor, but check if outdoor
         if (game.arena && game.arena.outdoor && game.arena.coordinates) {
@@ -699,7 +717,9 @@ export class WNBADataSyncService {
                 dataSource: 'openweather_api',
               };
 
-              await setDoc(doc(weatherCollection, game.gameId.toString()), gameWeatherData, { merge: true });
+              await setDoc(doc(weatherCollection, game.gameId.toString()), gameWeatherData, {
+                merge: true,
+              });
               weatherDataSynced++;
             }
           } catch (weatherError) {
@@ -733,7 +753,7 @@ export class WNBADataSyncService {
 
       // FLAG: WNBA injury reports would come from team announcements or news feeds
       const injuryResponse = await this.fetchFromWNBAAPI('/injuries.json');
-      
+
       if (injuryResponse.injuries) {
         const injuriesCollection = collection(db, 'wnba_injuries');
         let totalInjuriesSynced = 0;
@@ -761,7 +781,7 @@ export class WNBADataSyncService {
             injuryData,
             { merge: true }
           );
-          
+
           totalInjuriesSynced++;
         }
 
@@ -783,92 +803,91 @@ export class WNBADataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       Sentry.addBreadcrumb({
         message: `Making WNBA API request: ${url}`,
         category: 'wnba.api.request',
         level: 'debug',
-        data: { endpoint, retryCount }
+        data: { endpoint, retryCount },
       });
 
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
       if (!response.ok) {
         const errorMessage = `WNBA API error: ${response.status} ${response.statusText}`;
-        
+
         // Handle rate limiting
         if (response.status === 429) {
           const retryAfter = response.headers.get('Retry-After');
           const delay = retryAfter ? parseInt(retryAfter) * 1000 : 60000;
-          
+
           Sentry.addBreadcrumb({
             message: `Rate limited, waiting ${delay}ms before retry`,
             category: 'wnba.api.rate_limit',
             level: 'warning',
           });
-          
+
           await this.sleep(delay);
-          
+
           if (retryCount < this.maxRetries) {
             return this.fetchFromWNBAAPI(endpoint, retryCount + 1);
           }
         }
-        
+
         // Handle server errors with retry
         if (response.status >= 500 && retryCount < this.maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000;
-          
+
           Sentry.addBreadcrumb({
             message: `Server error ${response.status}, retrying in ${delay}ms`,
             category: 'wnba.api.server_error',
             level: 'warning',
           });
-          
+
           await this.sleep(delay);
           return this.fetchFromWNBAAPI(endpoint, retryCount + 1);
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
-      
+
       Sentry.addBreadcrumb({
         message: `WNBA API request successful: ${url}`,
         category: 'wnba.api.success',
         level: 'debug',
-        data: { 
-          endpoint, 
+        data: {
+          endpoint,
           dataSize: JSON.stringify(data).length,
-          retryCount 
-        }
+          retryCount,
+        },
       });
 
       this.requestCount++;
       return data;
-      
     } catch (error) {
       Sentry.captureException(error);
-      
+
       // Retry on network errors
       if (retryCount < this.maxRetries && (error as any).name === 'TypeError') {
         const delay = Math.pow(2, retryCount) * 1000;
-        
+
         Sentry.addBreadcrumb({
           message: `Network error, retrying in ${delay}ms`,
           category: 'wnba.api.network_error',
           level: 'warning',
         });
-        
+
         await this.sleep(delay);
         return this.fetchFromWNBAAPI(endpoint, retryCount + 1);
       }
-      
+
       throw new Error(`WNBA API request failed: ${(error as Error).message}`);
     }
   }
@@ -876,12 +895,12 @@ export class WNBADataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       const delay = this.rateLimitDelay - timeSinceLastRequest;
       await this.sleep(delay);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -903,7 +922,7 @@ export class WNBADataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.weatherBaseUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.weatherApiKey}&units=imperial`;
-      
+
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -911,15 +930,15 @@ export class WNBADataSyncService {
       }
 
       const weatherData = await response.json();
-      
+
       Sentry.addBreadcrumb({
         message: `Weather API request successful for coordinates: ${lat}, ${lon}`,
         category: 'wnba.weather.success',
         level: 'debug',
-        data: { 
+        data: {
           temperature: weatherData.main?.temp,
-          conditions: weatherData.weather?.[0]?.description 
-        }
+          conditions: weatherData.weather?.[0]?.description,
+        },
       });
 
       return weatherData;
@@ -945,8 +964,10 @@ export class WNBADataSyncService {
   private async getPlayerCurrentStats(playerId: string): Promise<any> {
     try {
       const currentYear = new Date().getFullYear();
-      const statsResponse = await this.fetchFromWNBAAPI(`/players/${playerId}/stats.json?season=${currentYear}`);
-      
+      const statsResponse = await this.fetchFromWNBAAPI(
+        `/players/${playerId}/stats.json?season=${currentYear}`
+      );
+
       if (!statsResponse.stats) {
         return null;
       }
@@ -969,10 +990,7 @@ export class WNBADataSyncService {
   private async getWeatherForGame(game: any): Promise<any> {
     // Most WNBA games are indoor, so weather is typically not relevant
     if (game.arena && game.arena.outdoor && game.arena.coordinates) {
-      return await this.fetchWeatherData(
-        game.arena.coordinates.lat,
-        game.arena.coordinates.lon
-      );
+      return await this.fetchWeatherData(game.arena.coordinates.lat, game.arena.coordinates.lon);
     }
     return null;
   }
@@ -989,18 +1007,23 @@ export class WNBADataSyncService {
   private calculateInjuryImpact(injury: any): string {
     const injuryType = injury.injuryType?.toLowerCase() || '';
     const status = injury.status?.toLowerCase() || '';
-    
+
     if (status.includes('out') || status.includes('season')) return 'High';
-    if (injuryType.includes('knee') || injuryType.includes('ankle') || injuryType.includes('shoulder')) return 'Medium';
+    if (
+      injuryType.includes('knee') ||
+      injuryType.includes('ankle') ||
+      injuryType.includes('shoulder')
+    )
+      return 'Medium';
     if (status.includes('day-to-day') || status.includes('questionable')) return 'Low';
-    
+
     return 'Unknown';
   }
 
   private validateGameData(game: any): boolean {
     const requiredFields = ['gameId', 'gameTimeUTC', 'hTeam', 'vTeam'];
     const hasRequiredFields = requiredFields.every(field => game[field] !== undefined);
-    
+
     return hasRequiredFields;
   }
 
@@ -1019,11 +1042,15 @@ export class WNBADataSyncService {
   async updateSyncStatus(status: any): Promise<void> {
     try {
       const statusDoc = doc(db, 'sync_status', 'wnba_data_sync');
-      
-      await setDoc(statusDoc, {
-        ...status,
-        lastUpdated: new Date(),
-      }, { merge: true });
+
+      await setDoc(
+        statusDoc,
+        {
+          ...status,
+          lastUpdated: new Date(),
+        },
+        { merge: true }
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw error;

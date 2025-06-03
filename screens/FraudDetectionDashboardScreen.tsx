@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -9,25 +12,23 @@ import {
   RefreshControl,
   Alert,
   Platform,
-  FlatList
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import BubbleChart from '../components/BubbleChart';
 import HeatMapChart from '../components/HeatMapChart';
+import { useTheme } from '../contexts/ThemeContext';
 import { fraudDetectionService } from '../services/fraudDetectionService';
 import {
   FraudAlert,
   AlertSeverity,
   AlertStatus,
   FraudPatternType,
-  FraudDetectionStats
+  FraudDetectionStats,
 } from '../types/fraudDetection';
-import { useTheme } from '../contexts/ThemeContext';
 
 // Define the navigation param list
 type RootStackParamList = {
@@ -64,20 +65,20 @@ const FraudDetectionDashboardScreen: React.FC = () => {
   const textColor = colors.text;
   const primaryColor = colors.primary;
   const accentColor = isDark ? '#4ECDC4' : '#2A9D8F';
-  
+
   // Severity colors
   const severityColors = {
     [AlertSeverity.LOW]: '#4CAF50',
     [AlertSeverity.MEDIUM]: '#FFC107',
     [AlertSeverity.HIGH]: '#FF9800',
-    [AlertSeverity.CRITICAL]: '#F44336'
+    [AlertSeverity.CRITICAL]: '#F44336',
   };
 
   // Load alerts and statistics
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Get alerts based on filter
       const alertsData = await fraudDetectionService.getAlerts(
         selectedFilter !== 'all' ? { severity: selectedFilter } : {},
@@ -86,17 +87,15 @@ const FraudDetectionDashboardScreen: React.FC = () => {
         50
       );
       setAlerts(alertsData);
-      
+
       // Get statistics based on time range
       const timeRangeMs = {
         day: 24 * 60 * 60 * 1000,
         week: 7 * 24 * 60 * 60 * 1000,
-        month: 30 * 24 * 60 * 60 * 1000
+        month: 30 * 24 * 60 * 60 * 1000,
       }[selectedTimeRange];
-      
-      const statsData = await fraudDetectionService.getStatistics(
-        Date.now() - timeRangeMs
-      );
+
+      const statsData = await fraudDetectionService.getStatistics(Date.now() - timeRangeMs);
       setStats(statsData);
     } catch (error) {
       console.error('Error loading fraud detection data:', error);
@@ -114,22 +113,22 @@ const FraudDetectionDashboardScreen: React.FC = () => {
       if (unsubscribe) {
         unsubscribe();
       }
-      
+
       // Set up new listener
       const newUnsubscribe = fraudDetectionService.listenForAlerts(
-        (newAlerts) => {
+        newAlerts => {
           setAlerts(newAlerts);
           // Refresh stats if we get new alerts
           loadData();
         },
         selectedFilter !== 'all' ? { severity: selectedFilter } : {}
       );
-      
+
       setUnsubscribe(newUnsubscribe);
     };
-    
+
     setupListener();
-    
+
     // Clean up listener on unmount
     return () => {
       if (unsubscribe) {
@@ -165,12 +164,10 @@ const FraudDetectionDashboardScreen: React.FC = () => {
   // Render alert severity badge
   const renderSeverityBadge = (severity: AlertSeverity) => {
     const backgroundColor = severityColors[severity];
-    
+
     return (
       <View style={[styles.severityBadge, { backgroundColor }]}>
-        <Text style={styles.severityText}>
-          {severity.toUpperCase()}
-        </Text>
+        <Text style={styles.severityText}>{severity.toUpperCase()}</Text>
       </View>
     );
   };
@@ -182,27 +179,21 @@ const FraudDetectionDashboardScreen: React.FC = () => {
         styles.alertCard,
         {
           backgroundColor: cardBackgroundColor,
-          borderColor: cardBorderColor
-        }
+          borderColor: cardBorderColor,
+        },
       ]}
       onPress={() => navigateToAlertDetails(item.id)}
     >
       <View style={styles.alertHeader}>
         <View style={styles.alertHeaderLeft}>
           {renderSeverityBadge(item.severity)}
-          <ThemedText style={styles.alertType}>
-            {item.patternType.replace(/_/g, ' ')}
-          </ThemedText>
+          <ThemedText style={styles.alertType}>{item.patternType.replace(/_/g, ' ')}</ThemedText>
         </View>
-        <ThemedText style={styles.alertTimestamp}>
-          {formatTimestamp(item.timestamp)}
-        </ThemedText>
+        <ThemedText style={styles.alertTimestamp}>{formatTimestamp(item.timestamp)}</ThemedText>
       </View>
-      
-      <ThemedText style={styles.alertDescription}>
-        {item.description}
-      </ThemedText>
-      
+
+      <ThemedText style={styles.alertDescription}>{item.description}</ThemedText>
+
       <View style={styles.alertFooter}>
         <View style={styles.alertStatus}>
           <View
@@ -213,23 +204,19 @@ const FraudDetectionDashboardScreen: React.FC = () => {
                   item.status === AlertStatus.NEW
                     ? '#2196F3'
                     : item.status === AlertStatus.INVESTIGATING
-                    ? '#FFC107'
-                    : item.status === AlertStatus.RESOLVED
-                    ? '#4CAF50'
-                    : item.status === AlertStatus.CONFIRMED
-                    ? '#9C27B0'
-                    : '#757575'
-              }
+                      ? '#FFC107'
+                      : item.status === AlertStatus.RESOLVED
+                        ? '#4CAF50'
+                        : item.status === AlertStatus.CONFIRMED
+                          ? '#9C27B0'
+                          : '#757575',
+              },
             ]}
           />
-          <ThemedText style={styles.statusText}>
-            {item.status.replace(/_/g, ' ')}
-          </ThemedText>
+          <ThemedText style={styles.statusText}>{item.status.replace(/_/g, ' ')}</ThemedText>
         </View>
-        
-        <ThemedText style={styles.alertUser}>
-          {item.username || item.userId}
-        </ThemedText>
+
+        <ThemedText style={styles.alertUser}>{item.username || item.userId}</ThemedText>
       </View>
     </TouchableOpacity>
   );
@@ -241,27 +228,24 @@ const FraudDetectionDashboardScreen: React.FC = () => {
       AlertSeverity.CRITICAL,
       AlertSeverity.HIGH,
       AlertSeverity.MEDIUM,
-      AlertSeverity.LOW
+      AlertSeverity.LOW,
     ];
-    
+
     return (
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterContainer}
       >
-        {filters.map((filter) => (
+        {filters.map(filter => (
           <TouchableOpacity
             key={filter}
             style={[
               styles.filterButton,
               {
-                backgroundColor:
-                  selectedFilter === filter
-                    ? primaryColor
-                    : 'transparent',
-                borderColor: primaryColor
-              }
+                backgroundColor: selectedFilter === filter ? primaryColor : 'transparent',
+                borderColor: primaryColor,
+              },
             ]}
             onPress={() => setSelectedFilter(filter)}
           >
@@ -269,11 +253,8 @@ const FraudDetectionDashboardScreen: React.FC = () => {
               style={[
                 styles.filterButtonText,
                 {
-                  color:
-                    selectedFilter === filter
-                      ? '#FFFFFF'
-                      : primaryColor
-                }
+                  color: selectedFilter === filter ? '#FFFFFF' : primaryColor,
+                },
               ]}
             >
               {filter === 'all' ? 'All' : filter.toUpperCase()}
@@ -289,23 +270,20 @@ const FraudDetectionDashboardScreen: React.FC = () => {
     const timeRanges: { value: 'day' | 'week' | 'month'; label: string }[] = [
       { value: 'day', label: 'Last 24 Hours' },
       { value: 'week', label: 'Last 7 Days' },
-      { value: 'month', label: 'Last 30 Days' }
+      { value: 'month', label: 'Last 30 Days' },
     ];
-    
+
     return (
       <View style={styles.timeRangeContainer}>
-        {timeRanges.map((range) => (
+        {timeRanges.map(range => (
           <TouchableOpacity
             key={range.value}
             style={[
               styles.timeRangeButton,
               {
-                backgroundColor:
-                  selectedTimeRange === range.value
-                    ? accentColor
-                    : 'transparent',
-                borderColor: accentColor
-              }
+                backgroundColor: selectedTimeRange === range.value ? accentColor : 'transparent',
+                borderColor: accentColor,
+              },
             ]}
             onPress={() => setSelectedTimeRange(range.value)}
           >
@@ -313,11 +291,8 @@ const FraudDetectionDashboardScreen: React.FC = () => {
               style={[
                 styles.timeRangeButtonText,
                 {
-                  color:
-                    selectedTimeRange === range.value
-                      ? '#FFFFFF'
-                      : accentColor
-                }
+                  color: selectedTimeRange === range.value ? '#FFFFFF' : accentColor,
+                },
               ]}
             >
               {range.label}
@@ -331,31 +306,31 @@ const FraudDetectionDashboardScreen: React.FC = () => {
   // Render statistics cards
   const renderStatisticsCards = () => {
     if (!stats) return null;
-    
+
     const cards = [
       {
         title: 'Total Alerts',
         value: stats.totalAlerts.toString(),
-        icon: 'alert-circle'
+        icon: 'alert-circle',
       },
       {
         title: 'Critical Alerts',
         value: stats.alertsBySeverity[AlertSeverity.CRITICAL].toString(),
         icon: 'warning',
-        color: severityColors[AlertSeverity.CRITICAL]
+        color: severityColors[AlertSeverity.CRITICAL],
       },
       {
         title: 'False Positive Rate',
         value: `${stats.falsePositiveRate.toFixed(1)}%`,
-        icon: 'analytics'
+        icon: 'analytics',
       },
       {
         title: 'Avg. Resolution Time',
         value: `${stats.averageResolutionTime.toFixed(1)} hrs`,
-        icon: 'time'
-      }
+        icon: 'time',
+      },
     ];
-    
+
     return (
       <View style={styles.statsCardsContainer}>
         {cards.map((card, index) => (
@@ -365,17 +340,13 @@ const FraudDetectionDashboardScreen: React.FC = () => {
               styles.statsCard,
               {
                 backgroundColor: cardBackgroundColor,
-                borderColor: cardBorderColor
-              }
+                borderColor: cardBorderColor,
+              },
             ]}
           >
             <View style={styles.statsCardHeader}>
               <ThemedText style={styles.statsCardTitle}>{card.title}</ThemedText>
-              <Ionicons
-                name={card.icon as any}
-                size={24}
-                color={card.color || primaryColor}
-              />
+              <Ionicons name={card.icon as any} size={24} color={card.color || primaryColor} />
             </View>
             <ThemedText style={styles.statsCardValue}>{card.value}</ThemedText>
           </View>
@@ -387,67 +358,63 @@ const FraudDetectionDashboardScreen: React.FC = () => {
   // Render alert distribution chart
   const renderAlertDistributionChart = () => {
     if (!stats) return null;
-    
+
     const data = [
       {
         label: 'Unusual Betting',
         value: stats.alertsByType[FraudPatternType.UNUSUAL_BETTING_PATTERN],
-        color: '#4285F4'
+        color: '#4285F4',
       },
       {
         label: 'Multiple Accounts',
         value: stats.alertsByType[FraudPatternType.MULTIPLE_ACCOUNTS],
-        color: '#EA4335'
+        color: '#EA4335',
       },
       {
         label: 'Account Switching',
         value: stats.alertsByType[FraudPatternType.RAPID_ACCOUNT_SWITCHING],
-        color: '#FBBC05'
+        color: '#FBBC05',
       },
       {
         label: 'Suspicious Location',
         value: stats.alertsByType[FraudPatternType.SUSPICIOUS_LOCATION],
-        color: '#34A853'
+        color: '#34A853',
       },
       {
         label: 'Odds Manipulation',
         value: stats.alertsByType[FraudPatternType.ODDS_MANIPULATION_ATTEMPT],
-        color: '#9C27B0'
+        color: '#9C27B0',
       },
       {
         label: 'Automated Betting',
         value: stats.alertsByType[FraudPatternType.AUTOMATED_BETTING],
-        color: '#FF9800'
+        color: '#FF9800',
       },
       {
         label: 'Payment Anomaly',
         value: stats.alertsByType[FraudPatternType.PAYMENT_ANOMALY],
-        color: '#00BCD4'
+        color: '#00BCD4',
       },
       {
         label: 'Account Takeover',
         value: stats.alertsByType[FraudPatternType.ACCOUNT_TAKEOVER],
-        color: '#FF5722'
-      }
+        color: '#FF5722',
+      },
     ];
-    
+
     return (
       <View
         style={[
           styles.chartCard,
           {
             backgroundColor: cardBackgroundColor,
-            borderColor: cardBorderColor
-          }
+            borderColor: cardBorderColor,
+          },
         ]}
       >
         <ThemedText style={styles.chartTitle}>Alert Distribution by Type</ThemedText>
         <View style={{ height: 200 }}>
-          <BubbleChart
-            data={data}
-            title="Fraud alert distribution by type"
-            animated={true}
-          />
+          <BubbleChart data={data} title="Fraud alert distribution by type" animated />
         </View>
       </View>
     );
@@ -456,23 +423,23 @@ const FraudDetectionDashboardScreen: React.FC = () => {
   // Render alert activity heatmap
   const renderAlertActivityHeatmap = () => {
     if (!stats || !stats.alertsOverTime.length) return null;
-    
+
     // Convert alertsOverTime to heatmap data format
     const heatmapData: { [date: string]: number } = {};
-    
+
     stats.alertsOverTime.forEach(item => {
       const dateStr = new Date(item.timestamp).toISOString().split('T')[0];
       heatmapData[dateStr] = item.count;
     });
-    
+
     return (
       <View
         style={[
           styles.chartCard,
           {
             backgroundColor: cardBackgroundColor,
-            borderColor: cardBorderColor
-          }
+            borderColor: cardBorderColor,
+          },
         ]}
       >
         <ThemedText style={styles.chartTitle}>Alert Activity Over Time</ThemedText>
@@ -503,30 +470,28 @@ const FraudDetectionDashboardScreen: React.FC = () => {
         <ThemedText style={styles.title}>Fraud Detection</ThemedText>
         <ThemedText style={styles.subtitle}>Admin Dashboard</ThemedText>
       </View>
-      
+
       <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Filter buttons */}
         {renderFilterButtons()}
-        
+
         {/* Time range selector */}
         {renderTimeRangeButtons()}
-        
+
         {/* Statistics cards */}
         {renderStatisticsCards()}
-        
+
         {/* Charts */}
         {renderAlertDistributionChart()}
         {renderAlertActivityHeatmap()}
-        
+
         {/* Recent alerts */}
         <View style={styles.alertsSection}>
           <ThemedText style={styles.sectionTitle}>Recent Alerts</ThemedText>
-          
+
           {alerts.length === 0 ? (
             <ThemedView style={styles.emptyState}>
               <Ionicons name="alert-circle-outline" size={48} color={textColor} />
@@ -538,7 +503,7 @@ const FraudDetectionDashboardScreen: React.FC = () => {
             <FlatList
               data={alerts}
               renderItem={renderAlertItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={item => item.id}
               scrollEnabled={false}
               contentContainerStyle={styles.alertsList}
             />

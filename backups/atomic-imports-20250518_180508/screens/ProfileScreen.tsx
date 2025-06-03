@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { getAuth, User, onAuthStateChanged, signOut } from 'firebase/auth'; // Import getAuth and necessary functions
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -5,16 +8,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { getAuth, User, onAuthStateChanged, signOut } from 'firebase/auth'; // Import getAuth and necessary functions
-import { getUserSubscription, SubscriptionPlan } from '../services/firebaseSubscriptionService';
-import { ThemedText, ThemedView } from '../components/ThemedComponents'
-import { ThemedView } from '../atomic/atoms/ThemedView'
+
 import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { ThemedText, ThemedView } from '../components/ThemedComponents';
 import { Colors } from '../constants/Colors'; // Import base Colors
+import { getUserSubscription, SubscriptionPlan } from '../services/firebaseSubscriptionService';
 
 // Define subscription type (remains the same)
 interface Subscription {
@@ -37,7 +38,8 @@ const ProfileScreen = () => {
 
   // Auth listener and subscription loading
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => { // Use imported onAuthStateChanged
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      // Use imported onAuthStateChanged
       setUser(user);
       if (user) {
         loadSubscription(user.uid);
@@ -76,7 +78,8 @@ const ProfileScreen = () => {
     if (!user) return null;
 
     const getInitial = () => {
-      if (user.displayName && user.displayName.length > 0) return user.displayName.charAt(0).toUpperCase();
+      if (user.displayName && user.displayName.length > 0)
+        return user.displayName.charAt(0).toUpperCase();
       if (user.email && user.email.length > 0) return user.email.charAt(0).toUpperCase();
       return '?';
     };
@@ -86,24 +89,26 @@ const ProfileScreen = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Profile Header */}
         <View style={[styles.profileHeader, { borderBottomColor: colors.border }]}>
-          <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '33' }]}> {/* Use primary accent with opacity */}
+          <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '33' }]}>
+            {' '}
+            {/* Use primary accent with opacity */}
             <ThemedText style={[styles.avatarText, { color: colors.primary }]}>
               {getInitial()}
             </ThemedText>
           </View>
-          <ThemedText style={styles.userName}>
-            {displayName}
-          </ThemedText>
-          <ThemedText style={styles.userEmail}>
-            {user.email || 'No email provided'}
-          </ThemedText>
+          <ThemedText style={styles.userName}>{displayName}</ThemedText>
+          <ThemedText style={styles.userEmail}>{user.email || 'No email provided'}</ThemedText>
         </View>
 
         {/* Subscription Section */}
         <View style={[styles.sectionContainer, { borderBottomColor: colors.border }]}>
           <ThemedText style={styles.sectionTitle}>Subscription</ThemedText>
           {loading ? (
-            <ActivityIndicator size="small" color={colors.primary} style={styles.loadingIndicator} />
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              style={styles.loadingIndicator}
+            />
           ) : subscription ? (
             <View style={styles.subscriptionInfo}>
               <ThemedText style={styles.planName}>
@@ -150,7 +155,12 @@ const ProfileScreen = () => {
             style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('Settings' as never)}
           >
-            <Ionicons name="settings-outline" size={22} color={colors.text} style={styles.menuIcon} />
+            <Ionicons
+              name="settings-outline"
+              size={22}
+              color={colors.text}
+              style={styles.menuIcon}
+            />
             <ThemedText style={styles.menuItemText}>Settings</ThemedText>
             <Ionicons name="chevron-forward" size={22} color={colors.icon} />
           </TouchableOpacity>
@@ -159,8 +169,16 @@ const ProfileScreen = () => {
             style={[styles.menuItem, { borderBottomWidth: 0 }]} // No border on last item
             onPress={handleSignOut}
           >
-            <Ionicons name="log-out-outline" size={22} color={colors.notification} style={styles.menuIcon} /> {/* Use notification color for sign out */}
-            <ThemedText style={[styles.menuItemText, { color: colors.notification }]}>Sign Out</ThemedText>
+            <Ionicons
+              name="log-out-outline"
+              size={22}
+              color={colors.notification}
+              style={styles.menuIcon}
+            />{' '}
+            {/* Use notification color for sign out */}
+            <ThemedText style={[styles.menuItemText, { color: colors.notification }]}>
+              Sign Out
+            </ThemedText>
             <Ionicons name="chevron-forward" size={22} color={colors.icon} />
           </TouchableOpacity>
         </View>
@@ -172,10 +190,9 @@ const ProfileScreen = () => {
   const renderUnauthenticatedContent = () => {
     return (
       <View style={styles.unauthenticatedContainer}>
-        <Ionicons name="person-circle-outline" size={80} color={colors.icon} /> {/* Use icon color */}
-        <ThemedText style={styles.unauthenticatedTitle}>
-          Sign in to access your profile
-        </ThemedText>
+        <Ionicons name="person-circle-outline" size={80} color={colors.icon} />{' '}
+        {/* Use icon color */}
+        <ThemedText style={styles.unauthenticatedTitle}>Sign in to access your profile</ThemedText>
         <ThemedText style={styles.unauthenticatedSubtitle}>
           Create an account to track your predictions, access premium features, and more.
         </ThemedText>

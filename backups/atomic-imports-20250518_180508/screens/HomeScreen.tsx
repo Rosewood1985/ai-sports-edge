@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,16 +9,15 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedText, ThemedView } from '../components/ThemedComponents'
-import { ThemedView } from '../atomic/atoms/ThemedView'
+
 import { ThemedText } from '../atomic/atoms/ThemedText'; // Removed ThemedCard as we'll style directly
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import LanguageSelector from '../components/LanguageSelector';
+import { ThemedText, ThemedView } from '../components/ThemedComponents';
 import { Colors } from '../constants/Colors'; // Import base Colors
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Mock data (remains the same)
 const FEATURED_GAMES = [
@@ -26,17 +27,17 @@ const FEATURED_GAMES = [
       id: 'team1',
       name: 'Lakers',
       logo: '🏀',
-      score: 105
+      score: 105,
     },
     awayTeam: {
       id: 'team2',
       name: 'Warriors',
       logo: '🏀',
-      score: 98
+      score: 98,
     },
     status: 'completed',
     date: new Date(2025, 2, 20, 19, 30),
-    venue: 'Staples Center'
+    venue: 'Staples Center',
   },
   {
     id: 'game2',
@@ -44,17 +45,17 @@ const FEATURED_GAMES = [
       id: 'team3',
       name: 'Celtics',
       logo: '🏀',
-      score: 0
+      score: 0,
     },
     awayTeam: {
       id: 'team4',
       name: 'Nets',
       logo: '🏀',
-      score: 0
+      score: 0,
     },
     status: 'upcoming',
     date: new Date(2025, 3, 25, 20, 0),
-    venue: 'TD Garden'
+    venue: 'TD Garden',
   },
   {
     id: 'game3',
@@ -62,40 +63,40 @@ const FEATURED_GAMES = [
       id: 'team5',
       name: 'Heat',
       logo: '🏀',
-      score: 87
+      score: 87,
     },
     awayTeam: {
       id: 'team6',
       name: 'Bulls',
       logo: '🏀',
-      score: 92
+      score: 92,
     },
     status: 'live',
     date: new Date(),
     venue: 'American Airlines Arena',
     quarter: 4,
-    timeRemaining: '3:45'
-  }
+    timeRemaining: '3:45',
+  },
 ];
 const TRENDING_TOPICS = [
   {
     id: 'trend1',
     title: 'LeBron James breaks scoring record',
     image: '🏆',
-    category: 'news'
+    category: 'news',
   },
   {
     id: 'trend2',
     title: 'Warriors on 10-game winning streak',
     image: '🔥',
-    category: 'stats'
+    category: 'stats',
   },
   {
     id: 'trend3',
     title: 'Top 5 rookies to watch this season',
     image: '👀',
-    category: 'analysis'
-  }
+    category: 'analysis',
+  },
 ];
 
 const HomeScreen = () => {
@@ -130,12 +131,12 @@ const HomeScreen = () => {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // Render featured game item
-  const renderFeaturedGameItem = ({ item }: { item: typeof FEATURED_GAMES[0] }) => {
+  const renderFeaturedGameItem = ({ item }: { item: (typeof FEATURED_GAMES)[0] }) => {
     return (
       <TouchableOpacity
         style={[styles.cardBase, styles.gameCard, { backgroundColor: colors.card }]} // Use theme card color
@@ -157,7 +158,9 @@ const HomeScreen = () => {
           {/* Home Team */}
           <View style={styles.teamContainer}>
             <ThemedText style={styles.teamLogo}>{item.homeTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName} numberOfLines={1}>{item.homeTeam.name}</ThemedText>
+            <ThemedText style={styles.teamName} numberOfLines={1}>
+              {item.homeTeam.name}
+            </ThemedText>
             <ThemedText style={styles.teamScore}>
               {item.status !== 'upcoming' ? item.homeTeam.score : '-'}
             </ThemedText>
@@ -171,16 +174,16 @@ const HomeScreen = () => {
                 <ThemedText style={styles.timeRemainingText}>{item.timeRemaining}</ThemedText>
               </View>
             ) : (
-              <ThemedText style={styles.gameDateText}>
-                {formatDate(item.date)}
-              </ThemedText>
+              <ThemedText style={styles.gameDateText}>{formatDate(item.date)}</ThemedText>
             )}
           </View>
 
           {/* Away Team */}
           <View style={styles.teamContainer}>
             <ThemedText style={styles.teamLogo}>{item.awayTeam.logo}</ThemedText>
-            <ThemedText style={styles.teamName} numberOfLines={1}>{item.awayTeam.name}</ThemedText>
+            <ThemedText style={styles.teamName} numberOfLines={1}>
+              {item.awayTeam.name}
+            </ThemedText>
             <ThemedText style={styles.teamScore}>
               {item.status !== 'upcoming' ? item.awayTeam.score : '-'}
             </ThemedText>
@@ -191,7 +194,7 @@ const HomeScreen = () => {
   };
 
   // Render trending topic item
-  const renderTrendingTopicItem = ({ item }: { item: typeof TRENDING_TOPICS[0] }) => {
+  const renderTrendingTopicItem = ({ item }: { item: (typeof TRENDING_TOPICS)[0] }) => {
     return (
       <TouchableOpacity
         style={[styles.cardBase, styles.trendingCard, { backgroundColor: colors.card }]} // Use theme card color
@@ -200,8 +203,12 @@ const HomeScreen = () => {
         }}
       >
         <ThemedText style={styles.trendingEmoji}>{item.image}</ThemedText>
-        <ThemedText style={styles.trendingTitle} numberOfLines={2}>{item.title}</ThemedText>
-        <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '33' }]}> {/* Use primary accent with opacity */}
+        <ThemedText style={styles.trendingTitle} numberOfLines={2}>
+          {item.title}
+        </ThemedText>
+        <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '33' }]}>
+          {' '}
+          {/* Use primary accent with opacity */}
           <ThemedText style={[styles.categoryText, { color: colors.primary }]}>
             {item.category.toUpperCase()}
           </ThemedText>
@@ -256,7 +263,7 @@ const HomeScreen = () => {
           <FlatList
             data={featuredGames}
             renderItem={renderFeaturedGameItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalListContent} // Use shared style
@@ -271,7 +278,7 @@ const HomeScreen = () => {
           <FlatList
             data={trendingTopics}
             renderItem={renderTrendingTopicItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalListContent} // Use shared style
@@ -483,7 +490,7 @@ const styles = StyleSheet.create({
     fontSize: 10, // Smaller category text
     fontWeight: 'bold',
     // Color is set dynamically using theme
-  }
+  },
 });
 
 export default HomeScreen;

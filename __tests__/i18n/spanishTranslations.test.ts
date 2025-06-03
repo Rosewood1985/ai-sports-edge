@@ -1,4 +1,5 @@
 import { I18nManager } from 'react-native';
+
 import en from '../../translations/en.json';
 import es from '../../translations/es.json';
 
@@ -20,26 +21,26 @@ describe('Spanish Translations', () => {
     function checkKeysExist(enObj: any, esObj: any, path = '') {
       for (const key in enObj) {
         const currentPath = path ? `${path}.${key}` : key;
-        
+
         // Check if the key exists in Spanish translations
         expect(esObj).toHaveProperty(key);
-        
+
         // If the value is an object, recursively check its keys
         if (typeof enObj[key] === 'object' && enObj[key] !== null && !Array.isArray(enObj[key])) {
           checkKeysExist(enObj[key], esObj[key], currentPath);
         }
       }
     }
-    
+
     checkKeysExist(en, es);
   });
-  
+
   it('should not have empty translations in Spanish', () => {
     // Recursively check that no Spanish translations are empty
     function checkNotEmpty(obj: any, path = '') {
       for (const key in obj) {
         const currentPath = path ? `${path}.${key}` : key;
-        
+
         if (typeof obj[key] === 'string') {
           const value = obj[key].trim();
           expect(value.length).toBeGreaterThan(0);
@@ -48,15 +49,15 @@ describe('Spanish Translations', () => {
         }
       }
     }
-    
+
     checkNotEmpty(es);
   });
-  
+
   it('should have weather-related translations', () => {
     // Check that weather section exists in both languages
     expect(en).toHaveProperty('weather');
     expect(es).toHaveProperty('weather');
-    
+
     // Check specific weather keys
     const weatherKeys = [
       'loading',
@@ -68,32 +69,33 @@ describe('Spanish Translations', () => {
       'wind',
       'impact',
       'noData',
-      'confidence'
+      'confidence',
     ] as const;
-    
+
     weatherKeys.forEach(key => {
       expect(en.weather).toHaveProperty(key);
       expect(es.weather).toHaveProperty(key);
       // Use type assertion to avoid TypeScript error
       const weatherKey = key as keyof typeof es.weather;
-      if (weatherKey !== 'impact') { // Skip 'impact' as it's an object
+      if (weatherKey !== 'impact') {
+        // Skip 'impact' as it's an object
         expect(typeof es.weather[weatherKey]).toBe('string');
         expect(es.weather[weatherKey].length).toBeGreaterThan(0);
       }
     });
-    
+
     // Check impact levels
     expect(en.weather).toHaveProperty('impact');
     expect(es.weather).toHaveProperty('impact');
-    
+
     const impactLevels = [
       'strongNegative',
       'slightNegative',
       'neutral',
       'slightPositive',
-      'strongPositive'
+      'strongPositive',
     ] as const;
-    
+
     impactLevels.forEach(level => {
       expect(en.weather.impact).toHaveProperty(level);
       expect(es.weather.impact).toHaveProperty(level);

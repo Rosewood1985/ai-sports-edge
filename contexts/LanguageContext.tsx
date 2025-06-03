@@ -1,8 +1,8 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { I18nManager } from 'react-native';
 import * as Localization from 'expo-localization';
 import i18n from 'i18n-js';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { I18nManager } from 'react-native';
 
 // Define a more accurate type for i18n that matches how we're using it
 // This is necessary because the TypeScript definitions from the library don't match our usage
@@ -34,7 +34,7 @@ const loadTranslations = async (languageCode: string): Promise<any> => {
     console.log(`LanguageContext: Translations for ${languageCode} already loaded`);
     return i18nExt.translations[languageCode];
   }
-  
+
   try {
     // Dynamically import the translation file
     console.log(`LanguageContext: Dynamically importing translations for ${languageCode}`);
@@ -47,10 +47,12 @@ const loadTranslations = async (languageCode: string): Promise<any> => {
         translations = (await import('../translations/es.json')).default;
         break;
       default:
-        console.log(`LanguageContext: Unknown language code ${languageCode}, falling back to English`);
+        console.log(
+          `LanguageContext: Unknown language code ${languageCode}, falling back to English`
+        );
         translations = (await import('../translations/en.json')).default;
     }
-    
+
     // Cache the translations
     console.log(`LanguageContext: Caching translations for ${languageCode}`);
     i18nExt.translations[languageCode] = translations;
@@ -104,7 +106,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         // Start performance measurement
         const startTime = Date.now();
-        
+
         // Try to get stored language preference
         console.log('LanguageContext: Retrieving stored language preference');
         let storedLanguage;
@@ -115,9 +117,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           console.error('LanguageContext: Error accessing AsyncStorage:', storageError);
           storedLanguage = null;
         }
-        
+
         let languageToUse: string;
-        
+
         if (storedLanguage && LANGUAGES[storedLanguage as keyof typeof LANGUAGES]) {
           // Use stored preference if available
           languageToUse = storedLanguage;
@@ -127,17 +129,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           console.log(`LanguageContext: No valid stored preference, checking device locale`);
           const deviceLocale = Localization.locale.split('-')[0];
           console.log(`LanguageContext: Device locale is: ${deviceLocale}`);
-          
-          languageToUse = LANGUAGES[deviceLocale as keyof typeof LANGUAGES]
-            ? deviceLocale
-            : 'en';
+
+          languageToUse = LANGUAGES[deviceLocale as keyof typeof LANGUAGES] ? deviceLocale : 'en';
           console.log(`LanguageContext: Selected language to use: ${languageToUse}`);
         }
-        
+
         // Set the language
         console.log(`LanguageContext: Changing language to: ${languageToUse}`);
         await changeLanguage(languageToUse);
-        
+
         // Log performance metrics in development
         if (__DEV__) {
           const endTime = Date.now();
@@ -150,7 +150,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         try {
           await changeLanguage('en');
         } catch (fallbackError) {
-          console.error('LanguageContext: Critical error - even fallback to English failed:', fallbackError);
+          console.error(
+            'LanguageContext: Critical error - even fallback to English failed:',
+            fallbackError
+          );
         }
       }
     };
@@ -182,7 +185,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (I18nManager.isRTL !== isRightToLeft) {
         console.log(`LanguageContext: Updating RTL setting to ${isRightToLeft}`);
         I18nManager.forceRTL(isRightToLeft);
-        console.log('LanguageContext: RTL setting updated. Note: App reload may be needed for full effect');
+        console.log(
+          'LanguageContext: RTL setting updated. Note: App reload may be needed for full effect'
+        );
         // Note: In a real app, you might want to reload the app here
         // to ensure RTL changes take effect properly
       }
@@ -194,11 +199,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Update state
       console.log(`LanguageContext: Updating language state to ${languageCode}`);
       setLanguageState(languageCode);
-      
+
       // Log performance metrics in development
       if (__DEV__) {
         console.log(`LanguageContext: Language changed to ${languageCode}`);
-        console.log(`LanguageContext: Translation object size: ${JSON.stringify(i18nExt.translations[languageCode]).length} bytes`);
+        console.log(
+          `LanguageContext: Translation object size: ${JSON.stringify(i18nExt.translations[languageCode]).length} bytes`
+        );
       }
     } catch (error) {
       console.error('Error changing language:', error);
@@ -220,11 +227,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     availableLanguages: LANGUAGES,
   };
 
-  return (
-    <LanguageContext.Provider value={contextValue}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  return <LanguageContext.Provider value={contextValue}>{children}</LanguageContext.Provider>;
 };
 
 export default LanguageContext;

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform } from 'react-native';
+
 import {
   shouldEnableComplexAnimations,
   getOptimizedDuration,
-  AnimationType
+  AnimationType,
 } from '../utils/animationOptimizer';
 
 /**
@@ -11,56 +12,55 @@ import {
  * @param options Animation options
  * @returns Animation value and control functions
  */
-export const useOptimizedFade = (options: {
-  initialValue?: number;
-  toValue?: number;
-  duration?: number;
-  easing?: typeof Easing.linear;
-} = {}) => {
+export const useOptimizedFade = (
+  options: {
+    initialValue?: number;
+    toValue?: number;
+    duration?: number;
+    easing?: typeof Easing.linear;
+  } = {}
+) => {
   const {
     initialValue = 0,
     toValue = 1,
     duration = 300,
-    easing = Easing.inOut(Easing.ease)
+    easing = Easing.inOut(Easing.ease),
   } = options;
-  
+
   // Create animation value
   const fadeAnim = useRef(new Animated.Value(initialValue)).current;
-  
+
   // Get optimized duration based on device performance
-  const optimizedDuration = getOptimizedDuration(
-    duration,
-    AnimationType.FADE
-  );
-  
+  const optimizedDuration = getOptimizedDuration(duration, AnimationType.FADE);
+
   // Start fade animation
   const startFade = (callback?: () => void) => {
     Animated.timing(fadeAnim, {
       toValue,
       duration: optimizedDuration,
       easing,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(({ finished }) => {
       if (finished && callback) {
         callback();
       }
     });
   };
-  
+
   // Reset fade animation
   const resetFade = (callback?: () => void) => {
     Animated.timing(fadeAnim, {
       toValue: initialValue,
       duration: optimizedDuration / 2, // Reset faster
       easing,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(({ finished }) => {
       if (finished && callback) {
         callback();
       }
     });
   };
-  
+
   return { fadeAnim, startFade, resetFade };
 };
 
@@ -69,56 +69,55 @@ export const useOptimizedFade = (options: {
  * @param options Animation options
  * @returns Animation value and control functions
  */
-export const useOptimizedScale = (options: {
-  initialValue?: number;
-  toValue?: number;
-  duration?: number;
-  easing?: typeof Easing.linear;
-} = {}) => {
+export const useOptimizedScale = (
+  options: {
+    initialValue?: number;
+    toValue?: number;
+    duration?: number;
+    easing?: typeof Easing.linear;
+  } = {}
+) => {
   const {
     initialValue = 1,
     toValue = 1.1,
     duration = 300,
-    easing = Easing.inOut(Easing.ease)
+    easing = Easing.inOut(Easing.ease),
   } = options;
-  
+
   // Create animation value
   const scaleAnim = useRef(new Animated.Value(initialValue)).current;
-  
+
   // Get optimized duration based on device performance
-  const optimizedDuration = getOptimizedDuration(
-    duration,
-    AnimationType.SCALE
-  );
-  
+  const optimizedDuration = getOptimizedDuration(duration, AnimationType.SCALE);
+
   // Start scale animation
   const startScale = (callback?: () => void) => {
     Animated.timing(scaleAnim, {
       toValue,
       duration: optimizedDuration,
       easing,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(({ finished }) => {
       if (finished && callback) {
         callback();
       }
     });
   };
-  
+
   // Reset scale animation
   const resetScale = (callback?: () => void) => {
     Animated.timing(scaleAnim, {
       toValue: initialValue,
       duration: optimizedDuration / 2, // Reset faster
       easing,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(({ finished }) => {
       if (finished && callback) {
         callback();
       }
     });
   };
-  
+
   return { scaleAnim, startScale, resetScale };
 };
 
@@ -138,27 +137,24 @@ export const useOptimizedSlide = (
 ) => {
   // Create animation value
   const slideAnim = useRef(new Animated.Value(initialValue)).current;
-  
+
   // Get optimized duration based on device performance
-  const optimizedDuration = getOptimizedDuration(
-    duration,
-    AnimationType.SLIDE
-  );
-  
+  const optimizedDuration = getOptimizedDuration(duration, AnimationType.SLIDE);
+
   // Start slide animation
   const startSlide = (callback?: () => void) => {
     Animated.timing(slideAnim, {
       toValue,
       duration: optimizedDuration,
       easing,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(({ finished }) => {
       if (finished && callback) {
         callback();
       }
     });
   };
-  
+
   return { slideAnim, startSlide };
 };
 
@@ -167,29 +163,27 @@ export const useOptimizedSlide = (
  * @param animations Array of animation start functions
  * @returns Function to start the sequence
  */
-export const useOptimizedSequence = (
-  animations: Array<(callback?: () => void) => void>
-) => {
+export const useOptimizedSequence = (animations: ((callback?: () => void) => void)[]) => {
   // Start sequence of animations
   const startSequence = () => {
     if (animations.length === 0) return;
-    
+
     let currentIndex = 0;
-    
+
     const runNextAnimation = () => {
       if (currentIndex >= animations.length) return;
-      
+
       const currentAnimation = animations[currentIndex];
       currentIndex++;
-      
+
       currentAnimation(() => {
         runNextAnimation();
       });
     };
-    
+
     runNextAnimation();
   };
-  
+
   return { startSequence };
 };
 
@@ -207,22 +201,22 @@ export const useOptimizedLoop = (
 ) => {
   const iterationCount = useRef(0);
   const isRunning = useRef(false);
-  
+
   // Start loop animation
   const startLoop = () => {
     if (isRunning.current) return;
-    
+
     isRunning.current = true;
     iterationCount.current = 0;
-    
+
     const runIteration = () => {
       if (!isRunning.current) return;
-      
+
       if (iterations > 0 && iterationCount.current >= iterations) {
         isRunning.current = false;
         return;
       }
-      
+
       animation(() => {
         resetAnimation(() => {
           iterationCount.current++;
@@ -230,15 +224,15 @@ export const useOptimizedLoop = (
         });
       });
     };
-    
+
     runIteration();
   };
-  
+
   // Stop loop animation
   const stopLoop = () => {
     isRunning.current = false;
   };
-  
+
   return { startLoop, stopLoop };
 };
 
@@ -269,15 +263,11 @@ export const useStaggeredAnimation = (
   staggerDelay: number = 50
 ) => {
   // Create animation values for each item
-  const animations = Array.from({ length: itemCount }, (_, index) => 
-    createAnimation(index)
-  );
-  
+  const animations = Array.from({ length: itemCount }, (_, index) => createAnimation(index));
+
   // Get optimized delay based on device performance
-  const optimizedDelay = Platform.OS === 'ios' ? 
-    staggerDelay : 
-    Math.max(staggerDelay / 2, 25);
-  
+  const optimizedDelay = Platform.OS === 'ios' ? staggerDelay : Math.max(staggerDelay / 2, 25);
+
   // Start staggered animation
   const startStaggered = () => {
     animations.forEach((anim, index) => {
@@ -285,11 +275,11 @@ export const useStaggeredAnimation = (
         Animated.timing(anim, {
           toValue: 1,
           duration: 300,
-          useNativeDriver: true
+          useNativeDriver: true,
         }).start();
       }, index * optimizedDelay);
     });
   };
-  
+
   return { animations, startStaggered };
 };

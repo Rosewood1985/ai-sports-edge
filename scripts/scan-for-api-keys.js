@@ -20,6 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
+
 const { securityManager } = require('../atomic/organisms/security');
 
 // Parse command line arguments

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TextProps, StyleSheet, PixelRatio, Dimensions, TextStyle } from 'react-native';
+
 import { ThemedText, ThemedTextProps } from './ThemedText';
 import {
   responsiveFontSize,

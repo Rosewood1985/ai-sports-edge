@@ -19,12 +19,13 @@ import {
   updateDoc,
   Timestamp,
 } from 'firebase/firestore';
+
+import { ConsentType, ConsentMethod, PrivacyRegion } from '../../atoms/privacy/gdprConfig';
 import {
   ConsentRecord,
   UserConsentRecord,
   PrivacyPreferences,
 } from '../../atoms/privacy/privacyTypes';
-import { ConsentType, ConsentMethod, PrivacyRegion } from '../../atoms/privacy/gdprConfig';
 
 /**
  * Class for managing user consent
@@ -186,8 +187,8 @@ export class ConsentManager {
             data.expiresAt instanceof Timestamp
               ? data.expiresAt.toDate()
               : data.expiresAt
-              ? new Date(data.expiresAt)
-              : undefined,
+                ? new Date(data.expiresAt)
+                : undefined,
         });
       });
 
@@ -242,8 +243,8 @@ export class ConsentManager {
               data.expiresAt instanceof Timestamp
                 ? data.expiresAt.toDate()
                 : data.expiresAt
-                ? new Date(data.expiresAt)
-                : undefined,
+                  ? new Date(data.expiresAt)
+                  : undefined,
           };
         }
       });
@@ -429,7 +430,7 @@ export class ConsentManager {
 
       // Update the user document
       await updateDoc(userDocRef, {
-        region: region,
+        region,
         privacySettingsUpdatedAt: new Date(),
       });
     } catch (error) {

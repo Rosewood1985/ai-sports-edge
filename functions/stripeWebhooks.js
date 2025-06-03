@@ -1,7 +1,7 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const groupSubscriptions = require('./groupSubscriptions');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const groupSubscriptions = require("./groupSubscriptions");
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -21,11 +21,11 @@ if (!admin.apps.length) {
  * - invoice.payment_failed
  */
 exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
-  const signature = req.headers['stripe-signature'];
+  const signature = req.headers["stripe-signature"];
   
   if (!signature) {
-    console.error('No Stripe signature found');
-    return res.status(400).send('Missing Stripe signature');
+    console.error("No Stripe signature found");
+    return res.status(400).send("Missing Stripe signature");
   }
 
   let event;
@@ -38,36 +38,36 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error('Webhook signature verification failed', err);
+    console.error("Webhook signature verification failed", err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   // Handle the event
   try {
     switch (event.type) {
-      case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object);
-        break;
-      case 'payment_intent.payment_failed':
-        await handlePaymentIntentFailed(event.data.object);
-        break;
-      case 'customer.subscription.created':
-        await handleSubscriptionCreated(event.data.object);
-        break;
-      case 'customer.subscription.updated':
-        await handleSubscriptionUpdated(event.data.object);
-        break;
-      case 'customer.subscription.deleted':
-        await handleSubscriptionDeleted(event.data.object);
-        break;
-      case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(event.data.object);
-        break;
-      case 'invoice.payment_failed':
-        await handleInvoicePaymentFailed(event.data.object);
-        break;
-      default:
-        console.log(`Unhandled event type ${event.type}`);
+    case "payment_intent.succeeded":
+      await handlePaymentIntentSucceeded(event.data.object);
+      break;
+    case "payment_intent.payment_failed":
+      await handlePaymentIntentFailed(event.data.object);
+      break;
+    case "customer.subscription.created":
+      await handleSubscriptionCreated(event.data.object);
+      break;
+    case "customer.subscription.updated":
+      await handleSubscriptionUpdated(event.data.object);
+      break;
+    case "customer.subscription.deleted":
+      await handleSubscriptionDeleted(event.data.object);
+      break;
+    case "invoice.payment_succeeded":
+      await handleInvoicePaymentSucceeded(event.data.object);
+      break;
+    case "invoice.payment_failed":
+      await handleInvoicePaymentFailed(event.data.object);
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
     }
 
     // Return a 200 response to acknowledge receipt of the event
@@ -83,10 +83,10 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
  * @param {Object} paymentIntent - Stripe payment intent object
  */
 async function handlePaymentIntentSucceeded(paymentIntent) {
-  console.log('Payment intent succeeded:', paymentIntent.id);
+  console.log("Payment intent succeeded:", paymentIntent.id);
   
   // If this is a one-time payment (not subscription), handle it here
-  if (paymentIntent.metadata && paymentIntent.metadata.type === 'one_time') {
+  if (paymentIntent.metadata && paymentIntent.metadata.type === "one_time") {
     await handleOneTimePayment(paymentIntent);
   }
   
@@ -98,27 +98,27 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
  * @param {Object} paymentIntent - Stripe payment intent object
  */
 async function handlePaymentIntentFailed(paymentIntent) {
-  console.log('Payment intent failed:', paymentIntent.id);
+  console.log("Payment intent failed:", paymentIntent.id);
   
   const db = admin.firestore();
   
   // If this is a one-time payment, update its status
-  if (paymentIntent.metadata && paymentIntent.metadata.type === 'one_time') {
+  if (paymentIntent.metadata && paymentIntent.metadata.type === "one_time") {
     const userId = paymentIntent.metadata.userId;
     const productId = paymentIntent.metadata.productId;
     
     if (userId && productId) {
-      const purchaseRef = db.collection('users').doc(userId)
-        .collection('purchases').doc(paymentIntent.id);
+      const purchaseRef = db.collection("users").doc(userId)
+        .collection("purchases").doc(paymentIntent.id);
       
       await purchaseRef.update({
-        status: 'failed',
-        errorMessage: paymentIntent.last_payment_error?.message || 'Payment failed',
+        status: "failed",
+        errorMessage: paymentIntent.last_payment_error?.message || "Payment failed",
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
       
       // Notify user about failed payment
-      await notifyUserAboutFailedPayment(userId, 'one_time', productId);
+      await notifyUserAboutFailedPayment(userId, "one_time", productId);
     }
   }
   
@@ -130,13 +130,13 @@ async function handlePaymentIntentFailed(paymentIntent) {
  * @param {Object} subscription - Stripe subscription object
  */
 async function handleSubscriptionCreated(subscription) {
-  console.log('Subscription created:', subscription.id);
+  console.log("Subscription created:", subscription.id);
   
   // Check if this is a group subscription
-  if (subscription.metadata && subscription.metadata.type === 'group_subscription') {
+  if (subscription.metadata && subscription.metadata.type === "group_subscription") {
     // Group subscriptions are handled by the createGroupSubscription function
     // This webhook is just for tracking and additional processing
-    console.log('Group subscription created, handled by createGroupSubscription function');
+    console.log("Group subscription created, handled by createGroupSubscription function");
     return;
   }
   
@@ -144,33 +144,33 @@ async function handleSubscriptionCreated(subscription) {
   const customerId = subscription.customer;
   
   // Find the Firebase user associated with this Stripe customer
-  const userSnapshot = await db.collection('users')
-    .where('stripeCustomerId', '==', customerId)
+  const userSnapshot = await db.collection("users")
+    .where("stripeCustomerId", "==", customerId)
     .limit(1)
     .get();
   
   if (userSnapshot.empty) {
-    console.error('No user found for Stripe customer:', customerId);
+    console.error("No user found for Stripe customer:", customerId);
     return;
   }
   
   const userId = userSnapshot.docs[0].id;
-  const userRef = db.collection('users').doc(userId);
+  const userRef = db.collection("users").doc(userId);
   
   // Get the price details
   const priceId = subscription.items.data[0].price.id;
-  const priceSnapshot = await db.collection('products')
-    .where('priceId', '==', priceId)
+  const priceSnapshot = await db.collection("products")
+    .where("priceId", "==", priceId)
     .limit(1)
     .get();
   
-  let planName = 'Premium';
+  let planName = "Premium";
   if (!priceSnapshot.empty) {
     planName = priceSnapshot.docs[0].data().name;
   }
   
   // Store subscription in Firestore
-  await userRef.collection('subscriptions').doc(subscription.id).set({
+  await userRef.collection("subscriptions").doc(subscription.id).set({
     status: subscription.status,
     priceId: priceId,
     planName: planName,
@@ -194,13 +194,13 @@ async function handleSubscriptionCreated(subscription) {
  * @param {Object} subscription - Stripe subscription object
  */
 async function handleSubscriptionUpdated(subscription) {
-  console.log('Subscription updated:', subscription.id);
+  console.log("Subscription updated:", subscription.id);
   
   // Check if this is a group subscription
-  if (subscription.metadata && subscription.metadata.type === 'group_subscription') {
+  if (subscription.metadata && subscription.metadata.type === "group_subscription") {
     // Handle group subscription update
     await groupSubscriptions.handleGroupSubscriptionWebhook({
-      type: 'customer.subscription.updated',
+      type: "customer.subscription.updated",
       data: { object: subscription }
     });
     return;
@@ -210,19 +210,19 @@ async function handleSubscriptionUpdated(subscription) {
   const customerId = subscription.customer;
   
   // Find the Firebase user associated with this Stripe customer
-  const userSnapshot = await db.collection('users')
-    .where('stripeCustomerId', '==', customerId)
+  const userSnapshot = await db.collection("users")
+    .where("stripeCustomerId", "==", customerId)
     .limit(1)
     .get();
   
   if (userSnapshot.empty) {
-    console.error('No user found for Stripe customer:', customerId);
+    console.error("No user found for Stripe customer:", customerId);
     return;
   }
   
   const userId = userSnapshot.docs[0].id;
-  const userRef = db.collection('users').doc(userId);
-  const subscriptionRef = userRef.collection('subscriptions').doc(subscription.id);
+  const userRef = db.collection("users").doc(userId);
+  const subscriptionRef = userRef.collection("subscriptions").doc(subscription.id);
   
   // Update subscription in Firestore
   await subscriptionRef.update({
@@ -245,13 +245,13 @@ async function handleSubscriptionUpdated(subscription) {
  * @param {Object} subscription - Stripe subscription object
  */
 async function handleSubscriptionDeleted(subscription) {
-  console.log('Subscription deleted:', subscription.id);
+  console.log("Subscription deleted:", subscription.id);
   
   // Check if this is a group subscription
-  if (subscription.metadata && subscription.metadata.type === 'group_subscription') {
+  if (subscription.metadata && subscription.metadata.type === "group_subscription") {
     // Handle group subscription deletion
     await groupSubscriptions.handleGroupSubscriptionWebhook({
-      type: 'customer.subscription.deleted',
+      type: "customer.subscription.deleted",
       data: { object: subscription }
     });
     return;
@@ -261,30 +261,30 @@ async function handleSubscriptionDeleted(subscription) {
   const customerId = subscription.customer;
   
   // Find the Firebase user associated with this Stripe customer
-  const userSnapshot = await db.collection('users')
-    .where('stripeCustomerId', '==', customerId)
+  const userSnapshot = await db.collection("users")
+    .where("stripeCustomerId", "==", customerId)
     .limit(1)
     .get();
   
   if (userSnapshot.empty) {
-    console.error('No user found for Stripe customer:', customerId);
+    console.error("No user found for Stripe customer:", customerId);
     return;
   }
   
   const userId = userSnapshot.docs[0].id;
-  const userRef = db.collection('users').doc(userId);
-  const subscriptionRef = userRef.collection('subscriptions').doc(subscription.id);
+  const userRef = db.collection("users").doc(userId);
+  const subscriptionRef = userRef.collection("subscriptions").doc(subscription.id);
   
   // Update subscription in Firestore
   await subscriptionRef.update({
-    status: 'canceled',
+    status: "canceled",
     canceledAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
   
   // Update user's subscription status
   await userRef.update({
-    subscriptionStatus: 'canceled',
+    subscriptionStatus: "canceled",
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
 }
@@ -294,10 +294,10 @@ async function handleSubscriptionDeleted(subscription) {
  * @param {Object} invoice - Stripe invoice object
  */
 async function handleInvoicePaymentSucceeded(invoice) {
-  console.log('Invoice payment succeeded:', invoice.id);
+  console.log("Invoice payment succeeded:", invoice.id);
   
   if (!invoice.subscription) {
-    console.log('Invoice is not for a subscription');
+    console.log("Invoice is not for a subscription");
     return;
   }
   
@@ -305,30 +305,30 @@ async function handleInvoicePaymentSucceeded(invoice) {
   const customerId = invoice.customer;
   
   // Find the Firebase user associated with this Stripe customer
-  const userSnapshot = await db.collection('users')
-    .where('stripeCustomerId', '==', customerId)
+  const userSnapshot = await db.collection("users")
+    .where("stripeCustomerId", "==", customerId)
     .limit(1)
     .get();
   
   if (userSnapshot.empty) {
-    console.error('No user found for Stripe customer:', customerId);
+    console.error("No user found for Stripe customer:", customerId);
     return;
   }
   
   const userId = userSnapshot.docs[0].id;
-  const userRef = db.collection('users').doc(userId);
-  const subscriptionRef = userRef.collection('subscriptions').doc(invoice.subscription);
+  const userRef = db.collection("users").doc(userId);
+  const subscriptionRef = userRef.collection("subscriptions").doc(invoice.subscription);
   
   // Update subscription payment status
   await subscriptionRef.update({
     lastInvoiceId: invoice.id,
-    lastPaymentStatus: 'succeeded',
+    lastPaymentStatus: "succeeded",
     lastPaymentDate: admin.firestore.Timestamp.fromMillis(invoice.created * 1000),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
   
   // Store the invoice
-  await userRef.collection('invoices').doc(invoice.id).set({
+  await userRef.collection("invoices").doc(invoice.id).set({
     subscriptionId: invoice.subscription,
     amount: invoice.amount_paid,
     currency: invoice.currency,
@@ -343,10 +343,10 @@ async function handleInvoicePaymentSucceeded(invoice) {
  * @param {Object} invoice - Stripe invoice object
  */
 async function handleInvoicePaymentFailed(invoice) {
-  console.log('Invoice payment failed:', invoice.id);
+  console.log("Invoice payment failed:", invoice.id);
   
   if (!invoice.subscription) {
-    console.log('Invoice is not for a subscription');
+    console.log("Invoice is not for a subscription");
     return;
   }
   
@@ -354,41 +354,41 @@ async function handleInvoicePaymentFailed(invoice) {
   const customerId = invoice.customer;
   
   // Find the Firebase user associated with this Stripe customer
-  const userSnapshot = await db.collection('users')
-    .where('stripeCustomerId', '==', customerId)
+  const userSnapshot = await db.collection("users")
+    .where("stripeCustomerId", "==", customerId)
     .limit(1)
     .get();
   
   if (userSnapshot.empty) {
-    console.error('No user found for Stripe customer:', customerId);
+    console.error("No user found for Stripe customer:", customerId);
     return;
   }
   
   const userId = userSnapshot.docs[0].id;
-  const userRef = db.collection('users').doc(userId);
-  const subscriptionRef = userRef.collection('subscriptions').doc(invoice.subscription);
+  const userRef = db.collection("users").doc(userId);
+  const subscriptionRef = userRef.collection("subscriptions").doc(invoice.subscription);
   
   // Update subscription payment status
   await subscriptionRef.update({
     lastInvoiceId: invoice.id,
-    lastPaymentStatus: 'failed',
-    lastPaymentError: invoice.last_payment_error?.message || 'Payment failed',
+    lastPaymentStatus: "failed",
+    lastPaymentError: invoice.last_payment_error?.message || "Payment failed",
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
   
   // Store the invoice
-  await userRef.collection('invoices').doc(invoice.id).set({
+  await userRef.collection("invoices").doc(invoice.id).set({
     subscriptionId: invoice.subscription,
     amount: invoice.amount_due,
     currency: invoice.currency,
     status: invoice.status,
     failedAt: admin.firestore.Timestamp.fromMillis(invoice.created * 1000),
-    errorMessage: invoice.last_payment_error?.message || 'Payment failed',
+    errorMessage: invoice.last_payment_error?.message || "Payment failed",
     createdAt: admin.firestore.FieldValue.serverTimestamp()
   });
   
   // Notify user about failed payment
-  await notifyUserAboutFailedPayment(userId, 'subscription', invoice.subscription);
+  await notifyUserAboutFailedPayment(userId, "subscription", invoice.subscription);
 }
 
 /**
@@ -401,18 +401,18 @@ async function handleOneTimePayment(paymentIntent) {
   const productId = paymentIntent.metadata.productId;
   
   if (!userId || !productId) {
-    console.error('Missing userId or productId in payment intent metadata');
+    console.error("Missing userId or productId in payment intent metadata");
     return;
   }
   
-  const userRef = db.collection('users').doc(userId);
+  const userRef = db.collection("users").doc(userId);
   
   // Store the purchase
-  await userRef.collection('purchases').doc(paymentIntent.id).set({
+  await userRef.collection("purchases").doc(paymentIntent.id).set({
     productId: productId,
     amount: paymentIntent.amount,
     currency: paymentIntent.currency,
-    status: 'succeeded',
+    status: "succeeded",
     paidAt: admin.firestore.Timestamp.fromMillis(paymentIntent.created * 1000),
     createdAt: admin.firestore.FieldValue.serverTimestamp()
   });
@@ -423,7 +423,7 @@ async function handleOneTimePayment(paymentIntent) {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + duration);
     
-    await userRef.collection('purchases').doc(paymentIntent.id).update({
+    await userRef.collection("purchases").doc(paymentIntent.id).update({
       duration: duration,
       expiresAt: admin.firestore.Timestamp.fromDate(expiresAt)
     });
@@ -439,16 +439,16 @@ async function handleOneTimePayment(paymentIntent) {
 async function notifyUserAboutFailedPayment(userId, type, itemId) {
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(userId);
+    const userRef = db.collection("users").doc(userId);
     const user = await admin.auth().getUser(userId);
     
     // Create a notification in Firestore
-    await userRef.collection('notifications').add({
-      type: 'payment_failed',
+    await userRef.collection("notifications").add({
+      type: "payment_failed",
       paymentType: type,
       itemId: itemId,
-      title: 'Payment Failed',
-      message: `Your ${type === 'subscription' ? 'subscription' : 'payment'} was not processed successfully. Please update your payment method.`,
+      title: "Payment Failed",
+      message: `Your ${type === "subscription" ? "subscription" : "payment"} was not processed successfully. Please update your payment method.`,
       read: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -457,11 +457,11 @@ async function notifyUserAboutFailedPayment(userId, type, itemId) {
     console.log(`Notification created for user ${userId} about failed ${type} payment`);
     
     // For demonstration purposes, we'll log what would be sent
-    console.log('Would send email to:', user.email);
-    console.log('Email subject: Payment Failed');
-    console.log(`Email body: Your ${type === 'subscription' ? 'subscription' : 'payment'} was not processed successfully. Please update your payment method.`);
+    console.log("Would send email to:", user.email);
+    console.log("Email subject: Payment Failed");
+    console.log(`Email body: Your ${type === "subscription" ? "subscription" : "payment"} was not processed successfully. Please update your payment method.`);
   } catch (error) {
-    console.error('Error notifying user about failed payment:', error);
+    console.error("Error notifying user about failed payment:", error);
   }
 }
 

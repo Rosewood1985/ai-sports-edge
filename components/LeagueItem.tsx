@@ -1,8 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 import { League } from '../types/sports';
-import { Ionicons } from '@expo/vector-icons';
 
 interface LeagueItemProps {
   league: League;
@@ -15,13 +16,9 @@ interface LeagueItemProps {
  * @param {LeagueItemProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const LeagueItem: React.FC<LeagueItemProps> = ({ 
-  league, 
-  onSelect,
-  isSelected = false
-}) => {
+const LeagueItem: React.FC<LeagueItemProps> = ({ league, onSelect, isSelected = false }) => {
   const { colors, isDark } = useTheme();
-  
+
   // Determine icon based on sport
   const getSportIcon = (sport: string) => {
     const sportName = sport.toLowerCase();
@@ -32,7 +29,7 @@ const LeagueItem: React.FC<LeagueItemProps> = ({
     if (sportName === 'ice hockey') return 'ice-cream-outline'; // Using a similar icon as hockey-sticks isn't available
     return 'trophy-outline';
   };
-  
+
   return (
     <TouchableOpacity
       style={[
@@ -43,32 +40,22 @@ const LeagueItem: React.FC<LeagueItemProps> = ({
           borderWidth: isSelected ? 2 : 1,
           borderLeftWidth: isSelected ? 6 : 1,
           borderLeftColor: isSelected ? colors.primary : colors.border,
-        }
+        },
       ]}
       onPress={onSelect}
     >
       <View style={styles.iconContainer}>
-        <Ionicons
-          name={getSportIcon(league.strSport)}
-          size={24}
-          color={colors.primary}
-        />
+        <Ionicons name={getSportIcon(league.strSport)} size={24} color={colors.primary} />
       </View>
-      
+
       <View style={styles.infoContainer}>
-        <Text style={[styles.leagueName, { color: colors.text }]}>
-          {league.strLeague}
-        </Text>
-        
+        <Text style={[styles.leagueName, { color: colors.text }]}>{league.strLeague}</Text>
+
         <View style={styles.detailsRow}>
-          <Text style={[styles.sportName, { color: colors.text }]}>
-            {league.strSport}
-          </Text>
-          
-          <Text style={[styles.countryName, { color: colors.text }]}>
-            {league.strCountry}
-          </Text>
-          
+          <Text style={[styles.sportName, { color: colors.text }]}>{league.strSport}</Text>
+
+          <Text style={[styles.countryName, { color: colors.text }]}>{league.strCountry}</Text>
+
           {league.isCollege && (
             <View style={[styles.collegeTag, { backgroundColor: colors.primary }]}>
               <Text style={styles.collegeTagText}>College</Text>
@@ -76,7 +63,7 @@ const LeagueItem: React.FC<LeagueItemProps> = ({
           )}
         </View>
       </View>
-      
+
       {isSelected ? (
         <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
       ) : (

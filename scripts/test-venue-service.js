@@ -2,10 +2,10 @@
 
 /**
  * Test script for the venue service implementation
- * 
+ *
  * This script tests the JavaScript implementation of the venue service
  * by using a simplified version that can be run directly with Node.js.
- * 
+ *
  * Usage:
  *   node scripts/test-venue-service.js
  */
@@ -22,12 +22,12 @@ if (!API_KEY) {
 
 // Mock location data for testing
 const MOCK_LOCATION_DATA = {
-  city: "New York",
-  state: "New York",
-  country: "United States",
+  city: 'New York',
+  state: 'New York',
+  country: 'United States',
   latitude: 40.7128,
-  longitude: -74.0060,
-  timezone: "America/New_York"
+  longitude: -74.006,
+  timezone: 'America/New_York',
 };
 
 // Mock venue data for testing
@@ -42,7 +42,7 @@ const MOCK_VENUES = [
     teams: ['New York Yankees'],
     sports: ['Baseball'],
     latitude: 40.8296,
-    longitude: -73.9262
+    longitude: -73.9262,
   },
   {
     id: 'v2',
@@ -54,7 +54,7 @@ const MOCK_VENUES = [
     teams: ['New York Mets'],
     sports: ['Baseball'],
     latitude: 40.7571,
-    longitude: -73.8458
+    longitude: -73.8458,
   },
   {
     id: 'v3',
@@ -66,7 +66,7 @@ const MOCK_VENUES = [
     teams: ['New York Giants', 'New York Jets'],
     sports: ['Football'],
     latitude: 40.8135,
-    longitude: -74.0744
+    longitude: -74.0744,
   },
   {
     id: 'v4',
@@ -78,7 +78,7 @@ const MOCK_VENUES = [
     teams: ['New York Knicks', 'New York Rangers'],
     sports: ['Basketball', 'Hockey'],
     latitude: 40.7505,
-    longitude: -73.9934
+    longitude: -73.9934,
   },
   {
     id: 'v5',
@@ -90,7 +90,7 @@ const MOCK_VENUES = [
     teams: ['Brooklyn Nets', 'New York Liberty'],
     sports: ['Basketball'],
     latitude: 40.6826,
-    longitude: -73.9754
+    longitude: -73.9754,
   },
   {
     id: 'v6',
@@ -102,7 +102,7 @@ const MOCK_VENUES = [
     teams: ['Boston Red Sox'],
     sports: ['Baseball'],
     latitude: 42.3467,
-    longitude: -71.0972
+    longitude: -71.0972,
   },
   {
     id: 'v7',
@@ -114,7 +114,7 @@ const MOCK_VENUES = [
     teams: ['Boston Celtics', 'Boston Bruins'],
     sports: ['Basketball', 'Hockey'],
     latitude: 42.3662,
-    longitude: -71.0621
+    longitude: -71.0621,
   },
   {
     id: 'v8',
@@ -126,7 +126,7 @@ const MOCK_VENUES = [
     teams: ['Los Angeles Dodgers'],
     sports: ['Baseball'],
     latitude: 34.0739,
-    longitude: -118.2400
+    longitude: -118.24,
   },
   {
     id: 'v9',
@@ -137,8 +137,8 @@ const MOCK_VENUES = [
     capacity: 19079,
     teams: ['Los Angeles Lakers', 'Los Angeles Clippers', 'Los Angeles Kings'],
     sports: ['Basketball', 'Hockey'],
-    latitude: 34.0430,
-    longitude: -118.2673
+    latitude: 34.043,
+    longitude: -118.2673,
   },
   {
     id: 'v10',
@@ -150,8 +150,8 @@ const MOCK_VENUES = [
     teams: ['Chicago Cubs'],
     sports: ['Baseball'],
     latitude: 41.9484,
-    longitude: -87.6553
-  }
+    longitude: -87.6553,
+  },
 ];
 
 /**
@@ -177,11 +177,13 @@ class VenueService {
     const R = 6371; // Radius of the earth in km
     const dLat = this.deg2rad(lat2 - lat1);
     const dLon = this.deg2rad(lon2 - lon1);
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.deg2rad(lat1)) *
+        Math.cos(this.deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; // Distance in km
     return distance;
   }
@@ -192,7 +194,7 @@ class VenueService {
    * @returns {number} Radians
    */
   deg2rad(deg) {
-    return deg * (Math.PI/180);
+    return deg * (Math.PI / 180);
   }
 
   /**
@@ -203,17 +205,21 @@ class VenueService {
   async getAllVenues(useCache = true) {
     try {
       // Check if we have cached venues
-      if (useCache && this.cachedVenues && (Date.now() - this.lastVenueUpdate < this.CACHE_DURATION)) {
+      if (
+        useCache &&
+        this.cachedVenues &&
+        Date.now() - this.lastVenueUpdate < this.CACHE_DURATION
+      ) {
         return this.cachedVenues;
       }
-      
+
       console.log('Fetching venue data...');
-      
+
       // In a real implementation, we would fetch venues from an API
       // For now, we'll use the mock data
       this.cachedVenues = MOCK_VENUES;
       this.lastVenueUpdate = Date.now();
-      
+
       return MOCK_VENUES;
     } catch (error) {
       console.error('Error getting venues:', error.message);
@@ -232,32 +238,33 @@ class VenueService {
     try {
       // If no location provided, use mock location
       const userLocation = location || MOCK_LOCATION_DATA;
-      
+
       if (!userLocation) {
         throw new Error('No location data available');
       }
-      
+
       // Get all venues
       const allVenues = await this.getAllVenues();
-      
+
       // Calculate distance for each venue and filter by maxDistance
-      const venuesWithDistance = allVenues.map(venue => {
-        const distance = this.calculateDistance(
-          userLocation.latitude,
-          userLocation.longitude,
-          venue.latitude,
-          venue.longitude
-        );
-        
-        return {
-          ...venue,
-          distance
-        };
-      })
-      .filter(venue => venue.distance <= maxDistance)
-      .sort((a, b) => (a.distance || 0) - (b.distance || 0))
-      .slice(0, limit);
-      
+      const venuesWithDistance = allVenues
+        .map(venue => {
+          const distance = this.calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            venue.latitude,
+            venue.longitude
+          );
+
+          return {
+            ...venue,
+            distance,
+          };
+        })
+        .filter(venue => venue.distance <= maxDistance)
+        .sort((a, b) => (a.distance || 0) - (b.distance || 0))
+        .slice(0, limit);
+
       return venuesWithDistance;
     } catch (error) {
       console.error('Error getting nearby venues:', error.message);
@@ -273,12 +280,12 @@ class VenueService {
   async getVenuesForTeams(teamNames) {
     try {
       const allVenues = await this.getAllVenues();
-      
+
       // Filter venues by team names
-      const teamVenues = allVenues.filter(venue => 
+      const teamVenues = allVenues.filter(venue =>
         venue.teams.some(team => teamNames.includes(team))
       );
-      
+
       return teamVenues;
     } catch (error) {
       console.error('Error getting venues for teams:', error.message);
@@ -294,12 +301,10 @@ class VenueService {
   async getVenuesForSport(sport) {
     try {
       const allVenues = await this.getAllVenues();
-      
+
       // Filter venues by sport
-      const sportVenues = allVenues.filter(venue => 
-        venue.sports.includes(sport)
-      );
-      
+      const sportVenues = allVenues.filter(venue => venue.sports.includes(sport));
+
       return sportVenues;
     } catch (error) {
       console.error('Error getting venues for sport:', error.message);
@@ -323,19 +328,19 @@ class VenueService {
 async function main() {
   console.log('Testing venue service implementation...');
   console.log('=======================================\n');
-  
+
   // Create venue service instance
   const venueService = new VenueService();
-  
+
   // Get all venues
   console.log('Getting all venues...');
   const allVenues = await venueService.getAllVenues();
   console.log(`Found ${allVenues.length} venues in total`);
-  
+
   // Get nearby venues
   console.log('\nGetting nearby venues...');
   const nearbyVenues = await venueService.getNearbyVenues(MOCK_LOCATION_DATA, 50, 5);
-  
+
   if (nearbyVenues.length > 0) {
     console.log(`Found ${nearbyVenues.length} venues near ${MOCK_LOCATION_DATA.city}:`);
     nearbyVenues.forEach(venue => {
@@ -344,11 +349,11 @@ async function main() {
   } else {
     console.log('No nearby venues found');
   }
-  
+
   // Get venues for specific teams
   console.log('\nGetting venues for New York Yankees and New York Knicks...');
   const teamVenues = await venueService.getVenuesForTeams(['New York Yankees', 'New York Knicks']);
-  
+
   if (teamVenues.length > 0) {
     console.log(`Found ${teamVenues.length} venues for specified teams:`);
     teamVenues.forEach(venue => {
@@ -357,11 +362,11 @@ async function main() {
   } else {
     console.log('No venues found for specified teams');
   }
-  
+
   // Get venues for a specific sport
   console.log('\nGetting venues for Basketball...');
   const basketballVenues = await venueService.getVenuesForSport('Basketball');
-  
+
   if (basketballVenues.length > 0) {
     console.log(`Found ${basketballVenues.length} venues for Basketball:`);
     basketballVenues.forEach(venue => {
@@ -370,17 +375,17 @@ async function main() {
   } else {
     console.log('No venues found for Basketball');
   }
-  
+
   // Test caching
   console.log('\nTesting caching...');
   console.log('Getting venues again (should use cache)...');
   const cachedVenues = await venueService.getAllVenues();
   console.log('Venue data retrieved from cache:', !!cachedVenues);
-  
+
   // Clear cache
   console.log('\nClearing cache...');
   venueService.clearCache();
-  
+
   console.log('\nVenue service test completed successfully!');
 }
 

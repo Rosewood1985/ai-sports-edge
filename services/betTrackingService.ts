@@ -4,6 +4,7 @@
 // =============================================================================
 
 import * as Sentry from '@sentry/react-native';
+
 import { optimizedQuery, firebaseOptimizationService } from './firebaseOptimizationService';
 
 // =============================================================================
@@ -15,37 +16,37 @@ export interface Bet {
   userId: string;
   betType: 'single' | 'parlay' | 'system' | 'round_robin';
   sport: 'nba' | 'nfl' | 'mlb' | 'nhl' | 'ncaab' | 'ncaaf' | 'soccer' | 'tennis' | 'mma' | 'boxing';
-  
+
   // Bet details
   selections: BetSelection[];
   stake: number;
   potentialPayout: number;
   totalOdds: number;
   currency: string;
-  
+
   // Status and timing
   status: 'pending' | 'won' | 'lost' | 'push' | 'void' | 'cashed_out';
   placedAt: Date;
   settledAt?: Date;
   expiresAt?: Date;
-  
+
   // Tracking
   sportsbook: string;
   betSlipId?: string;
   reference: string;
   tags: string[];
   notes?: string;
-  
+
   // Analytics
   confidence: number; // AI confidence in this bet
   expectedValue: number; // EV calculation
   bankrollPercentage: number; // % of bankroll
-  
+
   // Results
   actualPayout?: number;
   profit?: number;
   roi?: number;
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -56,17 +57,17 @@ export interface BetSelection {
   id: string;
   gameId: string;
   selectionType: 'moneyline' | 'spread' | 'total' | 'prop';
-  
+
   // Game information
   homeTeam: string;
   awayTeam: string;
   gameDate: Date;
-  
+
   // Selection details
   selection: string; // "Lakers ML", "Over 210.5", "LeBron Over 25.5 pts"
   odds: number;
   line?: number; // For spreads and totals
-  
+
   // Prop bet specific
   player?: {
     id: string;
@@ -74,12 +75,12 @@ export interface BetSelection {
     team: string;
   };
   propType?: string; // "points", "rebounds", "assists"
-  
+
   // Status
   status: 'pending' | 'won' | 'lost' | 'push' | 'void';
   result?: string;
   actualValue?: number;
-  
+
   // AI Analysis
   aiPrediction?: number;
   confidence?: number;
@@ -95,13 +96,13 @@ export interface BetAnalytics {
   winRate: number;
   averageOdds: number;
   averageStake: number;
-  
+
   // Performance by category
   byBetType: { [key: string]: BetCategoryStats };
   bySport: { [key: string]: BetCategoryStats };
   bySportsbook: { [key: string]: BetCategoryStats };
   byConfidence: { [key: string]: BetCategoryStats };
-  
+
   // Trends
   monthlyStats: MonthlyBetStats[];
   streaks: {
@@ -110,7 +111,7 @@ export interface BetAnalytics {
     longestWin: number;
     longestLoss: number;
   };
-  
+
   // Advanced metrics
   sharpeRatio: number;
   kellyBankrollGrowth: number;
@@ -208,11 +209,11 @@ export class BetTrackingService {
    */
   async placeBet(betData: Omit<Bet, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const startTime = Date.now();
-    
+
     try {
       const betId = `bet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const now = new Date();
-      
+
       const bet: Bet = {
         ...betData,
         id: betId,
@@ -223,21 +224,21 @@ export class BetTrackingService {
 
       // Validate bet
       this.validateBet(bet);
-      
+
       // Calculate analytics
       bet.expectedValue = await this.calculateExpectedValue(bet);
       bet.bankrollPercentage = this.calculateBankrollPercentage(bet.stake, betData.userId);
-      
+
       // Store bet using optimized query
       await this.storeBet(bet);
-      
+
       // Update cache
       this.betCache.set(betId, bet);
       this.invalidateAnalyticsCache();
-      
+
       // Record performance
       firebaseOptimizationService.recordQueryPerformance('bet_place', Date.now() - startTime);
-      
+
       Sentry.addBreadcrumb({
         message: 'Bet placed successfully',
         category: 'bet.tracking.place',
@@ -252,7 +253,6 @@ export class BetTrackingService {
       });
 
       return betId;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to place bet: ${error}`);
@@ -263,8 +263,8 @@ export class BetTrackingService {
    * Update bet status
    */
   async updateBetStatus(
-    betId: string, 
-    status: Bet['status'], 
+    betId: string,
+    status: Bet['status'],
     settledAt?: Date,
     actualPayout?: number
   ): Promise<void> {
@@ -290,7 +290,7 @@ export class BetTrackingService {
       }
 
       await this.updateBet(betId, updates);
-      
+
       // Update cache
       this.betCache.set(betId, { ...bet, ...updates });
       this.invalidateAnalyticsCache();
@@ -301,7 +301,6 @@ export class BetTrackingService {
         level: 'info',
         data: { betId, status, actualPayout },
       });
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to update bet status: ${error}`);
@@ -312,17 +311,16 @@ export class BetTrackingService {
    * Get user's bets with filters
    */
   async getUserBets(
-    userId: string, 
+    userId: string,
     filters: BetFilters = {},
     pageSize: number = 25,
     lastBetId?: string
   ): Promise<{ bets: Bet[]; hasMore: boolean; lastBetId?: string }> {
     const startTime = Date.now();
-    
+
     try {
       // Build query constraints
-      const queryBuilder = optimizedQuery(this.collectionName)
-        .where('userId', '==', userId);
+      const queryBuilder = optimizedQuery(this.collectionName).where('userId', '==', userId);
 
       // Apply filters
       if (filters.status && filters.status.length > 0) {
@@ -354,7 +352,7 @@ export class BetTrackingService {
 
       // Apply additional filters that can't be done in Firestore
       let filteredBets = result.data;
-      
+
       if (filters.minStake || filters.maxStake) {
         filteredBets = filteredBets.filter(bet => {
           if (filters.minStake && bet.stake < filters.minStake) return false;
@@ -377,7 +375,6 @@ export class BetTrackingService {
         hasMore: result.hasMore,
         lastBetId: result.lastDoc?.id,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get user bets: ${error}`);
@@ -410,7 +407,6 @@ export class BetTrackingService {
       }
 
       return bet;
-
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -424,9 +420,12 @@ export class BetTrackingService {
   /**
    * Get comprehensive bet analytics for user
    */
-  async getBetAnalytics(userId: string, timeframe?: 'week' | 'month' | 'year' | 'all'): Promise<BetAnalytics> {
+  async getBetAnalytics(
+    userId: string,
+    timeframe?: 'week' | 'month' | 'year' | 'all'
+  ): Promise<BetAnalytics> {
     const startTime = Date.now();
-    
+
     try {
       // Check cache
       if (this.analyticsCache && Date.now() - this.analyticsCache.timestamp < this.cacheTimeout) {
@@ -435,10 +434,10 @@ export class BetTrackingService {
 
       // Get all user bets for analytics
       const bets = await this.getAllUserBets(userId, timeframe);
-      
+
       // Calculate analytics
       const analytics = this.calculateBetAnalytics(bets);
-      
+
       // Cache results
       this.analyticsCache = {
         data: analytics,
@@ -449,7 +448,6 @@ export class BetTrackingService {
       firebaseOptimizationService.recordQueryPerformance('bet_analytics', Date.now() - startTime);
 
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get bet analytics: ${error}`);
@@ -463,15 +461,15 @@ export class BetTrackingService {
     try {
       const analytics = await this.getBetAnalytics(userId);
       const activeBets = await this.getActiveBets(userId);
-      
+
       const totalBankroll = 10000; // This would come from user settings
       const lockedInBets = activeBets.reduce((sum, bet) => sum + bet.stake, 0);
       const availableBankroll = totalBankroll - lockedInBets;
-      
+
       // Calculate Kelly percentage based on recent performance
       const kellyPercentage = this.calculateKellyPercentage(analytics);
       const recommendedBetSize = availableBankroll * kellyPercentage;
-      
+
       return {
         totalBankroll,
         availableBankroll,
@@ -481,7 +479,6 @@ export class BetTrackingService {
         riskTolerance: this.determineRiskTolerance(analytics),
         maxBetPercentage: 5, // Max 5% of bankroll per bet
       };
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get bankroll management: ${error}`);
@@ -501,25 +498,27 @@ export class BetTrackingService {
   }> {
     try {
       const analytics = await this.getBetAnalytics(userId);
-      
+
       // Find strongest and weakest performers
-      const sportPerformance = Object.entries(analytics.bySport)
-        .sort(([, a], [, b]) => b.roi - a.roi);
-      
-      const betTypePerformance = Object.entries(analytics.byBetType)
-        .sort(([, a], [, b]) => b.roi - a.roi);
-      
+      const sportPerformance = Object.entries(analytics.bySport).sort(
+        ([, a], [, b]) => b.roi - a.roi
+      );
+
+      const betTypePerformance = Object.entries(analytics.byBetType).sort(
+        ([, a], [, b]) => b.roi - a.roi
+      );
+
       const strongestSports = sportPerformance.slice(0, 3).map(([sport]) => sport);
       const weakestSports = sportPerformance.slice(-3).map(([sport]) => sport);
       const bestBetTypes = betTypePerformance.slice(0, 2).map(([type]) => type);
       const worstBetTypes = betTypePerformance.slice(-2).map(([type]) => type);
-      
+
       // Determine optimal stake range
       const optimalStakeRange = this.calculateOptimalStakeRange(analytics);
-      
+
       // Generate recommendations
       const recommendations = this.generateBetRecommendations(analytics);
-      
+
       return {
         strongestSports,
         weakestSports,
@@ -528,7 +527,6 @@ export class BetTrackingService {
         optimalStakeRange,
         recommendations,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get bet insights: ${error}`);
@@ -546,19 +544,19 @@ export class BetTrackingService {
     if (!bet.userId) {
       throw new Error('User ID is required');
     }
-    
+
     if (bet.stake <= 0) {
       throw new Error('Stake must be greater than 0');
     }
-    
+
     if (bet.selections.length === 0) {
       throw new Error('At least one selection is required');
     }
-    
+
     if (bet.betType === 'parlay' && bet.selections.length < 2) {
       throw new Error('Parlay bets require at least 2 selections');
     }
-    
+
     if (bet.totalOdds <= 0) {
       throw new Error('Total odds must be greater than 0');
     }
@@ -579,16 +577,16 @@ export class BetTrackingService {
   private async calculateExpectedValue(bet: Bet): Promise<number> {
     // Simplified EV calculation - in production would use more sophisticated models
     let totalEV = 0;
-    
+
     for (const selection of bet.selections) {
       if (selection.aiPrediction && selection.confidence) {
         const impliedProbability = 1 / selection.odds;
         const aiProbability = selection.confidence / 100;
-        const selectionEV = (aiProbability * selection.odds) - 1;
+        const selectionEV = aiProbability * selection.odds - 1;
         totalEV += selectionEV;
       }
     }
-    
+
     return totalEV / bet.selections.length;
   }
 
@@ -638,7 +636,7 @@ export class BetTrackingService {
    */
   private calculateBetAnalytics(bets: Bet[]): BetAnalytics {
     const settledBets = bets.filter(bet => ['won', 'lost', 'push'].includes(bet.status));
-    
+
     if (settledBets.length === 0) {
       return this.getEmptyAnalytics();
     }
@@ -647,11 +645,12 @@ export class BetTrackingService {
     const totalReturns = settledBets.reduce((sum, bet) => sum + (bet.actualPayout || 0), 0);
     const netProfit = totalReturns - totalStaked;
     const overallROI = (netProfit / totalStaked) * 100;
-    
+
     const wonBets = settledBets.filter(bet => bet.status === 'won');
     const winRate = (wonBets.length / settledBets.length) * 100;
-    
-    const averageOdds = settledBets.reduce((sum, bet) => sum + bet.totalOdds, 0) / settledBets.length;
+
+    const averageOdds =
+      settledBets.reduce((sum, bet) => sum + bet.totalOdds, 0) / settledBets.length;
     const averageStake = totalStaked / settledBets.length;
 
     return {
@@ -679,9 +678,12 @@ export class BetTrackingService {
   /**
    * Calculate category statistics
    */
-  private calculateCategoryStats(bets: Bet[], category: keyof Bet): { [key: string]: BetCategoryStats } {
+  private calculateCategoryStats(
+    bets: Bet[],
+    category: keyof Bet
+  ): { [key: string]: BetCategoryStats } {
     const stats: { [key: string]: BetCategoryStats } = {};
-    
+
     bets.forEach(bet => {
       const key = String(bet[category]);
       if (!stats[key]) {
@@ -698,24 +700,24 @@ export class BetTrackingService {
           averageOdds: 0,
         };
       }
-      
+
       const stat = stats[key];
       stat.bets++;
       stat.staked += bet.stake;
       stat.returns += bet.actualPayout || 0;
-      
+
       if (bet.status === 'won') stat.wins++;
       else if (bet.status === 'lost') stat.losses++;
       else if (bet.status === 'push') stat.pushes++;
     });
-    
+
     // Calculate derived metrics
     Object.values(stats).forEach(stat => {
       stat.profit = stat.returns - stat.staked;
       stat.roi = stat.staked > 0 ? (stat.profit / stat.staked) * 100 : 0;
       stat.winRate = stat.bets > 0 ? (stat.wins / stat.bets) * 100 : 0;
     });
-    
+
     return stats;
   }
 
@@ -729,15 +731,15 @@ export class BetTrackingService {
       'Low (40-59%)': bets.filter(bet => bet.confidence >= 40 && bet.confidence < 60),
       'Very Low (<40%)': bets.filter(bet => bet.confidence < 40),
     };
-    
+
     const stats: { [key: string]: BetCategoryStats } = {};
-    
+
     Object.entries(ranges).forEach(([range, rangeBets]) => {
       if (rangeBets.length > 0) {
         stats[range] = this.calculateStatsForBets(rangeBets);
       }
     });
-    
+
     return stats;
   }
 
@@ -751,7 +753,7 @@ export class BetTrackingService {
     const losses = bets.filter(bet => bet.status === 'lost').length;
     const pushes = bets.filter(bet => bet.status === 'push').length;
     const averageOdds = bets.reduce((sum, bet) => sum + bet.totalOdds, 0) / bets.length;
-    
+
     return {
       bets: bets.length,
       wins,
@@ -771,7 +773,7 @@ export class BetTrackingService {
    */
   private calculateMonthlyStats(bets: Bet[]): MonthlyBetStats[] {
     const monthlyData: { [month: string]: Bet[] } = {};
-    
+
     bets.forEach(bet => {
       const month = bet.placedAt.toISOString().slice(0, 7); // "2024-01"
       if (!monthlyData[month]) {
@@ -779,19 +781,21 @@ export class BetTrackingService {
       }
       monthlyData[month].push(bet);
     });
-    
-    return Object.entries(monthlyData).map(([month, monthBets]) => {
-      const stats = this.calculateStatsForBets(monthBets);
-      return {
-        month,
-        bets: stats.bets,
-        staked: stats.staked,
-        returns: stats.returns,
-        profit: stats.profit,
-        roi: stats.roi,
-        winRate: stats.winRate,
-      };
-    }).sort((a, b) => a.month.localeCompare(b.month));
+
+    return Object.entries(monthlyData)
+      .map(([month, monthBets]) => {
+        const stats = this.calculateStatsForBets(monthBets);
+        return {
+          month,
+          bets: stats.bets,
+          staked: stats.staked,
+          returns: stats.returns,
+          profit: stats.profit,
+          roi: stats.roi,
+          winRate: stats.winRate,
+        };
+      })
+      .sort((a, b) => a.month.localeCompare(b.month));
   }
 
   /**
@@ -799,14 +803,14 @@ export class BetTrackingService {
    */
   private calculateStreaks(bets: Bet[]): BetAnalytics['streaks'] {
     const sortedBets = [...bets].sort((a, b) => a.placedAt.getTime() - b.placedAt.getTime());
-    
+
     let currentWin = 0;
     let currentLoss = 0;
     let longestWin = 0;
     let longestLoss = 0;
     let tempWin = 0;
     let tempLoss = 0;
-    
+
     sortedBets.forEach(bet => {
       if (bet.status === 'won') {
         tempWin++;
@@ -818,11 +822,11 @@ export class BetTrackingService {
         longestLoss = Math.max(longestLoss, tempLoss);
       }
     });
-    
+
     // Current streaks are the temp values
     currentWin = tempWin;
     currentLoss = tempLoss;
-    
+
     return {
       currentWin,
       currentLoss,
@@ -836,14 +840,14 @@ export class BetTrackingService {
    */
   private calculateKellyPercentage(analytics: BetAnalytics): number {
     if (analytics.totalBets === 0) return 0.01; // 1% default
-    
+
     const winRate = analytics.winRate / 100;
     const averageOdds = analytics.averageOdds;
-    
+
     // Kelly criterion: f = (bp - q) / b
     // where b = odds-1, p = win probability, q = loss probability
     const kellyPercentage = (winRate * averageOdds - (1 - winRate)) / averageOdds;
-    
+
     // Cap at 5% to be conservative
     return Math.max(0.01, Math.min(0.05, kellyPercentage));
   }
@@ -866,11 +870,11 @@ export class BetTrackingService {
    */
   private calculateOptimalStakeRange(analytics: BetAnalytics): { min: number; max: number } {
     const avgStake = analytics.averageStake;
-    
+
     // Base on performance - better performance allows higher stakes
-    const performanceMultiplier = analytics.overallROI > 10 ? 1.5 : 
-                                 analytics.overallROI > 0 ? 1.2 : 0.8;
-    
+    const performanceMultiplier =
+      analytics.overallROI > 10 ? 1.5 : analytics.overallROI > 0 ? 1.2 : 0.8;
+
     return {
       min: Math.max(10, avgStake * 0.5 * performanceMultiplier),
       max: Math.min(500, avgStake * 2 * performanceMultiplier),
@@ -882,27 +886,26 @@ export class BetTrackingService {
    */
   private generateBetRecommendations(analytics: BetAnalytics): string[] {
     const recommendations: string[] = [];
-    
+
     if (analytics.winRate < 45) {
       recommendations.push('Consider reducing bet sizes until performance improves');
     }
-    
+
     if (analytics.overallROI > 15) {
       recommendations.push('Excellent performance! Consider gradually increasing stakes');
     }
-    
+
     if (analytics.sharpeRatio < 0.5) {
       recommendations.push('Focus on higher confidence bets to improve risk-adjusted returns');
     }
-    
+
     // Find best performing categories
-    const bestSport = Object.entries(analytics.bySport)
-      .sort(([, a], [, b]) => b.roi - a.roi)[0];
-    
+    const bestSport = Object.entries(analytics.bySport).sort(([, a], [, b]) => b.roi - a.roi)[0];
+
     if (bestSport && bestSport[1].roi > 20) {
       recommendations.push(`Consider focusing more on ${bestSport[0]} - your strongest sport`);
     }
-    
+
     return recommendations;
   }
 
@@ -911,12 +914,13 @@ export class BetTrackingService {
    */
   private calculateSharpeRatio(bets: Bet[]): number {
     if (bets.length < 10) return 0;
-    
+
     const returns = bets.map(bet => bet.roi || 0);
     const avgReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-    const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length;
+    const variance =
+      returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length;
     const stdDev = Math.sqrt(variance);
-    
+
     return stdDev > 0 ? avgReturn / stdDev : 0;
   }
 
@@ -933,12 +937,12 @@ export class BetTrackingService {
   private calculateAverageHoldingTime(bets: Bet[]): number {
     const settledBets = bets.filter(bet => bet.settledAt);
     if (settledBets.length === 0) return 0;
-    
+
     const totalHours = settledBets.reduce((sum, bet) => {
       const hours = (bet.settledAt!.getTime() - bet.placedAt.getTime()) / (1000 * 60 * 60);
       return sum + hours;
     }, 0);
-    
+
     return totalHours / settledBets.length;
   }
 
@@ -979,27 +983,29 @@ export class BetTrackingService {
   private generateMockBets(userId: string): Bet[] {
     const mockBets: Bet[] = [];
     const now = new Date();
-    
+
     for (let i = 0; i < 50; i++) {
       const daysAgo = Math.floor(Math.random() * 30);
       const betDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-      
+
       const bet: Bet = {
         id: `mock_bet_${i}`,
         userId,
         betType: ['single', 'parlay'][Math.floor(Math.random() * 2)] as any,
         sport: ['nba', 'nfl', 'mlb'][Math.floor(Math.random() * 3)] as any,
-        selections: [{
-          id: `sel_${i}`,
-          gameId: `game_${i}`,
-          selectionType: 'moneyline',
-          homeTeam: 'Lakers',
-          awayTeam: 'Warriors',
-          gameDate: betDate,
-          selection: 'Lakers ML',
-          odds: 1.8 + Math.random() * 2,
-          status: Math.random() > 0.5 ? 'won' : 'lost',
-        }],
+        selections: [
+          {
+            id: `sel_${i}`,
+            gameId: `game_${i}`,
+            selectionType: 'moneyline',
+            homeTeam: 'Lakers',
+            awayTeam: 'Warriors',
+            gameDate: betDate,
+            selection: 'Lakers ML',
+            odds: 1.8 + Math.random() * 2,
+            status: Math.random() > 0.5 ? 'won' : 'lost',
+          },
+        ],
         stake: 50 + Math.random() * 200,
         potentialPayout: 0,
         totalOdds: 1.8 + Math.random() * 2,
@@ -1016,15 +1022,15 @@ export class BetTrackingService {
         createdAt: betDate,
         updatedAt: betDate,
       };
-      
+
       bet.potentialPayout = bet.stake * bet.totalOdds;
       bet.actualPayout = bet.status === 'won' ? bet.potentialPayout : 0;
       bet.profit = bet.actualPayout - bet.stake;
       bet.roi = (bet.profit / bet.stake) * 100;
-      
+
       mockBets.push(bet);
     }
-    
+
     return mockBets;
   }
 

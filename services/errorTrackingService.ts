@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/browser';
 import { CaptureContext } from '@sentry/types';
+
 import { BreadcrumbData } from './errorUtils';
 
 /**
@@ -18,7 +19,7 @@ const getCurrentUser = () => {
 // Initialize Sentry with the appropriate DSN
 export const initErrorTracking = () => {
   console.log('initErrorTracking: Starting initialization');
-  
+
   // Wrap the entire function in a try/catch to catch any unexpected errors
   try {
     // Check if Sentry is defined
@@ -27,15 +28,17 @@ export const initErrorTracking = () => {
       console.error('initErrorTracking: Sentry is undefined');
       return false;
     }
-    
+
     // Log environment variables
     console.log('initErrorTracking: Checking environment variables');
     let dsn, environment;
-    
+
     try {
       dsn = process.env.SENTRY_DSN || 'https://examplePublicKey@o0.ingest.sentry.io/0';
       environment = process.env.NODE_ENV || 'development';
-      console.log(`initErrorTracking: Using DSN: ${dsn.substring(0, 15)}... and environment: ${environment}`);
+      console.log(
+        `initErrorTracking: Using DSN: ${dsn.substring(0, 15)}... and environment: ${environment}`
+      );
     } catch (envError) {
       console.error('initErrorTracking: Error accessing environment variables:', envError);
       dsn = 'https://examplePublicKey@o0.ingest.sentry.io/0';
@@ -46,8 +49,8 @@ export const initErrorTracking = () => {
     console.log('initErrorTracking: About to call Sentry.init');
     try {
       const initOptions = {
-        dsn: dsn,
-        environment: environment,
+        dsn,
+        environment,
         release: 'ai-sports-edge@1.0.0',
         maxBreadcrumbs: 50,
         beforeSend: (event: any) => {
@@ -69,8 +72,11 @@ export const initErrorTracking = () => {
         },
         tracesSampleRate: 0.2,
       };
-      
-      console.log('initErrorTracking: Calling Sentry.init with options:', JSON.stringify(initOptions, null, 2));
+
+      console.log(
+        'initErrorTracking: Calling Sentry.init with options:',
+        JSON.stringify(initOptions, null, 2)
+      );
       Sentry.init(initOptions);
       console.log('initErrorTracking: Sentry.init completed successfully');
     } catch (initError) {
@@ -105,7 +111,6 @@ export const initErrorTracking = () => {
   }
 };
 
-
 /**
  * Capture an exception
  * @param error Error to capture
@@ -119,7 +124,7 @@ export const captureException = (error: Error, context?: CaptureContext) => {
   try {
     Sentry.captureException(error, context);
   } catch (sentryError) {
-    console.error("Sentry captureException failed:", sentryError);
+    console.error('Sentry captureException failed:', sentryError);
   }
 };
 
@@ -134,7 +139,7 @@ export const captureMessage = (message: string) => {
   try {
     Sentry.captureMessage(message);
   } catch (sentryError) {
-    console.error("Sentry captureMessage failed:", sentryError);
+    console.error('Sentry captureMessage failed:', sentryError);
   }
 };
 
@@ -146,7 +151,7 @@ export const addBreadcrumb = (breadcrumb: BreadcrumbData) => {
   try {
     Sentry.addBreadcrumb(breadcrumb);
   } catch (sentryError) {
-    console.error("Sentry addBreadcrumb failed:", sentryError);
+    console.error('Sentry addBreadcrumb failed:', sentryError);
   }
 };
 
@@ -154,16 +159,18 @@ export const addBreadcrumb = (breadcrumb: BreadcrumbData) => {
  * Set user information
  * @param user User information
  */
-export const setUser = (user: {
-  id?: string;
-  email?: string;
-  username?: string;
-  [key: string]: any;
-} | null) => {
+export const setUser = (
+  user: {
+    id?: string;
+    email?: string;
+    username?: string;
+    [key: string]: any;
+  } | null
+) => {
   try {
     Sentry.setUser(user);
   } catch (sentryError) {
-    console.error("Sentry setUser failed:", sentryError);
+    console.error('Sentry setUser failed:', sentryError);
   }
 };
 
@@ -176,7 +183,7 @@ export const setTag = (key: string, value: string) => {
   try {
     Sentry.setTag(key, value);
   } catch (sentryError) {
-    console.error("Sentry setTag failed:", sentryError);
+    console.error('Sentry setTag failed:', sentryError);
   }
 };
 
@@ -188,7 +195,7 @@ export const setTags = (tags: { [key: string]: string }) => {
   try {
     Sentry.setTags(tags);
   } catch (sentryError) {
-    console.error("Sentry setTags failed:", sentryError);
+    console.error('Sentry setTags failed:', sentryError);
   }
 };
 
@@ -201,7 +208,7 @@ export const setExtra = (key: string, value: any) => {
   try {
     Sentry.setExtra(key, value);
   } catch (sentryError) {
-    console.error("Sentry setExtra failed:", sentryError);
+    console.error('Sentry setExtra failed:', sentryError);
   }
 };
 
@@ -213,7 +220,7 @@ export const setExtras = (extras: { [key: string]: any }) => {
   try {
     Sentry.setExtras(extras);
   } catch (sentryError) {
-    console.error("Sentry setExtras failed:", sentryError);
+    console.error('Sentry setExtras failed:', sentryError);
   }
 };
 

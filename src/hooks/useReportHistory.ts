@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ReportHistory, ReportHistoryFilters } from '../types/reporting';
+
 import { ReportingService } from '../services/reportingService';
+import { ReportHistory, ReportHistoryFilters } from '../types/reporting';
 
 interface UseReportHistoryResult {
   history: ReportHistory[];

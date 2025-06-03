@@ -1,20 +1,20 @@
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import Constants from 'expo-constants';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { Platform, View, Text } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Import Sentry service
+import AppNavigator from './navigation/AppNavigator';
+import { advancedImageOptimizationService } from './services/advancedImageOptimizationService';
+import { optimizationOrchestrator } from './services/optimizationOrchestrator';
 import { sentryService, createSentryConfig } from './services/sentryService';
 import { sentryNavigationInstrumentation } from './utils/sentryNavigationInstrumentation';
 
 // Import optimization services
-import { optimizationOrchestrator } from './services/optimizationOrchestrator';
-import { advancedImageOptimizationService } from './services/advancedImageOptimizationService';
 
 // Import navigation
-import AppNavigator from './navigation/AppNavigator';
 
 // Main App component
 export default function App() {
@@ -25,11 +25,11 @@ export default function App() {
     // Initialize Sentry first
     const environment = __DEV__ ? 'development' : 'production';
     const sentryConfig = createSentryConfig(environment);
-    
+
     if (sentryConfig.dsn) {
       sentryService.initialize(sentryConfig);
       sentryNavigationInstrumentation.initialize();
-      
+
       console.log(`[Sentry] Initialized for ${environment} environment`);
     } else {
       console.log('[Sentry] DSN not configured - error tracking disabled');
@@ -39,25 +39,21 @@ export default function App() {
     const initOptimizations = async () => {
       try {
         console.log('🚀 Initializing optimization services...');
-        
+
         // Initialize optimization orchestrator
         await optimizationOrchestrator.initialize();
-        
+
         // Enable lazy loading for images
         advancedImageOptimizationService.enableLazyLoading();
-        
+
         console.log('✅ Optimization services activated');
-        
+
         if (sentryService.isActive()) {
-          sentryService.addBreadcrumb(
-            'Optimization services initialized',
-            'optimization',
-            'info'
-          );
+          sentryService.addBreadcrumb('Optimization services initialized', 'optimization', 'info');
         }
       } catch (error) {
         console.error('❌ Failed to initialize optimizations:', error);
-        
+
         if (sentryService.isActive()) {
           sentryService.captureError(error, {
             additionalData: {
@@ -68,7 +64,7 @@ export default function App() {
         }
       }
     };
-    
+
     initOptimizations();
 
     // Initialize other services (will be added back when imports are fixed)
@@ -86,20 +82,15 @@ export default function App() {
         features: ['racing_data_phase3', 'atomic_architecture', 'firebase_auth'],
       });
 
-      sentryService.addBreadcrumb(
-        'App initialized',
-        'app_lifecycle',
-        'info',
-        {
-          platform: Platform.OS,
-          environment,
-        }
-      );
+      sentryService.addBreadcrumb('App initialized', 'app_lifecycle', 'info', {
+        platform: Platform.OS,
+        environment,
+      });
     }
   }, []);
 
   // Handle navigation state changes for Sentry
-  const handleNavigationStateChange = React.useCallback((state) => {
+  const handleNavigationStateChange = React.useCallback(state => {
     if (sentryService.isActive()) {
       sentryNavigationInstrumentation.onStateChange(state);
     }
@@ -108,7 +99,7 @@ export default function App() {
   // Handle app errors
   const handleError = React.useCallback((error: Error, errorInfo?: any) => {
     console.error('App Error:', error);
-    
+
     if (sentryService.isActive()) {
       sentryService.captureError(error, {
         additionalData: {
@@ -126,7 +117,7 @@ export default function App() {
 
     React.useEffect(() => {
       const originalConsoleError = console.error;
-      
+
       console.error = (...args) => {
         const error = args[0];
         if (error instanceof Error) {
@@ -168,11 +159,7 @@ export default function App() {
           onReady={() => {
             // Navigation is ready
             if (sentryService.isActive()) {
-              sentryService.addBreadcrumb(
-                'Navigation ready',
-                'navigation',
-                'info'
-              );
+              sentryService.addBreadcrumb('Navigation ready', 'navigation', 'info');
             }
           }}
         >

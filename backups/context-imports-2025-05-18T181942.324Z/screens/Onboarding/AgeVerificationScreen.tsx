@@ -1,13 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
+import { ThemedText } from '../../atomic/atoms/ThemedText';
+import { ThemedView } from '../../atomic/atoms/ThemedView';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-import { ThemedView } from '../../atomic/atoms/ThemedView';
-import { ThemedText } from '../../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
 
@@ -60,7 +60,7 @@ const AgeVerificationScreen = () => {
         <TouchableOpacity
           style={styles.checkboxContainer}
           onPress={() => setAgeConfirmed(!ageConfirmed)}
-          accessible={true}
+          accessible
           accessibilityLabel={t('age_verification.confirmation')}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: ageConfirmed }}
@@ -83,7 +83,7 @@ const AgeVerificationScreen = () => {
           ]}
           onPress={handleContinue}
           disabled={!ageConfirmed}
-          accessible={true}
+          accessible
           accessibilityLabel={t('common.continue')}
           accessibilityRole="button"
           accessibilityState={{ disabled: !ageConfirmed }}

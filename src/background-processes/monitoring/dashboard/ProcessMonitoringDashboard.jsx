@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
-import { db } from '../../../firebase/config';
+import { CheckCircleIcon, WarningIcon, TimeIcon, RepeatIcon, InfoIcon } from '@chakra-ui/icons';
 import {
   Box,
   Heading,
@@ -30,7 +28,10 @@ import {
   useColorModeValue,
   Spinner,
 } from '@chakra-ui/react';
-import { CheckCircleIcon, WarningIcon, TimeIcon, RepeatIcon, InfoIcon } from '@chakra-ui/icons';
+import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+
+import { db } from '../../../firebase/config';
 
 /**
  * Process Monitoring Dashboard Component

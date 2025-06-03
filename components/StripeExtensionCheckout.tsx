@@ -3,11 +3,12 @@
  * Uses Firebase Stripe Extension for subscription and payment processing
  */
 
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { stripeExtensionService } from '../services/stripeExtensionService';
+
 import { useTheme } from '../contexts/ThemeContext';
-import { Ionicons } from '@expo/vector-icons';
+import { stripeExtensionService } from '../services/stripeExtensionService';
 
 interface Product {
   id: string;
@@ -41,7 +42,7 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
   onSuccess,
   onError,
   showOneTimeOptions = false,
-  allowTrials = true
+  allowTrials = true,
 }) => {
   const { colors, isDark } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
@@ -56,7 +57,7 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
     try {
       setLoading(true);
       const productsData = await stripeExtensionService.getProducts();
-      
+
       // Filter active products and sort by price
       const activeProducts = productsData
         .filter(product => product.active)
@@ -64,7 +65,7 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
           ...product,
           prices: product.prices
             .filter((price: Price) => price.unit_amount > 0)
-            .sort((a: Price, b: Price) => a.unit_amount - b.unit_amount)
+            .sort((a: Price, b: Price) => a.unit_amount - b.unit_amount),
         }))
         .filter(product => product.prices.length > 0);
 
@@ -80,35 +81,31 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
   const handleSubscriptionCheckout = async (priceId: string, trialDays?: number) => {
     try {
       setProcessingPriceId(priceId);
-      
+
       const checkoutUrl = await stripeExtensionService.createSubscriptionCheckout(priceId, {
         trialPeriodDays: trialDays,
         allowPromotionCodes: true,
         automaticTax: true,
         metadata: {
           source: 'mobile_app',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
 
       // In a real app, you'd navigate to the checkout URL
       // For React Native, you might use a WebView or external browser
       console.log('Checkout URL:', checkoutUrl);
-      
+
       // Simulate success for demo purposes
-      Alert.alert(
-        'Checkout Ready',
-        'Redirecting to Stripe Checkout...',
-        [
-          {
-            text: 'Continue',
-            onPress: () => {
-              // In a real implementation, open the checkout URL
-              onSuccess?.();
-            }
-          }
-        ]
-      );
+      Alert.alert('Checkout Ready', 'Redirecting to Stripe Checkout...', [
+        {
+          text: 'Continue',
+          onPress: () => {
+            // In a real implementation, open the checkout URL
+            onSuccess?.();
+          },
+        },
+      ]);
     } catch (error) {
       console.error('Error creating checkout:', error);
       Alert.alert('Error', 'Failed to create checkout session');
@@ -121,29 +118,25 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
   const handleOneTimeCheckout = async (priceId: string) => {
     try {
       setProcessingPriceId(priceId);
-      
+
       const checkoutUrl = await stripeExtensionService.createOneTimeCheckout([priceId], {
         metadata: {
           source: 'mobile_app',
           type: 'one_time_purchase',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
 
       console.log('One-time Checkout URL:', checkoutUrl);
-      
-      Alert.alert(
-        'Checkout Ready',
-        'Redirecting to Stripe Checkout...',
-        [
-          {
-            text: 'Continue',
-            onPress: () => {
-              onSuccess?.();
-            }
-          }
-        ]
-      );
+
+      Alert.alert('Checkout Ready', 'Redirecting to Stripe Checkout...', [
+        {
+          text: 'Continue',
+          onPress: () => {
+            onSuccess?.();
+          },
+        },
+      ]);
     } catch (error) {
       console.error('Error creating one-time checkout:', error);
       Alert.alert('Error', 'Failed to create checkout session');
@@ -156,14 +149,14 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
   const formatPrice = (price: Price): string => {
     const amount = price.unit_amount / 100;
     const currency = price.currency.toUpperCase();
-    
+
     if (price.recurring) {
       const interval = price.recurring.interval;
       const intervalCount = price.recurring.interval_count;
       const intervalText = intervalCount === 1 ? interval : `${intervalCount} ${interval}s`;
       return `$${amount}/${intervalText}`;
     }
-    
+
     return `$${amount} ${currency}`;
   };
 
@@ -171,7 +164,7 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
     const isProcessing = processingPriceId === price.id;
     const isSubscription = !!price.recurring;
     const hasFreeTrial = allowTrials && isSubscription && product.metadata.trial_days;
-    
+
     return (
       <TouchableOpacity
         key={price.id}
@@ -181,7 +174,7 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
             backgroundColor: isDark ? colors.surface : colors.background,
             borderColor: colors.primary,
           },
-          isProcessing && styles.processingButton
+          isProcessing && styles.processingButton,
         ]}
         onPress={() => {
           if (isSubscription) {
@@ -197,9 +190,7 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
       >
         <View style={styles.priceButtonContent}>
           <View style={styles.priceInfo}>
-            <Text style={[styles.priceText, { color: colors.text }]}>
-              {formatPrice(price)}
-            </Text>
+            <Text style={[styles.priceText, { color: colors.text }]}>{formatPrice(price)}</Text>
             {hasFreeTrial && (
               <Text style={[styles.trialText, { color: colors.primary }]}>
                 {product.metadata.trial_days} day free trial
@@ -211,15 +202,11 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
               </View>
             )}
           </View>
-          
+
           {isProcessing ? (
             <ActivityIndicator size="small" color={colors.primary} />
           ) : (
-            <Ionicons 
-              name="arrow-forward" 
-              size={20} 
-              color={colors.primary} 
-            />
+            <Ionicons name="arrow-forward" size={20} color={colors.primary} />
           )}
         </View>
       </TouchableOpacity>
@@ -240,16 +227,16 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
   if (products.length === 0) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Ionicons 
-          name="alert-circle-outline" 
-          size={48} 
-          color={colors.text} 
+        <Ionicons
+          name="alert-circle-outline"
+          size={48}
+          color={colors.text}
           style={styles.errorIcon}
         />
         <Text style={[styles.errorText, { color: colors.text }]}>
           No subscription plans available
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.retryButton, { backgroundColor: colors.primary }]}
           onPress={loadProducts}
         >
@@ -261,28 +248,24 @@ export const StripeExtensionCheckout: React.FC<StripeExtensionCheckoutProps> = (
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.text }]}>
-        Choose Your Plan
-      </Text>
-      
+      <Text style={[styles.title, { color: colors.text }]}>Choose Your Plan</Text>
+
       {products.map(product => (
         <View key={product.id} style={styles.productContainer}>
-          <Text style={[styles.productName, { color: colors.text }]}>
-            {product.name}
-          </Text>
-          
+          <Text style={[styles.productName, { color: colors.text }]}>{product.name}</Text>
+
           {product.description && (
             <Text style={[styles.productDescription, { color: colors.textSecondary }]}>
               {product.description}
             </Text>
           )}
-          
+
           <View style={styles.pricesContainer}>
             {product.prices.map(price => renderPriceButton(product, price))}
           </View>
         </View>
       ))}
-      
+
       <Text style={[styles.disclaimer, { color: colors.textSecondary }]}>
         Secure payment powered by Stripe. Cancel anytime.
       </Text>

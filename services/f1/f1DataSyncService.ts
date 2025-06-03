@@ -4,9 +4,10 @@
 // Following MLB Pattern Exactly for Consistency - Using Ergast F1 API
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
+
+import { firestore as db } from '../../config/firebase';
 import { getWeatherApiKey } from '../../utils/apiKeys';
 
 export class F1DataSyncService {
@@ -69,12 +70,12 @@ export class F1DataSyncService {
       // Get last 3 seasons for historical data
       const currentYear = new Date().getFullYear();
       const seasons = [currentYear - 2, currentYear - 1, currentYear];
-      
+
       const seasonsCollection = collection(db, 'f1_seasons');
 
       for (const year of seasons) {
         const seasonResponse = await this.fetchFromF1API(`/${year}.json`);
-        
+
         if (!this.validateSeasonResponse(seasonResponse)) {
           Sentry.addBreadcrumb({
             message: `Invalid season response for ${year}`,
@@ -85,7 +86,7 @@ export class F1DataSyncService {
         }
 
         const seasonData = {
-          year: year,
+          year,
           url: seasonResponse.MRData?.url,
           totalRounds: seasonResponse.MRData?.total,
           // Get race schedule for this season
@@ -102,7 +103,7 @@ export class F1DataSyncService {
         };
 
         await setDoc(doc(seasonsCollection, year.toString()), seasonData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced season: ${year}`,
           category: 'f1.sync.seasons.detail',
@@ -131,7 +132,7 @@ export class F1DataSyncService {
 
       const currentYear = new Date().getFullYear();
       const driversResponse = await this.fetchFromF1API(`/${currentYear}/drivers.json`);
-      
+
       if (!this.validateDriversResponse(driversResponse)) {
         throw new Error('Invalid drivers API response structure');
       }
@@ -169,7 +170,7 @@ export class F1DataSyncService {
         };
 
         await setDoc(doc(driversCollection, driver.driverId), driverData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced driver: ${driver.givenName} ${driver.familyName}`,
           category: 'f1.sync.drivers.detail',
@@ -198,7 +199,7 @@ export class F1DataSyncService {
 
       const currentYear = new Date().getFullYear();
       const constructorsResponse = await this.fetchFromF1API(`/${currentYear}/constructors.json`);
-      
+
       if (!this.validateConstructorsResponse(constructorsResponse)) {
         throw new Error('Invalid constructors API response structure');
       }
@@ -217,23 +218,33 @@ export class F1DataSyncService {
           teamStats: await this.getConstructorSeasonStats(constructor.constructorId, currentYear),
           careerStats: await this.getConstructorCareerStats(constructor.constructorId),
           // Technical data
-          carSpecifications: await this.getCarSpecifications(constructor.constructorId, currentYear),
+          carSpecifications: await this.getCarSpecifications(
+            constructor.constructorId,
+            currentYear
+          ),
           engineSupplier: await this.getEngineSupplier(constructor.constructorId, currentYear),
           // Championship history
-          championshipHistory: await this.getConstructorChampionshipHistory(constructor.constructorId),
+          championshipHistory: await this.getConstructorChampionshipHistory(
+            constructor.constructorId
+          ),
           // Current form and performance
           formAnalysis: await this.analyzeConstructorForm(constructor.constructorId),
           developmentTrend: await this.analyzeConstructorDevelopment(constructor.constructorId),
           // Reliability statistics
-          reliabilityStats: await this.getConstructorReliabilityStats(constructor.constructorId, currentYear),
+          reliabilityStats: await this.getConstructorReliabilityStats(
+            constructor.constructorId,
+            currentYear
+          ),
           // Sync metadata
           lastUpdated: new Date(),
           dataSource: 'ergast_f1_api',
           syncStatus: 'completed',
         };
 
-        await setDoc(doc(constructorsCollection, constructor.constructorId), constructorData, { merge: true });
-        
+        await setDoc(doc(constructorsCollection, constructor.constructorId), constructorData, {
+          merge: true,
+        });
+
         Sentry.addBreadcrumb({
           message: `Synced constructor: ${constructor.name}`,
           category: 'f1.sync.constructors.detail',
@@ -262,7 +273,7 @@ export class F1DataSyncService {
 
       const currentYear = new Date().getFullYear();
       const circuitsResponse = await this.fetchFromF1API(`/${currentYear}/circuits.json`);
-      
+
       if (!this.validateCircuitsResponse(circuitsResponse)) {
         throw new Error('Invalid circuits API response structure');
       }
@@ -303,7 +314,7 @@ export class F1DataSyncService {
         };
 
         await setDoc(doc(circuitsCollection, circuit.circuitId), circuitData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced circuit: ${circuit.circuitName}`,
           category: 'f1.sync.circuits.detail',
@@ -332,7 +343,7 @@ export class F1DataSyncService {
 
       const currentYear = new Date().getFullYear();
       const racesResponse = await this.fetchFromF1API(`/${currentYear}.json`);
-      
+
       if (!this.validateRacesResponse(racesResponse)) {
         throw new Error('Invalid races API response structure');
       }
@@ -387,8 +398,10 @@ export class F1DataSyncService {
           syncStatus: 'completed',
         };
 
-        await setDoc(doc(racesCollection, `${race.season}_${race.round}`), raceData, { merge: true });
-        
+        await setDoc(doc(racesCollection, `${race.season}_${race.round}`), raceData, {
+          merge: true,
+        });
+
         Sentry.addBreadcrumb({
           message: `Synced race: ${race.raceName} ${race.season}`,
           category: 'f1.sync.races.detail',
@@ -417,22 +430,22 @@ export class F1DataSyncService {
 
       const currentYear = new Date().getFullYear();
       const years = [currentYear - 2, currentYear - 1, currentYear];
-      
+
       const resultsCollection = collection(db, 'f1_results');
 
       for (const year of years) {
         // Get all race results for the year
         const resultsResponse = await this.fetchFromF1API(`/${year}/results.json?limit=1000`);
-        
+
         if (!this.validateResultsResponse(resultsResponse)) {
           continue;
         }
 
         const races = resultsResponse.MRData?.RaceTable?.Races || [];
-        
+
         for (const race of races) {
           const results = race.Results || [];
-          
+
           for (const result of results) {
             const resultData = {
               id: `${race.season}_${race.round}_${result.Driver.driverId}`,
@@ -495,12 +508,16 @@ export class F1DataSyncService {
       });
 
       const currentYear = new Date().getFullYear();
-      
+
       // Get driver standings
-      const driverStandingsResponse = await this.fetchFromF1API(`/${currentYear}/driverStandings.json`);
+      const driverStandingsResponse = await this.fetchFromF1API(
+        `/${currentYear}/driverStandings.json`
+      );
       // Get constructor standings
-      const constructorStandingsResponse = await this.fetchFromF1API(`/${currentYear}/constructorStandings.json`);
-      
+      const constructorStandingsResponse = await this.fetchFromF1API(
+        `/${currentYear}/constructorStandings.json`
+      );
+
       const standingsCollection = collection(db, 'f1_standings');
 
       // Process driver standings
@@ -526,7 +543,8 @@ export class F1DataSyncService {
 
       // Process constructor standings
       if (this.validateStandingsResponse(constructorStandingsResponse)) {
-        const standingsTable = constructorStandingsResponse.MRData?.StandingsTable?.StandingsLists?.[0];
+        const standingsTable =
+          constructorStandingsResponse.MRData?.StandingsTable?.StandingsLists?.[0];
         if (standingsTable) {
           const constructorStandingsData = {
             type: 'constructor',
@@ -566,7 +584,7 @@ export class F1DataSyncService {
 
       const currentYear = new Date().getFullYear();
       const racesResponse = await this.fetchFromF1API(`/${currentYear}.json`);
-      
+
       if (!this.validateRacesResponse(racesResponse)) {
         throw new Error('Invalid races response for weather sync');
       }
@@ -575,7 +593,7 @@ export class F1DataSyncService {
       let weatherDataSynced = 0;
 
       const races = racesResponse.MRData?.RaceTable?.Races || [];
-      
+
       for (const race of races) {
         if (race.Circuit?.Location?.lat && race.Circuit?.Location?.long) {
           try {
@@ -609,7 +627,9 @@ export class F1DataSyncService {
                 dataSource: 'openweather_api',
               };
 
-              await setDoc(doc(weatherCollection, raceWeatherData.raceId), raceWeatherData, { merge: true });
+              await setDoc(doc(weatherCollection, raceWeatherData.raceId), raceWeatherData, {
+                merge: true,
+              });
               weatherDataSynced++;
             }
           } catch (weatherError) {
@@ -641,60 +661,59 @@ export class F1DataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       Sentry.addBreadcrumb({
         message: `Making F1 API request: ${url}`,
         category: 'f1.api.request',
         level: 'debug',
-        data: { endpoint, retryCount }
+        data: { endpoint, retryCount },
       });
 
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
       if (!response.ok) {
         const errorMessage = `F1 API error: ${response.status} ${response.statusText}`;
-        
+
         // Handle rate limiting
         if (response.status === 429) {
           const retryAfter = response.headers.get('Retry-After');
           const delay = retryAfter ? parseInt(retryAfter) * 1000 : 60000;
-          
+
           await this.sleep(delay);
-          
+
           if (retryCount < this.maxRetries) {
             return this.fetchFromF1API(endpoint, retryCount + 1);
           }
         }
-        
+
         // Handle server errors with retry
         if (response.status >= 500 && retryCount < this.maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000;
           await this.sleep(delay);
           return this.fetchFromF1API(endpoint, retryCount + 1);
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
       this.requestCount++;
       return data;
-      
     } catch (error) {
       Sentry.captureException(error);
-      
+
       // Retry on network errors
       if (retryCount < this.maxRetries && (error as any).name === 'TypeError') {
         const delay = Math.pow(2, retryCount) * 1000;
         await this.sleep(delay);
         return this.fetchFromF1API(endpoint, retryCount + 1);
       }
-      
+
       throw new Error(`F1 API request failed: ${(error as Error).message}`);
     }
   }
@@ -702,12 +721,12 @@ export class F1DataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       const delay = this.rateLimitDelay - timeSinceLastRequest;
       await this.sleep(delay);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -724,7 +743,7 @@ export class F1DataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.weatherBaseUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.weatherApiKey}&units=metric`;
-      
+
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -791,7 +810,7 @@ export class F1DataSyncService {
   private calculateTireStrategyImpact(weatherData: any): string {
     const precipitation = weatherData.rain?.['1h'] || weatherData.snow?.['1h'] || 0;
     const temp = weatherData.main?.temp || 20;
-    
+
     if (precipitation > 0.5) return 'Wet/Intermediate tires required';
     if (temp > 30) return 'Hard compounds favored';
     if (temp < 15) return 'Soft compounds favored';
@@ -801,7 +820,7 @@ export class F1DataSyncService {
   private calculateAerodynamicImpact(weatherData: any): string {
     const windSpeed = weatherData.wind?.speed || 0;
     const temp = weatherData.main?.temp || 20;
-    
+
     if (windSpeed > 15) return 'Significant aerodynamic disruption';
     if (temp > 35) return 'Reduced downforce efficiency';
     return 'Minimal aerodynamic impact';
@@ -1064,11 +1083,15 @@ export class F1DataSyncService {
   async updateSyncStatus(status: any): Promise<void> {
     try {
       const statusDoc = doc(db, 'sync_status', 'f1_data_sync');
-      
-      await setDoc(statusDoc, {
-        ...status,
-        lastUpdated: new Date(),
-      }, { merge: true });
+
+      await setDoc(
+        statusDoc,
+        {
+          ...status,
+          lastUpdated: new Date(),
+        },
+        { merge: true }
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw error;

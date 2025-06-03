@@ -4,8 +4,9 @@
 // Following UFC Analytics Pattern for Consistency
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class MLBAnalyticsService {
   async analyzePlayerPerformance(playerId: string): Promise<PlayerAnalysis> {
@@ -163,8 +164,8 @@ export class MLBAnalyticsService {
 
   private async analyzeClutchPerformance(gameHistory: any[]): Promise<ClutchAnalysis> {
     try {
-      const clutchSituations = gameHistory.filter(game => 
-        game.leverage && game.leverage > 1.5 // High leverage situations
+      const clutchSituations = gameHistory.filter(
+        game => game.leverage && game.leverage > 1.5 // High leverage situations
       );
 
       return {
@@ -206,7 +207,6 @@ export class MLBAnalyticsService {
 
       await this.storeTeamAnalysis(teamId, analysis);
       return analysis;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Team analysis failed: ${error.message}`);
@@ -266,7 +266,10 @@ export class MLBAnalyticsService {
         homeTeam: homeTeamId,
         awayTeam: awayTeamId,
         winProbability: this.calculateWinProbability(homeTeamAnalysis, awayTeamAnalysis),
-        runLineRecommendation: this.calculateRunLineRecommendation(homeTeamAnalysis, awayTeamAnalysis),
+        runLineRecommendation: this.calculateRunLineRecommendation(
+          homeTeamAnalysis,
+          awayTeamAnalysis
+        ),
         totalRecommendation: this.calculateTotalRecommendation(homeTeamAnalysis, awayTeamAnalysis),
         keyMatchups: this.identifyKeyMatchups(homeTeamAnalysis, awayTeamAnalysis),
         weatherFactor: await this.calculateWeatherFactor(homeTeamId),
@@ -287,20 +290,20 @@ export class MLBAnalyticsService {
   private calculateAverage(stats: any[], field: string): number {
     const validStats = stats.filter(stat => stat[field] !== undefined && stat[field] !== null);
     if (validStats.length === 0) return 0;
-    
+
     const sum = validStats.reduce((acc, stat) => acc + stat[field], 0);
     return sum / validStats.length;
   }
 
   private calculateTrend(stats: any[], field: string): string {
     if (stats.length < 2) return 'Insufficient Data';
-    
+
     const recent = stats.slice(-10); // Last 10 games
     const early = stats.slice(0, 10); // First 10 games
-    
+
     const recentAvg = this.calculateAverage(recent, field);
     const earlyAvg = this.calculateAverage(early, field);
-    
+
     if (recentAvg > earlyAvg * 1.1) return 'Improving';
     if (recentAvg < earlyAvg * 0.9) return 'Declining';
     return 'Stable';
@@ -317,7 +320,7 @@ export class MLBAnalyticsService {
     }
 
     if (analysis.pitchingAnalysis) {
-      rating += (5.00 - analysis.pitchingAnalysis.eraConsistency) * 20 * 0.3;
+      rating += (5.0 - analysis.pitchingAnalysis.eraConsistency) * 20 * 0.3;
       weight += 0.3;
     }
 
@@ -391,7 +394,7 @@ export class MLBAnalyticsService {
   private calculateERAConsistency(pitchingStats: any[]): number {
     const eras = pitchingStats.map(stat => stat.era).filter(era => era > 0);
     if (eras.length === 0) return 0;
-    
+
     const mean = eras.reduce((sum, era) => sum + era, 0) / eras.length;
     const variance = eras.reduce((sum, era) => sum + Math.pow(era - mean, 2), 0) / eras.length;
     return Math.sqrt(variance);
@@ -429,7 +432,8 @@ export class MLBAnalyticsService {
   // Data retrieval methods
   private async getGameHistory(playerId: string): Promise<any[]> {
     try {
-      const gamesRef = firebaseService.collection('mlb_games')
+      const gamesRef = firebaseService
+        .collection('mlb_games')
         .where('players', 'array-contains', playerId)
         .orderBy('date', 'desc')
         .limit(162); // Full season
@@ -444,7 +448,8 @@ export class MLBAnalyticsService {
 
   private async getTeamGameHistory(teamId: string): Promise<any[]> {
     try {
-      const gamesRef = firebaseService.collection('mlb_games')
+      const gamesRef = firebaseService
+        .collection('mlb_games')
         .where('teams', 'array-contains', teamId)
         .orderBy('date', 'desc')
         .limit(162); // Full season
@@ -476,13 +481,13 @@ export class MLBAnalyticsService {
   // Default analysis methods for error handling
   private getDefaultPitchingAnalysis(): PitchingAnalysis {
     return {
-      eraConsistency: 4.50,
-      strikeoutRate: 0.20,
+      eraConsistency: 4.5,
+      strikeoutRate: 0.2,
       commandControl: {
         strikePercentage: 0.65,
-        firstPitchStrike: 0.60,
+        firstPitchStrike: 0.6,
         walkRate: 0.08,
-        swingingStrike: 0.10,
+        swingingStrike: 0.1,
       },
       pitchRepertoire: {
         fastballVelocity: 92.0,
@@ -499,12 +504,12 @@ export class MLBAnalyticsService {
       },
       clutchPitching: {
         leverageIndex: 1.0,
-        clutchERA: 4.50,
+        clutchERA: 4.5,
       },
       ballparkFactors: {},
       batterHandedness: {
-        vsLefty: 0.250,
-        vsRighty: 0.260,
+        vsLefty: 0.25,
+        vsRighty: 0.26,
       },
     };
   }
@@ -537,11 +542,11 @@ export class MLBAnalyticsService {
 
   private getDefaultClutchAnalysis(): ClutchAnalysis {
     return {
-      clutchBattingAverage: 0.250,
-      rbiOpportunities: 0.30,
+      clutchBattingAverage: 0.25,
+      rbiOpportunities: 0.3,
       pressureSituations: 0.275,
-      walkOffPerformance: 0.300,
-      postseasonPerformance: 0.250,
+      walkOffPerformance: 0.3,
+      postseasonPerformance: 0.25,
     };
   }
 
@@ -552,8 +557,8 @@ export class MLBAnalyticsService {
   }
 
   private calculateStrikeoutRate(stats: any[]): number {
-    // FLAG: Implement strikeout rate calculation  
-    return 0.20;
+    // FLAG: Implement strikeout rate calculation
+    return 0.2;
   }
 
   private calculateSwingRate(battingStats: any[]): number {
@@ -583,7 +588,7 @@ export class MLBAnalyticsService {
 
   private calculateBasesLoadedAverage(gameHistory: any[]): number {
     // FLAG: Implement bases loaded average calculation
-    return 0.290;
+    return 0.29;
   }
 
   private calculateLateInningAverage(gameHistory: any[]): number {
@@ -608,22 +613,22 @@ export class MLBAnalyticsService {
 
   private calculateVsLeftyStats(gameHistory: any[]): any {
     // FLAG: Implement vs lefty stats calculation
-    return { average: 0.265, ops: 0.750 };
+    return { average: 0.265, ops: 0.75 };
   }
 
   private calculateVsRightyStats(gameHistory: any[]): any {
     // FLAG: Implement vs righty stats calculation
-    return { average: 0.275, ops: 0.780 };
+    return { average: 0.275, ops: 0.78 };
   }
 
   private calculateVsFastballStats(gameHistory: any[]): any {
     // FLAG: Implement vs fastball stats calculation
-    return { average: 0.285, slugging: 0.450 };
+    return { average: 0.285, slugging: 0.45 };
   }
 
   private calculateVsBreakingBallStats(gameHistory: any[]): any {
     // FLAG: Implement vs breaking ball stats calculation
-    return { average: 0.235, slugging: 0.380 };
+    return { average: 0.235, slugging: 0.38 };
   }
 
   // Additional calculation methods would be implemented here
@@ -666,12 +671,12 @@ export class MLBAnalyticsService {
   // Additional team analysis methods
   private analyzePowerNumbers(teamGames: any[]): any {
     // FLAG: Implement power numbers analysis
-    return { homeRuns: 200, slugging: 0.450, iso: 0.180 };
+    return { homeRuns: 200, slugging: 0.45, iso: 0.18 };
   }
 
   private analyzeTeamClutchHitting(teamGames: any[]): any {
     // FLAG: Implement team clutch hitting analysis
-    return { rispAverage: 0.275, lateInning: 0.260 };
+    return { rispAverage: 0.275, lateInning: 0.26 };
   }
 
   private analyzeTeamBaserunning(teamGames: any[]): any {

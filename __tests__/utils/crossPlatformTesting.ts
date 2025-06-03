@@ -1,6 +1,6 @@
 /**
  * Cross-Platform Testing Utilities
- * 
+ *
  * This file contains utilities for testing components across different platforms.
  * It helps ensure that components work correctly on both iOS and Android.
  */
@@ -10,7 +10,7 @@ import { Platform } from 'react-native';
 /**
  * Platform-specific test wrapper
  * Runs tests for specific platforms only
- * 
+ *
  * @param platform Platform to run tests on ('ios', 'android', or 'web')
  * @param testFn Test function to run
  */
@@ -20,7 +20,7 @@ export function platformTest(
   testFn: () => void
 ): void {
   const platforms = Array.isArray(platform) ? platform : [platform];
-  
+
   if (platforms.includes(Platform.OS as any)) {
     test(testName, testFn);
   } else {
@@ -85,21 +85,21 @@ export function platformSpecific<T>(ios: T, android: T, web?: T): T {
  */
 export function mockPlatform(platform: 'ios' | 'android' | 'web'): () => void {
   const originalPlatform = Platform.OS;
-  
+
   // Mock Platform.OS
   jest.spyOn(Platform, 'OS', 'get').mockReturnValue(platform as any);
-  
+
   // Mock Platform.select
   jest.spyOn(Platform, 'select').mockImplementation((obj: any) => {
     return obj[platform] || obj.default || obj.ios;
   });
-  
+
   // Return function to restore original platform
   const restoreFn = () => {
     jest.spyOn(Platform, 'OS', 'get').mockReturnValue(originalPlatform as any);
     jest.spyOn(Platform, 'select').mockRestore();
   };
-  
+
   return restoreFn;
 }
 
@@ -113,7 +113,7 @@ export function allPlatformsTest(
   testFn: (platform: 'ios' | 'android' | 'web') => void
 ): void {
   const platforms: ('ios' | 'android' | 'web')[] = ['ios', 'android', 'web'];
-  
+
   platforms.forEach(platform => {
     test(`${testName} (${platform})`, () => {
       const restorePlatform = mockPlatform(platform);

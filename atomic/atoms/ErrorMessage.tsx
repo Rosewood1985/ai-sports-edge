@@ -5,15 +5,16 @@
  */
 import React from 'react';
 import { TextStyle } from 'react-native';
-import { useUITheme } from '../../components/UIThemeProvider';
+
 import { ThemedText } from './ThemedText';
+import { useUITheme } from '../../components/UIThemeProvider';
 
 interface ErrorMessageProps {
   /**
    * Error message to display
    */
   message: string;
-  
+
   /**
    * Optional style overrides
    */
@@ -27,7 +28,7 @@ interface ErrorMessageProps {
  */
 export const ErrorMessage = ({ message, style }: ErrorMessageProps): JSX.Element => {
   const { theme } = useUITheme();
-  
+
   const errorStyle: TextStyle = {
     color: theme.colors.error,
     fontSize: theme.typography.fontSize.bodyStd,
@@ -37,11 +38,7 @@ export const ErrorMessage = ({ message, style }: ErrorMessageProps): JSX.Element
     fontFamily: theme.typography.fontFamily.body,
   };
 
-  return (
-    <ThemedText style={[errorStyle, style]}>
-      {message}
-    </ThemedText>
-  );
+  return <ThemedText style={[errorStyle, style]}>{message}</ThemedText>;
 };
 
 export default ErrorMessage;

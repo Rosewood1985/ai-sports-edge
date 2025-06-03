@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Modal, Alert } from 'react-native';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import PlayerPlusMinusList from '../components/PlayerPlusMinusList';
-import { PlayerPlusMinus } from '../services/playerStatsService';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { useColorScheme } from '../hooks/useColorScheme';
-import { StackScreenProps } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Alert,
+} from 'react-native';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import PlayerPlusMinusList from '../components/PlayerPlusMinusList';
 import { auth } from '../config/firebase';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { useThemeColor } from '../hooks/useThemeColor';
+import { PlayerPlusMinus } from '../services/playerStatsService';
 import subscriptionService from '../services/subscriptionService';
 
 // Import the RootStackParamList from the navigator file
@@ -24,47 +33,44 @@ type PlayerStatsScreenProps = StackScreenProps<RootStackParamList, 'PlayerStats'
 /**
  * Screen to display player plus-minus statistics for a game
  */
-const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
-  route,
-  navigation
-}) => {
+const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({ route, navigation }) => {
   const { gameId, gameTitle = 'Game Stats' } = route.params;
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerPlusMinus | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [upgradeModalVisible, setUpgradeModalVisible] = useState(false);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const colorScheme = useColorScheme() ?? 'light';
   const primaryColor = '#0a7ea4';
-  
+
   // Modal background and card colors
   const modalBackgroundColor = colorScheme === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.7)';
   const cardBackgroundColor = colorScheme === 'light' ? '#fff' : '#1c1c1e';
   const cardBorderColor = colorScheme === 'light' ? '#e1e1e1' : '#38383A';
-  
+
   // Check if user has access to player plus-minus data
   useEffect(() => {
     const checkAccess = async () => {
       setLoading(true);
       const user = auth.currentUser;
-      
+
       if (!user) {
         setHasAccess(false);
         setLoading(false);
         return;
       }
-      
+
       const access = await subscriptionService.hasPlayerPlusMinusAccess(user.uid, gameId);
       setHasAccess(access);
       setLoading(false);
     };
-    
+
     checkAccess();
   }, [gameId]);
-  
+
   // Handle player selection
   const handlePlayerPress = (player: PlayerPlusMinus) => {
     setSelectedPlayer(player);
@@ -75,43 +81,48 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
   const closeModal = () => {
     setModalVisible(false);
   };
-  
+
   // Show upgrade modal
   const showUpgradeModal = () => {
     setUpgradeModalVisible(true);
   };
-  
+
   // Close upgrade modal
   const closeUpgradeModal = () => {
     setUpgradeModalVisible(false);
   };
-  
+
   // Navigate to subscription screen
   const navigateToSubscription = () => {
     closeUpgradeModal();
     navigation.navigate('Subscription');
   };
-  
+
   // Purchase one-time access
   const purchaseOneTimeAccess = async () => {
     const user = auth.currentUser;
-    
+
     if (!user) {
       Alert.alert('Error', 'You must be logged in to make a purchase.');
       return;
     }
-    
+
     try {
       const success = await subscriptionService.purchasePlayerPlusMinusAccess(user.uid, gameId);
-      
+
       if (success) {
         Alert.alert(
           'Purchase Successful',
           'You now have access to player plus-minus data for this game.',
-          [{ text: 'OK', onPress: () => {
-            setHasAccess(true);
-            closeUpgradeModal();
-          }}]
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setHasAccess(true);
+                closeUpgradeModal();
+              },
+            },
+          ]
         );
       } else {
         Alert.alert('Error', 'Failed to process your purchase. Please try again.');
@@ -136,7 +147,7 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
       </SafeAreaView>
     );
   }
-  
+
   // Render locked state for users without access
   if (!hasAccess) {
     return (
@@ -145,60 +156,60 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
           <ThemedText style={styles.title}>{gameTitle}</ThemedText>
           <ThemedText style={styles.subtitle}>Player Plus/Minus</ThemedText>
         </View>
-        
+
         <View style={styles.lockedContainer}>
-          <Ionicons 
-            name="lock-closed" 
-            size={64} 
-            color={colorScheme === 'light' ? '#999' : '#666'} 
+          <Ionicons
+            name="lock-closed"
+            size={64}
+            color={colorScheme === 'light' ? '#999' : '#666'}
             style={styles.lockIcon}
           />
           <ThemedText style={styles.lockedTitle}>Premium Feature</ThemedText>
           <ThemedText style={styles.lockedDescription}>
-            Player plus-minus tracking is available to Premium subscribers or as a one-time purchase.
+            Player plus-minus tracking is available to Premium subscribers or as a one-time
+            purchase.
           </ThemedText>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.upgradeButton, { backgroundColor: primaryColor }]}
             onPress={showUpgradeModal}
           >
             <ThemedText style={styles.upgradeButtonText}>Unlock Player Stats</ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         {/* Upgrade Modal */}
         <Modal
           animationType="fade"
-          transparent={true}
+          transparent
           visible={upgradeModalVisible}
           onRequestClose={closeUpgradeModal}
         >
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.modalOverlay, { backgroundColor: modalBackgroundColor }]}
             activeOpacity={1}
             onPress={closeUpgradeModal}
           >
-            <View 
+            <View
               style={[
-                styles.modalContent, 
-                { 
+                styles.modalContent,
+                {
                   backgroundColor: cardBackgroundColor,
-                  borderColor: cardBorderColor
-                }
+                  borderColor: cardBorderColor,
+                },
               ]}
             >
-              <ThemedText style={styles.modalTitle}>
-                Unlock Player Plus/Minus
-              </ThemedText>
-              
+              <ThemedText style={styles.modalTitle}>Unlock Player Plus/Minus</ThemedText>
+
               <ThemedText style={styles.modalDescription}>
                 Track the real-time impact of players with plus-minus statistics.
               </ThemedText>
-              
+
               <View style={styles.optionContainer}>
                 <ThemedText style={styles.optionTitle}>Option 1: Subscribe</ThemedText>
                 <ThemedText style={styles.optionDescription}>
-                  Get full access to all premium features including player plus-minus tracking for all games.
+                  Get full access to all premium features including player plus-minus tracking for
+                  all games.
                 </ThemedText>
                 <View style={styles.planRow}>
                   <ThemedText style={styles.planName}>Premium Monthly</ThemedText>
@@ -208,14 +219,14 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
                   <ThemedText style={styles.planName}>Premium Annual</ThemedText>
                   <ThemedText style={styles.planPrice}>$99.99/year</ThemedText>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.optionButton, { backgroundColor: primaryColor }]}
                   onPress={navigateToSubscription}
                 >
                   <ThemedText style={styles.optionButtonText}>View Plans</ThemedText>
                 </TouchableOpacity>
               </View>
-              
+
               <View style={[styles.optionContainer, styles.optionContainerAlt]}>
                 <ThemedText style={styles.optionTitle}>Option 2: One-Time Purchase</ThemedText>
                 <ThemedText style={styles.optionDescription}>
@@ -225,18 +236,15 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
                   <ThemedText style={styles.planName}>Single Game Access</ThemedText>
                   <ThemedText style={styles.planPrice}>$1.99</ThemedText>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.optionButton, { backgroundColor: '#34C759' }]}
                   onPress={purchaseOneTimeAccess}
                 >
                   <ThemedText style={styles.optionButtonText}>Purchase</ThemedText>
                 </TouchableOpacity>
               </View>
-              
-              <TouchableOpacity 
-                style={styles.closeButton}
-                onPress={closeUpgradeModal}
-              >
+
+              <TouchableOpacity style={styles.closeButton} onPress={closeUpgradeModal}>
                 <ThemedText style={styles.closeButtonText}>Close</ThemedText>
               </TouchableOpacity>
             </View>
@@ -245,7 +253,7 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
       </SafeAreaView>
     );
   }
-  
+
   // Render player stats for users with access
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -253,19 +261,24 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
         <ThemedText style={styles.title}>{gameTitle}</ThemedText>
         <ThemedText style={styles.subtitle}>Player Plus/Minus</ThemedText>
       </View>
-      
+
       <View style={styles.actionsContainer}>
         <TouchableOpacity
           style={[styles.advancedStatsButton, { borderColor: primaryColor }]}
           onPress={() => navigation.navigate('AdvancedPlayerStats', { gameId, gameTitle })}
         >
-          <Ionicons name="analytics-outline" size={16} color={primaryColor} style={styles.buttonIcon} />
+          <Ionicons
+            name="analytics-outline"
+            size={16}
+            color={primaryColor}
+            style={styles.buttonIcon}
+          />
           <ThemedText style={[styles.advancedStatsText, { color: primaryColor }]}>
             Advanced Metrics
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView style={styles.scrollView}>
         <PlayerPlusMinusList
           gameId={gameId}
@@ -273,68 +286,67 @@ const PlayerStatsScreen: React.FC<PlayerStatsScreenProps> = ({
           onPlayerPress={handlePlayerPress}
         />
       </ScrollView>
-      
+
       {/* Player Detail Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
-        <TouchableOpacity 
+      <Modal animationType="fade" transparent visible={modalVisible} onRequestClose={closeModal}>
+        <TouchableOpacity
           style={[styles.modalOverlay, { backgroundColor: modalBackgroundColor }]}
           activeOpacity={1}
           onPress={closeModal}
         >
-          <View 
+          <View
             style={[
-              styles.modalContent, 
-              { 
+              styles.modalContent,
+              {
                 backgroundColor: cardBackgroundColor,
-                borderColor: cardBorderColor
-              }
+                borderColor: cardBorderColor,
+              },
             ]}
           >
             {selectedPlayer && (
               <>
-                <ThemedText style={styles.modalTitle}>
-                  {selectedPlayer.playerName}
-                </ThemedText>
-                
+                <ThemedText style={styles.modalTitle}>{selectedPlayer.playerName}</ThemedText>
+
                 <View style={styles.statRow}>
                   <ThemedText style={styles.statLabel}>Team:</ThemedText>
                   <ThemedText style={styles.statValue}>{selectedPlayer.team}</ThemedText>
                 </View>
-                
+
                 <View style={styles.statRow}>
                   <ThemedText style={styles.statLabel}>Plus/Minus:</ThemedText>
-                  <ThemedText 
+                  <ThemedText
                     style={[
-                      styles.statValue, 
-                      { 
-                        color: selectedPlayer.plusMinus > 0 
-                          ? (colorScheme === 'light' ? '#34C759' : '#30D158') 
-                          : selectedPlayer.plusMinus < 0 
-                            ? (colorScheme === 'light' ? '#FF3B30' : '#FF453A')
-                            : textColor
-                      }
+                      styles.statValue,
+                      {
+                        color:
+                          selectedPlayer.plusMinus > 0
+                            ? colorScheme === 'light'
+                              ? '#34C759'
+                              : '#30D158'
+                            : selectedPlayer.plusMinus < 0
+                              ? colorScheme === 'light'
+                                ? '#FF3B30'
+                                : '#FF453A'
+                              : textColor,
+                      },
                     ]}
                   >
-                    {selectedPlayer.plusMinus > 0 ? `+${selectedPlayer.plusMinus}` : selectedPlayer.plusMinus}
+                    {selectedPlayer.plusMinus > 0
+                      ? `+${selectedPlayer.plusMinus}`
+                      : selectedPlayer.plusMinus}
                   </ThemedText>
                 </View>
-                
+
                 <View style={styles.statRow}>
                   <ThemedText style={styles.statLabel}>Last Updated:</ThemedText>
                   <ThemedText style={styles.statValue}>
-                    {selectedPlayer.timestamp ? new Date(selectedPlayer.timestamp).toLocaleTimeString() : 'N/A'}
+                    {selectedPlayer.timestamp
+                      ? new Date(selectedPlayer.timestamp).toLocaleTimeString()
+                      : 'N/A'}
                   </ThemedText>
                 </View>
-                
-                <TouchableOpacity 
-                  style={styles.closeButton}
-                  onPress={closeModal}
-                >
+
+                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                   <ThemedText style={styles.closeButtonText}>Close</ThemedText>
                 </TouchableOpacity>
               </>

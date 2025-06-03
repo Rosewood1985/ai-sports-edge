@@ -5,6 +5,13 @@
  * It combines stripe payment and tax molecules to provide a unified interface.
  */
 
+const logger = require('../../../utils/logger');
+const { getStripe, validateStripeApiKey } = require('../../atoms/stripe/stripeConfig');
+const {
+  isStripeTaxEnabled,
+  getTaxSettingsForCountry,
+  TAX_CODES,
+} = require('../../atoms/stripe/stripeTaxConfig');
 const {
   createPaymentIntent,
   confirmPaymentIntent,
@@ -14,7 +21,6 @@ const {
   createCustomer,
   attachPaymentMethod,
 } = require('../../molecules/stripe/stripePayment');
-
 const {
   calculateTax,
   createPaymentIntentWithTax,
@@ -22,16 +28,6 @@ const {
   getTaxRatesForLocation,
   createPaymentIntentWithCustomTax,
 } = require('../../molecules/stripe/stripeTax');
-
-const { getStripe, validateStripeApiKey } = require('../../atoms/stripe/stripeConfig');
-
-const {
-  isStripeTaxEnabled,
-  getTaxSettingsForCountry,
-  TAX_CODES,
-} = require('../../atoms/stripe/stripeTaxConfig');
-
-const logger = require('../../../utils/logger');
 
 /**
  * Initialize the Stripe service

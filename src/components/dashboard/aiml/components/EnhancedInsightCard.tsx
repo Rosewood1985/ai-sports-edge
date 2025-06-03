@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+
 import { EnhancedInsight } from '../../../../types/enhancedInsights';
 
 interface EnhancedInsightCardProps {
@@ -18,35 +19,49 @@ interface EnhancedInsightCardProps {
   expanded?: boolean;
 }
 
-export function EnhancedInsightCard({ 
-  insight, 
-  onStatusUpdate, 
-  expanded = false 
+export function EnhancedInsightCard({
+  insight,
+  onStatusUpdate,
+  expanded = false,
 }: EnhancedInsightCardProps) {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [showActions, setShowActions] = useState(false);
 
   const getTypeIcon = (type: EnhancedInsight['type']) => {
     switch (type) {
-      case 'opportunity': return '🎯';
-      case 'risk': return '⚠️';
-      case 'trend': return '📈';
-      case 'anomaly': return '🚨';
-      case 'correlation': return '🔗';
-      case 'prediction': return '🔮';
-      default: return '💡';
+      case 'opportunity':
+        return '🎯';
+      case 'risk':
+        return '⚠️';
+      case 'trend':
+        return '📈';
+      case 'anomaly':
+        return '🚨';
+      case 'correlation':
+        return '🔗';
+      case 'prediction':
+        return '🔮';
+      default:
+        return '💡';
     }
   };
 
   const getCategoryIcon = (category: EnhancedInsight['category']) => {
     switch (category) {
-      case 'user_behavior': return '👥';
-      case 'financial': return '💰';
-      case 'operational': return '⚙️';
-      case 'marketing': return '📢';
-      case 'product': return '📱';
-      case 'security': return '🔒';
-      default: return '📊';
+      case 'user_behavior':
+        return '👥';
+      case 'financial':
+        return '💰';
+      case 'operational':
+        return '⚙️';
+      case 'marketing':
+        return '📢';
+      case 'product':
+        return '📱';
+      case 'security':
+        return '🔒';
+      default:
+        return '📊';
     }
   };
 
@@ -84,10 +99,14 @@ export function EnhancedInsightCard({
 
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment) {
-      case 'positive': return 'text-green-600';
-      case 'negative': return 'text-red-600';
-      case 'neutral': return 'text-gray-600';
-      default: return 'text-gray-600';
+      case 'positive':
+        return 'text-green-600';
+      case 'negative':
+        return 'text-red-600';
+      case 'neutral':
+        return 'text-gray-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
@@ -98,15 +117,25 @@ export function EnhancedInsightCard({
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return (
+      date.toLocaleDateString() +
+      ' ' +
+      date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    );
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow border-l-4 ${
-      insight.severity === 'critical' ? 'border-red-500' :
-      insight.severity === 'high' ? 'border-orange-500' :
-      insight.severity === 'medium' ? 'border-yellow-500' : 'border-blue-500'
-    }`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow border-l-4 ${
+        insight.severity === 'critical'
+          ? 'border-red-500'
+          : insight.severity === 'high'
+            ? 'border-orange-500'
+            : insight.severity === 'medium'
+              ? 'border-yellow-500'
+              : 'border-blue-500'
+      }`}
+    >
       {/* Header */}
       <div className="p-6">
         <div className="flex items-start justify-between">
@@ -117,17 +146,19 @@ export function EnhancedInsightCard({
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   {insight.title}
                 </h3>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSeverityColor(insight.severity)}`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSeverityColor(insight.severity)}`}
+                >
                   {insight.severity}
                 </span>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}
+                >
                   {insight.status}
                 </span>
               </div>
-              
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                {insight.description}
-              </p>
+
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{insight.description}</p>
 
               {/* Key Metrics */}
               <div className="flex items-center space-x-6 text-sm">
@@ -159,7 +190,7 @@ export function EnhancedInsightCard({
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -216,7 +247,9 @@ export function EnhancedInsightCard({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Sentiment</div>
-                <div className={`text-sm font-medium ${getSentimentColor(insight.nlpSummary.sentiment)}`}>
+                <div
+                  className={`text-sm font-medium ${getSentimentColor(insight.nlpSummary.sentiment)}`}
+                >
                   {insight.nlpSummary.sentiment} ({insight.nlpSummary.readabilityScore}/100)
                 </div>
               </div>
@@ -275,8 +308,8 @@ export function EnhancedInsightCard({
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <div className="text-xs text-gray-500 dark:text-gray-400">Affected Users</div>
                 <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  {typeof insight.impact.affectedUsers === 'number' 
-                    ? insight.impact.affectedUsers.toLocaleString() 
+                  {typeof insight.impact.affectedUsers === 'number'
+                    ? insight.impact.affectedUsers.toLocaleString()
                     : 'Unknown'}
                 </div>
               </div>
@@ -304,12 +337,17 @@ export function EnhancedInsightCard({
                           <h5 className="text-sm font-medium text-gray-900 dark:text-white">
                             {rec.title}
                           </h5>
-                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                            rec.priority === 'urgent' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                            rec.priority === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                            rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                          }`}>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                              rec.priority === 'urgent'
+                                ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                : rec.priority === 'high'
+                                  ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                                  : rec.priority === 'medium'
+                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                            }`}
+                          >
                             {rec.priority}
                           </span>
                         </div>
@@ -337,7 +375,10 @@ export function EnhancedInsightCard({
               </h4>
               <div className="space-y-2">
                 {insight.evidence.map((evidence, index) => (
-                  <div key={evidence.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                  <div
+                    key={evidence.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded"
+                  >
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {evidence.type} - {evidence.source}

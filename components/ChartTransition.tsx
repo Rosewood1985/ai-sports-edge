@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, ViewStyle, StyleProp, Easing, View } from 'react-native';
+
 import { useAccessibilityService } from '../hooks/useAccessibilityService';
 
 interface ChartTransitionProps {
@@ -7,22 +8,22 @@ interface ChartTransitionProps {
    * Children to be animated
    */
   children: React.ReactNode;
-  
+
   /**
    * Delay before starting the animation in milliseconds
    */
   delay?: number;
-  
+
   /**
    * Index for staggered animations
    */
   index?: number;
-  
+
   /**
    * Additional styles for the container
    */
   style?: StyleProp<ViewStyle>;
-  
+
   /**
    * Whether the chart is currently visible
    */
@@ -31,7 +32,7 @@ interface ChartTransitionProps {
 
 /**
  * ChartTransition component for smooth chart animations
- * 
+ *
  * This component provides smooth entrance animations for charts
  * with accessibility considerations (reduced motion when needed).
  */
@@ -46,19 +47,19 @@ const ChartTransition: React.FC<ChartTransitionProps> = ({
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const translateYAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
-  
+
   // Get accessibility preferences
   const { isReducedMotionEnabled } = useAccessibilityService();
-  
+
   // Calculate total delay including index
-  const totalDelay = delay + (index * 100);
-  
+  const totalDelay = delay + index * 100;
+
   // Run animation when component mounts or when visibility changes
   useEffect(() => {
     if (visible) {
       // Create animations
       const animations = [];
-      
+
       // Fade animation (always used)
       animations.push(
         Animated.timing(opacityAnim, {
@@ -69,7 +70,7 @@ const ChartTransition: React.FC<ChartTransitionProps> = ({
           easing: Easing.out(Easing.cubic),
         })
       );
-      
+
       // Only add motion animations if reduced motion is not enabled
       if (!isReducedMotionEnabled) {
         // Slide up animation
@@ -82,7 +83,7 @@ const ChartTransition: React.FC<ChartTransitionProps> = ({
             easing: Easing.out(Easing.cubic),
           })
         );
-        
+
         // Scale animation
         animations.push(
           Animated.timing(scaleAnim, {
@@ -98,7 +99,7 @@ const ChartTransition: React.FC<ChartTransitionProps> = ({
         translateYAnim.setValue(0);
         scaleAnim.setValue(1);
       }
-      
+
       // Run all animations in parallel
       Animated.parallel(animations).start();
     } else {
@@ -108,17 +109,14 @@ const ChartTransition: React.FC<ChartTransitionProps> = ({
       scaleAnim.setValue(0.95);
     }
   }, [visible, totalDelay, isReducedMotionEnabled]);
-  
+
   return (
     <Animated.View
       style={[
         style,
         {
           opacity: opacityAnim,
-          transform: [
-            { translateY: translateYAnim },
-            { scale: scaleAnim },
-          ],
+          transform: [{ translateY: translateYAnim }, { scale: scaleAnim }],
         },
       ]}
     >

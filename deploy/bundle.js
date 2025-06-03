@@ -1,17 +1,16 @@
-
 // AI Sports Edge application
 console.log('AI Sports Edge application loaded');
 
 // Initialize Firebase
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDFps9-V4XXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "ai-sports-edge.firebaseapp.com",
-  projectId: "ai-sports-edge",
-  storageBucket: "ai-sports-edge.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890",
-  measurementId: "G-XXXXXXXXXX"
+  apiKey: 'AIzaSyDFps9-V4XXXXXXXXXXXXXXXXXXXXXXXXXX',
+  authDomain: 'ai-sports-edge.firebaseapp.com',
+  projectId: 'ai-sports-edge',
+  storageBucket: 'ai-sports-edge.appspot.com',
+  messagingSenderId: '123456789012',
+  appId: '1:123456789012:web:abcdef1234567890',
+  measurementId: 'G-XXXXXXXXXX',
 };
 
 // Initialize Firebase - MUST be called before any Firebase services are used
@@ -63,9 +62,9 @@ function init() {
   const path = window.location.hash.substring(1) || '/';
   const route = routes[path] || routes['/'];
   route();
-  
+
   // Check if user is already logged in
-  firebase.auth().onAuthStateChanged((user) => {
+  firebase.auth().onAuthStateChanged(user => {
     if (user) {
       console.log('User is signed in:', user.email);
       // If on login or signup page, redirect to dashboard
@@ -109,57 +108,56 @@ function showLoginPage() {
       </div>
     </div>
   `;
-  
-  document.getElementById('login-form').addEventListener('submit', async (e) => {
+
+  document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
-    
+
     // Get form values
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
+
     // Clear previous error messages
     const errorElement = document.getElementById('error-message');
     const successElement = document.getElementById('success-message');
     errorElement.style.display = 'none';
     successElement.style.display = 'none';
-    
+
     // Validate form
     if (!email) {
       errorElement.textContent = 'Please enter your email address.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     if (!password) {
       errorElement.textContent = 'Please enter your password.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     // Disable the button and show loading state
     const loginButton = document.getElementById('login-button');
     const originalButtonText = loginButton.textContent;
     loginButton.disabled = true;
     loginButton.textContent = 'Logging in...';
-    
+
     try {
       // Sign in with Firebase Auth
       await firebase.auth().signInWithEmailAndPassword(email, password);
-      
+
       // Show success message
       successElement.textContent = 'Login successful! Redirecting...';
       successElement.style.display = 'block';
-      
+
       // Redirect to dashboard after a short delay
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 1000);
-      
     } catch (error) {
       // Show error message
       errorElement.textContent = getErrorMessage(error.code);
       errorElement.style.display = 'block';
-      
+
       console.error('Login error:', error.code, error.message);
     } finally {
       // Re-enable the button
@@ -202,70 +200,69 @@ function showSignupPage() {
       </div>
     </div>
   `;
-  
-  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+
+  document.getElementById('signup-form').addEventListener('submit', async e => {
     e.preventDefault();
-    
+
     // Get form values
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
-    
+
     // Clear previous error messages
     const errorElement = document.getElementById('error-message');
     const successElement = document.getElementById('success-message');
     errorElement.style.display = 'none';
     successElement.style.display = 'none';
-    
+
     // Validate form
     if (!email) {
       errorElement.textContent = 'Please enter your email address.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     if (!password) {
       errorElement.textContent = 'Please enter a password.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     if (password.length < 8) {
       errorElement.textContent = 'Password must be at least 8 characters long.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     if (password !== confirmPassword) {
       errorElement.textContent = 'Passwords do not match.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     // Disable the button and show loading state
     const signupButton = document.getElementById('signup-button');
     const originalButtonText = signupButton.textContent;
     signupButton.disabled = true;
     signupButton.textContent = 'Creating Account...';
-    
+
     try {
       // Create user with Firebase Auth
       await firebase.auth().createUserWithEmailAndPassword(email, password);
-      
+
       // Show success message
       successElement.textContent = 'Account created successfully! Redirecting to login...';
       successElement.style.display = 'block';
-      
+
       // Redirect to login page after a short delay
       setTimeout(() => {
         window.location.hash = '#/login';
       }, 2000);
-      
     } catch (error) {
       // Show error message
       errorElement.textContent = getErrorMessage(error.code);
       errorElement.style.display = 'block';
-      
+
       console.error('Signup error:', error.code, error.message);
     } finally {
       // Re-enable the button
@@ -300,45 +297,44 @@ function showForgotPasswordPage() {
       </div>
     </div>
   `;
-  
-  document.getElementById('reset-form').addEventListener('submit', async (e) => {
+
+  document.getElementById('reset-form').addEventListener('submit', async e => {
     e.preventDefault();
-    
+
     // Get form values
     const email = document.getElementById('reset-email').value;
-    
+
     // Clear previous error messages
     const errorElement = document.getElementById('error-message');
     const successElement = document.getElementById('success-message');
     errorElement.style.display = 'none';
     successElement.style.display = 'none';
-    
+
     // Validate form
     if (!email) {
       errorElement.textContent = 'Please enter your email address.';
       errorElement.style.display = 'block';
       return;
     }
-    
+
     // Disable the button and show loading state
     const resetButton = document.getElementById('reset-button');
     const originalButtonText = resetButton.textContent;
     resetButton.disabled = true;
     resetButton.textContent = 'Sending...';
-    
+
     try {
       // Send password reset email with Firebase Auth
       await firebase.auth().sendPasswordResetEmail(email);
-      
+
       // Show success message
       successElement.textContent = 'Password reset email sent! Check your inbox.';
       successElement.style.display = 'block';
-      
     } catch (error) {
       // Show error message
       errorElement.textContent = getErrorMessage(error.code);
       errorElement.style.display = 'block';
-      
+
       console.error('Password reset error:', error.code, error.message);
     } finally {
       // Re-enable the button

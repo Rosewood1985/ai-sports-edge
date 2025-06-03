@@ -16,7 +16,7 @@ export interface ReferralNotification {
 class ReferralNotificationService {
   private notificationsCache: ReferralNotification[] = [];
   private hasLoadedNotifications = false;
-  
+
   /**
    * Get all notifications for the current user
    */
@@ -26,13 +26,13 @@ class ReferralNotificationService {
       if (!userId) {
         return [];
       }
-      
+
       // In a real app, this would fetch from Firestore
       // For now, we'll use the cache or generate mock data
       if (this.hasLoadedNotifications) {
         return this.notificationsCache;
       }
-      
+
       // Generate mock notifications
       const mockNotifications: ReferralNotification[] = [
         {
@@ -41,17 +41,17 @@ class ReferralNotificationService {
           title: 'New Referral!',
           message: 'Your friend John has joined using your referral code.',
           read: false,
-          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // 1 day ago
+          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
         },
         {
           id: '2',
           type: 'milestone',
           title: 'Milestone Reached!',
-          message: 'You\'ve reached 5 referrals and earned a premium trial.',
+          message: "You've reached 5 referrals and earned a premium trial.",
           rewardAmount: 2,
           rewardType: 'months',
           read: false,
-          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() // 2 days ago
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
         },
         {
           id: '3',
@@ -61,29 +61,29 @@ class ReferralNotificationService {
           rewardAmount: 1,
           rewardType: 'month',
           read: true,
-          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days ago
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
         },
         {
           id: '4',
           type: 'badge',
           title: 'New Badge Earned',
-          message: 'You\'ve earned the Elite Referrer badge for your referral achievements.',
+          message: "You've earned the Elite Referrer badge for your referral achievements.",
           badgeType: 'elite',
           read: true,
-          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days ago
-        }
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+        },
       ];
-      
+
       this.notificationsCache = mockNotifications;
       this.hasLoadedNotifications = true;
-      
+
       return mockNotifications;
     } catch (error) {
       console.error('Error getting notifications:', error);
       return [];
     }
   }
-  
+
   /**
    * Get unread notification count
    */
@@ -96,7 +96,7 @@ class ReferralNotificationService {
       return 0;
     }
   }
-  
+
   /**
    * Mark a notification as read
    */
@@ -106,7 +106,7 @@ class ReferralNotificationService {
       if (!userId) {
         return false;
       }
-      
+
       // In a real app, this would update Firestore
       // For now, we'll update the cache
       const notification = this.notificationsCache.find(n => n.id === notificationId);
@@ -114,14 +114,14 @@ class ReferralNotificationService {
         notification.read = true;
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('Error marking notification as read:', error);
       return false;
     }
   }
-  
+
   /**
    * Mark all notifications as read
    */
@@ -131,48 +131,50 @@ class ReferralNotificationService {
       if (!userId) {
         return false;
       }
-      
+
       // In a real app, this would update Firestore
       // For now, we'll update the cache
       this.notificationsCache.forEach(notification => {
         notification.read = true;
       });
-      
+
       return true;
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       return false;
     }
   }
-  
+
   /**
    * Add a new notification
    * In a real app, this would be called by a Firebase function
    */
-  async addNotification(notification: Omit<ReferralNotification, 'id' | 'createdAt'>): Promise<boolean> {
+  async addNotification(
+    notification: Omit<ReferralNotification, 'id' | 'createdAt'>
+  ): Promise<boolean> {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) {
         return false;
       }
-      
+
       // In a real app, this would add to Firestore
       // For now, we'll add to the cache
       const newNotification: ReferralNotification = {
         ...notification,
         id: Date.now().toString(),
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
-      
+
       this.notificationsCache.unshift(newNotification);
-      
+
       return true;
     } catch (error) {
       console.error('Error adding notification:', error);
       return false;
     }
   }
-  
+
   /**
    * Delete a notification
    */
@@ -182,7 +184,7 @@ class ReferralNotificationService {
       if (!userId) {
         return false;
       }
-      
+
       // In a real app, this would delete from Firestore
       // For now, we'll remove from the cache
       const index = this.notificationsCache.findIndex(n => n.id === notificationId);
@@ -190,14 +192,14 @@ class ReferralNotificationService {
         this.notificationsCache.splice(index, 1);
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('Error deleting notification:', error);
       return false;
     }
   }
-  
+
   /**
    * Clear all notifications
    */
@@ -207,11 +209,11 @@ class ReferralNotificationService {
       if (!userId) {
         return false;
       }
-      
+
       // In a real app, this would delete from Firestore
       // For now, we'll clear the cache
       this.notificationsCache = [];
-      
+
       return true;
     } catch (error) {
       console.error('Error clearing notifications:', error);

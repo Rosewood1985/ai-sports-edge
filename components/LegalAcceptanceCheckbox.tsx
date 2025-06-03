@@ -5,15 +5,10 @@
  * and Privacy Policy during signup, with links to view the full documents.
  */
 
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Linking 
-} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
+
 import { useThemeColor } from '../hooks/useThemeColor';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -58,29 +53,29 @@ const LegalAcceptanceCheckbox: React.FC<LegalAcceptanceCheckboxProps> = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.checkboxContainer}
         onPress={handleCheckboxPress}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isAccepted }}
         accessibilityLabel={t('auth.agree_to_terms')}
       >
-        <View style={[
-          styles.checkbox, 
-          { borderColor: primaryColor },
-          isAccepted && { backgroundColor: primaryColor }
-        ]}>
-          {isAccepted && (
-            <Text style={styles.checkmark}>✓</Text>
-          )}
+        <View
+          style={[
+            styles.checkbox,
+            { borderColor: primaryColor },
+            isAccepted && { backgroundColor: primaryColor },
+          ]}
+        >
+          {isAccepted && <Text style={styles.checkmark}>✓</Text>}
         </View>
-        
+
         <View style={styles.textContainer}>
           <Text style={[styles.agreementText, { color: textColor }]}>
             {t('auth.by_signing_up')}{' '}
           </Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             onPress={handleTermsPress}
             accessibilityRole="link"
             accessibilityLabel={t('auth.terms_and_conditions')}
@@ -89,32 +84,22 @@ const LegalAcceptanceCheckbox: React.FC<LegalAcceptanceCheckboxProps> = ({
               {t('auth.terms_and_conditions')}
             </Text>
           </TouchableOpacity>
-          
-          <Text style={[styles.agreementText, { color: textColor }]}>
-            {' '}{t('auth.and')}{' '}
-          </Text>
-          
-          <TouchableOpacity 
+
+          <Text style={[styles.agreementText, { color: textColor }]}> {t('auth.and')} </Text>
+
+          <TouchableOpacity
             onPress={handlePrivacyPolicyPress}
             accessibilityRole="link"
             accessibilityLabel={t('auth.privacy_policy')}
           >
-            <Text style={[styles.linkText, { color: linkColor }]}>
-              {t('auth.privacy_policy')}
-            </Text>
+            <Text style={[styles.linkText, { color: linkColor }]}>{t('auth.privacy_policy')}</Text>
           </TouchableOpacity>
-          
-          <Text style={[styles.agreementText, { color: textColor }]}>
-            .
-          </Text>
+
+          <Text style={[styles.agreementText, { color: textColor }]}>.</Text>
         </View>
       </TouchableOpacity>
-      
-      {!isAccepted && (
-        <Text style={styles.requirementText}>
-          {t('auth.agreement_required')}
-        </Text>
-      )}
+
+      {!isAccepted && <Text style={styles.requirementText}>{t('auth.agreement_required')}</Text>}
     </View>
   );
 };

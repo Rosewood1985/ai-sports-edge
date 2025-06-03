@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/browser';
+
 import { safeErrorCapture } from './errorUtils';
-import { info, LogCategory } from './loggingService';
-import { error as logError } from './loggingService';
+import { info, LogCategory, error as logError } from './loggingService';
 
 /**
  * Performance Monitoring Service
- * 
+ *
  * This service provides performance monitoring functionality.
  * It tracks app performance metrics, network requests, and custom transactions.
  */
@@ -47,22 +47,26 @@ export const initPerformanceMonitoring = () => {
     // Track app start time
     console.log('initPerformanceMonitoring: Setting app start time');
     performanceMetrics.appStartTime = Date.now();
-    
+
     // Set device information
     console.log('initPerformanceMonitoring: Setting device information');
     performanceMetrics.deviceModel = 'Web Browser';
     performanceMetrics.osVersion = navigator.userAgent;
-    
+
     // Set up performance monitoring integrations
     console.log('initPerformanceMonitoring: Setting up integrations');
     // Note: Sentry's performance monitoring is already set up in errorTrackingService.ts
-    
+
     console.log('initPerformanceMonitoring: Initialization completed successfully');
     info(LogCategory.PERFORMANCE, 'Performance monitoring initialized successfully');
     return true;
   } catch (initError) {
     console.error('initPerformanceMonitoring: Failed to initialize:', initError);
-    logError(LogCategory.PERFORMANCE, 'Failed to initialize performance monitoring', initError as Error);
+    logError(
+      LogCategory.PERFORMANCE,
+      'Failed to initialize performance monitoring',
+      initError as Error
+    );
     safeErrorCapture(initError as Error);
     return false;
   }
@@ -91,7 +95,7 @@ export const startTransaction = (
       },
       level: 'info',
     });
-    
+
     // Return a mock transaction object
     return {
       finish: () => {
@@ -104,7 +108,7 @@ export const startTransaction = (
           },
           level: 'info',
         });
-      }
+      },
     };
   } catch (error) {
     console.error('Failed to start transaction:', error);
@@ -121,12 +125,10 @@ export const startTransaction = (
  */
 export const trackNavigation = (routeName: string, previousRoute?: string) => {
   try {
-    const transaction = startTransaction(
-      `Navigation: ${routeName}`,
-      TransactionType.NAVIGATION,
-      { previousRoute }
-    );
-    
+    const transaction = startTransaction(`Navigation: ${routeName}`, TransactionType.NAVIGATION, {
+      previousRoute,
+    });
+
     // Add breadcrumb for navigation
     Sentry.addBreadcrumb({
       category: 'navigation',
@@ -134,7 +136,7 @@ export const trackNavigation = (routeName: string, previousRoute?: string) => {
       data: { previousRoute },
       level: 'info',
     });
-    
+
     // Finish the transaction after a delay to capture render time
     setTimeout(() => {
       transaction?.finish();
@@ -153,19 +155,14 @@ export const trackNavigation = (routeName: string, previousRoute?: string) => {
  * @param status HTTP status code
  * @param duration Request duration in ms
  */
-export const trackApiRequest = (
-  url: string,
-  method: string,
-  status: number,
-  duration: number
-) => {
+export const trackApiRequest = (url: string, method: string, status: number, duration: number) => {
   try {
     const transaction = startTransaction(
       `API: ${method} ${getUrlPath(url)}`,
       TransactionType.API_REQUEST,
       { url, method, status, duration }
     );
-    
+
     // Add breadcrumb for API request
     Sentry.addBreadcrumb({
       category: 'xhr',
@@ -173,7 +170,7 @@ export const trackApiRequest = (
       data: { url, method, status, duration },
       level: status >= 400 ? 'error' : 'info',
     });
-    
+
     // Finish the transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -190,12 +187,11 @@ export const trackApiRequest = (
  */
 export const trackUiRender = (componentName: string, duration: number) => {
   try {
-    const transaction = startTransaction(
-      `Render: ${componentName}`,
-      TransactionType.UI_RENDER,
-      { componentName, duration }
-    );
-    
+    const transaction = startTransaction(`Render: ${componentName}`, TransactionType.UI_RENDER, {
+      componentName,
+      duration,
+    });
+
     // Finish the transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -217,12 +213,11 @@ export const trackDataOperation = (
   data?: Record<string, any>
 ) => {
   try {
-    const transaction = startTransaction(
-      `Data: ${operationName}`,
-      TransactionType.DATA_OPERATION,
-      { ...data, duration }
-    );
-    
+    const transaction = startTransaction(`Data: ${operationName}`, TransactionType.DATA_OPERATION, {
+      ...data,
+      duration,
+    });
+
     // Finish the transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -249,7 +244,7 @@ export const trackUserInteraction = (
       TransactionType.USER_INTERACTION,
       { ...data, duration }
     );
-    
+
     // Add breadcrumb for user interaction
     Sentry.addBreadcrumb({
       category: 'ui.interaction',
@@ -257,7 +252,7 @@ export const trackUserInteraction = (
       data,
       level: 'info',
     });
-    
+
     // Finish the transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -277,7 +272,7 @@ export const updatePerformanceMetrics = (metrics: Partial<PerformanceMetrics>) =
       ...performanceMetrics,
       ...metrics,
     };
-    
+
     // Set tags for performance metrics
     Object.entries(metrics).forEach(([key, value]) => {
       if (value !== undefined) {

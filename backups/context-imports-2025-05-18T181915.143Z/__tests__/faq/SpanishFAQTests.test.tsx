@@ -1,9 +1,10 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import FAQScreen from '../../screens/FAQScreen';
+import React from 'react';
+
 import QuestionSubmissionForm from '../../components/QuestionSubmissionForm';
 import { I18nProvider } from '../../contexts/I18nContext';
 import { ThemeProvider } from '../../contexts/ThemeContext';
+import FAQScreen from '../../screens/FAQScreen';
 
 // Mock navigation
 jest.mock('@react-navigation/native', () => ({
@@ -57,10 +58,14 @@ describe('Spanish FAQ Tests', () => {
 
     // Check that the title is in Spanish
     expect(await findByText('Preguntas Frecuentes')).toBeTruthy();
-    expect(await findByText('Aprenda más sobre nuestras predicciones de apuestas deportivas con IA')).toBeTruthy();
+    expect(
+      await findByText('Aprenda más sobre nuestras predicciones de apuestas deportivas con IA')
+    ).toBeTruthy();
 
     // Check that at least one FAQ item is in Spanish
-    expect(await findByText('¿Cómo se calculan los intervalos de confianza en las predicciones de IA?')).toBeTruthy();
+    expect(
+      await findByText('¿Cómo se calculan los intervalos de confianza en las predicciones de IA?')
+    ).toBeTruthy();
   });
 
   it('should render question submission form in Spanish', () => {
@@ -74,10 +79,16 @@ describe('Spanish FAQ Tests', () => {
 
     // Check that the form elements are in Spanish
     expect(getByText('Hacer una Pregunta')).toBeTruthy();
-    expect(getByText('¿Tiene una pregunta sobre apuestas deportivas o nuestras predicciones de IA? Envíela aquí y nuestro equipo la responderá.')).toBeTruthy();
+    expect(
+      getByText(
+        '¿Tiene una pregunta sobre apuestas deportivas o nuestras predicciones de IA? Envíela aquí y nuestro equipo la responderá.'
+      )
+    ).toBeTruthy();
     expect(getByPlaceholderText('Escriba su pregunta aquí...')).toBeTruthy();
     expect(getByText('Enviar Pregunta')).toBeTruthy();
-    expect(getByText('Las preguntas son revisadas por nuestro equipo antes de ser añadidas a las FAQ.')).toBeTruthy();
+    expect(
+      getByText('Las preguntas son revisadas por nuestro equipo antes de ser añadidas a las FAQ.')
+    ).toBeTruthy();
   });
 
   it('should handle form submission in Spanish', () => {
@@ -121,10 +132,7 @@ describe('Spanish FAQ Tests', () => {
     fireEvent.press(submitButton);
 
     // Check that the error alert is shown in Spanish
-    expect(mockAlert).toHaveBeenCalledWith(
-      'Error',
-      'Por favor ingrese una pregunta'
-    );
+    expect(mockAlert).toHaveBeenCalledWith('Error', 'Por favor ingrese una pregunta');
   });
 
   it('should expand FAQ items in Spanish', async () => {
@@ -137,12 +145,16 @@ describe('Spanish FAQ Tests', () => {
     );
 
     // Find a FAQ question in Spanish
-    const question = await findByText('¿Cómo se calculan los intervalos de confianza en las predicciones de IA?');
-    
+    const question = await findByText(
+      '¿Cómo se calculan los intervalos de confianza en las predicciones de IA?'
+    );
+
     // Click on the question to expand it
     fireEvent.press(question);
-    
+
     // Check that the answer is displayed in Spanish
-    expect(await findByText(/Los intervalos de confianza en nuestras predicciones de IA se calculan/)).toBeTruthy();
+    expect(
+      await findByText(/Los intervalos de confianza en nuestras predicciones de IA se calculan/)
+    ).toBeTruthy();
   });
 });

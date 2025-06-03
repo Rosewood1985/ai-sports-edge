@@ -4,8 +4,8 @@
  * An atomic component that displays a chip for a report widget.
  */
 
-import React from 'react';
 import { Chip, ChipProps } from '@mui/material';
+import React from 'react';
 
 // Widget name mapping
 const WIDGET_NAMES: Record<string, string> = {

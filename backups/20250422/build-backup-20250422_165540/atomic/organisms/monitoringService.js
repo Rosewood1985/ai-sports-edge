@@ -6,6 +6,17 @@
  */
 
 import {
+  safeErrorCapture,
+  formatError,
+  createError,
+  parseError,
+  getErrorCode,
+  getUserFriendlyMessage,
+  isNetworkError,
+  isAuthError,
+  isPermissionError,
+} from '../atoms/errorUtils';
+import {
   initErrorTracking,
   captureException,
   captureMessage,
@@ -19,7 +30,6 @@ import {
   flush as flushSentry,
   close as closeSentry,
 } from '../molecules/errorTracking';
-
 import {
   initLogging,
   LogLevel,
@@ -39,7 +49,6 @@ import {
   enableRemoteLogging,
   manualFlushLogs,
 } from '../molecules/logging';
-
 import {
   initPerformanceMonitoring,
   TransactionType,
@@ -53,18 +62,6 @@ import {
   getPerformanceMetrics,
   createPerformanceTimer,
 } from '../molecules/performance';
-
-import {
-  safeErrorCapture,
-  formatError,
-  createError,
-  parseError,
-  getErrorCode,
-  getUserFriendlyMessage,
-  isNetworkError,
-  isAuthError,
-  isPermissionError,
-} from '../atoms/errorUtils';
 
 /**
  * Monitoring service initialization options

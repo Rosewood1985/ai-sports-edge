@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   View,
@@ -8,12 +9,12 @@ import {
   Modal,
   Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
-import { useTheme } from '../contexts/ThemeContext';
-import Colors from '../constants/Colors';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
+import Colors from '../constants/Colors';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Define time period types
 export type TimePeriod = 'today' | 'week' | 'month' | 'year' | 'all' | 'custom';
@@ -39,12 +40,12 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   const [selectedStartDate, setSelectedStartDate] = useState<string | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<string | null>(null);
   const [markedDates, setMarkedDates] = useState<any>({});
-  
+
   // Get theme colors
   const { colors, isDark } = useTheme();
   const backgroundColor = isDark ? '#1A1A1A' : '#FFFFFF';
   const textColor = isDark ? '#FFFFFF' : '#000000';
-  
+
   // Time period options
   const periods = [
     { key: 'today', label: 'Today' },
@@ -59,7 +60,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     { key: 'ytd', label: 'Year to Date' },
     { key: 'year', label: 'Last Year' },
   ];
-  
+
   // Show calendar modal
   const showCalendar = () => {
     // Reset selection
@@ -68,16 +69,16 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     setMarkedDates({});
     setIsCalendarVisible(true);
   };
-  
+
   // Hide calendar modal
   const hideCalendar = () => {
     setIsCalendarVisible(false);
   };
-  
+
   // Handle date selection
   const handleDateSelect = (day: any) => {
     const dateString = day.dateString;
-    
+
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
       // Start new selection
       setSelectedStartDate(dateString);
@@ -94,7 +95,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
       // Complete the selection
       const start = new Date(selectedStartDate);
       const end = new Date(dateString);
-      
+
       // Ensure start date is before end date
       if (start > end) {
         setSelectedStartDate(dateString);
@@ -102,17 +103,17 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
       } else {
         setSelectedEndDate(dateString);
       }
-      
+
       // Mark the range
       const markedDatesObj: any = {};
       const startDate = start < end ? start : end;
       const endDate = start < end ? end : start;
-      
-      let currentDate = new Date(startDate);
-      
+
+      const currentDate = new Date(startDate);
+
       while (currentDate <= endDate) {
         const dateStr = currentDate.toISOString().split('T')[0];
-        
+
         if (dateStr === startDate.toISOString().split('T')[0]) {
           markedDatesObj[dateStr] = {
             selected: true,
@@ -134,31 +135,31 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
             textColor: 'white',
           };
         }
-        
+
         currentDate.setDate(currentDate.getDate() + 1);
       }
-      
+
       setMarkedDates(markedDatesObj);
     }
   };
-  
+
   // Apply selected date range
   const applyDateRange = () => {
     if (selectedStartDate && selectedEndDate && onSelectCustomRange) {
       const start = new Date(selectedStartDate);
       const end = new Date(selectedEndDate);
-      
+
       // Ensure start date is before end date
       if (start > end) {
         onSelectCustomRange(end, start);
       } else {
         onSelectCustomRange(start, end);
       }
-      
+
       hideCalendar();
     }
   };
-  
+
   // Format date for display
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -167,7 +168,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
       year: 'numeric',
     });
   };
-  
+
   // Get custom range display text
   const getCustomRangeText = () => {
     if (customDateRange) {
@@ -175,7 +176,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     }
     return 'Custom Range';
   };
-  
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -184,7 +185,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
         style={styles.periodSelector}
         contentContainerStyle={styles.periodSelectorContent}
       >
-        {periods.map((period) => (
+        {periods.map(period => (
           <TouchableOpacity
             key={period.key}
             style={[
@@ -205,7 +206,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
             </Text>
           </TouchableOpacity>
         ))}
-        
+
         <TouchableOpacity
           style={[
             styles.periodOption,
@@ -225,10 +226,10 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
           </Text>
         </TouchableOpacity>
       </ScrollView>
-      
+
       <Modal
         visible={isCalendarVisible}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={hideCalendar}
       >
@@ -240,7 +241,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                 <Ionicons name="close" size={24} color={textColor} />
               </TouchableOpacity>
             </View>
-            
+
             <Calendar
               markingType="period"
               markedDates={markedDates}
@@ -266,7 +267,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
                 textDayHeaderFontSize: 16,
               }}
             />
-            
+
             <View style={styles.calendarFooter}>
               <TouchableOpacity
                 style={[styles.calendarButton, styles.cancelButton]}
@@ -274,7 +275,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
               >
                 <Text style={styles.calendarButtonText}>Cancel</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[
                   styles.calendarButton,

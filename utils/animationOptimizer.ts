@@ -11,7 +11,7 @@ export enum AnimationType {
   SEQUENCE = 'sequence',
   PARALLEL = 'parallel',
   SPRING = 'spring',
-  STAGGER = 'stagger'
+  STAGGER = 'stagger',
 }
 
 /**
@@ -20,7 +20,7 @@ export enum AnimationType {
 export enum DevicePerformanceLevel {
   LOW = 'low',
   MEDIUM = 'medium',
-  HIGH = 'high'
+  HIGH = 'high',
 }
 
 // Cache the device performance level
@@ -35,11 +35,11 @@ export const getDevicePerformanceLevel = (): DevicePerformanceLevel => {
   if (cachedPerformanceLevel) {
     return cachedPerformanceLevel;
   }
-  
+
   // Get screen dimensions
   const { width, height } = Dimensions.get('window');
   const screenResolution = width * height;
-  
+
   // Determine performance level based on platform and screen resolution
   if (Platform.OS === 'web') {
     // Web performance is generally good
@@ -66,7 +66,7 @@ export const getDevicePerformanceLevel = (): DevicePerformanceLevel => {
       cachedPerformanceLevel = DevicePerformanceLevel.LOW;
     }
   }
-  
+
   return cachedPerformanceLevel;
 };
 
@@ -76,7 +76,7 @@ export const getDevicePerformanceLevel = (): DevicePerformanceLevel => {
  */
 export const shouldEnableComplexAnimations = (): boolean => {
   const performanceLevel = getDevicePerformanceLevel();
-  
+
   // Enable complex animations only on medium and high performance devices
   return performanceLevel !== DevicePerformanceLevel.LOW;
 };
@@ -92,17 +92,17 @@ export const getOptimizedDuration = (
   animationType: AnimationType
 ): number => {
   const performanceLevel = getDevicePerformanceLevel();
-  
+
   // Adjust duration based on performance level and animation type
   switch (performanceLevel) {
     case DevicePerformanceLevel.LOW:
       // Shorter durations for low-end devices
       return Math.min(baseDuration * 0.7, 500);
-      
+
     case DevicePerformanceLevel.MEDIUM:
       // Slightly adjusted durations for mid-range devices
       return baseDuration * 0.9;
-      
+
     case DevicePerformanceLevel.HIGH:
     default:
       // Full durations for high-end devices
@@ -115,11 +115,9 @@ export const getOptimizedDuration = (
  * @param animationType Type of animation
  * @returns Configuration object with optimized parameters
  */
-export const getOptimizedConfig = (
-  animationType: AnimationType
-): Record<string, any> => {
+export const getOptimizedConfig = (animationType: AnimationType): Record<string, any> => {
   const performanceLevel = getDevicePerformanceLevel();
-  
+
   // Base configurations
   const baseConfig: Record<string, Record<string, any>> = {
     [AnimationType.FADE]: {
@@ -149,10 +147,10 @@ export const getOptimizedConfig = (
       // No specific config for stagger
     },
   };
-  
+
   // Get base config for animation type
   const config = { ...baseConfig[animationType] };
-  
+
   // Adjust config based on performance level
   switch (performanceLevel) {
     case DevicePerformanceLevel.LOW:
@@ -162,7 +160,7 @@ export const getOptimizedConfig = (
         config.tension = 30; // Lower tension for less computation
       }
       break;
-      
+
     case DevicePerformanceLevel.MEDIUM:
       // Slight optimizations for mid-range devices
       if (animationType === AnimationType.SPRING) {
@@ -170,13 +168,13 @@ export const getOptimizedConfig = (
         config.tension = 35;
       }
       break;
-      
+
     case DevicePerformanceLevel.HIGH:
     default:
       // No adjustments needed for high-end devices
       break;
   }
-  
+
   return config;
 };
 
@@ -187,16 +185,16 @@ export const getOptimizedConfig = (
  */
 export const getOptimizedDelay = (baseDelay: number): number => {
   const performanceLevel = getDevicePerformanceLevel();
-  
+
   switch (performanceLevel) {
     case DevicePerformanceLevel.LOW:
       // Longer delays for low-end devices to reduce CPU load
       return Math.max(baseDelay * 1.5, 100);
-      
+
     case DevicePerformanceLevel.MEDIUM:
       // Slightly longer delays for mid-range devices
       return baseDelay * 1.2;
-      
+
     case DevicePerformanceLevel.HIGH:
     default:
       // Normal delays for high-end devices

@@ -1,30 +1,27 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Alert,
   ScrollView,
   NativeSyntheticEvent,
-  NativeScrollEvent
+  NativeScrollEvent,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
 import { useLanguage } from '../../../atomic/organisms/i18n/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
-import { saveVerificationData } from '../../services/userService';
-import { markOnboardingCompleted } from '../../services/onboardingService';
-import { info, error as logError, LogCategory } from '../../services/loggingService';
 import { safeErrorCapture } from '../../services/errorUtils';
+import { info, error as logError, LogCategory } from '../../services/loggingService';
+import { markOnboardingCompleted } from '../../services/onboardingService';
+import { saveVerificationData } from '../../services/userService';
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 
 type LiabilityWaiverScreenNavigationProp = StackNavigationProp<
   OnboardingStackParamList,
@@ -39,62 +36,53 @@ const LiabilityWaiverScreen = () => {
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
-  
+
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     const paddingToBottom = 20;
-    
-    if (layoutMeasurement.height + contentOffset.y >= 
-        contentSize.height - paddingToBottom) {
+
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom) {
       setHasScrolledToBottom(true);
     }
   };
-  
+
   const handleAccept = async () => {
     console.log('LiabilityWaiverScreen: handleAccept called');
-    
+
     if (!user) {
       console.log('LiabilityWaiverScreen: No user found');
-      Alert.alert(
-        t('common.error'),
-        t('common.not_authenticated'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('common.not_authenticated'), [{ text: t('common.ok') }]);
       return;
     }
-    
+
     if (!hasScrolledToBottom || !hasAcknowledged) {
       console.log('LiabilityWaiverScreen: User has not scrolled to bottom or acknowledged');
-      Alert.alert(
-        t('liability.alert_title'),
-        t('liability.alert_message'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('liability.alert_title'), t('liability.alert_message'), [
+        { text: t('common.ok') },
+      ]);
       return;
     }
-    
+
     try {
       console.log('LiabilityWaiverScreen: Saving waiver acceptance');
-      
+
       // Save waiver acceptance to user profile
       await saveVerificationData(user.uid, 'waiverAcceptance', {
         accepted: true,
-        version: '1.0'
+        version: '1.0',
       });
-      
+
       // Mark onboarding as completed
       console.log('LiabilityWaiverScreen: Marking onboarding as completed');
       await markOnboardingCompleted();
       info(LogCategory.APP, 'Onboarding completed by user');
-      
+
       // Navigate to main app
       // In a real app, this would navigate to the main app
       // For now, we'll just show an alert
       console.log('LiabilityWaiverScreen: Showing completion alert');
-      Alert.alert(
-        t('onboarding.complete_title'),
-        t('onboarding.complete_message'),
-        [{
+      Alert.alert(t('onboarding.complete_title'), t('onboarding.complete_message'), [
+        {
           text: t('common.ok'),
           onPress: () => {
             console.log('LiabilityWaiverScreen: Navigating to Main app');
@@ -103,146 +91,123 @@ const LiabilityWaiverScreen = () => {
               index: 0,
               routes: [{ name: 'Welcome' }], // This would be 'Main' in a real app
             });
-          }
-        }]
-      );
+          },
+        },
+      ]);
     } catch (error) {
       console.error('LiabilityWaiverScreen: Error during acceptance process:', error);
       logError(LogCategory.APP, 'Error during liability waiver acceptance', error as Error);
       safeErrorCapture(error as Error);
-      
-      Alert.alert(
-        t('common.error'),
-        t('liability.save_error'),
-        [{ text: t('common.ok') }]
-      );
+
+      Alert.alert(t('common.error'), t('liability.save_error'), [{ text: t('common.ok') }]);
     }
   };
-  
+
   const handleDecline = () => {
-    Alert.alert(
-      t('liability.decline_title'),
-      t('liability.decline_message'),
-      [
-        { 
-          text: t('liability.review_again'), 
-          onPress: () => {
-            // Scroll back to top
-            scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-          } 
+    Alert.alert(t('liability.decline_title'), t('liability.decline_message'), [
+      {
+        text: t('liability.review_again'),
+        onPress: () => {
+          // Scroll back to top
+          scrollViewRef.current?.scrollTo({ y: 0, animated: true });
         },
-        { 
-          text: t('liability.exit'), 
-          style: 'cancel',
-          onPress: () => {
-            // Navigate back to welcome screen
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Welcome' }],
-            });
-          } 
-        }
-      ]
-    );
+      },
+      {
+        text: t('liability.exit'),
+        style: 'cancel',
+        onPress: () => {
+          // Navigate back to welcome screen
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Welcome' }],
+          });
+        },
+      },
+    ]);
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          {t('liability.title')}
-        </ThemedText>
-        
+        <ThemedText style={styles.title}>{t('liability.title')}</ThemedText>
+
         <ScrollView
           ref={scrollViewRef}
           style={styles.scrollView}
           onScroll={handleScroll}
           scrollEventThrottle={400}
-          accessible={true}
+          accessible
           accessibilityLabel={t('liability.content')}
           accessibilityRole="text"
           testID="waiver-scroll-view"
         >
-          <ThemedText style={styles.content}>
-            {t('liability.content')}
-          </ThemedText>
+          <ThemedText style={styles.content}>{t('liability.content')}</ThemedText>
         </ScrollView>
-        
+
         {!hasScrolledToBottom && (
           <ThemedText style={[styles.scrollPrompt, { color: colors.primary }]}>
             {t('liability.scroll_to_continue')}
           </ThemedText>
         )}
-        
+
         <TouchableOpacity
           style={styles.checkboxContainer}
           onPress={() => setHasAcknowledged(!hasAcknowledged)}
           disabled={!hasScrolledToBottom}
-          accessible={true}
+          accessible
           accessibilityLabel={t('liability.acknowledgment')}
           accessibilityRole="checkbox"
-          accessibilityState={{ 
+          accessibilityState={{
             checked: hasAcknowledged,
-            disabled: !hasScrolledToBottom
+            disabled: !hasScrolledToBottom,
           }}
           testID="waiver-checkbox"
         >
-          <View style={[
-            styles.checkbox,
-            { 
-              borderColor: colors.text,
-              opacity: hasScrolledToBottom ? 1 : 0.5
-            }
-          ]}>
-            {hasAcknowledged && (
-              <Ionicons
-                name="checkmark"
-                size={18}
-                color={colors.primary}
-              />
-            )}
+          <View
+            style={[
+              styles.checkbox,
+              {
+                borderColor: colors.text,
+                opacity: hasScrolledToBottom ? 1 : 0.5,
+              },
+            ]}
+          >
+            {hasAcknowledged && <Ionicons name="checkmark" size={18} color={colors.primary} />}
           </View>
-          <ThemedText style={[
-            styles.checkboxLabel,
-            { opacity: hasScrolledToBottom ? 1 : 0.5 }
-          ]}>
+          <ThemedText style={[styles.checkboxLabel, { opacity: hasScrolledToBottom ? 1 : 0.5 }]}>
             {t('liability.acknowledgment')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.declineButton, { borderColor: colors.border }]}
             onPress={handleDecline}
-            accessible={true}
+            accessible
             accessibilityLabel={t('liability.decline')}
             accessibilityRole="button"
           >
-            <ThemedText style={styles.declineButtonText}>
-              {t('liability.decline')}
-            </ThemedText>
+            <ThemedText style={styles.declineButtonText}>{t('liability.decline')}</ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
-              styles.acceptButton, 
-              { 
+              styles.acceptButton,
+              {
                 backgroundColor: colors.primary,
-                opacity: hasScrolledToBottom && hasAcknowledged ? 1 : 0.5 
-              }
+                opacity: hasScrolledToBottom && hasAcknowledged ? 1 : 0.5,
+              },
             ]}
             onPress={handleAccept}
             disabled={!hasScrolledToBottom || !hasAcknowledged}
-            accessible={true}
+            accessible
             accessibilityLabel={t('liability.accept')}
             accessibilityRole="button"
-            accessibilityState={{ 
-              disabled: !hasScrolledToBottom || !hasAcknowledged 
+            accessibilityState={{
+              disabled: !hasScrolledToBottom || !hasAcknowledged,
             }}
           >
-            <Text style={styles.acceptButtonText}>
-              {t('liability.accept')}
-            </Text>
+            <Text style={styles.acceptButtonText}>{t('liability.accept')}</Text>
           </TouchableOpacity>
         </View>
       </View>

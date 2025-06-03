@@ -1,15 +1,18 @@
 import React from 'react';
+
 import { EnhancedWidget } from './EnhancedWidget';
-import { MetricCard } from '../metrics/MetricCard';
-import { HorizontalBarChart } from '../charts/HorizontalBarChart';
-import { PieChart } from '../charts/PieChart';
-import { LineChart } from '../charts/LineChart';
-import { RiskMatrix } from './RiskMatrix';
 import { RecommendationsList } from './RecommendationsList';
-import { TrendDirection } from '../metrics/MetricCard';
+import { RiskMatrix } from './RiskMatrix';
 import { Tooltip } from '../../../components/ui/Tooltip';
-import { useSubscriptionAnalyticsData, SubscriptionAnalyticsData } from '../../../services/adminDashboardService';
+import {
+  useSubscriptionAnalyticsData,
+  SubscriptionAnalyticsData,
+} from '../../../services/adminDashboardService';
 import { DataStatusIndicator } from '../atoms/DataStatusIndicator';
+import { HorizontalBarChart } from '../charts/HorizontalBarChart';
+import { LineChart } from '../charts/LineChart';
+import { PieChart } from '../charts/PieChart';
+import { TrendDirection, MetricCard } from '../metrics/MetricCard';
 
 // Real-time recommendation action handler
 const useRecommendationActions = () => {
@@ -55,7 +58,7 @@ export function EnhancedSubscriptionAnalyticsWidget() {
           <a href="/analytics/subscriptions" className="text-blue-500 hover:underline text-sm">
             View detailed subscription analytics
           </a>
-          <DataStatusIndicator 
+          <DataStatusIndicator
             isRealTime={isRealTime || false}
             lastUpdated={new Date().toISOString()}
             connectionStatus={!error}

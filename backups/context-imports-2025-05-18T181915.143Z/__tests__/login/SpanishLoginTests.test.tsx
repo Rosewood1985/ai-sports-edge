@@ -1,8 +1,9 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import NeonLoginScreen from '../../screens/NeonLoginScreen';
+import React from 'react';
+
 import { I18nProvider } from '../../contexts/I18nContext';
 import { ThemeProvider } from '../../contexts/ThemeContext';
+import NeonLoginScreen from '../../screens/NeonLoginScreen';
 
 // Mock navigation
 jest.mock('@react-navigation/native', () => ({
@@ -91,7 +92,7 @@ describe('Spanish Login Screen Tests', () => {
     // Enter email and password
     const emailInput = getByPlaceholderText('Correo electrónico');
     const passwordInput = getByPlaceholderText('Contraseña');
-    
+
     fireEvent.changeText(emailInput, 'test@example.com');
     fireEvent.changeText(passwordInput, 'password123');
 

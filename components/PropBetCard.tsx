@@ -1,9 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { PropBetPrediction } from '../types/playerProps';
-import { useTheme } from '../contexts/ThemeContext';
+
 import PremiumFeature from './PremiumFeature';
+import { useTheme } from '../contexts/ThemeContext';
+import { PropBetPrediction } from '../types/playerProps';
 
 interface PropBetCardProps {
   prediction: PropBetPrediction;
@@ -11,21 +12,15 @@ interface PropBetCardProps {
   onSubscribe?: () => void;
 }
 
-const PropBetCard: React.FC<PropBetCardProps> = ({ 
-  prediction, 
-  isPremium,
-  onSubscribe 
-}) => {
+const PropBetCard: React.FC<PropBetCardProps> = ({ prediction, isPremium, onSubscribe }) => {
   const { colors, isDark } = useTheme();
-  
+
   // Format the prop type for display
   const formatPropType = (type: string): string => {
     // Convert camelCase to Title Case with spaces
-    return type
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (str) => str.toUpperCase());
+    return type.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
   };
-  
+
   // Get icon for prop type
   const getPropTypeIcon = (type: string): string => {
     switch (type) {
@@ -63,7 +58,7 @@ const PropBetCard: React.FC<PropBetCardProps> = ({
         return 'stats-chart';
     }
   };
-  
+
   // Get color for confidence level
   const getConfidenceColor = (confidence: string): string => {
     switch (confidence) {
@@ -77,7 +72,7 @@ const PropBetCard: React.FC<PropBetCardProps> = ({
         return '#9E9E9E'; // Grey
     }
   };
-  
+
   // If premium content and user doesn't have premium access
   if (prediction.isPremium && !isPremium) {
     return (
@@ -92,15 +87,17 @@ const PropBetCard: React.FC<PropBetCardProps> = ({
       </PremiumFeature>
     );
   }
-  
+
   return (
-    <View style={[
-      styles.container,
-      { 
-        backgroundColor: isDark ? '#2A2A2A' : '#FFFFFF',
-        borderColor: isDark ? '#444444' : '#E0E0E0'
-      }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? '#2A2A2A' : '#FFFFFF',
+          borderColor: isDark ? '#444444' : '#E0E0E0',
+        },
+      ]}
+    >
       <View style={styles.header}>
         <View style={styles.playerInfo}>
           <Text style={[styles.playerName, { color: colors.text }]}>
@@ -110,89 +107,82 @@ const PropBetCard: React.FC<PropBetCardProps> = ({
             {prediction.propBet.team}
           </Text>
         </View>
-        
-        <View style={[
-          styles.confidenceBadge,
-          { backgroundColor: getConfidenceColor(prediction.confidence) }
-        ]}>
+
+        <View
+          style={[
+            styles.confidenceBadge,
+            { backgroundColor: getConfidenceColor(prediction.confidence) },
+          ]}
+        >
           <Text style={styles.confidenceText}>
             {prediction.confidence.toUpperCase()} CONFIDENCE
           </Text>
         </View>
       </View>
-      
+
       <View style={styles.propDetails}>
         <View style={styles.propTypeContainer}>
-          <Ionicons 
-            name={getPropTypeIcon(prediction.propBet.type) as any} 
-            size={24} 
-            color={colors.primary} 
+          <Ionicons
+            name={getPropTypeIcon(prediction.propBet.type) as any}
+            size={24}
+            color={colors.primary}
           />
           <Text style={[styles.propType, { color: colors.text }]}>
             {formatPropType(prediction.propBet.type)}
           </Text>
         </View>
-        
+
         <View style={styles.lineContainer}>
-          <Text style={[styles.lineLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>
-            Line:
-          </Text>
-          <Text style={[styles.lineValue, { color: colors.text }]}>
-            {prediction.propBet.line}
-          </Text>
+          <Text style={[styles.lineLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>Line:</Text>
+          <Text style={[styles.lineValue, { color: colors.text }]}>{prediction.propBet.line}</Text>
         </View>
       </View>
-      
+
       <View style={styles.predictionContainer}>
         <Text style={[styles.predictionLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>
           AI Prediction:
         </Text>
-        <View style={[
-          styles.predictionBadge,
-          { 
-            backgroundColor: prediction.prediction === 'over' 
-              ? '#4CAF50' 
-              : '#F44336' 
-          }
-        ]}>
-          <Text style={styles.predictionText}>
-            {prediction.prediction.toUpperCase()}
-          </Text>
+        <View
+          style={[
+            styles.predictionBadge,
+            {
+              backgroundColor: prediction.prediction === 'over' ? '#4CAF50' : '#F44336',
+            },
+          ]}
+        >
+          <Text style={styles.predictionText}>{prediction.prediction.toUpperCase()}</Text>
         </View>
       </View>
-      
+
       <View style={styles.oddsContainer}>
         <View style={styles.oddsItem}>
-          <Text style={[styles.oddsLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>
-            Over:
-          </Text>
+          <Text style={[styles.oddsLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>Over:</Text>
           <Text style={[styles.oddsValue, { color: colors.text }]}>
-            {prediction.propBet.overOdds > 0 ? `+${prediction.propBet.overOdds}` : prediction.propBet.overOdds}
+            {prediction.propBet.overOdds > 0
+              ? `+${prediction.propBet.overOdds}`
+              : prediction.propBet.overOdds}
           </Text>
         </View>
-        
+
         <View style={styles.oddsItem}>
-          <Text style={[styles.oddsLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>
-            Under:
-          </Text>
+          <Text style={[styles.oddsLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>Under:</Text>
           <Text style={[styles.oddsValue, { color: colors.text }]}>
-            {prediction.propBet.underOdds > 0 ? `+${prediction.propBet.underOdds}` : prediction.propBet.underOdds}
+            {prediction.propBet.underOdds > 0
+              ? `+${prediction.propBet.underOdds}`
+              : prediction.propBet.underOdds}
           </Text>
         </View>
       </View>
-      
-      <View style={[
-        styles.reasoningContainer,
-        { backgroundColor: isDark ? '#222222' : '#F5F5F5' }
-      ]}>
+
+      <View
+        style={[styles.reasoningContainer, { backgroundColor: isDark ? '#222222' : '#F5F5F5' }]}
+      >
         <Text style={[styles.reasoningLabel, { color: isDark ? '#BBBBBB' : '#666666' }]}>
           AI Reasoning:
         </Text>
-        <Text style={[styles.reasoning, { color: colors.text }]}>
-          {prediction.reasoning}
-        </Text>
+        <Text style={[styles.reasoning, { color: colors.text }]}>{prediction.reasoning}</Text>
       </View>
-      
+
       <View style={styles.footer}>
         <Text style={[styles.accuracyText, { color: isDark ? '#BBBBBB' : '#666666' }]}>
           Historical Accuracy: {prediction.historicalAccuracy}%

@@ -9,8 +9,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
 import { Platform } from 'react-native';
-import { info, error as logError, LogCategory } from '../../../services/loggingService';
+
 import { safeErrorCapture } from '../../../services/errorUtils';
+import { info, error as logError, LogCategory } from '../../../services/loggingService';
 import { apiCache, ApiCacheOptions } from '../../molecules/cache/apiCache';
 
 // API base URL

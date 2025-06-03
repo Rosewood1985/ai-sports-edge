@@ -1,12 +1,12 @@
 /**
  * Advanced Stripe Service
- * 
+ *
  * Client-side service for advanced Stripe features including proration,
  * tax calculation, and multi-currency support
  */
 
-import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 export interface ProrationDetails {
   currentPlan: {
@@ -43,11 +43,11 @@ export interface TaxCalculation {
   taxAmount: number;
   totalAmount: number;
   currency: string;
-  taxBreakdown: Array<{
+  taxBreakdown: {
     jurisdiction: string;
     rate: number;
     amount: number;
-  }>;
+  }[];
 }
 
 export interface CustomerDetails {
@@ -92,7 +92,7 @@ class AdvancedStripeService {
     previewOnly: boolean = true
   ): Promise<ProrationDetails> {
     const calculateProration = httpsCallable(this.functions, 'calculateProration');
-    
+
     const user = this.auth.currentUser;
     if (!user) {
       throw new Error('User must be authenticated to calculate proration');
@@ -103,7 +103,7 @@ class AdvancedStripeService {
         userId: user.uid,
         subscriptionId,
         newPriceId,
-        previewOnly
+        previewOnly,
       });
 
       return result.data as ProrationDetails;
@@ -128,7 +128,7 @@ class AdvancedStripeService {
     currentPeriodEnd: number;
   }> {
     const updateSubscription = httpsCallable(this.functions, 'updateSubscriptionWithProration');
-    
+
     const user = this.auth.currentUser;
     if (!user) {
       throw new Error('User must be authenticated to update subscription');
@@ -139,7 +139,7 @@ class AdvancedStripeService {
         userId: user.uid,
         subscriptionId,
         newPriceId,
-        prorationBehavior
+        prorationBehavior,
       });
 
       return result.data as any;
@@ -152,12 +152,9 @@ class AdvancedStripeService {
   /**
    * Calculate tax for a purchase
    */
-  async calculateTax(
-    priceId: string,
-    customerDetails: CustomerDetails
-  ): Promise<TaxCalculation> {
+  async calculateTax(priceId: string, customerDetails: CustomerDetails): Promise<TaxCalculation> {
     const calculateTax = httpsCallable(this.functions, 'calculateTax');
-    
+
     const user = this.auth.currentUser;
     if (!user) {
       throw new Error('User must be authenticated to calculate tax');
@@ -167,7 +164,7 @@ class AdvancedStripeService {
       const result = await calculateTax({
         userId: user.uid,
         priceId,
-        customerDetails
+        customerDetails,
       });
 
       return result.data as TaxCalculation;
@@ -191,7 +188,7 @@ class AdvancedStripeService {
     availableCurrencies: string[];
   }> {
     const getPricing = httpsCallable(this.functions, 'getPricingForCurrency');
-    
+
     const user = this.auth.currentUser;
     if (!user) {
       throw new Error('User must be authenticated to get pricing');
@@ -201,7 +198,7 @@ class AdvancedStripeService {
       const result = await getPricing({
         userId: user.uid,
         productId,
-        currency
+        currency,
       });
 
       return result.data as any;
@@ -228,7 +225,7 @@ class AdvancedStripeService {
     currentPeriodEnd: number;
   }> {
     const createSubscription = httpsCallable(this.functions, 'createAdvancedSubscription');
-    
+
     const user = this.auth.currentUser;
     if (!user) {
       throw new Error('User must be authenticated to create subscription');
@@ -240,7 +237,7 @@ class AdvancedStripeService {
         paymentMethodId,
         priceId,
         customerDetails,
-        currency
+        currency,
       });
 
       return result.data as any;
@@ -256,7 +253,7 @@ class AdvancedStripeService {
   formatCurrencyAmount(amount: number, currency: string): string {
     // Handle zero-decimal currencies
     const divisor = ['jpy', 'krw', 'vnd'].includes(currency.toLowerCase()) ? 1 : 100;
-    
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency.toUpperCase(),
@@ -266,7 +263,7 @@ class AdvancedStripeService {
   /**
    * Get supported currencies
    */
-  getSupportedCurrencies(): Array<{ code: string; name: string; symbol: string }> {
+  getSupportedCurrencies(): { code: string; name: string; symbol: string }[] {
     return [
       { code: 'USD', name: 'US Dollar', symbol: '$' },
       { code: 'EUR', name: 'Euro', symbol: '€' },
@@ -360,7 +357,35 @@ class AdvancedStripeService {
     }
 
     // EU-specific validation
-    const euCountries = ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'];
+    const euCountries = [
+      'AT',
+      'BE',
+      'BG',
+      'HR',
+      'CY',
+      'CZ',
+      'DK',
+      'EE',
+      'FI',
+      'FR',
+      'DE',
+      'GR',
+      'HU',
+      'IE',
+      'IT',
+      'LV',
+      'LT',
+      'LU',
+      'MT',
+      'NL',
+      'PL',
+      'PT',
+      'RO',
+      'SK',
+      'SI',
+      'ES',
+      'SE',
+    ];
     if (euCountries.includes(customerDetails.address?.country || '')) {
       if (!customerDetails.address.postal_code) {
         errors.push('Postal code is required for EU addresses');
@@ -369,7 +394,7 @@ class AdvancedStripeService {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 }

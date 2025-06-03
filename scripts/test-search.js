@@ -62,7 +62,7 @@ async function testSearchWithFilters(query, filters) {
   try {
     const results = await searchService.search(query, filters);
     console.log(`Found ${results.totalResults} results with filters`);
-    
+
     // Display filtered results counts
     console.log(`- ${results.news.length} news items`);
     console.log(`- ${results.teams.length} teams`);

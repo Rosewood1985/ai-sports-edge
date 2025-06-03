@@ -3,13 +3,13 @@
  * Designed specifically for Firebase Functions environment without browser dependencies
  */
 
-const axios = require('axios');
+const axios = require("axios");
 
 class CloudGeolocationService {
   constructor() {
     this.initialized = true;
     this.apiKey = process.env.IPGEOLOCATION_API_KEY;
-    this.baseUrl = 'https://api.ipgeolocation.io/ipgeo';
+    this.baseUrl = "https://api.ipgeolocation.io/ipgeo";
   }
 
   /**
@@ -35,21 +35,21 @@ class CloudGeolocationService {
     try {
       // Try various headers that might contain the real IP
       const possibleHeaders = [
-        'x-forwarded-for',
-        'x-real-ip',
-        'x-client-ip',
-        'cf-connecting-ip', // Cloudflare
-        'x-cluster-client-ip',
-        'x-forwarded',
-        'forwarded-for',
-        'forwarded'
+        "x-forwarded-for",
+        "x-real-ip",
+        "x-client-ip",
+        "cf-connecting-ip", // Cloudflare
+        "x-cluster-client-ip",
+        "x-forwarded",
+        "forwarded-for",
+        "forwarded"
       ];
 
       for (const header of possibleHeaders) {
         const headerValue = req.get(header);
         if (headerValue) {
           // x-forwarded-for can contain multiple IPs, take the first one
-          const ip = headerValue.split(',')[0].trim();
+          const ip = headerValue.split(",")[0].trim();
           if (this.isValidIP(ip)) {
             return ip;
           }
@@ -68,7 +68,7 @@ class CloudGeolocationService {
 
       return null;
     } catch (error) {
-      console.error('Error extracting client IP:', error);
+      console.error("Error extracting client IP:", error);
       return null;
     }
   }
@@ -79,7 +79,7 @@ class CloudGeolocationService {
    * @returns {boolean} True if valid IP
    */
   isValidIP(ip) {
-    if (!ip || typeof ip !== 'string') return false;
+    if (!ip || typeof ip !== "string") return false;
     
     // IPv4 regex
     const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
@@ -98,13 +98,13 @@ class CloudGeolocationService {
   async getLocationFromIP(ipAddress) {
     try {
       if (!ipAddress || !this.isValidIP(ipAddress)) {
-        console.warn('Invalid IP address provided:', ipAddress);
+        console.warn("Invalid IP address provided:", ipAddress);
         return this.getDefaultLocation();
       }
 
       // Skip private/local IPs
       if (this.isPrivateIP(ipAddress)) {
-        console.log('Private IP detected, returning default location');
+        console.log("Private IP detected, returning default location");
         return this.getDefaultLocation();
       }
 
@@ -113,7 +113,7 @@ class CloudGeolocationService {
       const response = await axios.get(url, {
         timeout: 5000,
         headers: {
-          'User-Agent': 'AI-Sports-Edge/1.0'
+          "User-Agent": "AI-Sports-Edge/1.0"
         }
       });
 
@@ -121,22 +121,22 @@ class CloudGeolocationService {
         const data = response.data;
         
         return {
-          city: data.city || 'Unknown',
-          state: data.state_prov || 'Unknown',
-          country: data.country_name || 'Unknown',
+          city: data.city || "Unknown",
+          state: data.state_prov || "Unknown",
+          country: data.country_name || "Unknown",
           latitude: parseFloat(data.latitude) || 0,
           longitude: parseFloat(data.longitude) || 0,
-          timezone: data.time_zone?.name || 'Unknown',
-          postalCode: data.zipcode || 'Unknown',
+          timezone: data.time_zone?.name || "Unknown",
+          postalCode: data.zipcode || "Unknown",
           ipAddress: ipAddress,
           accuracy: data.accuracy || 0,
-          source: 'ipgeolocation-api'
+          source: "ipgeolocation-api"
         };
       }
 
-      throw new Error('Invalid API response');
+      throw new Error("Invalid API response");
     } catch (error) {
-      console.error('Error getting location from IP:', error.message);
+      console.error("Error getting location from IP:", error.message);
       return this.getDefaultLocation(ipAddress);
     }
   }
@@ -174,13 +174,13 @@ class CloudGeolocationService {
       const clientIp = this.getClientIP(req);
       
       if (!clientIp) {
-        console.warn('Could not determine client IP from request');
+        console.warn("Could not determine client IP from request");
         return this.getDefaultLocation();
       }
       
       return await this.getLocationFromIP(clientIp);
     } catch (error) {
-      console.error('Error getting location from request:', error);
+      console.error("Error getting location from request:", error);
       return this.getDefaultLocation();
     }
   }
@@ -190,18 +190,18 @@ class CloudGeolocationService {
    * @param {string} ipAddress - IP address (optional)
    * @returns {Object} Default location data
    */
-  getDefaultLocation(ipAddress = 'Unknown') {
+  getDefaultLocation(ipAddress = "Unknown") {
     return {
-      city: 'Unknown',
-      state: 'Unknown',
-      country: 'Unknown',
+      city: "Unknown",
+      state: "Unknown",
+      country: "Unknown",
       latitude: 0,
       longitude: 0,
-      timezone: 'UTC',
-      postalCode: 'Unknown',
+      timezone: "UTC",
+      postalCode: "Unknown",
       ipAddress: ipAddress,
       accuracy: 0,
-      source: 'default-fallback'
+      source: "default-fallback"
     };
   }
 
@@ -211,10 +211,10 @@ class CloudGeolocationService {
    * @returns {string} Timezone string
    */
   getTimezoneFromLocation(locationData) {
-    if (locationData && locationData.timezone && locationData.timezone !== 'Unknown') {
+    if (locationData && locationData.timezone && locationData.timezone !== "Unknown") {
       return locationData.timezone;
     }
-    return 'UTC';
+    return "UTC";
   }
 
   /**
@@ -223,23 +223,23 @@ class CloudGeolocationService {
    * @returns {string} Formatted location string
    */
   formatLocationDisplay(locationData) {
-    if (!locationData) return 'Unknown Location';
+    if (!locationData) return "Unknown Location";
     
     const parts = [];
     
-    if (locationData.city && locationData.city !== 'Unknown') {
+    if (locationData.city && locationData.city !== "Unknown") {
       parts.push(locationData.city);
     }
     
-    if (locationData.state && locationData.state !== 'Unknown') {
+    if (locationData.state && locationData.state !== "Unknown") {
       parts.push(locationData.state);
     }
     
-    if (locationData.country && locationData.country !== 'Unknown') {
+    if (locationData.country && locationData.country !== "Unknown") {
       parts.push(locationData.country);
     }
     
-    return parts.length > 0 ? parts.join(', ') : 'Unknown Location';
+    return parts.length > 0 ? parts.join(", ") : "Unknown Location";
   }
 }
 

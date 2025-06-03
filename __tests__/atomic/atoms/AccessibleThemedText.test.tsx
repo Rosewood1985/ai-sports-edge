@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+
 import '@testing-library/jest-dom';
 import { AccessibleThemedText } from '../../../atomic/atoms/AccessibleThemedText';
 
@@ -30,20 +31,20 @@ describe('AccessibleThemedText', () => {
 
   it('applies accessibility attributes correctly', () => {
     render(
-      <AccessibleThemedText 
+      <AccessibleThemedText
         {...defaultProps}
         accessibilityRole="header"
         accessibilityLabel="Main heading"
       />
     );
-    
+
     const element = screen.getByText('Test text content');
     expect(element).toHaveAttribute('role', 'header');
     expect(element).toHaveAttribute('aria-label', 'Main heading');
   });
 
   it('handles empty children gracefully', () => {
-    render(<AccessibleThemedText>{''}</AccessibleThemedText>);
+    render(<AccessibleThemedText />);
     expect(screen.getByTestId('accessible-themed-text')).toBeInTheDocument();
   });
 
@@ -55,7 +56,7 @@ describe('AccessibleThemedText', () => {
   it('applies custom styles correctly', () => {
     const customStyle = { fontSize: 16, fontWeight: 'bold' };
     render(<AccessibleThemedText {...defaultProps} style={customStyle} />);
-    
+
     const element = screen.getByText('Test text content');
     expect(element).toHaveStyle('font-size: 16px');
     expect(element).toHaveStyle('font-weight: bold');
@@ -63,13 +64,9 @@ describe('AccessibleThemedText', () => {
 
   it('supports semantic heading levels', () => {
     render(
-      <AccessibleThemedText 
-        {...defaultProps}
-        accessibilityRole="heading"
-        accessibilityLevel={2}
-      />
+      <AccessibleThemedText {...defaultProps} accessibilityRole="heading" accessibilityLevel={2} />
     );
-    
+
     const element = screen.getByText('Test text content');
     expect(element).toHaveAttribute('role', 'heading');
     expect(element).toHaveAttribute('aria-level', '2');
@@ -83,12 +80,12 @@ describe('AccessibleThemedText', () => {
 
   it('supports accessibility hints', () => {
     render(
-      <AccessibleThemedText 
+      <AccessibleThemedText
         {...defaultProps}
         accessibilityHint="This text provides important information"
       />
     );
-    
+
     const element = screen.getByText('Test text content');
     expect(element).toHaveAttribute('aria-describedby');
   });
@@ -102,19 +99,14 @@ describe('AccessibleThemedText', () => {
   it('applies correct color contrast for accessibility', () => {
     render(<AccessibleThemedText {...defaultProps} />);
     const element = screen.getByText('Test text content');
-    
+
     // Should have adequate contrast (mocked theme provides black on white)
     expect(element).toHaveStyle('color: #000000');
   });
 
   it('supports screen reader-only content', () => {
-    render(
-      <AccessibleThemedText 
-        {...defaultProps}
-        screenReaderOnly={true}
-      />
-    );
-    
+    render(<AccessibleThemedText {...defaultProps} screenReaderOnly />);
+
     const element = screen.getByText('Test text content');
     expect(element).toHaveClass('sr-only');
   });
@@ -122,7 +114,7 @@ describe('AccessibleThemedText', () => {
   it('handles dynamic text updates', () => {
     const { rerender } = render(<AccessibleThemedText>Original text</AccessibleThemedText>);
     expect(screen.getByText('Original text')).toBeInTheDocument();
-    
+
     rerender(<AccessibleThemedText>Updated text</AccessibleThemedText>);
     expect(screen.getByText('Updated text')).toBeInTheDocument();
     expect(screen.queryByText('Original text')).not.toBeInTheDocument();
@@ -130,14 +122,14 @@ describe('AccessibleThemedText', () => {
 
   it('supports multiple accessibility roles', () => {
     render(
-      <AccessibleThemedText 
+      <AccessibleThemedText
         {...defaultProps}
         accessibilityRole="button"
         accessibilityLabel="Text button"
         accessibilityState={{ pressed: false }}
       />
     );
-    
+
     const element = screen.getByText('Test text content');
     expect(element).toHaveAttribute('role', 'button');
     expect(element).toHaveAttribute('aria-label', 'Text button');

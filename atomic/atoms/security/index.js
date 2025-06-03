@@ -5,8 +5,8 @@
  */
 
 const apiKeyPatterns = require('./apiKeyPatterns');
-const inputValidation = require('./inputValidation');
 const authChecks = require('./authChecks');
+const inputValidation = require('./inputValidation');
 
 module.exports = {
   // API Key Detection

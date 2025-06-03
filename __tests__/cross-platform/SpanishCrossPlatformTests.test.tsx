@@ -1,9 +1,10 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+import React from 'react';
 import { Platform } from 'react-native';
+
 import { I18nProvider } from '../../../atomic/organisms/i18n/I18nContext';
-import { ThemeProvider } from '../../contexts/ThemeContext';
 import LanguageSelector from '../../components/LanguageSelector';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 import NeonLoginScreen from '../../screens/NeonLoginScreen';
 
 // Mock AsyncStorage
@@ -62,7 +63,7 @@ describe('Spanish Cross-Platform Tests', () => {
   describe('LanguageSelector', () => {
     it('should render correctly on iOS', () => {
       const restorePlatform = mockPlatform('ios');
-      
+
       try {
         const { getByText } = render(
           <ThemeProvider>
@@ -71,17 +72,17 @@ describe('Spanish Cross-Platform Tests', () => {
             </I18nProvider>
           </ThemeProvider>
         );
-        
+
         expect(getByText('English')).toBeTruthy();
         expect(getByText('Español')).toBeTruthy();
       } finally {
         restorePlatform();
       }
     });
-    
+
     it('should render correctly on Android', () => {
       const restorePlatform = mockPlatform('android');
-      
+
       try {
         const { getByText } = render(
           <ThemeProvider>
@@ -90,17 +91,17 @@ describe('Spanish Cross-Platform Tests', () => {
             </I18nProvider>
           </ThemeProvider>
         );
-        
+
         expect(getByText('English')).toBeTruthy();
         expect(getByText('Español')).toBeTruthy();
       } finally {
         restorePlatform();
       }
     });
-    
+
     it('should render correctly on Web', () => {
       const restorePlatform = mockPlatform('web');
-      
+
       try {
         const { getByText } = render(
           <ThemeProvider>
@@ -109,7 +110,7 @@ describe('Spanish Cross-Platform Tests', () => {
             </I18nProvider>
           </ThemeProvider>
         );
-        
+
         expect(getByText('English')).toBeTruthy();
         expect(getByText('Español')).toBeTruthy();
       } finally {
@@ -117,11 +118,11 @@ describe('Spanish Cross-Platform Tests', () => {
       }
     });
   });
-  
+
   describe('NeonLoginScreen', () => {
     it('should render correctly on iOS', () => {
       const restorePlatform = mockPlatform('ios');
-      
+
       try {
         const { getByText } = render(
           <ThemeProvider>
@@ -130,17 +131,17 @@ describe('Spanish Cross-Platform Tests', () => {
             </I18nProvider>
           </ThemeProvider>
         );
-        
+
         expect(getByText('INICIAR SESIÓN')).toBeTruthy();
         expect(getByText('¿Olvidó su contraseña?')).toBeTruthy();
       } finally {
         restorePlatform();
       }
     });
-    
+
     it('should render correctly on Android', () => {
       const restorePlatform = mockPlatform('android');
-      
+
       try {
         const { getByText } = render(
           <ThemeProvider>
@@ -149,17 +150,17 @@ describe('Spanish Cross-Platform Tests', () => {
             </I18nProvider>
           </ThemeProvider>
         );
-        
+
         expect(getByText('INICIAR SESIÓN')).toBeTruthy();
         expect(getByText('¿Olvidó su contraseña?')).toBeTruthy();
       } finally {
         restorePlatform();
       }
     });
-    
+
     it('should render correctly on Web', () => {
       const restorePlatform = mockPlatform('web');
-      
+
       try {
         const { getByText } = render(
           <ThemeProvider>
@@ -168,7 +169,7 @@ describe('Spanish Cross-Platform Tests', () => {
             </I18nProvider>
           </ThemeProvider>
         );
-        
+
         expect(getByText('INICIAR SESIÓN')).toBeTruthy();
         expect(getByText('¿Olvidó su contraseña?')).toBeTruthy();
       } finally {
@@ -176,14 +177,14 @@ describe('Spanish Cross-Platform Tests', () => {
       }
     });
   });
-  
+
   describe('Language Switching', () => {
     it('should switch language correctly on all platforms', () => {
       const platforms: ('ios' | 'android' | 'web')[] = ['ios', 'android', 'web'];
-      
+
       platforms.forEach(platform => {
         const restorePlatform = mockPlatform(platform);
-        
+
         try {
           const { getByText } = render(
             <ThemeProvider>
@@ -192,13 +193,13 @@ describe('Spanish Cross-Platform Tests', () => {
               </I18nProvider>
             </ThemeProvider>
           );
-          
+
           // Switch to English
           fireEvent.press(getByText('English'));
-          
+
           // Switch back to Spanish
           fireEvent.press(getByText('Español'));
-          
+
           // Verify Spanish is active
           expect(getByText('Español')).toBeTruthy();
         } finally {

@@ -1,6 +1,6 @@
 /**
  * Theme Module
- * 
+ *
  * Central module for theme configuration and context.
  * Exports all theme-related functionality.
  */

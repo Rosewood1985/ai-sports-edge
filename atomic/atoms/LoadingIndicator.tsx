@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+
 import { ThemedText } from './ThemedText';
 import { useUITheme } from '../../organisms/theme/UIThemeProvider';
 
@@ -15,14 +16,9 @@ interface LoadingIndicatorProps {
   style?: any;
 }
 
-export function LoadingIndicator({
-  size = 'large',
-  color,
-  text,
-  style,
-}: LoadingIndicatorProps) {
+export function LoadingIndicator({ size = 'large', color, text, style }: LoadingIndicatorProps) {
   const { theme } = useUITheme();
-  
+
   const styles = StyleSheet.create({
     container: {
       alignItems: 'center',
@@ -39,10 +35,7 @@ export function LoadingIndicator({
 
   return (
     <View style={[styles.container, style]}>
-      <ActivityIndicator 
-        size={size} 
-        color={color || theme.colors.primary} 
-      />
+      <ActivityIndicator size={size} color={color || theme.colors.primary} />
       {text && <ThemedText style={styles.text}>{text}</ThemedText>}
     </View>
   );

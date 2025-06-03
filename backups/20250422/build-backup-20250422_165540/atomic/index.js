@@ -1,6 +1,6 @@
 /**
  * Atomic Architecture Index
- * 
+ *
  * This file exports all components from the atomic architecture.
  * It provides a single entry point for importing components from any level.
  */

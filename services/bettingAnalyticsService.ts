@@ -1,4 +1,19 @@
-import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, addDoc, updateDoc, Timestamp, DocumentData } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  addDoc,
+  updateDoc,
+  Timestamp,
+  DocumentData,
+} from 'firebase/firestore';
+
 import { auth } from '../config/firebase';
 
 /**
@@ -35,7 +50,7 @@ export enum BetType {
   OVER_UNDER = 'overUnder',
   PROP = 'prop',
   PARLAY = 'parlay',
-  FUTURES = 'futures'
+  FUTURES = 'futures',
 }
 
 /**
@@ -44,7 +59,7 @@ export enum BetType {
 export enum BetStatus {
   PENDING = 'pending',
   SETTLED = 'settled',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 /**
@@ -54,7 +69,7 @@ export enum BetResult {
   WIN = 'win',
   LOSS = 'loss',
   PUSH = 'push',
-  VOID = 'void'
+  VOID = 'void',
 }
 
 /**
@@ -135,7 +150,7 @@ export interface TimePeriodFilter {
 class BettingAnalyticsService {
   private firestore = getFirestore();
   private betsCollection = collection(this.firestore, 'bets');
-  
+
   /**
    * Add a new bet record
    * @param bet Bet record to add
@@ -147,19 +162,19 @@ class BettingAnalyticsService {
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      
+
       // Calculate potential winnings if not provided
       if (!bet.potentialWinnings) {
         bet.potentialWinnings = this.calculatePotentialWinnings(bet.amount, bet.odds);
       }
-      
+
       const betWithUserId = {
         ...bet,
         userId,
         createdAt: bet.createdAt || Timestamp.now(),
-        status: bet.status || BetStatus.PENDING
+        status: bet.status || BetStatus.PENDING,
       };
-      
+
       const docRef = await addDoc(this.betsCollection, betWithUserId);
       return docRef.id;
     } catch (error) {
@@ -167,7 +182,7 @@ class BettingAnalyticsService {
       throw error;
     }
   }
-  
+
   /**
    * Update a bet record
    * @param betId Bet ID
@@ -179,31 +194,31 @@ class BettingAnalyticsService {
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      
+
       const betRef = doc(this.firestore, 'bets', betId);
       const betSnap = await getDoc(betRef);
-      
+
       if (!betSnap.exists()) {
         throw new Error('Bet not found');
       }
-      
+
       const betData = betSnap.data() as BetRecord;
       if (betData.userId !== userId) {
         throw new Error('Not authorized to update this bet');
       }
-      
+
       // If updating status to settled, add settledAt timestamp
       if (updates.status === BetStatus.SETTLED && !updates.settledAt) {
         updates.settledAt = Timestamp.now();
       }
-      
+
       await updateDoc(betRef, updates);
     } catch (error) {
       console.error('Error updating bet:', error);
       throw error;
     }
   }
-  
+
   /**
    * Get all bets for the current user
    * @param filters Optional filters
@@ -223,37 +238,34 @@ class BettingAnalyticsService {
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      
-      let q = query(
-        this.betsCollection,
-        where('userId', '==', userId)
-      );
-      
+
+      let q = query(this.betsCollection, where('userId', '==', userId));
+
       // Apply filters
       if (filters) {
         if (filters.status) {
           q = query(q, where('status', '==', filters.status));
         }
-        
+
         if (filters.betType) {
           q = query(q, where('betType', '==', filters.betType));
         }
-        
+
         if (filters.sport) {
           q = query(q, where('sport', '==', filters.sport));
         }
-        
+
         if (filters.league) {
           q = query(q, where('league', '==', filters.league));
         }
-        
+
         if (filters.teamId) {
           q = query(q, where('teamId', '==', filters.teamId));
         }
-        
+
         if (filters.timePeriod) {
           const { startDate, endDate, period } = filters.timePeriod;
-          
+
           if (startDate && endDate) {
             q = query(
               q,
@@ -263,7 +275,7 @@ class BettingAnalyticsService {
           } else if (period) {
             const now = new Date();
             let periodStartDate: Date;
-            
+
             switch (period) {
               case 'today':
                 periodStartDate = new Date(now.setHours(0, 0, 0, 0));
@@ -281,37 +293,37 @@ class BettingAnalyticsService {
                 // 'all' - no date filter
                 periodStartDate = new Date(0); // Beginning of time
             }
-            
+
             q = query(q, where('createdAt', '>=', Timestamp.fromDate(periodStartDate)));
           }
         }
-        
+
         // Order by creation date (newest first)
         q = query(q, orderBy('createdAt', 'desc'));
-        
+
         // Apply limit if specified
         if (filters.limit) {
           q = query(q, limit(filters.limit));
         }
       }
-      
+
       const querySnapshot = await getDocs(q);
       const bets: BetRecord[] = [];
-      
-      querySnapshot.forEach((doc) => {
+
+      querySnapshot.forEach(doc => {
         bets.push({
           id: doc.id,
-          ...doc.data() as Omit<BetRecord, 'id'>
+          ...(doc.data() as Omit<BetRecord, 'id'>),
         });
       });
-      
+
       return bets;
     } catch (error) {
       console.error('Error getting user bets:', error);
       throw error;
     }
   }
-  
+
   /**
    * Get analytics summary for the current user
    * @param timePeriod Optional time period filter
@@ -322,51 +334,52 @@ class BettingAnalyticsService {
       // Get all settled bets for the user within the time period
       const bets = await this.getUserBets({
         status: BetStatus.SETTLED,
-        timePeriod
+        timePeriod,
       });
-      
+
       if (bets.length === 0) {
         return this.getEmptyAnalyticsSummary();
       }
-      
+
       // Calculate basic stats
       const totalBets = bets.length;
       const totalWagered = bets.reduce((sum, bet) => sum + bet.amount, 0);
-      
+
       const winningBets = bets.filter(bet => bet.result === BetResult.WIN);
       const losingBets = bets.filter(bet => bet.result === BetResult.LOSS);
       const pushBets = bets.filter(bet => bet.result === BetResult.PUSH);
-      
+
       const totalWinnings = winningBets.reduce((sum, bet) => sum + (bet.potentialWinnings || 0), 0);
       const netProfit = totalWinnings - totalWagered;
       const roi = totalWagered > 0 ? (netProfit / totalWagered) * 100 : 0;
       const winRate = totalBets > 0 ? (winningBets.length / totalBets) * 100 : 0;
       const averageBetAmount = totalBets > 0 ? totalWagered / totalBets : 0;
-      const averageOdds = totalBets > 0 ? bets.reduce((sum, bet) => sum + bet.odds, 0) / totalBets : 0;
-      
+      const averageOdds =
+        totalBets > 0 ? bets.reduce((sum, bet) => sum + bet.odds, 0) / totalBets : 0;
+
       // Find best and worst bets
       const bestBet = this.findBestBet(bets);
       const worstBet = this.findWorstBet(bets);
-      
+
       // Calculate most bet sport and team
       const sportCounts: Record<string, number> = {};
       const teamCounts: Record<string, { teamId: string; teamName: string; count: number }> = {};
-      
+
       bets.forEach(bet => {
         // Count sports
         sportCounts[bet.sport] = (sportCounts[bet.sport] || 0) + 1;
-        
+
         // Count teams
         if (!teamCounts[bet.teamId]) {
           teamCounts[bet.teamId] = {
             teamId: bet.teamId,
             teamName: bet.teamName,
-            count: 0
+            count: 0,
           };
         }
         teamCounts[bet.teamId].count++;
       });
-      
+
       // Find most bet sport
       let mostBetSport: { sport: string; count: number } | undefined;
       Object.entries(sportCounts).forEach(([sport, count]) => {
@@ -374,7 +387,7 @@ class BettingAnalyticsService {
           mostBetSport = { sport, count };
         }
       });
-      
+
       // Find most bet team
       let mostBetTeam: { teamId: string; teamName: string; count: number } | undefined;
       Object.values(teamCounts).forEach(teamCount => {
@@ -382,19 +395,19 @@ class BettingAnalyticsService {
           mostBetTeam = teamCount;
         }
       });
-      
+
       // Calculate recent form (last 5 bets)
       const recentForm = bets
         .slice(0, 5)
         .map(bet => bet.result as BetResult)
         .filter(result => result !== undefined);
-      
+
       // Calculate streaks
       const streaks = this.calculateStreaks(bets);
-      
+
       // Calculate bet type breakdown
       const betTypeBreakdown: AnalyticsSummary['betTypeBreakdown'] = {};
-      
+
       Object.values(BetType).forEach(betType => {
         const betsOfType = bets.filter(bet => bet.betType === betType);
         if (betsOfType.length > 0) {
@@ -403,15 +416,15 @@ class BettingAnalyticsService {
           const totalWinningsOfType = betsOfType
             .filter(bet => bet.result === BetResult.WIN)
             .reduce((sum, bet) => sum + (bet.potentialWinnings || 0), 0);
-          
+
           betTypeBreakdown[betType] = {
             count: betsOfType.length,
             winRate: (winsOfType / betsOfType.length) * 100,
-            profit: totalWinningsOfType - totalWageredOfType
+            profit: totalWinningsOfType - totalWageredOfType,
           };
         }
       });
-      
+
       return {
         totalBets,
         totalWagered,
@@ -427,14 +440,14 @@ class BettingAnalyticsService {
         mostBetTeam,
         recentForm,
         streaks,
-        betTypeBreakdown
+        betTypeBreakdown,
       };
     } catch (error) {
       console.error('Error getting analytics summary:', error);
       throw error;
     }
   }
-  
+
   /**
    * Calculate potential winnings based on bet amount and odds
    * @param amount Bet amount
@@ -450,7 +463,7 @@ class BettingAnalyticsService {
       return amount * (100 / Math.abs(odds));
     }
   }
-  
+
   /**
    * Find the best bet from a list of bets
    * @param bets List of bets
@@ -461,15 +474,15 @@ class BettingAnalyticsService {
     if (winningBets.length === 0) {
       return undefined;
     }
-    
+
     return winningBets.reduce((best, bet) => {
       const profit = (bet.potentialWinnings || 0) - bet.amount;
       const bestProfit = (best.potentialWinnings || 0) - best.amount;
-      
+
       return profit > bestProfit ? bet : best;
     }, winningBets[0]);
   }
-  
+
   /**
    * Find the worst bet from a list of bets
    * @param bets List of bets
@@ -480,12 +493,12 @@ class BettingAnalyticsService {
     if (losingBets.length === 0) {
       return undefined;
     }
-    
+
     return losingBets.reduce((worst, bet) => {
       return bet.amount > worst.amount ? bet : worst;
     }, losingBets[0]);
   }
-  
+
   /**
    * Calculate winning and losing streaks
    * @param bets List of bets
@@ -496,12 +509,10 @@ class BettingAnalyticsService {
     let currentStreakCount = 0;
     let longestWinStreak = 0;
     let longestLossStreak = 0;
-    
+
     // Sort bets by date (oldest first) to calculate streaks chronologically
-    const sortedBets = [...bets].sort((a, b) => 
-      a.createdAt.toMillis() - b.createdAt.toMillis()
-    );
-    
+    const sortedBets = [...bets].sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis());
+
     sortedBets.forEach(bet => {
       if (bet.result === BetResult.WIN || bet.result === BetResult.LOSS) {
         if (currentStreakType === bet.result) {
@@ -512,7 +523,7 @@ class BettingAnalyticsService {
           currentStreakType = bet.result;
           currentStreakCount = 1;
         }
-        
+
         // Update longest streaks
         if (bet.result === BetResult.WIN && currentStreakCount > longestWinStreak) {
           longestWinStreak = currentStreakCount;
@@ -522,17 +533,17 @@ class BettingAnalyticsService {
       }
       // Ignore PUSH and VOID results for streak calculations
     });
-    
+
     return {
       currentStreak: {
         type: currentStreakType || BetResult.PUSH,
-        count: currentStreakCount
+        count: currentStreakCount,
       },
       longestWinStreak,
-      longestLossStreak
+      longestLossStreak,
     };
   }
-  
+
   /**
    * Get empty analytics summary for users with no bets
    * @returns Empty analytics summary
@@ -551,12 +562,12 @@ class BettingAnalyticsService {
       streaks: {
         currentStreak: {
           type: BetResult.PUSH,
-          count: 0
+          count: 0,
         },
         longestWinStreak: 0,
-        longestLossStreak: 0
+        longestLossStreak: 0,
       },
-      betTypeBreakdown: {}
+      betTypeBreakdown: {},
     };
   }
 }

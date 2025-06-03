@@ -15,5 +15,5 @@ export type {
   ScheduledReport,
   ReportType,
   ReportFormat,
-  ReportStatus
+  ReportStatus,
 } from '../../../src/types/reporting';

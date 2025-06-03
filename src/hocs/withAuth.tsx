@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../hooks/useAuth';
+import React, { useEffect, useState } from 'react';
+
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * Higher-order component that wraps a page component to provide authentication

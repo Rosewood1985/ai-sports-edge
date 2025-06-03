@@ -1,10 +1,11 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import accessibilityService from '../../services/accessibilityService';
-import { AccessibleThemedView } from '../../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../../atomic/atoms/AccessibleTouchableOpacity';
+import accessibilityService from '../../services/accessibilityService';
 
 /**
  * Example component demonstrating voice control integration

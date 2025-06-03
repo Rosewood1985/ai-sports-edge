@@ -1,8 +1,9 @@
-import { CollegeFootballDataSyncService } from './collegefootballDataSyncService';
+import * as admin from 'firebase-admin';
+
 import { CollegeFootballAnalyticsService } from './collegefootballAnalyticsService';
+import { CollegeFootballDataSyncService } from './collegefootballDataSyncService';
 import { CollegeFootballMLPredictionService } from './collegefootballMLPredictionService';
 import { initSentry } from '../sentryConfig';
-import * as admin from 'firebase-admin';
 
 // Initialize Sentry for monitoring
 const Sentry = initSentry();
@@ -133,14 +134,17 @@ export class CollegeFootballIntegrationService {
    */
   private async startRealTimeUpdates(): Promise<void> {
     // Schedule regular updates every 30 minutes during season
-    this.syncInterval = setInterval(async () => {
-      try {
-        await this.performIncrementalSync();
-      } catch (error) {
-        Sentry.captureException(error);
-        console.error('Real-time sync error:', error.message);
-      }
-    }, 30 * 60 * 1000); // 30 minutes
+    this.syncInterval = setInterval(
+      async () => {
+        try {
+          await this.performIncrementalSync();
+        } catch (error) {
+          Sentry.captureException(error);
+          console.error('Real-time sync error:', error.message);
+        }
+      },
+      30 * 60 * 1000
+    ); // 30 minutes
   }
 
   /**
@@ -153,7 +157,10 @@ export class CollegeFootballIntegrationService {
 
       // Update recruiting data (weekly)
       const lastRecruitingSync = await this.getLastSyncTime('recruiting');
-      if (!lastRecruitingSync || Date.now() - lastRecruitingSync.getTime() > 7 * 24 * 60 * 60 * 1000) {
+      if (
+        !lastRecruitingSync ||
+        Date.now() - lastRecruitingSync.getTime() > 7 * 24 * 60 * 60 * 1000
+      ) {
         await this.dataSyncService.syncRecruitingData();
       }
 
@@ -204,7 +211,7 @@ export class CollegeFootballIntegrationService {
       );
 
       const predictions = await Promise.all(predictionPromises);
-      
+
       // Store predictions in Firestore
       const batch = this.db.batch();
       predictions.forEach((prediction, index) => {
@@ -258,20 +265,19 @@ export class CollegeFootballIntegrationService {
   private async updateUpcomingPredictions(): Promise<void> {
     try {
       const upcomingGames = await this.dataSyncService.getUpcomingGames(3); // Next 3 days
-      
+
       // Only update predictions that are older than cache timeout
       const cacheTimeout = this.options.cacheTimeouts?.predictions || 600000;
       const cutoffTime = new Date(Date.now() - cacheTimeout);
 
       const gamesToUpdate = [];
       for (const game of upcomingGames) {
-        const existingPrediction = await this.db
-          .collection('cfb_predictions')
-          .doc(game.id)
-          .get();
+        const existingPrediction = await this.db.collection('cfb_predictions').doc(game.id).get();
 
-        if (!existingPrediction.exists || 
-            existingPrediction.data()?.updatedAt?.toDate() < cutoffTime) {
+        if (
+          !existingPrediction.exists ||
+          existingPrediction.data()?.updatedAt?.toDate() < cutoffTime
+        ) {
           gamesToUpdate.push(game);
         }
       }
@@ -282,16 +288,20 @@ export class CollegeFootballIntegrationService {
         );
 
         const predictions = await Promise.all(predictionPromises);
-        
+
         const batch = this.db.batch();
         predictions.forEach((prediction, index) => {
           const gameId = gamesToUpdate[index].id;
           const predictionRef = this.db.collection('cfb_predictions').doc(gameId);
-          batch.set(predictionRef, {
-            ...prediction,
-            gameId,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          }, { merge: true });
+          batch.set(
+            predictionRef,
+            {
+              ...prediction,
+              gameId,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
         });
 
         await batch.commit();
@@ -396,7 +406,7 @@ export class CollegeFootballIntegrationService {
   private async calculatePredictionAccuracy(): Promise<number> {
     try {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      
+
       const predictionsSnapshot = await this.db
         .collection('cfb_predictions')
         .where('createdAt', '>=', thirtyDaysAgo)
@@ -412,10 +422,7 @@ export class CollegeFootballIntegrationService {
         const gameId = prediction.gameId;
 
         // Get actual game result
-        const gameSnapshot = await this.db
-          .collection('cfb_games')
-          .doc(gameId)
-          .get();
+        const gameSnapshot = await this.db.collection('cfb_games').doc(gameId).get();
 
         if (gameSnapshot.exists) {
           const game = gameSnapshot.data();
@@ -423,7 +430,7 @@ export class CollegeFootballIntegrationService {
             total++;
             const actualWinner = game.scores.home > game.scores.away ? 'home' : 'away';
             const predictedWinner = prediction.winProbability > 0.5 ? 'home' : 'away';
-            
+
             if (actualWinner === predictedWinner) {
               correct++;
             }
@@ -460,12 +467,9 @@ export class CollegeFootballIntegrationService {
    */
   private async updateLastSyncTime(operation: string): Promise<void> {
     try {
-      await this.db
-        .collection('cfb_system_status')
-        .doc(`last_${operation}_sync`)
-        .set({
-          timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        });
+      await this.db.collection('cfb_system_status').doc(`last_${operation}_sync`).set({
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      });
     } catch (error) {
       Sentry.captureException(error);
     }
@@ -494,7 +498,7 @@ export class CollegeFootballIntegrationService {
   async getComprehensiveTeamData(teamId: string): Promise<any> {
     try {
       const currentSeason = new Date().getFullYear();
-      
+
       const [teamData, analytics, upcomingGames] = await Promise.all([
         this.dataSyncService.getTeamById(teamId),
         this.analyticsService.generateTeamAnalytics(teamId, currentSeason),
@@ -507,9 +511,7 @@ export class CollegeFootballIntegrationService {
       );
 
       const predictionDocs = await Promise.all(predictionPromises);
-      const predictions = predictionDocs
-        .filter(doc => doc.exists)
-        .map(doc => doc.data());
+      const predictions = predictionDocs.filter(doc => doc.exists).map(doc => doc.data());
 
       return {
         team: teamData,

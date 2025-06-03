@@ -4,6 +4,7 @@
  * Location: /atomic/organisms/widgets/EnhancedSubscriptionAnalyticsWidget.tsx
  */
 import React, { memo, useMemo } from 'react';
+
 import { LineChart } from '../../molecules/charts';
 
 interface AnalyticsData {
@@ -17,10 +18,10 @@ interface AnalyticsData {
     retentionRate?: number;
     activeSubscriptions?: number;
   };
-  trends?: Array<{
+  trends?: {
     date: string;
     count: number;
-  }>;
+  }[];
 }
 
 interface EnhancedSubscriptionAnalyticsWidgetProps {
@@ -35,13 +36,13 @@ export const EnhancedSubscriptionAnalyticsWidget = memo<EnhancedSubscriptionAnal
       return (
         <div className={`enhanced-subscription-analytics-widget ${className}`}>
           <div className="animate-pulse p-6">
-            <div className="h-4 bg-gray-300 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/4 mb-4" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-20 bg-gray-300 rounded"></div>
+                <div key={i} className="h-20 bg-gray-300 rounded" />
               ))}
             </div>
-            <div className="h-48 bg-gray-300 rounded"></div>
+            <div className="h-48 bg-gray-300 rounded" />
           </div>
         </div>
       );
@@ -125,8 +126,8 @@ export const EnhancedSubscriptionAnalyticsWidget = memo<EnhancedSubscriptionAnal
               height={200}
               lineColor="#3B82F6"
               areaColor="rgba(59, 130, 246, 0.1)"
-              showPoints={true}
-              showLabels={true}
+              showPoints
+              showLabels
             />
           </div>
 

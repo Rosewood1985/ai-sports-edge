@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+} from 'react-native';
+
 import { useNLPProcessor } from '../../../../hooks/useEnhancedInsights';
 import { NLPSummary, EntityType, SentimentType } from '../../../../types/enhancedInsights';
-import LoadingIndicator from '../../../LoadingIndicator';
 import ErrorMessage from '../../../ErrorMessage';
+import LoadingIndicator from '../../../LoadingIndicator';
 
 interface NLPInsightsWidgetProps {
   textData: string[];
   entityTypes: EntityType[];
 }
 
-export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
-  textData,
-  entityTypes
-}) => {
+export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({ textData, entityTypes }) => {
   const [selectedText, setSelectedText] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSentiment, setSelectedSentiment] = useState<SentimentType | 'all'>('all');
   const [selectedEntityType, setSelectedEntityType] = useState<EntityType | 'all'>('all');
 
-  const { 
-    processText, 
-    analyzeSentiment, 
-    extractEntities, 
+  const {
+    processText,
+    analyzeSentiment,
+    extractEntities,
     extractKeyPhrases,
     analyzeTopics,
-    isLoading, 
-    error 
+    isLoading,
+    error,
   } = useNLPProcessor();
 
-  const [nlpResults, setNlpResults] = useState<{[key: string]: NLPSummary}>({});
+  const [nlpResults, setNlpResults] = useState<{ [key: string]: NLPSummary }>({});
   const [selectedResult, setSelectedResult] = useState<NLPSummary | null>(null);
 
   useEffect(() => {
@@ -37,9 +43,10 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
   }, [textData]);
 
   const processAllTexts = async () => {
-    const results: {[key: string]: NLPSummary} = {};
-    
-    for (const text of textData.slice(0, 10)) { // Limit for performance
+    const results: { [key: string]: NLPSummary } = {};
+
+    for (const text of textData.slice(0, 10)) {
+      // Limit for performance
       try {
         const summary = await processText(text);
         results[text.substring(0, 50)] = summary;
@@ -47,7 +54,7 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
         console.warn('Failed to process text:', error);
       }
     }
-    
+
     setNlpResults(results);
   };
 
@@ -58,21 +65,31 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
 
   const getSentimentColor = (sentiment: SentimentType): string => {
     switch (sentiment) {
-      case 'positive': return '#2ECC71';
-      case 'negative': return '#E74C3C';
-      case 'neutral': return '#95A5A6';
-      case 'mixed': return '#F39C12';
-      default: return '#95A5A6';
+      case 'positive':
+        return '#2ECC71';
+      case 'negative':
+        return '#E74C3C';
+      case 'neutral':
+        return '#95A5A6';
+      case 'mixed':
+        return '#F39C12';
+      default:
+        return '#95A5A6';
     }
   };
 
   const getSentimentIcon = (sentiment: SentimentType): string => {
     switch (sentiment) {
-      case 'positive': return '😊';
-      case 'negative': return '😞';
-      case 'neutral': return '😐';
-      case 'mixed': return '🤔';
-      default: return '❓';
+      case 'positive':
+        return '😊';
+      case 'negative':
+        return '😞';
+      case 'neutral':
+        return '😐';
+      case 'mixed':
+        return '🤔';
+      default:
+        return '❓';
     }
   };
 
@@ -84,46 +101,47 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
       event: '#1ABC9C',
       product: '#F39C12',
       monetary: '#27AE60',
-      temporal: '#E91E63'
+      temporal: '#E91E63',
     };
     return colors[type] || '#95A5A6';
   };
 
   const filteredResults = Object.entries(nlpResults).filter(([text, result]) => {
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch =
+      searchQuery === '' ||
       text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.keyPhrases.some(phrase => 
+      result.keyPhrases.some(phrase =>
         phrase.text.toLowerCase().includes(searchQuery.toLowerCase())
       );
-    
-    const matchesSentiment = selectedSentiment === 'all' || 
-      result.sentiment.overall === selectedSentiment;
-    
-    const matchesEntity = selectedEntityType === 'all' || 
+
+    const matchesSentiment =
+      selectedSentiment === 'all' || result.sentiment.overall === selectedSentiment;
+
+    const matchesEntity =
+      selectedEntityType === 'all' ||
       result.entities.some(entity => entity.type === selectedEntityType);
-    
+
     return matchesSearch && matchesSentiment && matchesEntity;
   });
 
   const renderNLPCard = ({ item }: { item: [string, NLPSummary] }) => {
     const [text, result] = item;
-    
+
     return (
       <TouchableOpacity
-        style={[
-          styles.nlpCard,
-          selectedResult === result && styles.selectedCard
-        ]}
+        style={[styles.nlpCard, selectedResult === result && styles.selectedCard]}
         onPress={() => setSelectedResult(result)}
       >
         <View style={styles.cardHeader}>
           <Text style={styles.textPreview} numberOfLines={2}>
             {text}
           </Text>
-          <View style={[
-            styles.sentimentBadge,
-            { backgroundColor: getSentimentColor(result.sentiment.overall) }
-          ]}>
+          <View
+            style={[
+              styles.sentimentBadge,
+              { backgroundColor: getSentimentColor(result.sentiment.overall) },
+            ]}
+          >
             <Text style={styles.sentimentText}>
               {getSentimentIcon(result.sentiment.overall)} {result.sentiment.overall}
             </Text>
@@ -133,11 +151,9 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
         <View style={styles.cardContent}>
           <View style={styles.scoreContainer}>
             <Text style={styles.scoreLabel}>Confidence:</Text>
-            <Text style={styles.scoreValue}>
-              {(result.sentiment.confidence * 100).toFixed(1)}%
-            </Text>
+            <Text style={styles.scoreValue}>{(result.sentiment.confidence * 100).toFixed(1)}%</Text>
           </View>
-          
+
           <View style={styles.entitiesPreview}>
             <Text style={styles.entitiesLabel}>Entities:</Text>
             <View style={styles.entityTags}>
@@ -146,21 +162,16 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
                   key={index}
                   style={[
                     styles.entityTag,
-                    { backgroundColor: getEntityTypeColor(entity.type) + '20' }
+                    { backgroundColor: getEntityTypeColor(entity.type) + '20' },
                   ]}
                 >
-                  <Text style={[
-                    styles.entityTagText,
-                    { color: getEntityTypeColor(entity.type) }
-                  ]}>
+                  <Text style={[styles.entityTagText, { color: getEntityTypeColor(entity.type) }]}>
                     {entity.text}
                   </Text>
                 </View>
               ))}
               {result.entities.length > 3 && (
-                <Text style={styles.moreEntities}>
-                  +{result.entities.length - 3} more
-                </Text>
+                <Text style={styles.moreEntities}>+{result.entities.length - 3} more</Text>
               )}
             </View>
           </View>
@@ -168,7 +179,10 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
           <View style={styles.keyPhrasesPreview}>
             <Text style={styles.keyPhrasesLabel}>Key Phrases:</Text>
             <Text style={styles.keyPhrasesText} numberOfLines={1}>
-              {result.keyPhrases.slice(0, 3).map(phrase => phrase.text).join(', ')}
+              {result.keyPhrases
+                .slice(0, 3)
+                .map(phrase => phrase.text)
+                .join(', ')}
             </Text>
           </View>
         </View>
@@ -191,12 +205,15 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
       <ScrollView style={styles.detailsContainer}>
         <View style={styles.detailsHeader}>
           <Text style={styles.detailsTitle}>NLP Analysis Details</Text>
-          <View style={[
-            styles.overallSentimentBadge,
-            { backgroundColor: getSentimentColor(selectedResult.sentiment.overall) }
-          ]}>
+          <View
+            style={[
+              styles.overallSentimentBadge,
+              { backgroundColor: getSentimentColor(selectedResult.sentiment.overall) },
+            ]}
+          >
             <Text style={styles.overallSentimentText}>
-              {getSentimentIcon(selectedResult.sentiment.overall)} {selectedResult.sentiment.overall.toUpperCase()}
+              {getSentimentIcon(selectedResult.sentiment.overall)}{' '}
+              {selectedResult.sentiment.overall.toUpperCase()}
             </Text>
           </View>
         </View>
@@ -208,45 +225,51 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
             <View style={styles.sentimentItem}>
               <Text style={styles.sentimentItemLabel}>Positive:</Text>
               <View style={styles.sentimentBar}>
-                <View style={[
-                  styles.sentimentFill,
-                  { 
-                    width: `${selectedResult.sentiment.scores.positive * 100}%`,
-                    backgroundColor: '#2ECC71'
-                  }
-                ]} />
+                <View
+                  style={[
+                    styles.sentimentFill,
+                    {
+                      width: `${selectedResult.sentiment.scores.positive * 100}%`,
+                      backgroundColor: '#2ECC71',
+                    },
+                  ]}
+                />
               </View>
               <Text style={styles.sentimentScore}>
                 {(selectedResult.sentiment.scores.positive * 100).toFixed(1)}%
               </Text>
             </View>
-            
+
             <View style={styles.sentimentItem}>
               <Text style={styles.sentimentItemLabel}>Negative:</Text>
               <View style={styles.sentimentBar}>
-                <View style={[
-                  styles.sentimentFill,
-                  { 
-                    width: `${selectedResult.sentiment.scores.negative * 100}%`,
-                    backgroundColor: '#E74C3C'
-                  }
-                ]} />
+                <View
+                  style={[
+                    styles.sentimentFill,
+                    {
+                      width: `${selectedResult.sentiment.scores.negative * 100}%`,
+                      backgroundColor: '#E74C3C',
+                    },
+                  ]}
+                />
               </View>
               <Text style={styles.sentimentScore}>
                 {(selectedResult.sentiment.scores.negative * 100).toFixed(1)}%
               </Text>
             </View>
-            
+
             <View style={styles.sentimentItem}>
               <Text style={styles.sentimentItemLabel}>Neutral:</Text>
               <View style={styles.sentimentBar}>
-                <View style={[
-                  styles.sentimentFill,
-                  { 
-                    width: `${selectedResult.sentiment.scores.neutral * 100}%`,
-                    backgroundColor: '#95A5A6'
-                  }
-                ]} />
+                <View
+                  style={[
+                    styles.sentimentFill,
+                    {
+                      width: `${selectedResult.sentiment.scores.neutral * 100}%`,
+                      backgroundColor: '#95A5A6',
+                    },
+                  ]}
+                />
               </View>
               <Text style={styles.sentimentScore}>
                 {(selectedResult.sentiment.scores.neutral * 100).toFixed(1)}%
@@ -262,16 +285,10 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
             {selectedResult.entities.map((entity, index) => (
               <View
                 key={index}
-                style={[
-                  styles.entityCard,
-                  { borderLeftColor: getEntityTypeColor(entity.type) }
-                ]}
+                style={[styles.entityCard, { borderLeftColor: getEntityTypeColor(entity.type) }]}
               >
                 <Text style={styles.entityText}>{entity.text}</Text>
-                <Text style={[
-                  styles.entityType,
-                  { color: getEntityTypeColor(entity.type) }
-                ]}>
+                <Text style={[styles.entityType, { color: getEntityTypeColor(entity.type) }]}>
                   {entity.type}
                 </Text>
                 <Text style={styles.entityConfidence}>
@@ -289,9 +306,7 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
             {selectedResult.keyPhrases.map((phrase, index) => (
               <View key={index} style={styles.keyPhraseCard}>
                 <Text style={styles.keyPhraseText}>{phrase.text}</Text>
-                <Text style={styles.keyPhraseScore}>
-                  Score: {phrase.score.toFixed(3)}
-                </Text>
+                <Text style={styles.keyPhraseScore}>Score: {phrase.score.toFixed(3)}</Text>
               </View>
             ))}
           </View>
@@ -305,9 +320,7 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
               {selectedResult.topics.map((topic, index) => (
                 <View key={index} style={styles.topicCard}>
                   <Text style={styles.topicName}>{topic.name}</Text>
-                  <Text style={styles.topicWeight}>
-                    Weight: {topic.weight.toFixed(3)}
-                  </Text>
+                  <Text style={styles.topicWeight}>Weight: {topic.weight.toFixed(3)}</Text>
                   <View style={styles.topicKeywords}>
                     {topic.keywords.map((keyword, kwIndex) => (
                       <Text key={kwIndex} style={styles.topicKeyword}>
@@ -326,21 +339,15 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
           <Text style={styles.sectionTitle}>Language Metrics</Text>
           <View style={styles.metricsGrid}>
             <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>
-                {selectedResult.language || 'en'}
-              </Text>
+              <Text style={styles.metricValue}>{selectedResult.language || 'en'}</Text>
               <Text style={styles.metricLabel}>Language</Text>
             </View>
             <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>
-                {selectedResult.entities.length}
-              </Text>
+              <Text style={styles.metricValue}>{selectedResult.entities.length}</Text>
               <Text style={styles.metricLabel}>Entities</Text>
             </View>
             <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>
-                {selectedResult.keyPhrases.length}
-              </Text>
+              <Text style={styles.metricValue}>{selectedResult.keyPhrases.length}</Text>
               <Text style={styles.metricLabel}>Key Phrases</Text>
             </View>
             <View style={styles.metricItem}>
@@ -359,9 +366,7 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>NLP Insights</Text>
-        <Text style={styles.subtitle}>
-          {Object.keys(nlpResults).length} texts analyzed
-        </Text>
+        <Text style={styles.subtitle}>{Object.keys(nlpResults).length} texts analyzed</Text>
       </View>
 
       {/* Filters */}
@@ -372,36 +377,34 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        
+
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterTabs}>
           <TouchableOpacity
-            style={[
-              styles.filterTab,
-              selectedSentiment === 'all' && styles.activeFilterTab
-            ]}
+            style={[styles.filterTab, selectedSentiment === 'all' && styles.activeFilterTab]}
             onPress={() => setSelectedSentiment('all')}
           >
-            <Text style={[
-              styles.filterTabText,
-              selectedSentiment === 'all' && styles.activeFilterTabText
-            ]}>
+            <Text
+              style={[
+                styles.filterTabText,
+                selectedSentiment === 'all' && styles.activeFilterTabText,
+              ]}
+            >
               All Sentiments
             </Text>
           </TouchableOpacity>
-          
+
           {(['positive', 'negative', 'neutral', 'mixed'] as SentimentType[]).map(sentiment => (
             <TouchableOpacity
               key={sentiment}
-              style={[
-                styles.filterTab,
-                selectedSentiment === sentiment && styles.activeFilterTab
-              ]}
+              style={[styles.filterTab, selectedSentiment === sentiment && styles.activeFilterTab]}
               onPress={() => setSelectedSentiment(sentiment)}
             >
-              <Text style={[
-                styles.filterTabText,
-                selectedSentiment === sentiment && styles.activeFilterTabText
-              ]}>
+              <Text
+                style={[
+                  styles.filterTabText,
+                  selectedSentiment === sentiment && styles.activeFilterTabText,
+                ]}
+              >
                 {getSentimentIcon(sentiment)} {sentiment}
               </Text>
             </TouchableOpacity>
@@ -410,33 +413,34 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterTabs}>
           <TouchableOpacity
-            style={[
-              styles.filterTab,
-              selectedEntityType === 'all' && styles.activeFilterTab
-            ]}
+            style={[styles.filterTab, selectedEntityType === 'all' && styles.activeFilterTab]}
             onPress={() => setSelectedEntityType('all')}
           >
-            <Text style={[
-              styles.filterTabText,
-              selectedEntityType === 'all' && styles.activeFilterTabText
-            ]}>
+            <Text
+              style={[
+                styles.filterTabText,
+                selectedEntityType === 'all' && styles.activeFilterTabText,
+              ]}
+            >
               All Entities
             </Text>
           </TouchableOpacity>
-          
+
           {entityTypes.map(entityType => (
             <TouchableOpacity
               key={entityType}
               style={[
                 styles.filterTab,
-                selectedEntityType === entityType && styles.activeFilterTab
+                selectedEntityType === entityType && styles.activeFilterTab,
               ]}
               onPress={() => setSelectedEntityType(entityType)}
             >
-              <Text style={[
-                styles.filterTabText,
-                selectedEntityType === entityType && styles.activeFilterTabText
-              ]}>
+              <Text
+                style={[
+                  styles.filterTabText,
+                  selectedEntityType === entityType && styles.activeFilterTabText,
+                ]}
+              >
                 {entityType}
               </Text>
             </TouchableOpacity>
@@ -450,16 +454,14 @@ export const NLPInsightsWidget: React.FC<NLPInsightsWidgetProps> = ({
           <FlatList
             data={filteredResults}
             renderItem={renderNLPCard}
-            keyExtractor={(item) => item[0]}
+            keyExtractor={item => item[0]}
             showsVerticalScrollIndicator={false}
             style={styles.resultsList}
           />
         </View>
 
         {/* NLP Details */}
-        <View style={styles.detailsPane}>
-          {renderNLPDetails()}
-        </View>
+        <View style={styles.detailsPane}>{renderNLPDetails()}</View>
       </View>
     </View>
   );

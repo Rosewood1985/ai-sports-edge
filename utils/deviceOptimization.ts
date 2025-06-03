@@ -3,7 +3,7 @@ import { Dimensions, Platform, PixelRatio, ScaledSize } from 'react-native';
 
 /**
  * Device Optimization Utilities
- * 
+ *
  * This file provides utilities for optimizing UI elements for different device sizes and platforms.
  * It helps ensure consistent appearance across various screen sizes and pixel densities.
  */
@@ -17,10 +17,10 @@ const BASE_HEIGHT = 812; // iPhone X height
 
 // Device type detection
 export enum DeviceType {
-  PHONE_SMALL = 'PHONE_SMALL',   // < 360dp width
-  PHONE = 'PHONE',               // 360dp - 480dp width
-  PHONE_LARGE = 'PHONE_LARGE',   // 480dp - 600dp width
-  TABLET = 'TABLET',             // 600dp - 840dp width
+  PHONE_SMALL = 'PHONE_SMALL', // < 360dp width
+  PHONE = 'PHONE', // 360dp - 480dp width
+  PHONE_LARGE = 'PHONE_LARGE', // 480dp - 600dp width
+  TABLET = 'TABLET', // 600dp - 840dp width
   TABLET_LARGE = 'TABLET_LARGE', // > 840dp width
 }
 
@@ -30,7 +30,7 @@ export enum DeviceType {
  */
 export const getDeviceType = (): DeviceType => {
   const { width } = Dimensions.get('window');
-  
+
   if (width < 360) return DeviceType.PHONE_SMALL;
   if (width < 480) return DeviceType.PHONE;
   if (width < 600) return DeviceType.PHONE_LARGE;
@@ -46,11 +46,11 @@ export const getDeviceType = (): DeviceType => {
 export const scaleWidth = (size: number): number => {
   const scale = SCREEN_WIDTH / BASE_WIDTH;
   const newSize = size * scale;
-  
+
   if (Platform.OS === 'ios') {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
   }
-  
+
   return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
 };
 
@@ -62,11 +62,11 @@ export const scaleWidth = (size: number): number => {
 export const scaleHeight = (size: number): number => {
   const scale = SCREEN_HEIGHT / BASE_HEIGHT;
   const newSize = size * scale;
-  
+
   if (Platform.OS === 'ios') {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
   }
-  
+
   return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
 };
 
@@ -87,7 +87,7 @@ export const scaleSizeMin = (size: number): number => {
  */
 export const scaleFontSize = (size: number): number => {
   const deviceType = getDeviceType();
-  
+
   // Apply different scaling factors based on device type
   switch (deviceType) {
     case DeviceType.PHONE_SMALL:
@@ -112,7 +112,7 @@ export const scaleFontSize = (size: number): number => {
  */
 export const getResponsiveSpacing = (baseSpacing: number): number => {
   const deviceType = getDeviceType();
-  
+
   switch (deviceType) {
     case DeviceType.PHONE_SMALL:
       return baseSpacing * 0.8;
@@ -136,7 +136,7 @@ export const getResponsiveSpacing = (baseSpacing: number): number => {
  */
 export const getOptimizedShadow = (shadow: any): any => {
   const pixelRatio = PixelRatio.get();
-  
+
   // Adjust shadow values based on pixel ratio
   if (pixelRatio <= 1) {
     // Low density screens
@@ -166,20 +166,20 @@ export const getOptimizedShadow = (shadow: any): any => {
  */
 export const useDimensionsListener = (): ScaledSize => {
   const [dimensions, setDimensions] = React.useState(Dimensions.get('window'));
-  
+
   React.useEffect(() => {
     const onChange = ({ window }: { window: ScaledSize }) => {
       setDimensions(window);
     };
-    
+
     const subscription = Dimensions.addEventListener('change', onChange);
-    
+
     return () => {
       // Clean up subscription
       subscription.remove();
     };
   }, []);
-  
+
   return dimensions;
 };
 
@@ -197,17 +197,19 @@ export const isTablet = (): boolean => {
  * @param {string} defaultIntensity - Default intensity ('low', 'medium', 'high')
  * @returns {string} - Optimized intensity
  */
-export const getOptimizedGlowIntensity = (defaultIntensity: 'low' | 'medium' | 'high'): 'low' | 'medium' | 'high' => {
+export const getOptimizedGlowIntensity = (
+  defaultIntensity: 'low' | 'medium' | 'high'
+): 'low' | 'medium' | 'high' => {
   // Check if device is low-end
   const isLowEndDevice = Platform.OS === 'android' && PixelRatio.get() < 2;
-  
+
   if (isLowEndDevice) {
     // Reduce glow intensity on low-end devices
     if (defaultIntensity === 'high') return 'medium';
     if (defaultIntensity === 'medium') return 'low';
     return 'low';
   }
-  
+
   return defaultIntensity;
 };
 

@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator,
-  Alert
-} from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import { auth } from '../config/firebase';
 import { formatDate } from '../utils/dateUtils';
-
-
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
 
 // Define the purchase history item type
 interface PurchaseHistoryItem {
@@ -42,7 +38,7 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
   const loadPurchaseHistory = async () => {
     try {
       setLoading(true);
-      
+
       // Get current user
       const user = auth.currentUser;
       if (!user) {
@@ -50,18 +46,18 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
         navigation.navigate('Auth');
         return;
       }
-      
+
       // Get purchase history from AsyncStorage
       const purchaseHistoryJson = await AsyncStorage.getItem(`user_purchases_${user.uid}`);
       let purchaseHistory: PurchaseHistoryItem[] = [];
-      
+
       if (purchaseHistoryJson) {
         purchaseHistory = JSON.parse(purchaseHistoryJson);
       }
-      
+
       // Sort purchases by date (newest first)
       purchaseHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      
+
       setPurchases(purchaseHistory);
     } catch (error) {
       console.error('Error loading purchase history:', error);
@@ -91,15 +87,13 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
     if (item.productType === 'premium_stats') icon = 'analytics';
     if (item.productType === 'expert_picks') icon = 'star';
     if (item.productType === 'player_comparison') icon = 'people';
-    
+
     // Determine status color
-    const statusColor = 
-      item.status === 'active' ? '#4CAF50' : 
-      item.status === 'expired' ? '#F44336' : 
-      '#FFC107';
-    
+    const statusColor =
+      item.status === 'active' ? '#4CAF50' : item.status === 'expired' ? '#F44336' : '#FFC107';
+
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.purchaseItem, { borderBottomColor: colors.border }]}
         onPress={() => {
           if (item.gameId) {
@@ -110,20 +104,18 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
         <View style={styles.iconContainer}>
           <Ionicons name={icon as any} size={24} color={colors.primary} />
         </View>
-        
+
         <View style={styles.purchaseDetails}>
           <ThemedText style={styles.purchaseName}>{item.name}</ThemedText>
           <ThemedText style={styles.purchaseDate}>
             Purchased on {formatDate(new Date(item.date))}
           </ThemedText>
-          
+
           {item.price && (
-            <ThemedText style={styles.purchasePrice}>
-              ${(item.price / 100).toFixed(2)}
-            </ThemedText>
+            <ThemedText style={styles.purchasePrice}>${(item.price / 100).toFixed(2)}</ThemedText>
           )}
         </View>
-        
+
         <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
           <Text style={styles.statusText}>
             {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
@@ -137,9 +129,7 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Ionicons name="cart-outline" size={64} color={colors.text} style={{ opacity: 0.5 }} />
-      <ThemedText style={styles.emptyStateText}>
-        You haven't made any purchases yet.
-      </ThemedText>
+      <ThemedText style={styles.emptyStateText}>You haven't made any purchases yet.</ThemedText>
       <TouchableOpacity
         style={[styles.browseButton, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Home')}
@@ -154,7 +144,7 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
       <View style={styles.header}>
         <ThemedText style={styles.title}>Purchase History</ThemedText>
       </View>
-      
+
       {loading && !refreshing ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -164,7 +154,7 @@ const PurchaseHistoryScreen = ({ navigation }: any) => {
         <FlatList
           data={purchases}
           renderItem={renderPurchaseItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={renderEmptyState}
           refreshing={refreshing}

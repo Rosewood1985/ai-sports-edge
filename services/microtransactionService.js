@@ -1,6 +1,6 @@
 /**
  * Microtransaction Service
- * 
+ *
  * This service identifies and manages microtransaction opportunities throughout the app.
  * It provides functions to determine when and where to show microtransaction options,
  * track user interactions, and optimize conversion rates.
@@ -8,10 +8,11 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+
 import { analyticsService } from './analyticsService';
-import { FEATURE_FLAGS, STRIPE_CONFIG } from '../config/affiliateConfig';
-import { fanduelCookieService } from './fanduelCookieService';
 import apiService from './apiService';
+import { fanduelCookieService } from './fanduelCookieService';
+import { FEATURE_FLAGS, STRIPE_CONFIG } from '../config/affiliateConfig';
 import { auth } from '../config/firebase';
 
 // Storage keys
@@ -57,11 +58,11 @@ class MicrotransactionService {
     // Initialize frequency control storage
     this.lastShownTimestamps = {};
     this.recentOpportunities = [];
-    
+
     // Load from AsyncStorage if available
     this.loadFrequencyControlData();
   }
-  
+
   /**
    * Load frequency control data from AsyncStorage
    * @private
@@ -72,7 +73,7 @@ class MicrotransactionService {
       if (lastShownData) {
         this.lastShownTimestamps = JSON.parse(lastShownData);
       }
-      
+
       const recentOppsData = await AsyncStorage.getItem(STORAGE_KEYS.RECENT_OPPORTUNITIES);
       if (recentOppsData) {
         this.recentOpportunities = JSON.parse(recentOppsData);
@@ -81,7 +82,7 @@ class MicrotransactionService {
       console.error('Error loading frequency control data:', error);
     }
   }
-  
+
   /**
    * Save frequency control data to AsyncStorage
    * @private
@@ -92,7 +93,7 @@ class MicrotransactionService {
         STORAGE_KEYS.LAST_SHOWN_TIMESTAMPS,
         JSON.stringify(this.lastShownTimestamps)
       );
-      
+
       await AsyncStorage.setItem(
         STORAGE_KEYS.RECENT_OPPORTUNITIES,
         JSON.stringify(this.recentOpportunities)
@@ -101,7 +102,7 @@ class MicrotransactionService {
       console.error('Error saving frequency control data:', error);
     }
   }
-  
+
   /**
    * Check if microtransactions are enabled
    * @returns {boolean} Whether microtransactions are enabled
@@ -109,7 +110,7 @@ class MicrotransactionService {
   isMicrotransactionsEnabled() {
     return FEATURE_FLAGS.ENABLE_MICROTRANSACTIONS;
   }
-  
+
   /**
    * Check if a microtransaction opportunity should be shown based on frequency rules
    * @param {string} userId User ID
@@ -119,53 +120,53 @@ class MicrotransactionService {
    */
   async shouldShowOpportunity(userId, contextType, opportunityId) {
     if (!userId) return true; // Always show for non-authenticated users
-    
+
     const now = Date.now();
     const key = `${userId}_${contextType}_${opportunityId}`;
-    
+
     // Check if this specific opportunity was shown recently (24-hour cooldown)
-    if (this.lastShownTimestamps[key] &&
-        (now - this.lastShownTimestamps[key]) < 24 * 60 * 60 * 1000) {
+    if (
+      this.lastShownTimestamps[key] &&
+      now - this.lastShownTimestamps[key] < 24 * 60 * 60 * 1000
+    ) {
       return false;
     }
-    
+
     // Check if we've shown too many opportunities recently (max 3 per hour)
     const oneHourAgo = now - 60 * 60 * 1000;
     const recentCount = this.recentOpportunities.filter(
       opp => opp.userId === userId && opp.timestamp > oneHourAgo
     ).length;
-    
+
     if (recentCount >= 3) {
       return false;
     }
-    
+
     // Get user preferences
     const prefs = await this.getUserPreferences(userId);
     if (!prefs.enableMicrotransactions) {
       return false;
     }
-    
+
     // Update frequency control data
     this.lastShownTimestamps[key] = now;
     this.recentOpportunities.push({
       userId,
       contextType,
       opportunityId,
-      timestamp: now
+      timestamp: now,
     });
-    
+
     // Clean up old data (older than 7 days)
     const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
-    this.recentOpportunities = this.recentOpportunities.filter(
-      opp => opp.timestamp > sevenDaysAgo
-    );
-    
+    this.recentOpportunities = this.recentOpportunities.filter(opp => opp.timestamp > sevenDaysAgo);
+
     // Save updated data
     this.saveFrequencyControlData();
-    
+
     return true;
   }
-  
+
   /**
    * Get microtransaction opportunities for a specific context
    * @param {string} contextType Type of context (e.g., 'game_card', 'player_profile')
@@ -178,7 +179,7 @@ class MicrotransactionService {
     if (!this.isMicrotransactionsEnabled()) {
       return [];
     }
-    
+
     // Get all potential opportunities based on context type
     let opportunities = [];
     switch (contextType) {
@@ -215,26 +216,32 @@ class MicrotransactionService {
       default:
         opportunities = [];
     }
-    
+
     // Filter opportunities based on frequency rules
     if (userData && userData.id) {
       const filteredOpportunities = [];
-      
+
       for (const opportunity of opportunities) {
-        const opportunityId = opportunity.type + (opportunity.gameId || opportunity.playerId || opportunity.teamId || '');
-        const shouldShow = await this.shouldShowOpportunity(userData.id, contextType, opportunityId);
-        
+        const opportunityId =
+          opportunity.type +
+          (opportunity.gameId || opportunity.playerId || opportunity.teamId || '');
+        const shouldShow = await this.shouldShowOpportunity(
+          userData.id,
+          contextType,
+          opportunityId
+        );
+
         if (shouldShow) {
           filteredOpportunities.push(opportunity);
         }
       }
-      
+
       return filteredOpportunities;
     }
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for game cards
    * @param {Object} gameData Game data
@@ -243,10 +250,10 @@ class MicrotransactionService {
    */
   getGameCardOpportunities(gameData, userData) {
     const opportunities = [];
-    
+
     // Check if user has already purchased odds for this game
     const hasPurchasedOdds = userData.purchases?.includes(gameData.id);
-    
+
     // If user hasn't purchased odds, add odds access opportunity
     if (!hasPurchasedOdds) {
       opportunities.push({
@@ -260,7 +267,7 @@ class MicrotransactionService {
         cookieEnabled: true,
       });
     }
-    
+
     // Add premium stats opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.PREMIUM_STATS,
@@ -272,7 +279,7 @@ class MicrotransactionService {
       priority: 2,
       cookieEnabled: true,
     });
-    
+
     // Add expert picks opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.EXPERT_PICKS,
@@ -284,10 +291,10 @@ class MicrotransactionService {
       priority: 3,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for player profiles
    * @param {Object} playerData Player data
@@ -296,7 +303,7 @@ class MicrotransactionService {
    */
   getPlayerProfileOpportunities(playerData, userData) {
     const opportunities = [];
-    
+
     // Add player comparison opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.PLAYER_COMPARISON,
@@ -308,7 +315,7 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     // Add premium stats opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.PREMIUM_STATS,
@@ -320,7 +327,7 @@ class MicrotransactionService {
       priority: 2,
       cookieEnabled: true,
     });
-    
+
     // Add injury reports opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.INJURY_REPORTS,
@@ -332,10 +339,10 @@ class MicrotransactionService {
       priority: 3,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for team pages
    * @param {Object} teamData Team data
@@ -344,7 +351,7 @@ class MicrotransactionService {
    */
   getTeamPageOpportunities(teamData, userData) {
     const opportunities = [];
-    
+
     // Add team insights opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.TEAM_INSIGHTS,
@@ -356,7 +363,7 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     // Add historical matchups opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.HISTORICAL_MATCHUPS,
@@ -368,7 +375,7 @@ class MicrotransactionService {
       priority: 2,
       cookieEnabled: true,
     });
-    
+
     // Add betting trends opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.BETTING_TRENDS,
@@ -380,10 +387,10 @@ class MicrotransactionService {
       priority: 3,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for odds pages
    * @param {Object} oddsData Odds data
@@ -392,7 +399,7 @@ class MicrotransactionService {
    */
   getOddsPageOpportunities(oddsData, userData) {
     const opportunities = [];
-    
+
     // Add expert picks opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.EXPERT_PICKS,
@@ -404,7 +411,7 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     // Add betting trends opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.BETTING_TRENDS,
@@ -416,10 +423,10 @@ class MicrotransactionService {
       priority: 2,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for stats pages
    * @param {Object} statsData Stats data
@@ -428,7 +435,7 @@ class MicrotransactionService {
    */
   getStatsPageOpportunities(statsData, userData) {
     const opportunities = [];
-    
+
     // Add premium stats opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.PREMIUM_STATS,
@@ -441,10 +448,10 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for prediction pages
    * @param {Object} predictionData Prediction data
@@ -453,7 +460,7 @@ class MicrotransactionService {
    */
   getPredictionPageOpportunities(predictionData, userData) {
     const opportunities = [];
-    
+
     // Add expert picks opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.EXPERT_PICKS,
@@ -465,10 +472,10 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for live feeds
    * @param {Object} feedData Feed data
@@ -477,7 +484,7 @@ class MicrotransactionService {
    */
   getLiveFeedOpportunities(feedData, userData) {
     const opportunities = [];
-    
+
     // Add live updates opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.LIVE_UPDATES,
@@ -489,10 +496,10 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for search results
    * @param {Object} searchData Search data
@@ -504,7 +511,7 @@ class MicrotransactionService {
     // in search results might be too intrusive
     return [];
   }
-  
+
   /**
    * Get microtransaction opportunities for the home screen
    * @param {Object} homeData Home screen data
@@ -513,7 +520,7 @@ class MicrotransactionService {
    */
   getHomeScreenOpportunities(homeData, userData) {
     const opportunities = [];
-    
+
     // Add personalized alerts opportunity
     opportunities.push({
       type: MICROTRANSACTION_TYPES.PERSONALIZED_ALERTS,
@@ -524,10 +531,10 @@ class MicrotransactionService {
       priority: 1,
       cookieEnabled: true,
     });
-    
+
     return opportunities;
   }
-  
+
   /**
    * Get microtransaction opportunities for notifications
    * @param {Object} notificationData Notification data
@@ -539,7 +546,7 @@ class MicrotransactionService {
     // in notifications might be too intrusive
     return [];
   }
-  
+
   /**
    * Track microtransaction interaction
    * @param {string} interactionType Type of interaction (e.g., 'impression', 'click', 'purchase')
@@ -560,27 +567,27 @@ class MicrotransactionService {
         timestamp: Date.now(),
         platform: Platform.OS,
       };
-      
+
       // Track interaction
       analyticsService.trackEvent('microtransaction_interaction', interactionData);
-      
+
       // If this is a purchase, use the API service for server-side validation
       if (interactionType === 'purchase') {
         // Only authenticated users can make purchases
         if (!auth.currentUser) {
           throw new Error('User must be authenticated to make purchases');
         }
-        
+
         try {
           // Get payment method (in a real app, this would be selected by the user)
           const paymentMethodId = 'pm_card_visa'; // Example payment method ID
-          
+
           // Use the API service to make the purchase with server-side validation
           const result = await apiService.purchaseMicrotransaction(
             opportunityData.type,
             paymentMethodId
           );
-          
+
           // If purchase is successful and cookies are enabled, initialize cookies
           if (result && opportunityData.cookieEnabled) {
             await fanduelCookieService.initializeCookies(
@@ -589,7 +596,7 @@ class MicrotransactionService {
               opportunityData.teamId
             );
           }
-          
+
           // Return the purchase result
           return result;
         } catch (error) {
@@ -597,14 +604,14 @@ class MicrotransactionService {
           throw error;
         }
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error tracking microtransaction interaction:', error);
       return false;
     }
   }
-  
+
   /**
    * Get pricing for a microtransaction type
    * @param {string} type Microtransaction type
@@ -625,7 +632,7 @@ class MicrotransactionService {
           return 299; // $2.99 default
       }
     }
-    
+
     // Handle other microtransaction types
     switch (type) {
       case MICROTRANSACTION_TYPES.ODDS_ACCESS:
@@ -652,7 +659,7 @@ class MicrotransactionService {
         return 199; // $1.99 default
     }
   }
-  
+
   /**
    * Get user's microtransaction preferences
    * @param {string} userId User ID
@@ -660,12 +667,16 @@ class MicrotransactionService {
    */
   async getUserPreferences(userId) {
     try {
-      const preferencesJson = await AsyncStorage.getItem(`${STORAGE_KEYS.USER_PREFERENCES}_${userId}`);
-      return preferencesJson ? JSON.parse(preferencesJson) : {
-        enableMicrotransactions: true,
-        preferredTypes: [],
-        maxPrice: 500, // $5.00
-      };
+      const preferencesJson = await AsyncStorage.getItem(
+        `${STORAGE_KEYS.USER_PREFERENCES}_${userId}`
+      );
+      return preferencesJson
+        ? JSON.parse(preferencesJson)
+        : {
+            enableMicrotransactions: true,
+            preferredTypes: [],
+            maxPrice: 500, // $5.00
+          };
     } catch (error) {
       console.error('Error getting user microtransaction preferences:', error);
       return {
@@ -675,7 +686,7 @@ class MicrotransactionService {
       };
     }
   }
-  
+
   /**
    * Save user's microtransaction preferences
    * @param {string} userId User ID

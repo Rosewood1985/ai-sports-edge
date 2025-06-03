@@ -1,6 +1,6 @@
 /**
  * Monitoring Module
- * 
+ *
  * Central module for monitoring services including error tracking,
  * logging, performance monitoring, and alerting.
  */

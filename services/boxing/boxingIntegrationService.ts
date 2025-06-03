@@ -3,10 +3,11 @@
 // Comprehensive Boxing System Integration with Fight Predictions
 // =============================================================================
 
-import { BoxingDataSyncService } from './boxingDataSyncService';
-import { BoxingAnalyticsService } from './boxingAnalyticsService';
-import { initSentry } from '../sentryConfig';
 import * as admin from 'firebase-admin';
+
+import { BoxingAnalyticsService } from './boxingAnalyticsService';
+import { BoxingDataSyncService } from './boxingDataSyncService';
+import { initSentry } from '../sentryConfig';
 
 // Initialize Sentry for monitoring
 const Sentry = initSentry();
@@ -54,13 +55,15 @@ export class BoxingIntegrationService {
   private syncInterval: NodeJS.Timeout | null = null;
   private analyticsInterval: NodeJS.Timeout | null = null;
 
-  constructor(options: BoxingIntegrationOptions = {
-    enableRealTimeUpdates: true,
-    enableFightPredictions: true,
-    enableAnalytics: true,
-    syncFrequency: 'medium',
-    enableBettingIntegration: true,
-  }) {
+  constructor(
+    options: BoxingIntegrationOptions = {
+      enableRealTimeUpdates: true,
+      enableFightPredictions: true,
+      enableAnalytics: true,
+      syncFrequency: 'medium',
+      enableBettingIntegration: true,
+    }
+  ) {
     this.options = options;
     this.db = admin.firestore();
     this.dataSyncService = new BoxingDataSyncService();
@@ -78,10 +81,7 @@ export class BoxingIntegrationService {
       });
 
       // Initialize all subsystems
-      await Promise.all([
-        this.dataSyncService.initialize(),
-        this.analyticsService.initialize(),
-      ]);
+      await Promise.all([this.dataSyncService.initialize(), this.analyticsService.initialize()]);
 
       // Start scheduled processes
       if (this.options.enableRealTimeUpdates) {
@@ -149,14 +149,17 @@ export class BoxingIntegrationService {
       }, syncFrequency);
 
       // Analytics update every 4 hours
-      this.analyticsInterval = setInterval(async () => {
-        try {
-          await this.updateRecentAnalytics();
-        } catch (error) {
-          Sentry.captureException(error);
-          console.error('Scheduled analytics update error:', error.message);
-        }
-      }, 4 * 60 * 60 * 1000);
+      this.analyticsInterval = setInterval(
+        async () => {
+          try {
+            await this.updateRecentAnalytics();
+          } catch (error) {
+            Sentry.captureException(error);
+            console.error('Scheduled analytics update error:', error.message);
+          }
+        },
+        4 * 60 * 60 * 1000
+      );
 
       console.log('Boxing scheduled processes started');
     } catch (error) {
@@ -186,10 +189,23 @@ export class BoxingIntegrationService {
 
       // Generate weight class analytics
       const weightClasses = [
-        'Heavyweight', 'Cruiserweight', 'Light Heavyweight', 'Super Middleweight',
-        'Middleweight', 'Super Welterweight', 'Welterweight', 'Super Lightweight',
-        'Lightweight', 'Super Featherweight', 'Featherweight', 'Super Bantamweight',
-        'Bantamweight', 'Super Flyweight', 'Flyweight', 'Light Flyweight', 'Minimumweight'
+        'Heavyweight',
+        'Cruiserweight',
+        'Light Heavyweight',
+        'Super Middleweight',
+        'Middleweight',
+        'Super Welterweight',
+        'Welterweight',
+        'Super Lightweight',
+        'Lightweight',
+        'Super Featherweight',
+        'Featherweight',
+        'Super Bantamweight',
+        'Bantamweight',
+        'Super Flyweight',
+        'Flyweight',
+        'Light Flyweight',
+        'Minimumweight',
       ];
 
       const weightClassPromises = weightClasses.map(weightClass =>
@@ -197,7 +213,9 @@ export class BoxingIntegrationService {
       );
       await Promise.all(weightClassPromises);
 
-      console.log(`Generated analytics for ${fighters.length} fighters and ${weightClasses.length} weight classes`);
+      console.log(
+        `Generated analytics for ${fighters.length} fighters and ${weightClasses.length} weight classes`
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`System-wide analytics generation failed: ${error.message}`);
@@ -258,7 +276,7 @@ export class BoxingIntegrationService {
     try {
       // Get fighters who had recent fights (last 30 days)
       const recentDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      
+
       const recentFightsSnapshot = await this.db
         .collection('boxing_fights')
         .where('date', '>=', recentDate)
@@ -313,13 +331,10 @@ export class BoxingIntegrationService {
   async getUpcomingFightPredictions(days: number = 30): Promise<any[]> {
     try {
       const upcomingFights = await this.dataSyncService.getUpcomingFights(days);
-      
+
       const predictions = await Promise.all(
-        upcomingFights.map(async (fight) => {
-          const analytics = await this.db
-            .collection('boxing_fight_analytics')
-            .doc(fight.id)
-            .get();
+        upcomingFights.map(async fight => {
+          const analytics = await this.db.collection('boxing_fight_analytics').doc(fight.id).get();
 
           return {
             fight,
@@ -369,7 +384,8 @@ export class BoxingIntegrationService {
     try {
       const [fighters, analytics] = await Promise.all([
         this.dataSyncService.getFightersByWeightClass(weightClass),
-        this.db.collection('boxing_weight_class_analytics')
+        this.db
+          .collection('boxing_weight_class_analytics')
           .doc(weightClass.toLowerCase().replace(' ', '_'))
           .get(),
       ]);
@@ -432,10 +448,14 @@ export class BoxingIntegrationService {
 
   private getSyncFrequency(): number {
     switch (this.options.syncFrequency) {
-      case 'high': return 30 * 60 * 1000; // 30 minutes
-      case 'medium': return 2 * 60 * 60 * 1000; // 2 hours
-      case 'low': return 6 * 60 * 60 * 1000; // 6 hours
-      default: return 2 * 60 * 60 * 1000;
+      case 'high':
+        return 30 * 60 * 1000; // 30 minutes
+      case 'medium':
+        return 2 * 60 * 60 * 1000; // 2 hours
+      case 'low':
+        return 6 * 60 * 60 * 1000; // 6 hours
+      default:
+        return 2 * 60 * 60 * 1000;
     }
   }
 
@@ -448,8 +468,7 @@ export class BoxingIntegrationService {
       ]);
 
       const lastSync = await this.getLastSyncTime('data');
-      const nextSync = this.syncInterval ? 
-        new Date(Date.now() + this.getSyncFrequency()) : null;
+      const nextSync = this.syncInterval ? new Date(Date.now() + this.getSyncFrequency()) : null;
 
       return {
         status: 'active',
@@ -474,11 +493,12 @@ export class BoxingIntegrationService {
 
   private async getAnalyticsStatus(): Promise<BoxingSystemStatus['analytics']> {
     try {
-      const [fighterAnalyticsCount, fightAnalyticsCount, weightClassAnalyticsCount] = await Promise.all([
-        this.getCollectionCount('boxing_fighter_analytics'),
-        this.getCollectionCount('boxing_fight_analytics'),
-        this.getCollectionCount('boxing_weight_class_analytics'),
-      ]);
+      const [fighterAnalyticsCount, fightAnalyticsCount, weightClassAnalyticsCount] =
+        await Promise.all([
+          this.getCollectionCount('boxing_fighter_analytics'),
+          this.getCollectionCount('boxing_fight_analytics'),
+          this.getCollectionCount('boxing_weight_class_analytics'),
+        ]);
 
       const lastUpdate = await this.getLastSyncTime('analytics');
 

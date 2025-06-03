@@ -1,16 +1,16 @@
-import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 
 // Import screens
-import WelcomeScreen from '../screens/Onboarding/WelcomeScreen';
-import ProfileSetupScreen from '../screens/Onboarding/ProfileSetupScreen';
-import PreferencesScreen from '../screens/Onboarding/PreferencesScreen';
-import GDPRConsentScreen from '../screens/Onboarding/GDPRConsentScreen';
-import CookieConsentScreen from '../screens/Onboarding/CookieConsentScreen';
 import AgeVerificationScreen from '../screens/Onboarding/AgeVerificationScreen';
-import SelfExclusionScreen from '../screens/Onboarding/SelfExclusionScreen';
-import ResponsibleGamblingScreen from '../screens/Onboarding/ResponsibleGamblingScreen';
+import CookieConsentScreen from '../screens/Onboarding/CookieConsentScreen';
+import GDPRConsentScreen from '../screens/Onboarding/GDPRConsentScreen';
 import LiabilityWaiverScreen from '../screens/Onboarding/LiabilityWaiverScreen';
+import PreferencesScreen from '../screens/Onboarding/PreferencesScreen';
+import ProfileSetupScreen from '../screens/Onboarding/ProfileSetupScreen';
+import ResponsibleGamblingScreen from '../screens/Onboarding/ResponsibleGamblingScreen';
+import SelfExclusionScreen from '../screens/Onboarding/SelfExclusionScreen';
+import WelcomeScreen from '../screens/Onboarding/WelcomeScreen';
 
 // Define navigation types
 export type OnboardingStackParamList = {

@@ -1,19 +1,19 @@
 // Firebase SDK Configuration
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-import { getFunctions } from "firebase/functions";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAnalytics, isSupported } from 'firebase/analytics';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getFunctions } from 'firebase/functions';
+import { getStorage } from 'firebase/storage';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDNBnQsHukUdPfaF2HEnwi6B9-cN4aDiRc",
-  authDomain: "ai-sports-edge-final.firebaseapp.com",
-  projectId: "ai-sports-edge-final",
-  storageBucket: "ai-sports-edge-final.appspot.com",
-  messagingSenderId: "676798996425",
-  appId: "1:676798996425:web:82641620e8b8bedd6dd218"
+  apiKey: 'AIzaSyDNBnQsHukUdPfaF2HEnwi6B9-cN4aDiRc',
+  authDomain: 'ai-sports-edge-final.firebaseapp.com',
+  projectId: 'ai-sports-edge-final',
+  storageBucket: 'ai-sports-edge-final.appspot.com',
+  messagingSenderId: '676798996425',
+  appId: '1:676798996425:web:82641620e8b8bedd6dd218',
 };
 
 // Initialize Firebase
@@ -27,20 +27,14 @@ const functions = getFunctions(app);
 
 // Initialize Analytics conditionally (it may not be available in all environments)
 let analytics = null;
-isSupported().then(supported => {
-  if (supported) {
-    analytics = getAnalytics(app);
-  }
-}).catch(error => {
-  console.error("Firebase Analytics error:", error);
-});
+isSupported()
+  .then(supported => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  })
+  .catch(error => {
+    console.error('Firebase Analytics error:', error);
+  });
 
-export { 
-  app, 
-  auth, 
-  firestore, 
-  storage, 
-  functions, 
-  analytics,
-  firebaseConfig 
-};
+export { app, auth, firestore, storage, functions, analytics, firebaseConfig };

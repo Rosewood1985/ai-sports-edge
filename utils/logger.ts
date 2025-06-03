@@ -1,6 +1,6 @@
 /**
  * Logger Utility
- * 
+ *
  * A simple logging utility for consistent logging across the application.
  */
 

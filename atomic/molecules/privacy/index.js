@@ -5,9 +5,9 @@
  * and consent management in compliance with GDPR and CCPA requirements.
  */
 
-import PrivacyManager from './PrivacyManager';
 import * as DataAccessManager from './DataAccessManager';
 import * as DataDeletionManager from './DataDeletionManager';
+import PrivacyManager from './PrivacyManager';
 
 export { PrivacyManager as default, DataAccessManager, DataDeletionManager };
 

@@ -7,8 +7,8 @@
 
 import { startTransaction } from './errorTracking';
 import { info, error as logError, LogCategory } from './logging';
-import { safeErrorCapture } from '../atoms/errorUtils';
 import { isDevelopment } from '../atoms/envConfig';
+import { safeErrorCapture } from '../atoms/errorUtils';
 
 /**
  * Transaction types

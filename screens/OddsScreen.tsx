@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,29 +8,28 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Alert
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { auth } from "../config/firebase";
-import { hasPremiumAccess } from "../services/subscriptionService";
-import useOddsData from "../hooks/useOddsData";
-import { Header } from "../atomic/organisms";
-import { LoadingIndicator, ErrorMessage, EmptyState } from "../atomic/atoms";
-import GameCard from "../components/GameCard";
-import DailyFreePick from "../components/DailyFreePick";
-import TrendingBets from "../components/TrendingBets";
-import CommunityPolls from "../components/CommunityPolls";
-import AILeaderboard from "../components/AILeaderboard";
-import FreemiumFeature from "../components/FreemiumFeature";
-import BlurredPrediction from "../components/BlurredPrediction";
-import { useTheme } from "../contexts/ThemeContext";
-import { 
-  getTrendingBets, 
-  getCommunityPolls, 
+  Alert,
+} from 'react-native';
+
+import { LoadingIndicator, ErrorMessage, EmptyState } from '../atomic/atoms';
+import { Header } from '../atomic/organisms';
+import AILeaderboard from '../components/AILeaderboard';
+import BlurredPrediction from '../components/BlurredPrediction';
+import CommunityPolls from '../components/CommunityPolls';
+import DailyFreePick from '../components/DailyFreePick';
+import FreemiumFeature from '../components/FreemiumFeature';
+import GameCard from '../components/GameCard';
+import TrendingBets from '../components/TrendingBets';
+import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import useOddsData from '../hooks/useOddsData';
+import {
+  getTrendingBets,
+  getCommunityPolls,
   getAILeaderboard,
-  getBlurredPredictions
-} from "../services/aiPredictionService";
+  getBlurredPredictions,
+} from '../services/aiPredictionService';
+import { hasPremiumAccess } from '../services/subscriptionService';
 
 type OddsScreenProps = {
   navigation: StackNavigationProp<any, 'Odds'>;
@@ -47,7 +48,7 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
   const [leaderboardEntries, setLeaderboardEntries] = useState<any[]>([]);
   const [blurredPredictions, setBlurredPredictions] = useState<any[]>([]);
   const { colors, isDark } = useTheme();
-  
+
   // Use our custom hook to manage odds data, loading state, and errors
   const {
     data: odds,
@@ -55,22 +56,22 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
     error,
     refresh,
     dailyInsights,
-    refreshLiveData
-  } = useOddsData("americanfootball_nfl");
-  
+    refreshLiveData,
+  } = useOddsData('americanfootball_nfl');
+
   // Check if user has premium access
   useEffect(() => {
     let isMounted = true;
-    
+
     const checkPremiumAccess = async () => {
       try {
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           if (isMounted) setHasPremium(false);
           return;
         }
-        
+
         const premium = await hasPremiumAccess(userId);
         if (isMounted) setHasPremium(premium);
       } catch (error) {
@@ -78,40 +79,40 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
         if (isMounted) setHasPremium(false);
       }
     };
-    
+
     checkPremiumAccess();
-    
+
     // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       if (user && isMounted) {
         checkPremiumAccess();
       }
     });
-    
+
     return () => {
       isMounted = false;
       unsubscribe();
     };
   }, []);
-  
+
   // Load freemium content
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadFreemiumContent = async () => {
       try {
         // Get trending bets
         const trends = await getTrendingBets();
         if (isMounted) setTrendingBets(trends);
-        
+
         // Get community polls
         const polls = await getCommunityPolls();
         if (isMounted) setCommunityPolls(polls);
-        
+
         // Get leaderboard entries
         const entries = await getAILeaderboard();
         if (isMounted) setLeaderboardEntries(entries);
-        
+
         // Get blurred predictions if not premium
         if (!hasPremium && odds.length > 0) {
           const blurred = await getBlurredPredictions(odds.slice(0, 3));
@@ -121,53 +122,49 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
         console.error('Error loading freemium content:', error);
       }
     };
-    
+
     loadFreemiumContent();
-    
+
     return () => {
       isMounted = false;
     };
   }, [odds, hasPremium]);
-  
+
   // Set up auto-refresh for live data
   useEffect(() => {
     const intervalId = setInterval(() => {
       refreshLiveData();
     }, 60000); // Refresh every minute
-    
+
     return () => clearInterval(intervalId);
   }, []);
-  
+
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await refresh();
     setRefreshing(false);
   }, [refresh]);
-  
+
   // Handle ad viewing
   const handleAdRequested = async (): Promise<boolean> => {
     // In a real app, this would show an ad
     // For now, we'll just simulate ad viewing
-    return new Promise((resolve) => {
-      Alert.alert(
-        "Watch Ad",
-        "In a real app, this would show an ad. Simulating ad view...",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              // Simulate ad completion
-              setTimeout(() => {
-                resolve(true);
-              }, 1000);
-            }
-          }
-        ]
-      );
+    return new Promise(resolve => {
+      Alert.alert('Watch Ad', 'In a real app, this would show an ad. Simulating ad view...', [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Simulate ad completion
+            setTimeout(() => {
+              resolve(true);
+            }, 1000);
+          },
+        },
+      ]);
     });
   };
-  
+
   // Define poll option type
   interface PollOption {
     id: string;
@@ -188,23 +185,23 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
             }
             return option;
           });
-          
+
           return {
             ...poll,
             options: updatedOptions,
-            totalVotes: poll.totalVotes + 1
+            totalVotes: poll.totalVotes + 1,
           };
         }
         return poll;
       })
     );
   };
-  
+
   // Navigate to subscription screen
   const handleUpgrade = () => {
     navigation.navigate('Subscription');
   };
-  
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: isDark ? '#121212' : '#f8f9fa' }]}
@@ -217,12 +214,8 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
       }
     >
       <View style={styles.headerContainer}>
-        <Header
-          title="Live Betting Odds"
-          onRefresh={refresh}
-          isLoading={loading}
-        />
-        
+        <Header title="Live Betting Odds" onRefresh={refresh} isLoading={loading} />
+
         {!hasPremium && (
           <TouchableOpacity
             style={[styles.upgradeButton, { backgroundColor: colors.primary }]}
@@ -233,34 +226,19 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
           </TouchableOpacity>
         )}
       </View>
-      
+
       {/* Daily Free Pick (for free users) */}
-      {!hasPremium && (
-        <DailyFreePick
-          games={odds}
-          onAdRequested={handleAdRequested}
-        />
-      )}
-      
+      {!hasPremium && <DailyFreePick games={odds} onAdRequested={handleAdRequested} />}
+
       {/* Trending Bets (for all users) */}
-      <TrendingBets
-        trendingBets={trendingBets}
-        showUpgradePrompt={!hasPremium}
-      />
-      
+      <TrendingBets trendingBets={trendingBets} showUpgradePrompt={!hasPremium} />
+
       {/* Community Polls (for all users) */}
-      <CommunityPolls
-        polls={communityPolls}
-        onVote={handlePollVote}
-        isPremium={hasPremium}
-      />
-      
+      <CommunityPolls polls={communityPolls} onVote={handlePollVote} isPremium={hasPremium} />
+
       {/* AI Leaderboard (for all users, but with premium features) */}
-      <AILeaderboard
-        entries={leaderboardEntries}
-        isPremium={hasPremium}
-      />
-      
+      <AILeaderboard entries={leaderboardEntries} isPremium={hasPremium} />
+
       {/* Blurred Predictions (for free users) */}
       {!hasPremium && blurredPredictions.length > 0 && (
         <View style={styles.predictionsContainer}>
@@ -270,72 +248,55 @@ export default function OddsScreen({ navigation }: OddsScreenProps): JSX.Element
               AI Predictions Preview
             </Text>
           </View>
-          
+
           {blurredPredictions.map((game, index) => (
             <BlurredPrediction
               key={`blurred-${index}`}
               prediction={game.ai_prediction}
-              isBlurred={true}
+              isBlurred
               teamName={game.home_team}
             />
           ))}
-          
+
           <TouchableOpacity
             style={[styles.fullWidthButton, { backgroundColor: colors.primary }]}
             onPress={handleUpgrade}
           >
-            <Text style={styles.fullWidthButtonText}>
-              Unlock All AI Predictions
-            </Text>
+            <Text style={styles.fullWidthButtonText}>Unlock All AI Predictions</Text>
           </TouchableOpacity>
         </View>
       )}
-      
+
       {/* Premium Games (for premium users) */}
-      <FreemiumFeature
-        type="locked"
-        message="Upgrade to see all games with AI predictions"
-      >
-        {loading && !refreshing && (
-          <LoadingIndicator message="Loading odds..." />
-        )}
-        
+      <FreemiumFeature type="locked" message="Upgrade to see all games with AI predictions">
+        {loading && !refreshing && <LoadingIndicator message="Loading odds..." />}
+
         {error && <ErrorMessage message={error} />}
-        
-        {!loading && odds.length === 0 && !error && (
-          <EmptyState message="No odds data available" />
-        )}
-        
+
+        {!loading && odds.length === 0 && !error && <EmptyState message="No odds data available" />}
+
         {odds.map((game, index) => (
           <GameCard
             key={`game-${index}`}
             game={game}
-            onPress={() => console.log("Game pressed:", game.id)}
+            onPress={() => console.log('Game pressed:', game.id)}
           />
         ))}
       </FreemiumFeature>
-      
+
       {/* Upgrade Banner */}
       {!hasPremium && (
-        <View style={[
-          styles.upgradeBanner,
-          { backgroundColor: colors.primary }
-        ]}>
+        <View style={[styles.upgradeBanner, { backgroundColor: colors.primary }]}>
           <View style={styles.upgradeContent}>
             <Ionicons name="star" size={24} color="#fff" />
             <View style={styles.upgradeTextContainer}>
-              <Text style={styles.upgradeBannerTitle}>
-                Upgrade to Premium
-              </Text>
+              <Text style={styles.upgradeBannerTitle}>Upgrade to Premium</Text>
               <Text style={styles.upgradeBannerText}>
                 Get unlimited AI predictions, real-time insights, and more
               </Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.upgradeBannerButton}
-            onPress={handleUpgrade}
-          >
+          <TouchableOpacity style={styles.upgradeBannerButton} onPress={handleUpgrade}>
             <Text style={styles.upgradeBannerButtonText}>Upgrade</Text>
           </TouchableOpacity>
         </View>

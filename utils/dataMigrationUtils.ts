@@ -1,24 +1,29 @@
-import { 
-  doc, 
-  getDoc, 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
+import { Auth } from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
   writeBatch,
   limit,
   Firestore,
   DocumentData,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot,
 } from 'firebase/firestore';
-import { Auth } from 'firebase/auth';
-import { info, error as logError, LogCategory } from '../services/loggingService';
+
+import * as firebaseConfig from '../config/firebase';
 import { safeErrorCapture } from '../services/errorUtils';
-import { firebaseMonitoringService, FirebaseOperationType, FirebaseServiceType } from '../services/firebaseMonitoringService';
+import {
+  firebaseMonitoringService,
+  FirebaseOperationType,
+  FirebaseServiceType,
+} from '../services/firebaseMonitoringService';
+import { info, error as logError, LogCategory } from '../services/loggingService';
 import { OptimizedUserData } from '../services/optimizedUserService';
 
 // Import Firebase services
-import * as firebaseConfig from '../config/firebase';
 
 // Get Firebase services with type assertions
 const auth = firebaseConfig.auth as Auth;
@@ -33,10 +38,10 @@ export interface MigrationProgress {
   succeeded: number;
   failed: number;
   skipped: number;
-  errors: Array<{
+  errors: {
     id: string;
     error: string;
-  }>;
+  }[];
   startTime: number;
   endTime?: number;
   status: 'pending' | 'running' | 'completed' | 'failed';
@@ -58,7 +63,7 @@ export interface MigrationOptions {
 const defaultMigrationOptions: MigrationOptions = {
   batchSize: 100,
   dryRun: false,
-  skipExisting: true
+  skipExisting: true,
 };
 
 /**
@@ -72,7 +77,7 @@ export async function migrateUserData(
   options?: MigrationOptions
 ): Promise<MigrationProgress> {
   const opts = { ...defaultMigrationOptions, ...options };
-  
+
   // Initialize progress
   const progress: MigrationProgress = {
     total: 0,
@@ -82,20 +87,22 @@ export async function migrateUserData(
     skipped: 0,
     errors: [],
     startTime: Date.now(),
-    status: 'running'
+    status: 'running',
   };
-  
+
   try {
     console.log('dataMigrationUtils: Starting user data migration');
-    info(LogCategory.STORAGE, 'Starting user data migration', { userIds: userIds?.length || 'all' });
-    
+    info(LogCategory.STORAGE, 'Starting user data migration', {
+      userIds: userIds?.length || 'all',
+    });
+
     // Get users to migrate
     let usersToMigrate: QueryDocumentSnapshot<DocumentData>[] = [];
-    
+
     if (userIds && userIds.length > 0) {
       // Get specific users
       progress.total = userIds.length;
-      
+
       // Get users in batches to avoid large IN queries
       const batchSize = 10; // Firestore IN queries are limited to 10 items
       for (let i = 0; i < userIds.length; i += batchSize) {
@@ -103,128 +110,130 @@ export async function migrateUserData(
         const usersRef = collection(firestore, 'users');
         const usersQuery = query(usersRef, where('__name__', 'in', batchIds));
         const usersSnapshot = await getDocs(usersQuery);
-        
+
         usersToMigrate = [...usersToMigrate, ...usersSnapshot.docs];
       }
     } else {
       // Get all users
       const usersRef = collection(firestore, 'users');
       const usersSnapshot = await getDocs(usersRef);
-      
+
       usersToMigrate = usersSnapshot.docs;
       progress.total = usersSnapshot.size;
     }
-    
+
     // Update progress
     if (opts.onProgress) {
       opts.onProgress({ ...progress });
     }
-    
+
     // Process users in batches
     const batchSize = opts.batchSize || 100;
     for (let i = 0; i < usersToMigrate.length; i += batchSize) {
       const userBatch = usersToMigrate.slice(i, i + batchSize);
-      
+
       // Process batch
-      await Promise.all(userBatch.map(async (userDoc) => {
-        const userId = userDoc.id;
-        
-        try {
-          // Start timing
-          const startTime = Date.now();
-          
-          // Check if user already has optimized data
-          if (opts.skipExisting) {
-            const userData = userDoc.data();
-            
-            // Check if user already has embedded preferences
-            if (userData.preferences) {
-              progress.processed++;
-              progress.skipped++;
-              return;
+      await Promise.all(
+        userBatch.map(async userDoc => {
+          const userId = userDoc.id;
+
+          try {
+            // Start timing
+            const startTime = Date.now();
+
+            // Check if user already has optimized data
+            if (opts.skipExisting) {
+              const userData = userDoc.data();
+
+              // Check if user already has embedded preferences
+              if (userData.preferences) {
+                progress.processed++;
+                progress.skipped++;
+                return;
+              }
             }
-          }
-          
-          // Migrate user data
-          if (!opts.dryRun) {
-            await migrateUser(userId);
-          }
-          
-          // End timing
-          const endTime = Date.now();
-          const duration = endTime - startTime;
-          
-          // Track operation
-          firebaseMonitoringService.trackOperation({
-            type: FirebaseOperationType.BATCH,
-            service: FirebaseServiceType.FIRESTORE,
-            path: `users/${userId}`,
-            duration,
-            success: true,
-            metadata: {
-              operation: 'migrateUser',
-              dryRun: opts.dryRun
+
+            // Migrate user data
+            if (!opts.dryRun) {
+              await migrateUser(userId);
             }
-          });
-          
-          // Update progress
-          progress.processed++;
-          progress.succeeded++;
-        } catch (error) {
-          // Update progress
-          progress.processed++;
-          progress.failed++;
-          
-          // Add error
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          progress.errors.push({
-            id: userId,
-            error: errorMessage
-          });
-          
-          // Log error
-          console.error(`dataMigrationUtils: Error migrating user ${userId}:`, error);
-          logError(LogCategory.STORAGE, `Error migrating user ${userId}`, error as Error);
-          safeErrorCapture(error as Error);
-        }
-      }));
-      
+
+            // End timing
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+
+            // Track operation
+            firebaseMonitoringService.trackOperation({
+              type: FirebaseOperationType.BATCH,
+              service: FirebaseServiceType.FIRESTORE,
+              path: `users/${userId}`,
+              duration,
+              success: true,
+              metadata: {
+                operation: 'migrateUser',
+                dryRun: opts.dryRun,
+              },
+            });
+
+            // Update progress
+            progress.processed++;
+            progress.succeeded++;
+          } catch (error) {
+            // Update progress
+            progress.processed++;
+            progress.failed++;
+
+            // Add error
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            progress.errors.push({
+              id: userId,
+              error: errorMessage,
+            });
+
+            // Log error
+            console.error(`dataMigrationUtils: Error migrating user ${userId}:`, error);
+            logError(LogCategory.STORAGE, `Error migrating user ${userId}`, error as Error);
+            safeErrorCapture(error as Error);
+          }
+        })
+      );
+
       // Update progress
       if (opts.onProgress) {
         opts.onProgress({ ...progress });
       }
     }
-    
+
     // Complete migration
     progress.endTime = Date.now();
     progress.status = 'completed';
-    
+
     console.log('dataMigrationUtils: User data migration completed', {
       total: progress.total,
       succeeded: progress.succeeded,
       failed: progress.failed,
       skipped: progress.skipped,
-      duration: `${(progress.endTime - progress.startTime) / 1000}s`
+      duration: `${(progress.endTime - progress.startTime) / 1000}s`,
     });
-    
+
     info(LogCategory.STORAGE, 'User data migration completed', {
       total: progress.total,
       succeeded: progress.succeeded,
       failed: progress.failed,
       skipped: progress.skipped,
-      duration: `${(progress.endTime - progress.startTime) / 1000}s`
+      duration: `${(progress.endTime - progress.startTime) / 1000}s`,
     });
-    
+
     return progress;
   } catch (error) {
     // Failed migration
     progress.endTime = Date.now();
     progress.status = 'failed';
-    
+
     console.error('dataMigrationUtils: User data migration failed:', error);
     logError(LogCategory.STORAGE, 'User data migration failed', error as Error);
     safeErrorCapture(error as Error);
-    
+
     return progress;
   }
 }
@@ -236,22 +245,22 @@ export async function migrateUserData(
 export async function migrateUser(userId: string): Promise<void> {
   try {
     console.log(`dataMigrationUtils: Migrating user ${userId}`);
-    
+
     // Get user document
     const userRef = doc(firestore, 'users', userId);
     const userDoc = await getDoc(userRef);
-    
+
     if (!userDoc.exists()) {
       throw new Error(`User ${userId} not found`);
     }
-    
+
     const userData = userDoc.data();
-    
+
     // Create optimized user data
     const optimizedData: Partial<OptimizedUserData> = {
       id: userId,
       updatedAt: new Date(),
-      
+
       // Initialize embedded objects
       preferences: {},
       verifications: {},
@@ -259,23 +268,26 @@ export async function migrateUser(userId: string): Promise<void> {
         current: 0,
         longest: 0,
         lastActiveDate: userData.lastActive || new Date(),
-        availableRewards: 0
+        availableRewards: 0,
       },
-      followedPicks: {}
+      followedPicks: {},
     };
-    
+
     // Migrate preferences
     try {
       const prefsDocRef = doc(collection(userRef, 'preferences'), 'sports');
       const prefsDoc = await getDoc(prefsDocRef);
-      
+
       if (prefsDoc.exists()) {
         optimizedData.preferences = prefsDoc.data();
       }
     } catch (prefsError) {
-      console.error(`dataMigrationUtils: Error migrating preferences for user ${userId}:`, prefsError);
+      console.error(
+        `dataMigrationUtils: Error migrating preferences for user ${userId}:`,
+        prefsError
+      );
     }
-    
+
     // Migrate verifications
     optimizedData.verifications = {
       ageVerification: userData.ageVerification,
@@ -283,55 +295,61 @@ export async function migrateUser(userId: string): Promise<void> {
       responsibleGamblingAcknowledgment: userData.responsibleGamblingAcknowledgment,
       waiverAcceptance: userData.waiverAcceptance,
       gdprConsent: userData.gdprConsent,
-      cookieConsent: userData.cookieConsent
+      cookieConsent: userData.cookieConsent,
     };
-    
+
     // Migrate streaks
     try {
       const streaksRef = doc(firestore, 'userStreaks', userId);
       const streaksDoc = await getDoc(streaksRef);
-      
+
       if (streaksDoc.exists()) {
         const streaksData = streaksDoc.data();
         optimizedData.streaks = {
           current: streaksData.currentStreak || 0,
           longest: streaksData.longestStreak || 0,
           lastActiveDate: streaksData.lastActiveDate || userData.lastActive || new Date(),
-          availableRewards: streaksData.rewards?.availableRewards || 0
+          availableRewards: streaksData.rewards?.availableRewards || 0,
         };
       }
     } catch (streaksError) {
-      console.error(`dataMigrationUtils: Error migrating streaks for user ${userId}:`, streaksError);
+      console.error(
+        `dataMigrationUtils: Error migrating streaks for user ${userId}:`,
+        streaksError
+      );
     }
-    
+
     // Migrate followed picks
     try {
       const userPicksRef = collection(firestore, 'userPicks');
       const userPicksQuery = query(userPicksRef, where('userId', '==', userId), limit(100));
       const userPicksSnapshot = await getDocs(userPicksQuery);
-      
+
       if (!userPicksSnapshot.empty) {
         const followedPicks: Record<string, any> = {};
-        
+
         userPicksSnapshot.forEach(doc => {
           const pickData = doc.data();
           followedPicks[pickData.pickId] = {
             followedAt: pickData.followedAt || new Date(),
-            notificationEnabled: pickData.notificationEnabled || true
+            notificationEnabled: pickData.notificationEnabled || true,
           };
         });
-        
+
         optimizedData.followedPicks = followedPicks;
       }
     } catch (picksError) {
-      console.error(`dataMigrationUtils: Error migrating followed picks for user ${userId}:`, picksError);
+      console.error(
+        `dataMigrationUtils: Error migrating followed picks for user ${userId}:`,
+        picksError
+      );
     }
-    
+
     // Update user document
     const batch = writeBatch(firestore);
     batch.update(userRef, optimizedData);
     await batch.commit();
-    
+
     console.log(`dataMigrationUtils: User ${userId} migrated successfully`);
   } catch (error) {
     console.error(`dataMigrationUtils: Error migrating user ${userId}:`, error);
@@ -348,29 +366,33 @@ export async function migrateUser(userId: string): Promise<void> {
 export async function rollbackUserMigration(userId: string): Promise<void> {
   try {
     console.log(`dataMigrationUtils: Rolling back migration for user ${userId}`);
-    
+
     // Get user document
     const userRef = doc(firestore, 'users', userId);
     const userDoc = await getDoc(userRef);
-    
+
     if (!userDoc.exists()) {
       throw new Error(`User ${userId} not found`);
     }
-    
+
     // Remove embedded data
     const batch = writeBatch(firestore);
     batch.update(userRef, {
       preferences: null,
       verifications: null,
       streaks: null,
-      followedPicks: null
+      followedPicks: null,
     });
     await batch.commit();
-    
+
     console.log(`dataMigrationUtils: Migration rollback for user ${userId} completed`);
   } catch (error) {
     console.error(`dataMigrationUtils: Error rolling back migration for user ${userId}:`, error);
-    logError(LogCategory.STORAGE, `Error rolling back migration for user ${userId}`, error as Error);
+    logError(
+      LogCategory.STORAGE,
+      `Error rolling back migration for user ${userId}`,
+      error as Error
+    );
     safeErrorCapture(error as Error);
     throw error;
   }
@@ -379,5 +401,5 @@ export async function rollbackUserMigration(userId: string): Promise<void> {
 export default {
   migrateUserData,
   migrateUser,
-  rollbackUserMigration
+  rollbackUserMigration,
 };

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
+
 import { PrivacySettingsScreen } from '../atomic/organisms/privacy';
 
 /**

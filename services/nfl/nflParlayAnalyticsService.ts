@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
 import * as Sentry from '@sentry/node';
+import * as admin from 'firebase-admin';
 
 interface ParlayLeg {
   gameId: string;
@@ -140,14 +140,14 @@ export class NFLParlayAnalyticsService {
   async analyzeParlayProbability(parlayData: ParlayData): Promise<ParlayPrediction> {
     const transaction = Sentry.startTransaction({
       op: 'nfl_parlay_analysis',
-      name: 'Analyze NFL Parlay Probability'
+      name: 'Analyze NFL Parlay Probability',
     });
 
     try {
       Sentry.addBreadcrumb({
         message: `Analyzing parlay with ${parlayData.legs.length} legs`,
         level: 'info',
-        data: { parlayId: parlayData.parlayId, totalOdds: parlayData.totalOdds }
+        data: { parlayId: parlayData.parlayId, totalOdds: parlayData.totalOdds },
       });
 
       // Step 1: Calculate individual leg probabilities
@@ -198,7 +198,7 @@ export class NFLParlayAnalyticsService {
         recommendations,
         expectedValue,
         confidence: this.calculateConfidence(individualProbabilities, correlations),
-        alternativeSelections
+        alternativeSelections,
       };
 
       await this.storeParlayAnalysis(prediction);
@@ -209,12 +209,11 @@ export class NFLParlayAnalyticsService {
         data: {
           overallProbability,
           expectedValue,
-          confidence: prediction.confidence
-        }
+          confidence: prediction.confidence,
+        },
       });
 
       return prediction;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error analyzing parlay probability:', error);
@@ -256,17 +255,14 @@ export class NFLParlayAnalyticsService {
       }
 
       // Apply game-specific adjustments
-      const adjustedProbability = await this.applyGameSpecificAdjustments(
-        leg,
-        rawProbability
-      );
+      const adjustedProbability = await this.applyGameSpecificAdjustments(leg, rawProbability);
 
       probabilities.push({
         legIndex: i,
         rawProbability,
         adjustedProbability,
         confidence: this.calculateLegConfidence(leg, rawProbability),
-        keyFactors
+        keyFactors,
       });
     }
 
@@ -300,7 +296,10 @@ export class NFLParlayAnalyticsService {
     return correlations;
   }
 
-  private async analyzeSameGameCorrelation(leg1: ParlayLeg, leg2: ParlayLeg): Promise<GameCorrelation> {
+  private async analyzeSameGameCorrelation(
+    leg1: ParlayLeg,
+    leg2: ParlayLeg
+  ): Promise<GameCorrelation> {
     const correlationFactors: CorrelationFactor[] = [];
     let correlationStrength = 0;
     let correlationType: 'positive' | 'negative' | 'neutral' = 'neutral';
@@ -314,10 +313,9 @@ export class NFLParlayAnalyticsService {
         factor: 'blowout_correlation',
         impact: 0.15,
         confidence: 0.85,
-        description: 'Blowout games tend to go over the total'
+        description: 'Blowout games tend to go over the total',
       });
-    }
-    else if (leg1.betType === 'player_prop' && leg2.betType === 'total') {
+    } else if (leg1.betType === 'player_prop' && leg2.betType === 'total') {
       // Player prop and game total correlation
       if (leg1.statType === 'passing_yards' || leg1.statType === 'rushing_yards') {
         correlationStrength = 0.25;
@@ -326,11 +324,10 @@ export class NFLParlayAnalyticsService {
           factor: 'offensive_production_correlation',
           impact: 0.25,
           confidence: 0.8,
-          description: 'High offensive output correlates with higher game totals'
+          description: 'High offensive output correlates with higher game totals',
         });
       }
-    }
-    else if (leg1.betType === 'player_prop' && leg2.betType === 'player_prop') {
+    } else if (leg1.betType === 'player_prop' && leg2.betType === 'player_prop') {
       // Same team player props correlation
       if (leg1.playerId !== leg2.playerId) {
         correlationStrength = await this.calculatePlayerPropCorrelation(leg1, leg2);
@@ -345,11 +342,14 @@ export class NFLParlayAnalyticsService {
       correlationStrength: Math.abs(correlationStrength),
       historicalWinRate: await this.getHistoricalCorrelationWinRate(leg1, leg2),
       sampleSize: 100, // Would be calculated from historical data
-      factors: correlationFactors
+      factors: correlationFactors,
     };
   }
 
-  private async analyzeCrossGameCorrelation(leg1: ParlayLeg, leg2: ParlayLeg): Promise<GameCorrelation> {
+  private async analyzeCrossGameCorrelation(
+    leg1: ParlayLeg,
+    leg2: ParlayLeg
+  ): Promise<GameCorrelation> {
     const correlationFactors: CorrelationFactor[] = [];
     let correlationStrength = 0;
     let correlationType: 'positive' | 'negative' | 'neutral' = 'neutral';
@@ -363,7 +363,7 @@ export class NFLParlayAnalyticsService {
         factor: 'divisional_week_correlation',
         impact: 0.1,
         confidence: 0.7,
-        description: 'Divisional games in same week tend to have similar outcomes'
+        description: 'Divisional games in same week tend to have similar outcomes',
       });
     }
 
@@ -375,7 +375,7 @@ export class NFLParlayAnalyticsService {
         factor: 'weather_correlation',
         impact: weatherCorrelation.strength,
         confidence: 0.8,
-        description: weatherCorrelation.description
+        description: weatherCorrelation.description,
       });
     }
 
@@ -387,7 +387,7 @@ export class NFLParlayAnalyticsService {
         factor: 'primetime_bias',
         impact: primetimeCorrelation,
         confidence: 0.75,
-        description: 'Primetime games have public betting biases'
+        description: 'Primetime games have public betting biases',
       });
     }
 
@@ -398,7 +398,7 @@ export class NFLParlayAnalyticsService {
       correlationStrength,
       historicalWinRate: correlationStrength > 0 ? 0.45 : 0.5, // Slightly worse than independent
       sampleSize: 50,
-      factors: correlationFactors
+      factors: correlationFactors,
     };
   }
 
@@ -421,7 +421,7 @@ export class NFLParlayAnalyticsService {
           affectedLegs,
           adjustmentType: correlation.correlationType === 'positive' ? 'negative' : 'positive',
           magnitude: correlation.correlationStrength * 0.1, // Conservative adjustment
-          reason: `${correlation.correlationType} correlation detected: ${correlation.factors[0]?.description || 'correlation factor'}`
+          reason: `${correlation.correlationType} correlation detected: ${correlation.factors[0]?.description || 'correlation factor'}`,
         });
       }
     }
@@ -443,7 +443,7 @@ export class NFLParlayAnalyticsService {
           severity: weatherImpact.severity,
           affectedLegs: [i],
           description: weatherImpact.description,
-          impact: weatherImpact.impact
+          impact: weatherImpact.impact,
         });
       }
 
@@ -455,7 +455,7 @@ export class NFLParlayAnalyticsService {
           severity: injuryRisk.severity,
           affectedLegs: [i],
           description: injuryRisk.description,
-          impact: injuryRisk.impact
+          impact: injuryRisk.impact,
         });
       }
 
@@ -467,7 +467,7 @@ export class NFLParlayAnalyticsService {
           severity: motivationRisk.severity,
           affectedLegs: [i],
           description: motivationRisk.description,
-          impact: motivationRisk.impact
+          impact: motivationRisk.impact,
         });
       }
 
@@ -479,7 +479,7 @@ export class NFLParlayAnalyticsService {
           severity: primetimeRisk.severity,
           affectedLegs: [i],
           description: primetimeRisk.description,
-          impact: primetimeRisk.impact
+          impact: primetimeRisk.impact,
         });
       }
     }
@@ -498,10 +498,10 @@ export class NFLParlayAnalyticsService {
     for (const adjustment of adjustments) {
       if (adjustment.adjustmentType === 'negative') {
         // Negative correlation adjustment (decreases overall probability)
-        overallProb *= (1 - adjustment.magnitude);
+        overallProb *= 1 - adjustment.magnitude;
       } else {
         // Positive correlation adjustment (increases overall probability)
-        overallProb *= (1 + adjustment.magnitude * 0.5); // Conservative positive adjustment
+        overallProb *= 1 + adjustment.magnitude * 0.5; // Conservative positive adjustment
       }
     }
 
@@ -517,8 +517,10 @@ export class NFLParlayAnalyticsService {
     const recommendations: ParlayRecommendation[] = [];
 
     // Identify weak legs
-    const weakestLeg = probabilities.reduce((min, prob, index) => 
-      prob.adjustedProbability < probabilities[min].adjustedProbability ? index : min, 0
+    const weakestLeg = probabilities.reduce(
+      (min, prob, index) =>
+        prob.adjustedProbability < probabilities[min].adjustedProbability ? index : min,
+      0
     );
 
     if (probabilities[weakestLeg].adjustedProbability < 0.4) {
@@ -526,7 +528,7 @@ export class NFLParlayAnalyticsService {
         type: 'remove_leg',
         legIndex: weakestLeg,
         reason: `Leg ${weakestLeg + 1} has low probability (${(probabilities[weakestLeg].adjustedProbability * 100).toFixed(1)}%)`,
-        expectedImpact: 0.15
+        expectedImpact: 0.15,
       });
     }
 
@@ -536,7 +538,7 @@ export class NFLParlayAnalyticsService {
       recommendations.push({
         type: 'avoid_parlay',
         reason: `High risk factors detected: ${highRiskFactors.map(rf => rf.type).join(', ')}`,
-        expectedImpact: -0.2
+        expectedImpact: -0.2,
       });
     }
 
@@ -551,7 +553,7 @@ export class NFLParlayAnalyticsService {
       recommendations.push({
         type: 'avoid_parlay',
         reason: `Negative expected value: ${(expectedValue * 100).toFixed(1)}%`,
-        expectedImpact: expectedValue
+        expectedImpact: expectedValue,
       });
     }
 
@@ -562,7 +564,7 @@ export class NFLParlayAnalyticsService {
         type: 'add_leg',
         reason: 'Adding correlated leg for positive correlation',
         expectedImpact: 0.05,
-        alternative: correlatedSuggestion
+        alternative: correlatedSuggestion,
       });
     }
 
@@ -574,7 +576,7 @@ export class NFLParlayAnalyticsService {
 
     for (let i = 0; i < legs.length; i++) {
       const leg = legs[i];
-      
+
       if (leg.betType === 'spread' && leg.line) {
         // Suggest alternative spread
         const altLine = leg.line + (Math.random() > 0.5 ? 0.5 : -0.5);
@@ -583,10 +585,13 @@ export class NFLParlayAnalyticsService {
           alternativeSelection: `${leg.selection} ${altLine > 0 ? '+' : ''}${altLine}`,
           alternativeOdds: leg.odds + (altLine > leg.line ? 15 : -15),
           probabilityImprovement: altLine > leg.line ? 0.08 : -0.08,
-          reason: altLine > leg.line ? 'Safer line with better probability' : 'More aggressive line for better odds'
+          reason:
+            altLine > leg.line
+              ? 'Safer line with better probability'
+              : 'More aggressive line for better odds',
         });
       }
-      
+
       if (leg.betType === 'total' && leg.line) {
         // Suggest alternative total
         const altLine = leg.line + (Math.random() > 0.5 ? 0.5 : -0.5);
@@ -595,7 +600,7 @@ export class NFLParlayAnalyticsService {
           alternativeSelection: `${leg.selection} ${altLine}`,
           alternativeOdds: leg.odds + (Math.random() > 0.5 ? 10 : -10),
           probabilityImprovement: 0.05,
-          reason: 'Alternative total line based on weather and pace factors'
+          reason: 'Alternative total line based on weather and pace factors',
         });
       }
     }
@@ -637,7 +642,7 @@ export class NFLParlayAnalyticsService {
     // Weather adjustments
     const weather = await this.getWeatherImpact(leg.gameId);
     if (weather && leg.betType === 'total') {
-      adjusted *= (1 + weather.impactOnTotals);
+      adjusted *= 1 + weather.impactOnTotals;
     }
 
     // Divisional game adjustments
@@ -683,14 +688,14 @@ export class NFLParlayAnalyticsService {
 
   private calculateExpectedValue(probability: number, odds: number, stake: number): number {
     const payout = this.calculatePayout(odds, stake);
-    return (probability * payout) - ((1 - probability) * stake);
+    return probability * payout - (1 - probability) * stake;
   }
 
   private calculatePayout(odds: number, stake: number): number {
     if (odds > 0) {
-      return stake + (stake * odds / 100);
+      return stake + (stake * odds) / 100;
     } else {
-      return stake + (stake / (Math.abs(odds) / 100));
+      return stake + stake / (Math.abs(odds) / 100);
     }
   }
 
@@ -702,8 +707,12 @@ export class NFLParlayAnalyticsService {
     }
   }
 
-  private calculateConfidence(probabilities: LegProbability[], correlations: GameCorrelation[]): number {
-    const avgLegConfidence = probabilities.reduce((sum, prob) => sum + prob.confidence, 0) / probabilities.length;
+  private calculateConfidence(
+    probabilities: LegProbability[],
+    correlations: GameCorrelation[]
+  ): number {
+    const avgLegConfidence =
+      probabilities.reduce((sum, prob) => sum + prob.confidence, 0) / probabilities.length;
     const correlationPenalty = correlations.length * 0.02; // Slight penalty for each correlation
     return Math.max(0.1, Math.min(0.95, avgLegConfidence - correlationPenalty));
   }
@@ -719,11 +728,14 @@ export class NFLParlayAnalyticsService {
     return Math.random() < 0.2; // 20% chance placeholder
   }
 
-  private async analyzeWeatherCorrelation(gameId1: string, gameId2: string): Promise<{strength: number, description: string}> {
+  private async analyzeWeatherCorrelation(
+    gameId1: string,
+    gameId2: string
+  ): Promise<{ strength: number; description: string }> {
     // Analyze weather correlation between games
     return {
       strength: Math.random() * 0.1,
-      description: 'Similar weather conditions in both markets'
+      description: 'Similar weather conditions in both markets',
     };
   }
 
@@ -740,39 +752,47 @@ export class NFLParlayAnalyticsService {
     return 0;
   }
 
-  private async analyzeWeatherRisk(gameId: string): Promise<{severity: 'low' | 'medium' | 'high', description: string, impact: number}> {
+  private async analyzeWeatherRisk(
+    gameId: string
+  ): Promise<{ severity: 'low' | 'medium' | 'high'; description: string; impact: number }> {
     // Analyze weather risk for the game
     return {
       severity: 'low',
       description: 'Clear conditions expected',
-      impact: 0
+      impact: 0,
     };
   }
 
-  private async analyzeInjuryRisk(leg: ParlayLeg): Promise<{severity: 'low' | 'medium' | 'high', description: string, impact: number}> {
+  private async analyzeInjuryRisk(
+    leg: ParlayLeg
+  ): Promise<{ severity: 'low' | 'medium' | 'high'; description: string; impact: number }> {
     // Analyze injury risk for players involved in the bet
     return {
       severity: 'low',
       description: 'No significant injury concerns',
-      impact: 0
+      impact: 0,
     };
   }
 
-  private async analyzeMotivationRisk(gameId: string): Promise<{severity: 'low' | 'medium' | 'high', description: string, impact: number}> {
+  private async analyzeMotivationRisk(
+    gameId: string
+  ): Promise<{ severity: 'low' | 'medium' | 'high'; description: string; impact: number }> {
     // Analyze motivation factors (playoff implications, etc.)
     return {
       severity: 'low',
       description: 'Standard regular season motivation',
-      impact: 0
+      impact: 0,
     };
   }
 
-  private async analyzePrimetimeRisk(gameId: string): Promise<{severity: 'low' | 'medium' | 'high', description: string, impact: number}> {
+  private async analyzePrimetimeRisk(
+    gameId: string
+  ): Promise<{ severity: 'low' | 'medium' | 'high'; description: string; impact: number }> {
     // Analyze primetime game risk (public betting bias, etc.)
     return {
       severity: 'low',
       description: 'No significant primetime bias expected',
-      impact: 0
+      impact: 0,
     };
   }
 
@@ -797,10 +817,13 @@ export class NFLParlayAnalyticsService {
   }
 
   private async storeParlayAnalysis(prediction: ParlayPrediction): Promise<void> {
-    await this.db.collection('nfl_parlay_analysis').doc(prediction.parlayId).set({
-      ...prediction,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
+    await this.db
+      .collection('nfl_parlay_analysis')
+      .doc(prediction.parlayId)
+      .set({
+        ...prediction,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
   }
 }
 

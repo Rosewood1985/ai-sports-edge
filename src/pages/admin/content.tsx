@@ -1,7 +1,8 @@
-import React from 'react';
 import { NextPage } from 'next';
-import { AdminLayout } from '../../components/layouts/AdminLayout';
+import React from 'react';
+
 import { ContentManagement } from '../../components/dashboard/content/ContentManagement';
+import { AdminLayout } from '../../components/layouts/AdminLayout';
 import { withAuth } from '../../hocs/withAuth';
 
 const ContentPage: NextPage = () => {

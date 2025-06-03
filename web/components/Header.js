@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
 import '../styles/header.css';
-import PersonalizationPanel from './PersonalizationPanel';
 import BetNowButton from './BetNowButton';
+import PersonalizationPanel from './PersonalizationPanel';
 import ThemeToggle from './ThemeToggle';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 
@@ -11,62 +12,80 @@ const Header = () => {
   const [personalizationOpen, setPersonalizationOpen] = useState(false);
   const location = useLocation();
   const { showBetButton } = useBettingAffiliate();
-  
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-  
+
   const closeMenu = () => {
     setMenuOpen(false);
   };
-  
+
   const togglePersonalization = () => {
     setPersonalizationOpen(!personalizationOpen);
     if (menuOpen) {
       setMenuOpen(false);
     }
   };
-  
+
   const closePersonalization = () => {
     setPersonalizationOpen(false);
   };
-  
-  const isActive = (path) => {
+
+  const isActive = path => {
     return location.pathname === path ? 'active' : '';
   };
-  
+
   return (
     <header className="header">
       <div className="container">
         <div className="header-content">
           <Link to="/" className="logo" onClick={closeMenu}>
-            <img src="/images/ai_logo.webp" alt="AI Sports Edge Logo" width="40" height="40" className="app-logo" />
+            <img
+              src="/images/ai_logo.webp"
+              alt="AI Sports Edge Logo"
+              width="40"
+              height="40"
+              className="app-logo"
+            />
             <span>AI Sports Edge</span>
           </Link>
-          
+
           <button className="menu-toggle" onClick={toggleMenu} aria-label="Toggle menu">
-            <span className={`hamburger ${menuOpen ? 'open' : ''}`}></span>
+            <span className={`hamburger ${menuOpen ? 'open' : ''}`} />
           </button>
-          
+
           <nav className={`nav ${menuOpen ? 'open' : ''}`}>
             <ul className="nav-list">
               <li className="nav-item">
-                <Link to="/" className={isActive('/')} onClick={closeMenu}>Home</Link>
+                <Link to="/" className={isActive('/')} onClick={closeMenu}>
+                  Home
+                </Link>
               </li>
               <li className="nav-item">
-                <Link to="/features" className={isActive('/features')} onClick={closeMenu}>Features</Link>
+                <Link to="/features" className={isActive('/features')} onClick={closeMenu}>
+                  Features
+                </Link>
               </li>
               <li className="nav-item">
-                <Link to="/odds" className={isActive('/odds')} onClick={closeMenu}>Live Odds</Link>
+                <Link to="/odds" className={isActive('/odds')} onClick={closeMenu}>
+                  Live Odds
+                </Link>
               </li>
               <li className="nav-item">
-                <Link to="/predictions" className={isActive('/predictions')} onClick={closeMenu}>AI Predictions</Link>
+                <Link to="/predictions" className={isActive('/predictions')} onClick={closeMenu}>
+                  AI Predictions
+                </Link>
               </li>
               <li className="nav-item">
-                <Link to="/pricing" className={isActive('/pricing')} onClick={closeMenu}>Pricing</Link>
+                <Link to="/pricing" className={isActive('/pricing')} onClick={closeMenu}>
+                  Pricing
+                </Link>
               </li>
               <li className="nav-item">
-                <Link to="/about" className={isActive('/about')} onClick={closeMenu}>About</Link>
+                <Link to="/about" className={isActive('/about')} onClick={closeMenu}>
+                  About
+                </Link>
               </li>
               <li className="nav-item">
                 <button
@@ -74,12 +93,14 @@ const Header = () => {
                   onClick={togglePersonalization}
                   aria-label="Personalize"
                 >
-                  <i className="fas fa-sliders-h"></i>
+                  <i className="fas fa-sliders-h" />
                   <span>Personalize</span>
                 </button>
               </li>
               <li className="nav-item">
-                <Link to="/download" className="download-button" onClick={closeMenu}>Download</Link>
+                <Link to="/download" className="download-button" onClick={closeMenu}>
+                  Download
+                </Link>
               </li>
               {/* Theme Toggle */}
               <li className="nav-item">
@@ -88,19 +109,13 @@ const Header = () => {
               {/* Add Bet Now button to header */}
               {showBetButton('header') && (
                 <li className="nav-item">
-                  <BetNowButton
-                    size="small"
-                    position="inline"
-                    contentType="header"
-                  />
+                  <BetNowButton size="small" position="inline" contentType="header" />
                 </li>
               )}
             </ul>
           </nav>
-          
-          {personalizationOpen && (
-            <PersonalizationPanel onClose={closePersonalization} />
-          )}
+
+          {personalizationOpen && <PersonalizationPanel onClose={closePersonalization} />}
         </div>
       </div>
     </header>

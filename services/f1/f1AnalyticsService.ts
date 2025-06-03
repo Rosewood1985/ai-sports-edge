@@ -4,8 +4,9 @@
 // Following UFC Analytics Pattern for Consistency
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class F1AnalyticsService {
   async analyzeDriverPerformance(driverId: string): Promise<DriverAnalysis> {
@@ -99,7 +100,9 @@ export class F1AnalyticsService {
     }
   }
 
-  private async analyzeQualifyingPerformance(qualifyingHistory: any[]): Promise<QualifyingAnalysis> {
+  private async analyzeQualifyingPerformance(
+    qualifyingHistory: any[]
+  ): Promise<QualifyingAnalysis> {
     try {
       const qualifyingStats = qualifyingHistory.map(session => ({
         position: session.position || 20,
@@ -127,7 +130,7 @@ export class F1AnalyticsService {
         },
         circuitAdaptation: {
           newCircuitPerformance: this.analyzeNewCircuitQualifying(qualifyingStats),
-        existingCircuitOptimization: this.analyzeExistingCircuitOptimization(qualifyingStats),
+          existingCircuitOptimization: this.analyzeExistingCircuitOptimization(qualifyingStats),
           setupSensitivity: this.analyzeSetupSensitivity(qualifyingStats),
         },
         trackEvolutionHandling: {
@@ -227,11 +230,10 @@ export class F1AnalyticsService {
 
   private async analyzeWeatherPerformance(raceHistory: any[]): Promise<WeatherAnalysis> {
     try {
-      const weatherRaces = raceHistory.filter(race => 
-        race.weatherConditions && (
-          race.weatherConditions.rain > 0 || 
-          race.weatherConditions.changingConditions
-        )
+      const weatherRaces = raceHistory.filter(
+        race =>
+          race.weatherConditions &&
+          (race.weatherConditions.rain > 0 || race.weatherConditions.changingConditions)
       );
 
       return {
@@ -292,7 +294,6 @@ export class F1AnalyticsService {
 
       await this.storeTeamAnalysis(constructorId, analysis);
       return analysis;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Team analysis failed: ${error.message}`);
@@ -363,44 +364,44 @@ export class F1AnalyticsService {
   private calculateAverage(stats: any[], field: string): number {
     const validStats = stats.filter(stat => stat[field] !== undefined && stat[field] !== null);
     if (validStats.length === 0) return 0;
-    
+
     const sum = validStats.reduce((acc, stat) => acc + stat[field], 0);
     return sum / validStats.length;
   }
 
   private calculateOverallRating(analysis: DriverAnalysis): number {
     let rating = 50; // Base rating
-    
+
     // Race pace contribution (30%)
     if (analysis.racePaceAnalysis) {
       rating += this.calculateRacePaceContribution(analysis.racePaceAnalysis) * 0.3;
     }
-    
+
     // Qualifying contribution (20%)
     if (analysis.qualifyingAnalysis) {
       rating += this.calculateQualifyingContribution(analysis.qualifyingAnalysis) * 0.2;
     }
-    
+
     // Overtaking contribution (15%)
     if (analysis.overtakingAnalysis) {
       rating += this.calculateOvertakingContribution(analysis.overtakingAnalysis) * 0.15;
     }
-    
+
     // Weather performance contribution (15%)
     if (analysis.weatherPerformanceAnalysis) {
       rating += this.calculateWeatherContribution(analysis.weatherPerformanceAnalysis) * 0.15;
     }
-    
+
     // Consistency contribution (10%)
     if (analysis.consistencyAnalysis) {
       rating += this.calculateConsistencyContribution(analysis.consistencyAnalysis) * 0.1;
     }
-    
+
     // Pressure handling contribution (10%)
     if (analysis.pressureHandling) {
       rating += this.calculatePressureContribution(analysis.pressureHandling) * 0.1;
     }
-    
+
     return Math.max(0, Math.min(100, Math.round(rating)));
   }
 
@@ -417,7 +418,10 @@ export class F1AnalyticsService {
 
   private calculateOvertakeSuccessRate(overtakingStats: any[]): number {
     const totalOvertakes = overtakingStats.reduce((sum, stat) => sum + stat.overtakesMade, 0);
-    const totalAttempts = overtakingStats.reduce((sum, stat) => sum + stat.overtakesMade + stat.overtakesLost, 0);
+    const totalAttempts = overtakingStats.reduce(
+      (sum, stat) => sum + stat.overtakesMade + stat.overtakesLost,
+      0
+    );
     return totalAttempts > 0 ? (totalOvertakes / totalAttempts) * 100 : 0;
   }
 
@@ -441,7 +445,8 @@ export class F1AnalyticsService {
   // Data retrieval methods
   private async getRaceHistory(driverId: string): Promise<any[]> {
     try {
-      const racesRef = firebaseService.collection('f1_results')
+      const racesRef = firebaseService
+        .collection('f1_results')
         .where('driver.driverId', '==', driverId)
         .orderBy('season', 'desc')
         .orderBy('round', 'desc')
@@ -457,7 +462,8 @@ export class F1AnalyticsService {
 
   private async getQualifyingHistory(driverId: string): Promise<any[]> {
     try {
-      const qualifyingRef = firebaseService.collection('f1_qualifying')
+      const qualifyingRef = firebaseService
+        .collection('f1_qualifying')
         .where('driver.driverId', '==', driverId)
         .orderBy('season', 'desc')
         .orderBy('round', 'desc')
@@ -473,7 +479,8 @@ export class F1AnalyticsService {
 
   private async getTeamRaceHistory(constructorId: string): Promise<any[]> {
     try {
-      const racesRef = firebaseService.collection('f1_results')
+      const racesRef = firebaseService
+        .collection('f1_results')
         .where('constructor.constructorId', '==', constructorId)
         .orderBy('season', 'desc')
         .orderBy('round', 'desc')
@@ -704,7 +711,7 @@ export class F1AnalyticsService {
     return [
       { position: 1, driverId: 'driver_001', probability: 0.25 },
       { position: 2, driverId: 'driver_002', probability: 0.22 },
-      { position: 3, driverId: 'driver_003', probability: 0.20 },
+      { position: 3, driverId: 'driver_003', probability: 0.2 },
     ];
   }
 
@@ -713,7 +720,7 @@ export class F1AnalyticsService {
     return driverAnalyses.slice(0, 10).map((analysis, index) => ({
       driverId: analysis.driverId,
       position: index + 1,
-      probability: Math.max(0.05, 0.25 - (index * 0.02)),
+      probability: Math.max(0.05, 0.25 - index * 0.02),
     }));
   }
 

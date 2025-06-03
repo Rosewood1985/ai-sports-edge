@@ -4,8 +4,9 @@
 // Following UFC ML Pattern for Consistency
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class NFLMLPredictionService {
   private readonly modelConfigs = {
@@ -17,7 +18,7 @@ export class NFLMLPredictionService {
     pointSpread: {
       features: 55,
       algorithm: 'neural_network',
-      confidence_threshold: 0.70,
+      confidence_threshold: 0.7,
     },
     total: {
       features: 45,
@@ -31,7 +32,11 @@ export class NFLMLPredictionService {
     },
   };
 
-  async generateGamePrediction(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<GamePrediction> {
+  async generateGamePrediction(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<GamePrediction> {
     try {
       Sentry.addBreadcrumb({
         message: `Generating NFL game prediction: ${homeTeamId} vs ${awayTeamId}`,
@@ -40,7 +45,7 @@ export class NFLMLPredictionService {
       });
 
       const features = await this.extractGameFeatures(homeTeamId, awayTeamId, gameDate);
-      
+
       const predictions = {
         winnerPrediction: await this.predictGameWinner(features),
         spreadPrediction: await this.predictPointSpread(features),
@@ -72,7 +77,11 @@ export class NFLMLPredictionService {
     }
   }
 
-  private async extractGameFeatures(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<NFLMLFeatures> {
+  private async extractGameFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<NFLMLFeatures> {
     try {
       const homeTeamAnalytics = await this.getTeamAnalytics(homeTeamId);
       const awayTeamAnalytics = await this.getTeamAnalytics(awayTeamId);
@@ -84,22 +93,38 @@ export class NFLMLPredictionService {
 
       return {
         // Offensive metrics
-        homePointsPerGame: homeTeamAnalytics?.offensiveAnalysis?.scoringMetrics?.pointsPerGame || 21.0,
-        awayPointsPerGame: awayTeamAnalytics?.offensiveAnalysis?.scoringMetrics?.pointsPerGame || 21.0,
-        homePassingYardsPerGame: homeTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250,
-        awayPassingYardsPerGame: awayTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250,
-        homeRushingYardsPerGame: homeTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120,
-        awayRushingYardsPerGame: awayTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120,
-        homeTotalYardsPerGame: (homeTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250) + (homeTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120),
-        awayTotalYardsPerGame: (awayTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250) + (awayTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120),
-        
+        homePointsPerGame:
+          homeTeamAnalytics?.offensiveAnalysis?.scoringMetrics?.pointsPerGame || 21.0,
+        awayPointsPerGame:
+          awayTeamAnalytics?.offensiveAnalysis?.scoringMetrics?.pointsPerGame || 21.0,
+        homePassingYardsPerGame:
+          homeTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250,
+        awayPassingYardsPerGame:
+          awayTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250,
+        homeRushingYardsPerGame:
+          homeTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120,
+        awayRushingYardsPerGame:
+          awayTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120,
+        homeTotalYardsPerGame:
+          (homeTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250) +
+          (homeTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120),
+        awayTotalYardsPerGame:
+          (awayTeamAnalytics?.offensiveAnalysis?.passingMetrics?.passingYardsPerGame || 250) +
+          (awayTeamAnalytics?.offensiveAnalysis?.rushingMetrics?.rushingYardsPerGame || 120),
+
         // Defensive metrics
-        homePointsAllowedPerGame: homeTeamAnalytics?.defensiveAnalysis?.scoringDefense?.pointsAllowedPerGame || 21.0,
-        awayPointsAllowedPerGame: awayTeamAnalytics?.defensiveAnalysis?.scoringDefense?.pointsAllowedPerGame || 21.0,
-        homePassingYardsAllowed: homeTeamAnalytics?.defensiveAnalysis?.passingDefense?.passingYardsAllowed || 250,
-        awayPassingYardsAllowed: awayTeamAnalytics?.defensiveAnalysis?.passingDefense?.passingYardsAllowed || 250,
-        homeRushingYardsAllowed: homeTeamAnalytics?.defensiveAnalysis?.rushingDefense?.rushingYardsAllowed || 120,
-        awayRushingYardsAllowed: awayTeamAnalytics?.defensiveAnalysis?.rushingDefense?.rushingYardsAllowed || 120,
+        homePointsAllowedPerGame:
+          homeTeamAnalytics?.defensiveAnalysis?.scoringDefense?.pointsAllowedPerGame || 21.0,
+        awayPointsAllowedPerGame:
+          awayTeamAnalytics?.defensiveAnalysis?.scoringDefense?.pointsAllowedPerGame || 21.0,
+        homePassingYardsAllowed:
+          homeTeamAnalytics?.defensiveAnalysis?.passingDefense?.passingYardsAllowed || 250,
+        awayPassingYardsAllowed:
+          awayTeamAnalytics?.defensiveAnalysis?.passingDefense?.passingYardsAllowed || 250,
+        homeRushingYardsAllowed:
+          homeTeamAnalytics?.defensiveAnalysis?.rushingDefense?.rushingYardsAllowed || 120,
+        awayRushingYardsAllowed:
+          awayTeamAnalytics?.defensiveAnalysis?.rushingDefense?.rushingYardsAllowed || 120,
         homeSacksPerGame: homeTeamAnalytics?.defensiveAnalysis?.pressureMetrics?.sacks || 2.5,
         awaySacksPerGame: awayTeamAnalytics?.defensiveAnalysis?.pressureMetrics?.sacks || 2.5,
         homeTurnoverDifferential: homeTeamAnalytics?.turnoverDifferential || 0,
@@ -112,21 +137,25 @@ export class NFLMLPredictionService {
         awayReturnYardage: awayTeamAnalytics?.specialTeamsAnalysis?.returnGame?.averageReturn || 22,
 
         // Efficiency metrics
-        homeRedZoneEfficiency: homeTeamAnalytics?.offensiveAnalysis?.situationalOffense?.redZone?.efficiency || 60,
-        awayRedZoneEfficiency: awayTeamAnalytics?.offensiveAnalysis?.situationalOffense?.redZone?.efficiency || 60,
-        homeThirdDownConversion: homeTeamAnalytics?.offensiveAnalysis?.situationalOffense?.thirdDown?.conversionRate || 40,
-        awayThirdDownConversion: awayTeamAnalytics?.offensiveAnalysis?.situationalOffense?.thirdDown?.conversionRate || 40,
+        homeRedZoneEfficiency:
+          homeTeamAnalytics?.offensiveAnalysis?.situationalOffense?.redZone?.efficiency || 60,
+        awayRedZoneEfficiency:
+          awayTeamAnalytics?.offensiveAnalysis?.situationalOffense?.redZone?.efficiency || 60,
+        homeThirdDownConversion:
+          homeTeamAnalytics?.offensiveAnalysis?.situationalOffense?.thirdDown?.conversionRate || 40,
+        awayThirdDownConversion:
+          awayTeamAnalytics?.offensiveAnalysis?.situationalOffense?.thirdDown?.conversionRate || 40,
         homeTimeOfPossession: homeTeamAnalytics?.timeOfPossession || 30.0,
         awayTimeOfPossession: awayTeamAnalytics?.timeOfPossession || 30.0,
 
         // Historical data
-        historicalHomeWinPercentage: historicalMatchups?.homeWinPercentage || 0.50,
+        historicalHomeWinPercentage: historicalMatchups?.homeWinPercentage || 0.5,
         historicalPointDifferential: historicalMatchups?.averagePointDifferential || 0,
         gamesPlayedAgainstEachOther: historicalMatchups?.gamesPlayed || 0,
 
         // Recent form (last 4 games)
-        homeRecentWinPercentage: recentForm?.home?.winPercentage || 0.50,
-        awayRecentWinPercentage: recentForm?.away?.winPercentage || 0.50,
+        homeRecentWinPercentage: recentForm?.home?.winPercentage || 0.5,
+        awayRecentWinPercentage: recentForm?.away?.winPercentage || 0.5,
         homeRecentPointsPerGame: recentForm?.home?.pointsPerGame || 21.0,
         awayRecentPointsPerGame: recentForm?.away?.pointsPerGame || 21.0,
         homeRecentPointsAllowed: recentForm?.home?.pointsAllowed || 21.0,
@@ -168,8 +197,8 @@ export class NFLMLPredictionService {
         awayOffensiveRating: awayTeamAnalytics?.advancedMetrics?.offensiveRating || 100,
         homeDefensiveRating: homeTeamAnalytics?.advancedMetrics?.defensiveRating || 100,
         awayDefensiveRating: awayTeamAnalytics?.advancedMetrics?.defensiveRating || 100,
-        homeStrengthOfSchedule: homeTeamAnalytics?.strengthOfSchedule || 0.50,
-        awayStrengthOfSchedule: awayTeamAnalytics?.strengthOfSchedule || 0.50,
+        homeStrengthOfSchedule: homeTeamAnalytics?.strengthOfSchedule || 0.5,
+        awayStrengthOfSchedule: awayTeamAnalytics?.strengthOfSchedule || 0.5,
       };
     } catch (error) {
       Sentry.captureException(error);
@@ -182,13 +211,13 @@ export class NFLMLPredictionService {
       // Calculate team strength differential
       const homeStrength = this.calculateTeamStrength(features, 'home');
       const awayStrength = this.calculateTeamStrength(features, 'away');
-      
+
       // Apply home field advantage (typically 2.5-3 points in NFL)
       const adjustedHomeStrength = homeStrength + 2.8;
-      
+
       const strengthDifference = adjustedHomeStrength - awayStrength;
       const homeWinProbability = 1 / (1 + Math.exp(-strengthDifference / 7.0)); // NFL has higher variance
-      
+
       return {
         homeWinProbability,
         awayWinProbability: 1 - homeWinProbability,
@@ -208,14 +237,14 @@ export class NFLMLPredictionService {
       const homeExpectedPoints = this.calculateExpectedPoints(features, 'home');
       const awayExpectedPoints = this.calculateExpectedPoints(features, 'away');
       const expectedPointDifferential = homeExpectedPoints - awayExpectedPoints;
-      
+
       // Common NFL spreads
       const spreads = [-14, -10, -7, -3, -1, 1, 3, 7, 10, 14];
       const spreadPredictions = spreads.map(spread => ({
         spread,
         homeCoverProbability: this.calculateCoverProbability(expectedPointDifferential, spread),
       }));
-      
+
       return {
         expectedPointDifferential,
         homeExpectedPoints,
@@ -236,20 +265,20 @@ export class NFLMLPredictionService {
       const homeExpectedPoints = this.calculateExpectedPoints(features, 'home');
       const awayExpectedPoints = this.calculateExpectedPoints(features, 'away');
       let expectedTotal = homeExpectedPoints + awayExpectedPoints;
-      
+
       // Apply weather adjustments
       expectedTotal = this.applyWeatherAdjustments(expectedTotal, features);
-      
+
       // Apply pace adjustments
       expectedTotal = this.applyPaceAdjustments(expectedTotal, features);
-      
+
       // Common NFL totals
       const totals = [35.5, 38.5, 41.5, 44.5, 47.5, 50.5, 53.5, 56.5];
       const totalPredictions = totals.map(total => ({
         total,
         overProbability: this.calculateOverProbability(expectedTotal, total),
       }));
-      
+
       return {
         expectedTotal,
         homeExpectedPoints,
@@ -271,15 +300,15 @@ export class NFLMLPredictionService {
     try {
       const homeKeyPlayers = await this.getKeyPlayers(features.homeTeam);
       const awayKeyPlayers = await this.getKeyPlayers(features.awayTeam);
-      
+
       const playerPredictions: PlayerPrediction[] = [];
-      
+
       for (const player of [...homeKeyPlayers, ...awayKeyPlayers]) {
         const playerFeatures = await this.extractPlayerFeatures(player.id, features);
         const prediction = await this.predictIndividualPlayerPerformance(player, playerFeatures);
         playerPredictions.push(prediction);
       }
-      
+
       return playerPredictions;
     } catch (error) {
       Sentry.captureException(error);
@@ -290,72 +319,74 @@ export class NFLMLPredictionService {
   // Utility methods
   private calculateTeamStrength(features: NFLMLFeatures, team: 'home' | 'away'): number {
     const prefix = team === 'home' ? 'home' : 'away';
-    
+
     // Weighted combination of team metrics
     const offenseWeight = 0.35;
     const defenseWeight = 0.35;
     const specialTeamsWeight = 0.15;
     const turnoverWeight = 0.15;
-    
+
     const offenseStrength = (features[`${prefix}PointsPerGame`] - 21.0) / 7.0;
     const defenseStrength = (21.0 - features[`${prefix}PointsAllowedPerGame`]) / 7.0;
     const specialTeamsStrength = (features[`${prefix}KickingAccuracy`] - 85) / 10.0;
     const turnoverStrength = features[`${prefix}TurnoverDifferential`] / 5.0;
-    
-    return (offenseStrength * offenseWeight) + 
-           (defenseStrength * defenseWeight) + 
-           (specialTeamsStrength * specialTeamsWeight) +
-           (turnoverStrength * turnoverWeight);
+
+    return (
+      offenseStrength * offenseWeight +
+      defenseStrength * defenseWeight +
+      specialTeamsStrength * specialTeamsWeight +
+      turnoverStrength * turnoverWeight
+    );
   }
 
   private calculateExpectedPoints(features: NFLMLFeatures, team: 'home' | 'away'): number {
     const prefix = team === 'home' ? 'home' : 'away';
     const oppositePrefix = team === 'home' ? 'away' : 'home';
-    
+
     let expectedPoints = features[`${prefix}PointsPerGame`];
-    
+
     // Adjust for opposing defense
     const opposingDefense = features[`${oppositePrefix}PointsAllowedPerGame`];
     const leagueAverage = 21.0;
     const defenseAdjustment = (opposingDefense - leagueAverage) * 0.7;
     expectedPoints += defenseAdjustment;
-    
+
     // Apply recent form
     const recentForm = features[`${prefix}RecentPointsPerGame`];
     const seasonAverage = features[`${prefix}PointsPerGame`];
     const formAdjustment = (recentForm - seasonAverage) * 0.3;
     expectedPoints += formAdjustment;
-    
+
     return Math.max(6.0, expectedPoints); // Minimum 6 points (2 field goals)
   }
 
   private applyWeatherAdjustments(total: number, features: NFLMLFeatures): number {
     let adjustedTotal = total;
-    
+
     // Wind adjustments (significant for passing game)
     if (features.windSpeed > 20) {
-      adjustedTotal *= 0.90; // High wind reduces passing effectiveness
+      adjustedTotal *= 0.9; // High wind reduces passing effectiveness
     } else if (features.windSpeed > 15) {
       adjustedTotal *= 0.95;
     }
-    
+
     // Temperature adjustments
     if (features.temperature < 20) {
       adjustedTotal *= 0.92; // Very cold weather reduces offensive efficiency
     } else if (features.temperature < 32) {
       adjustedTotal *= 0.96;
     }
-    
+
     // Precipitation adjustments
     if (features.precipitation > 0.1) {
       adjustedTotal *= 0.88; // Rain/snow significantly affects offense
     }
-    
+
     // Dome games are unaffected by weather
     if (features.isDome) {
       return total; // Return original total for dome games
     }
-    
+
     return adjustedTotal;
   }
 
@@ -364,16 +395,18 @@ export class NFLMLPredictionService {
     // but still varies based on team style
     const homePace = features.homeTimeOfPossession;
     const awayPace = features.awayTimeOfPossession;
-    
+
     // Teams that control the ball longer typically have lower-scoring games
     const averagePossessionTime = (homePace + awayPace) / 2;
-    
-    if (averagePossessionTime > 32) { // Slow pace teams
+
+    if (averagePossessionTime > 32) {
+      // Slow pace teams
       return total * 0.95;
-    } else if (averagePossessionTime < 28) { // Fast pace teams
+    } else if (averagePossessionTime < 28) {
+      // Fast pace teams
       return total * 1.05;
     }
-    
+
     return total;
   }
 
@@ -394,18 +427,18 @@ export class NFLMLPredictionService {
   }
 
   private erf(x: number): number {
-    const a1 =  0.254829592;
+    const a1 = 0.254829592;
     const a2 = -0.284496736;
-    const a3 =  1.421413741;
+    const a3 = 1.421413741;
     const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
     const sign = x >= 0 ? 1 : -1;
     x = Math.abs(x);
 
     const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
     return sign * y;
   }
@@ -413,11 +446,11 @@ export class NFLMLPredictionService {
   // Helper methods
   private encodeFieldCondition(condition: string): number {
     const conditions: { [key: string]: number } = {
-      'excellent': 1.0,
-      'good': 0.8,
-      'fair': 0.6,
-      'poor': 0.4,
-      'terrible': 0.2,
+      excellent: 1.0,
+      good: 0.8,
+      fair: 0.6,
+      poor: 0.4,
+      terrible: 0.2,
     };
     return conditions[condition] || 0.8;
   }
@@ -442,12 +475,19 @@ export class NFLMLPredictionService {
     return false;
   }
 
-  private async calculatePlayoffImplications(homeTeamId: string, awayTeamId: string): Promise<number> {
+  private async calculatePlayoffImplications(
+    homeTeamId: string,
+    awayTeamId: string
+  ): Promise<number> {
     // FLAG: Implement playoff implications calculation
     return 0.5; // Neutral playoff implications
   }
 
-  private async calculateRestDays(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<number> {
+  private async calculateRestDays(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<number> {
     // FLAG: Implement rest days calculation
     return 7; // Standard week rest
   }
@@ -458,8 +498,8 @@ export class NFLMLPredictionService {
       offensiveRating: 0.25,
       defensiveRating: 0.25,
       turnoverDifferential: 0.15,
-      homeFieldAdvantage: 0.10,
-      recentForm: 0.10,
+      homeFieldAdvantage: 0.1,
+      recentForm: 0.1,
       injuries: 0.08,
       weather: 0.05,
       specialTeams: 0.02,
@@ -468,9 +508,9 @@ export class NFLMLPredictionService {
 
   private getSpreadFeatureImportance(): any {
     return {
-      pointDifferential: 0.30,
-      offensiveEfficiency: 0.20,
-      defensiveEfficiency: 0.20,
+      pointDifferential: 0.3,
+      offensiveEfficiency: 0.2,
+      defensiveEfficiency: 0.2,
       turnoverMargin: 0.12,
       homeField: 0.08,
       weather: 0.06,
@@ -480,11 +520,11 @@ export class NFLMLPredictionService {
 
   private getTotalFeatureImportance(): any {
     return {
-      offensiveOutput: 0.30,
+      offensiveOutput: 0.3,
       defensiveAllowance: 0.25,
-      weather: 0.20,
+      weather: 0.2,
       pace: 0.15,
-      gameScript: 0.10,
+      gameScript: 0.1,
     };
   }
 
@@ -684,7 +724,7 @@ interface SpreadPrediction {
   expectedPointDifferential: number;
   homeExpectedPoints: number;
   awayExpectedPoints: number;
-  spreadPredictions: Array<{ spread: number; homeCoverProbability: number }>;
+  spreadPredictions: { spread: number; homeCoverProbability: number }[];
   recommendedBet: any;
   confidence: number;
   modelFeatureImportance: any;
@@ -694,7 +734,7 @@ interface TotalPrediction {
   expectedTotal: number;
   homeExpectedPoints: number;
   awayExpectedPoints: number;
-  totalPredictions: Array<{ total: number; overProbability: number }>;
+  totalPredictions: { total: number; overProbability: number }[];
   recommendedBet: any;
   confidence: number;
   weatherImpact: number;

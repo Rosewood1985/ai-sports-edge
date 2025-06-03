@@ -30,40 +30,40 @@ export const Colors = {
     surfaceBackground: '#121212', // Cards, Modals, elevated surfaces
 
     // Text
-    primaryText: '#FFFFFF',       // Headlines, key info
-    secondaryText: '#B0B0B0',     // Body copy, labels
-    tertiaryText: '#808080',      // Disabled states, subtle info, borders
+    primaryText: '#FFFFFF', // Headlines, key info
+    secondaryText: '#B0B0B0', // Body copy, labels
+    tertiaryText: '#808080', // Disabled states, subtle info, borders
 
     // Actions & Accents (Neon Blue)
-    primaryAction: '#00F0FF',     // Primary buttons, active states, key highlights (Bright Neon Blue)
-    subtleAction: '#40E0D0',      // Secondary highlights, icons (Desaturated Neon Blue)
-    accent: '#00F0FF',           // Alias for primary action or specific accent use
+    primaryAction: '#00F0FF', // Primary buttons, active states, key highlights (Bright Neon Blue)
+    subtleAction: '#40E0D0', // Secondary highlights, icons (Desaturated Neon Blue)
+    accent: '#00F0FF', // Alias for primary action or specific accent use
 
     // Icons (Can alias text colors or use specific values)
-    iconPrimary: '#FFFFFF',       // Use primaryText
-    iconSecondary: '#B0B0B0',     // Use secondaryText
-    iconTertiary: '#808080',      // Use tertiaryText
+    iconPrimary: '#FFFFFF', // Use primaryText
+    iconSecondary: '#B0B0B0', // Use secondaryText
+    iconTertiary: '#808080', // Use tertiaryText
 
     // Tabs (Example using new roles)
-    tabIconDefault: '#808080',    // Tertiary Text color
-    tabIconSelected: '#FFFFFF',   // Primary Text color (or primaryAction for more emphasis)
+    tabIconDefault: '#808080', // Tertiary Text color
+    tabIconSelected: '#FFFFFF', // Primary Text color (or primaryAction for more emphasis)
 
     // Borders
-    borderSubtle: '#808080',      // Use tertiaryText color
+    borderSubtle: '#808080', // Use tertiaryText color
 
     // Original 'tint' mapping (Mapped to primaryText for selected elements)
-    tint: tintColorDark,         // #FFFFFF
+    tint: tintColorDark, // #FFFFFF
   },
   status: {
     // Confidence Indicators
-    highConfidence: '#39FF14',   // Neon Green
-    mediumConfidence: '#FFF000',  // Neon Yellow
-    lowConfidence: '#FF1010',    // Neon Red
+    highConfidence: '#39FF14', // Neon Green
+    mediumConfidence: '#FFF000', // Neon Yellow
+    lowConfidence: '#FF1010', // Neon Red
 
     // Add other status colors as needed (e.g., info, warning)
     // info: '#00BFFF', // Example
     // warning: '#FFD700', // Example
-  }
+  },
 };
 
 export default Colors;

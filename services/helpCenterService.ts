@@ -1,10 +1,11 @@
 import { Platform } from 'react-native';
+
 import { captureException } from './errorTrackingService';
 import { info, error, LogCategory } from './loggingService';
 
 /**
  * Help Center Service
- * 
+ *
  * This service provides access to help documentation, FAQs, and support resources.
  */
 
@@ -72,15 +73,15 @@ export const initHelpCenter = async (): Promise<boolean> => {
     if (isInitialized) {
       return true;
     }
-    
+
     info(LogCategory.APP, 'Initializing help center');
-    
+
     // In a real implementation, this would fetch help content from a server
     // For now, we'll use mock data
     helpArticles = getMockHelpArticles();
     faqs = getMockFAQs();
     contactInfo = getMockContactInfo();
-    
+
     isInitialized = true;
     info(LogCategory.APP, 'Help center initialized successfully');
     return true;
@@ -124,23 +125,23 @@ export const getHelpArticleById = (id: string): HelpArticle | undefined => {
  */
 export const searchHelpArticles = (query: string): HelpArticle[] => {
   const normalizedQuery = query.toLowerCase().trim();
-  
+
   return helpArticles.filter(article => {
     // Search in title
     if (article.title.toLowerCase().includes(normalizedQuery)) {
       return true;
     }
-    
+
     // Search in content
     if (article.content.toLowerCase().includes(normalizedQuery)) {
       return true;
     }
-    
+
     // Search in tags
     if (article.tags.some(tag => tag.toLowerCase().includes(normalizedQuery))) {
       return true;
     }
-    
+
     return false;
   });
 };
@@ -169,23 +170,23 @@ export const getFAQsByCategory = (category: HelpCategory): FAQ[] => {
  */
 export const searchFAQs = (query: string): FAQ[] => {
   const normalizedQuery = query.toLowerCase().trim();
-  
+
   return faqs.filter(faq => {
     // Search in question
     if (faq.question.toLowerCase().includes(normalizedQuery)) {
       return true;
     }
-    
+
     // Search in answer
     if (faq.answer.toLowerCase().includes(normalizedQuery)) {
       return true;
     }
-    
+
     // Search in tags
     if (faq.tags.some(tag => tag.toLowerCase().includes(normalizedQuery))) {
       return true;
     }
-    
+
     return false;
   });
 };
@@ -215,15 +216,15 @@ export const getContactInfoByMethod = (method: ContactMethod): ContactInfo | und
 export const openHelpArticleInBrowser = async (articleId: string): Promise<boolean> => {
   try {
     const article = getHelpArticleById(articleId);
-    
+
     if (!article) {
       return false;
     }
-    
+
     // In a real implementation, this would open the article in a browser
     // For now, we'll just log it
     info(LogCategory.APP, `Opening help article in browser: ${article.title}`);
-    
+
     return true;
   } catch (err) {
     error(LogCategory.APP, 'Failed to open help article in browser', err as Error);
@@ -238,21 +239,18 @@ export const openHelpArticleInBrowser = async (articleId: string): Promise<boole
  * @param message Optional message
  * @returns Promise that resolves when the contact is initiated
  */
-export const contactSupport = async (
-  method: ContactMethod,
-  message?: string
-): Promise<boolean> => {
+export const contactSupport = async (method: ContactMethod, message?: string): Promise<boolean> => {
   try {
     const contact = getContactInfoByMethod(method);
-    
+
     if (!contact) {
       return false;
     }
-    
+
     // In a real implementation, this would initiate contact
     // For now, we'll just log it
     info(LogCategory.APP, `Contacting support via ${method}`, { message });
-    
+
     return true;
   } catch (err) {
     error(LogCategory.APP, 'Failed to contact support', err as Error);
@@ -702,70 +700,80 @@ const getMockFAQs = (): FAQ[] => {
     {
       id: 'what-is-ai-sports-edge',
       question: 'What is AI Sports Edge?',
-      answer: 'AI Sports Edge is an app that uses artificial intelligence to provide sports betting predictions and analysis. Our advanced algorithms analyze vast amounts of data to identify value bets and help you make more informed betting decisions.',
+      answer:
+        'AI Sports Edge is an app that uses artificial intelligence to provide sports betting predictions and analysis. Our advanced algorithms analyze vast amounts of data to identify value bets and help you make more informed betting decisions.',
       category: HelpCategory.GETTING_STARTED,
       tags: ['general', 'introduction'],
     },
     {
       id: 'how-accurate-are-predictions',
       question: 'How accurate are the predictions?',
-      answer: 'Our predictions have a historical accuracy rate of approximately 60-65%, depending on the sport and bet type. However, it\'s important to remember that no prediction system is perfect, and past performance is not a guarantee of future results. We continuously evaluate and improve our models to maintain and enhance accuracy.',
+      answer:
+        "Our predictions have a historical accuracy rate of approximately 60-65%, depending on the sport and bet type. However, it's important to remember that no prediction system is perfect, and past performance is not a guarantee of future results. We continuously evaluate and improve our models to maintain and enhance accuracy.",
       category: HelpCategory.PREDICTIONS,
       tags: ['predictions', 'accuracy', 'performance'],
     },
     {
       id: 'how-to-cancel-subscription',
       question: 'How do I cancel my subscription?',
-      answer: 'To cancel your subscription: 1) Go to Profile, 2) Tap Subscription, 3) Tap Cancel Subscription, 4) Follow the prompts to confirm cancellation. Your subscription will remain active until the end of your current billing cycle, and you will not be charged for future billing cycles.',
+      answer:
+        'To cancel your subscription: 1) Go to Profile, 2) Tap Subscription, 3) Tap Cancel Subscription, 4) Follow the prompts to confirm cancellation. Your subscription will remain active until the end of your current billing cycle, and you will not be charged for future billing cycles.',
       category: HelpCategory.SUBSCRIPTION,
       tags: ['subscription', 'cancellation', 'billing'],
     },
     {
       id: 'forgot-password',
       question: 'I forgot my password. How do I reset it?',
-      answer: 'To reset your password: 1) On the login screen, tap "Forgot Password", 2) Enter your email address, 3) Check your email for a password reset link, 4) Click the link and follow the instructions to create a new password. If you don\'t receive the email, check your spam folder or contact support.',
+      answer:
+        'To reset your password: 1) On the login screen, tap "Forgot Password", 2) Enter your email address, 3) Check your email for a password reset link, 4) Click the link and follow the instructions to create a new password. If you don\'t receive the email, check your spam folder or contact support.',
       category: HelpCategory.ACCOUNT,
       tags: ['password', 'login', 'account'],
     },
     {
       id: 'app-not-loading',
       question: 'The app is not loading. What should I do?',
-      answer: 'If the app is not loading, try these steps: 1) Close and reopen the app, 2) Check your internet connection, 3) Restart your device, 4) Update the app to the latest version, 5) Clear the app cache (Android) or offload and reinstall the app (iOS). If the problem persists, contact our support team.',
+      answer:
+        'If the app is not loading, try these steps: 1) Close and reopen the app, 2) Check your internet connection, 3) Restart your device, 4) Update the app to the latest version, 5) Clear the app cache (Android) or offload and reinstall the app (iOS). If the problem persists, contact our support team.',
       category: HelpCategory.TROUBLESHOOTING,
       tags: ['technical issue', 'loading', 'crash'],
     },
     {
       id: 'data-privacy',
       question: 'How is my data protected?',
-      answer: 'We take data privacy seriously. Your personal information is encrypted and stored securely. We do not sell your data to third parties. We use industry-standard security measures to protect your data from unauthorized access. For more details, please see our Privacy Policy.',
+      answer:
+        'We take data privacy seriously. Your personal information is encrypted and stored securely. We do not sell your data to third parties. We use industry-standard security measures to protect your data from unauthorized access. For more details, please see our Privacy Policy.',
       category: HelpCategory.PRIVACY_SECURITY,
       tags: ['privacy', 'data', 'security'],
     },
     {
       id: 'payment-methods',
       question: 'What payment methods do you accept?',
-      answer: 'We accept credit/debit cards (Visa, Mastercard, American Express), PayPal, Apple Pay (iOS only), and Google Pay (Android only). All payments are processed securely through our payment providers.',
+      answer:
+        'We accept credit/debit cards (Visa, Mastercard, American Express), PayPal, Apple Pay (iOS only), and Google Pay (Android only). All payments are processed securely through our payment providers.',
       category: HelpCategory.PAYMENT,
       tags: ['payment', 'billing', 'subscription'],
     },
     {
       id: 'refund-policy',
       question: 'What is your refund policy?',
-      answer: 'We offer a 7-day money-back guarantee for new subscribers. If you\'re not satisfied with your subscription within the first 7 days, contact our support team for a full refund. After the first 7 days, we do not offer refunds for partial subscription periods.',
+      answer:
+        "We offer a 7-day money-back guarantee for new subscribers. If you're not satisfied with your subscription within the first 7 days, contact our support team for a full refund. After the first 7 days, we do not offer refunds for partial subscription periods.",
       category: HelpCategory.SUBSCRIPTION,
       tags: ['refund', 'subscription', 'billing'],
     },
     {
       id: 'betting-through-app',
       question: 'Can I place bets directly through the app?',
-      answer: 'No, AI Sports Edge does not handle actual betting. We provide predictions and analysis to help you make informed betting decisions. To place a bet, you need to use a licensed sportsbook or betting platform. You can tap "Bet Now" on a prediction to be redirected to your preferred sportsbook.',
+      answer:
+        'No, AI Sports Edge does not handle actual betting. We provide predictions and analysis to help you make informed betting decisions. To place a bet, you need to use a licensed sportsbook or betting platform. You can tap "Bet Now" on a prediction to be redirected to your preferred sportsbook.',
       category: HelpCategory.BETTING,
       tags: ['betting', 'sportsbook', 'wagering'],
     },
     {
       id: 'supported-sports',
       question: 'What sports do you cover?',
-      answer: 'We currently cover major sports including NFL, NBA, MLB, NHL, soccer (Premier League, La Liga, Serie A, Bundesliga, MLS), tennis (Grand Slams and ATP/WTA tournaments), and UFC/MMA. We are continuously expanding our coverage to include more sports and leagues.',
+      answer:
+        'We currently cover major sports including NFL, NBA, MLB, NHL, soccer (Premier League, La Liga, Serie A, Bundesliga, MLS), tennis (Grand Slams and ATP/WTA tournaments), and UFC/MMA. We are continuously expanding our coverage to include more sports and leagues.',
       category: HelpCategory.PREDICTIONS,
       tags: ['sports', 'coverage', 'predictions'],
     },

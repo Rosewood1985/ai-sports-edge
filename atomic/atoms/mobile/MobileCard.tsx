@@ -1,5 +1,6 @@
 import React, { useRef, useCallback } from 'react';
 import { View, TouchableOpacity, Animated, StyleSheet, ViewStyle } from 'react-native';
+
 import { useHaptics } from '../../../hooks/useMobile';
 
 interface MobileCardProps {
@@ -85,7 +86,7 @@ export const MobileCard: React.FC<MobileCardProps> = ({
           neon && {
             shadowColor: '#3B82F6',
             shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: shadowOpacity,
+            shadowOpacity,
             shadowRadius: 12,
             elevation: 8,
           },

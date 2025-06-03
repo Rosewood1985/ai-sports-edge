@@ -1,46 +1,36 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 
-type GDPRConsentScreenNavigationProp = StackNavigationProp<
-  OnboardingStackParamList,
-  'GDPRConsent'
->;
+type GDPRConsentScreenNavigationProp = StackNavigationProp<OnboardingStackParamList, 'GDPRConsent'>;
 
 const GDPRConsentScreen = () => {
   const navigation = useNavigation<GDPRConsentScreenNavigationProp>();
   const { colors } = useTheme();
   const { t } = useLanguage();
   const { user } = useAuth();
-  
+
   // Consent options
   const [essentialConsent, setEssentialConsent] = useState(true); // Always required
   const [analyticsConsent, setAnalyticsConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [thirdPartyConsent, setThirdPartyConsent] = useState(false);
-  
+
   const handleContinue = async () => {
     if (!user) {
-      Alert.alert(
-        t('common.error'),
-        t('common.not_authenticated'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('common.not_authenticated'), [{ text: t('common.ok') }]);
       return;
     }
-    
+
     try {
       // Save GDPR consent to user profile
       await saveVerificationData(user.uid, 'gdprConsent', {
@@ -48,165 +38,153 @@ const GDPRConsentScreen = () => {
         analyticsConsent,
         marketingConsent,
         thirdPartyConsent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // Navigate to next screen (Cookie Consent or Age Verification)
       navigation.navigate('CookieConsent');
     } catch (error) {
       console.error('Error saving GDPR consent:', error);
-      Alert.alert(
-        t('common.error'),
-        t('gdpr.save_error'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('gdpr.save_error'), [{ text: t('common.ok') }]);
     }
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
-          <ThemedText style={styles.title}>
-            {t('gdpr.title')}
-          </ThemedText>
-          
-          <ThemedText style={styles.description}>
-            {t('gdpr.description')}
-          </ThemedText>
-          
+          <ThemedText style={styles.title}>{t('gdpr.title')}</ThemedText>
+
+          <ThemedText style={styles.description}>{t('gdpr.description')}</ThemedText>
+
           {/* Essential Data - Always required */}
           <View style={styles.consentSection}>
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>
-                {t('gdpr.essential_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: colors.primary,
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.consentTitle}>{t('gdpr.essential_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 <Ionicons name="checkmark" size={18} color="white" />
               </View>
             </View>
-            
+
             <ThemedText style={styles.consentDescription}>
               {t('gdpr.essential_description')}
             </ThemedText>
           </View>
-          
+
           {/* Analytics Data */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.consentSection}
             onPress={() => setAnalyticsConsent(!analyticsConsent)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.analytics_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: analyticsConsent }}
           >
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>
-                {t('gdpr.analytics_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: analyticsConsent ? colors.primary : 'transparent',
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.consentTitle}>{t('gdpr.analytics_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: analyticsConsent ? colors.primary : 'transparent',
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 {analyticsConsent && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
-            
+
             <ThemedText style={styles.consentDescription}>
               {t('gdpr.analytics_description')}
             </ThemedText>
           </TouchableOpacity>
-          
+
           {/* Marketing Data */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.consentSection}
             onPress={() => setMarketingConsent(!marketingConsent)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.marketing_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: marketingConsent }}
           >
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>
-                {t('gdpr.marketing_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: marketingConsent ? colors.primary : 'transparent',
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.consentTitle}>{t('gdpr.marketing_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: marketingConsent ? colors.primary : 'transparent',
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 {marketingConsent && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
-            
+
             <ThemedText style={styles.consentDescription}>
               {t('gdpr.marketing_description')}
             </ThemedText>
           </TouchableOpacity>
-          
+
           {/* Third-Party Data */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.consentSection}
             onPress={() => setThirdPartyConsent(!thirdPartyConsent)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.third_party_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: thirdPartyConsent }}
           >
             <View style={styles.consentHeader}>
-              <ThemedText style={styles.consentTitle}>
-                {t('gdpr.third_party_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: thirdPartyConsent ? colors.primary : 'transparent',
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.consentTitle}>{t('gdpr.third_party_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: thirdPartyConsent ? colors.primary : 'transparent',
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 {thirdPartyConsent && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
-            
+
             <ThemedText style={styles.consentDescription}>
               {t('gdpr.third_party_description')}
             </ThemedText>
           </TouchableOpacity>
-          
-          <ThemedText style={styles.privacyNote}>
-            {t('gdpr.privacy_note')}
-          </ThemedText>
-          
+
+          <ThemedText style={styles.privacyNote}>{t('gdpr.privacy_note')}</ThemedText>
+
           <TouchableOpacity
             style={[styles.continueButton, { backgroundColor: colors.primary }]}
             onPress={handleContinue}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.continue')}
             accessibilityRole="button"
           >
-            <Text style={styles.continueButtonText}>
-              {t('gdpr.continue')}
-            </Text>
+            <Text style={styles.continueButtonText}>{t('gdpr.continue')}</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.privacyLink}
             onPress={() => {
               // Navigate to privacy policy
               navigation.navigate('Legal', { type: 'privacy-policy' });
             }}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.view_privacy_policy')}
             accessibilityRole="link"
           >

@@ -4,12 +4,12 @@
  * Enhanced Stripe functionality including proration, tax calculation, and multi-currency support
  */
 
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 let stripe = null;
 const getStripe = () => {
   if (!stripe) {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
   }
   return stripe;
 };
@@ -34,27 +34,27 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is calculating proration for their own subscription
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only calculate proration for their own subscriptions.'
+      "permission-denied",
+      "Users can only calculate proration for their own subscriptions."
     );
   }
 
   try {
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     const userDoc = await userRef.get();
 
     if (!userDoc.exists || !userDoc.data().stripeCustomerId) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'User does not have a Stripe customer ID.'
+        "not-found",
+        "User does not have a Stripe customer ID."
       );
     }
 
@@ -69,12 +69,12 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
         id: subscription.items.data[0].id,
         price: data.newPriceId,
       }],
-      subscription_proration_behavior: 'create_prorations',
+      subscription_proration_behavior: "create_prorations",
     });
 
     // Calculate proration amount
     const prorationLineItems = invoice.lines.data.filter(item => 
-      item.type === 'invoiceitem' && item.proration
+      item.type === "invoiceitem" && item.proration
     );
 
     const creditAmount = prorationLineItems
@@ -89,11 +89,11 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
 
     // Get new price details
     const newPrice = await getStripe().prices.retrieve(data.newPriceId, {
-      expand: ['product']
+      expand: ["product"]
     });
 
     const currentPrice = await getStripe().prices.retrieve(subscription.items.data[0].price.id, {
-      expand: ['product']
+      expand: ["product"]
     });
 
     const result = {
@@ -127,7 +127,7 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
 
     // Store proration calculation if not preview only
     if (!data.previewOnly) {
-      await userRef.collection('prorationCalculations').add({
+      await userRef.collection("prorationCalculations").add({
         subscriptionId: data.subscriptionId,
         currentPriceId: subscription.items.data[0].price.id,
         newPriceId: data.newPriceId,
@@ -138,8 +138,8 @@ exports.calculateProration = functions.https.onCall(async (data, context) => {
 
     return result;
   } catch (error) {
-    console.error('Error calculating proration:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error calculating proration:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -156,21 +156,21 @@ exports.updateSubscriptionWithProration = functions.https.onCall(async (data, co
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is updating their own subscription
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only update their own subscriptions.'
+      "permission-denied",
+      "Users can only update their own subscriptions."
     );
   }
 
   try {
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     
     // Get current subscription
     const currentSubscription = await getStripe().subscriptions.retrieve(data.subscriptionId);
@@ -181,16 +181,16 @@ exports.updateSubscriptionWithProration = functions.https.onCall(async (data, co
         id: currentSubscription.items.data[0].id,
         price: data.newPriceId,
       }],
-      proration_behavior: data.prorationBehavior || 'create_prorations',
+      proration_behavior: data.prorationBehavior || "create_prorations",
     });
 
     // Get new price details
     const newPrice = await getStripe().prices.retrieve(data.newPriceId, {
-      expand: ['product']
+      expand: ["product"]
     });
 
     // Update subscription in Firestore
-    await userRef.collection('subscriptions').doc(data.subscriptionId).update({
+    await userRef.collection("subscriptions").doc(data.subscriptionId).update({
       priceId: data.newPriceId,
       planName: newPrice.product.name,
       status: updatedSubscription.status,
@@ -200,12 +200,12 @@ exports.updateSubscriptionWithProration = functions.https.onCall(async (data, co
     });
 
     // Log subscription change
-    await userRef.collection('subscriptionChanges').add({
+    await userRef.collection("subscriptionChanges").add({
       subscriptionId: data.subscriptionId,
       previousPriceId: currentSubscription.items.data[0].price.id,
       newPriceId: data.newPriceId,
-      prorationBehavior: data.prorationBehavior || 'create_prorations',
-      changeType: 'plan_change',
+      prorationBehavior: data.prorationBehavior || "create_prorations",
+      changeType: "plan_change",
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
@@ -217,8 +217,8 @@ exports.updateSubscriptionWithProration = functions.https.onCall(async (data, co
       currentPeriodEnd: updatedSubscription.current_period_end
     };
   } catch (error) {
-    console.error('Error updating subscription with proration:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error updating subscription with proration:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -238,27 +238,27 @@ exports.calculateTax = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is calculating tax for themselves
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only calculate tax for themselves.'
+      "permission-denied",
+      "Users can only calculate tax for themselves."
     );
   }
 
   try {
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     const userDoc = await userRef.get();
 
     if (!userDoc.exists || !userDoc.data().stripeCustomerId) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'User does not have a Stripe customer ID.'
+        "not-found",
+        "User does not have a Stripe customer ID."
       );
     }
 
@@ -272,7 +272,7 @@ exports.calculateTax = functions.https.onCall(async (data, context) => {
       currency: price.currency,
       customer_details: {
         address: data.customerDetails.address,
-        address_source: 'billing',
+        address_source: "billing",
       },
       line_items: [{
         amount: price.unit_amount,
@@ -283,11 +283,11 @@ exports.calculateTax = functions.https.onCall(async (data, context) => {
     // Update customer with tax information
     await getStripe().customers.update(customerId, {
       address: data.customerDetails.address,
-      tax_exempt: data.customerDetails.tax_exempt || 'none',
+      tax_exempt: data.customerDetails.tax_exempt || "none",
     });
 
     // Store tax calculation in Firestore
-    await userRef.collection('taxCalculations').add({
+    await userRef.collection("taxCalculations").add({
       calculationId: taxCalculation.id,
       priceId: data.priceId,
       amount: price.unit_amount,
@@ -311,8 +311,8 @@ exports.calculateTax = functions.https.onCall(async (data, context) => {
       }))
     };
   } catch (error) {
-    console.error('Error calculating tax:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error calculating tax:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -329,21 +329,21 @@ exports.createMultiCurrencyPricing = functions.https.onCall(async (data, context
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Admin-only function (you might want to add admin role checking)
   if (!context.auth.token.admin) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Only administrators can create multi-currency pricing.'
+      "permission-denied",
+      "Only administrators can create multi-currency pricing."
     );
   }
 
   try {
-    const supportedCurrencies = ['usd', 'eur', 'gbp', 'cad', 'aud', 'jpy'];
+    const supportedCurrencies = ["usd", "eur", "gbp", "cad", "aud", "jpy"];
     const currencyPricing = {};
 
     // Create prices for each supported currency
@@ -359,7 +359,7 @@ exports.createMultiCurrencyPricing = functions.https.onCall(async (data, context
       let amount = Math.round(data.baseAmount * exchangeRate);
       
       // Special handling for zero-decimal currencies (JPY)
-      if (currency.toLowerCase() === 'jpy') {
+      if (currency.toLowerCase() === "jpy") {
         amount = Math.round(amount / 100);
       }
 
@@ -379,18 +379,18 @@ exports.createMultiCurrencyPricing = functions.https.onCall(async (data, context
         amount: amount,
         currency: currency.toLowerCase(),
         exchangeRate: exchangeRate,
-        formattedAmount: new Intl.NumberFormat('en-US', {
-          style: 'currency',
+        formattedAmount: new Intl.NumberFormat("en-US", {
+          style: "currency",
           currency: currency.toUpperCase(),
-        }).format(currency.toLowerCase() === 'jpy' ? amount : amount / 100)
+        }).format(currency.toLowerCase() === "jpy" ? amount : amount / 100)
       };
     }
 
     // Store multi-currency pricing in Firestore
-    await db.collection('multiCurrencyPricing').doc(data.productId).set({
+    await db.collection("multiCurrencyPricing").doc(data.productId).set({
       productId: data.productId,
       baseAmount: data.baseAmount,
-      baseCurrency: 'usd',
+      baseCurrency: "usd",
       currencies: currencyPricing,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -403,8 +403,8 @@ exports.createMultiCurrencyPricing = functions.https.onCall(async (data, context
       supportedCurrencies: Object.keys(currencyPricing)
     };
   } catch (error) {
-    console.error('Error creating multi-currency pricing:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error creating multi-currency pricing:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -420,21 +420,21 @@ exports.getPricingForCurrency = functions.https.onCall(async (data, context) => 
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   try {
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     
     // Get multi-currency pricing for product
-    const pricingDoc = await db.collection('multiCurrencyPricing').doc(data.productId).get();
+    const pricingDoc = await db.collection("multiCurrencyPricing").doc(data.productId).get();
     
     if (!pricingDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'Multi-currency pricing not found for this product.'
+        "not-found",
+        "Multi-currency pricing not found for this product."
       );
     }
 
@@ -446,7 +446,7 @@ exports.getPricingForCurrency = functions.https.onCall(async (data, context) => 
       // Fallback to USD if requested currency not available
       return {
         productId: data.productId,
-        currency: 'usd',
+        currency: "usd",
         pricing: pricingData.currencies.usd,
         fallback: true,
         availableCurrencies: Object.keys(pricingData.currencies)
@@ -467,8 +467,8 @@ exports.getPricingForCurrency = functions.https.onCall(async (data, context) => 
       availableCurrencies: Object.keys(pricingData.currencies)
     };
   } catch (error) {
-    console.error('Error getting pricing for currency:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error getting pricing for currency:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -486,21 +486,21 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is creating a subscription for themselves
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only create subscriptions for themselves.'
+      "permission-denied",
+      "Users can only create subscriptions for themselves."
     );
   }
 
   try {
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     const userDoc = await userRef.get();
 
     // Get or create customer
@@ -524,7 +524,7 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
     // Update customer with address and tax information
     await getStripe().customers.update(customerId, {
       address: data.customerDetails.address,
-      preferred_locales: [data.customerDetails.locale || 'en'],
+      preferred_locales: [data.customerDetails.locale || "en"],
     });
 
     // Attach payment method
@@ -536,19 +536,19 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
     const subscription = await getStripe().subscriptions.create({
       customer: customerId,
       items: [{ price: data.priceId }],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { save_default_payment_method: 'on_subscription' },
+      payment_behavior: "default_incomplete",
+      payment_settings: { save_default_payment_method: "on_subscription" },
       automatic_tax: { enabled: true },
-      expand: ['latest_invoice.payment_intent'],
+      expand: ["latest_invoice.payment_intent"],
     });
 
     // Get price and product details
     const price = await getStripe().prices.retrieve(data.priceId, {
-      expand: ['product']
+      expand: ["product"]
     });
 
     // Store enhanced subscription in Firestore
-    await userRef.collection('subscriptions').doc(subscription.id).set({
+    await userRef.collection("subscriptions").doc(subscription.id).set({
       status: subscription.status,
       priceId: data.priceId,
       planName: price.product.name,
@@ -580,8 +580,8 @@ exports.createAdvancedSubscription = functions.https.onCall(async (data, context
       currentPeriodEnd: subscription.current_period_end
     };
   } catch (error) {
-    console.error('Error creating advanced subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error creating advanced subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 

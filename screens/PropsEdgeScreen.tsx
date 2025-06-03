@@ -1,12 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, TextInput, FlatList, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '../hooks';
-import { useTheme } from '../contexts/ThemeContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  SafeAreaView,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../hooks';
 import { propPredictionService, PropBet, TopPropBet } from '../services/propPredictionService';
 
 // Define types for the component props and state
@@ -67,7 +77,7 @@ const PropsEdgeScreen: React.FC = () => {
       // Load featured prop and top props in parallel
       const [featured, topProps] = await Promise.all([
         propPredictionService.getFeaturedPropPrediction(selectedSport),
-        propPredictionService.getTopPropPredictions(3, selectedSport)
+        propPredictionService.getTopPropPredictions(3, selectedSport),
       ]);
 
       setFeaturedPropBet(featured);
@@ -75,11 +85,11 @@ const PropsEdgeScreen: React.FC = () => {
     } catch (err) {
       console.error('Error loading prop predictions:', err);
       setError('Failed to load predictions. Using cached data.');
-      
+
       // Fallback to service's built-in fallback data
       const fallbackFeatured = await propPredictionService.getFeaturedPropPrediction(selectedSport);
       const fallbackTop = await propPredictionService.getTopPropPredictions(3, selectedSport);
-      
+
       setFeaturedPropBet(fallbackFeatured);
       setTopPropBets(fallbackTop);
     } finally {
@@ -452,7 +462,9 @@ const PropsEdgeScreen: React.FC = () => {
       >
         {/* Error Message */}
         {error && (
-          <AccessibleThemedView style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}>
+          <AccessibleThemedView
+            style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}
+          >
             <Ionicons name="warning-outline" size={20} color={colors.error} />
             <AccessibleThemedText style={[styles.errorText, { color: colors.error }]}>
               {error}

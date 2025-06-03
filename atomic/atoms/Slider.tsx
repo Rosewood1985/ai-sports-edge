@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -10,9 +11,9 @@ import {
   AccessibilityInfo,
   LayoutChangeEvent,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import AccessibleThemedView from './AccessibleThemedView';
+
 import AccessibleThemedText from './AccessibleThemedText';
+import AccessibleThemedView from './AccessibleThemedView';
 import { useI18n } from '../organisms/i18n/I18nContext';
 
 /**

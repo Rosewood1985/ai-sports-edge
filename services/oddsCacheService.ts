@@ -4,8 +4,8 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
+import { Platform } from 'react-native';
 
 // Cache keys
 const CACHE_KEYS = {
@@ -38,40 +38,40 @@ class OddsCacheService {
       // Get cached data
       const cachedDataString = await AsyncStorage.getItem(`${CACHE_KEYS.ODDS_DATA}_${key}`);
       if (!cachedDataString) return null;
-      
+
       const cachedData: CacheItem<T> = JSON.parse(cachedDataString);
       const now = Date.now();
-      
+
       // Check if cache is expired
       if (now - cachedData.timestamp > cachedData.ttl) {
         // Check network status
         const netInfo = await NetInfo.fetch();
-        
+
         // If offline, extend TTL and mark as stale
         if (!netInfo.isConnected) {
           // If cache is too old, don't use it
           if (now - cachedData.timestamp > MAX_TTL) {
             return null;
           }
-          
+
           // Extend TTL and mark as stale
           cachedData.ttl = EXTENDED_TTL;
           cachedData.source = 'stale';
           await this.setCachedData(key, cachedData.data, EXTENDED_TTL, 'stale');
           return cachedData;
         }
-        
+
         // If online but cache expired, return null
         return null;
       }
-      
+
       return cachedData;
     } catch (error) {
       console.error('Error getting cached data:', error);
       return null;
     }
   }
-  
+
   /**
    * Set cached data
    * @param key Cache key
@@ -80,8 +80,8 @@ class OddsCacheService {
    * @param source Source of the data (api, cache, stale)
    */
   async setCachedData<T>(
-    key: string, 
-    data: T, 
+    key: string,
+    data: T,
     ttl: number = DEFAULT_TTL,
     source: 'api' | 'cache' | 'stale' = 'api'
   ): Promise<void> {
@@ -92,14 +92,14 @@ class OddsCacheService {
         ttl,
         source,
       };
-      
+
       await AsyncStorage.setItem(`${CACHE_KEYS.ODDS_DATA}_${key}`, JSON.stringify(cacheItem));
       await AsyncStorage.setItem(CACHE_KEYS.LAST_UPDATED, Date.now().toString());
     } catch (error) {
       console.error('Error setting cached data:', error);
     }
   }
-  
+
   /**
    * Clear all cached data
    */
@@ -107,7 +107,7 @@ class OddsCacheService {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const cacheKeys = keys.filter(key => key.startsWith(CACHE_KEYS.ODDS_DATA));
-      
+
       if (cacheKeys.length > 0) {
         await AsyncStorage.multiRemove(cacheKeys);
       }
@@ -115,7 +115,7 @@ class OddsCacheService {
       console.error('Error clearing cache:', error);
     }
   }
-  
+
   /**
    * Get cache statistics
    * @returns Cache statistics
@@ -129,11 +129,11 @@ class OddsCacheService {
       // Get last updated timestamp
       const lastUpdatedString = await AsyncStorage.getItem(CACHE_KEYS.LAST_UPDATED);
       const lastUpdated = lastUpdatedString ? parseInt(lastUpdatedString) : null;
-      
+
       // Get all cache keys
       const keys = await AsyncStorage.getAllKeys();
       const cacheKeys = keys.filter(key => key.startsWith(CACHE_KEYS.ODDS_DATA));
-      
+
       // Get cache size
       let cacheSize = 0;
       for (const key of cacheKeys) {
@@ -142,7 +142,7 @@ class OddsCacheService {
           cacheSize += value.length;
         }
       }
-      
+
       return {
         lastUpdated,
         cacheSize,
@@ -157,7 +157,7 @@ class OddsCacheService {
       };
     }
   }
-  
+
   /**
    * Set cache TTL (Time To Live)
    * @param ttl Time to live in milliseconds
@@ -169,7 +169,7 @@ class OddsCacheService {
       console.error('Error setting cache TTL:', error);
     }
   }
-  
+
   /**
    * Get cache TTL (Time To Live)
    * @returns Cache TTL in milliseconds
@@ -183,28 +183,25 @@ class OddsCacheService {
       return DEFAULT_TTL;
     }
   }
-  
+
   /**
    * Prefetch odds data
    * @param fetchFunction Function to fetch odds data
    * @param key Cache key
    */
-  async prefetchOddsData<T>(
-    fetchFunction: () => Promise<T>,
-    key: string
-  ): Promise<void> {
+  async prefetchOddsData<T>(fetchFunction: () => Promise<T>, key: string): Promise<void> {
     try {
       // Check if we already have cached data
       const cachedData = await this.getCachedData<T>(key);
-      
+
       // If cache is fresh, don't prefetch
       if (cachedData && cachedData.source === 'api') {
         return;
       }
-      
+
       // Fetch new data
       const data = await fetchFunction();
-      
+
       // Cache the data
       await this.setCachedData(key, data);
     } catch (error) {

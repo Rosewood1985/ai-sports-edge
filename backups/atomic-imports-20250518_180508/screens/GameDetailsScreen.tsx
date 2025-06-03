@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator
-} from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedText, ThemedView } from '../components/ThemedComponents'
-import { ThemedView } from '../atomic/atoms/ThemedView'
+import { useRoute, useNavigation, RouteProp, useTheme } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+
 import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { ThemedText, ThemedView } from '../components/ThemedComponents';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Define route params type
 type GameDetailsParams = {
@@ -26,17 +20,17 @@ const MOCK_GAME = {
     id: 'team1',
     name: 'Lakers',
     logo: '🏀',
-    score: 105
+    score: 105,
   },
   awayTeam: {
     id: 'team2',
     name: 'Warriors',
     logo: '🏀',
-    score: 98
+    score: 98,
   },
   status: 'completed',
   date: new Date(2025, 2, 20, 19, 30),
-  venue: 'Staples Center'
+  venue: 'Staples Center',
 };
 
 const GameDetailsScreen = () => {
@@ -47,16 +41,16 @@ const GameDetailsScreen = () => {
   const [game, setGame] = useState<typeof MOCK_GAME | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Get game ID from route params
   const { gameId } = route.params || {};
-  
+
   // Load game data
   useEffect(() => {
     const loadGameData = async () => {
       try {
         setLoading(true);
-        
+
         // In a real app, this would be an API call
         // For now, we'll just use mock data
         setTimeout(() => {
@@ -68,10 +62,10 @@ const GameDetailsScreen = () => {
         setLoading(false);
       }
     };
-    
+
     loadGameData();
   }, [gameId]);
-  
+
   // Format date
   const formatDate = (date: Date) => {
     return date.toLocaleDateString(undefined, {
@@ -80,10 +74,10 @@ const GameDetailsScreen = () => {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -93,15 +87,13 @@ const GameDetailsScreen = () => {
       </ThemedView>
     );
   }
-  
+
   // Render error state if game not found
   if (!game) {
     return (
       <ThemedView style={styles.errorContainer}>
         <Ionicons name="alert-circle-outline" size={64} color={colors.text} />
-        <ThemedText style={styles.errorText}>
-          {t('games.game_not_found')}
-        </ThemedText>
+        <ThemedText style={styles.errorText}>{t('games.game_not_found')}</ThemedText>
         <TouchableOpacity
           style={[styles.backButton, { backgroundColor: colors.primary }]}
           onPress={() => navigation.goBack()}
@@ -111,14 +103,11 @@ const GameDetailsScreen = () => {
       </ThemedView>
     );
   }
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          style={styles.backButtonContainer}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButtonContainer} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>
@@ -126,60 +115,60 @@ const GameDetailsScreen = () => {
         </ThemedText>
         <View style={styles.headerRight} />
       </View>
-      
+
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'overview' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'overview' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('overview')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'overview' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'overview' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.overview')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'stats' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'stats' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('stats')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'stats' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'stats' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.stats')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'players' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'players' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('players')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'players' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'players' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.players')}
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.scoreboardContainer}>
           <View style={styles.teamContainer}>
@@ -187,20 +176,20 @@ const GameDetailsScreen = () => {
             <ThemedText style={styles.teamName}>{game.homeTeam.name}</ThemedText>
             <ThemedText style={styles.teamScore}>{game.homeTeam.score}</ThemedText>
           </View>
-          
+
           <View style={styles.gameInfoContainer}>
             <ThemedText style={styles.gameStatus}>
               {game.status === 'live' ? 'LIVE' : 'FINAL'}
             </ThemedText>
           </View>
-          
+
           <View style={styles.teamContainer}>
             <ThemedText style={styles.teamLogo}>{game.awayTeam.logo}</ThemedText>
             <ThemedText style={styles.teamName}>{game.awayTeam.name}</ThemedText>
             <ThemedText style={styles.teamScore}>{game.awayTeam.score}</ThemedText>
           </View>
         </View>
-        
+
         <View style={[styles.infoCard, { backgroundColor: colors.card }]}>
           <ThemedText style={styles.infoCardTitle}>{t('games.game_info')}</ThemedText>
           <View style={styles.infoRow}>
@@ -347,7 +336,7 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 14,
     fontWeight: '500',
-  }
+  },
 });
 
 export default GameDetailsScreen;

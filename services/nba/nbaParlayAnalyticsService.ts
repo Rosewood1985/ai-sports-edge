@@ -3,12 +3,23 @@
 // Advanced Parlay Strategy Analysis for NBA Betting
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
-import { NBATeam, NBAPlayer, NBAGame } from './nbaDataSyncService';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+
 import { NBATeamAnalytics } from './nbaAnalyticsService';
+import { NBATeam, NBAPlayer, NBAGame } from './nbaDataSyncService';
 import { NBAGamePrediction } from './nbaMLPredictionService';
+import { firestore as db } from '../../config/firebase';
 
 // NBA Parlay-specific interfaces
 export interface NBAParlayOpportunity {
@@ -17,10 +28,10 @@ export interface NBAParlayOpportunity {
   confidence: number; // Overall confidence score (0-1)
   expectedValue: number; // Expected return value
   riskLevel: 'low' | 'medium' | 'high';
-  
+
   // Parlay Components
   legs: ParlayLeg[];
-  
+
   // Analytics
   analytics: {
     correlationScore: number; // How correlated the legs are
@@ -28,7 +39,7 @@ export interface NBAParlayOpportunity {
     varianceScore: number; // Expected variance in outcomes
     kellyBetSize: number; // Recommended bet size using Kelly criterion
   };
-  
+
   // Success Metrics
   successMetrics: {
     historicalHitRate: number; // Historical success rate for similar parlays
@@ -36,7 +47,7 @@ export interface NBAParlayOpportunity {
     breakEvenOdds: number; // Odds needed to break even
     profitMargin: number; // Expected profit margin
   };
-  
+
   // Risk Assessment
   riskAssessment: {
     worstCaseScenario: number; // Worst case loss
@@ -44,7 +55,7 @@ export interface NBAParlayOpportunity {
     volatility: number; // Expected volatility
     maxDrawdown: number; // Maximum expected losing streak
   };
-  
+
   lastUpdated: Date;
 }
 
@@ -55,7 +66,7 @@ export interface ParlayLeg {
   odds: number; // Decimal odds
   probability: number; // Model probability (0-1)
   confidence: number; // Confidence in this leg (0-1)
-  
+
   // Correlation factors
   correlations: {
     withOtherLegs: number[]; // Correlation with each other leg
@@ -63,7 +74,7 @@ export interface ParlayLeg {
     rest: number; // Impact of team rest
     motivation: number; // Situational motivation factor
   };
-  
+
   // Supporting data
   supportingFactors: string[];
   riskFactors: string[];
@@ -77,7 +88,7 @@ export interface NBAPlayerPropAnalysis {
   overProbability: number;
   underProbability: number;
   confidence: number;
-  
+
   // Analysis factors
   factors: {
     recentForm: number; // Recent performance in this stat
@@ -89,7 +100,7 @@ export interface NBAPlayerPropAnalysis {
     restAdvantage: number; // Rest days advantage
     homeAwayFactor: number; // Home/away performance difference
   };
-  
+
   // Historical context
   historical: {
     seasonAverage: number;
@@ -97,7 +108,7 @@ export interface NBAPlayerPropAnalysis {
     vsOpponent: number; // Average vs this opponent
     inSimilarSituations: number; // In similar game contexts
   };
-  
+
   recommendation: 'strong-over' | 'lean-over' | 'avoid' | 'lean-under' | 'strong-under';
   lastUpdated: Date;
 }
@@ -106,7 +117,7 @@ export interface NBASameGameParlayBuilder {
   gameId: string;
   homeTeam: string;
   awayTeam: string;
-  
+
   // Available legs with correlations
   availableLegs: {
     gameLines: {
@@ -116,17 +127,17 @@ export interface NBASameGameParlayBuilder {
     };
     playerProps: NBAPlayerPropAnalysis[];
   };
-  
+
   // Optimal combinations
   optimalCombinations: {
     conservative: NBAParlayOpportunity;
     balanced: NBAParlayOpportunity;
     aggressive: NBAParlayOpportunity;
   };
-  
+
   // Correlation matrix
   correlationMatrix: number[][]; // Correlation between all possible legs
-  
+
   lastUpdated: Date;
 }
 
@@ -135,7 +146,7 @@ export interface NBAParlayStrategy {
   description: string;
   riskLevel: 'low' | 'medium' | 'high';
   timeframe: 'single-game' | 'daily' | 'weekly' | 'season-long';
-  
+
   // Strategy parameters
   parameters: {
     maxLegs: number;
@@ -145,7 +156,7 @@ export interface NBAParlayStrategy {
     maxCorrelation: number;
     bankrollPercentage: number;
   };
-  
+
   // Historical performance
   performance: {
     totalBets: number;
@@ -157,7 +168,7 @@ export interface NBAParlayStrategy {
     longestLoseStreak: number;
     profitLoss: number;
   };
-  
+
   // Active opportunities
   currentOpportunities: NBAParlayOpportunity[];
   lastUpdated: Date;
@@ -222,14 +233,13 @@ export class NBAParlayAnalyticsService {
       // Sort by expected value and confidence
       const sortedOpportunities = opportunities
         .filter(opp => opp.confidence >= this.minConfidenceThreshold)
-        .sort((a, b) => (b.expectedValue * b.confidence) - (a.expectedValue * a.confidence));
+        .sort((a, b) => b.expectedValue * b.confidence - a.expectedValue * a.confidence);
 
       // Store opportunities
       await this.storeOpportunities(sortedOpportunities);
 
       console.log(`Generated ${sortedOpportunities.length} NBA parlay opportunities`);
       return sortedOpportunities.slice(0, 20); // Return top 20
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to analyze parlay opportunities: ${error.message}`);
@@ -247,7 +257,9 @@ export class NBAParlayAnalyticsService {
       const opportunities: NBAParlayOpportunity[] = [];
 
       // Add conservative combination
-      if (sameGameBuilder.optimalCombinations.conservative.confidence >= this.minConfidenceThreshold) {
+      if (
+        sameGameBuilder.optimalCombinations.conservative.confidence >= this.minConfidenceThreshold
+      ) {
         opportunities.push(sameGameBuilder.optimalCombinations.conservative);
       }
 
@@ -262,7 +274,6 @@ export class NBAParlayAnalyticsService {
       }
 
       return opportunities;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -276,7 +287,7 @@ export class NBAParlayAnalyticsService {
     try {
       const game = await this.getGameData(gameId);
       const prediction = await this.getGamePrediction(gameId);
-      
+
       if (!game || !prediction) return null;
 
       // Generate available legs
@@ -291,7 +302,7 @@ export class NBAParlayAnalyticsService {
         gameLines.total.under,
         gameLines.moneyline.home,
         gameLines.moneyline.away,
-        ...playerProps.map(prop => this.convertPropToLeg(prop))
+        ...playerProps.map(prop => this.convertPropToLeg(prop)),
       ];
 
       const correlationMatrix = await this.buildCorrelationMatrix(allLegs);
@@ -317,7 +328,6 @@ export class NBAParlayAnalyticsService {
       };
 
       return builder;
-
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -330,14 +340,12 @@ export class NBAParlayAnalyticsService {
   async generateMultiGameParlays(gameIds: string[]): Promise<NBAParlayOpportunity[]> {
     try {
       const opportunities: NBAParlayOpportunity[] = [];
-      
+
       // Get predictions for all games
-      const predictions = await Promise.all(
-        gameIds.map(gameId => this.getGamePrediction(gameId))
-      );
+      const predictions = await Promise.all(gameIds.map(gameId => this.getGamePrediction(gameId)));
 
       const validPredictions = predictions.filter(p => p !== null) as NBAGamePrediction[];
-      
+
       if (validPredictions.length < 2) return opportunities;
 
       // Generate 2-leg parlays
@@ -370,7 +378,6 @@ export class NBAParlayAnalyticsService {
       }
 
       return opportunities;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -383,7 +390,7 @@ export class NBAParlayAnalyticsService {
   async generatePlayerPropParlays(gameIds: string[]): Promise<NBAParlayOpportunity[]> {
     try {
       const opportunities: NBAParlayOpportunity[] = [];
-      
+
       // Get all player props for the games
       const allPlayerProps: NBAPlayerPropAnalysis[] = [];
       for (const gameId of gameIds) {
@@ -392,9 +399,10 @@ export class NBAParlayAnalyticsService {
       }
 
       // Filter high-confidence props
-      const highConfidenceProps = allPlayerProps.filter(prop => 
-        prop.confidence >= 0.75 && 
-        (prop.recommendation === 'strong-over' || prop.recommendation === 'strong-under')
+      const highConfidenceProps = allPlayerProps.filter(
+        prop =>
+          prop.confidence >= 0.75 &&
+          (prop.recommendation === 'strong-over' || prop.recommendation === 'strong-under')
       );
 
       if (highConfidenceProps.length < 2) return opportunities;
@@ -404,7 +412,7 @@ export class NBAParlayAnalyticsService {
 
       for (const combination of propCombinations) {
         const correlationScore = await this.calculatePropCorrelation(combination);
-        
+
         if (correlationScore <= this.maxCorrelationThreshold) {
           const parlay = await this.buildPlayerPropParlay(combination);
           if (parlay && parlay.confidence >= this.minConfidenceThreshold) {
@@ -414,7 +422,6 @@ export class NBAParlayAnalyticsService {
       }
 
       return opportunities;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -446,7 +453,6 @@ export class NBAParlayAnalyticsService {
       return props
         .filter(prop => prop.confidence >= 0.6)
         .sort((a, b) => b.confidence - a.confidence);
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -547,8 +553,12 @@ export class NBAParlayAnalyticsService {
       gameId: prop.gameId,
       type: 'player-prop',
       selection: `${prop.playerId} ${prop.propType} ${prop.recommendation.includes('over') ? 'Over' : 'Under'} ${prop.line}`,
-      odds: this.convertProbabilityToOdds(prop.recommendation.includes('over') ? prop.overProbability : prop.underProbability),
-      probability: prop.recommendation.includes('over') ? prop.overProbability : prop.underProbability,
+      odds: this.convertProbabilityToOdds(
+        prop.recommendation.includes('over') ? prop.overProbability : prop.underProbability
+      ),
+      probability: prop.recommendation.includes('over')
+        ? prop.overProbability
+        : prop.underProbability,
       confidence: prop.confidence,
       correlations: { withOtherLegs: [], timeOfGame: 1.0, rest: 1.0, motivation: 1.0 },
       supportingFactors: [],
@@ -558,7 +568,7 @@ export class NBAParlayAnalyticsService {
 
   private async buildCorrelationMatrix(legs: ParlayLeg[]): Promise<number[][]> {
     const matrix: number[][] = [];
-    
+
     for (let i = 0; i < legs.length; i++) {
       matrix[i] = [];
       for (let j = 0; j < legs.length; j++) {
@@ -569,7 +579,7 @@ export class NBAParlayAnalyticsService {
         }
       }
     }
-    
+
     return matrix;
   }
 
@@ -577,28 +587,35 @@ export class NBAParlayAnalyticsService {
     // Same game correlations
     if (leg1.gameId === leg2.gameId) {
       // High correlation between spread and moneyline
-      if ((leg1.type === 'spread' && leg2.type === 'moneyline') ||
-          (leg1.type === 'moneyline' && leg2.type === 'spread')) {
+      if (
+        (leg1.type === 'spread' && leg2.type === 'moneyline') ||
+        (leg1.type === 'moneyline' && leg2.type === 'spread')
+      ) {
         return 0.85;
       }
-      
+
       // Medium correlation between team performance and totals
-      if ((leg1.type === 'spread' && leg2.type === 'total') ||
-          (leg1.type === 'total' && leg2.type === 'spread')) {
+      if (
+        (leg1.type === 'spread' && leg2.type === 'total') ||
+        (leg1.type === 'total' && leg2.type === 'spread')
+      ) {
         return 0.4;
       }
-      
+
       // Low correlation between different player props
       if (leg1.type === 'player-prop' && leg2.type === 'player-prop') {
         return 0.2;
       }
     }
-    
+
     // Different games - generally low correlation
     return 0.1;
   }
 
-  private async buildConservativeParlay(legs: ParlayLeg[], correlationMatrix: number[][]): Promise<NBAParlayOpportunity> {
+  private async buildConservativeParlay(
+    legs: ParlayLeg[],
+    correlationMatrix: number[][]
+  ): Promise<NBAParlayOpportunity> {
     // Select 2-3 high-confidence, low-correlation legs
     const highConfidenceLegs = legs
       .filter(leg => leg.confidence >= 0.8)
@@ -606,23 +623,29 @@ export class NBAParlayAnalyticsService {
       .slice(0, 3);
 
     const selectedLegs = this.selectUncorrelatedLegs(highConfidenceLegs, correlationMatrix, 2);
-    
+
     return this.buildParlayFromLegs(selectedLegs, 'low');
   }
 
-  private async buildBalancedParlay(legs: ParlayLeg[], correlationMatrix: number[][]): Promise<NBAParlayOpportunity> {
+  private async buildBalancedParlay(
+    legs: ParlayLeg[],
+    correlationMatrix: number[][]
+  ): Promise<NBAParlayOpportunity> {
     // Select 3-4 good-confidence legs with moderate correlation tolerance
     const goodConfidenceLegs = legs
       .filter(leg => leg.confidence >= 0.7)
-      .sort((a, b) => (b.confidence * b.probability) - (a.confidence * a.probability))
+      .sort((a, b) => b.confidence * b.probability - a.confidence * a.probability)
       .slice(0, 5);
 
     const selectedLegs = this.selectUncorrelatedLegs(goodConfidenceLegs, correlationMatrix, 3);
-    
+
     return this.buildParlayFromLegs(selectedLegs, 'medium');
   }
 
-  private async buildAggressiveParlay(legs: ParlayLeg[], correlationMatrix: number[][]): Promise<NBAParlayOpportunity> {
+  private async buildAggressiveParlay(
+    legs: ParlayLeg[],
+    correlationMatrix: number[][]
+  ): Promise<NBAParlayOpportunity> {
     // Select 4-5 legs prioritizing value over correlation
     const valueLegs = legs
       .filter(leg => leg.confidence >= 0.6)
@@ -630,49 +653,66 @@ export class NBAParlayAnalyticsService {
       .slice(0, 6);
 
     const selectedLegs = this.selectUncorrelatedLegs(valueLegs, correlationMatrix, 4);
-    
+
     return this.buildParlayFromLegs(selectedLegs, 'high');
   }
 
-  private selectUncorrelatedLegs(legs: ParlayLeg[], correlationMatrix: number[][], targetCount: number): ParlayLeg[] {
+  private selectUncorrelatedLegs(
+    legs: ParlayLeg[],
+    correlationMatrix: number[][],
+    targetCount: number
+  ): ParlayLeg[] {
     if (legs.length <= targetCount) return legs;
 
     const selected: ParlayLeg[] = [legs[0]]; // Start with highest confidence/value
-    
+
     for (let i = 1; i < legs.length && selected.length < targetCount; i++) {
       const candidate = legs[i];
       let maxCorrelation = 0;
-      
+
       // Check correlation with already selected legs
       for (const selectedLeg of selected) {
         const legIndex1 = legs.findIndex(l => l === candidate);
         const legIndex2 = legs.findIndex(l => l === selectedLeg);
-        
-        if (legIndex1 >= 0 && legIndex2 >= 0 && correlationMatrix[legIndex1] && correlationMatrix[legIndex1][legIndex2]) {
+
+        if (
+          legIndex1 >= 0 &&
+          legIndex2 >= 0 &&
+          correlationMatrix[legIndex1] &&
+          correlationMatrix[legIndex1][legIndex2]
+        ) {
           maxCorrelation = Math.max(maxCorrelation, correlationMatrix[legIndex1][legIndex2]);
         }
       }
-      
+
       // Add if correlation is acceptable
       if (maxCorrelation <= this.maxCorrelationThreshold) {
         selected.push(candidate);
       }
     }
-    
+
     return selected;
   }
 
-  private buildParlayFromLegs(legs: ParlayLeg[], riskLevel: 'low' | 'medium' | 'high'): NBAParlayOpportunity {
+  private buildParlayFromLegs(
+    legs: ParlayLeg[],
+    riskLevel: 'low' | 'medium' | 'high'
+  ): NBAParlayOpportunity {
     const combinedOdds = legs.reduce((total, leg) => total * leg.odds, 1);
     const combinedProbability = legs.reduce((total, leg) => total * leg.probability, 1);
     const averageConfidence = legs.reduce((total, leg) => total + leg.confidence, 0) / legs.length;
-    
-    const expectedValue = (combinedOdds * combinedProbability) - 1;
+
+    const expectedValue = combinedOdds * combinedProbability - 1;
     const correlationScore = this.calculateCombinedCorrelation(legs);
-    
+
     return {
       id: `parlay_${Date.now()}_${legs.length}leg`,
-      type: legs.length === 1 ? 'same-game' : legs.every(l => l.gameId === legs[0].gameId) ? 'same-game' : 'multi-game',
+      type:
+        legs.length === 1
+          ? 'same-game'
+          : legs.every(l => l.gameId === legs[0].gameId)
+            ? 'same-game'
+            : 'multi-game',
       confidence: averageConfidence * (1 - correlationScore * 0.3), // Reduce confidence for high correlation
       expectedValue,
       riskLevel,
@@ -714,11 +754,11 @@ export class NBAParlayAnalyticsService {
 
   private calculateCombinedCorrelation(legs: ParlayLeg[]): number {
     if (legs.length <= 1) return 0;
-    
+
     // Simplified correlation calculation
     let totalCorrelation = 0;
     let pairs = 0;
-    
+
     for (let i = 0; i < legs.length; i++) {
       for (let j = i + 1; j < legs.length; j++) {
         // Same game has higher correlation
@@ -730,14 +770,15 @@ export class NBAParlayAnalyticsService {
         pairs++;
       }
     }
-    
+
     return pairs > 0 ? totalCorrelation / pairs : 0;
   }
 
   private calculateVariance(legs: ParlayLeg[]): number {
     const probabilities = legs.map(leg => leg.probability);
     const mean = probabilities.reduce((sum, p) => sum + p, 0) / probabilities.length;
-    const variance = probabilities.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / probabilities.length;
+    const variance =
+      probabilities.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / probabilities.length;
     return variance;
   }
 
@@ -755,34 +796,37 @@ export class NBAParlayAnalyticsService {
     return Math.ceil(-Math.log(0.01) / Math.log(1 - probability));
   }
 
-  private generatePropCombinations(props: NBAPlayerPropAnalysis[], maxLegs: number): NBAPlayerPropAnalysis[][] {
+  private generatePropCombinations(
+    props: NBAPlayerPropAnalysis[],
+    maxLegs: number
+  ): NBAPlayerPropAnalysis[][] {
     const combinations: NBAPlayerPropAnalysis[][] = [];
-    
+
     // Generate all possible combinations up to maxLegs
     for (let i = 2; i <= Math.min(maxLegs, props.length); i++) {
       const combos = this.getCombinations(props, i);
       combinations.push(...combos);
     }
-    
+
     return combinations;
   }
 
   private getCombinations<T>(array: T[], size: number): T[][] {
     const combinations: T[][] = [];
-    
+
     function backtrack(start: number, current: T[]) {
       if (current.length === size) {
         combinations.push([...current]);
         return;
       }
-      
+
       for (let i = start; i < array.length; i++) {
         current.push(array[i]);
         backtrack(i + 1, current);
         current.pop();
       }
     }
-    
+
     backtrack(0, []);
     return combinations;
   }
@@ -790,29 +834,29 @@ export class NBAParlayAnalyticsService {
   private async calculatePropCorrelation(props: NBAPlayerPropAnalysis[]): Promise<number> {
     // Calculate correlation between player props
     let correlation = 0;
-    
+
     for (let i = 0; i < props.length; i++) {
       for (let j = i + 1; j < props.length; j++) {
         const prop1 = props[i];
         const prop2 = props[j];
-        
+
         // Same game = higher correlation
         if (prop1.gameId === prop2.gameId) {
           correlation += 0.3;
         }
-        
+
         // Same player = very high correlation
         if (prop1.playerId === prop2.playerId) {
           correlation += 0.8;
         }
-        
+
         // Related stats (points/assists, rebounds/blocks) = medium correlation
         if (this.areRelatedStats(prop1.propType, prop2.propType)) {
           correlation += 0.4;
         }
       }
     }
-    
+
     const pairs = (props.length * (props.length - 1)) / 2;
     return pairs > 0 ? correlation / pairs : 0;
   }
@@ -823,10 +867,8 @@ export class NBAParlayAnalyticsService {
       ['rebounds', 'blocks'],
       ['steals', 'assists'],
     ];
-    
-    return relatedGroups.some(group => 
-      group.includes(stat1) && group.includes(stat2)
-    );
+
+    return relatedGroups.some(group => group.includes(stat1) && group.includes(stat2));
   }
 
   /**
@@ -836,7 +878,7 @@ export class NBAParlayAnalyticsService {
   private async getGameData(gameId: string): Promise<NBAGame | null> {
     try {
       const gameDoc = await getDoc(doc(db, 'nba_games', gameId));
-      return gameDoc.exists() ? gameDoc.data() as NBAGame : null;
+      return gameDoc.exists() ? (gameDoc.data() as NBAGame) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -846,7 +888,7 @@ export class NBAParlayAnalyticsService {
   private async getGamePrediction(gameId: string): Promise<NBAGamePrediction | null> {
     try {
       const predictionDoc = await getDoc(doc(db, 'nba_predictions', gameId));
-      return predictionDoc.exists() ? predictionDoc.data() as NBAGamePrediction : null;
+      return predictionDoc.exists() ? (predictionDoc.data() as NBAGamePrediction) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -871,7 +913,7 @@ export class NBAParlayAnalyticsService {
         where('isStarter', '==', true),
         limit(8)
       );
-      
+
       const playersSnapshot = await getDocs(playersQuery);
       return playersSnapshot.docs.map(doc => doc.data() as NBAPlayer);
     } catch (error) {
@@ -880,28 +922,38 @@ export class NBAParlayAnalyticsService {
     }
   }
 
-  private async analyzePlayerPropTypes(playerId: string, gameId: string): Promise<NBAPlayerPropAnalysis[]> {
+  private async analyzePlayerPropTypes(
+    playerId: string,
+    gameId: string
+  ): Promise<NBAPlayerPropAnalysis[]> {
     // Placeholder for actual player prop analysis
     return [];
   }
 
-  private async buildTwoGameParlay(prediction1: NBAGamePrediction, prediction2: NBAGamePrediction): Promise<NBAParlayOpportunity | null> {
+  private async buildTwoGameParlay(
+    prediction1: NBAGamePrediction,
+    prediction2: NBAGamePrediction
+  ): Promise<NBAParlayOpportunity | null> {
     // Build a simple 2-game parlay from the best legs of each game
     const leg1 = this.getBestLegFromPrediction(prediction1);
     const leg2 = this.getBestLegFromPrediction(prediction2);
-    
+
     if (!leg1 || !leg2) return null;
-    
+
     return this.buildParlayFromLegs([leg1, leg2], 'medium');
   }
 
-  private async buildThreeGameParlay(prediction1: NBAGamePrediction, prediction2: NBAGamePrediction, prediction3: NBAGamePrediction): Promise<NBAParlayOpportunity | null> {
+  private async buildThreeGameParlay(
+    prediction1: NBAGamePrediction,
+    prediction2: NBAGamePrediction,
+    prediction3: NBAGamePrediction
+  ): Promise<NBAParlayOpportunity | null> {
     const leg1 = this.getBestLegFromPrediction(prediction1);
     const leg2 = this.getBestLegFromPrediction(prediction2);
     const leg3 = this.getBestLegFromPrediction(prediction3);
-    
+
     if (!leg1 || !leg2 || !leg3) return null;
-    
+
     return this.buildParlayFromLegs([leg1, leg2, leg3], 'high');
   }
 
@@ -920,11 +972,13 @@ export class NBAParlayAnalyticsService {
         riskFactors: [],
       };
     }
-    
+
     return null;
   }
 
-  private async buildPlayerPropParlay(props: NBAPlayerPropAnalysis[]): Promise<NBAParlayOpportunity | null> {
+  private async buildPlayerPropParlay(
+    props: NBAPlayerPropAnalysis[]
+  ): Promise<NBAParlayOpportunity | null> {
     const legs = props.map(prop => this.convertPropToLeg(prop));
     return this.buildParlayFromLegs(legs, 'medium');
   }
@@ -932,7 +986,7 @@ export class NBAParlayAnalyticsService {
   private async storeOpportunities(opportunities: NBAParlayOpportunity[]): Promise<void> {
     try {
       const batch = opportunities.slice(0, 10); // Store top 10
-      
+
       for (let i = 0; i < batch.length; i++) {
         const opportunityRef = doc(db, 'nba_parlay_opportunities', batch[i].id);
         await setDoc(opportunityRef, batch[i]);
@@ -965,7 +1019,7 @@ export class NBAParlayAnalyticsService {
   async getParlayById(parlayId: string): Promise<NBAParlayOpportunity | null> {
     try {
       const parlayDoc = await getDoc(doc(db, 'nba_parlay_opportunities', parlayId));
-      return parlayDoc.exists() ? parlayDoc.data() as NBAParlayOpportunity : null;
+      return parlayDoc.exists() ? (parlayDoc.data() as NBAParlayOpportunity) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;

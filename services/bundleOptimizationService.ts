@@ -1,11 +1,12 @@
 /**
  * Bundle Optimization Service
- * 
+ *
  * Provides intelligent bundle analysis, code splitting recommendations,
  * and dynamic import optimization for the AI Sports Edge platform.
  */
 
 import React from 'react';
+
 import { analyticsService } from './analyticsService';
 import { sentryService } from './sentryService';
 
@@ -114,7 +115,7 @@ class BundleOptimizationService {
   private trackBundleMetrics(): void {
     // Monitor chunk loading
     if (typeof window !== 'undefined' && window.performance) {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (entry.name.includes('.chunk.js')) {
             const chunkName = this.extractChunkName(entry.name);
@@ -193,7 +194,6 @@ class BundleOptimizationService {
       });
 
       return recommendations;
-
     } catch (error) {
       console.error('❌ Error analyzing bundle optimization:', error);
       sentryService.captureException(error);
@@ -247,7 +247,8 @@ class BundleOptimizationService {
 
     // Find slow-loading chunks
     for (const [chunk, loadTime] of this.chunkLoadTimes.entries()) {
-      if (loadTime > 1000) { // > 1 second
+      if (loadTime > 1000) {
+        // > 1 second
         recommendations.push({
           type: 'split',
           target: chunk,
@@ -336,12 +337,12 @@ class BundleOptimizationService {
   private estimateComponentSize(componentName: string): number {
     // Rough estimates based on component complexity
     const sizeEstimates: Record<string, number> = {
-      'AdvancedAnalyticsDashboard': 45000,
-      'BettingAnalyticsChart': 32000,
-      'EnhancedPlayerStatistics': 28000,
-      'ParlayOddsCard': 15000,
-      'RealTimeDataIntegration': 38000,
-      'AdvancedStripeComponents': 25000,
+      AdvancedAnalyticsDashboard: 45000,
+      BettingAnalyticsChart: 32000,
+      EnhancedPlayerStatistics: 28000,
+      ParlayOddsCard: 15000,
+      RealTimeDataIntegration: 38000,
+      AdvancedStripeComponents: 25000,
     };
 
     return sizeEstimates[componentName] || 10000; // Default 10KB
@@ -350,7 +351,10 @@ class BundleOptimizationService {
   /**
    * Create lazy loading wrapper for a component
    */
-  createLazyComponent(componentPath: string, fallback?: React.ComponentType): React.LazyExoticComponent<any> {
+  createLazyComponent(
+    componentPath: string,
+    fallback?: React.ComponentType
+  ): React.LazyExoticComponent<any> {
     const LazyComponent = React.lazy(() => import(componentPath));
 
     return LazyComponent;
@@ -387,13 +391,13 @@ export const ${componentName} = (props) => (
    */
   checkPerformanceBudget(): {
     passed: boolean;
-    results: Array<{ metric: string; value: number; budget: number; passed: boolean }>;
+    results: { metric: string; value: number; budget: number; passed: boolean }[];
   } {
     const budgets = {
       totalBundleSize: 500 * 1024, // 500KB
-      mainChunkSize: 250 * 1024,   // 250KB
-      vendorChunkSize: 300 * 1024,  // 300KB
-      cssSize: 50 * 1024,          // 50KB
+      mainChunkSize: 250 * 1024, // 250KB
+      vendorChunkSize: 300 * 1024, // 300KB
+      cssSize: 50 * 1024, // 50KB
     };
 
     const results = [];
@@ -403,9 +407,9 @@ export const ${componentName} = (props) => (
     for (const [metric, budget] of Object.entries(budgets)) {
       const currentValue = this.getCurrentBundleSize(metric);
       const passed = currentValue <= budget;
-      
+
       if (!passed) allPassed = false;
-      
+
       results.push({
         metric,
         value: currentValue,
@@ -446,10 +450,9 @@ export const ${componentName} = (props) => (
       performanceBudget: budgetCheck,
       recommendations,
       componentUsage: Array.from(this.componentUsageStats.entries())
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 20), // Top 20 most used components
-      chunkLoadTimes: Array.from(this.chunkLoadTimes.entries())
-        .sort(([,a], [,b]) => b - a),
+      chunkLoadTimes: Array.from(this.chunkLoadTimes.entries()).sort(([, a], [, b]) => b - a),
       lazyLoadConfigs: Array.from(this.lazyComponents.entries()),
       estimatedSavings: recommendations.reduce((sum, r) => sum + r.estimatedSavings, 0),
     };
@@ -463,7 +466,7 @@ export const ${componentName} = (props) => (
       console.log('🚀 Applying automatic bundle optimizations...');
 
       const recommendations = await this.analyzeBundleOptimization();
-      
+
       // Apply low-risk optimizations automatically
       for (const rec of recommendations) {
         if (rec.impact === 'low' && rec.type === 'preload') {
@@ -475,7 +478,6 @@ export const ${componentName} = (props) => (
       this.optimizeLazyLoadingThresholds();
 
       console.log('✅ Automatic optimizations applied');
-
     } catch (error) {
       console.error('❌ Error applying automatic optimizations:', error);
       sentryService.captureException(error);
@@ -500,14 +502,14 @@ export const ${componentName} = (props) => (
   private optimizeLazyLoadingThresholds(): void {
     for (const [component, config] of this.lazyComponents.entries()) {
       const usage = this.componentUsageStats.get(component) || 0;
-      
+
       // Adjust threshold based on usage frequency
       if (usage > 100) {
         config.threshold = Math.max(0.05, config.threshold * 0.8); // Load earlier
       } else if (usage < 10) {
         config.threshold = Math.min(0.5, config.threshold * 1.2); // Load later
       }
-      
+
       this.lazyComponents.set(component, config);
     }
   }
@@ -531,9 +533,9 @@ export const ${componentName} = (props) => (
     return total / this.chunkLoadTimes.size;
   }
 
-  private getMostUsedComponents(count: number): Array<{ name: string; usage: number }> {
+  private getMostUsedComponents(count: number): { name: string; usage: number }[] {
     return Array.from(this.componentUsageStats.entries())
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, count)
       .map(([name, usage]) => ({ name, usage }));
   }

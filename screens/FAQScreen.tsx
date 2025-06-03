@@ -1,3 +1,5 @@
+import { useNavigation, ParamListBase, NavigationProp } from '@react-navigation/native';
+import { Timestamp } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,14 +10,13 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation, ParamListBase, NavigationProp } from '@react-navigation/native';
-import QuestionSubmissionForm from '../atomic/molecules/forms/QuestionSubmissionForm';
-import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
-import { Timestamp } from 'firebase/firestore';
-import { useLanguage } from '../contexts/LanguageContext';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleTouchableOpacity } from '../atomic/atoms/AccessibleTouchableOpacity';
+import QuestionSubmissionForm from '../atomic/molecules/forms/QuestionSubmissionForm';
+import { useLanguage } from '../contexts/LanguageContext';
+import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 
 // Define navigation params for type safety
 type RootStackParamList = ParamListBase & {
@@ -189,7 +190,7 @@ const FAQScreen = (): JSX.Element => {
 
     // Replace Privacy Policy with clickable link
     let parts = text.split(privacyPolicyRegex);
-    let result: (string | JSX.Element)[] = [];
+    const result: (string | JSX.Element)[] = [];
 
     for (let i = 0; i < parts.length; i++) {
       result.push(parts[i]);
@@ -200,7 +201,7 @@ const FAQScreen = (): JSX.Element => {
             style={styles.link}
             type="bodyStd"
             onPress={() => navigation.navigate('LegalScreen', { type: 'privacy-policy' })}
-            accessible={true}
+            accessible
             accessibilityRole="link"
             accessibilityLabel={t('legal.privacy_policy')}
             accessibilityHint={t('faq.accessibility.linkHint')}
@@ -223,17 +224,17 @@ const FAQScreen = (): JSX.Element => {
 
     // Replace Terms of Service with clickable link
     parts = combinedText.split(termsOfServiceRegex);
-    let finalResult: (string | JSX.Element)[] = [];
+    const finalResult: (string | JSX.Element)[] = [];
 
     for (let i = 0; i < parts.length; i++) {
       if (typeof parts[i] === 'string') {
         // Process each part to replace Privacy Policy placeholders with the actual components
-        let subParts = parts[i].split('Privacy Policy');
+        const subParts = parts[i].split('Privacy Policy');
         for (let j = 0; j < subParts.length; j++) {
           finalResult.push(subParts[j]);
           if (j < subParts.length - 1) {
             // Find the corresponding Privacy Policy component
-            let privacyIndex = result.findIndex(
+            const privacyIndex = result.findIndex(
               (item, idx) => typeof item !== 'string' && idx > finalResult.length - 1
             );
             if (privacyIndex !== -1) {
@@ -250,7 +251,7 @@ const FAQScreen = (): JSX.Element => {
             style={styles.link}
             type="bodyStd"
             onPress={() => navigation.navigate('LegalScreen', { type: 'terms-of-service' })}
-            accessible={true}
+            accessible
             accessibilityRole="link"
             accessibilityLabel={t('legal.terms_of_service')}
             accessibilityHint={t('faq.accessibility.linkHint')}

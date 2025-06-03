@@ -3,11 +3,27 @@
 // Advanced March Madness and College Basketball Predictions
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
-import { NCAATeam, NCAAPlayer, NCAAGame, MarchMadnessBracket } from './ncaaBasketballDataSyncService';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+
 import { NCAATeamAnalytics, NCAAPlayerAnalytics } from './ncaaBasketballAnalyticsService';
+import {
+  NCAATeam,
+  NCAAPlayer,
+  NCAAGame,
+  MarchMadnessBracket,
+} from './ncaaBasketballDataSyncService';
+import { firestore as db } from '../../config/firebase';
 
 // NCAA Basketball ML Prediction interfaces
 export interface NCAAGamePrediction {
@@ -16,12 +32,12 @@ export interface NCAAGamePrediction {
   awayTeam: string;
   gameDate: Date;
   seasonType: 'Regular Season' | 'Conference Tournament' | 'March Madness' | 'NIT' | 'CBI';
-  
+
   // Primary Predictions
   winProbability: number; // Home team win probability (0-1)
   spreadPrediction: number; // Predicted point spread (positive = home favored)
   totalPointsPrediction: number; // Predicted total points
-  
+
   // March Madness Specific
   marchMadnessMetrics?: {
     upsetPotential: number; // Probability of upset if higher seed vs lower seed
@@ -30,7 +46,7 @@ export interface NCAAGamePrediction {
     viewershipPrediction: number; // Expected TV viewership
     buzzerBeaterProbability: number; // Close game probability
   };
-  
+
   // Confidence Metrics
   confidence: {
     overall: number; // Overall prediction confidence (0-1)
@@ -38,7 +54,7 @@ export interface NCAAGamePrediction {
     total: number; // Total points prediction confidence
     upset: number; // Upset prediction confidence (if applicable)
   };
-  
+
   // Advanced Predictions
   advancedPredictions: {
     marginOfVictory: number; // Predicted margin for winning team
@@ -49,7 +65,7 @@ export interface NCAAGamePrediction {
     halfTimeLeader: 'home' | 'away' | 'tied';
     finalMinuteDrama: number; // Game decided in final minute probability
   };
-  
+
   // Player Performance Predictions
   playerPredictions: {
     homeTeam: NCAAPlayerGamePrediction[];
@@ -60,7 +76,7 @@ export interface NCAAGamePrediction {
       gameChangingProbability: number;
     }[];
   };
-  
+
   // Situational Factors
   situationalFactors: {
     neutralSite: boolean;
@@ -73,7 +89,7 @@ export interface NCAAGamePrediction {
     coachingFactor: number; // March Madness coaching experience
     crowdFactor: number; // Crowd noise and atmosphere impact
   };
-  
+
   // March Madness Context
   tournamentContext?: {
     round: string;
@@ -86,7 +102,7 @@ export interface NCAAGamePrediction {
     };
     stakesLevel: number; // Championship implications (1-10)
   };
-  
+
   // Model Performance
   modelMetrics: {
     modelVersion: string;
@@ -96,7 +112,7 @@ export interface NCAAGamePrediction {
     lastTrainingDate: Date;
     predictionDate: Date;
   };
-  
+
   lastUpdated: Date;
 }
 
@@ -104,7 +120,7 @@ export interface NCAAPlayerGamePrediction {
   playerId: string;
   name: string;
   position: string;
-  
+
   // Basic Stats Predictions
   predictions: {
     minutes: number;
@@ -119,14 +135,14 @@ export interface NCAAPlayerGamePrediction {
     threePointPercentage: number;
     freeThrowPercentage: number;
   };
-  
+
   // Confidence Intervals
   confidence: {
     points: { low: number; high: number };
     rebounds: { low: number; high: number };
     assists: { low: number; high: number };
   };
-  
+
   // March Madness Factors
   tournamentFactors: {
     pressureHandling: number; // How well they handle big game pressure
@@ -140,7 +156,7 @@ export interface NCAAPlayerGamePrediction {
 export interface MarchMadnessBracketPrediction {
   year: number;
   lastUpdated: Date;
-  
+
   // Regional Predictions
   regionalPredictions: {
     [regionName: string]: {
@@ -165,7 +181,7 @@ export interface MarchMadnessBracketPrediction {
       }[];
     };
   };
-  
+
   // Final Four Predictions
   finalFourPredictions: {
     teams: {
@@ -186,7 +202,7 @@ export interface MarchMadnessBracketPrediction {
       surprises: string[];
     };
   };
-  
+
   // Championship Predictions
   championshipPredictions: {
     favorites: {
@@ -207,7 +223,7 @@ export interface MarchMadnessBracketPrediction {
       confidence: number;
     };
   };
-  
+
   // Simulation Results
   simulationResults: {
     totalSimulations: number;
@@ -248,7 +264,7 @@ export interface NCAAMLFeatures {
     momentumRating: number;
     intangibles: number;
   };
-  
+
   awayTeamStrength: {
     kenpomRating: number;
     netRating: number;
@@ -276,7 +292,7 @@ export interface NCAAMLFeatures {
     momentumRating: number;
     intangibles: number;
   };
-  
+
   // March Madness Specific Features (15 features)
   tournamentFactors: {
     homeTeamSeed: number;
@@ -295,7 +311,7 @@ export interface NCAAMLFeatures {
     chalkAdvantage: number;
     intangibleFactors: number;
   };
-  
+
   // Matchup Features (15 features)
   matchupMetrics: {
     paceMatchup: number;
@@ -314,7 +330,7 @@ export interface NCAAMLFeatures {
     clutchMatchup: number;
     intangibleMatchup: number;
   };
-  
+
   // Situational Features (10 features)
   situationalContext: {
     daysRest: number;
@@ -328,7 +344,7 @@ export interface NCAAMLFeatures {
     weatherConditions: number;
     arenaAtmosphere: number;
   };
-  
+
   // Historical Features (10 features)
   historicalContext: {
     headToHeadRecord: number;
@@ -347,7 +363,7 @@ export interface NCAAMLFeatures {
 export class NCAABasketballMLPredictionService {
   private readonly modelVersion = '2.0';
   private readonly featuresCount = 75;
-  
+
   constructor() {
     // Initialize ML prediction service
   }
@@ -365,18 +381,25 @@ export class NCAABasketballMLPredictionService {
 
       // Load pre-trained models
       await this.loadModels();
-      
+
       console.log('NCAA Basketball ML Prediction Service initialized successfully');
     } catch (error) {
       Sentry.captureException(error);
-      throw new Error(`Failed to initialize NCAA Basketball ML Prediction Service: ${error.message}`);
+      throw new Error(
+        `Failed to initialize NCAA Basketball ML Prediction Service: ${error.message}`
+      );
     }
   }
 
   /**
    * Predict NCAA Basketball game outcome with March Madness focus
    */
-  async predictGame(homeTeamId: string, awayTeamId: string, gameDate: Date, tournamentInfo?: any): Promise<NCAAGamePrediction> {
+  async predictGame(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date,
+    tournamentInfo?: any
+  ): Promise<NCAAGamePrediction> {
     try {
       Sentry.addBreadcrumb({
         message: `Predicting NCAA game: ${homeTeamId} vs ${awayTeamId}`,
@@ -385,25 +408,34 @@ export class NCAABasketballMLPredictionService {
       });
 
       // Extract comprehensive features
-      const features = await this.extractMLFeatures(homeTeamId, awayTeamId, gameDate, tournamentInfo);
-      
+      const features = await this.extractMLFeatures(
+        homeTeamId,
+        awayTeamId,
+        gameDate,
+        tournamentInfo
+      );
+
       // Generate base predictions using ML models
       const basePredictions = await this.generateBasePredictions(features);
-      
+
       // Apply March Madness specific modeling if applicable
-      const tournamentAdjustments = tournamentInfo ? 
-        await this.applyTournamentAdjustments(features, basePredictions, tournamentInfo) : 
-        {};
-      
+      const tournamentAdjustments = tournamentInfo
+        ? await this.applyTournamentAdjustments(features, basePredictions, tournamentInfo)
+        : {};
+
       // Generate advanced predictions
       const advancedPredictions = await this.generateAdvancedPredictions(features, basePredictions);
-      
+
       // Generate player predictions
-      const playerPredictions = await this.generatePlayerPredictions(homeTeamId, awayTeamId, features);
-      
+      const playerPredictions = await this.generatePlayerPredictions(
+        homeTeamId,
+        awayTeamId,
+        features
+      );
+
       // Calculate confidence metrics
       const confidence = await this.calculatePredictionConfidence(features, basePredictions);
-      
+
       // Compile final prediction
       const prediction: NCAAGamePrediction = {
         gameId: `${homeTeamId}_${awayTeamId}_${gameDate.getTime()}`,
@@ -414,12 +446,20 @@ export class NCAABasketballMLPredictionService {
         winProbability: basePredictions.winProbability,
         spreadPrediction: basePredictions.spread,
         totalPointsPrediction: basePredictions.total,
-        marchMadnessMetrics: tournamentInfo ? await this.calculateMarchMadnessMetrics(features, basePredictions) : undefined,
+        marchMadnessMetrics: tournamentInfo
+          ? await this.calculateMarchMadnessMetrics(features, basePredictions)
+          : undefined,
         confidence,
         advancedPredictions,
         playerPredictions,
-        situationalFactors: await this.calculateSituationalFactors(homeTeamId, awayTeamId, gameDate),
-        tournamentContext: tournamentInfo ? await this.calculateTournamentContext(tournamentInfo, features) : undefined,
+        situationalFactors: await this.calculateSituationalFactors(
+          homeTeamId,
+          awayTeamId,
+          gameDate
+        ),
+        tournamentContext: tournamentInfo
+          ? await this.calculateTournamentContext(tournamentInfo, features)
+          : undefined,
         modelMetrics: {
           modelVersion: this.modelVersion,
           featuresUsed: this.featuresCount,
@@ -437,7 +477,6 @@ export class NCAABasketballMLPredictionService {
 
       console.log(`Generated prediction for NCAA game: ${homeTeamId} vs ${awayTeamId}`);
       return prediction;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to predict NCAA game: ${error.message}`);
@@ -463,16 +502,16 @@ export class NCAABasketballMLPredictionService {
 
       // Run comprehensive tournament simulation
       const simulation = await this.runTournamentSimulation(bracket, year);
-      
+
       // Generate regional predictions
       const regionalPredictions = await this.generateRegionalPredictions(bracket, simulation);
-      
+
       // Generate Final Four predictions
       const finalFourPredictions = await this.generateFinalFourPredictions(simulation);
-      
+
       // Generate championship predictions
       const championshipPredictions = await this.generateChampionshipPredictions(simulation);
-      
+
       // Compile simulation results
       const simulationResults = this.compileSimulationResults(simulation);
 
@@ -491,7 +530,6 @@ export class NCAABasketballMLPredictionService {
 
       console.log(`Generated March Madness bracket prediction for ${year}`);
       return bracketPrediction;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to predict March Madness bracket: ${error.message}`);
@@ -501,10 +539,15 @@ export class NCAABasketballMLPredictionService {
   /**
    * Extract comprehensive ML features for NCAA Basketball prediction
    */
-  async extractMLFeatures(homeTeamId: string, awayTeamId: string, gameDate: Date, tournamentInfo?: any): Promise<NCAAMLFeatures> {
+  async extractMLFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date,
+    tournamentInfo?: any
+  ): Promise<NCAAMLFeatures> {
     try {
       const currentSeason = gameDate.getFullYear();
-      
+
       // Get team analytics
       const [homeTeamAnalytics, awayTeamAnalytics] = await Promise.all([
         this.getTeamAnalytics(homeTeamId, currentSeason),
@@ -519,14 +562,17 @@ export class NCAABasketballMLPredictionService {
       const features: NCAAMLFeatures = {
         homeTeamStrength: this.extractTeamStrengthFeatures(homeTeamAnalytics, 'home'),
         awayTeamStrength: this.extractTeamStrengthFeatures(awayTeamAnalytics, 'away'),
-        tournamentFactors: await this.extractTournamentFeatures(homeTeamId, awayTeamId, tournamentInfo),
+        tournamentFactors: await this.extractTournamentFeatures(
+          homeTeamId,
+          awayTeamId,
+          tournamentInfo
+        ),
         matchupMetrics: await this.calculateMatchupFeatures(homeTeamAnalytics, awayTeamAnalytics),
         situationalContext: await this.extractSituationalFeatures(homeTeamId, awayTeamId, gameDate),
         historicalContext: await this.extractHistoricalFeatures(homeTeamId, awayTeamId, gameDate),
       };
 
       return features;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to extract ML features: ${error.message}`);
@@ -536,7 +582,11 @@ export class NCAABasketballMLPredictionService {
   /**
    * Run Monte Carlo simulation for March Madness tournament
    */
-  async runTournamentSimulation(bracket: MarchMadnessBracket, year: number, simulations: number = 10000): Promise<any> {
+  async runTournamentSimulation(
+    bracket: MarchMadnessBracket,
+    year: number,
+    simulations: number = 10000
+  ): Promise<any> {
     try {
       Sentry.addBreadcrumb({
         message: `Running ${simulations} tournament simulations`,
@@ -557,7 +607,7 @@ export class NCAABasketballMLPredictionService {
 
       for (let sim = 0; sim < simulations; sim++) {
         const simulationResult = await this.simulateSingleTournament(bracket, year);
-        
+
         // Aggregate results
         this.aggregateSimulationResults(results, simulationResult);
       }
@@ -566,7 +616,6 @@ export class NCAABasketballMLPredictionService {
       this.convertCountsToProbabilities(results, simulations);
 
       return results;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Tournament simulation failed: ${error.message}`);
@@ -617,7 +666,7 @@ export class NCAABasketballMLPredictionService {
     // Create matchups for each round
     const teams = regionData.teams.slice(); // Copy array
     let currentRound = 'Round of 64';
-    
+
     while (teams.length > 1) {
       const roundResults: { [gameId: string]: string } = {};
       const nextRoundTeams = [];
@@ -627,13 +676,13 @@ export class NCAABasketballMLPredictionService {
         if (i + 1 < teams.length) {
           const team1 = teams[i];
           const team2 = teams[i + 1];
-          
+
           const gameId = `${regionName}_${currentRound}_${team1.teamId}_${team2.teamId}`;
           const winner = await this.simulateGame(team1.teamId, team2.teamId, year);
-          
+
           roundResults[gameId] = winner;
           nextRoundTeams.push(teams.find(t => t.teamId === winner));
-          
+
           // Check for upset
           if (team1.seed > team2.seed && winner === team1.teamId) {
             result.upsets.push({
@@ -655,7 +704,7 @@ export class NCAABasketballMLPredictionService {
 
       result.rounds[currentRound] = roundResults;
       teams.splice(0, teams.length, ...nextRoundTeams);
-      
+
       // Move to next round
       currentRound = this.getNextRound(currentRound);
     }
@@ -675,7 +724,7 @@ export class NCAABasketballMLPredictionService {
     // Simulate semifinals
     const finalist1 = await this.simulateGame(teams[0], teams[1], year);
     const finalist2 = await this.simulateGame(teams[2], teams[3], year);
-    
+
     // Simulate championship
     const champion = await this.simulateGame(finalist1, finalist2, year);
 
@@ -692,11 +741,10 @@ export class NCAABasketballMLPredictionService {
     try {
       // Get basic prediction
       const prediction = await this.predictGame(team1Id, team2Id, new Date(), null);
-      
+
       // Use win probability to determine winner
       const random = Math.random();
       return random < prediction.winProbability ? team1Id : team2Id;
-      
     } catch (error) {
       // Fallback to random selection if prediction fails
       return Math.random() < 0.5 ? team1Id : team2Id;
@@ -706,7 +754,7 @@ export class NCAABasketballMLPredictionService {
   /**
    * Helper methods for calculations
    */
-  
+
   private async loadModels(): Promise<void> {
     // Placeholder for model loading
     console.log('Loading NCAA Basketball ML models...');
@@ -715,26 +763,31 @@ export class NCAABasketballMLPredictionService {
   private async generateBasePredictions(features: NCAAMLFeatures): Promise<any> {
     // Simplified prediction logic for college basketball
     const homeAdvantage = 0.55; // College home advantage
-    const strengthDiff = features.homeTeamStrength.netEfficiency - features.awayTeamStrength.netEfficiency;
-    
+    const strengthDiff =
+      features.homeTeamStrength.netEfficiency - features.awayTeamStrength.netEfficiency;
+
     // Win probability calculation with college-specific factors
-    let winProbability = homeAdvantage + (strengthDiff / 1000);
-    
+    let winProbability = homeAdvantage + strengthDiff / 1000;
+
     // Adjust for tournament factors if applicable
     if (features.tournamentFactors.homeTeamSeed > 0) {
-      const seedAdj = (features.tournamentFactors.awayTeamSeed - features.tournamentFactors.homeTeamSeed) * 0.05;
+      const seedAdj =
+        (features.tournamentFactors.awayTeamSeed - features.tournamentFactors.homeTeamSeed) * 0.05;
       winProbability += seedAdj;
     }
-    
+
     winProbability = Math.max(0.05, Math.min(0.95, winProbability));
-    
+
     // Spread calculation
     const spread = strengthDiff / 3.0;
-    
+
     // Total calculation
-    const avgEfficiency = (features.homeTeamStrength.adjustedOffensiveEfficiency + features.awayTeamStrength.adjustedOffensiveEfficiency) / 2;
+    const avgEfficiency =
+      (features.homeTeamStrength.adjustedOffensiveEfficiency +
+        features.awayTeamStrength.adjustedOffensiveEfficiency) /
+      2;
     const totalPrediction = avgEfficiency * 2; // Rough total calculation
-    
+
     return {
       winProbability,
       spread,
@@ -742,18 +795,26 @@ export class NCAABasketballMLPredictionService {
     };
   }
 
-  private determineSeasonType(gameDate: Date, tournamentInfo?: any): 'Regular Season' | 'Conference Tournament' | 'March Madness' | 'NIT' | 'CBI' {
+  private determineSeasonType(
+    gameDate: Date,
+    tournamentInfo?: any
+  ): 'Regular Season' | 'Conference Tournament' | 'March Madness' | 'NIT' | 'CBI' {
     if (tournamentInfo) {
-      return tournamentInfo.tournamentName === 'March Madness' ? 'March Madness' : 'Conference Tournament';
+      return tournamentInfo.tournamentName === 'March Madness'
+        ? 'March Madness'
+        : 'Conference Tournament';
     }
-    
+
     const month = gameDate.getMonth() + 1;
     if (month >= 11 || month <= 2) return 'Regular Season';
     if (month === 3 && gameDate.getDate() < 15) return 'Conference Tournament';
     return 'March Madness';
   }
 
-  private extractTeamStrengthFeatures(analytics: NCAATeamAnalytics, homeAway: 'home' | 'away'): any {
+  private extractTeamStrengthFeatures(
+    analytics: NCAATeamAnalytics,
+    homeAway: 'home' | 'away'
+  ): any {
     return {
       kenpomRating: analytics.collegeBasketballMetrics.kenpomRating,
       netRating: analytics.collegeBasketballMetrics.netRating,
@@ -762,17 +823,38 @@ export class NCAABasketballMLPredictionService {
       adjustedOffensiveEfficiency: analytics.offensiveMetrics.adjustedOffensiveEfficiency,
       adjustedDefensiveEfficiency: analytics.defensiveMetrics.adjustedDefensiveEfficiency,
       netEfficiency: analytics.advancedMetrics.netEfficiency,
-      recentForm: analytics.situationalMetrics.versusRankedTeams.wins / Math.max(1, analytics.situationalMetrics.versusRankedTeams.wins + analytics.situationalMetrics.versusRankedTeams.losses),
-      quadrant1Record: analytics.collegeBasketballMetrics.quadrantRecord.q1.wins / Math.max(1, analytics.collegeBasketballMetrics.quadrantRecord.q1.wins + analytics.collegeBasketballMetrics.quadrantRecord.q1.losses),
+      recentForm:
+        analytics.situationalMetrics.versusRankedTeams.wins /
+        Math.max(
+          1,
+          analytics.situationalMetrics.versusRankedTeams.wins +
+            analytics.situationalMetrics.versusRankedTeams.losses
+        ),
+      quadrant1Record:
+        analytics.collegeBasketballMetrics.quadrantRecord.q1.wins /
+        Math.max(
+          1,
+          analytics.collegeBasketballMetrics.quadrantRecord.q1.wins +
+            analytics.collegeBasketballMetrics.quadrantRecord.q1.losses
+        ),
       qualityWins: analytics.collegeBasketballMetrics.qualityWins,
       badLosses: analytics.collegeBasketballMetrics.badLosses,
-      conferenceRecord: homeAway === 'home' ? analytics.situationalMetrics.homeCourtAdvantage : analytics.situationalMetrics.roadPerformance,
+      conferenceRecord:
+        homeAway === 'home'
+          ? analytics.situationalMetrics.homeCourtAdvantage
+          : analytics.situationalMetrics.roadPerformance,
       awayRecord: analytics.situationalMetrics.roadPerformance,
       neutralSiteRecord: analytics.situationalMetrics.neutralSitePerformance,
       versusTop25: analytics.situationalMetrics.versusRankedTeams.avgMargin,
       clutchPerformance: analytics.advancedMetrics.clutchPerformance,
       comebackRecord: analytics.situationalMetrics.comebackRecord,
-      blowoutRecord: analytics.situationalMetrics.blowoutRecord.wins / Math.max(1, analytics.situationalMetrics.blowoutRecord.wins + analytics.situationalMetrics.blowoutRecord.losses),
+      blowoutRecord:
+        analytics.situationalMetrics.blowoutRecord.wins /
+        Math.max(
+          1,
+          analytics.situationalMetrics.blowoutRecord.wins +
+            analytics.situationalMetrics.blowoutRecord.losses
+        ),
       experienceRating: analytics.advancedMetrics.experienceRating,
       coachingRating: analytics.advancedMetrics.coachingEffectiveness,
       benchDepth: analytics.advancedMetrics.benchDepth,
@@ -784,7 +866,14 @@ export class NCAABasketballMLPredictionService {
   }
 
   private getNextRound(currentRound: string): string {
-    const rounds = ['Round of 64', 'Round of 32', 'Sweet 16', 'Elite Eight', 'Final Four', 'Championship'];
+    const rounds = [
+      'Round of 64',
+      'Round of 32',
+      'Sweet 16',
+      'Elite Eight',
+      'Final Four',
+      'Championship',
+    ];
     const currentIndex = rounds.indexOf(currentRound);
     return currentIndex < rounds.length - 1 ? rounds[currentIndex + 1] : 'Championship';
   }
@@ -793,7 +882,8 @@ export class NCAABasketballMLPredictionService {
     // Aggregate regional champions
     for (const [region, champion] of Object.entries(simulation.regionalChampions)) {
       if (!results.regionalChampions[region]) results.regionalChampions[region] = {};
-      results.regionalChampions[region][champion as string] = (results.regionalChampions[region][champion as string] || 0) + 1;
+      results.regionalChampions[region][champion as string] =
+        (results.regionalChampions[region][champion as string] || 0) + 1;
     }
 
     // Aggregate Final Four
@@ -840,11 +930,14 @@ export class NCAABasketballMLPredictionService {
   /**
    * Data retrieval helpers and placeholder implementations
    */
-  
-  private async getTeamAnalytics(teamId: string, season: number): Promise<NCAATeamAnalytics | null> {
+
+  private async getTeamAnalytics(
+    teamId: string,
+    season: number
+  ): Promise<NCAATeamAnalytics | null> {
     try {
       const analyticsDoc = await getDoc(doc(db, 'ncaa_team_analytics', `${teamId}_${season}`));
-      return analyticsDoc.exists() ? analyticsDoc.data() as NCAATeamAnalytics : null;
+      return analyticsDoc.exists() ? (analyticsDoc.data() as NCAATeamAnalytics) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -854,7 +947,7 @@ export class NCAABasketballMLPredictionService {
   private async getCurrentBracket(year: number): Promise<MarchMadnessBracket | null> {
     try {
       const bracketDoc = await getDoc(doc(db, 'march_madness_brackets', year.toString()));
-      return bracketDoc.exists() ? bracketDoc.data() as MarchMadnessBracket : null;
+      return bracketDoc.exists() ? (bracketDoc.data() as MarchMadnessBracket) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -862,32 +955,108 @@ export class NCAABasketballMLPredictionService {
   }
 
   // Placeholder implementations for complex calculations
-  private async applyTournamentAdjustments(features: NCAAMLFeatures, predictions: any, tournamentInfo: any): Promise<any> { return {}; }
-  private async generateAdvancedPredictions(features: NCAAMLFeatures, basePredictions: any): Promise<any> { return {}; }
-  private async generatePlayerPredictions(homeTeamId: string, awayTeamId: string, features: NCAAMLFeatures): Promise<any> { return { homeTeam: [], awayTeam: [] }; }
-  private async calculatePredictionConfidence(features: NCAAMLFeatures, predictions: any): Promise<any> { return { overall: 0.75, spread: 0.75, total: 0.7, upset: 0.6 }; }
-  private async calculateMarchMadnessMetrics(features: NCAAMLFeatures, predictions: any): Promise<any> { return {}; }
-  private async calculateSituationalFactors(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<any> { return {}; }
-  private async calculateTournamentContext(tournamentInfo: any, features: NCAAMLFeatures): Promise<any> { return {}; }
-  private async extractTournamentFeatures(homeTeamId: string, awayTeamId: string, tournamentInfo: any): Promise<any> { return {}; }
-  private async calculateMatchupFeatures(homeAnalytics: NCAATeamAnalytics, awayAnalytics: NCAATeamAnalytics): Promise<any> { return {}; }
-  private async extractSituationalFeatures(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<any> { return {}; }
-  private async extractHistoricalFeatures(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<any> { return {}; }
-  private async generateRegionalPredictions(bracket: MarchMadnessBracket, simulation: any): Promise<any> { return {}; }
-  private async generateFinalFourPredictions(simulation: any): Promise<any> { return {}; }
-  private async generateChampionshipPredictions(simulation: any): Promise<any> { return {}; }
-  private compileSimulationResults(simulation: any): any { return {}; }
-  private async getTournamentModelAccuracy(): Promise<number> { return 0.72; }
-  private async getRegularSeasonModelAccuracy(): Promise<number> { return 0.68; }
+  private async applyTournamentAdjustments(
+    features: NCAAMLFeatures,
+    predictions: any,
+    tournamentInfo: any
+  ): Promise<any> {
+    return {};
+  }
+  private async generateAdvancedPredictions(
+    features: NCAAMLFeatures,
+    basePredictions: any
+  ): Promise<any> {
+    return {};
+  }
+  private async generatePlayerPredictions(
+    homeTeamId: string,
+    awayTeamId: string,
+    features: NCAAMLFeatures
+  ): Promise<any> {
+    return { homeTeam: [], awayTeam: [] };
+  }
+  private async calculatePredictionConfidence(
+    features: NCAAMLFeatures,
+    predictions: any
+  ): Promise<any> {
+    return { overall: 0.75, spread: 0.75, total: 0.7, upset: 0.6 };
+  }
+  private async calculateMarchMadnessMetrics(
+    features: NCAAMLFeatures,
+    predictions: any
+  ): Promise<any> {
+    return {};
+  }
+  private async calculateSituationalFactors(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<any> {
+    return {};
+  }
+  private async calculateTournamentContext(
+    tournamentInfo: any,
+    features: NCAAMLFeatures
+  ): Promise<any> {
+    return {};
+  }
+  private async extractTournamentFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    tournamentInfo: any
+  ): Promise<any> {
+    return {};
+  }
+  private async calculateMatchupFeatures(
+    homeAnalytics: NCAATeamAnalytics,
+    awayAnalytics: NCAATeamAnalytics
+  ): Promise<any> {
+    return {};
+  }
+  private async extractSituationalFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<any> {
+    return {};
+  }
+  private async extractHistoricalFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<any> {
+    return {};
+  }
+  private async generateRegionalPredictions(
+    bracket: MarchMadnessBracket,
+    simulation: any
+  ): Promise<any> {
+    return {};
+  }
+  private async generateFinalFourPredictions(simulation: any): Promise<any> {
+    return {};
+  }
+  private async generateChampionshipPredictions(simulation: any): Promise<any> {
+    return {};
+  }
+  private compileSimulationResults(simulation: any): any {
+    return {};
+  }
+  private async getTournamentModelAccuracy(): Promise<number> {
+    return 0.72;
+  }
+  private async getRegularSeasonModelAccuracy(): Promise<number> {
+    return 0.68;
+  }
 
   /**
    * Public utility methods
    */
-  
+
   async getPrediction(gameId: string): Promise<NCAAGamePrediction | null> {
     try {
       const predictionDoc = await getDoc(doc(db, 'ncaa_predictions', gameId));
-      return predictionDoc.exists() ? predictionDoc.data() as NCAAGamePrediction : null;
+      return predictionDoc.exists() ? (predictionDoc.data() as NCAAGamePrediction) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -896,8 +1065,12 @@ export class NCAABasketballMLPredictionService {
 
   async getBracketPrediction(year: number): Promise<MarchMadnessBracketPrediction | null> {
     try {
-      const predictionDoc = await getDoc(doc(db, 'march_madness_bracket_predictions', year.toString()));
-      return predictionDoc.exists() ? predictionDoc.data() as MarchMadnessBracketPrediction : null;
+      const predictionDoc = await getDoc(
+        doc(db, 'march_madness_bracket_predictions', year.toString())
+      );
+      return predictionDoc.exists()
+        ? (predictionDoc.data() as MarchMadnessBracketPrediction)
+        : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -910,7 +1083,7 @@ export class NCAABasketballMLPredictionService {
       if (!bracketPrediction) return [];
 
       const upsets: any[] = [];
-      
+
       for (const region of Object.values(bracketPrediction.regionalPredictions)) {
         upsets.push(...region.upsets.filter(upset => upset.upsetProbability >= minProbability));
       }
@@ -928,7 +1101,7 @@ export class NCAABasketballMLPredictionService {
       if (!bracketPrediction) return [];
 
       const cinderellas: any[] = [];
-      
+
       for (const region of Object.values(bracketPrediction.regionalPredictions)) {
         cinderellas.push(...region.sleepers.filter(sleeper => sleeper.seed >= 11));
       }
@@ -945,8 +1118,9 @@ export class NCAABasketballMLPredictionService {
       const bracketPrediction = await this.getBracketPrediction(year);
       if (!bracketPrediction) return [];
 
-      return bracketPrediction.championshipPredictions.favorites
-        .sort((a, b) => b.probability - a.probability);
+      return bracketPrediction.championshipPredictions.favorites.sort(
+        (a, b) => b.probability - a.probability
+      );
     } catch (error) {
       Sentry.captureException(error);
       return [];

@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '../hooks/useThemeColor';
@@ -15,12 +16,12 @@ interface ConflictResolutionModalProps {
    * Whether the modal is visible
    */
   visible: boolean;
-  
+
   /**
    * Callback when the modal is closed
    */
   onClose: () => void;
-  
+
   /**
    * Callback when all conflicts are resolved
    */
@@ -33,34 +34,34 @@ interface ConflictResolutionModalProps {
 const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
   visible,
   onClose,
-  onAllResolved
+  onAllResolved,
 }) => {
   const [conflicts, setConflicts] = useState<EntityData[]>([]);
   const [selectedConflict, setSelectedConflict] = useState<EntityData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = '#0a7ea4';
-  
+
   // Load conflicts when modal becomes visible
   useEffect(() => {
     if (visible) {
       loadConflicts();
     }
   }, [visible]);
-  
+
   /**
    * Load conflicts
    */
   const loadConflicts = async () => {
     setLoading(true);
-    
+
     try {
       const conflicts = await dataSyncService.getConflicts();
       setConflicts(conflicts);
-      
+
       if (conflicts.length > 0) {
         setSelectedConflict(conflicts[0]);
       } else {
@@ -72,7 +73,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
       setLoading(false);
     }
   };
-  
+
   /**
    * Resolve conflict
    * @param conflict Conflict to resolve
@@ -80,17 +81,17 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
    */
   const resolveConflict = async (conflict: EntityData, strategy: ConflictResolutionStrategy) => {
     setLoading(true);
-    
+
     try {
       await dataSyncService.resolveConflict(conflict, strategy);
-      
+
       // Remove resolved conflict from list
       setConflicts(conflicts.filter(c => c.id !== conflict.id || c.type !== conflict.type));
-      
+
       // Select next conflict
       const nextConflict = conflicts.find(c => c.id !== conflict.id || c.type !== conflict.type);
       setSelectedConflict(nextConflict || null);
-      
+
       // If no more conflicts, call onAllResolved
       if (conflicts.length === 1 && onAllResolved) {
         onAllResolved();
@@ -101,7 +102,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
       setLoading(false);
     }
   };
-  
+
   /**
    * Get entity type display name
    * @param type Entity type
@@ -110,7 +111,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
   const getEntityTypeDisplayName = (type: string): string => {
     return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
   };
-  
+
   /**
    * Format date
    * @param timestamp Timestamp
@@ -119,7 +120,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
   const formatDate = (timestamp: number): string => {
     return new Date(timestamp).toLocaleString();
   };
-  
+
   /**
    * Render conflict list
    */
@@ -132,7 +133,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
         </View>
       );
     }
-    
+
     return (
       <ScrollView style={styles.conflictList}>
         {conflicts.map((conflict, index) => (
@@ -140,9 +141,11 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
             key={`${conflict.type}-${conflict.id}`}
             style={[
               styles.conflictItem,
-              selectedConflict && selectedConflict.id === conflict.id && selectedConflict.type === conflict.type
+              selectedConflict &&
+              selectedConflict.id === conflict.id &&
+              selectedConflict.type === conflict.type
                 ? styles.selectedConflictItem
-                : null
+                : null,
             ]}
             onPress={() => setSelectedConflict(conflict)}
           >
@@ -160,7 +163,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
       </ScrollView>
     );
   };
-  
+
   /**
    * Render conflict details
    */
@@ -173,7 +176,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
         </View>
       );
     }
-    
+
     return (
       <View style={styles.conflictDetails}>
         <View style={styles.conflictHeader}>
@@ -182,7 +185,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
           </ThemedText>
           <ThemedText style={styles.conflictId}>{selectedConflict.id}</ThemedText>
         </View>
-        
+
         <View style={styles.conflictDataContainer}>
           <View style={styles.dataColumn}>
             <ThemedText style={styles.dataColumnTitle}>Local Data</ThemedText>
@@ -198,14 +201,15 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
               </ThemedText>
             </ScrollView>
           </View>
-          
+
           <View style={styles.dataColumn}>
             <ThemedText style={styles.dataColumnTitle}>Server Data</ThemedText>
             <ThemedText style={styles.dataColumnSubtitle}>
               Version: {selectedConflict.conflictData?.version || 'Unknown'}
             </ThemedText>
             <ThemedText style={styles.dataColumnSubtitle}>
-              Modified: {selectedConflict.conflictData?.lastModified
+              Modified:{' '}
+              {selectedConflict.conflictData?.lastModified
                 ? formatDate(selectedConflict.conflictData.lastModified)
                 : 'Unknown'}
             </ThemedText>
@@ -216,26 +220,30 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
             </ScrollView>
           </View>
         </View>
-        
+
         <View style={styles.resolutionOptions}>
           <TouchableOpacity
             style={[styles.resolutionButton, styles.clientButton]}
-            onPress={() => resolveConflict(selectedConflict, ConflictResolutionStrategy.CLIENT_WINS)}
+            onPress={() =>
+              resolveConflict(selectedConflict, ConflictResolutionStrategy.CLIENT_WINS)
+            }
             disabled={loading}
           >
             <Ionicons name="phone-portrait" size={24} color="#fff" />
             <ThemedText style={styles.resolutionButtonText}>Keep Local</ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[styles.resolutionButton, styles.serverButton]}
-            onPress={() => resolveConflict(selectedConflict, ConflictResolutionStrategy.SERVER_WINS)}
+            onPress={() =>
+              resolveConflict(selectedConflict, ConflictResolutionStrategy.SERVER_WINS)
+            }
             disabled={loading}
           >
             <Ionicons name="cloud" size={24} color="#fff" />
             <ThemedText style={styles.resolutionButtonText}>Use Server</ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[styles.resolutionButton, styles.mergeButton]}
             onPress={() => resolveConflict(selectedConflict, ConflictResolutionStrategy.MERGE)}
@@ -248,14 +256,9 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
       </View>
     );
   };
-  
+
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <ThemedView style={styles.modalContent}>
           <View style={styles.modalHeader}>
@@ -264,29 +267,23 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
               <Ionicons name="close" size={24} color={textColor} />
             </TouchableOpacity>
           </View>
-          
+
           <ThemedText style={styles.modalDescription}>
-            These conflicts occurred when syncing data with the server. Please choose how to resolve each conflict.
+            These conflicts occurred when syncing data with the server. Please choose how to resolve
+            each conflict.
           </ThemedText>
-          
+
           <View style={styles.contentContainer}>
             <View style={styles.sidebar}>
-              <ThemedText style={styles.sidebarTitle}>
-                Conflicts ({conflicts.length})
-              </ThemedText>
+              <ThemedText style={styles.sidebarTitle}>Conflicts ({conflicts.length})</ThemedText>
               {renderConflictList()}
             </View>
-            
-            <View style={styles.mainContent}>
-              {renderConflictDetails()}
-            </View>
+
+            <View style={styles.mainContent}>{renderConflictDetails()}</View>
           </View>
-          
+
           <View style={styles.modalFooter}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={onClose}
-            >
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <ThemedText style={styles.closeButtonText}>Close</ThemedText>
             </TouchableOpacity>
           </View>

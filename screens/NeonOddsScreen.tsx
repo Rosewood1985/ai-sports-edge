@@ -1,41 +1,37 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Alert
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { auth } from "../config/firebase";
-import { hasPremiumAccess } from "../services/subscriptionService";
-import useOddsData from "../hooks/useOddsData";
-import LoadingIndicator from "../components/LoadingIndicator";
-import ErrorMessage from "../components/ErrorMessage";
-import EmptyState from "../components/EmptyState";
-import FreemiumFeature from "../components/FreemiumFeature";
-import BlurredPrediction from "../components/BlurredPrediction";
-import DailyFreePick from "../components/DailyFreePick";
-import TrendingBets from "../components/TrendingBets";
-import CommunityPolls from "../components/CommunityPolls";
-import AILeaderboard from "../components/AILeaderboard";
-import NeonGameCard from "../components/NeonGameCard";
-import { 
-  getTrendingBets, 
-  getCommunityPolls, 
+  Alert,
+} from 'react-native';
+
+import AILeaderboard from '../components/AILeaderboard';
+import BlurredPrediction from '../components/BlurredPrediction';
+import CommunityPolls from '../components/CommunityPolls';
+import DailyFreePick from '../components/DailyFreePick';
+import EmptyState from '../components/EmptyState';
+import ErrorMessage from '../components/ErrorMessage';
+import FreemiumFeature from '../components/FreemiumFeature';
+import LoadingIndicator from '../components/LoadingIndicator';
+import NeonGameCard from '../components/NeonGameCard';
+import TrendingBets from '../components/TrendingBets';
+import { NeonText, NeonButton, NeonCard, NeonContainer } from '../components/ui';
+import { auth } from '../config/firebase';
+import useOddsData from '../hooks/useOddsData';
+import {
+  getTrendingBets,
+  getCommunityPolls,
   getAILeaderboard,
-  getBlurredPredictions
-} from "../services/aiPredictionService";
-import { 
-  NeonText, 
-  NeonButton, 
-  NeonCard, 
-  NeonContainer 
-} from "../components/ui";
-import { colors, spacing, borderRadius } from "../styles/theme";
-import { LinearGradient } from "expo-linear-gradient";
+  getBlurredPredictions,
+} from '../services/aiPredictionService';
+import { hasPremiumAccess } from '../services/subscriptionService';
+import { colors, spacing, borderRadius } from '../styles/theme';
 
 type OddsScreenProps = {
   navigation: StackNavigationProp<any, 'Odds'>;
@@ -53,7 +49,7 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
   const [communityPolls, setCommunityPolls] = useState<any[]>([]);
   const [leaderboardEntries, setLeaderboardEntries] = useState<any[]>([]);
   const [blurredPredictions, setBlurredPredictions] = useState<any[]>([]);
-  
+
   // Use our custom hook to manage odds data, loading state, and errors
   const {
     data: odds,
@@ -61,22 +57,22 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
     error,
     refresh,
     dailyInsights,
-    refreshLiveData
-  } = useOddsData("americanfootball_nfl");
-  
+    refreshLiveData,
+  } = useOddsData('americanfootball_nfl');
+
   // Check if user has premium access
   useEffect(() => {
     let isMounted = true;
-    
+
     const checkPremiumAccess = async () => {
       try {
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           if (isMounted) setHasPremium(false);
           return;
         }
-        
+
         const premium = await hasPremiumAccess(userId);
         if (isMounted) setHasPremium(premium);
       } catch (error) {
@@ -84,40 +80,40 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
         if (isMounted) setHasPremium(false);
       }
     };
-    
+
     checkPremiumAccess();
-    
+
     // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       if (user && isMounted) {
         checkPremiumAccess();
       }
     });
-    
+
     return () => {
       isMounted = false;
       unsubscribe();
     };
   }, []);
-  
+
   // Load freemium content
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadFreemiumContent = async () => {
       try {
         // Get trending bets
         const trends = await getTrendingBets();
         if (isMounted) setTrendingBets(trends);
-        
+
         // Get community polls
         const polls = await getCommunityPolls();
         if (isMounted) setCommunityPolls(polls);
-        
+
         // Get leaderboard entries
         const entries = await getAILeaderboard();
         if (isMounted) setLeaderboardEntries(entries);
-        
+
         // Get blurred predictions if not premium
         if (!hasPremium && odds.length > 0) {
           const blurred = await getBlurredPredictions(odds.slice(0, 3));
@@ -127,53 +123,49 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
         console.error('Error loading freemium content:', error);
       }
     };
-    
+
     loadFreemiumContent();
-    
+
     return () => {
       isMounted = false;
     };
   }, [odds, hasPremium]);
-  
+
   // Set up auto-refresh for live data
   useEffect(() => {
     const intervalId = setInterval(() => {
       refreshLiveData();
     }, 60000); // Refresh every minute
-    
+
     return () => clearInterval(intervalId);
   }, []);
-  
+
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await refresh();
     setRefreshing(false);
   }, [refresh]);
-  
+
   // Handle ad viewing
   const handleAdRequested = async (): Promise<boolean> => {
     // In a real app, this would show an ad
     // For now, we'll just simulate ad viewing
-    return new Promise((resolve) => {
-      Alert.alert(
-        "Watch Ad",
-        "In a real app, this would show an ad. Simulating ad view...",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              // Simulate ad completion
-              setTimeout(() => {
-                resolve(true);
-              }, 1000);
-            }
-          }
-        ]
-      );
+    return new Promise(resolve => {
+      Alert.alert('Watch Ad', 'In a real app, this would show an ad. Simulating ad view...', [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Simulate ad completion
+            setTimeout(() => {
+              resolve(true);
+            }, 1000);
+          },
+        },
+      ]);
     });
   };
-  
+
   // Define poll option type
   interface PollOption {
     id: string;
@@ -194,35 +186,35 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
             }
             return option;
           });
-          
+
           return {
             ...poll,
             options: updatedOptions,
-            totalVotes: poll.totalVotes + 1
+            totalVotes: poll.totalVotes + 1,
           };
         }
         return poll;
       })
     );
   };
-  
+
   // Navigate to subscription screen
   const handleUpgrade = () => {
     navigation.navigate('Subscription');
   };
-  
+
   // Render section header
   const renderSectionHeader = (title: string, icon: string) => (
     <View style={styles.sectionHeader}>
       <Ionicons name={icon as any} size={20} color={colors.neon.blue} />
-      <NeonText type="subheading" glow={true} style={styles.sectionTitle}>
+      <NeonText type="subheading" glow style={styles.sectionTitle}>
         {title}
       </NeonText>
     </View>
   );
-  
+
   return (
-    <NeonContainer gradient={true} gradientColors={[colors.background.primary, '#0D0D0D']}>
+    <NeonContainer gradient gradientColors={[colors.background.primary, '#0D0D0D']}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
@@ -238,12 +230,14 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
       >
         <View style={styles.headerContainer}>
           <View>
-            <NeonText type="heading" glow={true}>Live Betting Odds</NeonText>
+            <NeonText type="heading" glow>
+              Live Betting Odds
+            </NeonText>
             <NeonText type="caption" color={colors.text.secondary}>
               Powered by AI Sports Edge
             </NeonText>
           </View>
-          
+
           {!hasPremium ? (
             <NeonButton
               title="Upgrade"
@@ -255,69 +249,56 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
             />
           ) : (
             <TouchableOpacity onPress={refresh} style={styles.refreshButton}>
-              <Ionicons 
-                name="refresh" 
-                size={24} 
-                color={colors.neon.blue} 
+              <Ionicons
+                name="refresh"
+                size={24}
+                color={colors.neon.blue}
                 style={{ opacity: loading ? 0.5 : 1 }}
               />
             </TouchableOpacity>
           )}
         </View>
-        
+
         {/* Daily Free Pick (for free users) */}
         {!hasPremium && (
           <View style={styles.section}>
             {renderSectionHeader('Daily Free Pick', 'gift-outline')}
-            <DailyFreePick
-              games={odds}
-              onAdRequested={handleAdRequested}
-            />
+            <DailyFreePick games={odds} onAdRequested={handleAdRequested} />
           </View>
         )}
-        
+
         {/* Trending Bets (for all users) */}
         <View style={styles.section}>
           {renderSectionHeader('Trending Bets', 'trending-up')}
-          <TrendingBets
-            trendingBets={trendingBets}
-            showUpgradePrompt={!hasPremium}
-          />
+          <TrendingBets trendingBets={trendingBets} showUpgradePrompt={!hasPremium} />
         </View>
-        
+
         {/* Community Polls (for all users) */}
         <View style={styles.section}>
           {renderSectionHeader('Community Polls', 'people')}
-          <CommunityPolls
-            polls={communityPolls}
-            onVote={handlePollVote}
-            isPremium={hasPremium}
-          />
+          <CommunityPolls polls={communityPolls} onVote={handlePollVote} isPremium={hasPremium} />
         </View>
-        
+
         {/* AI Leaderboard (for all users, but with premium features) */}
         <View style={styles.section}>
           {renderSectionHeader('AI vs Public Leaderboard', 'podium')}
-          <AILeaderboard
-            entries={leaderboardEntries}
-            isPremium={hasPremium}
-          />
+          <AILeaderboard entries={leaderboardEntries} isPremium={hasPremium} />
         </View>
-        
+
         {/* Blurred Predictions (for free users) */}
         {!hasPremium && blurredPredictions.length > 0 && (
           <View style={styles.section}>
             {renderSectionHeader('AI Predictions Preview', 'analytics')}
-            
+
             {blurredPredictions.map((game, index) => (
               <BlurredPrediction
                 key={`blurred-${index}`}
                 prediction={game.ai_prediction}
-                isBlurred={true}
+                isBlurred
                 teamName={game.home_team}
               />
             ))}
-            
+
             <NeonButton
               title="Unlock All AI Predictions"
               onPress={handleUpgrade}
@@ -326,65 +307,69 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
             />
           </View>
         )}
-        
+
         {/* Sports Navigation */}
         <View style={styles.section}>
           {renderSectionHeader('Sports Categories', 'grid')}
-          
+
           <View style={styles.sportsGrid}>
             <TouchableOpacity
               style={styles.sportCard}
               onPress={() => navigation.navigate('Formula1')}
             >
-              <LinearGradient
-                colors={['#121212', '#1a1a1a']}
-                style={styles.sportCardGradient}
-              >
+              <LinearGradient colors={['#121212', '#1a1a1a']} style={styles.sportCardGradient}>
                 <Ionicons name="car-sport" size={28} color="#FF3B30" />
-                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                <NeonText
+                  type="subheading"
+                  color={colors.text.primary}
+                  style={styles.sportCardText}
+                >
                   Formula 1
                 </NeonText>
               </LinearGradient>
             </TouchableOpacity>
-            
+
             {/* Placeholder for other sports */}
             <TouchableOpacity style={[styles.sportCard, { opacity: 0.5 }]}>
-              <LinearGradient
-                colors={['#121212', '#1a1a1a']}
-                style={styles.sportCardGradient}
-              >
+              <LinearGradient colors={['#121212', '#1a1a1a']} style={styles.sportCardGradient}>
                 <Ionicons name="flag" size={28} color={colors.neon.yellow} />
-                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                <NeonText
+                  type="subheading"
+                  color={colors.text.primary}
+                  style={styles.sportCardText}
+                >
                   NASCAR
                 </NeonText>
               </LinearGradient>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={[styles.sportCard, { opacity: 0.5 }]}>
-              <LinearGradient
-                colors={['#121212', '#1a1a1a']}
-                style={styles.sportCardGradient}
-              >
+              <LinearGradient colors={['#121212', '#1a1a1a']} style={styles.sportCardGradient}>
                 <Ionicons name="football" size={28} color={colors.neon.green} />
-                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                <NeonText
+                  type="subheading"
+                  color={colors.text.primary}
+                  style={styles.sportCardText}
+                >
                   Rugby
                 </NeonText>
               </LinearGradient>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={[styles.sportCard, { opacity: 0.5 }]}>
-              <LinearGradient
-                colors={['#121212', '#1a1a1a']}
-                style={styles.sportCardGradient}
-              >
+              <LinearGradient colors={['#121212', '#1a1a1a']} style={styles.sportCardGradient}>
                 <Ionicons name="baseball" size={28} color={colors.neon.blue} />
-                <NeonText type="subheading" color={colors.text.primary} style={styles.sportCardText}>
+                <NeonText
+                  type="subheading"
+                  color={colors.text.primary}
+                  style={styles.sportCardText}
+                >
                   Cricket
                 </NeonText>
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          
+
           {!hasPremium && (
             <View style={styles.premiumSportsNote}>
               <Ionicons name="information-circle" size={16} color={colors.neon.yellow} />
@@ -394,37 +379,35 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
             </View>
           )}
         </View>
-        
+
         {/* Games List */}
         <View style={styles.section}>
           {renderSectionHeader('Live Games', 'basketball')}
-          
-          {loading && !refreshing && (
-            <LoadingIndicator message="Loading odds..." />
-          )}
-          
+
+          {loading && !refreshing && <LoadingIndicator message="Loading odds..." />}
+
           {error && <ErrorMessage message={error} />}
-          
+
           {!loading && odds.length === 0 && !error && (
             <EmptyState message="No odds data available" />
           )}
-          
+
           {odds.map((game, index) => (
             <NeonGameCard
               key={`game-${index}`}
               game={game}
-              onPress={() => console.log("Game pressed:", game.id)}
+              onPress={() => console.log('Game pressed:', game.id)}
             />
           ))}
         </View>
-        
+
         {/* Upgrade Banner */}
         {!hasPremium && (
           <NeonCard
             borderColor={colors.neon.cyan}
             glowColor={colors.neon.cyan}
             glowIntensity="medium"
-            gradient={true}
+            gradient
             gradientColors={[colors.neon.blue, '#0077B6']}
             style={styles.upgradeBanner}
           >
@@ -439,12 +422,7 @@ export default function NeonOddsScreen({ navigation }: OddsScreenProps): JSX.Ele
                 </NeonText>
               </View>
             </View>
-            <NeonButton
-              title="Upgrade"
-              onPress={handleUpgrade}
-              type="secondary"
-              size="small"
-            />
+            <NeonButton title="Upgrade" onPress={handleUpgrade} type="secondary" size="small" />
           </NeonCard>
         )}
       </ScrollView>

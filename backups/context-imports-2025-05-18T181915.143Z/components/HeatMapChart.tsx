@@ -1,10 +1,20 @@
 import React, { useMemo, useState, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Text, Pressable, AccessibilityInfo, findNodeHandle, Platform } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Text,
+  Pressable,
+  AccessibilityInfo,
+  findNodeHandle,
+  Platform,
+} from 'react-native';
 import { ContributionGraph } from 'react-native-chart-kit';
-import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../contexts/I18nContext';
-import Colors from '../constants/Colors';
+
 import { ThemedText } from './ThemedText';
+import Colors from '../constants/Colors';
+import { useI18n } from '../contexts/I18nContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface HeatMapChartProps {
   data: { [date: string]: number };
@@ -26,40 +36,40 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
 }) => {
   // Get translations
   const { t } = useI18n();
-  
+
   // Get theme colors
   const { colors, isDark } = useTheme();
   const backgroundColor = isDark ? '#1A1A1A' : '#FFFFFF';
   const textColor = isDark ? '#FFFFFF' : '#000000';
-  
+
   // Get screen width
   const screenWidth = Dimensions.get('window').width - 32; // Adjust for padding
-  
+
   // State for keyboard navigation
   const [focusedDay, setFocusedDay] = useState<number | null>(null);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const chartRef = useRef(null);
-  
+
   // Check if screen reader is enabled
   React.useEffect(() => {
     const checkScreenReader = async () => {
       const screenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
       setIsScreenReaderEnabled(screenReaderEnabled);
     };
-    
+
     checkScreenReader();
-    
+
     // Listen for screen reader changes
     const subscription = AccessibilityInfo.addEventListener(
       'screenReaderChanged',
       checkScreenReader
     );
-    
+
     return () => {
       subscription.remove();
     };
   }, []);
-  
+
   // Convert data object to array format required by ContributionGraph
   // Memoize to prevent unnecessary recalculations
   const formattedData = useMemo(() => {
@@ -68,7 +78,7 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
       count,
     }));
   }, [data]);
-  
+
   // Convert hex color to rgba - memoized helper function
   const hexToRgb = useMemo(() => {
     return (hex: string) => {
@@ -82,11 +92,11 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
         : { r: 0, g: 123, b: 255 }; // Default to blue
     };
   }, []);
-  
+
   // Chart configuration - memoized to prevent recreation on each render
   const chartConfig = useMemo(() => {
     return {
-      backgroundColor: backgroundColor,
+      backgroundColor,
       backgroundGradientFrom: backgroundColor,
       backgroundGradientTo: backgroundColor,
       decimalPlaces: 0,
@@ -100,47 +110,49 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
       },
     };
   }, [backgroundColor, chartColor, isDark, hexToRgb]);
-  
+
   // Calculate end date based on start date and number of days - memoized
   const endDate = useMemo(() => {
     const end = startDate ? new Date(startDate) : new Date();
     end.setDate(end.getDate() + numDays);
     return end;
   }, [startDate, numDays]);
-  
+
   // Create an accessible summary of the data for screen readers
   const accessibleSummary = useMemo(() => {
     const totalActivities = Object.values(data).reduce((sum, count) => sum + count, 0);
     const activeDays = Object.values(data).filter(count => count > 0).length;
     const mostActiveDate = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
-    
+
     return t('charts.heatmap.accessibleSummary', {
       totalActivities,
       activeDays,
       totalDays: numDays,
-      mostActiveDate: mostActiveDate ? `${mostActiveDate[0]} with ${mostActiveDate[1]} activities` : 'None'
+      mostActiveDate: mostActiveDate
+        ? `${mostActiveDate[0]} with ${mostActiveDate[1]} activities`
+        : 'None',
     });
   }, [data, numDays, t]);
-  
+
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!focusedDay && focusedDay !== 0) {
       setFocusedDay(0);
       return;
     }
-    
+
     switch (e.key) {
       case 'ArrowRight':
-        setFocusedDay(prev => (prev !== null && prev < numDays - 1) ? prev + 1 : prev);
+        setFocusedDay(prev => (prev !== null && prev < numDays - 1 ? prev + 1 : prev));
         break;
       case 'ArrowLeft':
-        setFocusedDay(prev => (prev !== null && prev > 0) ? prev - 1 : prev);
+        setFocusedDay(prev => (prev !== null && prev > 0 ? prev - 1 : prev));
         break;
       case 'ArrowUp':
-        setFocusedDay(prev => (prev !== null && prev >= 7) ? prev - 7 : prev);
+        setFocusedDay(prev => (prev !== null && prev >= 7 ? prev - 7 : prev));
         break;
       case 'ArrowDown':
-        setFocusedDay(prev => (prev !== null && prev < numDays - 7) ? prev + 7 : prev);
+        setFocusedDay(prev => (prev !== null && prev < numDays - 7 ? prev + 7 : prev));
         break;
       case 'Enter':
       case ' ':
@@ -150,7 +162,7 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
           focusedDate.setDate(focusedDate.getDate() + focusedDay);
           const dateString = focusedDate.toISOString().split('T')[0];
           const count = data[dateString] || 0;
-          
+
           AccessibilityInfo.announceForAccessibility(
             `${dateString}: ${count} ${count === 1 ? 'activity' : 'activities'}`
           );
@@ -158,28 +170,25 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
         break;
     }
   };
-  
+
   return (
     <View
       style={[styles.container, { backgroundColor }]}
-      accessible={true}
+      accessible
       accessibilityLabel={title}
       accessibilityHint={t('charts.heatmap.accessibilityHint')}
     >
       {title && (
-        <ThemedText
-          style={styles.title}
-          accessibilityRole="header"
-        >
+        <ThemedText style={styles.title} accessibilityRole="header">
           {title}
         </ThemedText>
       )}
-      
+
       {/* Screen reader summary */}
       {isScreenReaderEnabled && (
         <View accessibilityRole="summary" accessibilityLabel={accessibleSummary} />
       )}
-      
+
       {/* Keyboard navigable chart wrapper */}
       <View
         ref={chartRef}
@@ -189,10 +198,12 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
         onAccessibilityTap={() => setFocusedDay(0)}
         // Note: tabIndex and onKeyDown are web-only props
         // They will work in React Native Web but are not part of the React Native type definitions
-        {...(Platform.OS === 'web' ? {
-          tabIndex: 0,
-          onKeyDown: handleKeyDown
-        } : {})}
+        {...(Platform.OS === 'web'
+          ? {
+              tabIndex: 0,
+              onKeyDown: handleKeyDown,
+            }
+          : {})}
       >
         <ContributionGraph
           values={formattedData}
@@ -211,12 +222,8 @@ const HeatMapChart: React.FC<HeatMapChartProps> = ({
           style={styles.chart}
         />
       </View>
-      
-      <View
-        style={styles.legend}
-        accessible={true}
-        accessibilityLabel={t('charts.heatmap.legendLabel')}
-      >
+
+      <View style={styles.legend} accessible accessibilityLabel={t('charts.heatmap.legendLabel')}>
         <ThemedText style={styles.legendText}>{t('charts.heatmap.less')}</ThemedText>
         <View style={styles.legendItems}>
           {[0.2, 0.4, 0.6, 0.8, 1].map((opacity, index) => (

@@ -5,22 +5,23 @@
  * including opt-out rights and data sale disclosure.
  */
 
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { 
-  ScrollView, 
-  Text, 
-  View, 
-  StyleSheet, 
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
   SafeAreaView,
   TouchableOpacity,
   Switch,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+
+import { privacyService } from '../atomic/organisms/privacy';
+import { useAuth } from '../hooks/useAuth';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { useTranslation } from '../hooks/useTranslation';
-import { useAuth } from '../hooks/useAuth';
-import { privacyService } from '../atomic/organisms/privacy';
 
 interface CCPAPreferences {
   doNotSell: boolean;
@@ -80,7 +81,7 @@ const CCPAConsentScreen: React.FC = () => {
       setLoading(true);
 
       // Get existing preferences and merge with CCPA preferences
-      const existingPreferences = await privacyService.getPrivacyPreferences(user.uid) || {};
+      const existingPreferences = (await privacyService.getPrivacyPreferences(user.uid)) || {};
       const updatedPreferences = {
         ...existingPreferences,
         ccpaPreferences: preferences,
@@ -89,11 +90,9 @@ const CCPAConsentScreen: React.FC = () => {
       await privacyService.updatePrivacyPreferences(user.uid, updatedPreferences);
       setHasChanges(false);
 
-      Alert.alert(
-        t('common.success'),
-        t('ccpa.preferences_saved'),
-        [{ text: t('common.ok'), onPress: () => navigation.goBack() }]
-      );
+      Alert.alert(t('common.success'), t('ccpa.preferences_saved'), [
+        { text: t('common.ok'), onPress: () => navigation.goBack() },
+      ]);
     } catch (error) {
       console.error('Error saving CCPA preferences:', error);
       Alert.alert(t('common.error'), t('ccpa.save_error'));
@@ -115,32 +114,25 @@ const CCPAConsentScreen: React.FC = () => {
   const handleRequestDataDeletion = async () => {
     if (!user) return;
 
-    Alert.alert(
-      t('ccpa.confirm_deletion_title'),
-      t('ccpa.confirm_deletion_message'),
-      [
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
+    Alert.alert(t('ccpa.confirm_deletion_title'), t('ccpa.confirm_deletion_message'), [
+      {
+        text: t('common.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: t('ccpa.request_deletion'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await privacyService.requestDataDeletion(user.uid, ['all']);
+            Alert.alert(t('common.success'), t('ccpa.deletion_request_submitted'));
+          } catch (error) {
+            console.error('Error requesting data deletion:', error);
+            Alert.alert(t('common.error'), t('ccpa.deletion_request_error'));
+          }
         },
-        {
-          text: t('ccpa.request_deletion'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await privacyService.requestDataDeletion(user.uid, ['all']);
-              Alert.alert(
-                t('common.success'),
-                t('ccpa.deletion_request_submitted')
-              );
-            } catch (error) {
-              console.error('Error requesting data deletion:', error);
-              Alert.alert(t('common.error'), t('ccpa.deletion_request_error'));
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleDataSubjectRights = () => {
@@ -156,18 +148,14 @@ const CCPAConsentScreen: React.FC = () => {
     <View key={key} style={styles.optionContainer}>
       <View style={styles.optionHeader}>
         <View style={styles.optionTextContainer}>
-          <Text style={[styles.optionTitle, { color: textColor }]}>
-            {t(titleKey)}
-          </Text>
-          <Text style={[styles.optionDescription, { color: textColor }]}>
-            {t(descriptionKey)}
-          </Text>
+          <Text style={[styles.optionTitle, { color: textColor }]}>{t(titleKey)}</Text>
+          <Text style={[styles.optionDescription, { color: textColor }]}>{t(descriptionKey)}</Text>
         </View>
-        
+
         {!isSpecialAction ? (
           <Switch
             value={preferences[key]}
-            onValueChange={(value) => handlePreferenceChange(key, value)}
+            onValueChange={value => handlePreferenceChange(key, value)}
             trackColor={{ false: '#767577', true: primaryColor }}
             thumbColor={preferences[key] ? '#ffffff' : '#f4f3f4'}
           />
@@ -188,27 +176,16 @@ const CCPAConsentScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={[styles.backButtonText, { color: textColor }]}>
-            {t('common.back')}
-          </Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={[styles.backButtonText, { color: textColor }]}>{t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: textColor }]}>
-          {t('ccpa.title')}
-        </Text>
+        <Text style={[styles.headerTitle, { color: textColor }]}>{t('ccpa.title')}</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={true}>
-        <Text style={[styles.title, { color: textColor }]}>
-          {t('ccpa.title')}
-        </Text>
-        
-        <Text style={[styles.description, { color: textColor }]}>
-          {t('ccpa.description')}
-        </Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator>
+        <Text style={[styles.title, { color: textColor }]}>{t('ccpa.title')}</Text>
+
+        <Text style={[styles.description, { color: textColor }]}>{t('ccpa.description')}</Text>
 
         <View style={styles.noticeSection}>
           <Text style={[styles.noticeTitle, { color: textColor }]}>
@@ -220,15 +197,9 @@ const CCPAConsentScreen: React.FC = () => {
         </View>
 
         <View style={styles.optionsSection}>
-          <Text style={[styles.sectionTitle, { color: textColor }]}>
-            {t('ccpa.your_rights')}
-          </Text>
+          <Text style={[styles.sectionTitle, { color: textColor }]}>{t('ccpa.your_rights')}</Text>
 
-          {renderCCPAOption(
-            'doNotSell',
-            'ccpa.do_not_sell_title',
-            'ccpa.do_not_sell_description'
-          )}
+          {renderCCPAOption('doNotSell', 'ccpa.do_not_sell_title', 'ccpa.do_not_sell_description')}
 
           {renderCCPAOption(
             'doNotTrack',
@@ -236,11 +207,7 @@ const CCPAConsentScreen: React.FC = () => {
             'ccpa.do_not_track_description'
           )}
 
-          {renderCCPAOption(
-            'limitUse',
-            'ccpa.limit_use_title',
-            'ccpa.limit_use_description'
-          )}
+          {renderCCPAOption('limitUse', 'ccpa.limit_use_title', 'ccpa.limit_use_description')}
 
           {renderCCPAOption(
             'deleteData',
@@ -254,7 +221,7 @@ const CCPAConsentScreen: React.FC = () => {
           <Text style={[styles.sectionTitle, { color: textColor }]}>
             {t('ccpa.categories_collected')}
           </Text>
-          
+
           <Text style={[styles.categoryText, { color: textColor }]}>
             {t('ccpa.categories_list')}
           </Text>
@@ -266,9 +233,7 @@ const CCPAConsentScreen: React.FC = () => {
             onPress={handleOptOutAll}
             disabled={loading}
           >
-            <Text style={styles.optOutButtonText}>
-              {t('ccpa.opt_out_all')}
-            </Text>
+            <Text style={styles.optOutButtonText}>{t('ccpa.opt_out_all')}</Text>
           </TouchableOpacity>
 
           {hasChanges && (
@@ -288,11 +253,8 @@ const CCPAConsentScreen: React.FC = () => {
           <Text style={[styles.sectionTitle, { color: textColor }]}>
             {t('ccpa.additional_rights')}
           </Text>
-          
-          <TouchableOpacity
-            style={styles.rightsButton}
-            onPress={handleDataSubjectRights}
-          >
+
+          <TouchableOpacity style={styles.rightsButton} onPress={handleDataSubjectRights}>
             <Text style={[styles.rightsButtonText, { color: primaryColor }]}>
               {t('ccpa.manage_data_rights')}
             </Text>

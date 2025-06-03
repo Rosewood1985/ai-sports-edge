@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
+
 import { LineChart, PieChart } from './';
 import { AnalyticsSummary, TimePeriodFilter } from '../../../services/bettingAnalyticsService';
 
@@ -23,28 +24,33 @@ export function BettingAnalyticsChart({
   width = Dimensions.get('window').width - 32,
   height = 200,
 }: BettingAnalyticsChartProps) {
-  
   // Transform data based on chart type
   const getChartData = () => {
     switch (chartType) {
       case 'profit':
-        return data.profitOverTime?.map(item => ({
-          date: item.date,
-          count: item.profit || 0,
-        })) || [];
-      
+        return (
+          data.profitOverTime?.map(item => ({
+            date: item.date,
+            count: item.profit || 0,
+          })) || []
+        );
+
       case 'winRate':
-        return data.winRateOverTime?.map(item => ({
-          date: item.date,
-          count: item.winRate || 0,
-        })) || [];
-      
+        return (
+          data.winRateOverTime?.map(item => ({
+            date: item.date,
+            count: item.winRate || 0,
+          })) || []
+        );
+
       case 'betTypes':
-        return data.betTypeDistribution?.map(item => ({
-          name: item.type || 'Unknown',
-          value: item.count || 0,
-        })) || [];
-      
+        return (
+          data.betTypeDistribution?.map(item => ({
+            name: item.type || 'Unknown',
+            value: item.count || 0,
+          })) || []
+        );
+
       default:
         return [];
     }
@@ -69,7 +75,7 @@ export function BettingAnalyticsChart({
         <PieChart
           data={chartData}
           className="betting-chart"
-          showLegend={true}
+          showLegend
           colors={['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']}
         />
       ) : (
@@ -78,8 +84,8 @@ export function BettingAnalyticsChart({
           height={height}
           lineColor={chartType === 'profit' ? '#10B981' : '#3B82F6'}
           areaColor={chartType === 'profit' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)'}
-          showPoints={true}
-          showLabels={true}
+          showPoints
+          showLabels
           className="betting-chart"
         />
       )}

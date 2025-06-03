@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('./stripeConfig').stripe;
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("./stripeConfig").stripe;
 
 /**
  * Prepare payment for group subscription
@@ -15,8 +15,8 @@ exports.prepareGroupSubscriptionPayment = functions.https.onCall(async (data, co
   // Verify user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'You must be logged in to create a group subscription.'
+      "unauthenticated",
+      "You must be logged in to create a group subscription."
     );
   }
 
@@ -26,28 +26,28 @@ exports.prepareGroupSubscriptionPayment = functions.https.onCall(async (data, co
     // Validate required fields
     if (!data.userId || !data.memberEmails) {
       throw new functions.https.HttpsError(
-        'invalid-argument',
-        'User ID and member emails are required.'
+        "invalid-argument",
+        "User ID and member emails are required."
       );
     }
 
     // Verify the authenticated user matches the requested user ID
     if (userId !== data.userId) {
       throw new functions.https.HttpsError(
-        'permission-denied',
-        'You can only prepare payments for your own account.'
+        "permission-denied",
+        "You can only prepare payments for your own account."
       );
     }
 
     // Get user document
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(userId);
+    const userRef = db.collection("users").doc(userId);
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'User not found.'
+        "not-found",
+        "User not found."
       );
     }
 
@@ -76,17 +76,17 @@ exports.prepareGroupSubscriptionPayment = functions.https.onCall(async (data, co
     // Create ephemeral key for the customer
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: customerId },
-      { apiVersion: '2020-08-27' }
+      { apiVersion: "2020-08-27" }
     );
 
     // Create a payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 14999, // $149.99
-      currency: 'usd',
+      currency: "usd",
       customer: customerId,
       metadata: {
         firebaseUserId: userId,
-        type: 'group_subscription',
+        type: "group_subscription",
         memberCount: data.memberEmails.length + 1 // +1 for the owner
       }
     });
@@ -98,7 +98,7 @@ exports.prepareGroupSubscriptionPayment = functions.https.onCall(async (data, co
       clientSecret: paymentIntent.client_secret
     };
   } catch (error) {
-    console.error('Error preparing group subscription payment:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error preparing group subscription payment:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });

@@ -9,7 +9,7 @@ export enum AlertSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 /**
@@ -20,7 +20,7 @@ export enum AlertStatus {
   INVESTIGATING = 'investigating',
   RESOLVED = 'resolved',
   FALSE_POSITIVE = 'false_positive',
-  CONFIRMED = 'confirmed'
+  CONFIRMED = 'confirmed',
 }
 
 /**
@@ -34,7 +34,7 @@ export enum FraudPatternType {
   ODDS_MANIPULATION_ATTEMPT = 'odds_manipulation_attempt',
   AUTOMATED_BETTING = 'automated_betting',
   PAYMENT_ANOMALY = 'payment_anomaly',
-  ACCOUNT_TAKEOVER = 'account_takeover'
+  ACCOUNT_TAKEOVER = 'account_takeover',
 }
 
 /**
@@ -45,7 +45,7 @@ export enum AccountAction {
   RESTRICT = 'restrict',
   SUSPEND = 'suspend',
   BAN = 'ban',
-  CLEAR = 'clear'
+  CLEAR = 'clear',
 }
 
 /**
@@ -157,7 +157,14 @@ export interface FraudDetectionRule {
  */
 export interface RuleCondition {
   field: string;
-  operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains' | 'not_contains' | 'in_range';
+  operator:
+    | 'equals'
+    | 'not_equals'
+    | 'greater_than'
+    | 'less_than'
+    | 'contains'
+    | 'not_contains'
+    | 'in_range';
   value: any;
   threshold?: number;
   timeWindow?: number;

@@ -3,9 +3,9 @@
  * AI Sports Edge - Ensure all Spanish content is production-ready
  */
 
-const { onRequest } = require('firebase-functions/v2/https');
-const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require('./sentryConfig');
-const admin = require('firebase-admin');
+const { onRequest } = require("firebase-functions/v2/https");
+const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require("./sentryConfig");
+const admin = require("firebase-admin");
 
 // Initialize Firestore
 const db = admin.firestore();
@@ -13,23 +13,23 @@ const db = admin.firestore();
 // Content that should be audited for placeholders
 const CONTENT_SOURCES = {
   translations: [
-    '/atomic/atoms/translations/es.json',
-    '/atomic/atoms/translations/es-error-updates.json', 
-    '/atomic/atoms/translations/odds-comparison-es.json'
+    "/atomic/atoms/translations/es.json",
+    "/atomic/atoms/translations/es-error-updates.json", 
+    "/atomic/atoms/translations/odds-comparison-es.json"
   ],
   webContent: [
-    '/public/locales/es/features.json'
+    "/public/locales/es/features.json"
   ],
   sitemaps: [
-    '/public/sitemap-es.xml',
-    '/public/sitemap-es-US.xml',
-    '/public/sitemap-es-MX.xml',
-    '/public/sitemap-es-ES.xml'
+    "/public/sitemap-es.xml",
+    "/public/sitemap-es-US.xml",
+    "/public/sitemap-es-MX.xml",
+    "/public/sitemap-es-ES.xml"
   ],
   apiResponses: [
-    'personalizedRecommendations',
-    'trendingTopics',
-    'featuredGames'
+    "personalizedRecommendations",
+    "trendingTopics",
+    "featuredGames"
   ]
 };
 
@@ -58,12 +58,12 @@ const PLACEHOLDER_PATTERNS = [
 exports.spanishContentAudit = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
   try {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
       return;
     }
 
@@ -81,7 +81,7 @@ exports.spanishContentAudit = wrapHttpFunction(onRequest({ cors: true }, async (
       recommendations: [],
       productionReadiness: {
         score: 0,
-        status: 'pending',
+        status: "pending",
         criticalIssues: []
       }
     };
@@ -96,27 +96,27 @@ exports.spanishContentAudit = wrapHttpFunction(onRequest({ cors: true }, async (
     auditResults.productionReadiness = calculateProductionReadiness(auditResults.placeholderIssues);
 
     // Store audit results
-    await db.collection('spanish_content_audits').add({
+    await db.collection("spanish_content_audits").add({
       ...auditResults,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    trackFunctionPerformance('spanishContentAudit', Date.now() - startTime, true);
+    trackFunctionPerformance("spanishContentAudit", Date.now() - startTime, true);
 
     res.status(200).json({
       status: 200,
-      message: 'Spanish content audit completed',
+      message: "Spanish content audit completed",
       data: auditResults
     });
 
   } catch (error) {
-    console.error('Spanish content audit error:', error);
-    captureCloudFunctionError(error, 'spanishContentAudit');
-    trackFunctionPerformance('spanishContentAudit', Date.now() - startTime, false);
+    console.error("Spanish content audit error:", error);
+    captureCloudFunctionError(error, "spanishContentAudit");
+    trackFunctionPerformance("spanishContentAudit", Date.now() - startTime, false);
     
     res.status(500).json({
       status: 500,
-      message: 'Spanish content audit failed',
+      message: "Spanish content audit failed",
       error: error.message
     });
   }
@@ -130,11 +130,11 @@ async function auditTranslations() {
   const checks = [];
 
   // Check main Spanish translation file
-  checks.push(await checkTranslationFile('es.json', {
-    helplineNumber: '900 200 225', // Should be real helpline
-    errorMessages: 'error handling messages',
-    legalText: 'legal disclaimers and terms',
-    gamblingWarnings: 'responsible gambling warnings'
+  checks.push(await checkTranslationFile("es.json", {
+    helplineNumber: "900 200 225", // Should be real helpline
+    errorMessages: "error handling messages",
+    legalText: "legal disclaimers and terms",
+    gamblingWarnings: "responsible gambling warnings"
   }));
 
   // Check sports-specific translations
@@ -144,14 +144,14 @@ async function auditTranslations() {
   checks.push(await checkRegionalContent());
 
   return {
-    category: 'Spanish Translations',
+    category: "Spanish Translations",
     checks,
     issues: checks.flatMap(c => c.issues || []),
     recommendations: [
-      'Verify all Spanish legal text is reviewed by native speakers',
-      'Ensure gambling helpline numbers are real and functional',
-      'Check that all error messages are culturally appropriate',
-      'Validate that technical terms are correctly translated'
+      "Verify all Spanish legal text is reviewed by native speakers",
+      "Ensure gambling helpline numbers are real and functional",
+      "Check that all error messages are culturally appropriate",
+      "Validate that technical terms are correctly translated"
     ]
   };
 }
@@ -173,14 +173,14 @@ async function auditWebContent() {
   checks.push(await checkFeatureDescriptions());
 
   return {
-    category: 'Spanish Web Content',
+    category: "Spanish Web Content",
     checks,
     issues: checks.flatMap(c => c.issues || []),
     recommendations: [
-      'Review all Spanish marketing copy for cultural appropriateness',
-      'Ensure Spanish SEO content targets correct regional keywords',
-      'Validate that feature descriptions are accurate in Spanish',
-      'Check that all CTAs are properly translated'
+      "Review all Spanish marketing copy for cultural appropriateness",
+      "Ensure Spanish SEO content targets correct regional keywords",
+      "Validate that feature descriptions are accurate in Spanish",
+      "Check that all CTAs are properly translated"
     ]
   };
 }
@@ -202,14 +202,14 @@ async function auditApiContent() {
   checks.push(await checkBettingTerminology());
 
   return {
-    category: 'Spanish API Content',
+    category: "Spanish API Content",
     checks,
     issues: checks.flatMap(c => c.issues || []),
     recommendations: [
-      'Ensure API responses use proper Spanish betting terminology',
-      'Verify that sports news translations are accurate and timely',
-      'Check that personalized content is culturally relevant',
-      'Validate that odds are displayed in preferred Spanish format'
+      "Ensure API responses use proper Spanish betting terminology",
+      "Verify that sports news translations are accurate and timely",
+      "Check that personalized content is culturally relevant",
+      "Validate that odds are displayed in preferred Spanish format"
     ]
   };
 }
@@ -228,13 +228,13 @@ async function auditUserGeneratedContent() {
   checks.push(await checkUserProfiles());
 
   return {
-    category: 'User Content',
+    category: "User Content",
     checks,
     issues: checks.flatMap(c => c.issues || []),
     recommendations: [
-      'Implement Spanish content moderation',
-      'Ensure user profile fields support Spanish characters',
-      'Check that user communications are properly localized'
+      "Implement Spanish content moderation",
+      "Ensure user profile fields support Spanish characters",
+      "Check that user communications are properly localized"
     ]
   };
 }
@@ -256,13 +256,13 @@ async function auditMarketingContent() {
   checks.push(await checkSocialMediaContent());
 
   return {
-    category: 'Marketing Content',
+    category: "Marketing Content",
     checks,
     issues: checks.flatMap(c => c.issues || []),
     recommendations: [
-      'Review all promotional content for compliance with Spanish gambling laws',
-      'Ensure legal disclaimers are appropriate for each Spanish-speaking region',
-      'Validate that social media content follows local regulations'
+      "Review all promotional content for compliance with Spanish gambling laws",
+      "Ensure legal disclaimers are appropriate for each Spanish-speaking region",
+      "Validate that social media content follows local regulations"
     ]
   };
 }
@@ -281,10 +281,10 @@ async function checkTranslationFile(filename, sections) {
 
   if (hasPlaceholderContent) {
     issues.push({
-      type: 'placeholder_content',
+      type: "placeholder_content",
       file: filename,
-      description: 'Found placeholder text in Spanish translations',
-      severity: 'high'
+      description: "Found placeholder text in Spanish translations",
+      severity: "high"
     });
   }
 
@@ -297,34 +297,34 @@ async function checkTranslationFile(filename, sections) {
 
 async function checkSportsTranslations() {
   return {
-    name: 'Sports Terminology',
+    name: "Sports Terminology",
     passed: true,
     issues: [],
     details: {
-      soccerTerms: 'correct',
-      baseballTerms: 'correct', 
-      basketballTerms: 'correct',
-      americanFootballTerms: 'verified'
+      soccerTerms: "correct",
+      baseballTerms: "correct", 
+      basketballTerms: "correct",
+      americanFootballTerms: "verified"
     }
   };
 }
 
 async function checkRegionalContent() {
   return {
-    name: 'Regional Content',
+    name: "Regional Content",
     passed: true,
     issues: [],
     details: {
-      mexicanTerms: 'appropriate',
-      spanishTerms: 'appropriate',
-      usSpanishTerms: 'appropriate'
+      mexicanTerms: "appropriate",
+      spanishTerms: "appropriate",
+      usSpanishTerms: "appropriate"
     }
   };
 }
 
 async function checkMarketingContent() {
   return {
-    name: 'Marketing Content',
+    name: "Marketing Content",
     passed: true,
     issues: []
   };
@@ -332,21 +332,21 @@ async function checkMarketingContent() {
 
 async function checkSeoContent() {
   return {
-    name: 'SEO Content',
+    name: "SEO Content",
     passed: true,
     issues: [],
     details: {
-      metaTitles: 'translated',
-      metaDescriptions: 'translated',
-      headings: 'optimized',
-      keywords: 'region_appropriate'
+      metaTitles: "translated",
+      metaDescriptions: "translated",
+      headings: "optimized",
+      keywords: "region_appropriate"
     }
   };
 }
 
 async function checkFeatureDescriptions() {
   return {
-    name: 'Feature Descriptions',
+    name: "Feature Descriptions",
     passed: true,
     issues: []
   };
@@ -354,7 +354,7 @@ async function checkFeatureDescriptions() {
 
 async function checkPersonalizedContent() {
   return {
-    name: 'Personalized Content',
+    name: "Personalized Content",
     passed: true,
     issues: []
   };
@@ -362,7 +362,7 @@ async function checkPersonalizedContent() {
 
 async function checkNewsContent() {
   return {
-    name: 'Sports News',
+    name: "Sports News",
     passed: true,
     issues: []
   };
@@ -370,20 +370,20 @@ async function checkNewsContent() {
 
 async function checkBettingTerminology() {
   return {
-    name: 'Betting Terminology',
+    name: "Betting Terminology",
     passed: true,
     issues: [],
     details: {
-      oddsFormat: 'decimal_and_fractional',
-      bettingTypes: 'correctly_translated',
-      payoutTerms: 'culturally_appropriate'
+      oddsFormat: "decimal_and_fractional",
+      bettingTypes: "correctly_translated",
+      payoutTerms: "culturally_appropriate"
     }
   };
 }
 
 async function checkContentModeration() {
   return {
-    name: 'Content Moderation',
+    name: "Content Moderation",
     passed: true,
     issues: []
   };
@@ -391,7 +391,7 @@ async function checkContentModeration() {
 
 async function checkUserProfiles() {
   return {
-    name: 'User Profiles',
+    name: "User Profiles",
     passed: true,
     issues: []
   };
@@ -399,7 +399,7 @@ async function checkUserProfiles() {
 
 async function checkPromotionalCampaigns() {
   return {
-    name: 'Promotional Campaigns',
+    name: "Promotional Campaigns",
     passed: true,
     issues: []
   };
@@ -407,20 +407,20 @@ async function checkPromotionalCampaigns() {
 
 async function checkLegalDisclaimers() {
   return {
-    name: 'Legal Disclaimers',
+    name: "Legal Disclaimers",
     passed: true,
     issues: [],
     details: {
-      privacyPolicy: 'legally_compliant',
-      termsOfService: 'legally_compliant',
-      responsibleGambling: 'region_appropriate'
+      privacyPolicy: "legally_compliant",
+      termsOfService: "legally_compliant",
+      responsibleGambling: "region_appropriate"
     }
   };
 }
 
 async function checkSocialMediaContent() {
   return {
-    name: 'Social Media Content',
+    name: "Social Media Content",
     passed: true,
     issues: []
   };
@@ -430,20 +430,20 @@ async function checkSocialMediaContent() {
  * Calculate production readiness score
  */
 function calculateProductionReadiness(issues) {
-  const criticalIssues = issues.filter(issue => issue.severity === 'high');
-  const mediumIssues = issues.filter(issue => issue.severity === 'medium');
-  const lowIssues = issues.filter(issue => issue.severity === 'low');
+  const criticalIssues = issues.filter(issue => issue.severity === "high");
+  const mediumIssues = issues.filter(issue => issue.severity === "medium");
+  const lowIssues = issues.filter(issue => issue.severity === "low");
 
   let score = 100;
   score -= criticalIssues.length * 25; // Critical issues: -25 points each
   score -= mediumIssues.length * 10;   // Medium issues: -10 points each  
   score -= lowIssues.length * 5;       // Low issues: -5 points each
 
-  let status = 'ready';
+  let status = "ready";
   if (criticalIssues.length > 0) {
-    status = 'not_ready';
+    status = "not_ready";
   } else if (mediumIssues.length > 3) {
-    status = 'needs_review';
+    status = "needs_review";
   }
 
   return {
@@ -453,4 +453,4 @@ function calculateProductionReadiness(issues) {
   };
 }
 
-console.log('Spanish Content Audit module loaded successfully');
+console.log("Spanish Content Audit module loaded successfully");

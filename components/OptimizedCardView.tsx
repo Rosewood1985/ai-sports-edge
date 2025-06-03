@@ -1,12 +1,6 @@
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Platform } from 'react-native';
+
 import ResponsiveImage from './ResponsiveImage';
 import {
   useOptimizedFade,
@@ -37,7 +31,7 @@ const OptimizedCardView: React.FC<OptimizedCardViewProps> = ({
   const { fadeAnim, startFade } = useOptimizedFade();
   const { scaleAnim, startScale } = useOptimizedScale({ initialValue: 0.95 });
   const { slideAnim, startSlide } = useOptimizedSlide({ initialValue: 20 });
-  
+
   // Staggered animations for text elements
   const { animatedValues, startStagger } = useOptimizedStagger(
     2, // Number of text elements
@@ -45,7 +39,7 @@ const OptimizedCardView: React.FC<OptimizedCardViewProps> = ({
     300, // Duration
     100 // Stagger delay
   );
-  
+
   // Start animations when component mounts
   useEffect(() => {
     startFade();
@@ -53,28 +47,21 @@ const OptimizedCardView: React.FC<OptimizedCardViewProps> = ({
     startSlide();
     startStagger();
   }, []);
-  
+
   // Determine if we should use complex animations
   const useComplexAnimations = shouldEnableComplexAnimations();
-  
+
   return (
     <Animated.View
       style={[
         styles.container,
         {
           opacity: fadeAnim,
-          transform: [
-            { scale: scaleAnim },
-            { translateY: slideAnim },
-          ],
+          transform: [{ scale: scaleAnim }, { translateY: slideAnim }],
         },
       ]}
     >
-      <TouchableOpacity
-        style={styles.touchable}
-        onPress={onPress}
-        activeOpacity={0.9}
-      >
+      <TouchableOpacity style={styles.touchable} onPress={onPress} activeOpacity={0.9}>
         <View style={styles.imageContainer}>
           <ResponsiveImage
             basePath={imagePath}
@@ -84,7 +71,7 @@ const OptimizedCardView: React.FC<OptimizedCardViewProps> = ({
             resizeMode="cover"
           />
         </View>
-        
+
         <View style={styles.contentContainer}>
           <Animated.Text
             style={[
@@ -92,27 +79,35 @@ const OptimizedCardView: React.FC<OptimizedCardViewProps> = ({
               {
                 opacity: animatedValues[0],
                 transform: useComplexAnimations
-                  ? [{ translateX: animatedValues[0].interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [20, 0],
-                    })}]
+                  ? [
+                      {
+                        translateX: animatedValues[0].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [20, 0],
+                        }),
+                      },
+                    ]
                   : [],
               },
             ]}
           >
             {title}
           </Animated.Text>
-          
+
           <Animated.Text
             style={[
               styles.description,
               {
                 opacity: animatedValues[1],
                 transform: useComplexAnimations
-                  ? [{ translateX: animatedValues[1].interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [20, 0],
-                    })}]
+                  ? [
+                      {
+                        translateX: animatedValues[1].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [20, 0],
+                        }),
+                      },
+                    ]
                   : [],
               },
             ]}

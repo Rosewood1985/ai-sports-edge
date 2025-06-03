@@ -1,9 +1,10 @@
 import React from 'react';
+
+import { ReportingCenter } from './reporting/ReportingCenter';
 import { BetSlipPerformanceWidget } from './widgets/BetSlipPerformanceWidget';
+import { ConversionFunnelWidget } from './widgets/ConversionFunnelWidget';
 import { EnhancedSubscriptionAnalyticsWidget } from './widgets/EnhancedSubscriptionAnalyticsWidget';
 import { SystemHealthMonitoringWidget } from './widgets/SystemHealthMonitoringWidget';
-import { ConversionFunnelWidget } from './widgets/ConversionFunnelWidget';
-import { ReportingCenter } from './reporting/ReportingCenter';
 
 export interface AdminDashboardProps {
   className?: string;

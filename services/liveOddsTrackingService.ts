@@ -1,16 +1,17 @@
 /**
  * Live Odds Movement Tracking Service
- * 
+ *
  * Provides real-time odds monitoring, line movement tracking, and betting volume analysis
  * Addresses the missing real-time odds features identified in the analysis
  */
 
-import { EventEmitter } from 'events';
-import { realTimeDataService, REALTIME_EVENTS } from './realTimeDataService';
-import { oddsCacheService } from './oddsCacheService';
-import oddsService from './OddsService';
-import apiKeys from '../utils/apiKeys';
 import * as Sentry from '@sentry/react-native';
+import { EventEmitter } from 'events';
+
+import oddsService from './OddsService';
+import { oddsCacheService } from './oddsCacheService';
+import { realTimeDataService, REALTIME_EVENTS } from './realTimeDataService';
+import apiKeys from '../utils/apiKeys';
 
 // Odds movement tracking configuration
 const ODDS_TRACKING_CONFIG = {
@@ -18,15 +19,15 @@ const ODDS_TRACKING_CONFIG = {
   REAL_TIME_INTERVAL: 3000, // 3 seconds for live games
   ACTIVE_GAMES_INTERVAL: 30000, // 30 seconds for pre-game
   HISTORICAL_TRACKING_DAYS: 7, // Track movement for 7 days
-  
+
   // Movement thresholds
   SIGNIFICANT_MOVEMENT_THRESHOLD: 10, // American odds movement threshold
   ALERT_MOVEMENT_THRESHOLD: 25, // Large movement alert threshold
-  
+
   // Tracking limits
   MAX_TRACKED_GAMES: 100,
   MAX_BOOKMAKERS: 10,
-  
+
   // Storage keys
   CACHE_PREFIX: 'odds_tracking_',
 };
@@ -137,7 +138,6 @@ export class LiveOddsTrackingService extends EventEmitter {
 
       this.isInitialized = true;
       console.log('[ODDS TRACKING] Live odds tracking service initialized');
-
     } catch (error) {
       console.error('[ODDS TRACKING] Failed to initialize odds tracking service:', error);
       Sentry.captureException(error);
@@ -148,7 +148,13 @@ export class LiveOddsTrackingService extends EventEmitter {
   /**
    * Start tracking odds for a specific game
    */
-  async startTrackingGame(gameId: string, sport: string, homeTeam: string, awayTeam: string, gameDate: string): Promise<void> {
+  async startTrackingGame(
+    gameId: string,
+    sport: string,
+    homeTeam: string,
+    awayTeam: string,
+    gameDate: string
+  ): Promise<void> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
@@ -192,8 +198,9 @@ export class LiveOddsTrackingService extends EventEmitter {
 
       this.trackingIntervals.set(gameId, interval);
 
-      console.log(`[ODDS TRACKING] Started tracking odds for ${sport} game ${gameId}: ${homeTeam} vs ${awayTeam}`);
-
+      console.log(
+        `[ODDS TRACKING] Started tracking odds for ${sport} game ${gameId}: ${homeTeam} vs ${awayTeam}`
+      );
     } catch (error) {
       console.error(`[ODDS TRACKING] Failed to start tracking game ${gameId}:`, error);
       Sentry.captureException(error);
@@ -226,7 +233,6 @@ export class LiveOddsTrackingService extends EventEmitter {
       this.previousOdds.delete(gameId);
 
       console.log(`[ODDS TRACKING] Stopped tracking odds for game ${gameId}`);
-
     } catch (error) {
       console.error(`[ODDS TRACKING] Failed to stop tracking game ${gameId}:`, error);
     }
@@ -293,7 +299,6 @@ export class LiveOddsTrackingService extends EventEmitter {
         trackingData,
         60000 // 1 minute cache
       );
-
     } catch (error) {
       console.error(`[ODDS TRACKING] Error updating odds for game ${gameId}:`, error);
     }
@@ -336,8 +341,12 @@ export class LiveOddsTrackingService extends EventEmitter {
             markets: {},
           };
 
-          const homeOutcome = spreadsMarket.outcomes.find((o: any) => o.name === spreadsGame.homeTeam);
-          const awayOutcome = spreadsMarket.outcomes.find((o: any) => o.name === spreadsGame.awayTeam);
+          const homeOutcome = spreadsMarket.outcomes.find(
+            (o: any) => o.name === spreadsGame.homeTeam
+          );
+          const awayOutcome = spreadsMarket.outcomes.find(
+            (o: any) => o.name === spreadsGame.awayTeam
+          );
 
           existing.markets.spreads = {
             homeSpread: homeOutcome?.point || 0,
@@ -382,7 +391,11 @@ export class LiveOddsTrackingService extends EventEmitter {
   /**
    * Detect odds movements by comparing previous and current odds
    */
-  private detectOddsMovements(gameId: string, previousOdds: BookmakerOdds[], currentOdds: BookmakerOdds[]): OddsMovement[] {
+  private detectOddsMovements(
+    gameId: string,
+    previousOdds: BookmakerOdds[],
+    currentOdds: BookmakerOdds[]
+  ): OddsMovement[] {
     const movements: OddsMovement[] = [];
     const timestamp = new Date().toISOString();
 
@@ -392,8 +405,14 @@ export class LiveOddsTrackingService extends EventEmitter {
 
       // Check H2H movements
       if (current.markets.h2h && previous.markets.h2h) {
-        const homeMovement = this.calculateMovement(previous.markets.h2h.home, current.markets.h2h.home);
-        const awayMovement = this.calculateMovement(previous.markets.h2h.away, current.markets.h2h.away);
+        const homeMovement = this.calculateMovement(
+          previous.markets.h2h.home,
+          current.markets.h2h.home
+        );
+        const awayMovement = this.calculateMovement(
+          previous.markets.h2h.away,
+          current.markets.h2h.away
+        );
 
         if (homeMovement.movement !== 0) {
           movements.push({
@@ -405,7 +424,9 @@ export class LiveOddsTrackingService extends EventEmitter {
             newValue: current.markets.h2h.home,
             movement: homeMovement.movement,
             movementPercentage: homeMovement.percentage,
-            isSignificant: Math.abs(homeMovement.movement) >= ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
+            isSignificant:
+              Math.abs(homeMovement.movement) >=
+              ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
           });
         }
 
@@ -419,15 +440,23 @@ export class LiveOddsTrackingService extends EventEmitter {
             newValue: current.markets.h2h.away,
             movement: awayMovement.movement,
             movementPercentage: awayMovement.percentage,
-            isSignificant: Math.abs(awayMovement.movement) >= ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
+            isSignificant:
+              Math.abs(awayMovement.movement) >=
+              ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
           });
         }
       }
 
       // Check spreads movements
       if (current.markets.spreads && previous.markets.spreads) {
-        const homeOddsMovement = this.calculateMovement(previous.markets.spreads.homeOdds, current.markets.spreads.homeOdds);
-        const awayOddsMovement = this.calculateMovement(previous.markets.spreads.awayOdds, current.markets.spreads.awayOdds);
+        const homeOddsMovement = this.calculateMovement(
+          previous.markets.spreads.homeOdds,
+          current.markets.spreads.homeOdds
+        );
+        const awayOddsMovement = this.calculateMovement(
+          previous.markets.spreads.awayOdds,
+          current.markets.spreads.awayOdds
+        );
 
         if (homeOddsMovement.movement !== 0) {
           movements.push({
@@ -439,7 +468,9 @@ export class LiveOddsTrackingService extends EventEmitter {
             newValue: current.markets.spreads.homeOdds,
             movement: homeOddsMovement.movement,
             movementPercentage: homeOddsMovement.percentage,
-            isSignificant: Math.abs(homeOddsMovement.movement) >= ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
+            isSignificant:
+              Math.abs(homeOddsMovement.movement) >=
+              ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
           });
         }
 
@@ -453,15 +484,23 @@ export class LiveOddsTrackingService extends EventEmitter {
             newValue: current.markets.spreads.awayOdds,
             movement: awayOddsMovement.movement,
             movementPercentage: awayOddsMovement.percentage,
-            isSignificant: Math.abs(awayOddsMovement.movement) >= ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
+            isSignificant:
+              Math.abs(awayOddsMovement.movement) >=
+              ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
           });
         }
       }
 
       // Check totals movements
       if (current.markets.totals && previous.markets.totals) {
-        const overMovement = this.calculateMovement(previous.markets.totals.overOdds, current.markets.totals.overOdds);
-        const underMovement = this.calculateMovement(previous.markets.totals.underOdds, current.markets.totals.underOdds);
+        const overMovement = this.calculateMovement(
+          previous.markets.totals.overOdds,
+          current.markets.totals.overOdds
+        );
+        const underMovement = this.calculateMovement(
+          previous.markets.totals.underOdds,
+          current.markets.totals.underOdds
+        );
 
         if (overMovement.movement !== 0) {
           movements.push({
@@ -473,7 +512,9 @@ export class LiveOddsTrackingService extends EventEmitter {
             newValue: current.markets.totals.overOdds,
             movement: overMovement.movement,
             movementPercentage: overMovement.percentage,
-            isSignificant: Math.abs(overMovement.movement) >= ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
+            isSignificant:
+              Math.abs(overMovement.movement) >=
+              ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
           });
         }
 
@@ -487,7 +528,9 @@ export class LiveOddsTrackingService extends EventEmitter {
             newValue: current.markets.totals.underOdds,
             movement: underMovement.movement,
             movementPercentage: underMovement.percentage,
-            isSignificant: Math.abs(underMovement.movement) >= ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
+            isSignificant:
+              Math.abs(underMovement.movement) >=
+              ODDS_TRACKING_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD,
           });
         }
       }
@@ -499,10 +542,13 @@ export class LiveOddsTrackingService extends EventEmitter {
   /**
    * Calculate movement between two odds values
    */
-  private calculateMovement(oldValue: number, newValue: number): { movement: number; percentage: number } {
+  private calculateMovement(
+    oldValue: number,
+    newValue: number
+  ): { movement: number; percentage: number } {
     const movement = newValue - oldValue;
     const percentage = oldValue !== 0 ? (movement / Math.abs(oldValue)) * 100 : 0;
-    
+
     return { movement, percentage };
   }
 
@@ -557,8 +603,10 @@ export class LiveOddsTrackingService extends EventEmitter {
    */
   private isLineReversal(movement: OddsMovement): boolean {
     // For American odds, a line reversal typically means crossing from positive to negative or vice versa
-    return (movement.oldValue > 0 && movement.newValue < 0) || 
-           (movement.oldValue < 0 && movement.newValue > 0);
+    return (
+      (movement.oldValue > 0 && movement.newValue < 0) ||
+      (movement.oldValue < 0 && movement.newValue > 0)
+    );
   }
 
   /**
@@ -568,12 +616,12 @@ export class LiveOddsTrackingService extends EventEmitter {
     const gameTime = new Date(gameDate);
     const now = new Date();
     const timeUntilGame = gameTime.getTime() - now.getTime();
-    
+
     // If game is live or starting soon (within 2 hours)
     if (timeUntilGame <= 2 * 60 * 60 * 1000) {
       return ODDS_TRACKING_CONFIG.REAL_TIME_INTERVAL;
     }
-    
+
     // For upcoming games
     return ODDS_TRACKING_CONFIG.ACTIVE_GAMES_INTERVAL;
   }
@@ -582,12 +630,14 @@ export class LiveOddsTrackingService extends EventEmitter {
    * Setup real-time event listeners
    */
   private setupRealTimeListeners(): void {
-    realTimeDataService.on(REALTIME_EVENTS.ODDS_CHANGE, (oddsChange) => {
+    realTimeDataService.on(REALTIME_EVENTS.ODDS_CHANGE, oddsChange => {
       // Handle real-time odds updates
-      console.log(`[ODDS TRACKING] Real-time odds change: ${oddsChange.bookmaker} ${oddsChange.market} ${oddsChange.oldOdds} → ${oddsChange.newOdds}`);
+      console.log(
+        `[ODDS TRACKING] Real-time odds change: ${oddsChange.bookmaker} ${oddsChange.market} ${oddsChange.oldOdds} → ${oddsChange.newOdds}`
+      );
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.LINE_MOVEMENT, (lineMovement) => {
+    realTimeDataService.on(REALTIME_EVENTS.LINE_MOVEMENT, lineMovement => {
       // Handle line movement events
       console.log(`[ODDS TRACKING] Line movement detected: ${lineMovement.movement}`);
     });
@@ -597,9 +647,12 @@ export class LiveOddsTrackingService extends EventEmitter {
    * Setup cleanup interval for old data
    */
   private setupCleanupInterval(): void {
-    setInterval(() => {
-      this.cleanupOldData();
-    }, 60 * 60 * 1000); // Run every hour
+    setInterval(
+      () => {
+        this.cleanupOldData();
+      },
+      60 * 60 * 1000
+    ); // Run every hour
   }
 
   /**
@@ -621,13 +674,14 @@ export class LiveOddsTrackingService extends EventEmitter {
    * Clean up old tracking data
    */
   private cleanupOldData(): void {
-    const cutoffTime = Date.now() - (ODDS_TRACKING_CONFIG.HISTORICAL_TRACKING_DAYS * 24 * 60 * 60 * 1000);
-    
+    const cutoffTime =
+      Date.now() - ODDS_TRACKING_CONFIG.HISTORICAL_TRACKING_DAYS * 24 * 60 * 60 * 1000;
+
     // Clean up alert queue
-    this.alertQueue = this.alertQueue.filter(alert => 
-      new Date(alert.timestamp).getTime() > cutoffTime
+    this.alertQueue = this.alertQueue.filter(
+      alert => new Date(alert.timestamp).getTime() > cutoffTime
     );
-    
+
     console.log('[ODDS TRACKING] Cleaned up old tracking data');
   }
 
@@ -656,8 +710,10 @@ export class LiveOddsTrackingService extends EventEmitter {
     recentAlertsCount: number;
     totalMovements: number;
   } {
-    const totalMovements = Array.from(this.trackedGames.values())
-      .reduce((total, game) => total + game.movements.length, 0);
+    const totalMovements = Array.from(this.trackedGames.values()).reduce(
+      (total, game) => total + game.movements.length,
+      0
+    );
 
     return {
       isInitialized: this.isInitialized,
@@ -672,21 +728,21 @@ export class LiveOddsTrackingService extends EventEmitter {
    */
   async shutdown(): Promise<void> {
     console.log('[ODDS TRACKING] Shutting down odds tracking service...');
-    
+
     // Stop all tracking intervals
     this.trackingIntervals.forEach(interval => clearInterval(interval));
     this.trackingIntervals.clear();
-    
+
     // Archive all current tracking data
     for (const [gameId, trackingData] of this.trackedGames.entries()) {
       await this.archiveTrackingData(gameId, trackingData);
     }
-    
+
     this.trackedGames.clear();
     this.previousOdds.clear();
     this.alertQueue = [];
     this.isInitialized = false;
-    
+
     console.log('[ODDS TRACKING] Odds tracking service shut down');
   }
 }

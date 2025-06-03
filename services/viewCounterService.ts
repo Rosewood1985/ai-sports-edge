@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firestore, auth } from '../config/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, increment } from 'firebase/firestore';
+
 import { analyticsService } from './analyticsService';
+import { firestore, auth } from '../config/firebase';
 import environmentUtils from '../utils/environmentUtils';
 
 // Constants
@@ -39,12 +40,12 @@ export interface ViewCountData {
 const getDeviceId = async (): Promise<string> => {
   try {
     let deviceId = await AsyncStorage.getItem('device_id');
-    
+
     if (!deviceId) {
       deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
       await AsyncStorage.setItem('device_id', deviceId);
     }
-    
+
     return deviceId;
   } catch (error) {
     console.error('Error getting device ID:', error);
@@ -71,11 +72,11 @@ const initializeUserViewCounter = async (userId: string): Promise<ViewCountData>
   if (!db) {
     throw new Error('Firestore not initialized');
   }
-  
+
   const now = new Date();
   const nextReset = calculateNextResetDate();
   const deviceId = await getDeviceId();
-  
+
   const initialData = {
     [FIELD_COUNT]: 0,
     [FIELD_LAST_RESET]: serverTimestamp(),
@@ -84,11 +85,11 @@ const initializeUserViewCounter = async (userId: string): Promise<ViewCountData>
     [FIELD_BONUS_VIEWS]: 0,
     [FIELD_LAST_UPDATED]: serverTimestamp(),
     [FIELD_DEVICE_ID]: deviceId,
-    userId
+    userId,
   };
-  
+
   await setDoc(doc(db, VIEW_COUNTERS_COLLECTION, userId), initialData);
-  
+
   return {
     count: 0,
     lastReset: now,
@@ -96,7 +97,7 @@ const initializeUserViewCounter = async (userId: string): Promise<ViewCountData>
     maxViews: DEFAULT_MAX_FREE_VIEWS,
     bonusViews: 0,
     remainingViews: DEFAULT_MAX_FREE_VIEWS,
-    percentageUsed: 0
+    percentageUsed: 0,
   };
 };
 
@@ -109,14 +110,14 @@ export const getUserViewCount = async (userId?: string): Promise<ViewCountData> 
   try {
     // If no userId provided, try to get the current user
     const user = userId || auth.currentUser?.uid;
-    
+
     // If we have a user ID, try to get from Firestore first
     if (user) {
       const db = firestore;
       if (db) {
         const docRef = doc(db, VIEW_COUNTERS_COLLECTION, user);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
           const data = docSnap.data();
           const count = data[FIELD_COUNT] || 0;
@@ -125,17 +126,17 @@ export const getUserViewCount = async (userId?: string): Promise<ViewCountData> 
           const totalAllowedViews = maxViews + bonusViews;
           const remainingViews = Math.max(0, totalAllowedViews - count);
           const percentageUsed = Math.min(100, (count / totalAllowedViews) * 100);
-          
+
           // Check if we need to reset based on the next reset date
           const nextReset = data[FIELD_NEXT_RESET]?.toDate() || calculateNextResetDate();
           const now = new Date();
-          
+
           if (nextReset < now) {
             // Time to reset the counter
             await resetUserViewCounter(user);
             return getUserViewCount(user);
           }
-          
+
           return {
             count,
             lastReset: data[FIELD_LAST_RESET]?.toDate() || null,
@@ -143,7 +144,7 @@ export const getUserViewCount = async (userId?: string): Promise<ViewCountData> 
             maxViews,
             bonusViews,
             remainingViews,
-            percentageUsed
+            percentageUsed,
           };
         } else {
           // Initialize the counter if it doesn't exist
@@ -151,7 +152,7 @@ export const getUserViewCount = async (userId?: string): Promise<ViewCountData> 
         }
       }
     }
-    
+
     // Fall back to local storage if no user ID or Firestore
     const count = await getLocalViewCount();
     return {
@@ -161,11 +162,11 @@ export const getUserViewCount = async (userId?: string): Promise<ViewCountData> 
       maxViews: DEFAULT_MAX_FREE_VIEWS,
       bonusViews: 0,
       remainingViews: Math.max(0, DEFAULT_MAX_FREE_VIEWS - count),
-      percentageUsed: Math.min(100, (count / DEFAULT_MAX_FREE_VIEWS) * 100)
+      percentageUsed: Math.min(100, (count / DEFAULT_MAX_FREE_VIEWS) * 100),
     };
   } catch (error) {
     console.error('Error getting user view count:', error);
-    
+
     // Return default values in case of error
     return {
       count: 0,
@@ -174,7 +175,7 @@ export const getUserViewCount = async (userId?: string): Promise<ViewCountData> 
       maxViews: DEFAULT_MAX_FREE_VIEWS,
       bonusViews: 0,
       remainingViews: DEFAULT_MAX_FREE_VIEWS,
-      percentageUsed: 0
+      percentageUsed: 0,
     };
   }
 };
@@ -208,34 +209,34 @@ export const incrementUserViewCount = async (
     const currentLocalCount = await getLocalViewCount();
     const newLocalCount = currentLocalCount + 1;
     await AsyncStorage.setItem(LOCAL_VIEW_COUNTER_KEY, newLocalCount.toString());
-    
+
     // Track the view in analytics
     await analyticsService.trackEvent(`viewed_${featureType}`, {
-      count: newLocalCount
+      count: newLocalCount,
     });
-    
+
     // If no userId provided, try to get the current user
     const user = userId || auth.currentUser?.uid;
-    
+
     // If we have a user ID and Firestore is available, update the server count
     if (user) {
       const db = firestore;
       if (db) {
         const docRef = doc(db, VIEW_COUNTERS_COLLECTION, user);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
           // Update existing counter
           await updateDoc(docRef, {
             [FIELD_COUNT]: increment(1),
-            [FIELD_LAST_UPDATED]: serverTimestamp()
+            [FIELD_LAST_UPDATED]: serverTimestamp(),
           });
         } else {
           // Initialize with count = 1
           const now = new Date();
           const nextReset = calculateNextResetDate();
           const deviceId = await getDeviceId();
-          
+
           await setDoc(docRef, {
             [FIELD_COUNT]: 1,
             [FIELD_LAST_RESET]: serverTimestamp(),
@@ -244,15 +245,15 @@ export const incrementUserViewCount = async (
             [FIELD_BONUS_VIEWS]: 0,
             [FIELD_LAST_UPDATED]: serverTimestamp(),
             [FIELD_DEVICE_ID]: deviceId,
-            userId: user
+            userId: user,
           });
         }
-        
+
         // Get the updated count data
         return getUserViewCount(user);
       }
     }
-    
+
     // If we don't have a user ID or Firestore, return local data
     return {
       count: newLocalCount,
@@ -261,11 +262,11 @@ export const incrementUserViewCount = async (
       maxViews: DEFAULT_MAX_FREE_VIEWS,
       bonusViews: 0,
       remainingViews: Math.max(0, DEFAULT_MAX_FREE_VIEWS - newLocalCount),
-      percentageUsed: Math.min(100, (newLocalCount / DEFAULT_MAX_FREE_VIEWS) * 100)
+      percentageUsed: Math.min(100, (newLocalCount / DEFAULT_MAX_FREE_VIEWS) * 100),
     };
   } catch (error) {
     console.error('Error incrementing view counter:', error);
-    
+
     // Return default values in case of error
     return {
       count: 0,
@@ -274,7 +275,7 @@ export const incrementUserViewCount = async (
       maxViews: DEFAULT_MAX_FREE_VIEWS,
       bonusViews: 0,
       remainingViews: DEFAULT_MAX_FREE_VIEWS,
-      percentageUsed: 0
+      percentageUsed: 0,
     };
   }
 };
@@ -289,24 +290,24 @@ export const resetUserViewCounter = async (userId: string): Promise<void> => {
     if (!db) {
       throw new Error('Firestore not initialized');
     }
-    
+
     const now = new Date();
     const nextReset = calculateNextResetDate();
-    
+
     await updateDoc(doc(db, VIEW_COUNTERS_COLLECTION, userId), {
       [FIELD_COUNT]: 0,
       [FIELD_LAST_RESET]: serverTimestamp(),
       [FIELD_NEXT_RESET]: nextReset,
-      [FIELD_LAST_UPDATED]: serverTimestamp()
+      [FIELD_LAST_UPDATED]: serverTimestamp(),
     });
-    
+
     // Also reset local storage
     await AsyncStorage.setItem(LOCAL_VIEW_COUNTER_KEY, '0');
-    
+
     // Track the reset in analytics
     await analyticsService.trackEvent('view_counter_reset', {
       userId,
-      resetTime: now.toISOString()
+      resetTime: now.toISOString(),
     });
   } catch (error) {
     console.error('Error resetting user view counter:', error);
@@ -324,16 +325,16 @@ export const addBonusViews = async (userId: string, bonusViews: number): Promise
     if (!db) {
       throw new Error('Firestore not initialized');
     }
-    
+
     await updateDoc(doc(db, VIEW_COUNTERS_COLLECTION, userId), {
       [FIELD_BONUS_VIEWS]: increment(bonusViews),
-      [FIELD_LAST_UPDATED]: serverTimestamp()
+      [FIELD_LAST_UPDATED]: serverTimestamp(),
     });
-    
+
     // Track the bonus views in analytics
     await analyticsService.trackEvent('bonus_views_added', {
       userId,
-      bonusViews
+      bonusViews,
     });
   } catch (error) {
     console.error('Error adding bonus views:', error);
@@ -347,43 +348,43 @@ export const addBonusViews = async (userId: string, bonusViews: number): Promise
  */
 export const shouldShowUpgradePrompt = async (
   userId?: string
-): Promise<{show: boolean; reason: string}> => {
+): Promise<{ show: boolean; reason: string }> => {
   try {
     const viewData = await getUserViewCount(userId);
-    
+
     // Show prompt if user has used all their views
     if (viewData.remainingViews <= 0) {
       return {
         show: true,
-        reason: 'limit_reached'
+        reason: 'limit_reached',
       };
     }
-    
+
     // Show prompt if user has used 75% or more of their views
     if (viewData.percentageUsed >= 75) {
       return {
         show: true,
-        reason: 'approaching_limit'
+        reason: 'approaching_limit',
       };
     }
-    
+
     // Show prompt if this is the user's 3rd view (good time to introduce premium)
     if (viewData.count === 3) {
       return {
         show: true,
-        reason: 'engagement_opportunity'
+        reason: 'engagement_opportunity',
       };
     }
-    
+
     return {
       show: false,
-      reason: 'below_threshold'
+      reason: 'below_threshold',
     };
   } catch (error) {
     console.error('Error checking if upgrade prompt should be shown:', error);
     return {
       show: false,
-      reason: 'error'
+      reason: 'error',
     };
   }
 };
@@ -396,42 +397,42 @@ export const shouldShowUpgradePrompt = async (
 export const syncViewCount = async (userId: string): Promise<void> => {
   try {
     const localCount = await getLocalViewCount();
-    
+
     // Only sync if local count is greater than 0
     if (localCount > 0) {
       const db = firestore;
       if (!db) {
         return;
       }
-      
+
       const docRef = doc(db, VIEW_COUNTERS_COLLECTION, userId);
       const docSnap = await getDoc(docRef);
-      
+
       if (docSnap.exists()) {
         const serverCount = docSnap.data()[FIELD_COUNT] || 0;
-        
+
         // Use the maximum of local and server counts
         const newCount = Math.max(localCount, serverCount);
-        
+
         await updateDoc(docRef, {
           [FIELD_COUNT]: newCount,
-          [FIELD_LAST_UPDATED]: serverTimestamp()
+          [FIELD_LAST_UPDATED]: serverTimestamp(),
         });
       } else {
         // Initialize with the local count
         await initializeUserViewCounter(userId);
-        
+
         // Update the count to match local
         await updateDoc(docRef, {
-          [FIELD_COUNT]: localCount
+          [FIELD_COUNT]: localCount,
         });
       }
-      
+
       // Track the sync in analytics
       await analyticsService.trackEvent('view_count_synced', {
         userId,
         localCount,
-        serverCount: docSnap.exists() ? docSnap.data()[FIELD_COUNT] || 0 : 0
+        serverCount: docSnap.exists() ? docSnap.data()[FIELD_COUNT] || 0 : 0,
       });
     }
   } catch (error) {
@@ -447,5 +448,5 @@ export default {
   addBonusViews,
   shouldShowUpgradePrompt,
   syncViewCount,
-  DEFAULT_MAX_FREE_VIEWS
+  DEFAULT_MAX_FREE_VIEWS,
 };

@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,17 +8,21 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { formula1Service, firebaseSubscription } from '../services';
-import { Formula1Race, Formula1Driver, Formula1Team, Formula1Prediction } from '../services/formula1Service';
+
+import { LoadingIndicator, EmptyState } from '../atomic/atoms';
+import { PremiumFeature } from '../atomic/organisms';
+import Formula1BlurredPrediction from '../components/Formula1BlurredPrediction';
 import { auth } from '../config/firebase';
 import { useTheme } from '../contexts/ThemeContext';
-import Formula1BlurredPrediction from '../components/Formula1BlurredPrediction';
-import { PremiumFeature } from '../atomic/organisms';
-import { LoadingIndicator, EmptyState } from '../atomic/atoms';
+import { formula1Service, firebaseSubscription } from '../services';
+import {
+  Formula1Race,
+  Formula1Driver,
+  Formula1Team,
+  Formula1Prediction,
+} from '../services/formula1Service';
 
 /**
  * Formula 1 screen component
@@ -32,34 +38,34 @@ const Formula1Screen = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [predictionLoading, setPredictionLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'races' | 'drivers' | 'teams'>('races');
-  
+
   const navigation = useNavigation();
   const { colors } = useTheme();
-  
+
   // Load data on mount
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        
+
         // Check premium access
         const userId = auth.currentUser?.uid;
         if (userId) {
           const premium = await firebaseSubscription.hasPremiumAccess(userId);
           setHasPremium(premium);
         }
-        
+
         // Load races, drivers, and teams
         const [racesData, driversData, teamsData] = await Promise.all([
           formula1Service.getUpcomingRaces(),
           formula1Service.getDriverStandings(),
-          formula1Service.getTeamStandings()
+          formula1Service.getTeamStandings(),
         ]);
-        
+
         setRaces(racesData);
         setDrivers(driversData);
         setTeams(teamsData);
-        
+
         // Set first race as selected
         if (racesData.length > 0) {
           setSelectedRace(racesData[0]);
@@ -71,15 +77,15 @@ const Formula1Screen = (): JSX.Element => {
         setLoading(false);
       }
     };
-    
+
     loadData();
   }, []);
-  
+
   // Load prediction when selected race changes
   useEffect(() => {
     const loadPrediction = async () => {
       if (!selectedRace) return;
-      
+
       try {
         setPredictionLoading(true);
         const userId = auth.currentUser?.uid || '';
@@ -91,26 +97,26 @@ const Formula1Screen = (): JSX.Element => {
         setPredictionLoading(false);
       }
     };
-    
+
     loadPrediction();
   }, [selectedRace]);
-  
+
   // Handle race selection
   const handleRaceSelect = (race: Formula1Race) => {
     setSelectedRace(race);
   };
-  
+
   // Handle purchase of prediction
   const handlePurchasePrediction = async () => {
     if (!selectedRace) return;
-    
+
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) {
         navigation.navigate('Login' as never);
         return;
       }
-      
+
       // Get user's payment methods
       const paymentMethods = await firebaseSubscription.getUserPaymentMethods(userId);
       if (paymentMethods.length === 0) {
@@ -119,22 +125,22 @@ const Formula1Screen = (): JSX.Element => {
           'Please add a payment method in your account settings.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Go to Settings', 
-              onPress: () => navigation.navigate('SubscriptionManagement' as never) 
-            }
+            {
+              text: 'Go to Settings',
+              onPress: () => navigation.navigate('SubscriptionManagement' as never),
+            },
           ]
         );
         return;
       }
-      
+
       // Purchase the prediction
       const success = await firebaseSubscription.purchaseMicrotransaction(
         userId,
         'formula1-race-prediction',
         paymentMethods[0].id
       );
-      
+
       if (success) {
         Alert.alert('Success', 'Prediction purchased successfully!');
         // Reload prediction
@@ -148,7 +154,7 @@ const Formula1Screen = (): JSX.Element => {
       Alert.alert('Error', 'An error occurred while processing your purchase.');
     }
   };
-  
+
   // Handle purchase of driver stats
   const handlePurchaseDriverStats = async () => {
     try {
@@ -157,7 +163,7 @@ const Formula1Screen = (): JSX.Element => {
         navigation.navigate('Login' as never);
         return;
       }
-      
+
       // Get user's payment methods
       const paymentMethods = await firebaseSubscription.getUserPaymentMethods(userId);
       if (paymentMethods.length === 0) {
@@ -166,22 +172,22 @@ const Formula1Screen = (): JSX.Element => {
           'Please add a payment method in your account settings.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Go to Settings', 
-              onPress: () => navigation.navigate('SubscriptionManagement' as never) 
-            }
+            {
+              text: 'Go to Settings',
+              onPress: () => navigation.navigate('SubscriptionManagement' as never),
+            },
           ]
         );
         return;
       }
-      
+
       // Purchase the driver stats
       const success = await firebaseSubscription.purchaseMicrotransaction(
         userId,
         'formula1-driver-stats',
         paymentMethods[0].id
       );
-      
+
       if (success) {
         Alert.alert('Success', 'Driver statistics package purchased successfully!');
         // Reload data
@@ -195,12 +201,12 @@ const Formula1Screen = (): JSX.Element => {
       Alert.alert('Error', 'An error occurred while processing your purchase.');
     }
   };
-  
+
   // Render loading state
   if (loading) {
     return <LoadingIndicator message="Loading Formula 1 data..." />;
   }
-  
+
   // Render empty state
   if (races.length === 0) {
     return (
@@ -210,7 +216,7 @@ const Formula1Screen = (): JSX.Element => {
       />
     );
   }
-  
+
   // Render race card
   const renderRaceCard = (race: Formula1Race, isSelected: boolean) => (
     <TouchableOpacity
@@ -218,7 +224,7 @@ const Formula1Screen = (): JSX.Element => {
       style={[
         styles.raceCard,
         { backgroundColor: colors.card },
-        isSelected && { borderColor: colors.primary, borderWidth: 2 }
+        isSelected && { borderColor: colors.primary, borderWidth: 2 },
       ]}
       onPress={() => handleRaceSelect(race)}
     >
@@ -229,17 +235,12 @@ const Formula1Screen = (): JSX.Element => {
       <Text style={[styles.raceCountry, { color: colors.text }]}>{race.country}</Text>
     </TouchableOpacity>
   );
-  
+
   // Render driver card
   const renderDriverCard = (driver: Formula1Driver) => (
-    <View
-      key={driver.id}
-      style={[styles.driverCard, { backgroundColor: colors.card }]}
-    >
+    <View key={driver.id} style={[styles.driverCard, { backgroundColor: colors.card }]}>
       <View style={styles.driverPosition}>
-        <Text style={[styles.positionText, { color: colors.primary }]}>
-          {driver.position}
-        </Text>
+        <Text style={[styles.positionText, { color: colors.primary }]}>{driver.position}</Text>
       </View>
       <View style={styles.driverInfo}>
         <Text style={[styles.driverName, { color: colors.text }]}>{driver.name}</Text>
@@ -251,17 +252,12 @@ const Formula1Screen = (): JSX.Element => {
       </View>
     </View>
   );
-  
+
   // Render team card
   const renderTeamCard = (team: Formula1Team) => (
-    <View
-      key={team.id}
-      style={[styles.teamCard, { backgroundColor: colors.card }]}
-    >
+    <View key={team.id} style={[styles.teamCard, { backgroundColor: colors.card }]}>
       <View style={styles.teamPosition}>
-        <Text style={[styles.positionText, { color: colors.primary }]}>
-          {team.position}
-        </Text>
+        <Text style={[styles.positionText, { color: colors.primary }]}>{team.position}</Text>
       </View>
       <View style={styles.teamInfo}>
         <Text style={[styles.teamName, { color: colors.text }]}>{team.name}</Text>
@@ -273,22 +269,20 @@ const Formula1Screen = (): JSX.Element => {
       </View>
     </View>
   );
-  
+
   // Render prediction
   const renderPrediction = () => {
     if (!selectedRace) return null;
-    
+
     if (predictionLoading) {
       return (
         <View style={styles.predictionLoading}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            Loading prediction...
-          </Text>
+          <Text style={[styles.loadingText, { color: colors.text }]}>Loading prediction...</Text>
         </View>
       );
     }
-    
+
     if (!prediction) {
       return (
         <Formula1BlurredPrediction
@@ -299,13 +293,13 @@ const Formula1Screen = (): JSX.Element => {
         />
       );
     }
-    
+
     return (
       <View style={[styles.predictionContainer, { backgroundColor: colors.card }]}>
         <Text style={[styles.predictionTitle, { color: colors.text }]}>
           {selectedRace.name} Prediction
         </Text>
-        
+
         <View style={styles.podiumContainer}>
           <Text style={[styles.podiumTitle, { color: colors.primary }]}>Predicted Podium</Text>
           <View style={styles.podiumPositions}>
@@ -332,7 +326,7 @@ const Formula1Screen = (): JSX.Element => {
             Confidence: {Math.round(prediction.podiumPrediction.confidence * 100)}%
           </Text>
         </View>
-        
+
         <View style={styles.fastestLapContainer}>
           <Text style={[styles.fastestLapTitle, { color: colors.primary }]}>
             Fastest Lap Prediction
@@ -344,14 +338,14 @@ const Formula1Screen = (): JSX.Element => {
             Confidence: {Math.round(prediction.fastestLapPrediction.confidence * 100)}%
           </Text>
         </View>
-        
+
         <Text style={[styles.generatedAt, { color: colors.text }]}>
           Generated: {new Date(prediction.generatedAt).toLocaleString()}
         </Text>
       </View>
     );
   };
-  
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Tab navigation */}
@@ -359,14 +353,14 @@ const Formula1Screen = (): JSX.Element => {
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'races' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'races' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('races')}
         >
           <Text
             style={[
               styles.tabText,
-              { color: activeTab === 'races' ? colors.primary : colors.text }
+              { color: activeTab === 'races' ? colors.primary : colors.text },
             ]}
           >
             Races
@@ -375,14 +369,14 @@ const Formula1Screen = (): JSX.Element => {
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'drivers' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'drivers' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('drivers')}
         >
           <Text
             style={[
               styles.tabText,
-              { color: activeTab === 'drivers' ? colors.primary : colors.text }
+              { color: activeTab === 'drivers' ? colors.primary : colors.text },
             ]}
           >
             Drivers
@@ -391,28 +385,26 @@ const Formula1Screen = (): JSX.Element => {
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'teams' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'teams' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('teams')}
         >
           <Text
             style={[
               styles.tabText,
-              { color: activeTab === 'teams' ? colors.primary : colors.text }
+              { color: activeTab === 'teams' ? colors.primary : colors.text },
             ]}
           >
             Teams
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Content based on active tab */}
       <ScrollView style={styles.content}>
         {activeTab === 'races' && (
           <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Upcoming Races
-            </Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Upcoming Races</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -420,30 +412,28 @@ const Formula1Screen = (): JSX.Element => {
             >
               {races.map(race => renderRaceCard(race, selectedRace?.id === race.id))}
             </ScrollView>
-            
+
             {/* Race prediction */}
             {selectedRace && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Race Prediction
-                </Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Race Prediction</Text>
                 {hasPremium ? (
                   renderPrediction()
                 ) : (
-                  <PremiumFeature
-                    message="Upgrade to Premium Annual to access Formula 1 predictions and data."
-                  >
+                  <PremiumFeature message="Upgrade to Premium Annual to access Formula 1 predictions and data.">
                     <TouchableOpacity
                       style={{
                         paddingHorizontal: 16,
                         paddingVertical: 8,
                         borderRadius: 4,
                         marginTop: 8,
-                        backgroundColor: colors.primary
+                        backgroundColor: colors.primary,
                       }}
                       onPress={() => navigation.navigate('SubscriptionScreen' as never)}
                     >
-                      <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Upgrade Now</Text>
+                      <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
+                        Upgrade Now
+                      </Text>
                     </TouchableOpacity>
                   </PremiumFeature>
                 )}
@@ -451,61 +441,55 @@ const Formula1Screen = (): JSX.Element => {
             )}
           </>
         )}
-        
+
         {activeTab === 'drivers' && (
           <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Driver Standings
-            </Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Driver Standings</Text>
             {hasPremium ? (
               <View style={styles.driversContainer}>
                 {drivers.map(driver => renderDriverCard(driver))}
               </View>
             ) : (
-              <PremiumFeature
-                message="Upgrade to Premium Annual to access Formula 1 predictions and data."
-              >
+              <PremiumFeature message="Upgrade to Premium Annual to access Formula 1 predictions and data.">
                 <TouchableOpacity
                   style={{
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 4,
                     marginTop: 8,
-                    backgroundColor: colors.primary
+                    backgroundColor: colors.primary,
                   }}
                   onPress={() => navigation.navigate('SubscriptionScreen' as never)}
                 >
-                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Upgrade Now</Text>
+                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
+                    Upgrade Now
+                  </Text>
                 </TouchableOpacity>
               </PremiumFeature>
             )}
           </>
         )}
-        
+
         {activeTab === 'teams' && (
           <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Team Standings
-            </Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Team Standings</Text>
             {hasPremium ? (
-              <View style={styles.teamsContainer}>
-                {teams.map(team => renderTeamCard(team))}
-              </View>
+              <View style={styles.teamsContainer}>{teams.map(team => renderTeamCard(team))}</View>
             ) : (
-              <PremiumFeature
-                message="Upgrade to Premium Annual to access Formula 1 predictions and data."
-              >
+              <PremiumFeature message="Upgrade to Premium Annual to access Formula 1 predictions and data.">
                 <TouchableOpacity
                   style={{
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 4,
                     marginTop: 8,
-                    backgroundColor: colors.primary
+                    backgroundColor: colors.primary,
                   }}
                   onPress={() => navigation.navigate('SubscriptionScreen' as never)}
                 >
-                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Upgrade Now</Text>
+                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
+                    Upgrade Now
+                  </Text>
                 </TouchableOpacity>
               </PremiumFeature>
             )}

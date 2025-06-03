@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 
 interface PollOption {
@@ -35,11 +30,7 @@ interface CommunityPollsProps {
  * @param {CommunityPollsProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const CommunityPolls: React.FC<CommunityPollsProps> = ({ 
-  polls,
-  onVote,
-  isPremium
-}) => {
+const CommunityPolls: React.FC<CommunityPollsProps> = ({ polls, onVote, isPremium }) => {
   const [votedPolls, setVotedPolls] = useState<Record<string, string>>({});
   const navigation = useNavigation();
   const { colors, isDark } = useTheme();
@@ -54,7 +45,7 @@ const CommunityPolls: React.FC<CommunityPollsProps> = ({
   const handleVote = (pollId: string, optionId: string) => {
     setVotedPolls(prev => ({
       ...prev,
-      [pollId]: optionId
+      [pollId]: optionId,
     }));
     onVote(pollId, optionId);
   };
@@ -65,26 +56,24 @@ const CommunityPolls: React.FC<CommunityPollsProps> = ({
     const votedOptionId = votedPolls[item.id];
 
     return (
-      <View style={[
-        styles.pollContainer,
-        { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)' }
-      ]}>
-        <Text style={[styles.pollQuestion, { color: colors.text }]}>
-          {item.question}
-        </Text>
+      <View
+        style={[
+          styles.pollContainer,
+          { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)' },
+        ]}
+      >
+        <Text style={[styles.pollQuestion, { color: colors.text }]}>{item.question}</Text>
 
         {/* Poll options */}
         <View style={styles.optionsContainer}>
           {item.options.map(option => {
             const isSelected = votedOptionId === option.id;
-            const percentage = item.totalVotes > 0 
-              ? Math.round((option.votes / item.totalVotes) * 100) 
-              : 0;
-            
+            const percentage =
+              item.totalVotes > 0 ? Math.round((option.votes / item.totalVotes) * 100) : 0;
+
             // Determine if this option matches AI prediction
-            const isAIPrediction = isPremium && 
-              item.aiPrediction !== undefined && 
-              option.text === item.aiPrediction;
+            const isAIPrediction =
+              isPremium && item.aiPrediction !== undefined && option.text === item.aiPrediction;
 
             return (
               <TouchableOpacity
@@ -92,37 +81,41 @@ const CommunityPolls: React.FC<CommunityPollsProps> = ({
                 style={[
                   styles.optionButton,
                   isSelected && { borderColor: colors.primary },
-                  hasVoted && { opacity: isSelected ? 1 : 0.7 }
+                  hasVoted && { opacity: isSelected ? 1 : 0.7 },
                 ]}
                 onPress={() => handleVote(item.id, option.id)}
                 disabled={hasVoted}
               >
                 <View style={styles.optionContent}>
-                  <Text style={[
-                    styles.optionText,
-                    { color: colors.text },
-                    isSelected && { fontWeight: 'bold' }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      { color: colors.text },
+                      isSelected && { fontWeight: 'bold' },
+                    ]}
+                  >
                     {option.text}
                   </Text>
-                  
+
                   {hasVoted && (
                     <Text style={[styles.votePercentage, { color: colors.text }]}>
                       {percentage}%
                     </Text>
                   )}
                 </View>
-                
+
                 {hasVoted && (
-                  <View style={[
-                    styles.percentageBar,
-                    { 
-                      width: `${percentage}%`,
-                      backgroundColor: isSelected ? colors.primary : '#757575'
-                    }
-                  ]} />
+                  <View
+                    style={[
+                      styles.percentageBar,
+                      {
+                        width: `${percentage}%`,
+                        backgroundColor: isSelected ? colors.primary : '#757575',
+                      },
+                    ]}
+                  />
                 )}
-                
+
                 {isAIPrediction && (
                   <View style={styles.aiPredictionTag}>
                     <Ionicons name="flash" size={12} color="#fff" />
@@ -135,9 +128,7 @@ const CommunityPolls: React.FC<CommunityPollsProps> = ({
         </View>
 
         {/* Total votes */}
-        <Text style={[styles.totalVotes, { color: colors.text }]}>
-          {item.totalVotes} votes
-        </Text>
+        <Text style={[styles.totalVotes, { color: colors.text }]}>{item.totalVotes} votes</Text>
 
         {/* AI prediction for premium users */}
         {!isPremium && item.aiPrediction !== undefined && (
@@ -159,16 +150,11 @@ const CommunityPolls: React.FC<CommunityPollsProps> = ({
   };
 
   return (
-    <View style={[
-      styles.container,
-      { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }
-    ]}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Ionicons name="people" size={20} color={colors.primary} />
-          <Text style={[styles.title, { color: colors.text }]}>
-            Community Polls
-          </Text>
+          <Text style={[styles.title, { color: colors.text }]}>Community Polls</Text>
         </View>
         <Text style={[styles.subtitle, { color: colors.text }]}>
           Vote and see what others think
@@ -178,7 +164,7 @@ const CommunityPolls: React.FC<CommunityPollsProps> = ({
       <FlatList
         data={polls}
         renderItem={renderPoll}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         scrollEnabled={false}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />

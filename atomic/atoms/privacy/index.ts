@@ -5,6 +5,11 @@
  */
 
 // Configuration
+// Default exports
+import dataCategories from './dataCategories';
+import gdprConfig from './gdprConfig';
+import storageUtils from './storageUtils';
+
 export * from './gdprConfig';
 
 // Type Definitions
@@ -15,11 +20,6 @@ export * from './dataCategories';
 
 // Storage Utilities
 export * from './storageUtils';
-
-// Default exports
-import gdprConfig from './gdprConfig';
-import dataCategories from './dataCategories';
-import storageUtils from './storageUtils';
 
 export default {
   gdprConfig,

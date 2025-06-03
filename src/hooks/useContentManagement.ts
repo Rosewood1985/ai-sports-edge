@@ -1,4 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
+
+import { ContentManagementService } from '../services/contentManagementService';
 import {
   ContentItem,
   ContentListFilter,
@@ -12,7 +14,6 @@ import {
   ContentRevision,
   ContentComment,
 } from '../types/contentManagement';
-import { ContentManagementService } from '../services/contentManagementService';
 
 /**
  * Hook for managing content list with filtering and pagination
@@ -32,7 +33,7 @@ export function useContentList(
   const fetchContent = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.getContentList(page, pageSize, filters);
       setData(response);
@@ -94,7 +95,7 @@ export function useContentItem(id?: string) {
   const fetchContent = useCallback(async (contentId: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.getContentById(contentId);
       setData(response);
@@ -116,7 +117,7 @@ export function useContentItem(id?: string) {
   const createContent = useCallback(async (content: ContentCreateRequest) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.createContent(content);
       setData(response);
@@ -133,7 +134,7 @@ export function useContentItem(id?: string) {
   const updateContent = useCallback(async (content: ContentUpdateRequest) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.updateContent(content);
       setData(response);
@@ -147,24 +148,27 @@ export function useContentItem(id?: string) {
     }
   }, []);
 
-  const deleteContent = useCallback(async (contentId: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const success = await ContentManagementService.deleteContent(contentId);
-      if (success && data?.id === contentId) {
-        setData(null);
+  const deleteContent = useCallback(
+    async (contentId: string) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const success = await ContentManagementService.deleteContent(contentId);
+        if (success && data?.id === contentId) {
+          setData(null);
+        }
+        return success;
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to delete content'));
+        console.error('Error deleting content:', err);
+        return false;
+      } finally {
+        setIsLoading(false);
       }
-      return success;
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to delete content'));
-      console.error('Error deleting content:', err);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [data]);
+    },
+    [data]
+  );
 
   const refresh = useCallback(() => {
     if (id) {
@@ -193,7 +197,7 @@ export function useContentBulkOperations() {
   const performBulkOperation = useCallback(async (operation: ContentBulkOperation) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const success = await ContentManagementService.bulkOperation(operation);
       return success;
@@ -224,7 +228,7 @@ export function useContentTemplates() {
   const fetchTemplates = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.getContentTemplates();
       setData(response);
@@ -260,7 +264,7 @@ export function useContentTags() {
   const fetchTags = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.getContentTags();
       setData(response);
@@ -275,7 +279,7 @@ export function useContentTags() {
   const createTag = useCallback(async (tag: Omit<ContentTag, 'id'>) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.createContentTag(tag);
       setData(prev => [...prev, response]);
@@ -313,7 +317,7 @@ export function useMediaAssets() {
   const uploadAsset = useCallback(async (file: File, metadata: Partial<ContentMediaAsset>) => {
     setIsUploading(true);
     setUploadError(null);
-    
+
     try {
       const response = await ContentManagementService.uploadMediaAsset(file, metadata);
       return response;
@@ -344,7 +348,7 @@ export function useContentRevisions(contentId?: string) {
   const fetchRevisions = useCallback(async (id: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.getContentRevisions(id);
       setData(response);
@@ -382,7 +386,7 @@ export function useContentComments(contentId?: string) {
   const fetchComments = useCallback(async (id: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await ContentManagementService.getContentComments(id);
       setData(response);
@@ -394,27 +398,30 @@ export function useContentComments(contentId?: string) {
     }
   }, []);
 
-  const addComment = useCallback(async (
-    id: string,
-    content: string,
-    isInternal = false,
-    parentId?: string
-  ) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await ContentManagementService.addContentComment(id, content, isInternal, parentId);
-      setData(prev => [...prev, response]);
-      return response;
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to add comment'));
-      console.error('Error adding comment:', err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const addComment = useCallback(
+    async (id: string, content: string, isInternal = false, parentId?: string) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await ContentManagementService.addContentComment(
+          id,
+          content,
+          isInternal,
+          parentId
+        );
+        setData(prev => [...prev, response]);
+        return response;
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to add comment'));
+        console.error('Error adding comment:', err);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   // Fetch comments when content ID changes
   useEffect(() => {
@@ -427,8 +434,10 @@ export function useContentComments(contentId?: string) {
     data,
     isLoading,
     error,
-    addComment: contentId ? (content: string, isInternal?: boolean, parentId?: string) => 
-      addComment(contentId, content, isInternal, parentId) : undefined,
+    addComment: contentId
+      ? (content: string, isInternal?: boolean, parentId?: string) =>
+          addComment(contentId, content, isInternal, parentId)
+      : undefined,
     refresh: () => contentId && fetchComments(contentId),
   };
 }

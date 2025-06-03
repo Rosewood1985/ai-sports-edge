@@ -6,9 +6,10 @@
  */
 
 import { Platform } from 'react-native';
+
 import { addBreadcrumb } from './errorTracking';
-import { safeErrorCapture, formatError } from '../atoms/errorUtils';
 import { isDevelopment } from '../atoms/envConfig';
+import { safeErrorCapture, formatError } from '../atoms/errorUtils';
 
 /**
  * Log levels

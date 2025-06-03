@@ -6,11 +6,14 @@
 import { Platform } from 'react-native';
 
 // Cache for memoized values
-const memoizationCache: Record<string, {
-  value: any;
-  timestamp: number;
-  ttl: number;
-}> = {};
+const memoizationCache: Record<
+  string,
+  {
+    value: any;
+    timestamp: number;
+    ttl: number;
+  }
+> = {};
 
 // Resource cleanup registry
 const cleanupRegistry: Record<string, () => void> = {};
@@ -30,22 +33,25 @@ export function memoizeWithTTL<T extends (...args: any[]) => any>(
   return ((...args: Parameters<T>): ReturnType<T> => {
     const key = keyFn(...args);
     const now = Date.now();
-    
+
     // Check if cached value exists and is still valid
-    if (memoizationCache[key] && now - memoizationCache[key].timestamp < memoizationCache[key].ttl) {
+    if (
+      memoizationCache[key] &&
+      now - memoizationCache[key].timestamp < memoizationCache[key].ttl
+    ) {
       return memoizationCache[key].value;
     }
-    
+
     // Calculate new value
     const result = fn(...args);
-    
+
     // Cache the result
     memoizationCache[key] = {
       value: result,
       timestamp: now,
-      ttl
+      ttl,
     };
-    
+
     return result;
   }) as T;
 }
@@ -55,7 +61,7 @@ export function memoizeWithTTL<T extends (...args: any[]) => any>(
  */
 export function clearExpiredCache(): void {
   const now = Date.now();
-  
+
   Object.keys(memoizationCache).forEach(key => {
     if (now - memoizationCache[key].timestamp > memoizationCache[key].ttl) {
       delete memoizationCache[key];
@@ -109,7 +115,7 @@ export function clearAllCache(): void {
 export function getMemoryStats(): { cacheSize: number; cleanupFunctions: number } {
   return {
     cacheSize: Object.keys(memoizationCache).length,
-    cleanupFunctions: Object.keys(cleanupRegistry).length
+    cleanupFunctions: Object.keys(cleanupRegistry).length,
   };
 }
 
@@ -127,17 +133,17 @@ export function createDisposable<T>(
 ): T & { dispose: () => void } {
   const obj = createFn();
   const uniqueId = id || `disposable_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
+
   const dispose = () => {
     disposeFn(obj);
     unregisterCleanup(uniqueId);
   };
-  
+
   // Register cleanup
   registerCleanup(uniqueId, dispose);
-  
+
   // Add dispose method to object
-  return { ...obj as object, dispose } as T & { dispose: () => void };
+  return { ...(obj as object), dispose } as T & { dispose: () => void };
 }
 
 // Set up automatic cache cleanup interval
@@ -152,7 +158,7 @@ export function startMemoryManagement(interval: number = 2 * 60 * 1000): void {
   if (cleanupInterval) {
     clearInterval(cleanupInterval);
   }
-  
+
   // Set up new interval
   cleanupInterval = setInterval(() => {
     clearExpiredCache();
@@ -177,13 +183,13 @@ if (Platform.OS !== 'web') {
   // For React Native, we would typically use AppState here
   // This is a simplified version that would need to be expanded in a real app
   const { AppState } = require('react-native');
-  
+
   AppState.addEventListener('memoryWarning', () => {
     console.log('Memory warning received, clearing caches');
     clearAllCache();
     runAllCleanups();
   });
-  
+
   AppState.addEventListener('background', () => {
     console.log('App going to background, running cleanup');
     clearExpiredCache();

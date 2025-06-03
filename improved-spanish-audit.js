@@ -45,24 +45,24 @@ const REAL_PLACEHOLDER_PATTERNS = [
 function isLegitimateSpanishWord(match, context) {
   const lowerMatch = match.toLowerCase();
   const lowerContext = context.toLowerCase();
-  
+
   // Check if it's part of a known Spanish phrase
   if (lowerMatch === 'todo' && lowerContext.includes('ver todo')) {
     return true;
   }
-  
+
   if (lowerMatch.includes('demo') && lowerContext.includes('recomendaciones')) {
     return true;
   }
-  
+
   if (lowerMatch === 'prueba' && lowerContext.includes('prueba gratuita')) {
     return true;
   }
-  
+
   if (lowerMatch === 'ejemplo' && lowerContext.includes('por ejemplo')) {
     return true;
   }
-  
+
   return false;
 }
 
@@ -83,7 +83,7 @@ function checkFileForRealPlaceholders(filePath) {
     issues: [],
     templateVariables: [],
     legitimateSpanish: [],
-    content: null
+    content: null,
   };
 
   try {
@@ -93,20 +93,20 @@ function checkFileForRealPlaceholders(filePath) {
       results.content = content;
 
       // Check for actual problematic patterns
-      REAL_PLACEHOLDER_PATTERNS.forEach((pattern) => {
+      REAL_PLACEHOLDER_PATTERNS.forEach(pattern => {
         const matches = content.match(pattern);
         if (matches) {
           matches.forEach(match => {
             const lineNumber = findLineNumber(content, match);
             const lineContext = getLineContext(content, lineNumber);
-            
+
             if (!isLegitimateSpanishWord(match, lineContext)) {
               results.issues.push({
                 pattern: pattern.toString(),
-                match: match,
+                match,
                 line: lineNumber,
                 context: lineContext.trim(),
-                severity: 'high'
+                severity: 'high',
               });
             }
           });
@@ -114,18 +114,18 @@ function checkFileForRealPlaceholders(filePath) {
       });
 
       // Track template variables (these are legitimate)
-      TEMPLATE_PATTERNS.forEach((pattern) => {
+      TEMPLATE_PATTERNS.forEach(pattern => {
         const matches = content.match(pattern);
         if (matches) {
           matches.forEach(match => {
             results.templateVariables.push({
-              match: match,
-              line: findLineNumber(content, match)
+              match,
+              line: findLineNumber(content, match),
             });
           });
         }
       });
-      
+
       // Track legitimate Spanish words that might trigger false positives
       SPANISH_EXCEPTIONS.forEach(word => {
         const regex = new RegExp(`\\b${word}\\b`, 'gi');
@@ -134,7 +134,7 @@ function checkFileForRealPlaceholders(filePath) {
           matches.forEach(match => {
             results.legitimateSpanish.push({
               word: match,
-              line: findLineNumber(content, match)
+              line: findLineNumber(content, match),
             });
           });
         }
@@ -176,14 +176,14 @@ function getLineContext(content, lineNumber) {
  */
 async function runImprovedSpanishAudit() {
   console.log('🔍 Starting Improved Spanish Content Audit...\n');
-  
+
   const SPANISH_FILES = [
     './atomic/atoms/translations/es.json',
     './atomic/atoms/translations/es-error-updates.json',
     './atomic/atoms/translations/odds-comparison-es.json',
-    './public/locales/es/features.json'
+    './public/locales/es/features.json',
   ];
-  
+
   const auditResults = {
     timestamp: new Date().toISOString(),
     auditId: `improved_spanish_audit_${Date.now()}`,
@@ -193,13 +193,13 @@ async function runImprovedSpanishAudit() {
       filesWithIssues: 0,
       totalRealIssues: 0,
       templateVariables: 0,
-      legitimateSpanishWords: 0
+      legitimateSpanishWords: 0,
     },
     productionReadiness: {
       score: 0,
       status: 'pending',
-      realIssues: []
-    }
+      realIssues: [],
+    },
   };
 
   // Check each Spanish file with improved logic
@@ -207,16 +207,16 @@ async function runImprovedSpanishAudit() {
     console.log(`📁 Checking: ${filePath}`);
     const fileResult = checkFileForRealPlaceholders(filePath);
     auditResults.files.push(fileResult);
-    
+
     if (fileResult.exists) {
       auditResults.summary.totalFiles++;
       auditResults.summary.templateVariables += fileResult.templateVariables.length;
       auditResults.summary.legitimateSpanishWords += fileResult.legitimateSpanish.length;
-      
+
       if (fileResult.issues.length > 0) {
         auditResults.summary.filesWithIssues++;
         auditResults.summary.totalRealIssues += fileResult.issues.length;
-        
+
         console.log(`  ⚠️  Found ${fileResult.issues.length} REAL issues:`);
         fileResult.issues.forEach(issue => {
           console.log(`    - Line ${issue.line}: "${issue.match}" (${issue.severity})`);
@@ -225,11 +225,13 @@ async function runImprovedSpanishAudit() {
       } else {
         console.log(`  ✅ No actual placeholder content found`);
       }
-      
+
       if (fileResult.templateVariables.length > 0) {
-        console.log(`  📋 Found ${fileResult.templateVariables.length} legitimate template variables`);
+        console.log(
+          `  📋 Found ${fileResult.templateVariables.length} legitimate template variables`
+        );
       }
-      
+
       if (fileResult.legitimateSpanish.length > 0) {
         console.log(`  🇪🇸 Found ${fileResult.legitimateSpanish.length} legitimate Spanish words`);
       }
@@ -251,9 +253,7 @@ async function runImprovedSpanishAudit() {
   auditResults.productionReadiness = {
     score: Math.max(0, score),
     status,
-    realIssues: auditResults.files
-      .flatMap(f => f.issues)
-      .map(i => i.match)
+    realIssues: auditResults.files.flatMap(f => f.issues).map(i => i.match),
   };
 
   // Print summary
@@ -269,7 +269,9 @@ async function runImprovedSpanishAudit() {
 
   if (auditResults.productionReadiness.status === 'ready') {
     console.log('\n✅ Spanish content is PRODUCTION READY!');
-    console.log('   All detected patterns are either legitimate Spanish words or template variables.');
+    console.log(
+      '   All detected patterns are either legitimate Spanish words or template variables.'
+    );
   } else {
     console.log('\n❌ Spanish content has real issues that need fixing.');
     console.log('   The following are actual placeholder content that should be replaced:');

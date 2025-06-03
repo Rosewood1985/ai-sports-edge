@@ -14,14 +14,14 @@ import { useTranslation } from 'react-i18next';
  * @param {string} props.cancelText - Text for the cancel button
  * @returns {JSX.Element} - Rendered component
  */
-const ConfirmationModal = ({ 
-  show, 
-  onHide, 
-  title, 
-  message, 
-  onConfirm, 
-  confirmText, 
-  cancelText 
+const ConfirmationModal = ({
+  show,
+  onHide,
+  title,
+  message,
+  onConfirm,
+  confirmText,
+  cancelText,
 }) => {
   const { t } = useTranslation('common');
 
@@ -30,9 +30,9 @@ const ConfirmationModal = ({
   const cancelButtonText = cancelText || t('cancel');
 
   return (
-    <Modal 
-      show={show} 
-      onHide={onHide} 
+    <Modal
+      show={show}
+      onHide={onHide}
       centered
       aria-labelledby="confirmation-modal-title"
       aria-describedby="confirmation-modal-description"
@@ -44,15 +44,11 @@ const ConfirmationModal = ({
         <p id="confirmation-modal-description">{message}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
-          variant="secondary" 
-          onClick={onHide}
-          aria-label={cancelButtonText}
-        >
+        <Button variant="secondary" onClick={onHide} aria-label={cancelButtonText}>
           {cancelButtonText}
         </Button>
-        <Button 
-          variant="primary" 
+        <Button
+          variant="primary"
           onClick={() => {
             onConfirm();
             onHide();

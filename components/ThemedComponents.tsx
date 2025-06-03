@@ -1,9 +1,10 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
-import { 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   StyleSheet,
   TextStyle,
@@ -11,9 +12,8 @@ import {
   TextInputProps,
   TouchableOpacityProps,
   ScrollViewProps,
-  ViewProps
+  ViewProps,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 
 /**
  * ThemedText component that automatically uses the theme's text color
@@ -48,16 +48,16 @@ export const ThemedView: React.FC<ViewProps> = ({ style, children, ...props }) =
 export const ThemedCard: React.FC<ViewProps> = ({ style, children, ...props }) => {
   const { colors, dark } = useTheme();
   return (
-    <View 
+    <View
       style={[
-        styles.card, 
-        { 
+        styles.card,
+        {
           backgroundColor: dark ? colors.card : colors.card,
           borderColor: colors.border,
-          shadowColor: dark ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'
-        }, 
-        style
-      ]} 
+          shadowColor: dark ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)',
+        },
+        style,
+      ]}
       {...props}
     >
       {children}
@@ -77,9 +77,9 @@ export const ThemedInput: React.FC<TextInputProps> = ({ style, ...props }) => {
         {
           color: colors.text,
           backgroundColor: colors.card,
-          borderColor: colors.border
+          borderColor: colors.border,
         },
-        style
+        style,
       ]}
       placeholderTextColor={colors.text + '80'} // 50% opacity
       {...props}
@@ -98,10 +98,10 @@ export const ThemedButton: React.FC<
   }
 > = ({ style, title, titleStyle, variant = 'filled', ...props }) => {
   const { colors } = useTheme();
-  
+
   let buttonStyle: ViewStyle = {};
   let textStyle: TextStyle = {};
-  
+
   switch (variant) {
     case 'filled':
       buttonStyle = {
@@ -130,15 +130,10 @@ export const ThemedButton: React.FC<
       };
       break;
   }
-  
+
   return (
-    <TouchableOpacity
-      style={[styles.button, buttonStyle, style]}
-      {...props}
-    >
-      <Text style={[styles.buttonText, textStyle, titleStyle]}>
-        {title}
-      </Text>
+    <TouchableOpacity style={[styles.button, buttonStyle, style]} {...props}>
+      <Text style={[styles.buttonText, textStyle, titleStyle]}>{title}</Text>
     </TouchableOpacity>
   );
 };
@@ -149,10 +144,7 @@ export const ThemedButton: React.FC<
 export const ThemedScrollView: React.FC<ScrollViewProps> = ({ style, children, ...props }) => {
   const { colors } = useTheme();
   return (
-    <ScrollView
-      style={[{ backgroundColor: colors.background }, style]}
-      {...props}
-    >
+    <ScrollView style={[{ backgroundColor: colors.background }, style]} {...props}>
       {children}
     </ScrollView>
   );
@@ -165,15 +157,7 @@ export const ThemedDivider: React.FC<{
   style?: ViewStyle;
 }> = ({ style }) => {
   const { colors } = useTheme();
-  return (
-    <View
-      style={[
-        styles.divider,
-        { backgroundColor: colors.border },
-        style
-      ]}
-    />
-  );
+  return <View style={[styles.divider, { backgroundColor: colors.border }, style]} />;
 };
 
 const styles = StyleSheet.create({

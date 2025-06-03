@@ -6,7 +6,7 @@ import {
   Image,
   Dimensions,
   ImageSourcePropType,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -38,13 +38,13 @@ const OnboardingSlide = ({
   backgroundColor = '#ffffff',
   titleColor = '#333333',
   descriptionColor = '#666666',
-  actionButton
+  actionButton,
 }: OnboardingSlideProps): JSX.Element => {
   return (
     <View
       style={[styles.slide, { backgroundColor }]}
       accessibilityRole="none"
-      accessible={true}
+      accessible
       accessibilityLabel={`${title}. ${description}`}
     >
       <View style={styles.imageContainer}>
@@ -52,28 +52,24 @@ const OnboardingSlide = ({
           source={image}
           style={styles.image}
           resizeMode="contain"
-          accessible={true}
+          accessible
           accessibilityLabel={`Illustration for ${title}`}
           accessibilityRole="image"
         />
       </View>
-      
+
       <View style={styles.textContainer}>
-        <Text
-          style={[styles.title, { color: titleColor }]}
-          accessibilityRole="header"
-          accessible={true}
-        >
+        <Text style={[styles.title, { color: titleColor }]} accessibilityRole="header" accessible>
           {title}
         </Text>
         <Text
           style={[styles.description, { color: descriptionColor }]}
           accessibilityRole="text"
-          accessible={true}
+          accessible
         >
           {description}
         </Text>
-        
+
         {actionButton && (
           <TouchableOpacity
             style={styles.actionButton}
@@ -81,7 +77,7 @@ const OnboardingSlide = ({
             accessibilityLabel={actionButton.text}
             accessibilityRole="button"
             accessibilityHint={`Navigates to ${actionButton.text} screen`}
-            accessible={true}
+            accessible
           >
             <Text style={styles.actionButtonText}>{actionButton.text}</Text>
           </TouchableOpacity>

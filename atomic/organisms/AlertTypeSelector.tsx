@@ -1,9 +1,10 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, ViewStyle, StyleProp, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+
 import { AccessibleThemedView } from '../atoms';
-import { AlertTypeOption } from '../molecules';
 import { AlertType } from '../atoms/AlertTypeIcon';
+import { AlertTypeOption } from '../molecules';
 import { useI18n } from './i18n/I18nContext';
 
 /**

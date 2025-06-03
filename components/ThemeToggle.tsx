@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { useTheme } from '../screens/Onboarding/Context/ThemeContext';
+
 import { AccessibleTouchableOpacity } from '../atomic/atoms';
+import { useTheme } from '../screens/Onboarding/Context/ThemeContext';
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();

@@ -1,5 +1,5 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -14,25 +14,25 @@ exports.trackSubscriptionEvent = functions.https.onCall(async (data, context) =>
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Validate required fields
   if (!data.eventType || !data.userId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Event type and user ID are required.'
+      "invalid-argument",
+      "Event type and user ID are required."
     );
   }
 
   try {
     const db = admin.firestore();
-    const analyticsRef = db.collection('analytics').doc('subscriptions');
+    const analyticsRef = db.collection("analytics").doc("subscriptions");
     
     // Create the event record
-    await analyticsRef.collection('events').add({
+    await analyticsRef.collection("events").add({
       eventType: data.eventType,
       userId: data.userId,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
@@ -41,39 +41,39 @@ exports.trackSubscriptionEvent = functions.https.onCall(async (data, context) =>
     
     // Update aggregate metrics based on event type
     switch (data.eventType) {
-      case 'subscription_created':
-        await updateSubscriptionMetrics(analyticsRef, 'new_subscriptions', 1);
-        await updateUserSubscriptionStatus(db, data.userId, 'active', data.properties?.planId);
-        break;
+    case "subscription_created":
+      await updateSubscriptionMetrics(analyticsRef, "new_subscriptions", 1);
+      await updateUserSubscriptionStatus(db, data.userId, "active", data.properties?.planId);
+      break;
       
-      case 'subscription_cancelled':
-        await updateSubscriptionMetrics(analyticsRef, 'cancelled_subscriptions', 1);
-        await updateUserSubscriptionStatus(db, data.userId, 'cancelled', null);
-        break;
+    case "subscription_cancelled":
+      await updateSubscriptionMetrics(analyticsRef, "cancelled_subscriptions", 1);
+      await updateUserSubscriptionStatus(db, data.userId, "cancelled", null);
+      break;
       
-      case 'subscription_renewed':
-        await updateSubscriptionMetrics(analyticsRef, 'renewed_subscriptions', 1);
-        break;
+    case "subscription_renewed":
+      await updateSubscriptionMetrics(analyticsRef, "renewed_subscriptions", 1);
+      break;
       
-      case 'payment_failed':
-        await updateSubscriptionMetrics(analyticsRef, 'failed_payments', 1);
-        break;
+    case "payment_failed":
+      await updateSubscriptionMetrics(analyticsRef, "failed_payments", 1);
+      break;
       
-      case 'plan_upgraded':
-        await updateSubscriptionMetrics(analyticsRef, 'plan_upgrades', 1);
-        await updateUserSubscriptionStatus(db, data.userId, 'active', data.properties?.newPlanId);
-        break;
+    case "plan_upgraded":
+      await updateSubscriptionMetrics(analyticsRef, "plan_upgrades", 1);
+      await updateUserSubscriptionStatus(db, data.userId, "active", data.properties?.newPlanId);
+      break;
       
-      case 'plan_downgraded':
-        await updateSubscriptionMetrics(analyticsRef, 'plan_downgrades', 1);
-        await updateUserSubscriptionStatus(db, data.userId, 'active', data.properties?.newPlanId);
-        break;
+    case "plan_downgraded":
+      await updateSubscriptionMetrics(analyticsRef, "plan_downgrades", 1);
+      await updateUserSubscriptionStatus(db, data.userId, "active", data.properties?.newPlanId);
+      break;
     }
     
     return { success: true };
   } catch (error) {
-    console.error('Error tracking subscription event:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error tracking subscription event:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -89,8 +89,8 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
@@ -100,10 +100,10 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
   // Check if user is an admin
   let isAdmin = false;
   try {
-    const adminDoc = await db.collection('admins').doc(userId).get();
+    const adminDoc = await db.collection("admins").doc(userId).get();
     isAdmin = adminDoc.exists && adminDoc.data().isAdmin;
   } catch (error) {
-    console.log('Error checking admin status:', error);
+    console.log("Error checking admin status:", error);
     // Continue as regular user
   }
   
@@ -117,33 +117,33 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     endDate.setHours(23, 59, 59, 999); // End of the day
   } else {
     // Use timeRange
-    const timeRange = data.timeRange || '30d';
+    const timeRange = data.timeRange || "30d";
     endDate = new Date();
     endDate.setHours(23, 59, 59, 999); // End of the day
     
     startDate = new Date();
     switch (timeRange) {
-      case '7d':
-        startDate.setDate(startDate.getDate() - 7);
-        break;
-      case '30d':
-        startDate.setDate(startDate.getDate() - 30);
-        break;
-      case '90d':
-        startDate.setDate(startDate.getDate() - 90);
-        break;
-      case 'all':
-        startDate = new Date(2020, 0, 1); // Beginning of 2020 or some early date
-        break;
-      default:
-        startDate.setDate(startDate.getDate() - 30); // Default to 30 days
+    case "7d":
+      startDate.setDate(startDate.getDate() - 7);
+      break;
+    case "30d":
+      startDate.setDate(startDate.getDate() - 30);
+      break;
+    case "90d":
+      startDate.setDate(startDate.getDate() - 90);
+      break;
+    case "all":
+      startDate = new Date(2020, 0, 1); // Beginning of 2020 or some early date
+      break;
+    default:
+      startDate.setDate(startDate.getDate() - 30); // Default to 30 days
     }
   }
   
   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Invalid date format. Use YYYY-MM-DD.'
+      "invalid-argument",
+      "Invalid date format. Use YYYY-MM-DD."
     );
   }
 
@@ -151,17 +151,17 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     // We already have startDate and endDate from above
     
     // Query subscription events within the date range
-    const eventsRef = db.collection('analytics').doc('subscriptions').collection('events');
+    const eventsRef = db.collection("analytics").doc("subscriptions").collection("events");
     const eventsQuery = await eventsRef
-      .where('timestamp', '>=', admin.firestore.Timestamp.fromDate(startDate))
-      .where('timestamp', '<=', admin.firestore.Timestamp.fromDate(endDate))
+      .where("timestamp", ">=", admin.firestore.Timestamp.fromDate(startDate))
+      .where("timestamp", "<=", admin.firestore.Timestamp.fromDate(endDate))
       .get();
     
     // Initialize report data
     const report = {
       period: {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0]
+        startDate: startDate.toISOString().split("T")[0],
+        endDate: endDate.toISOString().split("T")[0]
       },
       metrics: {
         new_subscriptions: 0,
@@ -192,65 +192,65 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     // Count events by type
     events.forEach(event => {
       switch (event.eventType) {
-        case 'subscription_created':
-          report.metrics.new_subscriptions++;
+      case "subscription_created":
+        report.metrics.new_subscriptions++;
           
-          // Add revenue
-          if (event.properties && event.properties.amount) {
-            report.revenue.total += event.properties.amount;
+        // Add revenue
+        if (event.properties && event.properties.amount) {
+          report.revenue.total += event.properties.amount;
             
-            // Track by plan
-            const planId = event.properties.planId || 'unknown';
-            if (!report.revenue.by_plan[planId]) {
-              report.revenue.by_plan[planId] = 0;
-            }
-            report.revenue.by_plan[planId] += event.properties.amount;
+          // Track by plan
+          const planId = event.properties.planId || "unknown";
+          if (!report.revenue.by_plan[planId]) {
+            report.revenue.by_plan[planId] = 0;
           }
-          break;
+          report.revenue.by_plan[planId] += event.properties.amount;
+        }
+        break;
         
-        case 'subscription_cancelled':
-          report.metrics.cancelled_subscriptions++;
-          break;
+      case "subscription_cancelled":
+        report.metrics.cancelled_subscriptions++;
+        break;
         
-        case 'subscription_renewed':
-          report.metrics.renewed_subscriptions++;
+      case "subscription_renewed":
+        report.metrics.renewed_subscriptions++;
           
-          // Add revenue
-          if (event.properties && event.properties.amount) {
-            report.revenue.total += event.properties.amount;
+        // Add revenue
+        if (event.properties && event.properties.amount) {
+          report.revenue.total += event.properties.amount;
             
-            // Track by plan
-            const planId = event.properties.planId || 'unknown';
-            if (!report.revenue.by_plan[planId]) {
-              report.revenue.by_plan[planId] = 0;
-            }
-            report.revenue.by_plan[planId] += event.properties.amount;
+          // Track by plan
+          const planId = event.properties.planId || "unknown";
+          if (!report.revenue.by_plan[planId]) {
+            report.revenue.by_plan[planId] = 0;
           }
-          break;
+          report.revenue.by_plan[planId] += event.properties.amount;
+        }
+        break;
         
-        case 'payment_failed':
-          report.metrics.failed_payments++;
-          break;
+      case "payment_failed":
+        report.metrics.failed_payments++;
+        break;
         
-        case 'plan_upgraded':
-          report.metrics.plan_upgrades++;
-          break;
+      case "plan_upgraded":
+        report.metrics.plan_upgrades++;
+        break;
         
-        case 'plan_downgraded':
-          report.metrics.plan_downgrades++;
-          break;
+      case "plan_downgraded":
+        report.metrics.plan_downgrades++;
+        break;
         
-        case 'auto_resubscribe':
-          report.metrics.auto_resubscribes++;
-          break;
+      case "auto_resubscribe":
+        report.metrics.auto_resubscribes++;
+        break;
       }
     });
     
     // Calculate churn rate
     // Churn rate = (Cancelled subscriptions / Total subscriptions at start) * 100
-    const totalSubscriptionsQuery = await db.collection('users')
-      .where('subscriptionStatus', '==', 'active')
-      .where('subscriptionCreatedAt', '<', admin.firestore.Timestamp.fromDate(startDate))
+    const totalSubscriptionsQuery = await db.collection("users")
+      .where("subscriptionStatus", "==", "active")
+      .where("subscriptionCreatedAt", "<", admin.firestore.Timestamp.fromDate(startDate))
       .count()
       .get();
     
@@ -263,12 +263,12 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     
     // Calculate conversion rate
     // Conversion rate = (New subscriptions / Total subscription page views) * 100
-    const subscriptionPageViewsQuery = await db.collection('analytics')
-      .doc('pageViews')
-      .collection('events')
-      .where('page', '==', 'subscription')
-      .where('timestamp', '>=', admin.firestore.Timestamp.fromDate(startDate))
-      .where('timestamp', '<=', admin.firestore.Timestamp.fromDate(endDate))
+    const subscriptionPageViewsQuery = await db.collection("analytics")
+      .doc("pageViews")
+      .collection("events")
+      .where("page", "==", "subscription")
+      .where("timestamp", ">=", admin.firestore.Timestamp.fromDate(startDate))
+      .where("timestamp", "<=", admin.firestore.Timestamp.fromDate(endDate))
       .count()
       .get();
     
@@ -279,10 +279,10 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     }
     
     // Calculate average subscription length
-    const subscriptionsQuery = await db.collectionGroup('subscriptions')
-      .where('status', '==', 'cancelled')
-      .where('canceledAt', '>=', admin.firestore.Timestamp.fromDate(startDate))
-      .where('canceledAt', '<=', admin.firestore.Timestamp.fromDate(endDate))
+    const subscriptionsQuery = await db.collectionGroup("subscriptions")
+      .where("status", "==", "cancelled")
+      .where("canceledAt", ">=", admin.firestore.Timestamp.fromDate(startDate))
+      .where("canceledAt", "<=", admin.firestore.Timestamp.fromDate(endDate))
       .get();
     
     let totalDays = 0;
@@ -304,10 +304,10 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     }
     
     // Count referral conversions
-    const referralConversionsQuery = await db.collection('referrals')
-      .where('status', '==', 'completed')
-      .where('completedAt', '>=', admin.firestore.Timestamp.fromDate(startDate))
-      .where('completedAt', '<=', admin.firestore.Timestamp.fromDate(endDate))
+    const referralConversionsQuery = await db.collection("referrals")
+      .where("status", "==", "completed")
+      .where("completedAt", ">=", admin.firestore.Timestamp.fromDate(startDate))
+      .where("completedAt", "<=", admin.firestore.Timestamp.fromDate(endDate))
       .count()
       .get();
     
@@ -316,18 +316,18 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     // Helper function to get plan name by ID
     const getPlanNameById = (planId) => {
       const planMap = {
-        'price_basic_monthly': 'Basic Monthly',
-        'price_premium_monthly': 'Premium Monthly',
-        'price_premium_yearly': 'Premium Annual',
-        'unknown': 'Unknown Plan'
+        "price_basic_monthly": "Basic Monthly",
+        "price_premium_monthly": "Premium Monthly",
+        "price_premium_yearly": "Premium Annual",
+        "unknown": "Unknown Plan"
       };
-      return planMap[planId] || 'Unknown Plan';
+      return planMap[planId] || "Unknown Plan";
     };
     
     // Helper function to generate revenue by month
     const generateRevenueByMonth = async (start, end, db) => {
       const months = [];
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       
       // Create a copy of the start date
       const current = new Date(start);
@@ -348,10 +348,10 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
         
         // Query monthly revenue data
         for (const monthData of months) {
-          const monthKey = `${monthData.year}-${String(monthNames.indexOf(monthData.month) + 1).padStart(2, '0')}`;
-          const monthlyRevenueDoc = await db.collection('analytics')
-            .doc('subscriptions')
-            .collection('monthly')
+          const monthKey = `${monthData.year}-${String(monthNames.indexOf(monthData.month) + 1).padStart(2, "0")}`;
+          const monthlyRevenueDoc = await db.collection("analytics")
+            .doc("subscriptions")
+            .collection("monthly")
             .doc(monthKey)
             .get();
           
@@ -391,7 +391,7 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
           });
         }
       } catch (error) {
-        console.error('Error getting monthly revenue data:', error);
+        console.error("Error getting monthly revenue data:", error);
         // Fallback to even distribution if there's an error
         if (report.revenue.total > 0) {
           const monthCount = months.length;
@@ -442,19 +442,19 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
       // Subscriptions by status with more accurate data
       subscriptionsByStatus: [
         {
-          status: 'Active',
+          status: "Active",
           count: totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions,
           percentage: totalSubscriptionsAtStart > 0 ?
             Math.round(((totalSubscriptionsAtStart - report.metrics.cancelled_subscriptions) / totalSubscriptionsAtStart) * 100) : 0
         },
         {
-          status: 'Canceled',
+          status: "Canceled",
           count: report.metrics.cancelled_subscriptions,
           percentage: totalSubscriptionsAtStart > 0 ?
             Math.round((report.metrics.cancelled_subscriptions / totalSubscriptionsAtStart) * 100) : 0
         },
         {
-          status: 'Past Due',
+          status: "Past Due",
           count: report.metrics.failed_payments || 0,
           percentage: totalSubscriptionsAtStart > 0 ?
             Math.round((report.metrics.failed_payments || 0) / totalSubscriptionsAtStart * 100) : 0
@@ -464,7 +464,7 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     
     // Store the full report for admins
     if (isAdmin) {
-      const reportRef = db.collection('analytics').doc('subscriptions').collection('reports').doc();
+      const reportRef = db.collection("analytics").doc("subscriptions").collection("reports").doc();
       await reportRef.set({
         ...report,
         generatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -479,8 +479,8 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
     
     return clientReport;
   } catch (error) {
-    console.error('Error generating subscription report:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error generating subscription report:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -492,17 +492,17 @@ exports.generateSubscriptionReport = functions.https.onCall(async (data, context
  */
 async function updateSubscriptionMetrics(analyticsRef, metricName, incrementBy) {
   // Get the current date in YYYY-MM-DD format
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   
   // Update daily metrics
-  await analyticsRef.collection('daily').doc(today).set({
+  await analyticsRef.collection("daily").doc(today).set({
     [metricName]: admin.firestore.FieldValue.increment(incrementBy),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, { merge: true });
   
   // Update monthly metrics
   const month = today.substring(0, 7); // YYYY-MM
-  await analyticsRef.collection('monthly').doc(month).set({
+  await analyticsRef.collection("monthly").doc(month).set({
     [metricName]: admin.firestore.FieldValue.increment(incrementBy),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, { merge: true });
@@ -522,7 +522,7 @@ async function updateSubscriptionMetrics(analyticsRef, metricName, incrementBy) 
  * @param {string|null} planId - Plan ID
  */
 async function updateUserSubscriptionStatus(db, userId, status, planId) {
-  const userRef = db.collection('users').doc(userId);
+  const userRef = db.collection("users").doc(userId);
   
   const updateData = {
     subscriptionStatus: status,
@@ -533,7 +533,7 @@ async function updateUserSubscriptionStatus(db, userId, status, planId) {
     updateData.currentPlanId = planId;
   }
   
-  if (status === 'active' && !planId) {
+  if (status === "active" && !planId) {
     // Don't update the plan ID if it's not provided and the status is active
     delete updateData.currentPlanId;
   }

@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Modal, FlatList, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../../organisms/i18n/LanguageContext';
-import { ThemedText, ThemedView } from '../../atoms';
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Modal,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+
 import { useUITheme } from '../../../components/UIThemeProvider';
+import { ThemedText, ThemedView } from '../../atoms';
+import { useLanguage } from '../../organisms/i18n/LanguageContext';
 
 interface LanguageOption {
   code: string;
@@ -102,7 +111,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
 
       <Modal
         visible={modalVisible}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >

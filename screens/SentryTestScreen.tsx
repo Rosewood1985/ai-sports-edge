@@ -1,13 +1,14 @@
 /**
  * Sentry Test Screen
  * Screen wrapper for the Sentry Test Component
- * 
+ *
  * This screen provides a dedicated interface for testing Sentry integration
  * and can be easily added to your navigation for testing purposes.
  */
 
 import React from 'react';
 import { View, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+
 import SentryTestComponent from '../components/SentryTestComponent';
 
 export const SentryTestScreen: React.FC = () => {

@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -5,15 +7,13 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedText, ThemedView } from '../components/ThemedComponents'
-import { ThemedView } from '../atomic/atoms/ThemedView'
+
 import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { ThemedText, ThemedView } from '../components/ThemedComponents';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Mock data for games
 const MOCK_GAMES = [
@@ -23,17 +23,17 @@ const MOCK_GAMES = [
       id: 'team1',
       name: 'Lakers',
       logo: '🏀',
-      score: 105
+      score: 105,
     },
     awayTeam: {
       id: 'team2',
       name: 'Warriors',
       logo: '🏀',
-      score: 98
+      score: 98,
     },
     status: 'completed',
     date: new Date(2025, 2, 20, 19, 30),
-    venue: 'Staples Center'
+    venue: 'Staples Center',
   },
   {
     id: 'game2',
@@ -41,17 +41,17 @@ const MOCK_GAMES = [
       id: 'team3',
       name: 'Celtics',
       logo: '🏀',
-      score: 0
+      score: 0,
     },
     awayTeam: {
       id: 'team4',
       name: 'Nets',
       logo: '🏀',
-      score: 0
+      score: 0,
     },
     status: 'upcoming',
     date: new Date(2025, 3, 25, 20, 0),
-    venue: 'TD Garden'
+    venue: 'TD Garden',
   },
   {
     id: 'game3',
@@ -59,20 +59,20 @@ const MOCK_GAMES = [
       id: 'team5',
       name: 'Heat',
       logo: '🏀',
-      score: 87
+      score: 87,
     },
     awayTeam: {
       id: 'team6',
       name: 'Bulls',
       logo: '🏀',
-      score: 92
+      score: 92,
     },
     status: 'live',
     date: new Date(),
     venue: 'American Airlines Arena',
     quarter: 4,
-    timeRemaining: '3:45'
-  }
+    timeRemaining: '3:45',
+  },
 ];
 
 const GamesScreen = () => {
@@ -88,14 +88,14 @@ const GamesScreen = () => {
   const loadGames = async (tab = activeTab) => {
     try {
       setLoading(true);
-      
+
       // In a real app, this would be an API call
       // const response = await gamesService.getGames(tab);
       // setGames(response.data);
-      
+
       // For now, we'll just filter the mock data
       let filteredGames = [...MOCK_GAMES];
-      
+
       if (tab === 'live') {
         filteredGames = MOCK_GAMES.filter(game => game.status === 'live');
       } else if (tab === 'upcoming') {
@@ -103,7 +103,7 @@ const GamesScreen = () => {
       } else if (tab === 'completed') {
         filteredGames = MOCK_GAMES.filter(game => game.status === 'completed');
       }
-      
+
       setGames(filteredGames);
     } catch (error) {
       console.error('Error loading games:', error);
@@ -137,12 +137,12 @@ const GamesScreen = () => {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // Render game item
-  const renderGameItem = ({ item }: { item: typeof MOCK_GAMES[0] }) => {
+  const renderGameItem = ({ item }: { item: (typeof MOCK_GAMES)[0] }) => {
     return (
       <TouchableOpacity
         style={[styles.gameCard, { backgroundColor: colors.card }]}
@@ -153,14 +153,14 @@ const GamesScreen = () => {
       >
         <View style={styles.gameHeader}>
           <ThemedText style={styles.gameVenue}>{item.venue}</ThemedText>
-          
+
           {item.status === 'live' && (
             <View style={[styles.liveIndicator, { backgroundColor: '#FF3B30' }]}>
               <ThemedText style={styles.liveText}>LIVE</ThemedText>
             </View>
           )}
         </View>
-        
+
         <View style={styles.teamsContainer}>
           <View style={styles.teamContainer}>
             <ThemedText style={styles.teamLogo}>{item.homeTeam.logo}</ThemedText>
@@ -169,7 +169,7 @@ const GamesScreen = () => {
               {item.status !== 'upcoming' ? item.homeTeam.score : '-'}
             </ThemedText>
           </View>
-          
+
           <View style={styles.gameInfo}>
             {item.status === 'live' ? (
               <View style={styles.liveInfo}>
@@ -177,12 +177,10 @@ const GamesScreen = () => {
                 <ThemedText style={styles.timeRemaining}>{item.timeRemaining}</ThemedText>
               </View>
             ) : (
-              <ThemedText style={styles.gameDate}>
-                {formatDate(item.date)}
-              </ThemedText>
+              <ThemedText style={styles.gameDate}>{formatDate(item.date)}</ThemedText>
             )}
           </View>
-          
+
           <View style={styles.teamContainer}>
             <ThemedText style={styles.teamLogo}>{item.awayTeam.logo}</ThemedText>
             <ThemedText style={styles.teamName}>{item.awayTeam.name}</ThemedText>
@@ -191,18 +189,18 @@ const GamesScreen = () => {
             </ThemedText>
           </View>
         </View>
-        
+
         <View style={styles.gameFooter}>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="stats-chart-outline" size={16} color={colors.text} />
             <ThemedText style={styles.actionText}>{t('games.stats')}</ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="podium-outline" size={16} color={colors.text} />
             <ThemedText style={styles.actionText}>{t('games.odds')}</ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="analytics-outline" size={16} color={colors.text} />
             <ThemedText style={styles.actionText}>{t('games.predictions')}</ThemedText>
@@ -215,13 +213,16 @@ const GamesScreen = () => {
   // Render empty state
   const renderEmptyState = () => {
     if (loading) return null;
-    
+
     return (
       <View style={styles.emptyState}>
-        <Ionicons name="basketball-outline" size={64} color={colors.text} style={{ opacity: 0.5 }} />
-        <ThemedText style={styles.emptyStateText}>
-          {t('games.no_games_found')}
-        </ThemedText>
+        <Ionicons
+          name="basketball-outline"
+          size={64}
+          color={colors.text}
+          style={{ opacity: 0.5 }}
+        />
+        <ThemedText style={styles.emptyStateText}>{t('games.no_games_found')}</ThemedText>
       </View>
     );
   };
@@ -231,77 +232,80 @@ const GamesScreen = () => {
       <View style={styles.header}>
         <ThemedText style={styles.headerTitle}>{t('games.all_games')}</ThemedText>
       </View>
-      
+
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'all' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'all' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => handleTabChange('all')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'all' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'all' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.all_games')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'live' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'live' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => handleTabChange('live')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'live' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'live' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.live_games')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'upcoming' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'upcoming' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
           ]}
           onPress={() => handleTabChange('upcoming')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'upcoming' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'upcoming' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.upcoming_games')}
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'completed' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+            activeTab === 'completed' && {
+              borderBottomColor: colors.primary,
+              borderBottomWidth: 2,
+            },
           ]}
           onPress={() => handleTabChange('completed')}
         >
           <ThemedText
             style={[
               styles.tabText,
-              activeTab === 'completed' ? { color: colors.primary, fontWeight: 'bold' } : {}
+              activeTab === 'completed' ? { color: colors.primary, fontWeight: 'bold' } : {},
             ]}
           >
             {t('games.completed_games')}
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
+
       {loading && !refreshing ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -311,7 +315,7 @@ const GamesScreen = () => {
         <FlatList
           data={games}
           renderItem={renderGameItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={renderEmptyState}
           refreshControl={

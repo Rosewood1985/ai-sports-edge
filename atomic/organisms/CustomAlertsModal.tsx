@@ -1,12 +1,12 @@
+import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ViewStyle, StyleProp, View, Modal } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+
 import { AccessibleThemedView } from '../atoms';
 import { ModalHeader, AlertPreview, ActionButtons } from '../molecules';
+import AlertFiltersForm, { AlertFilters } from './AlertFiltersForm';
 import AlertTypeSelector from './AlertTypeSelector';
-import AlertFiltersForm from './AlertFiltersForm';
 import { AlertType } from '../atoms/AlertTypeIcon';
-import { AlertFilters } from './AlertFiltersForm';
 import { useI18n } from './i18n/I18nContext';
 
 /**
@@ -209,10 +209,10 @@ const CustomAlertsModal: React.FC<CustomAlertsModalProps> = ({
                   alertType === 'lineMovement'
                     ? 'stats-chart'
                     : alertType === 'sharpAction'
-                    ? 'information-circle'
-                    : alertType === 'aiPrediction'
-                    ? 'chatbubbles'
-                    : 'person'
+                      ? 'information-circle'
+                      : alertType === 'aiPrediction'
+                        ? 'chatbubbles'
+                        : 'person'
                 }
               />
             </View>

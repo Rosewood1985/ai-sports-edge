@@ -10,22 +10,22 @@ const DEFAULT_PREFERENCES = {
     refreshIntervalMinutes: 15,
     keywordFilters: {
       include: [],
-      exclude: []
-    }
+      exclude: [],
+    },
   },
   analytics: {
     showAnalytics: true,
     statsFormat: 'standard',
     enabledProviders: ['advanced_stats', 'team_analysis', 'historical_data'],
-    detailLevel: 'medium'
+    detailLevel: 'medium',
   },
   ui: {
     newsTicker: {
       scrollSpeed: 'medium',
-      pauseOnHover: true
+      pauseOnHover: true,
     },
-    theme: 'light'
-  }
+    theme: 'light',
+  },
 };
 
 // Storage key for preferences
@@ -39,18 +39,18 @@ export function getUserPreferences() {
   try {
     // Try to get preferences from local storage
     const storedPreferences = localStorage.getItem(PREFERENCES_STORAGE_KEY);
-    
+
     if (storedPreferences) {
       // Parse stored preferences
       const parsedPreferences = JSON.parse(storedPreferences);
-      
+
       // Merge with defaults to ensure all properties exist
       return mergeWithDefaults(parsedPreferences);
     }
   } catch (error) {
     console.error('Error retrieving user preferences:', error);
   }
-  
+
   // Return default preferences if none found or error occurred
   return { ...DEFAULT_PREFERENCES };
 }
@@ -64,10 +64,10 @@ export function updateUserPreferences(preferences) {
   try {
     // Merge with defaults to ensure all properties exist
     const mergedPreferences = mergeWithDefaults(preferences);
-    
+
     // Save to local storage
     localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(mergedPreferences));
-    
+
     return true;
   } catch (error) {
     console.error('Error saving user preferences:', error);
@@ -85,11 +85,11 @@ export function updatePreference(path, value) {
   try {
     // Get current preferences
     const preferences = getUserPreferences();
-    
+
     // Update the specific preference
     const parts = path.split('.');
     let current = preferences;
-    
+
     // Navigate to the nested property
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i];
@@ -98,10 +98,10 @@ export function updatePreference(path, value) {
       }
       current = current[part];
     }
-    
+
     // Set the value
     current[parts[parts.length - 1]] = value;
-    
+
     // Save updated preferences
     return updateUserPreferences(preferences);
   } catch (error) {
@@ -118,7 +118,7 @@ export function resetUserPreferences() {
   try {
     // Save default preferences
     localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(DEFAULT_PREFERENCES));
-    
+
     return true;
   } catch (error) {
     console.error('Error resetting user preferences:', error);
@@ -136,21 +136,21 @@ export function addKeywordFilter(keyword, type = 'include') {
   try {
     // Get current preferences
     const preferences = getUserPreferences();
-    
+
     // Ensure the filter type is valid
     if (type !== 'include' && type !== 'exclude') {
       throw new Error(`Invalid filter type: ${type}`);
     }
-    
+
     // Add the keyword if it doesn't already exist
     const filters = preferences.rssFeeds.keywordFilters[type];
     if (!filters.includes(keyword)) {
       filters.push(keyword);
-      
+
       // Save updated preferences
       return updateUserPreferences(preferences);
     }
-    
+
     return true;
   } catch (error) {
     console.error(`Error adding keyword filter ${keyword}:`, error);
@@ -168,23 +168,23 @@ export function removeKeywordFilter(keyword, type = 'include') {
   try {
     // Get current preferences
     const preferences = getUserPreferences();
-    
+
     // Ensure the filter type is valid
     if (type !== 'include' && type !== 'exclude') {
       throw new Error(`Invalid filter type: ${type}`);
     }
-    
+
     // Remove the keyword if it exists
     const filters = preferences.rssFeeds.keywordFilters[type];
     const index = filters.indexOf(keyword);
-    
+
     if (index !== -1) {
       filters.splice(index, 1);
-      
+
       // Save updated preferences
       return updateUserPreferences(preferences);
     }
-    
+
     return true;
   } catch (error) {
     console.error(`Error removing keyword filter ${keyword}:`, error);
@@ -210,13 +210,13 @@ export function updateNewsTickerSettings(settings) {
   try {
     // Get current preferences
     const preferences = getUserPreferences();
-    
+
     // Update news ticker settings
     preferences.ui.newsTicker = {
       ...preferences.ui.newsTicker,
-      ...settings
+      ...settings,
     };
-    
+
     // Save updated preferences
     return updateUserPreferences(preferences);
   } catch (error) {
@@ -234,13 +234,13 @@ export function updateAnalyticsSettings(settings) {
   try {
     // Get current preferences
     const preferences = getUserPreferences();
-    
+
     // Update analytics settings
     preferences.analytics = {
       ...preferences.analytics,
-      ...settings
+      ...settings,
     };
-    
+
     // Save updated preferences
     return updateUserPreferences(preferences);
   } catch (error) {
@@ -259,7 +259,7 @@ function mergeWithDefaults(preferences) {
   // Deep merge function for objects
   const deepMerge = (target, source) => {
     const output = { ...target };
-    
+
     if (isObject(target) && isObject(source)) {
       Object.keys(source).forEach(key => {
         if (isObject(source[key])) {
@@ -273,15 +273,15 @@ function mergeWithDefaults(preferences) {
         }
       });
     }
-    
+
     return output;
   };
-  
+
   // Helper to check if value is an object
-  const isObject = (item) => {
-    return (item && typeof item === 'object' && !Array.isArray(item));
+  const isObject = item => {
+    return item && typeof item === 'object' && !Array.isArray(item);
   };
-  
+
   // Merge preferences with defaults
   return deepMerge(DEFAULT_PREFERENCES, preferences);
 }

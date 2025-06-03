@@ -7,7 +7,9 @@
 import { STRIPE_PUBLISHABLE_KEY as ENV_STRIPE_KEY } from '@env';
 
 // Stripe publishable key - loaded from environment variables
-export const STRIPE_PUBLISHABLE_KEY = ENV_STRIPE_KEY || 'pk_live_51R3nPsEQcCDah3pyvQ59Ju2bGs5YZKys6OGhJfIL8RhsfHawGDfeSLxLAmouy50UPEvzT5J5klnIzsl5BWxiHgEW00oSQeW9xi';
+export const STRIPE_PUBLISHABLE_KEY =
+  ENV_STRIPE_KEY ||
+  'pk_live_51R3nPsEQcCDah3pyvQ59Ju2bGs5YZKys6OGhJfIL8RhsfHawGDfeSLxLAmouy50UPEvzT5J5klnIzsl5BWxiHgEW00oSQeW9xi';
 
 // Stripe price IDs for subscription plans
 export const STRIPE_PRICE_IDS = {
@@ -16,18 +18,18 @@ export const STRIPE_PRICE_IDS = {
   PREMIUM_MONTHLY: 'price_premium_monthly',
   PREMIUM_YEARLY: 'price_premium_yearly',
   GROUP_PRO_MONTHLY: 'price_group_pro_monthly', // New group subscription tier
-  
+
   // One-time purchases
   WEEKEND_PASS: 'price_weekend_pass',
   GAME_DAY_PASS: 'price_game_day_pass',
-  
+
   // Microtransactions
   SINGLE_PREDICTION: 'price_single_prediction',
   PARLAY_SUGGESTION: 'price_parlay_suggestion',
   PARLAY_PACKAGE: 'price_parlay_package',
   ALERT_PACKAGE_SMALL: 'price_alert_package_small',
   ALERT_PACKAGE_LARGE: 'price_alert_package_large',
-  PLAYER_PLUS_MINUS: 'price_player_plus_minus'
+  PLAYER_PLUS_MINUS: 'price_player_plus_minus',
 };
 
 // Note: Stripe webhook secret should only be used on the server side
@@ -35,5 +37,5 @@ export const STRIPE_PRICE_IDS = {
 
 export default {
   STRIPE_PUBLISHABLE_KEY,
-  STRIPE_PRICE_IDS
+  STRIPE_PRICE_IDS,
 };

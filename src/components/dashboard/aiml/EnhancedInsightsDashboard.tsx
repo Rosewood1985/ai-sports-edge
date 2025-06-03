@@ -5,15 +5,16 @@
  */
 
 import React, { useState } from 'react';
-import { useEnhancedInsightsDashboard } from '../../../hooks/useEnhancedInsights';
-import { InsightFilters } from '../../../types/enhancedInsights';
+
+import { CorrelationAnalysisWidget } from './components/CorrelationAnalysisWidget';
 import { EnhancedInsightCard } from './components/EnhancedInsightCard';
 import { InsightAnalyticsWidget } from './components/InsightAnalyticsWidget';
-import { PatternDetectionWidget } from './components/PatternDetectionWidget';
-import { CorrelationAnalysisWidget } from './components/CorrelationAnalysisWidget';
-import { NLPInsightsWidget } from './components/NLPInsightsWidget';
-import { RealTimeInsightsWidget } from './components/RealTimeInsightsWidget';
 import { InsightFiltersPanel } from './components/InsightFiltersPanel';
+import { NLPInsightsWidget } from './components/NLPInsightsWidget';
+import { PatternDetectionWidget } from './components/PatternDetectionWidget';
+import { RealTimeInsightsWidget } from './components/RealTimeInsightsWidget';
+import { useEnhancedInsightsDashboard } from '../../../hooks/useEnhancedInsights';
+import { InsightFilters } from '../../../types/enhancedInsights';
 import { Tabs } from '../../ui/Tabs';
 
 interface EnhancedInsightsDashboardProps {
@@ -28,15 +29,8 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
   const [filters, setFilters] = useState<InsightFilters>({});
   const [showFilters, setShowFilters] = useState(false);
 
-  const {
-    insights,
-    analytics,
-    patterns,
-    correlations,
-    quickStats,
-    loading,
-    error,
-  } = useEnhancedInsightsDashboard(filters);
+  const { insights, analytics, patterns, correlations, quickStats, loading, error } =
+    useEnhancedInsightsDashboard(filters);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '🎯' },
@@ -76,9 +70,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
               <span className="text-2xl">💡</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Insights
-              </p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Insights</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {quickStats.totalInsights}
               </p>
@@ -92,9 +84,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
               <span className="text-2xl">🆕</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                New Insights
-              </p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">New Insights</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {quickStats.newInsights}
               </p>
@@ -108,9 +98,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
               <span className="text-2xl">🚨</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Critical
-              </p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Critical</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {quickStats.criticalInsights}
               </p>
@@ -124,9 +112,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
               <span className="text-2xl">🎯</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Avg Confidence
-              </p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Confidence</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {(quickStats.averageConfidence * 100).toFixed(0)}%
               </p>
@@ -140,9 +126,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
               <span className="text-2xl">📊</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Top Category
-              </p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Category</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {quickStats.topCategory}
               </p>
@@ -167,9 +151,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Enhanced Insights
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Enhanced Insights</h3>
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -178,12 +160,14 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
                 Filters
               </button>
               <button
-                onClick={() => insights.generateInsights('all_sources', {
-                  includeNLP: true,
-                  includePatterns: true,
-                  includeCorrelations: true,
-                  includePredictions: true,
-                })}
+                onClick={() =>
+                  insights.generateInsights('all_sources', {
+                    includeNLP: true,
+                    includePatterns: true,
+                    includeCorrelations: true,
+                    includePredictions: true,
+                  })
+                }
                 className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
               >
                 Generate New
@@ -205,7 +189,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
               <span className="ml-2 text-gray-600 dark:text-gray-400">Loading insights...</span>
             </div>
           ) : error ? (
@@ -224,7 +208,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
             </div>
           ) : (
             <div className="space-y-4">
-              {insights.insights.map((insight) => (
+              {insights.insights.map(insight => (
                 <EnhancedInsightCard
                   key={insight.id}
                   insight={insight}
@@ -236,7 +220,8 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
               {insights.total > 20 && (
                 <div className="flex items-center justify-between pt-4">
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Showing {((insights.page - 1) * 20) + 1} to {Math.min(insights.page * 20, insights.total)} of {insights.total} insights
+                    Showing {(insights.page - 1) * 20 + 1} to{' '}
+                    {Math.min(insights.page * 20, insights.total)} of {insights.total} insights
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
@@ -307,13 +292,13 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
             <div className="flex items-center space-x-2">
               {quickStats.newInsights > 0 && (
                 <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse mr-2"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse mr-2" />
                   {quickStats.newInsights} new insight{quickStats.newInsights !== 1 ? 's' : ''}
                 </div>
               )}
               {quickStats.criticalInsights > 0 && (
                 <div className="flex items-center text-sm text-red-600 dark:text-red-400">
-                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse mr-2"></div>
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse mr-2" />
                   {quickStats.criticalInsights} critical
                 </div>
               )}
@@ -333,9 +318,7 @@ export function EnhancedInsightsDashboard({ className = '' }: EnhancedInsightsDa
       </div>
 
       {/* Tab Content */}
-      <div className="tab-content">
-        {renderTabContent()}
-      </div>
+      <div className="tab-content">{renderTabContent()}</div>
     </div>
   );
 }

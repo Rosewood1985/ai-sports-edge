@@ -6,19 +6,17 @@
 import { createLazyComponent } from '../utils/codeSplitting';
 
 // Lazy load OddsMovementAlerts component
-export const LazyOddsMovementAlerts = createLazyComponent(
-  () => import('./OddsMovementAlerts'),
-  { text: 'Loading alerts...' }
-);
+export const LazyOddsMovementAlerts = createLazyComponent(() => import('./OddsMovementAlerts'), {
+  text: 'Loading alerts...',
+});
 
 // Lazy load ParlayIntegration component
-export const LazyParlayIntegration = createLazyComponent(
-  () => import('./ParlayIntegration'),
-  { size: 'small' }
-);
+export const LazyParlayIntegration = createLazyComponent(() => import('./ParlayIntegration'), {
+  size: 'small',
+});
 
 // Lazy load SportSelector component
-export const LazySportSelector = createLazyComponent(
-  () => import('./SportSelector'),
-  { size: 'small', text: 'Loading sports...' }
-);
+export const LazySportSelector = createLazyComponent(() => import('./SportSelector'), {
+  size: 'small',
+  text: 'Loading sports...',
+});

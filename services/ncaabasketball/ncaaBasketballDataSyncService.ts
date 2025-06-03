@@ -3,9 +3,19 @@
 // Comprehensive March Madness and College Basketball Data Integration
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, writeBatch, query, where, getDocs } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  writeBatch,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
+
+import { firestore as db } from '../../config/firebase';
 import { getWeatherApiKey, getApiKey } from '../../utils/apiKeys';
 
 // NCAA Basketball-specific interfaces
@@ -198,7 +208,8 @@ export interface MarchMadnessBracket {
 }
 
 export class NCAABasketballDataSyncService {
-  private readonly espnBaseUrl = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball';
+  private readonly espnBaseUrl =
+    'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball';
   private readonly sportsReferenceUrl = 'https://www.sports-reference.com/cbb'; // For historical data
   private readonly rateLimitDelay = 1000; // 1 second between requests
   private lastRequestTime = 0;
@@ -222,7 +233,7 @@ export class NCAABasketballDataSyncService {
 
       // Validate API access
       await this.validateApiAccess();
-      
+
       console.log('NCAA Basketball Data Sync Service initialized successfully');
     } catch (error) {
       Sentry.captureException(error);
@@ -267,15 +278,15 @@ export class NCAABasketballDataSyncService {
       await this.syncTeams();
       await this.syncConferences();
       await this.syncPlayers();
-      
-      // Phase 2: Game data sync  
+
+      // Phase 2: Game data sync
       await this.syncCurrentSeasonGames();
       await this.syncTournamentGames();
-      
+
       // Phase 3: March Madness specific data
       await this.syncMarchMadnessBrackets();
       await this.syncHistoricalTournamentData();
-      
+
       // Phase 4: Analytics preparation data
       await this.syncRankings();
       await this.syncAdvancedStats();
@@ -305,7 +316,7 @@ export class NCAABasketballDataSyncService {
       });
 
       const teamsData = await this.makeApiCall(`${this.espnBaseUrl}/teams`);
-      
+
       if (!teamsData || !teamsData.sports || !teamsData.sports[0].leagues) {
         throw new Error('Invalid teams data structure from ESPN API');
       }
@@ -317,11 +328,13 @@ export class NCAABasketballDataSyncService {
       for (const teamData of teams) {
         try {
           const team = teamData.team;
-          
+
           // Get detailed team information
           const detailedTeamData = await this.makeApiCall(`${this.espnBaseUrl}/teams/${team.id}`);
-          const standings = await this.makeApiCall(`${this.espnBaseUrl}/teams/${team.id}/standings`);
-          
+          const standings = await this.makeApiCall(
+            `${this.espnBaseUrl}/teams/${team.id}/standings`
+          );
+
           const ncaaTeam: NCAATeam = {
             id: team.id,
             name: team.displayName,
@@ -354,7 +367,6 @@ export class NCAABasketballDataSyncService {
 
           // Rate limiting
           await this.enforceRateLimit();
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing team ${teamData.team?.displayName}:`, error.message);
@@ -364,7 +376,6 @@ export class NCAABasketballDataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NCAA Basketball teams`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NCAA Basketball teams: ${error.message}`);
@@ -384,7 +395,7 @@ export class NCAABasketballDataSyncService {
 
       // Get conference data from ESPN
       const conferencesData = await this.makeApiCall(`${this.espnBaseUrl}/conferences`);
-      
+
       if (!conferencesData || !conferencesData.conferences) {
         throw new Error('Invalid conferences data from ESPN API');
       }
@@ -411,7 +422,6 @@ export class NCAABasketballDataSyncService {
           syncedCount++;
 
           await this.enforceRateLimit();
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing conference ${confData.name}:`, error.message);
@@ -421,7 +431,6 @@ export class NCAABasketballDataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NCAA Basketball conferences`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NCAA Basketball conferences: ${error.message}`);
@@ -447,19 +456,19 @@ export class NCAABasketballDataSyncService {
       for (const teamDoc of teamsSnapshot.docs) {
         try {
           const teamId = teamDoc.id;
-          
+
           // Get roster data
           const rosterData = await this.makeApiCall(`${this.espnBaseUrl}/teams/${teamId}/roster`);
-          
+
           if (rosterData?.athletes) {
             for (const athleteData of rosterData.athletes) {
               try {
                 const player = athleteData.athlete;
-                
+
                 // Get detailed player stats
                 const playerStats = await this.getPlayerStats(player.id);
                 const advancedStats = await this.getAdvancedPlayerStats(player.id);
-                
+
                 const ncaaPlayer: NCAAPlayer = {
                   id: player.id,
                   name: player.displayName,
@@ -483,15 +492,16 @@ export class NCAABasketballDataSyncService {
 
                 // Rate limiting
                 await this.enforceRateLimit();
-
               } catch (error) {
                 Sentry.captureException(error);
-                console.error(`Error syncing player ${athleteData.athlete?.displayName}:`, error.message);
+                console.error(
+                  `Error syncing player ${athleteData.athlete?.displayName}:`,
+                  error.message
+                );
                 continue;
               }
             }
           }
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing roster for team ${teamId}:`, error.message);
@@ -501,7 +511,6 @@ export class NCAABasketballDataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NCAA Basketball players`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NCAA Basketball players: ${error.message}`);
@@ -521,7 +530,7 @@ export class NCAABasketballDataSyncService {
 
       const currentSeason = new Date().getFullYear();
       const scoreboardData = await this.makeApiCall(`${this.espnBaseUrl}/scoreboard`);
-      
+
       if (!scoreboardData?.events) {
         throw new Error('Invalid scoreboard data from ESPN API');
       }
@@ -534,23 +543,38 @@ export class NCAABasketballDataSyncService {
           const game: NCAAGame = {
             id: event.id,
             date: new Date(event.date),
-            homeTeam: event.competitions[0].competitors.find(c => c.homeAway === 'home')?.team?.id || '',
-            awayTeam: event.competitions[0].competitors.find(c => c.homeAway === 'away')?.team?.id || '',
+            homeTeam:
+              event.competitions[0].competitors.find(c => c.homeAway === 'home')?.team?.id || '',
+            awayTeam:
+              event.competitions[0].competitors.find(c => c.homeAway === 'away')?.team?.id || '',
             season: currentSeason,
             seasonType: this.determineSeasonType(event.date, event.season?.type),
-            tournamentInfo: event.season?.type === 3 ? await this.getTournamentInfo(event) : undefined,
+            tournamentInfo:
+              event.season?.type === 3 ? await this.getTournamentInfo(event) : undefined,
             status: this.mapGameStatus(event.status.type.name),
             venue: event.competitions[0].venue?.fullName || 'Unknown Venue',
             isNeutralSite: event.competitions[0].neutralSite || false,
             attendance: event.competitions[0].attendance,
             officials: event.competitions[0].officials?.map(o => o.displayName) || [],
-            scores: event.competitions[0].competitors[0].score ? {
-              home: parseInt(event.competitions[0].competitors.find(c => c.homeAway === 'home')?.score || '0'),
-              away: parseInt(event.competitions[0].competitors.find(c => c.homeAway === 'away')?.score || '0'),
-              halftime: await this.getHalftimeScores(event.id),
-            } : undefined,
-            gameFlow: event.status.type.name === 'STATUS_FINAL' ? await this.getGameFlow(event.id) : undefined,
-            keyStats: event.status.type.name === 'STATUS_FINAL' ? await this.getKeyStats(event.id) : undefined,
+            scores: event.competitions[0].competitors[0].score
+              ? {
+                  home: parseInt(
+                    event.competitions[0].competitors.find(c => c.homeAway === 'home')?.score || '0'
+                  ),
+                  away: parseInt(
+                    event.competitions[0].competitors.find(c => c.homeAway === 'away')?.score || '0'
+                  ),
+                  halftime: await this.getHalftimeScores(event.id),
+                }
+              : undefined,
+            gameFlow:
+              event.status.type.name === 'STATUS_FINAL'
+                ? await this.getGameFlow(event.id)
+                : undefined,
+            keyStats:
+              event.status.type.name === 'STATUS_FINAL'
+                ? await this.getKeyStats(event.id)
+                : undefined,
             broadcast: {
               tv: event.competitions[0].broadcasts?.map(b => b.names?.join(', ')) || [],
               radio: [],
@@ -565,7 +589,6 @@ export class NCAABasketballDataSyncService {
 
           // Rate limiting
           await this.enforceRateLimit();
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing game ${event.id}:`, error.message);
@@ -575,7 +598,6 @@ export class NCAABasketballDataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NCAA Basketball games`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NCAA Basketball games: ${error.message}`);
@@ -588,10 +610,12 @@ export class NCAABasketballDataSyncService {
   async syncTournamentGames(): Promise<void> {
     try {
       const currentYear = new Date().getFullYear();
-      
+
       // Get tournament games (March-April)
-      const tournamentData = await this.makeApiCall(`${this.espnBaseUrl}/scoreboard?dates=${currentYear}0301-${currentYear}0430&groups=50`);
-      
+      const tournamentData = await this.makeApiCall(
+        `${this.espnBaseUrl}/scoreboard?dates=${currentYear}0301-${currentYear}0430&groups=50`
+      );
+
       if (tournamentData?.events) {
         const batch = writeBatch(db);
         let syncedCount = 0;
@@ -620,16 +644,21 @@ export class NCAABasketballDataSyncService {
   async syncMarchMadnessBrackets(): Promise<void> {
     try {
       const currentYear = new Date().getFullYear();
-      
+
       // Get bracket data from ESPN
-      const bracketData = await this.makeApiCall(`${this.espnBaseUrl}/seasons/${currentYear}/types/3/bracket`);
-      
+      const bracketData = await this.makeApiCall(
+        `${this.espnBaseUrl}/seasons/${currentYear}/types/3/bracket`
+      );
+
       if (bracketData) {
-        const bracket: MarchMadnessBracket = await this.processBracketData(bracketData, currentYear);
-        
+        const bracket: MarchMadnessBracket = await this.processBracketData(
+          bracketData,
+          currentYear
+        );
+
         const bracketRef = doc(db, 'march_madness_brackets', currentYear.toString());
         await setDoc(bracketRef, bracket);
-        
+
         console.log(`Successfully synced ${currentYear} March Madness bracket`);
       }
     } catch (error) {
@@ -641,16 +670,47 @@ export class NCAABasketballDataSyncService {
   /**
    * Helper methods for data processing
    */
-  
+
   private determineRegion(location: string): 'North' | 'South' | 'East' | 'West' | 'Midwest' {
     // Simplified region determination based on location
     const northStates = ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA'];
-    const southStates = ['DE', 'MD', 'VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'AR', 'LA', 'TX', 'OK'];
-    const westStates = ['MT', 'ID', 'WY', 'NV', 'UT', 'CO', 'AZ', 'NM', 'WA', 'OR', 'CA', 'AK', 'HI'];
+    const southStates = [
+      'DE',
+      'MD',
+      'VA',
+      'WV',
+      'KY',
+      'TN',
+      'NC',
+      'SC',
+      'GA',
+      'FL',
+      'AL',
+      'MS',
+      'AR',
+      'LA',
+      'TX',
+      'OK',
+    ];
+    const westStates = [
+      'MT',
+      'ID',
+      'WY',
+      'NV',
+      'UT',
+      'CO',
+      'AZ',
+      'NM',
+      'WA',
+      'OR',
+      'CA',
+      'AK',
+      'HI',
+    ];
     const midwestStates = ['OH', 'IN', 'IL', 'MI', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS'];
-    
+
     if (!location) return 'Midwest';
-    
+
     // Check against state abbreviations in location
     for (const state of northStates) {
       if (location.includes(state)) return 'North';
@@ -664,23 +724,28 @@ export class NCAABasketballDataSyncService {
     for (const state of midwestStates) {
       if (location.includes(state)) return 'Midwest';
     }
-    
+
     return 'Midwest'; // Default
   }
 
-  private determineSeasonType(dateString: string, seasonType?: number): 'Regular Season' | 'Conference Tournament' | 'March Madness' | 'NIT' | 'CBI' {
+  private determineSeasonType(
+    dateString: string,
+    seasonType?: number
+  ): 'Regular Season' | 'Conference Tournament' | 'March Madness' | 'NIT' | 'CBI' {
     const date = new Date(dateString);
     const month = date.getMonth() + 1; // 1-12
-    
+
     if (seasonType === 3) return 'March Madness';
     if (month === 3 && date.getDate() < 15) return 'Conference Tournament';
     if (month >= 11 || month <= 2) return 'Regular Season';
     if (month >= 3 && month <= 4) return 'March Madness';
-    
+
     return 'Regular Season';
   }
 
-  private mapGameStatus(status: string): 'scheduled' | 'in-progress' | 'completed' | 'postponed' | 'cancelled' {
+  private mapGameStatus(
+    status: string
+  ): 'scheduled' | 'in-progress' | 'completed' | 'postponed' | 'cancelled' {
     switch (status) {
       case 'STATUS_SCHEDULED':
         return 'scheduled';
@@ -700,22 +765,35 @@ export class NCAABasketballDataSyncService {
   private determinePlayerYear(experience?: number): 'FR' | 'SO' | 'JR' | 'SR' | 'GR' {
     if (!experience) return 'FR';
     switch (experience) {
-      case 0: return 'FR';
-      case 1: return 'SO';
-      case 2: return 'JR';
-      case 3: return 'SR';
-      default: return 'GR';
+      case 0:
+        return 'FR';
+      case 1:
+        return 'SO';
+      case 2:
+        return 'JR';
+      case 3:
+        return 'SR';
+      default:
+        return 'GR';
     }
   }
 
   private determineAutoQualifier(conferenceName: string): boolean {
     // Power conferences that typically get auto-qualifiers
     const autoQualifierConferences = [
-      'ACC', 'Big 12', 'Big Ten', 'SEC', 'Pac-12', 'Big East',
-      'American', 'Atlantic 10', 'Mountain West', 'West Coast'
+      'ACC',
+      'Big 12',
+      'Big Ten',
+      'SEC',
+      'Pac-12',
+      'Big East',
+      'American',
+      'Atlantic 10',
+      'Mountain West',
+      'West Coast',
     ];
-    
-    return autoQualifierConferences.some(conf => 
+
+    return autoQualifierConferences.some(conf =>
       conferenceName.toLowerCase().includes(conf.toLowerCase())
     );
   }
@@ -723,13 +801,13 @@ export class NCAABasketballDataSyncService {
   private calculateConferencePrestige(conferenceName: string): number {
     // Rate conferences 1-10 based on historical performance
     const prestigeMap: { [key: string]: number } = {
-      'ACC': 9,
+      ACC: 9,
       'Big 12': 8,
       'Big Ten': 9,
-      'SEC': 8,
+      SEC: 8,
       'Pac-12': 7,
       'Big East': 8,
-      'American': 6,
+      American: 6,
       'Atlantic 10': 6,
       'Mountain West': 5,
       'West Coast': 6,
@@ -740,16 +818,19 @@ export class NCAABasketballDataSyncService {
         return rating;
       }
     }
-    
+
     return 4; // Default rating
   }
 
   private isTournamentGame(event: any): boolean {
-    return event.season?.type === 3 || // March Madness type
-           event.competitions?.[0]?.notes?.some((note: any) => 
-             note.headline?.toLowerCase().includes('tournament') ||
-             note.headline?.toLowerCase().includes('march madness')
-           );
+    return (
+      event.season?.type === 3 || // March Madness type
+      event.competitions?.[0]?.notes?.some(
+        (note: any) =>
+          note.headline?.toLowerCase().includes('tournament') ||
+          note.headline?.toLowerCase().includes('march madness')
+      )
+    );
   }
 
   /**
@@ -758,11 +839,11 @@ export class NCAABasketballDataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay - timeSinceLastRequest));
     }
-    
+
     this.lastRequestTime = Date.now();
     this.requestCount++;
   }
@@ -770,11 +851,11 @@ export class NCAABasketballDataSyncService {
   private async makeApiCall(url: string, retryCount = 0): Promise<any> {
     try {
       await this.enforceRateLimit();
-      
+
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
@@ -789,7 +870,7 @@ export class NCAABasketballDataSyncService {
         await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
         return this.makeApiCall(url, retryCount + 1);
       }
-      
+
       Sentry.captureException(error);
       throw error;
     }
@@ -805,27 +886,36 @@ export class NCAABasketballDataSyncService {
   }
 
   private async getHeadCoach(teamId: string): Promise<any> {
-    return { 
-      name: 'TBD', 
-      experience: 0, 
-      marchMadnessApperances: 0, 
-      championshipWins: 0 
+    return {
+      name: 'TBD',
+      experience: 0,
+      marchMadnessApperances: 0,
+      championshipWins: 0,
     };
   }
 
   private async getCurrentSeasonRecord(teamId: string, standings: any): Promise<any> {
     return {
-      wins: 0, losses: 0, conferenceWins: 0, conferenceLosses: 0,
+      wins: 0,
+      losses: 0,
+      conferenceWins: 0,
+      conferenceLosses: 0,
       streak: { type: 'W' as const, count: 0 },
       ranking: { ap: null, coaches: null, net: null, kenpom: null },
-      rpi: null, strengthOfSchedule: 0, qualityWins: 0, badLosses: 0,
+      rpi: null,
+      strengthOfSchedule: 0,
+      qualityWins: 0,
+      badLosses: 0,
     };
   }
 
   private async getMarchMadnessHistory(teamId: string): Promise<any> {
     return {
-      appearances: 0, lastAppearance: null, bestFinish: 'Never appeared',
-      championshipYears: [], tournamentRecord: { wins: 0, losses: 0 },
+      appearances: 0,
+      lastAppearance: null,
+      bestFinish: 'Never appeared',
+      championshipYears: [],
+      tournamentRecord: { wins: 0, losses: 0 },
     };
   }
 
@@ -835,17 +925,33 @@ export class NCAABasketballDataSyncService {
 
   private async getPlayerStats(playerId: string): Promise<any> {
     return {
-      games: 0, minutes: 0, points: 0, rebounds: 0, assists: 0,
-      steals: 0, blocks: 0, turnovers: 0, fouls: 0,
-      fieldGoalPercentage: 0, threePointPercentage: 0, freeThrowPercentage: 0,
+      games: 0,
+      minutes: 0,
+      points: 0,
+      rebounds: 0,
+      assists: 0,
+      steals: 0,
+      blocks: 0,
+      turnovers: 0,
+      fouls: 0,
+      fieldGoalPercentage: 0,
+      threePointPercentage: 0,
+      freeThrowPercentage: 0,
       playerEfficiencyRating: 0,
     };
   }
 
   private async getAdvancedPlayerStats(playerId: string): Promise<any> {
     return {
-      usageRate: 0, trueShootingPercentage: 0, assistRate: 0, reboundRate: 0,
-      stealRate: 0, blockRate: 0, turnoverRate: 0, winShares: 0, boxPlusMinus: 0,
+      usageRate: 0,
+      trueShootingPercentage: 0,
+      assistRate: 0,
+      reboundRate: 0,
+      stealRate: 0,
+      blockRate: 0,
+      turnoverRate: 0,
+      winShares: 0,
+      boxPlusMinus: 0,
     };
   }
 
@@ -898,7 +1004,7 @@ export class NCAABasketballDataSyncService {
   /**
    * Public utility methods
    */
-  
+
   async getAllActiveTeams(): Promise<NCAATeam[]> {
     try {
       const teamsSnapshot = await getDocs(collection(db, 'ncaa_teams'));
@@ -912,7 +1018,7 @@ export class NCAABasketballDataSyncService {
   async getTeamById(teamId: string): Promise<NCAATeam | null> {
     try {
       const teamDoc = await getDoc(doc(db, 'ncaa_teams', teamId));
-      return teamDoc.exists() ? teamDoc.data() as NCAATeam : null;
+      return teamDoc.exists() ? (teamDoc.data() as NCAATeam) : null;
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get NCAA team ${teamId}: ${error.message}`);
@@ -943,7 +1049,7 @@ export class NCAABasketballDataSyncService {
   async getTournamentGames(year?: number): Promise<NCAAGame[]> {
     try {
       const queryYear = year || new Date().getFullYear();
-      
+
       const gamesQuery = query(
         collection(db, 'ncaa_games'),
         where('season', '==', queryYear),
@@ -962,7 +1068,7 @@ export class NCAABasketballDataSyncService {
     try {
       const currentYear = new Date().getFullYear();
       const bracketDoc = await getDoc(doc(db, 'march_madness_brackets', currentYear.toString()));
-      return bracketDoc.exists() ? bracketDoc.data() as MarchMadnessBracket : null;
+      return bracketDoc.exists() ? (bracketDoc.data() as MarchMadnessBracket) : null;
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get current bracket: ${error.message}`);

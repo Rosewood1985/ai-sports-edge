@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { venueService, Venue } from '../services/venueService';
-import { geolocationService } from '../services/geolocationService';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+  Linking,
+  Alert,
+} from 'react-native';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
+import { geolocationService } from '../services/geolocationService';
+import { venueService, Venue } from '../services/venueService';
 
 interface NearbyVenuesProps {
   maxDistance?: number;
@@ -15,11 +25,7 @@ interface NearbyVenuesProps {
 /**
  * Component that displays nearby sports venues based on user's location
  */
-const NearbyVenues: React.FC<NearbyVenuesProps> = ({ 
-  maxDistance = 50, 
-  limit = 5,
-  onRefresh 
-}) => {
+const NearbyVenues: React.FC<NearbyVenuesProps> = ({ maxDistance = 50, limit = 5, onRefresh }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [venues, setVenues] = useState<Venue[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +44,7 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
 
       // Get user location
       const location = await geolocationService.getUserLocation();
-      
+
       if (!location) {
         setError('Unable to determine your location. Please check your location settings.');
         setLoading(false);
@@ -47,7 +53,7 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
 
       // Get nearby venues
       const nearbyVenues = await venueService.getNearbyVenues(location, maxDistance, limit);
-      
+
       if (nearbyVenues.length === 0) {
         setError('No venues found near your location.');
         setLoading(false);
@@ -79,19 +85,21 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
   const openInMaps = (venue: Venue) => {
     const { latitude, longitude, name } = venue;
     const url = `https://maps.apple.com/?q=${name}&ll=${latitude},${longitude}`;
-    
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        // Fallback for Android or if Apple Maps is not available
-        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-        Linking.openURL(googleMapsUrl);
-      }
-    }).catch(err => {
-      console.error('Error opening maps:', err);
-      Alert.alert('Error', 'Could not open maps application');
-    });
+
+    Linking.canOpenURL(url)
+      .then(supported => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          // Fallback for Android or if Apple Maps is not available
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+          Linking.openURL(googleMapsUrl);
+        }
+      })
+      .catch(err => {
+        console.error('Error opening maps:', err);
+        Alert.alert('Error', 'Could not open maps application');
+      });
   };
 
   /**
@@ -129,18 +137,15 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
       <ThemedView style={styles.venueItem}>
         <View style={styles.venueHeader}>
           <ThemedText style={styles.venueName}>{item.name}</ThemedText>
-          <TouchableOpacity 
-            style={styles.mapButton}
-            onPress={() => openInMaps(item)}
-          >
+          <TouchableOpacity style={styles.mapButton} onPress={() => openInMaps(item)}>
             <Ionicons name="map-outline" size={24} color="#0a7ea4" />
           </TouchableOpacity>
         </View>
-        
+
         <ThemedText style={styles.venueLocation}>
           {item.city}, {item.state}
         </ThemedText>
-        
+
         <View style={styles.venueDetails}>
           <View style={styles.detailItem}>
             <Ionicons name="people-outline" size={16} color="#666" />
@@ -148,7 +153,7 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
               Capacity: {item.capacity.toLocaleString()}
             </ThemedText>
           </View>
-          
+
           <View style={styles.detailItem}>
             <Ionicons name="navigate-outline" size={16} color="#666" />
             <ThemedText style={styles.detailText}>
@@ -156,7 +161,7 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
             </ThemedText>
           </View>
         </View>
-        
+
         <View style={styles.teamsContainer}>
           <ThemedText style={styles.teamsTitle}>Home to:</ThemedText>
           {item.teams.map((team, index) => (
@@ -165,7 +170,7 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
             </ThemedText>
           ))}
         </View>
-        
+
         <View style={styles.sportsContainer}>
           {item.sports.map((sport, index) => (
             <View key={index} style={styles.sportBadge}>
@@ -189,7 +194,7 @@ const NearbyVenues: React.FC<NearbyVenuesProps> = ({
       <FlatList
         data={venues}
         renderItem={renderVenueItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />

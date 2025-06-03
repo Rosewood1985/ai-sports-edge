@@ -1,7 +1,7 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 
 // Import translations
 import enTranslations from './translations/en.json';
@@ -41,7 +41,7 @@ export async function getLanguage(): Promise<string> {
     if (savedLanguage) {
       return savedLanguage;
     }
-    
+
     // Otherwise, return the current language
     return i18n.language;
   } catch (error) {
@@ -55,7 +55,7 @@ export async function setLanguage(language: string): Promise<void> {
   try {
     // Change language
     await i18n.changeLanguage(language);
-    
+
     // Save preference
     await AsyncStorage.setItem(LANGUAGE_KEY, language);
   } catch (error) {

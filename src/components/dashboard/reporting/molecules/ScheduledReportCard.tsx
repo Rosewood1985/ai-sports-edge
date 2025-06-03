@@ -1,4 +1,7 @@
-import React from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import {
   Card,
   CardContent,
@@ -11,10 +14,8 @@ import {
   Chip,
   Stack,
 } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import React from 'react';
+
 import { ScheduledReport } from '../../../../types/reporting';
 import { ScheduleStatusBadge, FrequencyBadge, RecipientChip } from '../atoms';
 

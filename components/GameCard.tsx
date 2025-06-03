@@ -1,16 +1,17 @@
-import React, { memo } from 'react';
-import { View, StyleSheet } from 'react-native'; // Keep View for specific layout needs if ThemedView isn't sufficient
-import { Game, ConfidenceLevel } from '../types/odds';
-import PremiumFeature from './PremiumFeature';
-import PropBetList from './PropBetList';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useUITheme } from './UIThemeProvider'; // Import theme hook
+import React, { memo } from 'react';
+import { View, StyleSheet } from 'react-native'; // Keep View for specific layout needs if ThemedView isn't sufficient
+
+import PremiumFeature from './PremiumFeature';
+import PropBetList from './PropBetList';
 import { ThemedText } from './ThemedText'; // Import ThemedText
 import { ThemedView } from './ThemedView'; // Import ThemedView
+import { useUITheme } from './UIThemeProvider'; // Import theme hook
 import { AccessibleTouchableOpacity } from '../atomic/atoms'; // Import AccessibleTouchableOpacity
 import { Colors } from '../constants/Colors'; // Import Colors for status
+import { Game, ConfidenceLevel } from '../types/odds';
 
 // Define navigation type
 type RootStackParamList = {

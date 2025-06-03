@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { geolocationService, LocationData, OddsSuggestion } from '../services/geolocationService';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+
+import BetNowButton from './BetNowButton';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import { useNavigation } from '@react-navigation/native';
-import BetNowButton from './BetNowButton';
+import { geolocationService, LocationData, OddsSuggestion } from '../services/geolocationService';
 
 interface LocalTeamOddsProps {
   onRefresh?: () => void;
@@ -140,12 +149,19 @@ const LocalTeamOdds: React.FC<LocalTeamOddsProps> = ({ onRefresh }) => {
     const isBetSuggested = item.suggestion === 'bet';
 
     return (
-      <ThemedView style={[styles.oddsSuggestionItem, isBetSuggested ? styles.betSuggested : styles.avoidSuggested]}>
+      <ThemedView
+        style={[
+          styles.oddsSuggestionItem,
+          isBetSuggested ? styles.betSuggested : styles.avoidSuggested,
+        ]}
+      >
         <View style={styles.oddsSuggestionContent}>
           <ThemedText style={styles.gameText}>{item.game}</ThemedText>
           <View style={styles.oddsRow}>
             <ThemedText style={styles.oddsText}>Odds: {item.odds.toFixed(2)}</ThemedText>
-            <View style={[styles.suggestionBadge, isBetSuggested ? styles.betBadge : styles.avoidBadge]}>
+            <View
+              style={[styles.suggestionBadge, isBetSuggested ? styles.betBadge : styles.avoidBadge]}
+            >
               <ThemedText style={styles.suggestionText}>
                 {isBetSuggested ? 'Recommended' : 'Not Recommended'}
               </ThemedText>

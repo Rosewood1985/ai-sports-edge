@@ -1,16 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Share,
   Clipboard,
   Alert,
   Modal,
-  Platform
+  Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { useThemeColor } from '../hooks/useThemeColor';
 import NeonButton from './ui/NeonButton';
 import NeonCard from './ui/NeonCard';
@@ -31,18 +32,18 @@ const ReferralShareOptions: React.FC<ReferralShareOptionsProps> = ({
   visible,
   onClose,
   referralCode,
-  appLink = 'https://aisportsedge.com/download'
+  appLink = 'https://aisportsedge.com/download',
 }) => {
   const [copied, setCopied] = useState<boolean>(false);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
-  
+
   // Generate share message
   const getShareMessage = (platform?: string) => {
     const baseMessage = `Join me on AI Sports Edge and get exclusive rewards! Use my referral code: ${referralCode}`;
-    
+
     switch (platform) {
       case 'sms':
         return `${baseMessage}\n\nDownload the app: ${appLink}`;
@@ -54,28 +55,28 @@ const ReferralShareOptions: React.FC<ReferralShareOptionsProps> = ({
         return `${baseMessage}\n\nDownload the app: ${appLink}`;
     }
   };
-  
+
   // Handle copy to clipboard
   const handleCopy = () => {
     Clipboard.setString(referralCode);
     setCopied(true);
-    
+
     // Reset copied state after 3 seconds
     setTimeout(() => {
       setCopied(false);
     }, 3000);
-    
+
     Alert.alert('Copied!', 'Referral code copied to clipboard');
   };
-  
+
   // Handle share via system share sheet
   const handleShare = async () => {
     try {
       const result = await Share.share({
         message: getShareMessage(),
-        url: appLink // iOS only
+        url: appLink, // iOS only
       });
-      
+
       if (result.action === Share.sharedAction) {
         // Track successful share
         console.log('Shared successfully');
@@ -85,21 +86,21 @@ const ReferralShareOptions: React.FC<ReferralShareOptionsProps> = ({
       Alert.alert('Error', 'Failed to share referral code. Please try again.');
     }
   };
-  
+
   // Handle share via SMS
   const handleSMS = async () => {
     try {
       // On a real device, this would use a library like react-native-sms
       // For now, we'll use the Share API
       await Share.share({
-        message: getShareMessage('sms')
+        message: getShareMessage('sms'),
       });
     } catch (error) {
       console.error('Error sharing via SMS:', error);
       Alert.alert('Error', 'Failed to share via SMS. Please try again.');
     }
   };
-  
+
   // Handle share via Email
   const handleEmail = async () => {
     try {
@@ -107,134 +108,91 @@ const ReferralShareOptions: React.FC<ReferralShareOptionsProps> = ({
       // For now, we'll use the Share API
       await Share.share({
         message: getShareMessage('email'),
-        subject: 'Join me on AI Sports Edge!'
+        subject: 'Join me on AI Sports Edge!',
       });
     } catch (error) {
       console.error('Error sharing via email:', error);
       Alert.alert('Error', 'Failed to share via email. Please try again.');
     }
   };
-  
+
   // Handle share via social media
   const handleSocial = async () => {
     try {
       await Share.share({
-        message: getShareMessage('social')
+        message: getShareMessage('social'),
       });
     } catch (error) {
       console.error('Error sharing via social:', error);
       Alert.alert('Error', 'Failed to share via social media. Please try again.');
     }
   };
-  
+
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <NeonCard style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={[styles.title, { color: textColor }]}>
-              Share Your Referral Code
-            </Text>
-            
+            <Text style={[styles.title, { color: textColor }]}>Share Your Referral Code</Text>
+
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={textColor} />
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.codeContainer}>
-            <Text style={[styles.codeLabel, { color: textColor }]}>
-              Your Code:
-            </Text>
-            
+            <Text style={[styles.codeLabel, { color: textColor }]}>Your Code:</Text>
+
             <View style={[styles.codeBox, { borderColor: primaryColor }]}>
-              <Text style={[styles.code, { color: primaryColor }]}>
-                {referralCode}
-              </Text>
+              <Text style={[styles.code, { color: primaryColor }]}>{referralCode}</Text>
             </View>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.copyButton, { backgroundColor: copied ? '#2ecc71' : primaryColor }]}
               onPress={handleCopy}
             >
-              <Ionicons 
-                name={copied ? "checkmark" : "copy-outline"} 
-                size={18} 
-                color="#fff" 
-              />
-              <Text style={styles.copyButtonText}>
-                {copied ? 'Copied!' : 'Copy Code'}
-              </Text>
+              <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} color="#fff" />
+              <Text style={styles.copyButtonText}>{copied ? 'Copied!' : 'Copy Code'}</Text>
             </TouchableOpacity>
           </View>
-          
-          <Text style={[styles.shareText, { color: textColor }]}>
-            Share via:
-          </Text>
-          
+
+          <Text style={[styles.shareText, { color: textColor }]}>Share via:</Text>
+
           <View style={styles.shareOptions}>
-            <TouchableOpacity 
-              style={styles.shareOption}
-              onPress={handleSMS}
-            >
+            <TouchableOpacity style={styles.shareOption} onPress={handleSMS}>
               <View style={[styles.shareIconContainer, { backgroundColor: '#3498db' }]}>
                 <Ionicons name="chatbubble" size={24} color="#fff" />
               </View>
-              <Text style={[styles.shareOptionText, { color: textColor }]}>
-                SMS
-              </Text>
+              <Text style={[styles.shareOptionText, { color: textColor }]}>SMS</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.shareOption}
-              onPress={handleEmail}
-            >
+
+            <TouchableOpacity style={styles.shareOption} onPress={handleEmail}>
               <View style={[styles.shareIconContainer, { backgroundColor: '#e74c3c' }]}>
                 <Ionicons name="mail" size={24} color="#fff" />
               </View>
-              <Text style={[styles.shareOptionText, { color: textColor }]}>
-                Email
-              </Text>
+              <Text style={[styles.shareOptionText, { color: textColor }]}>Email</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.shareOption}
-              onPress={handleSocial}
-            >
+
+            <TouchableOpacity style={styles.shareOption} onPress={handleSocial}>
               <View style={[styles.shareIconContainer, { backgroundColor: '#9b59b6' }]}>
                 <Ionicons name="share-social" size={24} color="#fff" />
               </View>
-              <Text style={[styles.shareOptionText, { color: textColor }]}>
-                Social
-              </Text>
+              <Text style={[styles.shareOptionText, { color: textColor }]}>Social</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.shareOption}
-              onPress={handleShare}
-            >
+
+            <TouchableOpacity style={styles.shareOption} onPress={handleShare}>
               <View style={[styles.shareIconContainer, { backgroundColor: '#2ecc71' }]}>
                 <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
               </View>
-              <Text style={[styles.shareOptionText, { color: textColor }]}>
-                More
-              </Text>
+              <Text style={[styles.shareOptionText, { color: textColor }]}>More</Text>
             </TouchableOpacity>
           </View>
-          
+
           <Text style={[styles.rewardText, { color: textColor }]}>
             You'll both get rewards when they subscribe!
           </Text>
-          
-          <NeonButton
-            title="Done"
-            onPress={onClose}
-            style={styles.doneButton}
-          />
+
+          <NeonButton title="Done" onPress={onClose} style={styles.doneButton} />
         </NeonCard>
       </View>
     </Modal>

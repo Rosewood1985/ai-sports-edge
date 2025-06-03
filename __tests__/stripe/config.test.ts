@@ -2,7 +2,7 @@ import { STRIPE_PUBLISHABLE_KEY, STRIPE_PRICE_IDS } from '../../config/stripe';
 
 /**
  * Stripe Configuration Tests
- * 
+ *
  * These tests verify that Stripe is properly configured in the application.
  */
 describe('Stripe Configuration', () => {
@@ -33,14 +33,14 @@ describe('Stripe Configuration', () => {
       expect(STRIPE_PRICE_IDS.BASIC_MONTHLY).toBeDefined();
       expect(STRIPE_PRICE_IDS.PREMIUM_MONTHLY).toBeDefined();
       expect(STRIPE_PRICE_IDS.PREMIUM_YEARLY).toBeDefined();
-      
+
       // Group subscription
       expect(STRIPE_PRICE_IDS.GROUP_PRO_MONTHLY).toBeDefined();
-      
+
       // One-time purchases
       expect(STRIPE_PRICE_IDS.WEEKEND_PASS).toBeDefined();
       expect(STRIPE_PRICE_IDS.GAME_DAY_PASS).toBeDefined();
-      
+
       // Microtransactions
       expect(STRIPE_PRICE_IDS.SINGLE_PREDICTION).toBeDefined();
       expect(STRIPE_PRICE_IDS.PARLAY_SUGGESTION).toBeDefined();

@@ -1,6 +1,7 @@
 import { collection, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
-import { firestore } from '../config/firebase';
+
 import { cacheService } from './cacheService';
+import { firestore } from '../config/firebase';
 
 // Cache keys
 const CACHE_KEYS = {
@@ -86,21 +87,24 @@ class AiPickSelector {
       }
 
       // Convert to array
-      const games = gamesSnapshot.docs.map((doc) => ({
+      const games = gamesSnapshot.docs.map(doc => ({
         gameId: doc.id,
         ...doc.data(),
       })) as AIPickData[];
 
       // Cache the result
-      await cacheService.set({
-        key: CACHE_KEYS.TOP_PICKS,
-        ttl: CACHE_TTL.TOP_PICKS,
-        version: APP_VERSION,
-      }, games);
+      await cacheService.set(
+        {
+          key: CACHE_KEYS.TOP_PICKS,
+          ttl: CACHE_TTL.TOP_PICKS,
+          version: APP_VERSION,
+        },
+        games
+      );
 
       return games;
     } catch (error) {
-      console.error('Error getting today\'s games:', error);
+      console.error("Error getting today's games:", error);
       return [];
     }
   }
@@ -117,14 +121,10 @@ class AiPickSelector {
       const games = await this.getTodaysGames();
 
       // Sort by confidence (descending)
-      const sortedGames = [...games].sort((a, b) => 
-        (b.confidence || 0) - (a.confidence || 0)
-      );
+      const sortedGames = [...games].sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
 
       // Filter by minimum confidence
-      const topPicks = sortedGames.filter((game) => 
-        (game.confidence || 0) >= minConfidence
-      );
+      const topPicks = sortedGames.filter(game => (game.confidence || 0) >= minConfidence);
 
       // Limit to specified number
       return topPicks.slice(0, maxPicks);
@@ -156,15 +156,18 @@ class AiPickSelector {
       const games = await this.getTodaysGames();
 
       // Find the game marked as Pick of the Day
-      const pickOfDay = games.find((game) => game.isAIPickOfDay);
+      const pickOfDay = games.find(game => game.isAIPickOfDay);
 
       if (pickOfDay) {
         // Cache the result
-        await cacheService.set({
-          key: CACHE_KEYS.PICK_OF_DAY,
-          ttl: CACHE_TTL.PICK_OF_DAY,
-          version: APP_VERSION,
-        }, pickOfDay);
+        await cacheService.set(
+          {
+            key: CACHE_KEYS.PICK_OF_DAY,
+            ttl: CACHE_TTL.PICK_OF_DAY,
+            version: APP_VERSION,
+          },
+          pickOfDay
+        );
 
         return pickOfDay;
       }
@@ -173,11 +176,14 @@ class AiPickSelector {
       const topPicks = await this.getTopPicks(1);
       if (topPicks.length > 0) {
         // Cache the result
-        await cacheService.set({
-          key: CACHE_KEYS.PICK_OF_DAY,
-          ttl: CACHE_TTL.PICK_OF_DAY,
-          version: APP_VERSION,
-        }, topPicks[0]);
+        await cacheService.set(
+          {
+            key: CACHE_KEYS.PICK_OF_DAY,
+            ttl: CACHE_TTL.PICK_OF_DAY,
+            version: APP_VERSION,
+          },
+          topPicks[0]
+        );
 
         return topPicks[0];
       }
@@ -241,7 +247,7 @@ class AiPickSelector {
         //   where('pickId', '==', gameId)
         // );
         // const userPickSnapshot = await getDocs(userPickQuery);
-        // 
+        //
         // if (!userPickSnapshot.empty) {
         //   const batch = writeBatch(firestore);
         //   userPickSnapshot.docs.forEach(doc => {

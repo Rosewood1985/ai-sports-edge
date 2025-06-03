@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -18,28 +18,28 @@ exports.processReferralDiscount = functions.https.onCall(async (data, context) =
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is requesting a discount for themselves
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only request discounts for themselves.'
+      "permission-denied",
+      "Users can only request discounts for themselves."
     );
   }
 
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     const userDoc = await userRef.get();
     
     if (!userDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'User not found.'
+        "not-found",
+        "User not found."
       );
     }
     
@@ -49,7 +49,7 @@ exports.processReferralDiscount = functions.https.onCall(async (data, context) =
     if (!userData.referredBy) {
       return {
         success: false,
-        message: 'User was not referred by anyone.',
+        message: "User was not referred by anyone.",
         discountApplied: false
       };
     }
@@ -58,7 +58,7 @@ exports.processReferralDiscount = functions.https.onCall(async (data, context) =
     if (userData.referralDiscountApplied) {
       return {
         success: false,
-        message: 'Referral discount has already been applied.',
+        message: "Referral discount has already been applied.",
         discountApplied: true
       };
     }
@@ -66,7 +66,7 @@ exports.processReferralDiscount = functions.https.onCall(async (data, context) =
     // Create a Stripe coupon for 10% off
     const coupon = await stripe.coupons.create({
       percent_off: 10,
-      duration: 'once',
+      duration: "once",
       metadata: {
         userId: data.userId,
         referrerId: userData.referredBy,
@@ -83,8 +83,8 @@ exports.processReferralDiscount = functions.https.onCall(async (data, context) =
     });
     
     // Track the discount in analytics
-    await db.collection('analytics').doc('referrals').collection('events').add({
-      type: 'referral_discount_created',
+    await db.collection("analytics").doc("referrals").collection("events").add({
+      type: "referral_discount_created",
       userId: data.userId,
       referrerId: userData.referredBy,
       discountAmount: 10,
@@ -94,14 +94,14 @@ exports.processReferralDiscount = functions.https.onCall(async (data, context) =
     
     return {
       success: true,
-      message: 'Referral discount created successfully.',
+      message: "Referral discount created successfully.",
       discountApplied: true,
       discountAmount: 10,
       couponId: coupon.id
     };
   } catch (error) {
-    console.error('Error processing referral discount:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error processing referral discount:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -117,28 +117,28 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is applying a discount for themselves
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only apply discounts for themselves.'
+      "permission-denied",
+      "Users can only apply discounts for themselves."
     );
   }
 
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     const userDoc = await userRef.get();
     
     if (!userDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'User not found.'
+        "not-found",
+        "User not found."
       );
     }
     
@@ -148,7 +148,7 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
     if (userData.referralDiscountApplied) {
       return {
         success: false,
-        message: 'Referral discount has already been applied.',
+        message: "Referral discount has already been applied.",
         discountApplied: true
       };
     }
@@ -156,8 +156,8 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
     // Verify the coupon ID matches the one stored for the user
     if (userData.referralDiscountCouponId !== data.couponId) {
       throw new functions.https.HttpsError(
-        'invalid-argument',
-        'Invalid coupon ID.'
+        "invalid-argument",
+        "Invalid coupon ID."
       );
     }
     
@@ -169,8 +169,8 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
     });
     
     // Track the discount application in analytics
-    await db.collection('analytics').doc('referrals').collection('events').add({
-      type: 'referral_discount_applied',
+    await db.collection("analytics").doc("referrals").collection("events").add({
+      type: "referral_discount_applied",
       userId: data.userId,
       referrerId: userData.referredBy,
       discountAmount: userData.referralDiscountAmount,
@@ -179,9 +179,9 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
     });
     
     // Create a notification for the user
-    await userRef.collection('notifications').add({
-      type: 'referral_discount_applied',
-      title: 'Referral Discount Applied',
+    await userRef.collection("notifications").add({
+      type: "referral_discount_applied",
+      title: "Referral Discount Applied",
       message: `Your ${userData.referralDiscountAmount}% referral discount has been applied to your subscription!`,
       read: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
@@ -189,13 +189,13 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
     
     return {
       success: true,
-      message: 'Referral discount applied successfully.',
+      message: "Referral discount applied successfully.",
       discountApplied: true,
       discountAmount: userData.referralDiscountAmount
     };
   } catch (error) {
-    console.error('Error applying referral discount:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error applying referral discount:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -209,10 +209,10 @@ exports.applyReferralDiscount = functions.https.onCall(async (data, context) => 
  */
 exports.processSubscriptionExtension = functions.https.onCall(async (data, context) => {
   // Only allow this function to be called by other Firebase functions or admin
-  if (context.auth && context.auth.token.firebase.sign_in_provider !== 'custom') {
+  if (context.auth && context.auth.token.firebase.sign_in_provider !== "custom") {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'This function can only be called by admin or other Firebase functions.'
+      "permission-denied",
+      "This function can only be called by admin or other Firebase functions."
     );
   }
 
@@ -221,17 +221,17 @@ exports.processSubscriptionExtension = functions.https.onCall(async (data, conte
     
     if (!referrerId || !referredUserId) {
       throw new functions.https.HttpsError(
-        'invalid-argument',
-        'referrerId and referredUserId are required.'
+        "invalid-argument",
+        "referrerId and referredUserId are required."
       );
     }
     
     const db = admin.firestore();
     
     // Get user's active subscription
-    const subscriptionsQuery = await db.collection('users').doc(referrerId)
-      .collection('subscriptions')
-      .where('status', '==', 'active')
+    const subscriptionsQuery = await db.collection("users").doc(referrerId)
+      .collection("subscriptions")
+      .where("status", "==", "active")
       .limit(1)
       .get();
     
@@ -239,14 +239,14 @@ exports.processSubscriptionExtension = functions.https.onCall(async (data, conte
       console.log(`No active subscription found for user ${referrerId}`);
       
       // Store the extension for future use
-      await db.collection('users').doc(referrerId).update({
+      await db.collection("users").doc(referrerId).update({
         pendingSubscriptionExtensionDays: admin.firestore.FieldValue.increment(extensionDays),
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
       
       return {
         success: true,
-        message: 'No active subscription found. Extension will be applied when user subscribes.',
+        message: "No active subscription found. Extension will be applied when user subscribes.",
         extensionApplied: false,
         pendingExtension: true
       };
@@ -263,7 +263,7 @@ exports.processSubscriptionExtension = functions.https.onCall(async (data, conte
     
     // Update subscription in Stripe
     await stripe.subscriptions.update(subscriptionId, {
-      proration_behavior: 'none',
+      proration_behavior: "none",
       trial_end: Math.floor(newPeriodEnd.getTime() / 1000)
     });
     
@@ -280,8 +280,8 @@ exports.processSubscriptionExtension = functions.https.onCall(async (data, conte
     });
     
     // Track the reward in analytics
-    await db.collection('analytics').doc('referrals').collection('events').add({
-      type: 'subscription_extension_applied',
+    await db.collection("analytics").doc("referrals").collection("events").add({
+      type: "subscription_extension_applied",
       referrerId,
       referredUserId,
       extensionDays,
@@ -290,9 +290,9 @@ exports.processSubscriptionExtension = functions.https.onCall(async (data, conte
     });
     
     // Create a notification for the referrer
-    await db.collection('users').doc(referrerId).collection('notifications').add({
-      type: 'subscription_extension',
-      title: 'Subscription Extended',
+    await db.collection("users").doc(referrerId).collection("notifications").add({
+      type: "subscription_extension",
+      title: "Subscription Extended",
       message: `Your subscription has been extended by ${extensionDays} days as a reward for your referral!`,
       read: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
@@ -302,14 +302,14 @@ exports.processSubscriptionExtension = functions.https.onCall(async (data, conte
     
     return {
       success: true,
-      message: 'Subscription extension applied successfully.',
+      message: "Subscription extension applied successfully.",
       extensionApplied: true,
       extensionDays,
       newEndDate: newPeriodEnd.toISOString()
     };
   } catch (error) {
-    console.error('Error processing subscription extension:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error processing subscription extension:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 

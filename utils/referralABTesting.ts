@@ -1,47 +1,48 @@
 /**
  * Referral A/B Testing Utility
- * 
+ *
  * This utility provides functions for A/B testing different referral reward structures.
  * It assigns users to different test groups and tracks their performance.
  */
 
-import { auth } from '../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { auth } from '../config/firebase';
 
 // A/B Test variants
 export enum ReferralRewardVariant {
-  CONTROL = 'control',           // Default reward structure
-  SUBSCRIPTION_FOCUSED = 'sub',  // More subscription extensions
-  CASH_FOCUSED = 'cash',         // More cash rewards
-  EARLY_REWARDS = 'early'        // More rewards at lower milestones
+  CONTROL = 'control', // Default reward structure
+  SUBSCRIPTION_FOCUSED = 'sub', // More subscription extensions
+  CASH_FOCUSED = 'cash', // More cash rewards
+  EARLY_REWARDS = 'early', // More rewards at lower milestones
 }
 
 // Reward structures for each variant
 export const REWARD_STRUCTURES = {
   [ReferralRewardVariant.CONTROL]: [
-    { count: 3, type: 'subscription_extension', value: 30 },  // 1 month
-    { count: 5, type: 'premium_trial', value: 60 },           // 2 months
-    { count: 10, type: 'cash_or_upgrade', value: 25 },        // $25
-    { count: 20, type: 'elite_status', value: 0 }             // Elite status
+    { count: 3, type: 'subscription_extension', value: 30 }, // 1 month
+    { count: 5, type: 'premium_trial', value: 60 }, // 2 months
+    { count: 10, type: 'cash_or_upgrade', value: 25 }, // $25
+    { count: 20, type: 'elite_status', value: 0 }, // Elite status
   ],
   [ReferralRewardVariant.SUBSCRIPTION_FOCUSED]: [
-    { count: 3, type: 'subscription_extension', value: 30 },  // 1 month
-    { count: 5, type: 'subscription_extension', value: 60 },  // 2 months
+    { count: 3, type: 'subscription_extension', value: 30 }, // 1 month
+    { count: 5, type: 'subscription_extension', value: 60 }, // 2 months
     { count: 10, type: 'subscription_extension', value: 90 }, // 3 months
-    { count: 15, type: 'elite_status', value: 0 }             // Elite status
+    { count: 15, type: 'elite_status', value: 0 }, // Elite status
   ],
   [ReferralRewardVariant.CASH_FOCUSED]: [
-    { count: 3, type: 'cash_reward', value: 10 },             // $10
-    { count: 5, type: 'cash_reward', value: 15 },             // $15
-    { count: 10, type: 'cash_reward', value: 30 },            // $30
-    { count: 20, type: 'elite_status', value: 0 }             // Elite status
+    { count: 3, type: 'cash_reward', value: 10 }, // $10
+    { count: 5, type: 'cash_reward', value: 15 }, // $15
+    { count: 10, type: 'cash_reward', value: 30 }, // $30
+    { count: 20, type: 'elite_status', value: 0 }, // Elite status
   ],
   [ReferralRewardVariant.EARLY_REWARDS]: [
-    { count: 1, type: 'subscription_extension', value: 15 },  // 15 days
-    { count: 3, type: 'premium_trial', value: 30 },           // 1 month
-    { count: 7, type: 'cash_or_upgrade', value: 20 },         // $20
-    { count: 15, type: 'elite_status', value: 0 }             // Elite status
-  ]
+    { count: 1, type: 'subscription_extension', value: 15 }, // 15 days
+    { count: 3, type: 'premium_trial', value: 30 }, // 1 month
+    { count: 7, type: 'cash_or_upgrade', value: 20 }, // $20
+    { count: 15, type: 'elite_status', value: 0 }, // Elite status
+  ],
 };
 
 // Storage key for A/B test assignment
@@ -55,18 +56,21 @@ export const getUserVariant = async (): Promise<ReferralRewardVariant> => {
   try {
     // Check if user already has an assigned variant
     const storedVariant = await AsyncStorage.getItem(AB_TEST_VARIANT_KEY);
-    
-    if (storedVariant && Object.values(ReferralRewardVariant).includes(storedVariant as ReferralRewardVariant)) {
+
+    if (
+      storedVariant &&
+      Object.values(ReferralRewardVariant).includes(storedVariant as ReferralRewardVariant)
+    ) {
       return storedVariant as ReferralRewardVariant;
     }
-    
+
     // Assign a new variant
     const variant = assignVariant();
     await AsyncStorage.setItem(AB_TEST_VARIANT_KEY, variant);
-    
+
     // Track assignment in analytics
     trackVariantAssignment(variant);
-    
+
     return variant;
   } catch (error) {
     console.error('Error getting A/B test variant:', error);
@@ -81,7 +85,7 @@ export const getUserVariant = async (): Promise<ReferralRewardVariant> => {
 const assignVariant = (): ReferralRewardVariant => {
   // Get a random number between 0 and 3
   const randomIndex = Math.floor(Math.random() * 4);
-  
+
   // Assign variant based on random number
   switch (randomIndex) {
     case 0:
@@ -123,9 +127,11 @@ export const getUserRewardStructure = async () => {
 export const trackReferralConversion = async (referralCode: string, subscribed: boolean) => {
   try {
     const variant = await getUserVariant();
-    
+
     // In a real app, this would track the conversion in Firebase Analytics
-    console.log(`Referral conversion for variant ${variant}: ${referralCode}, subscribed: ${subscribed}`);
+    console.log(
+      `Referral conversion for variant ${variant}: ${referralCode}, subscribed: ${subscribed}`
+    );
   } catch (error) {
     console.error('Error tracking referral conversion:', error);
   }
@@ -139,9 +145,11 @@ export const trackReferralConversion = async (referralCode: string, subscribed: 
 export const trackMilestoneRewardClaim = async (milestone: number, rewardType: string) => {
   try {
     const variant = await getUserVariant();
-    
+
     // In a real app, this would track the reward claim in Firebase Analytics
-    console.log(`Milestone reward claim for variant ${variant}: milestone ${milestone}, reward type: ${rewardType}`);
+    console.log(
+      `Milestone reward claim for variant ${variant}: milestone ${milestone}, reward type: ${rewardType}`
+    );
   } catch (error) {
     console.error('Error tracking milestone reward claim:', error);
   }

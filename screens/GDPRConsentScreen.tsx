@@ -5,22 +5,23 @@
  * including granular consent options and data subject rights information.
  */
 
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { 
-  ScrollView, 
-  Text, 
-  View, 
-  StyleSheet, 
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
   SafeAreaView,
   TouchableOpacity,
   Switch,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+
+import { privacyService } from '../atomic/organisms/privacy';
+import { useAuth } from '../hooks/useAuth';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { useTranslation } from '../hooks/useTranslation';
-import { useAuth } from '../hooks/useAuth';
-import { privacyService } from '../atomic/organisms/privacy';
 
 interface ConsentPreferences {
   essential: boolean;
@@ -76,10 +77,7 @@ const GDPRConsentScreen: React.FC = () => {
   const handlePreferenceChange = (key: keyof ConsentPreferences, value: boolean) => {
     if (key === 'essential') {
       // Essential cookies cannot be disabled
-      Alert.alert(
-        t('gdpr.essential_required_title'),
-        t('gdpr.essential_required_message')
-      );
+      Alert.alert(t('gdpr.essential_required_title'), t('gdpr.essential_required_message'));
       return;
     }
 
@@ -106,11 +104,9 @@ const GDPRConsentScreen: React.FC = () => {
       await privacyService.updatePrivacyPreferences(user.uid, privacyPreferences);
       setHasChanges(false);
 
-      Alert.alert(
-        t('common.success'),
-        t('gdpr.preferences_saved'),
-        [{ text: t('common.ok'), onPress: () => navigation.goBack() }]
-      );
+      Alert.alert(t('common.success'), t('gdpr.preferences_saved'), [
+        { text: t('common.ok'), onPress: () => navigation.goBack() },
+      ]);
     } catch (error) {
       console.error('Error saving privacy preferences:', error);
       Alert.alert(t('common.error'), t('gdpr.save_error'));
@@ -158,14 +154,12 @@ const GDPRConsentScreen: React.FC = () => {
             {t(titleKey)}
             {isRequired && <Text style={styles.requiredIndicator}> *</Text>}
           </Text>
-          <Text style={[styles.consentDescription, { color: textColor }]}>
-            {t(descriptionKey)}
-          </Text>
+          <Text style={[styles.consentDescription, { color: textColor }]}>{t(descriptionKey)}</Text>
         </View>
-        
+
         <Switch
           value={preferences[key]}
-          onValueChange={(value) => handlePreferenceChange(key, value)}
+          onValueChange={value => handlePreferenceChange(key, value)}
           disabled={isRequired}
           trackColor={{ false: '#767577', true: primaryColor }}
           thumbColor={preferences[key] ? '#ffffff' : '#f4f3f4'}
@@ -177,27 +171,16 @@ const GDPRConsentScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={[styles.backButtonText, { color: textColor }]}>
-            {t('common.back')}
-          </Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={[styles.backButtonText, { color: textColor }]}>{t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: textColor }]}>
-          {t('gdpr.title')}
-        </Text>
+        <Text style={[styles.headerTitle, { color: textColor }]}>{t('gdpr.title')}</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={true}>
-        <Text style={[styles.title, { color: textColor }]}>
-          {t('gdpr.title')}
-        </Text>
-        
-        <Text style={[styles.description, { color: textColor }]}>
-          {t('gdpr.description')}
-        </Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator>
+        <Text style={[styles.title, { color: textColor }]}>{t('gdpr.title')}</Text>
+
+        <Text style={[styles.description, { color: textColor }]}>{t('gdpr.description')}</Text>
 
         <View style={styles.consentSection}>
           <Text style={[styles.sectionTitle, { color: textColor }]}>
@@ -211,17 +194,9 @@ const GDPRConsentScreen: React.FC = () => {
             true
           )}
 
-          {renderConsentOption(
-            'analytics',
-            'gdpr.analytics_title',
-            'gdpr.analytics_description'
-          )}
+          {renderConsentOption('analytics', 'gdpr.analytics_title', 'gdpr.analytics_description')}
 
-          {renderConsentOption(
-            'marketing',
-            'gdpr.marketing_title',
-            'gdpr.marketing_description'
-          )}
+          {renderConsentOption('marketing', 'gdpr.marketing_title', 'gdpr.marketing_description')}
 
           {renderConsentOption(
             'thirdParty',
@@ -229,11 +204,7 @@ const GDPRConsentScreen: React.FC = () => {
             'gdpr.third_party_description'
           )}
 
-          {renderConsentOption(
-            'profiling',
-            'gdpr.profiling_title',
-            'gdpr.profiling_description'
-          )}
+          {renderConsentOption('profiling', 'gdpr.profiling_title', 'gdpr.profiling_description')}
         </View>
 
         <View style={styles.buttonContainer}>
@@ -242,9 +213,7 @@ const GDPRConsentScreen: React.FC = () => {
             onPress={handleRejectAll}
             disabled={loading}
           >
-            <Text style={styles.rejectButtonText}>
-              {t('gdpr.reject_all')}
-            </Text>
+            <Text style={styles.rejectButtonText}>{t('gdpr.reject_all')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -252,9 +221,7 @@ const GDPRConsentScreen: React.FC = () => {
             onPress={handleAcceptAll}
             disabled={loading}
           >
-            <Text style={styles.acceptButtonText}>
-              {t('gdpr.accept_all')}
-            </Text>
+            <Text style={styles.acceptButtonText}>{t('gdpr.accept_all')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -271,18 +238,13 @@ const GDPRConsentScreen: React.FC = () => {
         )}
 
         <View style={styles.rightsSection}>
-          <Text style={[styles.sectionTitle, { color: textColor }]}>
-            {t('gdpr.your_rights')}
-          </Text>
-          
+          <Text style={[styles.sectionTitle, { color: textColor }]}>{t('gdpr.your_rights')}</Text>
+
           <Text style={[styles.rightsDescription, { color: textColor }]}>
             {t('gdpr.rights_description')}
           </Text>
 
-          <TouchableOpacity
-            style={styles.rightsButton}
-            onPress={handleDataSubjectRights}
-          >
+          <TouchableOpacity style={styles.rightsButton} onPress={handleDataSubjectRights}>
             <Text style={[styles.rightsButtonText, { color: primaryColor }]}>
               {t('gdpr.manage_data_rights')}
             </Text>

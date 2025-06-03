@@ -1,6 +1,6 @@
-import { info, error as logError, LogCategory } from './loggingService';
-import { safeErrorCapture } from './errorUtils';
 import { enhancedCacheService, CacheStrategy } from './enhancedCacheService';
+import { safeErrorCapture } from './errorUtils';
+import { info, error as logError, LogCategory } from './loggingService';
 
 /**
  * Firebase operation types
@@ -11,7 +11,7 @@ export enum FirebaseOperationType {
   DELETE = 'delete',
   QUERY = 'query',
   BATCH = 'batch',
-  TRANSACTION = 'transaction'
+  TRANSACTION = 'transaction',
 }
 
 /**
@@ -22,7 +22,7 @@ export enum FirebaseServiceType {
   AUTH = 'auth',
   STORAGE = 'storage',
   FUNCTIONS = 'functions',
-  REALTIME_DB = 'realtime_db'
+  REALTIME_DB = 'realtime_db',
 }
 
 /**
@@ -58,25 +58,25 @@ export interface FirebaseUsageStats {
 
 /**
  * Firebase Monitoring Service
- * 
+ *
  * This service tracks Firebase operations to help optimize usage and reduce costs.
  */
 class FirebaseMonitoringService {
   // Maximum number of operations to store
   private readonly MAX_OPERATIONS = 1000;
-  
+
   // Operations array
   private operations: FirebaseOperation[] = [];
-  
+
   // Cache key for usage statistics
   private readonly STATS_CACHE_KEY = 'firebase_usage_stats';
-  
+
   // Cache TTL for usage statistics (1 hour)
   private readonly STATS_CACHE_TTL = 1000 * 60 * 60;
-  
+
   // Whether monitoring is enabled
   private isEnabled = process.env.NODE_ENV === 'development';
-  
+
   /**
    * Enable or disable monitoring
    * @param enabled Whether monitoring is enabled
@@ -85,7 +85,7 @@ class FirebaseMonitoringService {
     this.isEnabled = enabled;
     console.log(`FirebaseMonitoringService: Monitoring ${enabled ? 'enabled' : 'disabled'}`);
   }
-  
+
   /**
    * Track a Firebase operation
    * @param operation Firebase operation
@@ -94,41 +94,43 @@ class FirebaseMonitoringService {
     if (!this.isEnabled) {
       return;
     }
-    
+
     // Add timestamp
     const fullOperation: FirebaseOperation = {
       ...operation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     // Add to operations array
     this.operations.push(fullOperation);
-    
+
     // Trim operations array if it gets too large
     if (this.operations.length > this.MAX_OPERATIONS) {
       this.operations = this.operations.slice(-this.MAX_OPERATIONS);
     }
-    
+
     // Log operation
     if (process.env.NODE_ENV === 'development') {
-      console.log(`FirebaseMonitoringService: ${operation.type} operation on ${operation.service}:${operation.path} (${operation.duration}ms)`);
+      console.log(
+        `FirebaseMonitoringService: ${operation.type} operation on ${operation.service}:${operation.path} (${operation.duration}ms)`
+      );
     }
-    
+
     // Log errors
     if (!operation.success) {
       logError(
-        LogCategory.STORAGE, 
-        `Firebase ${operation.type} operation failed on ${operation.service}:${operation.path}`, 
+        LogCategory.STORAGE,
+        `Firebase ${operation.type} operation failed on ${operation.service}:${operation.path}`,
         new Error(operation.error || 'Unknown error')
       );
     }
-    
+
     // Invalidate stats cache
     enhancedCacheService.invalidate(this.STATS_CACHE_KEY).catch(err => {
       console.error('FirebaseMonitoringService: Error invalidating stats cache:', err);
     });
   }
-  
+
   /**
    * Track a Firestore read operation
    * @param path Document or collection path
@@ -151,10 +153,10 @@ class FirebaseMonitoringService {
       duration,
       success,
       error,
-      metadata
+      metadata,
     });
   }
-  
+
   /**
    * Track a Firestore write operation
    * @param path Document path
@@ -177,10 +179,10 @@ class FirebaseMonitoringService {
       duration,
       success,
       error,
-      metadata
+      metadata,
     });
   }
-  
+
   /**
    * Track a Firestore delete operation
    * @param path Document path
@@ -203,10 +205,10 @@ class FirebaseMonitoringService {
       duration,
       success,
       error,
-      metadata
+      metadata,
     });
   }
-  
+
   /**
    * Track a Firestore query operation
    * @param path Collection path
@@ -229,10 +231,10 @@ class FirebaseMonitoringService {
       duration,
       success,
       error,
-      metadata
+      metadata,
     });
   }
-  
+
   /**
    * Track a Firestore batch operation
    * @param paths Document paths
@@ -257,11 +259,11 @@ class FirebaseMonitoringService {
       error,
       metadata: {
         ...metadata,
-        paths
-      }
+        paths,
+      },
     });
   }
-  
+
   /**
    * Get Firebase usage statistics
    * @param forceRefresh Whether to force a refresh of the statistics
@@ -272,7 +274,7 @@ class FirebaseMonitoringService {
     if (!this.isEnabled) {
       return this.getEmptyStats();
     }
-    
+
     try {
       // Get stats from cache
       const result = await enhancedCacheService.get<FirebaseUsageStats>(
@@ -284,10 +286,10 @@ class FirebaseMonitoringService {
         {
           strategy: CacheStrategy.CACHE_FIRST,
           forceRefresh,
-          expiration: this.STATS_CACHE_TTL
+          expiration: this.STATS_CACHE_TTL,
         }
       );
-      
+
       return result.data || this.getEmptyStats();
     } catch (error) {
       console.error('FirebaseMonitoringService: Error getting usage stats:', error);
@@ -296,7 +298,7 @@ class FirebaseMonitoringService {
       return this.getEmptyStats();
     }
   }
-  
+
   /**
    * Calculate Firebase usage statistics
    * @returns Firebase usage statistics
@@ -306,7 +308,7 @@ class FirebaseMonitoringService {
     if (this.operations.length === 0) {
       return this.getEmptyStats();
     }
-    
+
     // Initialize stats
     const stats: FirebaseUsageStats = {
       reads: 0,
@@ -323,15 +325,15 @@ class FirebaseMonitoringService {
         [FirebaseServiceType.AUTH]: 0,
         [FirebaseServiceType.STORAGE]: 0,
         [FirebaseServiceType.FUNCTIONS]: 0,
-        [FirebaseServiceType.REALTIME_DB]: 0
+        [FirebaseServiceType.REALTIME_DB]: 0,
       },
-      byPath: {}
+      byPath: {},
     };
-    
+
     // Calculate total duration
     let totalDuration = 0;
     let errorCount = 0;
-    
+
     // Process operations
     for (const operation of this.operations) {
       // Increment operation type count
@@ -355,32 +357,32 @@ class FirebaseMonitoringService {
           stats.transactions++;
           break;
       }
-      
+
       // Increment service count
       stats.byService[operation.service]++;
-      
+
       // Increment path count
       const pathKey = `${operation.service}:${operation.path}`;
       stats.byPath[pathKey] = (stats.byPath[pathKey] || 0) + 1;
-      
+
       // Add to total duration
       totalDuration += operation.duration;
-      
+
       // Increment error count
       if (!operation.success) {
         errorCount++;
       }
     }
-    
+
     // Calculate average duration
     stats.averageDuration = totalDuration / this.operations.length;
-    
+
     // Calculate error rate
     stats.errorRate = errorCount / this.operations.length;
-    
+
     return stats;
   }
-  
+
   /**
    * Get empty Firebase usage statistics
    * @returns Empty Firebase usage statistics
@@ -401,25 +403,25 @@ class FirebaseMonitoringService {
         [FirebaseServiceType.AUTH]: 0,
         [FirebaseServiceType.STORAGE]: 0,
         [FirebaseServiceType.FUNCTIONS]: 0,
-        [FirebaseServiceType.REALTIME_DB]: 0
+        [FirebaseServiceType.REALTIME_DB]: 0,
       },
-      byPath: {}
+      byPath: {},
     };
   }
-  
+
   /**
    * Clear all operations
    */
   clearOperations(): void {
     this.operations = [];
     console.log('FirebaseMonitoringService: Operations cleared');
-    
+
     // Invalidate stats cache
     enhancedCacheService.invalidate(this.STATS_CACHE_KEY).catch(err => {
       console.error('FirebaseMonitoringService: Error invalidating stats cache:', err);
     });
   }
-  
+
   /**
    * Get recent operations
    * @param limit Maximum number of operations to return
@@ -428,7 +430,7 @@ class FirebaseMonitoringService {
   getRecentOperations(limit: number = 100): FirebaseOperation[] {
     return this.operations.slice(-limit);
   }
-  
+
   /**
    * Get operations by type
    * @param type Operation type
@@ -436,11 +438,9 @@ class FirebaseMonitoringService {
    * @returns Operations of the specified type
    */
   getOperationsByType(type: FirebaseOperationType, limit: number = 100): FirebaseOperation[] {
-    return this.operations
-      .filter(op => op.type === type)
-      .slice(-limit);
+    return this.operations.filter(op => op.type === type).slice(-limit);
   }
-  
+
   /**
    * Get operations by service
    * @param service Service type
@@ -448,11 +448,9 @@ class FirebaseMonitoringService {
    * @returns Operations for the specified service
    */
   getOperationsByService(service: FirebaseServiceType, limit: number = 100): FirebaseOperation[] {
-    return this.operations
-      .filter(op => op.service === service)
-      .slice(-limit);
+    return this.operations.filter(op => op.service === service).slice(-limit);
   }
-  
+
   /**
    * Get operations by path
    * @param path Document or collection path

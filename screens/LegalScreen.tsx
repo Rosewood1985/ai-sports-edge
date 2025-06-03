@@ -1,13 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRoute, useNavigation, RouteProp, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
 
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Define route params type
 type LegalScreenParams = {

@@ -1,6 +1,6 @@
 /**
  * Error Utilities
- * 
+ *
  * This file contains utility functions for error handling that can be used
  * by both loggingService and errorTrackingService without creating circular dependencies.
  */
@@ -9,7 +9,7 @@
  * Safely capture an error without causing circular dependencies
  * This function logs the error to console and can be extended to use other error tracking
  * mechanisms that don't create circular dependencies
- * 
+ *
  * @param error Error to capture
  * @param context Additional context
  */
@@ -19,7 +19,7 @@ export const safeErrorCapture = (error: Error, context?: Record<string, any>): v
     if (process.env.NODE_ENV === 'development' || __DEV__) {
       console.error('Error captured:', error, context);
     }
-    
+
     // In a production environment, this could use a direct API call to your error tracking service
     // instead of going through the errorTrackingService to avoid circular dependencies
   } catch (captureError) {

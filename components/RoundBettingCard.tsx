@@ -1,10 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
-import { RoundBettingOption, FightOutcome, UFCFighter } from '../types/ufc';
+
 import { ThemedText } from './ThemedText';
+import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { RoundBettingOption, FightOutcome, UFCFighter } from '../types/ufc';
 
 interface RoundBettingCardProps {
   fighter: UFCFighter;

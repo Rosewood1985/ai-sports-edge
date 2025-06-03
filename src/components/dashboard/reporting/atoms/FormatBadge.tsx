@@ -1,10 +1,11 @@
-import React from 'react';
-import { Chip, ChipProps } from '@mui/material';
-import { ReportFormat } from '../../../../types/reporting';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import TableChartIcon from '@mui/icons-material/TableChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ImageIcon from '@mui/icons-material/Image';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import { Chip, ChipProps } from '@mui/material';
+import React from 'react';
+
+import { ReportFormat } from '../../../../types/reporting';
 
 interface FormatBadgeProps {
   format: ReportFormat;

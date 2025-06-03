@@ -1,10 +1,11 @@
 /**
  * ParlayOddsScreen Component
- * 
+ *
  * Screen for displaying and managing parlay odds.
  * Allows users to select games, view parlay odds, and place bets.
  */
 
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -16,15 +17,14 @@ import {
   Alert,
   Platform,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
+import ParlayOddsCard from '../components/ParlayOddsCard';
+import Colors from '../constants/Colors';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { analyticsService } from '../services/analyticsService';
 import { parlayOddsService } from '../services/parlayOddsService';
-import ParlayOddsCard from '../components/ParlayOddsCard';
-import Colors from '../constants/Colors';
 
 // Define the game object structure
 interface Game {
@@ -48,27 +48,27 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
-  
+
   // Get theme colors
   const backgroundColor = useThemeColor({ light: '#F8F8F8', dark: '#121212' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text');
   const cardColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A1A' }, 'background');
-  
+
   // Mock user ID - in a real app, this would come from authentication
   const userId = 'user123';
-  
+
   // Load games and check access on mount
   useEffect(() => {
     loadGames();
     checkAccess();
-    
+
     // Track screen view
     analyticsService.trackEvent('screen_view', {
       screen_name: 'ParlayOddsScreen',
       userId,
     });
   }, []);
-  
+
   /**
    * Check if user has access to parlay odds
    */
@@ -80,18 +80,20 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
       console.error('Error checking parlay access:', error);
     }
   };
-  
+
   /**
    * Load games from real API
    */
   const loadGames = async () => {
     try {
       setIsLoading(true);
-      
+
       // Fetch games from Firebase function with parlay odds
-      const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+      const response = await fetch(
+        'https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames'
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         // Transform the games data to match our interface
         const transformedGames: Game[] = data.games.map((game: any) => ({
@@ -103,7 +105,7 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
           startTime: new Date(game.date),
           league: game.league || 'Unknown',
         }));
-        
+
         setGames(transformedGames);
       } else {
         throw new Error('Failed to fetch games');
@@ -117,14 +119,14 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
       setIsLoading(false);
     }
   };
-  
+
   /**
    * Handle game selection
    */
   const handleGameSelect = (game: Game) => {
     // Check if game is already selected
     const isSelected = selectedGames.some(g => g.id === game.id);
-    
+
     if (isSelected) {
       // Remove game from selection
       setSelectedGames(selectedGames.filter(g => g.id !== game.id));
@@ -136,7 +138,7 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
         Alert.alert('Maximum Selection', 'You can select up to 4 games for a parlay.');
       }
     }
-    
+
     // Track selection
     analyticsService.trackEvent('parlay_game_selection', {
       gameId: game.id,
@@ -144,21 +146,21 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
       userId,
     });
   };
-  
+
   /**
    * Handle purchase success
    */
   const handlePurchaseSuccess = () => {
     // Update access status
     setHasAccess(true);
-    
+
     // Track purchase success
     analyticsService.trackEvent('parlay_purchase_success', {
       userId,
       games: selectedGames.length,
     });
   };
-  
+
   /**
    * Filter games by league
    */
@@ -166,38 +168,36 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
     if (activeTab === 'all') {
       return games;
     }
-    
+
     return games.filter(game => game.league === activeTab);
   };
-  
+
   /**
    * Render game item
    */
   const renderGameItem = ({ item }: { item: Game }) => {
     const isSelected = selectedGames.some(g => g.id === item.id);
-    
+
     return (
       <TouchableOpacity
         style={[
           styles.gameCard,
           { backgroundColor: cardColor },
-          isSelected && styles.selectedGameCard
+          isSelected && styles.selectedGameCard,
         ]}
         onPress={() => handleGameSelect(item)}
       >
         <View style={styles.gameHeader}>
           <Text style={[styles.leagueLabel, { color: textColor }]}>{item.league}</Text>
-          {isSelected && (
-            <Ionicons name="checkmark-circle" size={20} color={Colors.neon.blue} />
-          )}
+          {isSelected && <Ionicons name="checkmark-circle" size={20} color={Colors.neon.blue} />}
         </View>
-        
+
         <View style={styles.matchupContainer}>
           <Text style={[styles.teamName, { color: textColor }]}>{item.homeTeam}</Text>
           <Text style={[styles.vsText, { color: textColor }]}>vs</Text>
           <Text style={[styles.teamName, { color: textColor }]}>{item.awayTeam}</Text>
         </View>
-        
+
         <View style={styles.oddsContainer}>
           <View style={styles.oddsItem}>
             <Text style={[styles.oddsLabel, { color: textColor }]}>Home</Text>
@@ -205,7 +205,7 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
               {item.homeOdds > 0 ? `+${item.homeOdds}` : item.homeOdds}
             </Text>
           </View>
-          
+
           <View style={styles.oddsItem}>
             <Text style={[styles.oddsLabel, { color: textColor }]}>Away</Text>
             <Text style={[styles.oddsValue, { color: Colors.neon.blue }]}>
@@ -213,20 +213,20 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
             </Text>
           </View>
         </View>
-        
+
         <Text style={[styles.startTime, { color: textColor }]}>
           Starts: {item.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </Text>
       </TouchableOpacity>
     );
   };
-  
+
   /**
    * Render league tabs
    */
   const renderLeagueTabs = () => {
     const leagues = ['all', 'NBA', 'NFL', 'MLB', 'NHL'];
-    
+
     return (
       <ScrollView
         horizontal
@@ -237,18 +237,10 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
         {leagues.map(league => (
           <TouchableOpacity
             key={league}
-            style={[
-              styles.tab,
-              activeTab === league && styles.activeTab
-            ]}
+            style={[styles.tab, activeTab === league && styles.activeTab]}
             onPress={() => setActiveTab(league)}
           >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === league && styles.activeTabText
-              ]}
-            >
+            <Text style={[styles.tabText, activeTab === league && styles.activeTabText]}>
               {league === 'all' ? 'All Games' : league}
             </Text>
           </TouchableOpacity>
@@ -256,7 +248,7 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
       </ScrollView>
     );
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
@@ -265,9 +257,9 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
           Select 2-4 games to create a parlay
         </Text>
       </View>
-      
+
       {renderLeagueTabs()}
-      
+
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.neon.blue} />
@@ -288,7 +280,7 @@ const ParlayOddsScreen: React.FC<any> = ({ navigation, route }) => {
           }
         />
       )}
-      
+
       {selectedGames.length >= 2 && (
         <View style={styles.parlayCardContainer}>
           <ParlayOddsCard

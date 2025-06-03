@@ -1,7 +1,7 @@
-const { onSchedule } = require('firebase-functions/v2/scheduler');
-const admin = require('firebase-admin');
-const axios = require('axios');
-const { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } = require('./sentryCronConfig');
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const admin = require("firebase-admin");
+const axios = require("axios");
+const { wrapScheduledFunction, trackApiCall, trackDatabaseOperation } = require("./sentryCronConfig");
 
 // Initialize admin if not already initialized
 if (!admin.apps.length) {
@@ -17,30 +17,30 @@ const db = admin.firestore();
  * that are due to be sent. It sends the notifications using OneSignal
  * and marks them as sent in Firestore.
  */
-exports.processScheduledNotifications = onSchedule('every 1 minutes', wrapScheduledFunction(
-  'processScheduledNotifications',
-  'every 1 minutes',
+exports.processScheduledNotifications = onSchedule("every 1 minutes", wrapScheduledFunction(
+  "processScheduledNotifications",
+  "every 1 minutes",
   async (event) => {
     try {
-      console.log('Processing scheduled notifications...');
+      console.log("Processing scheduled notifications...");
       
       // Get current time
       const now = admin.firestore.Timestamp.now();
       
       // Query for notifications that are scheduled to be sent now or in the past
       // and have not been sent yet
-      const query = db.collection('scheduledNotifications')
-        .where('scheduledAt', '<=', now)
-        .where('sent', '==', false)
+      const query = db.collection("scheduledNotifications")
+        .where("scheduledAt", "<=", now)
+        .where("sent", "==", false)
         .limit(100); // Process in batches to avoid timeout
       
       const snapshot = await trackDatabaseOperation(
-        'query_scheduled_notifications',
+        "query_scheduled_notifications",
         () => query.get()
       );
       
       if (snapshot.empty) {
-        console.log('No notifications to process');
+        console.log("No notifications to process");
         return null;
       }
       
@@ -56,7 +56,7 @@ exports.processScheduledNotifications = onSchedule('every 1 minutes', wrapSchedu
         
         try {
           // Get user's external ID (OneSignal ID)
-          const userDoc = await db.collection('users').doc(notification.userId).get();
+          const userDoc = await db.collection("users").doc(notification.userId).get();
           
           if (!userDoc.exists) {
             console.log(`User ${notification.userId} not found, skipping notification ${notificationId}`);
@@ -72,8 +72,8 @@ exports.processScheduledNotifications = onSchedule('every 1 minutes', wrapSchedu
           }
           
           // Get user's notification preferences
-          const prefsDoc = await db.collection('users').doc(notification.userId)
-            .collection('settings').doc('notifications').get();
+          const prefsDoc = await db.collection("users").doc(notification.userId)
+            .collection("settings").doc("notifications").get();
           
           // If preferences don't exist or notifications are disabled, skip
           if (!prefsDoc.exists) {
@@ -96,7 +96,7 @@ exports.processScheduledNotifications = onSchedule('every 1 minutes', wrapSchedu
           
           // Send notification using OneSignal
           await trackApiCall(
-            'onesignal_send_notification',
+            "onesignal_send_notification",
             () => sendOneSignalNotification(
               notification.title,
               notification.message,
@@ -125,14 +125,14 @@ exports.processScheduledNotifications = onSchedule('every 1 minutes', wrapSchedu
       
       // Commit the batch
       await trackDatabaseOperation(
-        'commit_notification_batch',
+        "commit_notification_batch",
         () => batch.commit()
       );
       
       console.log(`Successfully processed ${processedNotifications.length} notifications`);
       return null;
     } catch (error) {
-      console.error('Error processing scheduled notifications:', error);
+      console.error("Error processing scheduled notifications:", error);
       return null;
     }
   }));
@@ -151,7 +151,7 @@ async function sendOneSignalNotification(title, message, data, externalUserId) {
     const oneSignalAppId = process.env.ONESIGNAL_APP_ID;
     
     if (!oneSignalApiKey || !oneSignalAppId) {
-      throw new Error('OneSignal API key or app ID not configured');
+      throw new Error("OneSignal API key or app ID not configured");
     }
     
     // Prepare notification payload
@@ -165,20 +165,20 @@ async function sendOneSignalNotification(title, message, data, externalUserId) {
     
     // Send notification
     const response = await axios.post(
-      'https://onesignal.com/api/v1/notifications',
+      "https://onesignal.com/api/v1/notifications",
       payload,
       {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${oneSignalApiKey}`
+          "Content-Type": "application/json",
+          "Authorization": `Basic ${oneSignalApiKey}`
         }
       }
     );
     
-    console.log('OneSignal notification sent:', response.data);
+    console.log("OneSignal notification sent:", response.data);
     return response.data;
   } catch (error) {
-    console.error('Error sending OneSignal notification:', error);
+    console.error("Error sending OneSignal notification:", error);
     throw error;
   }
 }
@@ -247,5 +247,5 @@ exports.cleanupOldNotifications = functions.pubsub
 
 // Placeholder export
 exports.cleanupOldNotifications = () => {
-  console.log('cleanupOldNotifications temporarily disabled');
+  console.log("cleanupOldNotifications temporarily disabled");
 };

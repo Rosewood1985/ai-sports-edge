@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+
 // Create a separate file for shared interfaces to break circular dependency
 import { addBreadcrumb } from './errorTrackingService';
 
@@ -31,7 +32,7 @@ try {
 
 /**
  * Logging Service
- * 
+ *
  * This service provides logging functionality for the app.
  * It supports different log levels, structured logging, and integration with error tracking.
  */
@@ -111,7 +112,7 @@ export const initLogging = () => {
   try {
     // Set up logging integrations
     console.log('initLogging: Setting up logging integrations');
-    
+
     // Check if we're importing from errorUtils correctly
     console.log('initLogging: Checking errorUtils import');
     if (typeof safeErrorCapture === 'function') {
@@ -119,7 +120,7 @@ export const initLogging = () => {
     } else {
       console.log('initLogging: safeErrorCapture is NOT available');
     }
-    
+
     // Set up periodic log flushing
     console.log('initLogging: Setting up periodic log flushing');
     if (defaultLoggerConfig.enableRemote) {
@@ -128,7 +129,7 @@ export const initLogging = () => {
     } else {
       console.log('initLogging: Remote logging disabled');
     }
-    
+
     console.log('initLogging: Initialization completed successfully');
     return true;
   } catch (error) {
@@ -161,12 +162,12 @@ export const log = (
   try {
     // Get logger configuration
     const config = loggerConfigs[category];
-    
+
     // Check if log level meets minimum threshold
     if (!isLevelAtLeast(level, config.minLevel)) {
       return;
     }
-    
+
     // Create log entry
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
@@ -176,17 +177,17 @@ export const log = (
       data,
       tags,
     };
-    
+
     // Log to console
     if (config.enableConsole) {
       logToConsole(entry);
     }
-    
+
     // Log to Sentry
     if (config.enableSentry) {
       logToSentry(entry);
     }
-    
+
     // Log to remote
     if (config.enableRemote) {
       logToRemote(entry);
@@ -279,15 +280,17 @@ export const error = (
   // Combine error and data
   const combinedData = {
     ...data,
-    error: error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    } : undefined,
+    error: error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        }
+      : undefined,
   };
-  
+
   log(LogLevel.ERROR, category, message, combinedData, tags);
-  
+
   // Capture exception in Sentry
   if (error) {
     safeErrorCapture(error);
@@ -312,15 +315,17 @@ export const fatal = (
   // Combine error and data
   const combinedData = {
     ...data,
-    error: error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    } : undefined,
+    error: error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        }
+      : undefined,
   };
-  
+
   log(LogLevel.FATAL, category, message, combinedData, tags);
-  
+
   // Capture exception in Sentry
   if (error) {
     safeErrorCapture(error);
@@ -335,7 +340,7 @@ const logToConsole = (entry: LogEntry): void => {
   // Format log message
   const timestamp = entry.timestamp.split('T')[1].split('.')[0];
   const prefix = `[${timestamp}] [${entry.level.toUpperCase()}] [${entry.category}]`;
-  
+
   // Log to console based on level
   switch (entry.level) {
     case LogLevel.TRACE:
@@ -364,7 +369,7 @@ const logToSentry = (entry: LogEntry): void => {
   if (!isLevelAtLeast(entry.level, LogLevel.WARN)) {
     return;
   }
-  
+
   // Add breadcrumb to Sentry
   addBreadcrumb({
     category: entry.category,
@@ -381,12 +386,12 @@ const logToSentry = (entry: LogEntry): void => {
 const logToRemote = (entry: LogEntry): void => {
   // Add log to buffer
   logBuffer.push(entry);
-  
+
   // Trim buffer if it gets too large
   if (logBuffer.length > MAX_BUFFER_SIZE) {
     logBuffer.shift();
   }
-  
+
   // Flush logs immediately for errors and fatals
   if (isLevelAtLeast(entry.level, LogLevel.ERROR) && !isFlushingLogs) {
     flushLogs();
@@ -401,38 +406,38 @@ const flushLogs = async (): Promise<void> => {
   if (logBuffer.length === 0 || isFlushingLogs) {
     return;
   }
-  
+
   try {
     isFlushingLogs = true;
-    
+
     // Get logs to flush
     const logsToFlush = [...logBuffer];
-    
+
     // Clear buffer
     logBuffer.length = 0;
-    
+
     // In a real implementation, this would send logs to a remote logging service
     // For now, just log the count
     if (__DEV__) {
       console.log(`Would flush ${logsToFlush.length} logs to remote`);
     }
-    
+
     // Simulate remote logging
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     isFlushingLogs = false;
   } catch (error) {
     console.error('Failed to flush logs:', error);
     safeErrorCapture(error as Error);
-    
+
     // Put logs back in buffer
     logBuffer.unshift(...logBuffer);
-    
+
     // Trim buffer if it gets too large
     while (logBuffer.length > MAX_BUFFER_SIZE) {
       logBuffer.shift();
     }
-    
+
     isFlushingLogs = false;
   }
 };
@@ -452,10 +457,10 @@ const isLevelAtLeast = (level: LogLevel, minLevel: LogLevel): boolean => {
     LogLevel.ERROR,
     LogLevel.FATAL,
   ];
-  
+
   const levelIndex = levelOrder.indexOf(level);
   const minLevelIndex = levelOrder.indexOf(minLevel);
-  
+
   return levelIndex >= minLevelIndex;
 };
 
@@ -464,7 +469,9 @@ const isLevelAtLeast = (level: LogLevel, minLevel: LogLevel): boolean => {
  * @param level Log level
  * @returns Sentry level
  */
-const mapLogLevelToSentryLevel = (level: LogLevel): 'fatal' | 'error' | 'warning' | 'info' | 'debug' => {
+const mapLogLevelToSentryLevel = (
+  level: LogLevel
+): 'fatal' | 'error' | 'warning' | 'info' | 'debug' => {
   switch (level) {
     case LogLevel.TRACE:
     case LogLevel.DEBUG:

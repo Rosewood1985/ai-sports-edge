@@ -5,20 +5,21 @@
  */
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { useUITheme } from '../../components/UIThemeProvider';
+
 import { ThemedText } from './ThemedText';
+import { useUITheme } from '../../components/UIThemeProvider';
 
 interface EmptyStateProps {
   /**
    * Message to display
    */
   message: string;
-  
+
   /**
    * Optional icon component to display above the message
    */
   icon?: React.ReactNode;
-  
+
   /**
    * Optional style overrides
    */
@@ -30,13 +31,9 @@ interface EmptyStateProps {
  * @param {EmptyStateProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-export const EmptyState = ({ 
-  message, 
-  icon, 
-  style 
-}: EmptyStateProps): JSX.Element => {
+export const EmptyState = ({ message, icon, style }: EmptyStateProps): JSX.Element => {
   const { theme } = useUITheme();
-  
+
   const styles = StyleSheet.create({
     container: {
       alignItems: 'center',

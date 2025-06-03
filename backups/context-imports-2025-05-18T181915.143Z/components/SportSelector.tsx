@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
+
 import ResponsiveSportIcon from './ResponsiveSportIcon';
 import { useI18n } from '../contexts/I18nContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Define available sports
 export const AVAILABLE_SPORTS = [
@@ -28,18 +29,16 @@ interface SportSelectorProps {
 const SportSelector: React.FC<SportSelectorProps> = ({ selectedSport, onSelectSport }) => {
   const { colors, isDark } = useTheme();
   const { t } = useI18n();
-  
+
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.text }]}>
-        {t('oddsComparison.selectSport')}
-      </Text>
+      <Text style={[styles.label, { color: colors.text }]}>{t('oddsComparison.selectSport')}</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {AVAILABLE_SPORTS.map((sport) => {
+        {AVAILABLE_SPORTS.map(sport => {
           const isSelected = selectedSport === sport.key;
           return (
             <TouchableOpacity
@@ -47,13 +46,15 @@ const SportSelector: React.FC<SportSelectorProps> = ({ selectedSport, onSelectSp
               style={[
                 styles.sportButton,
                 isSelected && [styles.selectedSport, { backgroundColor: colors.primary }],
-                { backgroundColor: isDark ? '#333333' : '#f0f0f0' }
+                { backgroundColor: isDark ? '#333333' : '#f0f0f0' },
               ]}
               onPress={() => onSelectSport(sport.key)}
-              accessible={true}
+              accessible
               accessibilityRole="radio"
               accessibilityState={{ checked: isSelected }}
-              accessibilityLabel={t('oddsComparison.accessibility.selectSport', { sport: t(`sports.${sport.key}`) })}
+              accessibilityLabel={t('oddsComparison.accessibility.selectSport', {
+                sport: t(`sports.${sport.key}`),
+              })}
               accessibilityHint={t('oddsComparison.accessibility.selectSportHint')}
             >
               <ResponsiveSportIcon
@@ -66,7 +67,7 @@ const SportSelector: React.FC<SportSelectorProps> = ({ selectedSport, onSelectSp
                 style={[
                   styles.sportText,
                   isSelected && styles.selectedSportText,
-                  { color: isSelected ? '#fff' : (isDark ? '#e0e0e0' : '#333') }
+                  { color: isSelected ? '#fff' : isDark ? '#e0e0e0' : '#333' },
                 ]}
                 numberOfLines={1}
               >

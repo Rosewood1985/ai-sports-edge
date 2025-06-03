@@ -1,5 +1,6 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+import React from 'react';
+
 import { AccessibleThemedText } from '../../atomic/atoms/AccessibleThemedText';
 import accessibilityService from '../../services/accessibilityService';
 

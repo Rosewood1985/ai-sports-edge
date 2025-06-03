@@ -1,6 +1,6 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { Platform, NativeModules } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
 
 // Import types from config
 import { seoConfig } from '../config/seo';

@@ -1,17 +1,22 @@
+import { Auth } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Button, ScrollView } from 'react-native';
-import { getUserData, updateUserPreferences } from '../../services/optimizedUserService';
-import { batchLoadingService } from '../../services/batchLoadingService';
-import { firebaseMonitoringService, FirebaseOperationType, FirebaseServiceType } from '../../services/firebaseMonitoringService';
-import { Auth } from 'firebase/auth';
+
 import * as firebaseConfig from '../../config/firebase';
+import { batchLoadingService } from '../../services/batchLoadingService';
+import {
+  firebaseMonitoringService,
+  FirebaseOperationType,
+  FirebaseServiceType,
+} from '../../services/firebaseMonitoringService';
+import { getUserData, updateUserPreferences } from '../../services/optimizedUserService';
 
 // Get Firebase services with type assertions
 const auth = firebaseConfig.auth as Auth;
 
 /**
  * OptimizedUserProfile Component
- * 
+ *
  * This component demonstrates how to use the optimized Firebase services
  * to display and update user profile data efficiently.
  */
@@ -55,11 +60,7 @@ const OptimizedUserProfile: React.FC = () => {
       const duration = endTime - startTime;
 
       // Track operation
-      firebaseMonitoringService.trackFirestoreRead(
-        `users/${userId}`,
-        duration,
-        !!data
-      );
+      firebaseMonitoringService.trackFirestoreRead(`users/${userId}`, duration, !!data);
 
       // Update state
       setUserData(data);
@@ -85,7 +86,7 @@ const OptimizedUserProfile: React.FC = () => {
         includePicks: true,
         includeGames: true,
         includeNotifications: true,
-        includeAppConfig: true
+        includeAppConfig: true,
       });
 
       // End timing
@@ -98,7 +99,7 @@ const OptimizedUserProfile: React.FC = () => {
         service: FirebaseServiceType.FIRESTORE,
         path: `batch/${userId}`,
         duration,
-        success: true
+        success: true,
       });
 
       // Update state
@@ -123,7 +124,7 @@ const OptimizedUserProfile: React.FC = () => {
       // Update preferences
       await updateUserPreferences(userId!, {
         favoriteSports: ['basketball', 'football', 'baseball'],
-        favoriteLeagues: ['NBA', 'NFL', 'MLB']
+        favoriteLeagues: ['NBA', 'NFL', 'MLB'],
       });
 
       // End timing
@@ -131,11 +132,7 @@ const OptimizedUserProfile: React.FC = () => {
       const duration = endTime - startTime;
 
       // Track operation
-      firebaseMonitoringService.trackFirestoreWrite(
-        `users/${userId}/preferences`,
-        duration,
-        true
-      );
+      firebaseMonitoringService.trackFirestoreWrite(`users/${userId}/preferences`, duration, true);
 
       // Reload user data
       await loadUserData();
@@ -182,7 +179,7 @@ const OptimizedUserProfile: React.FC = () => {
     <ScrollView style={styles.scrollContainer}>
       <View style={styles.container}>
         <Text style={styles.title}>User Profile (Optimized)</Text>
-        
+
         {/* User Data */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>User Data</Text>
@@ -191,7 +188,7 @@ const OptimizedUserProfile: React.FC = () => {
               <Text style={styles.label}>ID: {userData.id}</Text>
               <Text style={styles.label}>Email: {userData.email || 'N/A'}</Text>
               <Text style={styles.label}>Display Name: {userData.displayName || 'N/A'}</Text>
-              
+
               {/* Preferences */}
               <Text style={styles.subSectionTitle}>Preferences</Text>
               <Text style={styles.label}>
@@ -203,14 +200,14 @@ const OptimizedUserProfile: React.FC = () => {
               <Text style={styles.label}>
                 Favorite Teams: {userData.preferences?.favoriteTeams?.join(', ') || 'None'}
               </Text>
-              
+
               <Button title="Update Preferences" onPress={updatePreferences} />
             </>
           ) : (
             <Text style={styles.text}>No user data available</Text>
           )}
         </View>
-        
+
         {/* Batch Data */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Batch Data</Text>
@@ -221,22 +218,16 @@ const OptimizedUserProfile: React.FC = () => {
               <Text style={styles.label}>
                 Pick of the Day: {batchData.pickOfDay ? 'Available' : 'None'}
               </Text>
-              <Text style={styles.label}>
-                Top Picks: {batchData.topPicks.length}
-              </Text>
-              <Text style={styles.label}>
-                Recent Games: {batchData.recentGames.length}
-              </Text>
-              <Text style={styles.label}>
-                Notifications: {batchData.notifications.length}
-              </Text>
+              <Text style={styles.label}>Top Picks: {batchData.topPicks.length}</Text>
+              <Text style={styles.label}>Recent Games: {batchData.recentGames.length}</Text>
+              <Text style={styles.label}>Notifications: {batchData.notifications.length}</Text>
             </>
           ) : (
             <Text style={styles.text}>No batch data loaded</Text>
           )}
           <Button title="Load Batch Data" onPress={loadBatchData} />
         </View>
-        
+
         {/* Usage Stats */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Firebase Usage Stats</Text>
@@ -245,7 +236,9 @@ const OptimizedUserProfile: React.FC = () => {
               <Text style={styles.label}>Total Reads: {stats.reads}</Text>
               <Text style={styles.label}>Total Writes: {stats.writes}</Text>
               <Text style={styles.label}>Total Queries: {stats.queries}</Text>
-              <Text style={styles.label}>Average Duration: {stats.averageDuration.toFixed(2)}ms</Text>
+              <Text style={styles.label}>
+                Average Duration: {stats.averageDuration.toFixed(2)}ms
+              </Text>
               <Text style={styles.label}>Error Rate: {(stats.errorRate * 100).toFixed(2)}%</Text>
             </>
           ) : (

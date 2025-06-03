@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { EnhancedWidget } from '../widgets/EnhancedWidget';
-import { Button } from '../../ui/Button';
-import { Card } from '../../ui/Card';
-import { Badge } from '../../ui/Badge';
-import { IconButton } from '../../ui/IconButton';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
-import { useContentList, useContentBulkOperations, useContentTags } from '../../../hooks/useContentManagement';
+
+import {
+  useContentList,
+  useContentBulkOperations,
+  useContentTags,
+} from '../../../hooks/useContentManagement';
 import {
   ContentItem,
   ContentListFilter,
@@ -14,6 +13,12 @@ import {
   ContentCategory,
 } from '../../../types/contentManagement';
 import { formatDateTime } from '../../../utils/dateUtils';
+import { Badge } from '../../ui/Badge';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { IconButton } from '../../ui/IconButton';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { EnhancedWidget } from '../widgets/EnhancedWidget';
 
 export interface ContentManagementDashboardProps {
   onCreateContent?: () => void;
@@ -53,10 +58,17 @@ export function ContentManagementDashboard({
   const stats = useMemo(() => {
     if (!contentList) return null;
 
-    const published = contentList.items.filter(item => item.status === ContentStatus.PUBLISHED).length;
+    const published = contentList.items.filter(
+      item => item.status === ContentStatus.PUBLISHED
+    ).length;
     const draft = contentList.items.filter(item => item.status === ContentStatus.DRAFT).length;
-    const scheduled = contentList.items.filter(item => item.status === ContentStatus.SCHEDULED).length;
-    const totalViews = contentList.items.reduce((sum, item) => sum + (item.analytics?.views || 0), 0);
+    const scheduled = contentList.items.filter(
+      item => item.status === ContentStatus.SCHEDULED
+    ).length;
+    const totalViews = contentList.items.reduce(
+      (sum, item) => sum + (item.analytics?.views || 0),
+      0
+    );
 
     return { published, draft, scheduled, totalViews };
   }, [contentList]);
@@ -73,7 +85,7 @@ export function ContentManagementDashboard({
 
   const handleSelectAll = () => {
     if (!contentList) return;
-    
+
     if (selectedItems.size === contentList.items.length) {
       setSelectedItems(new Set());
     } else {
@@ -148,11 +160,21 @@ export function ContentManagementDashboard({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Published</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.published}</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {stats.published}
+                </p>
               </div>
               <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-6 h-6 text-green-600 dark:text-green-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
             </div>
@@ -165,7 +187,11 @@ export function ContentManagementDashboard({
                 <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">{stats.draft}</p>
               </div>
               <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-full">
-                <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-6 h-6 text-gray-600 dark:text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                 </svg>
               </div>
@@ -176,11 +202,21 @@ export function ContentManagementDashboard({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Scheduled</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.scheduled}</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {stats.scheduled}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                <svg
+                  className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
             </div>
@@ -195,9 +231,17 @@ export function ContentManagementDashboard({
                 </p>
               </div>
               <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-6 h-6 text-purple-600 dark:text-purple-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
             </div>
@@ -222,7 +266,7 @@ export function ContentManagementDashboard({
               <Button onClick={onCreateContent} variant="primary">
                 Create Content
               </Button>
-              
+
               <div className="flex gap-2">
                 <button
                   onClick={() => setViewMode('grid')}
@@ -237,7 +281,11 @@ export function ContentManagementDashboard({
                   className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    <path
+                      fillRule="evenodd"
+                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
@@ -307,7 +355,7 @@ export function ContentManagementDashboard({
                   <input
                     type="text"
                     value={filters.search || ''}
-                    onChange={(e) => handleFilterChange({ search: e.target.value })}
+                    onChange={e => handleFilterChange({ search: e.target.value })}
                     placeholder="Search content..."
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   />
@@ -319,7 +367,9 @@ export function ContentManagementDashboard({
                   </label>
                   <select
                     value={filters.status || ''}
-                    onChange={(e) => handleFilterChange({ status: e.target.value as ContentStatus || undefined })}
+                    onChange={e =>
+                      handleFilterChange({ status: (e.target.value as ContentStatus) || undefined })
+                    }
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
                     <option value="">All Statuses</option>
@@ -336,7 +386,9 @@ export function ContentManagementDashboard({
                   </label>
                   <select
                     value={filters.type || ''}
-                    onChange={(e) => handleFilterChange({ type: e.target.value as ContentType || undefined })}
+                    onChange={e =>
+                      handleFilterChange({ type: (e.target.value as ContentType) || undefined })
+                    }
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
                     <option value="">All Types</option>
@@ -355,7 +407,11 @@ export function ContentManagementDashboard({
                   </label>
                   <select
                     value={filters.category || ''}
-                    onChange={(e) => handleFilterChange({ category: e.target.value as ContentCategory || undefined })}
+                    onChange={e =>
+                      handleFilterChange({
+                        category: (e.target.value as ContentCategory) || undefined,
+                      })
+                    }
                     className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
                     <option value="">All Categories</option>
@@ -397,7 +453,7 @@ export function ContentManagementDashboard({
               {/* Content Grid/List */}
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {contentList.items.map((item) => (
+                  {contentList.items.map(item => (
                     <Card key={item.id} className="relative overflow-hidden">
                       <div className="absolute top-3 left-3 z-10">
                         <input
@@ -435,12 +491,8 @@ export function ContentManagementDashboard({
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge className={getStatusColor(item.status)}>
-                            {item.status}
-                          </Badge>
-                          <Badge className={getTypeColor(item.type)}>
-                            {item.type}
-                          </Badge>
+                          <Badge className={getStatusColor(item.status)}>{item.status}</Badge>
+                          <Badge className={getTypeColor(item.type)}>{item.type}</Badge>
                         </div>
 
                         <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
@@ -458,7 +510,7 @@ export function ContentManagementDashboard({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {contentList.items.map((item) => (
+                  {contentList.items.map(item => (
                     <Card key={item.id} className="p-4">
                       <div className="flex items-center gap-4">
                         <input
@@ -473,12 +525,8 @@ export function ContentManagementDashboard({
                             <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
                               {item.title}
                             </h3>
-                            <Badge className={getStatusColor(item.status)}>
-                              {item.status}
-                            </Badge>
-                            <Badge className={getTypeColor(item.type)}>
-                              {item.type}
-                            </Badge>
+                            <Badge className={getStatusColor(item.status)}>{item.status}</Badge>
+                            <Badge className={getTypeColor(item.type)}>{item.type}</Badge>
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">
                             By {item.author.name} • Updated {formatDateTime(item.updatedAt)}
@@ -515,7 +563,7 @@ export function ContentManagementDashboard({
                     >
                       Previous
                     </Button>
-                    
+
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       const pageNum = Math.max(1, Math.min(totalPages - 4, page - 2)) + i;
                       return (
@@ -547,10 +595,22 @@ export function ContentManagementDashboard({
           {/* Empty State */}
           {contentList && contentList.items.length === 0 && (
             <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No content found</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                No content found
+              </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Get started by creating your first piece of content.
               </p>

@@ -1,25 +1,25 @@
 // Firebase Authentication Configuration
-import { initializeApp } from "firebase/app";
-import { 
-  getAuth, 
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup
-} from "firebase/auth";
+  signInWithPopup,
+} from 'firebase/auth';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDFps9-V4XXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "ai-sports-edge.firebaseapp.com",
-  projectId: "ai-sports-edge",
-  storageBucket: "ai-sports-edge.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890",
-  measurementId: "G-XXXXXXXXXX"
+  apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyDFps9-V4XXXXXXXXXXXXXXXXXXXXXXXXXX',
+  authDomain: 'ai-sports-edge.firebaseapp.com',
+  projectId: 'ai-sports-edge',
+  storageBucket: 'ai-sports-edge.appspot.com',
+  messagingSenderId: '123456789012',
+  appId: '1:123456789012:web:abcdef1234567890',
+  measurementId: 'G-XXXXXXXXXX',
 };
 
 // Initialize Firebase
@@ -32,11 +32,14 @@ export const createUser = async (email, password) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return { user: userCredential.user, error: null };
   } catch (error) {
-    console.error("Error creating user:", error.code, error.message);
-    return { user: null, error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error creating user:', error.code, error.message);
+    return {
+      user: null,
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -46,11 +49,14 @@ export const signIn = async (email, password) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return { user: userCredential.user, error: null };
   } catch (error) {
-    console.error("Error signing in:", error.code, error.message);
-    return { user: null, error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error signing in:', error.code, error.message);
+    return {
+      user: null,
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -61,11 +67,14 @@ export const signInWithGoogle = async () => {
     const userCredential = await signInWithPopup(auth, provider);
     return { user: userCredential.user, error: null };
   } catch (error) {
-    console.error("Error signing in with Google:", error.code, error.message);
-    return { user: null, error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error signing in with Google:', error.code, error.message);
+    return {
+      user: null,
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -75,25 +84,29 @@ export const logOut = async () => {
     await signOut(auth);
     return { error: null };
   } catch (error) {
-    console.error("Error signing out:", error.code, error.message);
-    return { error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error signing out:', error.code, error.message);
+    return {
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
 // Send password reset email
-export const resetPassword = async (email) => {
+export const resetPassword = async email => {
   try {
     await sendPasswordResetEmail(auth, email);
     return { error: null };
   } catch (error) {
-    console.error("Error sending password reset email:", error.code, error.message);
-    return { error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error sending password reset email:', error.code, error.message);
+    return {
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -103,12 +116,12 @@ export const getCurrentUser = () => {
 };
 
 // Listen for auth state changes
-export const onAuthChange = (callback) => {
+export const onAuthChange = callback => {
   return onAuthStateChanged(auth, callback);
 };
 
 // Get user-friendly error message
-const getErrorMessage = (errorCode) => {
+const getErrorMessage = errorCode => {
   switch (errorCode) {
     case 'auth/email-already-in-use':
       return 'This email is already in use. Please try another email or sign in.';

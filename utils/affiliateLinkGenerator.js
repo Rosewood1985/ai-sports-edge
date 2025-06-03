@@ -12,7 +12,7 @@
 export function generateFanDuelAffiliateLink(event, affiliateId) {
   // Base FanDuel URL
   const baseUrl = 'https://www.fanduel.com/';
-  
+
   // Construct path based on sport
   let path = '';
   switch (event.sport) {
@@ -43,19 +43,19 @@ export function generateFanDuelAffiliateLink(event, affiliateId) {
     default:
       path = 'sports';
   }
-  
+
   // Add event-specific parameters if available
   const params = new URLSearchParams();
   if (event.eventId) {
     params.append('eventId', event.eventId);
   }
-  
+
   // Always add affiliate ID
   params.append('aid', affiliateId || 'default');
-  
+
   // Track the source
   params.append('src', 'newsticker');
-  
+
   // Add team names if available
   if (event.teams) {
     // Try to extract team names from the teams field
@@ -65,7 +65,7 @@ export function generateFanDuelAffiliateLink(event, affiliateId) {
       params.append('team2', encodeURIComponent(teamNames[1]));
     }
   }
-  
+
   return `${baseUrl}${path}?${params.toString()}`;
 }
 
@@ -78,7 +78,7 @@ export function generateFanDuelAffiliateLink(event, affiliateId) {
 export function generateGenericAffiliateLink(sport, affiliateId) {
   // Base FanDuel URL
   const baseUrl = 'https://www.fanduel.com/';
-  
+
   // Construct path based on sport
   let path = '';
   switch (sport) {
@@ -109,12 +109,12 @@ export function generateGenericAffiliateLink(sport, affiliateId) {
     default:
       path = 'sports';
   }
-  
+
   // Add affiliate ID
   const params = new URLSearchParams();
   params.append('aid', affiliateId || 'default');
   params.append('src', 'app');
-  
+
   return `${baseUrl}${path}?${params.toString()}`;
 }
 
@@ -127,7 +127,7 @@ export function generateGenericAffiliateLink(sport, affiliateId) {
 export function generateBetMGMAffiliateLink(event, affiliateId) {
   // Base BetMGM URL
   const baseUrl = 'https://sports.betmgm.com/en/sports/';
-  
+
   // Construct path based on sport
   let path = '';
   switch (event.sport) {
@@ -158,12 +158,12 @@ export function generateBetMGMAffiliateLink(event, affiliateId) {
     default:
       path = '';
   }
-  
+
   // Add affiliate ID
   const params = new URLSearchParams();
   params.append('affiliate', affiliateId || 'default');
   params.append('src', 'ai-sports-edge');
-  
+
   return `${baseUrl}${path}?${params.toString()}`;
 }
 
@@ -176,7 +176,7 @@ export function generateBetMGMAffiliateLink(event, affiliateId) {
 export function generateDraftKingsAffiliateLink(event, affiliateId) {
   // Base DraftKings URL
   const baseUrl = 'https://sportsbook.draftkings.com/';
-  
+
   // Construct path based on sport
   let path = '';
   switch (event.sport) {
@@ -207,12 +207,12 @@ export function generateDraftKingsAffiliateLink(event, affiliateId) {
     default:
       path = '';
   }
-  
+
   // Add affiliate ID
   const params = new URLSearchParams();
   params.append('aid', affiliateId || 'default');
   params.append('src', 'ai-sports-edge');
-  
+
   return `${baseUrl}${path}?${params.toString()}`;
 }
 
@@ -223,16 +223,16 @@ export function generateDraftKingsAffiliateLink(event, affiliateId) {
  */
 function extractTeamNames(teamsString) {
   if (!teamsString) return [];
-  
+
   // Common separators in team matchups
   const separators = [' vs ', ' vs. ', ' at ', ' @ ', '-'];
-  
+
   for (const separator of separators) {
     if (teamsString.includes(separator)) {
       return teamsString.split(separator).map(team => team.trim());
     }
   }
-  
+
   // If no separator found, return the whole string
   return [teamsString];
 }
@@ -246,9 +246,9 @@ export function getDefaultAffiliateId(sportsbook) {
   const defaults = {
     fanduel: 'ai-sports-edge-001',
     betmgm: 'ai-sports-edge-002',
-    draftkings: 'ai-sports-edge-003'
+    draftkings: 'ai-sports-edge-003',
   };
-  
+
   return defaults[sportsbook.toLowerCase()] || 'default';
 }
 
@@ -261,7 +261,7 @@ export function getDefaultAffiliateId(sportsbook) {
  */
 export function generateAffiliateLink(sportsbook, event, affiliateId) {
   const sportsbookLower = sportsbook.toLowerCase();
-  
+
   switch (sportsbookLower) {
     case 'fanduel':
       return generateFanDuelAffiliateLink(event, affiliateId);

@@ -3,17 +3,11 @@
  * Container component with gradient background using UI theme system
  * Location: /atomic/atoms/ui/NeonContainer.tsx
  */
-import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ViewProps,
-  StyleProp,
-  ViewStyle,
-  SafeAreaView,
-} from 'react-native';
-import { useUITheme } from '../../../components/UIThemeProvider';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { View, StyleSheet, ViewProps, StyleProp, ViewStyle, SafeAreaView } from 'react-native';
+
+import { useUITheme } from '../../../components/UIThemeProvider';
 
 interface NeonContainerProps extends ViewProps {
   gradient?: boolean;
@@ -38,9 +32,12 @@ export const NeonContainer: React.FC<NeonContainerProps> = ({
   ...rest
 }) => {
   const { theme } = useUITheme();
-  
+
   // Use theme colors if no custom gradient colors provided
-  const defaultGradientColors = gradientColors || [theme.colors.primaryBackground, theme.colors.surfaceBackground];
+  const defaultGradientColors = gradientColors || [
+    theme.colors.primaryBackground,
+    theme.colors.surfaceBackground,
+  ];
 
   // Render container content
   const renderContent = () => {
@@ -55,10 +52,11 @@ export const NeonContainer: React.FC<NeonContainerProps> = ({
   const renderContainer = () => {
     if (gradient) {
       // Ensure we have at least two colors for the gradient
-      const gradientColorsArray: readonly [string, string] = Array.isArray(defaultGradientColors) && defaultGradientColors.length >= 2
-        ? [defaultGradientColors[0], defaultGradientColors[1]] as const
-        : [theme.colors.primaryBackground, theme.colors.surfaceBackground] as const;
-        
+      const gradientColorsArray: readonly [string, string] =
+        Array.isArray(defaultGradientColors) && defaultGradientColors.length >= 2
+          ? ([defaultGradientColors[0], defaultGradientColors[1]] as const)
+          : ([theme.colors.primaryBackground, theme.colors.surfaceBackground] as const);
+
       return (
         <LinearGradient
           colors={gradientColorsArray}

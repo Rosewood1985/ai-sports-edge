@@ -7,17 +7,17 @@
 require('dotenv').config();
 
 // Import dependencies
-const express = require('express');
 const cors = require('cors');
+const express = require('express');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const mongoose = require('mongoose');
+const morgan = require('morgan');
 
 // Import routes
+const adminRoutes = require('./api/routes/admin');
 const predictionRoutes = require('./api/routes/predictions');
 const recommendationRoutes = require('./api/routes/recommendations');
 const userRoutes = require('./api/routes/users');
-const adminRoutes = require('./api/routes/admin');
 
 // Create Express app
 const app = express();
@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
   res.json({
     name: 'ML Sports Edge API',
     version: '0.1.0',
-    status: 'running'
+    status: 'running',
   });
 });
 
@@ -50,14 +50,15 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     error: {
       message: err.message || 'Internal Server Error',
-      status: err.status || 500
-    }
+      status: err.status || 500,
+    },
   });
 });
 
 // Connect to MongoDB (if configured)
 if (process.env.MONGODB_URI) {
-  mongoose.connect(process.env.MONGODB_URI)
+  mongoose
+    .connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 } else {

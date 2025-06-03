@@ -4,10 +4,10 @@
  * This file provides an integrated service for Firebase Firestore backups.
  */
 
-import { exportFirestoreData } from '../molecules/firebaseBackupExport';
-import { applyRetentionPolicy, listAvailableBackups } from '../molecules/firebaseBackupStorage';
-import { logBackupEvent, sendEmailNotification } from '../molecules/firebaseBackupMonitoring';
 import { backupConfig } from '../atoms/firebaseBackupConfig';
+import { exportFirestoreData } from '../molecules/firebaseBackupExport';
+import { logBackupEvent, sendEmailNotification } from '../molecules/firebaseBackupMonitoring';
+import { applyRetentionPolicy, listAvailableBackups } from '../molecules/firebaseBackupStorage';
 
 /**
  * Executes a complete backup process

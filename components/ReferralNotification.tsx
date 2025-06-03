@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Modal,
-  Animated,
-  Dimensions
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Animated,
+  Dimensions,
+} from 'react-native';
+
+import ReferralBadge from './ReferralBadge';
 import { useThemeColor } from '../hooks/useThemeColor';
 import NeonText from './ui/NeonText';
-import ReferralBadge from './ReferralBadge';
 import { BadgeType } from '../types/rewards';
 
 interface ReferralNotificationProps {
@@ -39,25 +40,25 @@ const ReferralNotification: React.FC<ReferralNotificationProps> = ({
   message,
   badgeType,
   rewardAmount,
-  rewardType
+  rewardType,
 }) => {
   const [animation] = useState(new Animated.Value(0));
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
   const { width } = Dimensions.get('window');
-  
+
   useEffect(() => {
     if (visible) {
       // Reset animation
       animation.setValue(0);
-      
+
       // Start animation
       Animated.sequence([
         // Fade in and scale up
         Animated.timing(animation, {
           toValue: 1,
           duration: 500,
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         // Wait
         Animated.delay(500),
@@ -65,25 +66,23 @@ const ReferralNotification: React.FC<ReferralNotificationProps> = ({
         Animated.timing(animation, {
           toValue: 1.05,
           duration: 200,
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animation, {
           toValue: 1,
           duration: 200,
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]).start();
     }
   }, [visible, animation]);
-  
+
   // Animation styles
   const animatedStyle = {
     opacity: animation,
-    transform: [
-      { scale: animation }
-    ]
+    transform: [{ scale: animation }],
   };
-  
+
   // Get icon based on notification type
   const getIcon = () => {
     switch (type) {
@@ -99,7 +98,7 @@ const ReferralNotification: React.FC<ReferralNotificationProps> = ({
         return 'gift';
     }
   };
-  
+
   // Get gradient colors based on notification type
   const getGradientColors = () => {
     switch (type) {
@@ -115,14 +114,9 @@ const ReferralNotification: React.FC<ReferralNotificationProps> = ({
         return ['#3498db', '#2980b9'] as const;
     }
   };
-  
+
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalContent, animatedStyle]}>
           <LinearGradient
@@ -132,28 +126,28 @@ const ReferralNotification: React.FC<ReferralNotificationProps> = ({
             end={{ x: 1, y: 1 }}
           >
             <View style={styles.header}>
-              <NeonText type="heading" glow={true} style={styles.title}>
+              <NeonText type="heading" glow style={styles.title}>
                 {title}
               </NeonText>
-              
+
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                 <Ionicons name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <View style={styles.content}>
               {type === 'badge' && badgeType ? (
                 <View style={styles.badgeContainer}>
-                  <ReferralBadge type={badgeType} size="large" showLabel={true} />
+                  <ReferralBadge type={badgeType} size="large" showLabel />
                 </View>
               ) : (
                 <View style={styles.iconContainer}>
                   <Ionicons name={getIcon()} size={64} color="#fff" />
                 </View>
               )}
-              
+
               <Text style={styles.message}>{message}</Text>
-              
+
               {rewardAmount && rewardType && (
                 <View style={styles.rewardContainer}>
                   <Text style={styles.rewardText}>
@@ -162,11 +156,8 @@ const ReferralNotification: React.FC<ReferralNotificationProps> = ({
                 </View>
               )}
             </View>
-            
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={onClose}
-            >
+
+            <TouchableOpacity style={styles.actionButton} onPress={onClose}>
               <Text style={styles.actionButtonText}>Awesome!</Text>
             </TouchableOpacity>
           </LinearGradient>

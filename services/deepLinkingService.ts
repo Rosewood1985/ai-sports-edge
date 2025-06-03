@@ -1,6 +1,3 @@
-import { Linking } from 'react-native';
-import { analyticsService } from './analyticsService';
-import { auth, firestore } from '../config/firebase';
 import {
   doc,
   setDoc,
@@ -13,12 +10,16 @@ import {
   orderBy,
   limit,
   getDocs,
-  updateDoc
+  updateDoc,
 } from 'firebase/firestore';
+import { Linking } from 'react-native';
+
+import { analyticsService } from './analyticsService';
+import { auth, firestore } from '../config/firebase';
 
 /**
  * Deep Linking Service
- * 
+ *
  * This service handles deep linking functionality, allowing the app to respond
  * to external links and track marketing campaigns.
  */
@@ -40,7 +41,7 @@ export enum DeepLinkPath {
   REFERRAL = 'referral',
   NOTIFICATION = 'notification',
   SETTINGS = 'settings',
-  PROMO = 'promo'
+  PROMO = 'promo',
 }
 
 // Deep link parameters
@@ -86,16 +87,16 @@ class DeepLinkingService {
       // Get the initial URL if the app was opened from a deep link
       const initialUrl = await Linking.getInitialURL();
       this.initialLink = initialUrl;
-      
+
       if (initialUrl) {
         console.log('App opened from deep link:', initialUrl);
         const deepLinkData = this.parseDeepLink(initialUrl);
         this.processDeepLink(deepLinkData);
       }
-      
+
       // Add event listener for deep links while the app is running
       Linking.addEventListener('url', this.handleDeepLink);
-      
+
       console.log('Deep linking service initialized');
     } catch (error) {
       console.error('Error initializing deep linking service:', error);
@@ -124,23 +125,23 @@ class DeepLinkingService {
     try {
       // Create URL object
       const urlObj = new URL(url);
-      
+
       // Extract path
       let path = urlObj.pathname.replace(/^\/+/, '');
       if (path === '') {
         path = DeepLinkPath.HOME;
       }
-      
+
       // Validate path
       if (!Object.values(DeepLinkPath).includes(path as DeepLinkPath)) {
         console.warn(`Invalid deep link path: ${path}, defaulting to HOME`);
         path = DeepLinkPath.HOME;
       }
-      
+
       // Extract parameters
       const params: DeepLinkParams = {};
       const utmParams: UTMParams = {};
-      
+
       urlObj.searchParams.forEach((value, key) => {
         if (key.startsWith('utm_')) {
           // Extract UTM parameter
@@ -151,24 +152,24 @@ class DeepLinkingService {
           params[key] = value;
         }
       });
-      
+
       return {
         url,
         path: path as DeepLinkPath,
         params,
         utmParams,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     } catch (error) {
       console.error('Error parsing deep link:', error);
-      
+
       // Return default deep link data
       return {
         url,
         path: DeepLinkPath.HOME,
         params: {},
         utmParams: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     }
   }
@@ -181,14 +182,14 @@ class DeepLinkingService {
     try {
       // Log deep link
       await this.logDeepLink(data);
-      
+
       // Track analytics event
       analyticsService.trackEvent('deep_link_opened', {
         path: data.path,
         params: data.params,
-        utmParams: data.utmParams
+        utmParams: data.utmParams,
       });
-      
+
       // Notify listeners
       this.notifyListeners(data);
     } catch (error) {
@@ -203,17 +204,17 @@ class DeepLinkingService {
   private async logDeepLink(data: DeepLinkData): Promise<void> {
     try {
       const userId = auth.currentUser?.uid;
-      
+
       const deepLinkEntry: Omit<DeepLinkHistoryEntry, 'id'> = {
         ...data,
         userId,
-        processed: false
+        processed: false,
       };
-      
+
       const deepLinksRef = collection(firestore, 'deepLinkHistory');
       await addDoc(deepLinksRef, {
         ...deepLinkEntry,
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp(),
       });
     } catch (error) {
       console.error('Error logging deep link:', error);
@@ -227,7 +228,7 @@ class DeepLinkingService {
    */
   public addListener(listener: (data: DeepLinkData) => void): () => void {
     this.listeners.push(listener);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener);
@@ -271,26 +272,26 @@ class DeepLinkingService {
     try {
       // Create URL with scheme and path
       let url = `${APP_URL_SCHEME}${path}`;
-      
+
       // Add parameters
       const urlParams = new URLSearchParams();
-      
+
       // Add regular parameters
       Object.entries(params).forEach(([key, value]) => {
         urlParams.append(key, value);
       });
-      
+
       // Add UTM parameters
       Object.entries(utmParams).forEach(([key, value]) => {
         urlParams.append(`utm_${key}`, value);
       });
-      
+
       // Add parameters to URL
       const paramsString = urlParams.toString();
       if (paramsString) {
         url += `?${paramsString}`;
       }
-      
+
       return url;
     } catch (error) {
       console.error('Error creating deep link:', error);
@@ -313,26 +314,26 @@ class DeepLinkingService {
     try {
       // Create URL with web domain and path
       let url = `https://${APP_WEB_DOMAIN}/${path}`;
-      
+
       // Add parameters
       const urlParams = new URLSearchParams();
-      
+
       // Add regular parameters
       Object.entries(params).forEach(([key, value]) => {
         urlParams.append(key, value);
       });
-      
+
       // Add UTM parameters
       Object.entries(utmParams).forEach(([key, value]) => {
         urlParams.append(`utm_${key}`, value);
       });
-      
+
       // Add parameters to URL
       const paramsString = urlParams.toString();
       if (paramsString) {
         url += `?${paramsString}`;
       }
-      
+
       return url;
     } catch (error) {
       console.error('Error creating universal link:', error);
@@ -379,7 +380,7 @@ class DeepLinkingService {
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      
+
       const deepLinksRef = collection(firestore, 'deepLinkHistory');
       const q = query(
         deepLinksRef,
@@ -387,13 +388,16 @@ class DeepLinkingService {
         orderBy('timestamp', 'desc'),
         limit(maxEntries)
       );
-      
+
       const snapshot = await getDocs(q);
-      
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as DeepLinkHistoryEntry));
+
+      return snapshot.docs.map(
+        doc =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as DeepLinkHistoryEntry
+      );
     } catch (error) {
       console.error('Error getting deep link history:', error);
       return [];
@@ -411,7 +415,7 @@ class DeepLinkingService {
       await updateDoc(docRef, {
         processed: true,
         result,
-        processedAt: serverTimestamp()
+        processedAt: serverTimestamp(),
       });
     } catch (error) {
       console.error('Error marking deep link as processed:', error);

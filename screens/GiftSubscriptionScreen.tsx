@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { createGiftSubscription, GIFT_SUBSCRIPTION_AMOUNTS } from '../services/subscriptionService';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import { auth } from '../config/firebase';
+import { createGiftSubscription, GIFT_SUBSCRIPTION_AMOUNTS } from '../services/subscriptionService';
 // Custom Picker component since @react-native-picker/picker might not be available
-const Picker = ({ selectedValue, onValueChange, style, children }: {
+const Picker = ({
+  selectedValue,
+  onValueChange,
+  style,
+  children,
+}: {
   selectedValue: number;
   onValueChange: (value: number) => void;
   style?: any;
@@ -15,7 +32,7 @@ const Picker = ({ selectedValue, onValueChange, style, children }: {
   return (
     <View style={style}>
       <View style={{ padding: 8, borderWidth: 1, borderColor: '#ccc', borderRadius: 4 }}>
-        {GIFT_SUBSCRIPTION_AMOUNTS.map((option) => (
+        {GIFT_SUBSCRIPTION_AMOUNTS.map(option => (
           <TouchableOpacity
             key={option.value.toString()}
             style={{
@@ -34,18 +51,16 @@ const Picker = ({ selectedValue, onValueChange, style, children }: {
 };
 
 // Custom Picker.Item component (not used with the new implementation)
-Picker.Item = ({ label, value }: { label: string, value: number }) => {
+Picker.Item = ({ label, value }: { label: string; value: number }) => {
   return null;
 };
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
 
 type GiftSubscriptionScreenProps = {
   route?: {
     params?: {
       paymentMethodId?: string;
-    }
-  }
+    };
+  };
 };
 
 const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }) => {
@@ -55,35 +70,35 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [giftCode, setGiftCode] = useState<string | null>(null);
-  
+
   // Get payment method ID from route params or use default
   const paymentMethodId = route?.params?.paymentMethodId;
-  
+
   // Handle gift subscription creation
   const handleCreateGiftSubscription = async () => {
     if (!paymentMethodId) {
-      navigation.navigate('PaymentScreen', { 
+      navigation.navigate('PaymentScreen', {
         returnScreen: 'GiftSubscription',
-        amount
+        amount,
       });
       return;
     }
-    
+
     if (amount < 2500) {
       Alert.alert('Invalid Amount', 'The minimum gift amount is $25.');
       return;
     }
-    
+
     try {
       setLoading(true);
-      
+
       const userId = auth.currentUser?.uid;
       if (!userId) {
         Alert.alert('Error', 'You must be logged in to create a gift subscription.');
         setLoading(false);
         return;
       }
-      
+
       // Create the gift subscription
       const giftSubscription = await createGiftSubscription(
         userId,
@@ -92,18 +107,20 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
         recipientEmail || undefined,
         message || undefined
       );
-      
+
       // Show success message with the gift code
       setGiftCode(giftSubscription.code);
-      
     } catch (error: any) {
       console.error('Error creating gift subscription:', error);
-      Alert.alert('Error', error.message || 'Failed to create gift subscription. Please try again.');
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to create gift subscription. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
   };
-  
+
   // Render gift code success screen
   if (giftCode) {
     return (
@@ -112,26 +129,28 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
           <View style={styles.successContainer}>
             <Text style={styles.successTitle}>Gift Subscription Created!</Text>
             <Text style={styles.successMessage}>
-              Your gift subscription has been created successfully. Share the code below with the recipient.
+              Your gift subscription has been created successfully. Share the code below with the
+              recipient.
             </Text>
-            
+
             <View style={styles.codeContainer}>
               <Text style={styles.codeLabel}>Gift Code:</Text>
               <Text style={styles.code}>{giftCode}</Text>
             </View>
-            
+
             <Text style={styles.instructionsTitle}>Redemption Instructions:</Text>
             <Text style={styles.instructions}>
-              The recipient can redeem this code by going to Settings &gt; Redeem Gift in the AI Sports Edge app.
+              The recipient can redeem this code by going to Settings &gt; Redeem Gift in the AI
+              Sports Edge app.
             </Text>
-            
+
             {recipientEmail && (
               <Text style={styles.emailSent}>
                 We've sent an email to {recipientEmail} with the gift code and instructions.
               </Text>
             )}
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.doneButton}
               onPress={() => navigation.navigate('Dashboard')}
             >
@@ -142,44 +161,44 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
       </ThemedView>
     );
   }
-  
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <ThemedText style={styles.title}>Gift a Subscription</ThemedText>
-        
+
         <ThemedText style={styles.description}>
-          Give the gift of premium sports analytics to a friend or family member.
-          Gift subscriptions provide access to all premium features.
+          Give the gift of premium sports analytics to a friend or family member. Gift subscriptions
+          provide access to all premium features.
         </ThemedText>
-        
+
         <View style={styles.amountSection}>
           <ThemedText style={styles.sectionTitle}>Select Amount</ThemedText>
           <ThemedText style={styles.sectionDescription}>
-            The amount determines how long the subscription will last.
-            $25 provides approximately 1 month of premium access.
+            The amount determines how long the subscription will last. $25 provides approximately 1
+            month of premium access.
           </ThemedText>
-          
+
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={amount}
-              onValueChange={(value) => setAmount(Number(value))}
+              onValueChange={value => setAmount(Number(value))}
               style={styles.picker}
             >
-              {GIFT_SUBSCRIPTION_AMOUNTS.map((option) => (
-                <Picker.Item 
-                  key={option.value.toString()} 
-                  label={option.label} 
-                  value={option.value} 
+              {GIFT_SUBSCRIPTION_AMOUNTS.map(option => (
+                <Picker.Item
+                  key={option.value.toString()}
+                  label={option.label}
+                  value={option.value}
                 />
               ))}
             </Picker>
           </View>
         </View>
-        
+
         <View style={styles.recipientSection}>
           <ThemedText style={styles.sectionTitle}>Recipient Information (Optional)</ThemedText>
-          
+
           <View style={styles.inputContainer}>
             <ThemedText style={styles.label}>Recipient Email</ThemedText>
             <TextInput
@@ -194,7 +213,7 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
               We'll send the gift code and instructions to this email.
             </ThemedText>
           </View>
-          
+
           <View style={styles.inputContainer}>
             <ThemedText style={styles.label}>Personal Message (Optional)</ThemedText>
             <TextInput
@@ -207,7 +226,7 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
             />
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={styles.createButton}
           onPress={handleCreateGiftSubscription}
@@ -221,7 +240,7 @@ const GiftSubscriptionScreen: React.FC<GiftSubscriptionScreenProps> = ({ route }
             </Text>
           )}
         </TouchableOpacity>
-        
+
         <ThemedText style={styles.termsText}>
           By creating a gift subscription, you agree to our Terms of Service and Privacy Policy.
           Gift subscriptions are non-refundable once redeemed.

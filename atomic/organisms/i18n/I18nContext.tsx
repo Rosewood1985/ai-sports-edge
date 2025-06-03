@@ -1,12 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { I18nManager, Platform, NativeModules } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Storage key for language preference
-const LANGUAGE_STORAGE_KEY = 'app_language';
 
 // Import translations
 import { en, es } from '../../atoms/translations';
+
+// Storage key for language preference
+const LANGUAGE_STORAGE_KEY = 'app_language';
 
 // Define supported languages
 export type Language = 'en' | 'es' | 'es-US' | 'es-MX' | 'es-ES';

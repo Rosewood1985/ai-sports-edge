@@ -1,15 +1,10 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ImageBackground
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { AIPrediction, ConfidenceLevel } from '../types/odds';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
+import { AIPrediction, ConfidenceLevel } from '../types/odds';
 
 interface BlurredPredictionProps {
   prediction: AIPrediction;
@@ -22,10 +17,10 @@ interface BlurredPredictionProps {
  * @param {BlurredPredictionProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const BlurredPrediction: React.FC<BlurredPredictionProps> = ({ 
-  prediction, 
+const BlurredPrediction: React.FC<BlurredPredictionProps> = ({
+  prediction,
   isBlurred,
-  teamName
+  teamName,
 }) => {
   const navigation = useNavigation();
   const { colors, isDark } = useTheme();
@@ -55,37 +50,29 @@ const BlurredPrediction: React.FC<BlurredPredictionProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={[styles.teamName, { color: colors.text }]}>
-            {teamName}
-          </Text>
-          <View style={[
-            styles.confidenceTag,
-            { backgroundColor: getConfidenceColor(prediction.confidence) }
-          ]}>
-            <Text style={styles.confidenceText}>
-              {prediction.confidence.toUpperCase()}
-            </Text>
+          <Text style={[styles.teamName, { color: colors.text }]}>{teamName}</Text>
+          <View
+            style={[
+              styles.confidenceTag,
+              { backgroundColor: getConfidenceColor(prediction.confidence) },
+            ]}
+          >
+            <Text style={styles.confidenceText}>{prediction.confidence.toUpperCase()}</Text>
           </View>
         </View>
-        
+
         <View style={styles.scoreContainer}>
-          <Text style={[styles.scoreLabel, { color: colors.text }]}>
-            Confidence Score:
-          </Text>
+          <Text style={[styles.scoreLabel, { color: colors.text }]}>Confidence Score:</Text>
           <Text style={[styles.scoreValue, { color: colors.primary }]}>
             {prediction.confidence_score}%
           </Text>
         </View>
-        
+
         <View style={styles.reasoningContainer}>
-          <Text style={[styles.reasoningLabel, { color: colors.text }]}>
-            AI Reasoning:
-          </Text>
-          <Text style={[styles.reasoningText, { color: colors.text }]}>
-            {prediction.reasoning}
-          </Text>
+          <Text style={[styles.reasoningLabel, { color: colors.text }]}>AI Reasoning:</Text>
+          <Text style={[styles.reasoningText, { color: colors.text }]}>{prediction.reasoning}</Text>
         </View>
-        
+
         <View style={styles.accuracyContainer}>
           <Text style={[styles.accuracyText, { color: colors.text }]}>
             Historical Accuracy: {prediction.historical_accuracy}%
@@ -99,24 +86,24 @@ const BlurredPrediction: React.FC<BlurredPredictionProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={[styles.teamName, { color: colors.text }]}>
-          {teamName}
-        </Text>
-        <View style={[
-          styles.confidenceTag,
-          { backgroundColor: getConfidenceColor(prediction.confidence) }
-        ]}>
-          <Text style={styles.confidenceText}>
-            {prediction.confidence.toUpperCase()}
-          </Text>
+        <Text style={[styles.teamName, { color: colors.text }]}>{teamName}</Text>
+        <View
+          style={[
+            styles.confidenceTag,
+            { backgroundColor: getConfidenceColor(prediction.confidence) },
+          ]}
+        >
+          <Text style={styles.confidenceText}>{prediction.confidence.toUpperCase()}</Text>
         </View>
       </View>
-      
+
       <View style={styles.blurredContent}>
-        <View style={[
-          styles.blurredOverlay,
-          { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)' }
-        ]}>
+        <View
+          style={[
+            styles.blurredOverlay,
+            { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)' },
+          ]}
+        >
           <Ionicons name="lock-closed" size={24} color={colors.primary} />
           <Text style={[styles.blurredText, { color: colors.text }]}>
             Upgrade to see confidence score and detailed reasoning
@@ -128,7 +115,7 @@ const BlurredPrediction: React.FC<BlurredPredictionProps> = ({
             <Text style={styles.upgradeButtonText}>Upgrade Now</Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Fake blurred content */}
         <View style={styles.fakeContent}>
           <View style={styles.scoreContainer}>
@@ -137,16 +124,28 @@ const BlurredPrediction: React.FC<BlurredPredictionProps> = ({
             </Text>
             <View style={[styles.blurredScore, { backgroundColor: isDark ? '#333' : '#ddd' }]} />
           </View>
-          
+
           <View style={styles.reasoningContainer}>
             <Text style={[styles.reasoningLabel, { color: colors.text, opacity: 0.3 }]}>
               AI Reasoning:
             </Text>
-            <View style={[styles.blurredReasoning, { backgroundColor: isDark ? '#333' : '#ddd' }]} />
-            <View style={[styles.blurredReasoning, { backgroundColor: isDark ? '#333' : '#ddd', width: '80%' }]} />
-            <View style={[styles.blurredReasoning, { backgroundColor: isDark ? '#333' : '#ddd', width: '60%' }]} />
+            <View
+              style={[styles.blurredReasoning, { backgroundColor: isDark ? '#333' : '#ddd' }]}
+            />
+            <View
+              style={[
+                styles.blurredReasoning,
+                { backgroundColor: isDark ? '#333' : '#ddd', width: '80%' },
+              ]}
+            />
+            <View
+              style={[
+                styles.blurredReasoning,
+                { backgroundColor: isDark ? '#333' : '#ddd', width: '60%' },
+              ]}
+            />
           </View>
-          
+
           <View style={styles.accuracyContainer}>
             <View style={[styles.blurredAccuracy, { backgroundColor: isDark ? '#333' : '#ddd' }]} />
           </View>

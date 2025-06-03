@@ -1,4 +1,13 @@
 // Odds Conversion Utilities
+// Form Validation Utilities
+import { SPORTSBOOK_CONFIG } from '../config/sportsbook';
+import { BetLeg, BetSlip } from '../types/betting';
+
+// Analytics Calculation Utilities
+import { PerformanceMetrics } from '../types/betting';
+
+// OCR Text Processing Utilities
+
 export class OddsConverter {
   static americanToDecimal(american: number): number {
     if (american > 0) {
@@ -62,9 +71,6 @@ export class OddsConverter {
     }
   }
 }
-
-// Form Validation Utilities
-import { BetLeg, BetSlip } from '../types/betting';
 
 export class BetSlipValidator {
   static validateBetLeg(leg: Partial<BetLeg>): {
@@ -144,9 +150,6 @@ export class BetSlipValidator {
   }
 }
 
-// Analytics Calculation Utilities
-import { PerformanceMetrics } from '../types/betting';
-
 export class AnalyticsCalculator {
   static calculatePerformanceMetrics(betSlips: BetSlip[]): PerformanceMetrics {
     const settled = betSlips.filter(slip => slip.status !== 'pending');
@@ -162,7 +165,7 @@ export class AnalyticsCalculator {
       winRate: settled.length > 0 ? won.length / settled.length : 0,
       totalStaked: totalStake,
       totalReturned: totalPayout,
-      profitLoss: profitLoss,
+      profitLoss,
       roi: totalStake > 0 ? profitLoss / totalStake : 0,
       averageStake: settled.length > 0 ? totalStake / settled.length : 0,
       biggestWin: Math.max(...won.map(slip => slip.totalPayout || 0), 0),
@@ -210,12 +213,15 @@ export class AnalyticsCalculator {
   }
 
   static groupByProperty<T>(items: T[], property: keyof T): Record<string, T[]> {
-    return items.reduce((groups, item) => {
-      const key = String(item[property]);
-      groups[key] = groups[key] || [];
-      groups[key].push(item);
-      return groups;
-    }, {} as Record<string, T[]>);
+    return items.reduce(
+      (groups, item) => {
+        const key = String(item[property]);
+        groups[key] = groups[key] || [];
+        groups[key].push(item);
+        return groups;
+      },
+      {} as Record<string, T[]>
+    );
   }
 
   static average(numbers: number[]): number {
@@ -307,9 +313,6 @@ export class FileUploadHelper {
     return `bet-slip-${timestamp}-${random}${extension}`;
   }
 }
-
-// OCR Text Processing Utilities
-import { SPORTSBOOK_CONFIG } from '../config/sportsbook';
 
 export class OCRProcessor {
   static detectSportsbook(text: string): string {

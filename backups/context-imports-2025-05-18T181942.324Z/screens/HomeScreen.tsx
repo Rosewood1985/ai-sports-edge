@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -9,13 +11,12 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../contexts/LanguageContext';
+
 import { ThemedText } from '../atomic/atoms/ThemedText';
 import { ThemedView } from '../atomic/atoms/ThemedView';
 import LanguageSelector from '../components/LanguageSelector';
 import { Colors } from '../constants/Colors'; // Import base Colors
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Mock data (remains the same)
 const FEATURED_GAMES = [

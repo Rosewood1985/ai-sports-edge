@@ -5,10 +5,17 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { getTeamColors } from '../config/teamColors';
+
+import {
+  abTestingService,
+  ButtonVariation,
+  ButtonSize,
+  ButtonPosition,
+  ButtonText,
+} from './abTestingService';
 import { analyticsService } from './analyticsService';
-import { abTestingService, ButtonVariation, ButtonSize, ButtonPosition, ButtonText } from './abTestingService';
 import { gameUrlService, BettingSite } from './gameUrlService';
+import { getTeamColors } from '../config/teamColors';
 
 // Define types for button settings
 export interface ButtonSettings {
@@ -46,7 +53,13 @@ class BettingAffiliateService {
    * @param gameId Optional game ID for tracking
    * @returns Complete affiliate URL with tracking parameters
    */
-  async generateAffiliateLink(baseUrl: string, affiliateCode: string, teamId?: string, userId?: string, gameId?: string): Promise<string> {
+  async generateAffiliateLink(
+    baseUrl: string,
+    affiliateCode: string,
+    teamId?: string,
+    userId?: string,
+    gameId?: string
+  ): Promise<string> {
     // Try to get a specific game URL if gameId is provided
     let specificUrl = baseUrl;
     if (gameId) {
@@ -55,12 +68,12 @@ class BettingAffiliateService {
         specificUrl = gameUrl;
       }
     }
-    
+
     // Add affiliate code
     let url = specificUrl.includes('?')
       ? `${specificUrl}&aff_id=${encodeURIComponent(affiliateCode)}`
       : `${specificUrl}?aff_id=${encodeURIComponent(affiliateCode)}`;
-    
+
     // Add subId for tracking specific user and game
     if (userId || gameId) {
       const subId = [userId, gameId].filter(Boolean).join('-');
@@ -68,20 +81,20 @@ class BettingAffiliateService {
         url += `&subId=${encodeURIComponent(subId)}`;
       }
     }
-    
+
     if (teamId) {
       url += `&team=${encodeURIComponent(teamId)}`;
     }
-    
+
     // Add tracking parameters
     url += `&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=betbutton`;
-    
+
     // Add platform info
     url += `&utm_content=${Platform.OS}`;
-    
+
     return url;
   }
-  
+
   /**
    * Track button impression for analytics
    * @param location Location where button was shown
@@ -99,11 +112,11 @@ class BettingAffiliateService {
       platform: 'FanDuel',
       timestamp: Date.now(),
     });
-    
+
     // Also track for A/B testing
     abTestingService.trackButtonImpression(location, teamId, userId, gameId);
   }
-  
+
   /**
    * Track button click for analytics
    * @param location Location where button was clicked
@@ -112,7 +125,13 @@ class BettingAffiliateService {
    * @param userId Optional user ID for tracking
    * @param gameId Optional game ID for tracking
    */
-  trackButtonClick(location: string, affiliateCode: string, teamId?: string, userId?: string, gameId?: string): void {
+  trackButtonClick(
+    location: string,
+    affiliateCode: string,
+    teamId?: string,
+    userId?: string,
+    gameId?: string
+  ): void {
     // Track the event using the analytics service
     analyticsService.trackEvent(ANALYTICS_EVENTS.BUTTON_CLICK, {
       location,
@@ -123,7 +142,7 @@ class BettingAffiliateService {
       platform: 'FanDuel',
       timestamp: Date.now(),
     });
-    
+
     // Also track as a user action for better categorization
     analyticsService.trackUserAction('affiliate_link_clicked', {
       platform: 'FanDuel',
@@ -133,11 +152,11 @@ class BettingAffiliateService {
       gameId,
       timestamp: Date.now(),
     });
-    
+
     // Also track for A/B testing
     abTestingService.trackButtonClick(location, teamId, userId, gameId);
   }
-  
+
   /**
    * Determine if bet button should be shown
    * @param contentType Type of content being viewed
@@ -148,16 +167,16 @@ class BettingAffiliateService {
   shouldShowBetButton(contentType: string, teamId?: string, favoriteTeams: string[] = []): boolean {
     // Always show on odds pages
     if (contentType === 'odds') return true;
-    
+
     // Always show in header and footer
     if (contentType === 'header' || contentType === 'footer') return true;
-    
+
     // Show for favorite teams
     if (teamId && favoriteTeams.includes(teamId)) return true;
-    
+
     // Don't show on FAQ pages (except header/footer)
     if (contentType === 'faq') return false;
-    
+
     // Show based on content type
     switch (contentType) {
       case 'game':
@@ -170,7 +189,7 @@ class BettingAffiliateService {
         return false;
     }
   }
-  
+
   /**
    * Get button settings based on user preferences and subscription
    * @param isPremium Whether user has premium subscription
@@ -182,10 +201,10 @@ class BettingAffiliateService {
       size: 'medium',
       animation: isPremium ? 'surge' : 'pulse',
       position: 'inline',
-      style: isPremium && primaryTeam ? 'team-colored' : 'default'
+      style: isPremium && primaryTeam ? 'team-colored' : 'default',
     };
   }
-  
+
   /**
    * Save affiliate code to storage
    * @param code Affiliate code to save
@@ -197,7 +216,7 @@ class BettingAffiliateService {
       console.error('Error saving affiliate code:', error);
     }
   }
-  
+
   /**
    * Load affiliate code from storage
    * @returns Affiliate code or empty string if not found
@@ -211,7 +230,7 @@ class BettingAffiliateService {
       return '';
     }
   }
-  
+
   /**
    * Save button settings to storage
    * @param settings Button settings to save
@@ -223,7 +242,7 @@ class BettingAffiliateService {
       console.error('Error saving button settings:', error);
     }
   }
-  
+
   /**
    * Load button settings from storage
    * @returns Button settings or default settings if not found
@@ -237,7 +256,7 @@ class BettingAffiliateService {
       return this.getButtonSettings(false);
     }
   }
-  
+
   /**
    * Enable or disable affiliate buttons
    * @param enabled Whether buttons should be enabled
@@ -249,7 +268,7 @@ class BettingAffiliateService {
       console.error('Error saving affiliate enabled state:', error);
     }
   }
-  
+
   /**
    * Check if affiliate buttons are enabled
    * @returns Boolean indicating if buttons are enabled
@@ -263,7 +282,7 @@ class BettingAffiliateService {
       return true;
     }
   }
-  
+
   /**
    * Get button colors based on team ID
    * @param teamId Team ID to get colors for
@@ -271,10 +290,10 @@ class BettingAffiliateService {
    */
   getButtonColors(teamId?: string) {
     if (!teamId) return null;
-    
+
     const teamColors = getTeamColors(teamId);
     if (!teamColors) return null;
-    
+
     return {
       backgroundColor: teamColors.primaryColor,
       textColor: teamColors.secondaryColor,
@@ -282,7 +301,7 @@ class BettingAffiliateService {
       hoverColor: teamColors.neonSecondaryColor,
     };
   }
-  
+
   /**
    * Track conversion for A/B testing
    * @param conversionType Type of conversion (e.g., 'signup', 'deposit', 'bet')
@@ -292,7 +311,7 @@ class BettingAffiliateService {
   trackConversion(conversionType: string, conversionValue?: number, userId?: string): void {
     // Track the conversion using the A/B testing service
     abTestingService.trackConversion(conversionType, conversionValue, userId);
-    
+
     // Also track as a regular conversion event
     analyticsService.trackEvent(ANALYTICS_EVENTS.CONVERSION, {
       conversionType,

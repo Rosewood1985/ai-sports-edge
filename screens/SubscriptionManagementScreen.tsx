@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,21 +8,20 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+
+import { AutoResubscribeToggle } from '../components/AutoResubscribeToggle';
+import { ReferralProgramCard } from '../components/ReferralProgramCard';
+import { auth } from '../config/firebase';
+import { trackEvent } from '../services/analyticsService';
 import {
   getUserSubscription,
   cancelSubscription,
   Subscription,
   getUserPaymentMethods,
-  PaymentMethod
+  PaymentMethod,
 } from '../services/firebaseSubscriptionService';
-import { auth } from '../config/firebase';
-import { Ionicons } from '@expo/vector-icons';
-import { AutoResubscribeToggle } from '../components/AutoResubscribeToggle';
-import { ReferralProgramCard } from '../components/ReferralProgramCard';
-import { trackEvent } from '../services/analyticsService';
 
 /**
  * SubscriptionManagementScreen component for managing subscriptions
@@ -40,7 +41,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
     try {
       setLoading(true);
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         throw new Error('User not authenticated');
       }
@@ -48,7 +49,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
       // Get subscription and payment methods
       const [userSubscription, userPaymentMethods] = await Promise.all([
         getUserSubscription(userId),
-        getUserPaymentMethods(userId)
+        getUserPaymentMethods(userId),
       ]);
 
       setSubscription(userSubscription);
@@ -79,13 +80,13 @@ const SubscriptionManagementScreen = (): JSX.Element => {
             try {
               setLoading(true);
               const userId = auth.currentUser?.uid;
-              
+
               if (!userId) {
                 throw new Error('User not authenticated');
               }
 
               await cancelSubscription(userId);
-              
+
               Alert.alert(
                 'Subscription Canceled',
                 'Your subscription has been canceled. You will still have access until the end of your current billing period.',
@@ -162,24 +163,31 @@ const SubscriptionManagementScreen = (): JSX.Element => {
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Status:</Text>
           <View style={styles.statusContainer}>
-            <View 
+            <View
               style={[
-                styles.statusDot, 
-                subscription.status === 'active' ? styles.statusActive : styles.statusInactive
-              ]} 
+                styles.statusDot,
+                subscription.status === 'active' ? styles.statusActive : styles.statusInactive,
+              ]}
             />
             <Text style={styles.detailValue}>
-              {subscription.status === 'active' ? 'Active' : 
-               subscription.status === 'trialing' ? 'Trial' : 
-               subscription.status === 'canceled' ? 'Canceled' : 'Past Due'}
+              {subscription.status === 'active'
+                ? 'Active'
+                : subscription.status === 'trialing'
+                  ? 'Trial'
+                  : subscription.status === 'canceled'
+                    ? 'Canceled'
+                    : 'Past Due'}
             </Text>
           </View>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Price:</Text>
           <Text style={styles.detailValue}>
-            ${((subscription.plan?.amount || (subscription.plan?.price || 0) * 100 || 0) / 100).toFixed(2)}/
-            {subscription.plan?.interval || 'month'}
+            $
+            {(
+              (subscription.plan?.amount || (subscription.plan?.price || 0) * 100 || 0) / 100
+            ).toFixed(2)}
+            /{subscription.plan?.interval || 'month'}
           </Text>
         </View>
         <View style={styles.detailRow}>
@@ -223,9 +231,9 @@ const SubscriptionManagementScreen = (): JSX.Element => {
           <View style={styles.card}>
             <AutoResubscribeToggle subscriptionId={subscription.id} />
           </View>
-          
-          <ReferralProgramCard isSubscribed={true} />
-          
+
+          <ReferralProgramCard isSubscribed />
+
           <TouchableOpacity
             style={styles.analyticsButton}
             onPress={() => {
@@ -235,11 +243,8 @@ const SubscriptionManagementScreen = (): JSX.Element => {
           >
             <Text style={styles.analyticsButtonText}>View Subscription Analytics</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={handleCancelSubscription}
-          >
+
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSubscription}>
             <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
           </TouchableOpacity>
         </>
@@ -252,9 +257,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
           navigation.navigate('GiftRedemption');
         }}
       >
-        <Text style={styles.giftButtonText}>
-          Redeem a Gift Subscription
-        </Text>
+        <Text style={styles.giftButtonText}>Redeem a Gift Subscription</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -264,9 +267,7 @@ const SubscriptionManagementScreen = (): JSX.Element => {
           navigation.navigate('RefundPolicy');
         }}
       >
-        <Text style={styles.policyLinkText}>
-          View our Cancellation & Refund Policy
-        </Text>
+        <Text style={styles.policyLinkText}>View our Cancellation & Refund Policy</Text>
       </TouchableOpacity>
     </ScrollView>
   );

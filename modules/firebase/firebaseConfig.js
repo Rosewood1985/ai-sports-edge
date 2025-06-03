@@ -1,11 +1,12 @@
 /**
  * Firebase Configuration
- * 
+ *
  * Initializes Firebase app and exports the app instance.
  */
 
-import { initializeApp } from "firebase/app";
-import { firebaseConfig, validateConfig } from "../environment/envConfig";
+import { initializeApp } from 'firebase/app';
+
+import { firebaseConfig, validateConfig } from '../environment/envConfig';
 
 let app = null;
 

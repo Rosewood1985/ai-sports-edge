@@ -3,9 +3,9 @@
  * AI Sports Edge - Comprehensive security compliance for internationalization
  */
 
-const { onRequest } = require('firebase-functions/v2/https');
-const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require('./sentryConfig');
-const admin = require('firebase-admin');
+const { onRequest } = require("firebase-functions/v2/https");
+const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require("./sentryConfig");
+const admin = require("firebase-admin");
 
 // Initialize Firestore
 const db = admin.firestore();
@@ -13,29 +13,29 @@ const db = admin.firestore();
 // Security criteria for international features
 const SECURITY_CRITERIA = {
   i18n: {
-    inputValidation: 'All user inputs must be validated for both languages',
-    xssProtection: 'Cross-site scripting prevention for Spanish characters',
-    sqlInjection: 'SQL injection prevention with Unicode handling',
-    encodingAttacks: 'Proper encoding for Spanish special characters',
-    localizationSecurity: 'Secure handling of language switching'
+    inputValidation: "All user inputs must be validated for both languages",
+    xssProtection: "Cross-site scripting prevention for Spanish characters",
+    sqlInjection: "SQL injection prevention with Unicode handling",
+    encodingAttacks: "Proper encoding for Spanish special characters",
+    localizationSecurity: "Secure handling of language switching"
   },
   dataProtection: {
-    gdprCompliance: 'GDPR compliance for Spanish users in EU',
-    ccpaCompliance: 'CCPA compliance for Spanish users in California',
-    dataEncryption: 'Encryption of Spanish-language personal data',
-    dataRetention: 'Proper retention policies for international users'
+    gdprCompliance: "GDPR compliance for Spanish users in EU",
+    ccpaCompliance: "CCPA compliance for Spanish users in California",
+    dataEncryption: "Encryption of Spanish-language personal data",
+    dataRetention: "Proper retention policies for international users"
   },
   authentication: {
-    multiLanguageAuth: 'Secure authentication flow in both languages',
-    sessionManagement: 'Secure session handling across language switches',
-    passwordPolicies: 'Password policies for international keyboards',
-    mfaSupport: 'Multi-factor authentication in Spanish'
+    multiLanguageAuth: "Secure authentication flow in both languages",
+    sessionManagement: "Secure session handling across language switches",
+    passwordPolicies: "Password policies for international keyboards",
+    mfaSupport: "Multi-factor authentication in Spanish"
   },
   contentSecurity: {
-    cspHeaders: 'Content Security Policy headers for Spanish content',
-    xframeOptions: 'X-Frame-Options protection',
-    httpsEnforcement: 'HTTPS enforcement for Spanish domains',
-    corsConfiguration: 'Proper CORS for international API calls'
+    cspHeaders: "Content Security Policy headers for Spanish content",
+    xframeOptions: "X-Frame-Options protection",
+    httpsEnforcement: "HTTPS enforcement for Spanish domains",
+    corsConfiguration: "Proper CORS for international API calls"
   }
 };
 
@@ -45,19 +45,19 @@ const SECURITY_CRITERIA = {
 exports.securityAuditSpanish = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
   try {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
       return;
     }
 
     // Verify admin authorization
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace("Bearer ", "");
     if (!token) {
-      return res.status(401).json({ error: 'Authorization required' });
+      return res.status(401).json({ error: "Authorization required" });
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token);
@@ -76,7 +76,7 @@ exports.securityAuditSpanish = wrapHttpFunction(onRequest({ cors: true }, async 
       vulnerabilities: [],
       recommendations: [],
       complianceScore: 0,
-      riskLevel: 'low'
+      riskLevel: "low"
     };
 
     // Collect vulnerabilities and calculate risk
@@ -90,28 +90,28 @@ exports.securityAuditSpanish = wrapHttpFunction(onRequest({ cors: true }, async 
     auditResults.riskLevel = determineRiskLevel(auditResults.vulnerabilities);
 
     // Store audit results
-    await db.collection('security_audits').add({
+    await db.collection("security_audits").add({
       ...auditResults,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      auditType: 'spanish_internationalization'
+      auditType: "spanish_internationalization"
     });
 
-    trackFunctionPerformance('securityAuditSpanish', Date.now() - startTime, true);
+    trackFunctionPerformance("securityAuditSpanish", Date.now() - startTime, true);
 
     res.status(200).json({
       status: 200,
-      message: 'Security audit completed',
+      message: "Security audit completed",
       data: auditResults
     });
 
   } catch (error) {
-    console.error('Security audit error:', error);
-    captureCloudFunctionError(error, 'securityAuditSpanish');
-    trackFunctionPerformance('securityAuditSpanish', Date.now() - startTime, false);
+    console.error("Security audit error:", error);
+    captureCloudFunctionError(error, "securityAuditSpanish");
+    trackFunctionPerformance("securityAuditSpanish", Date.now() - startTime, false);
     
     res.status(500).json({
       status: 500,
-      message: 'Security audit failed',
+      message: "Security audit failed",
       error: error.message
     });
   }
@@ -126,23 +126,23 @@ async function auditInputValidation() {
 
   // Check Unicode character handling
   checks.push({
-    name: 'Unicode Character Validation',
+    name: "Unicode Character Validation",
     passed: true,
-    description: 'Spanish characters (ñ, é, ü, etc.) are properly validated'
+    description: "Spanish characters (ñ, é, ü, etc.) are properly validated"
   });
 
   // Check XSS protection with Spanish characters
   checks.push({
-    name: 'XSS Protection Spanish',
+    name: "XSS Protection Spanish",
     passed: true,
-    description: 'XSS protection works with Spanish special characters'
+    description: "XSS protection works with Spanish special characters"
   });
 
   // Check SQL injection with international characters
   checks.push({
-    name: 'SQL Injection Prevention',
+    name: "SQL Injection Prevention",
     passed: true,
-    description: 'SQL injection prevention handles international characters'
+    description: "SQL injection prevention handles international characters"
   });
 
   // Check form validation in Spanish
@@ -150,19 +150,19 @@ async function auditInputValidation() {
   checks.push(spanishFormValidation);
 
   return {
-    category: 'Input Validation',
+    category: "Input Validation",
     score: calculateCategoryScore(checks),
     checks,
     vulnerabilities: checks.filter(c => !c.passed).map(c => ({
-      type: 'input_validation',
-      severity: c.severity || 'medium',
+      type: "input_validation",
+      severity: c.severity || "medium",
       description: c.description,
       recommendation: c.recommendation
     })),
     recommendations: [
-      'Implement comprehensive Unicode input validation',
-      'Test XSS protection with Spanish character sets',
-      'Validate Spanish form inputs with proper encoding'
+      "Implement comprehensive Unicode input validation",
+      "Test XSS protection with Spanish character sets",
+      "Validate Spanish form inputs with proper encoding"
     ]
   };
 }
@@ -175,23 +175,23 @@ async function auditAuthenticationSecurity() {
 
   // Check password policies with international keyboards
   checks.push({
-    name: 'International Keyboard Support',
+    name: "International Keyboard Support",
     passed: true,
-    description: 'Password policies work with Spanish keyboard layouts'
+    description: "Password policies work with Spanish keyboard layouts"
   });
 
   // Check language switching security
   checks.push({
-    name: 'Language Switch Security',
+    name: "Language Switch Security",
     passed: true,
-    description: 'Language switching doesn\'t affect authentication state'
+    description: "Language switching doesn't affect authentication state"
   });
 
   // Check Spanish MFA support
   checks.push({
-    name: 'Spanish MFA Support',
+    name: "Spanish MFA Support",
     passed: true,
-    description: 'Multi-factor authentication messages available in Spanish'
+    description: "Multi-factor authentication messages available in Spanish"
   });
 
   // Check session management across language changes
@@ -199,18 +199,18 @@ async function auditAuthenticationSecurity() {
   checks.push(sessionSecurity);
 
   return {
-    category: 'Authentication Security',
+    category: "Authentication Security",
     score: calculateCategoryScore(checks),
     checks,
     vulnerabilities: checks.filter(c => !c.passed).map(c => ({
-      type: 'authentication',
-      severity: c.severity || 'high',
+      type: "authentication",
+      severity: c.severity || "high",
       description: c.description
     })),
     recommendations: [
-      'Test authentication with Spanish special characters',
-      'Ensure secure session handling during language switches',
-      'Validate MFA flows in Spanish'
+      "Test authentication with Spanish special characters",
+      "Ensure secure session handling during language switches",
+      "Validate MFA flows in Spanish"
     ]
   };
 }
@@ -223,16 +223,16 @@ async function auditDataProtection() {
 
   // Check GDPR compliance for Spanish users in EU
   checks.push({
-    name: 'GDPR Compliance Spanish',
+    name: "GDPR Compliance Spanish",
     passed: true,
-    description: 'GDPR compliance notices available in Spanish'
+    description: "GDPR compliance notices available in Spanish"
   });
 
   // Check data encryption for Spanish content
   checks.push({
-    name: 'Spanish Data Encryption',
+    name: "Spanish Data Encryption",
     passed: true,
-    description: 'Spanish user data is properly encrypted'
+    description: "Spanish user data is properly encrypted"
   });
 
   // Check privacy policy translations
@@ -241,24 +241,24 @@ async function auditDataProtection() {
 
   // Check data retention policies
   checks.push({
-    name: 'International Data Retention',
+    name: "International Data Retention",
     passed: true,
-    description: 'Data retention policies apply to Spanish users'
+    description: "Data retention policies apply to Spanish users"
   });
 
   return {
-    category: 'Data Protection',
+    category: "Data Protection",
     score: calculateCategoryScore(checks),
     checks,
     vulnerabilities: checks.filter(c => !c.passed).map(c => ({
-      type: 'data_protection',
-      severity: 'high',
+      type: "data_protection",
+      severity: "high",
       description: c.description
     })),
     recommendations: [
-      'Ensure Spanish privacy notices are legally compliant',
-      'Verify encryption of Spanish-language data',
-      'Test data deletion processes for Spanish users'
+      "Ensure Spanish privacy notices are legally compliant",
+      "Verify encryption of Spanish-language data",
+      "Test data deletion processes for Spanish users"
     ]
   };
 }
@@ -271,16 +271,16 @@ async function auditContentSecurity() {
 
   // Check Content Security Policy for Spanish content
   checks.push({
-    name: 'CSP Spanish Content',
+    name: "CSP Spanish Content",
     passed: true,
-    description: 'Content Security Policy covers Spanish content sources'
+    description: "Content Security Policy covers Spanish content sources"
   });
 
   // Check HTTPS enforcement for Spanish domains
   checks.push({
-    name: 'HTTPS Enforcement',
+    name: "HTTPS Enforcement",
     passed: true,
-    description: 'HTTPS enforced for Spanish language content'
+    description: "HTTPS enforced for Spanish language content"
   });
 
   // Check CORS configuration for international API calls
@@ -289,24 +289,24 @@ async function auditContentSecurity() {
 
   // Check X-Frame-Options
   checks.push({
-    name: 'X-Frame-Options',
+    name: "X-Frame-Options",
     passed: true,
-    description: 'X-Frame-Options configured for Spanish pages'
+    description: "X-Frame-Options configured for Spanish pages"
   });
 
   return {
-    category: 'Content Security',
+    category: "Content Security",
     score: calculateCategoryScore(checks),
     checks,
     vulnerabilities: checks.filter(c => !c.passed).map(c => ({
-      type: 'content_security',
-      severity: c.severity || 'medium',
+      type: "content_security",
+      severity: c.severity || "medium",
       description: c.description
     })),
     recommendations: [
-      'Review CSP policies for Spanish content delivery',
-      'Ensure HTTPS enforcement across all Spanish pages',
-      'Validate CORS settings for international users'
+      "Review CSP policies for Spanish content delivery",
+      "Ensure HTTPS enforcement across all Spanish pages",
+      "Validate CORS settings for international users"
     ]
   };
 }
@@ -319,16 +319,16 @@ async function auditI18nSecurity() {
 
   // Check locale injection attacks
   checks.push({
-    name: 'Locale Injection Protection',
+    name: "Locale Injection Protection",
     passed: true,
-    description: 'Protected against locale injection attacks'
+    description: "Protected against locale injection attacks"
   });
 
   // Check resource loading security
   checks.push({
-    name: 'Resource Loading Security',
+    name: "Resource Loading Security",
     passed: true,
-    description: 'Spanish language resources loaded securely'
+    description: "Spanish language resources loaded securely"
   });
 
   // Check character encoding attacks
@@ -337,24 +337,24 @@ async function auditI18nSecurity() {
 
   // Check translation integrity
   checks.push({
-    name: 'Translation Integrity',
+    name: "Translation Integrity",
     passed: true,
-    description: 'Spanish translations protected from tampering'
+    description: "Spanish translations protected from tampering"
   });
 
   return {
-    category: 'Internationalization Security',
+    category: "Internationalization Security",
     score: calculateCategoryScore(checks),
     checks,
     vulnerabilities: checks.filter(c => !c.passed).map(c => ({
-      type: 'i18n_security',
-      severity: c.severity || 'medium',
+      type: "i18n_security",
+      severity: c.severity || "medium",
       description: c.description
     })),
     recommendations: [
-      'Implement locale validation to prevent injection',
-      'Secure Spanish resource loading mechanisms',
-      'Protect translation files from unauthorized modification'
+      "Implement locale validation to prevent injection",
+      "Secure Spanish resource loading mechanisms",
+      "Protect translation files from unauthorized modification"
     ]
   };
 }
@@ -367,16 +367,16 @@ async function auditApiSecurity() {
 
   // Check API authentication for Spanish endpoints
   checks.push({
-    name: 'Spanish API Authentication',
+    name: "Spanish API Authentication",
     passed: true,
-    description: 'Spanish-specific API endpoints properly authenticated'
+    description: "Spanish-specific API endpoints properly authenticated"
   });
 
   // Check rate limiting for international users
   checks.push({
-    name: 'International Rate Limiting',
+    name: "International Rate Limiting",
     passed: true,
-    description: 'Rate limiting configured for Spanish users'
+    description: "Rate limiting configured for Spanish users"
   });
 
   // Check API input validation with Spanish characters
@@ -384,18 +384,18 @@ async function auditApiSecurity() {
   checks.push(apiValidation);
 
   return {
-    category: 'API Security',
+    category: "API Security",
     score: calculateCategoryScore(checks),
     checks,
     vulnerabilities: checks.filter(c => !c.passed).map(c => ({
-      type: 'api_security',
-      severity: c.severity || 'high',
+      type: "api_security",
+      severity: c.severity || "high",
       description: c.description
     })),
     recommendations: [
-      'Test API endpoints with Spanish character inputs',
-      'Ensure proper authentication for language-specific features',
-      'Validate rate limiting for international traffic'
+      "Test API endpoints with Spanish character inputs",
+      "Ensure proper authentication for language-specific features",
+      "Validate rate limiting for international traffic"
     ]
   };
 }
@@ -405,55 +405,55 @@ async function auditApiSecurity() {
  */
 async function checkSpanishFormValidation() {
   return {
-    name: 'Spanish Form Validation',
+    name: "Spanish Form Validation",
     passed: true,
-    description: 'Form validation handles Spanish characters properly',
-    severity: 'medium'
+    description: "Form validation handles Spanish characters properly",
+    severity: "medium"
   };
 }
 
 async function checkSessionSecurity() {
   return {
-    name: 'Session Security',
+    name: "Session Security",
     passed: true,
-    description: 'Sessions remain secure during language switching',
-    severity: 'high'
+    description: "Sessions remain secure during language switching",
+    severity: "high"
   };
 }
 
 async function checkPrivacyCompliance() {
   return {
-    name: 'Privacy Policy Compliance',
+    name: "Privacy Policy Compliance",
     passed: true,
-    description: 'Spanish privacy policies are legally compliant',
-    severity: 'high'
+    description: "Spanish privacy policies are legally compliant",
+    severity: "high"
   };
 }
 
 async function checkCorsConfiguration() {
   return {
-    name: 'CORS Configuration',
+    name: "CORS Configuration",
     passed: true,
-    description: 'CORS properly configured for Spanish domain access',
-    severity: 'medium'
+    description: "CORS properly configured for Spanish domain access",
+    severity: "medium"
   };
 }
 
 async function checkEncodingAttacks() {
   return {
-    name: 'Character Encoding Attacks',
+    name: "Character Encoding Attacks",
     passed: true,
-    description: 'Protected against character encoding attacks with Spanish text',
-    severity: 'medium'
+    description: "Protected against character encoding attacks with Spanish text",
+    severity: "medium"
   };
 }
 
 async function checkApiValidation() {
   return {
-    name: 'API Input Validation',
+    name: "API Input Validation",
     passed: true,
-    description: 'API endpoints validate Spanish character inputs properly',
-    severity: 'high'
+    description: "API endpoints validate Spanish character inputs properly",
+    severity: "high"
   };
 }
 
@@ -478,12 +478,12 @@ function calculateSecurityScore(categories) {
  * Determine risk level based on vulnerabilities
  */
 function determineRiskLevel(vulnerabilities) {
-  const highSeverityCount = vulnerabilities.filter(v => v.severity === 'high').length;
-  const mediumSeverityCount = vulnerabilities.filter(v => v.severity === 'medium').length;
+  const highSeverityCount = vulnerabilities.filter(v => v.severity === "high").length;
+  const mediumSeverityCount = vulnerabilities.filter(v => v.severity === "medium").length;
 
-  if (highSeverityCount > 0) return 'high';
-  if (mediumSeverityCount > 2) return 'medium';
-  return 'low';
+  if (highSeverityCount > 0) return "high";
+  if (mediumSeverityCount > 2) return "medium";
+  return "low";
 }
 
-console.log('Security Audit Spanish module loaded successfully');
+console.log("Security Audit Spanish module loaded successfully");

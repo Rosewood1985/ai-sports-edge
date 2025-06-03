@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Card, DataTable } from 'react-native-paper';
-import MLSportsEdgeService from '../../services/ml-sports-edge/MLSportsEdgeService';
+
 import { useTheme } from '../../contexts/ThemeContext';
+import MLSportsEdgeService from '../../services/ml-sports-edge/MLSportsEdgeService';
 
 interface ModelMetrics {
   accuracy: number;
@@ -36,7 +37,7 @@ const ModelPerformance: React.FC<ModelPerformanceProps> = ({ sport }) => {
       setLoading(true);
       setError(null);
       const data = await MLSportsEdgeService.getModels(sport);
-      
+
       // Transform data into the format we need
       const modelInfos: ModelInfo[] = [];
       for (const [modelName, modelData] of Object.entries(data.models || {})) {
@@ -45,7 +46,7 @@ const ModelPerformance: React.FC<ModelPerformanceProps> = ({ sport }) => {
           evaluation: (modelData as any).evaluation || {},
         });
       }
-      
+
       setModels(modelInfos);
     } catch (err) {
       setError('Failed to load model information');
@@ -68,7 +69,9 @@ const ModelPerformance: React.FC<ModelPerformanceProps> = ({ sport }) => {
         ) : error ? (
           <Text style={[styles.error, { color: theme.colors.error }]}>{error}</Text>
         ) : models.length === 0 ? (
-          <Text style={[styles.noData, { color: theme.colors.text }]}>No model information available</Text>
+          <Text style={[styles.noData, { color: theme.colors.text }]}>
+            No model information available
+          </Text>
         ) : (
           <DataTable>
             <DataTable.Header>
@@ -82,9 +85,7 @@ const ModelPerformance: React.FC<ModelPerformanceProps> = ({ sport }) => {
             {models.map((model, index) => (
               <DataTable.Row key={index}>
                 <DataTable.Cell>
-                  <Text style={{ color: theme.colors.text }}>
-                    {model.model_name}
-                  </Text>
+                  <Text style={{ color: theme.colors.text }}>{model.model_name}</Text>
                 </DataTable.Cell>
                 <DataTable.Cell numeric>
                   <Text style={{ color: theme.colors.text }}>

@@ -1,7 +1,7 @@
-import { CollegeFootballDataSyncService } from './collegefootballDataSyncService';
 import { CollegeFootballAnalyticsService } from './collegefootballAnalyticsService';
-import { CollegeFootballMLPredictionService } from './collegefootballMLPredictionService';
+import { CollegeFootballDataSyncService } from './collegefootballDataSyncService';
 import { CollegeFootballIntegrationService } from './collegefootballIntegrationService';
+import { CollegeFootballMLPredictionService } from './collegefootballMLPredictionService';
 import { initSentry } from '../sentryConfig';
 
 // Initialize Sentry for monitoring
@@ -59,8 +59,18 @@ export class CollegeFootballTestSuite {
   async runComprehensiveTests(): Promise<CFBTestResults> {
     const results: CFBTestResults = {
       dataSyncTests: { teamSync: false, gameSync: false, recruitingSync: false, errors: [] },
-      analyticsTests: { teamAnalytics: false, recruitingAnalytics: false, coachingAnalytics: false, errors: [] },
-      mlPredictionTests: { gamePredict: false, playoffPredict: false, featureExtraction: false, errors: [] },
+      analyticsTests: {
+        teamAnalytics: false,
+        recruitingAnalytics: false,
+        coachingAnalytics: false,
+        errors: [],
+      },
+      mlPredictionTests: {
+        gamePredict: false,
+        playoffPredict: false,
+        featureExtraction: false,
+        errors: [],
+      },
       integrationTests: { systemInit: false, dataFlow: false, realTimeUpdates: false, errors: [] },
       overallScore: 0,
       passed: false,
@@ -85,7 +95,9 @@ export class CollegeFootballTestSuite {
       results.overallScore = this.calculateOverallScore(results);
       results.passed = results.overallScore >= 80; // 80% pass threshold
 
-      console.log(`CFB Test Suite Complete - Score: ${results.overallScore}% - ${results.passed ? 'PASSED' : 'FAILED'}`);
+      console.log(
+        `CFB Test Suite Complete - Score: ${results.overallScore}% - ${results.passed ? 'PASSED' : 'FAILED'}`
+      );
 
       return results;
     } catch (error) {
@@ -123,7 +135,8 @@ export class CollegeFootballTestSuite {
       try {
         await this.dataSyncService.syncCurrentSeasonGames();
         const games = await this.dataSyncService.getUpcomingGames(7);
-        if (games && games.length >= 0) { // Can be 0 during off-season
+        if (games && games.length >= 0) {
+          // Can be 0 during off-season
           results.gameSync = true;
           console.log(`✓ Game sync test passed - ${games.length} upcoming games`);
         } else {
@@ -147,7 +160,6 @@ export class CollegeFootballTestSuite {
       } catch (error) {
         results.errors.push(`Recruiting sync failed: ${error.message}`);
       }
-
     } catch (error) {
       results.errors.push(`Data sync service initialization failed: ${error.message}`);
     }
@@ -159,7 +171,12 @@ export class CollegeFootballTestSuite {
    * Test Analytics Service
    */
   private async testAnalyticsService(): Promise<CFBTestResults['analyticsTests']> {
-    const results = { teamAnalytics: false, recruitingAnalytics: false, coachingAnalytics: false, errors: [] };
+    const results = {
+      teamAnalytics: false,
+      recruitingAnalytics: false,
+      coachingAnalytics: false,
+      errors: [],
+    };
 
     try {
       console.log('Testing CFB Analytics Service...');
@@ -169,7 +186,10 @@ export class CollegeFootballTestSuite {
 
       // Test team analytics generation
       try {
-        const analytics = await this.analyticsService.generateTeamAnalytics(testTeamId, currentSeason);
+        const analytics = await this.analyticsService.generateTeamAnalytics(
+          testTeamId,
+          currentSeason
+        );
         if (analytics && analytics.teamId && analytics.performanceMetrics) {
           results.teamAnalytics = true;
           console.log('✓ Team analytics test passed');
@@ -182,7 +202,10 @@ export class CollegeFootballTestSuite {
 
       // Test recruiting analytics
       try {
-        const recruitingAnalytics = await this.analyticsService.generateRecruitingAnalytics(testTeamId, currentSeason);
+        const recruitingAnalytics = await this.analyticsService.generateRecruitingAnalytics(
+          testTeamId,
+          currentSeason
+        );
         if (recruitingAnalytics && recruitingAnalytics.currentClassRanking !== undefined) {
           results.recruitingAnalytics = true;
           console.log('✓ Recruiting analytics test passed');
@@ -195,7 +218,10 @@ export class CollegeFootballTestSuite {
 
       // Test coaching analytics
       try {
-        const coachingAnalytics = await this.analyticsService.generateCoachingAnalytics(testTeamId, currentSeason);
+        const coachingAnalytics = await this.analyticsService.generateCoachingAnalytics(
+          testTeamId,
+          currentSeason
+        );
         if (coachingAnalytics && coachingAnalytics.headCoachExperience !== undefined) {
           results.coachingAnalytics = true;
           console.log('✓ Coaching analytics test passed');
@@ -205,7 +231,6 @@ export class CollegeFootballTestSuite {
       } catch (error) {
         results.errors.push(`Coaching analytics failed: ${error.message}`);
       }
-
     } catch (error) {
       results.errors.push(`Analytics service initialization failed: ${error.message}`);
     }
@@ -217,17 +242,32 @@ export class CollegeFootballTestSuite {
    * Test ML Prediction Service
    */
   private async testMLPredictionService(): Promise<CFBTestResults['mlPredictionTests']> {
-    const results = { gamePredict: false, playoffPredict: false, featureExtraction: false, errors: [] };
+    const results = {
+      gamePredict: false,
+      playoffPredict: false,
+      featureExtraction: false,
+      errors: [],
+    };
 
     try {
       console.log('Testing CFB ML Prediction Service...');
 
       // Test game prediction
       try {
-        const prediction = await this.mlPredictionService.predictGame('alabama', 'georgia', new Date());
-        if (prediction && prediction.winProbability !== undefined && prediction.spreadPrediction !== undefined) {
+        const prediction = await this.mlPredictionService.predictGame(
+          'alabama',
+          'georgia',
+          new Date()
+        );
+        if (
+          prediction &&
+          prediction.winProbability !== undefined &&
+          prediction.spreadPrediction !== undefined
+        ) {
           results.gamePredict = true;
-          console.log(`✓ Game prediction test passed - Win probability: ${prediction.winProbability}`);
+          console.log(
+            `✓ Game prediction test passed - Win probability: ${prediction.winProbability}`
+          );
         } else {
           results.errors.push('Game prediction returned incomplete data');
         }
@@ -237,7 +277,12 @@ export class CollegeFootballTestSuite {
 
       // Test playoff probability calculation
       try {
-        const playoffProbs = await this.mlPredictionService.calculatePlayoffProbabilities(['alabama', 'georgia', 'michigan', 'texas']);
+        const playoffProbs = await this.mlPredictionService.calculatePlayoffProbabilities([
+          'alabama',
+          'georgia',
+          'michigan',
+          'texas',
+        ]);
         if (playoffProbs && Object.keys(playoffProbs).length > 0) {
           results.playoffPredict = true;
           console.log('✓ Playoff probability test passed');
@@ -250,17 +295,25 @@ export class CollegeFootballTestSuite {
 
       // Test feature extraction
       try {
-        const features = await this.mlPredictionService.extractMLFeatures('alabama', 'georgia', new Date());
-        if (features && Object.keys(features).length >= 50) { // Should have 70 features
+        const features = await this.mlPredictionService.extractMLFeatures(
+          'alabama',
+          'georgia',
+          new Date()
+        );
+        if (features && Object.keys(features).length >= 50) {
+          // Should have 70 features
           results.featureExtraction = true;
-          console.log(`✓ Feature extraction test passed - ${Object.keys(features).length} features`);
+          console.log(
+            `✓ Feature extraction test passed - ${Object.keys(features).length} features`
+          );
         } else {
-          results.errors.push(`Feature extraction returned insufficient features: ${Object.keys(features || {}).length}`);
+          results.errors.push(
+            `Feature extraction returned insufficient features: ${Object.keys(features || {}).length}`
+          );
         }
       } catch (error) {
         results.errors.push(`Feature extraction failed: ${error.message}`);
       }
-
     } catch (error) {
       results.errors.push(`ML Prediction service initialization failed: ${error.message}`);
     }
@@ -311,7 +364,6 @@ export class CollegeFootballTestSuite {
       } catch (error) {
         results.errors.push(`System status monitoring failed: ${error.message}`);
       }
-
     } catch (error) {
       results.errors.push(`Integration service initialization failed: ${error.message}`);
     }
@@ -368,7 +420,10 @@ export class CollegeFootballTestSuite {
         return false;
       }
 
-      const testAnalytics = await this.analyticsService.generateTeamAnalytics(teams[0].id, new Date().getFullYear());
+      const testAnalytics = await this.analyticsService.generateTeamAnalytics(
+        teams[0].id,
+        new Date().getFullYear()
+      );
       if (!testAnalytics || !testAnalytics.teamId) {
         console.error('❌ Quick validation failed: Analytics generation failed');
         return false;
@@ -426,9 +481,11 @@ The CFB system implementation includes:
 - Machine learning predictions for games and playoff probabilities
 - Real-time integration and monitoring system
 
-${results.passed ? 
-  'The CFB system is ready for production deployment.' : 
-  'The CFB system requires fixes before production deployment.'}
+${
+  results.passed
+    ? 'The CFB system is ready for production deployment.'
+    : 'The CFB system requires fixes before production deployment.'
+}
 `;
 
     return report;

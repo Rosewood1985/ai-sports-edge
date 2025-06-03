@@ -1,11 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRoute, useNavigation, RouteProp, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ThemedView } from '../atomic/atoms/ThemedView';
+
 import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Define route params type
 type GameDetailsParams = {

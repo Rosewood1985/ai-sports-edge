@@ -5,14 +5,14 @@
  * It combines stripe configuration atoms to provide tax-related functions.
  */
 
+const cache = require('../../../utils/cache');
+const logger = require('../../../utils/logger');
 const { getStripe } = require('../../atoms/stripe/stripeConfig');
 const {
   DEFAULT_TAX_BEHAVIOR,
   TAX_CALCULATION_CACHE_TTL,
   TAX_CODES,
 } = require('../../atoms/stripe/stripeTaxConfig');
-const logger = require('../../../utils/logger');
-const cache = require('../../../utils/cache');
 
 /**
  * Calculate tax for a transaction
@@ -231,7 +231,7 @@ async function getTaxRatesForLocation({ countryCode, stateCode, postalCode, city
           country: countryCode,
           state: stateCode,
           postal_code: postalCode,
-          city: city,
+          city,
         },
         address_source: 'billing',
       },

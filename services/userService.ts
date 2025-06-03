@@ -1,8 +1,17 @@
-import { getAuth, updateProfile } from 'firebase/auth';
-import { getFirestore, doc, updateDoc, setDoc, getDoc, serverTimestamp, FirestoreError } from 'firebase/firestore';
-import { info, error as logError, LogCategory } from './loggingService';
-import { safeErrorCapture } from './errorUtils';
 import { FirebaseError } from 'firebase/app';
+import { getAuth, updateProfile } from 'firebase/auth';
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  setDoc,
+  getDoc,
+  serverTimestamp,
+  FirestoreError,
+} from 'firebase/firestore';
+
+import { safeErrorCapture } from './errorUtils';
+import { info, error as logError, LogCategory } from './loggingService';
 
 /**
  * Update the user's profile in Firebase Authentication and Firestore
@@ -12,7 +21,7 @@ import { FirebaseError } from 'firebase/app';
  */
 export const updateUserProfile = async (userId: string, data: any): Promise<void> => {
   console.log(`userService: Updating profile for user ${userId}`);
-  
+
   try {
     // Validate inputs
     if (!userId) {
@@ -22,7 +31,7 @@ export const updateUserProfile = async (userId: string, data: any): Promise<void
       safeErrorCapture(error);
       throw error;
     }
-    
+
     if (!data || Object.keys(data).length === 0) {
       const error = new Error('Profile data is required');
       console.error('userService: Empty profile data for update');
@@ -30,59 +39,65 @@ export const updateUserProfile = async (userId: string, data: any): Promise<void
       safeErrorCapture(error);
       throw error;
     }
-    
+
     const db = getFirestore();
     const userRef = doc(db, 'users', userId);
-    
+
     console.log(`userService: Checking if user document exists for ${userId}`);
-    
+
     // Check if user document exists
     try {
       const userDoc = await getDoc(userRef);
-      
+
       if (userDoc.exists()) {
         console.log(`userService: User document exists, updating document for ${userId}`);
         info(LogCategory.USER, 'Updating existing user document', { userId });
-        
+
         // Update existing document
         await updateDoc(userRef, {
           ...data,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
-        
+
         console.log(`userService: User document updated successfully for ${userId}`);
         info(LogCategory.USER, 'User document updated successfully', { userId });
       } else {
-        console.log(`userService: User document does not exist, creating new document for ${userId}`);
+        console.log(
+          `userService: User document does not exist, creating new document for ${userId}`
+        );
         info(LogCategory.USER, 'Creating new user document', { userId });
-        
+
         // Create new document
         await setDoc(userRef, {
           ...data,
           createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
-        
+
         console.log(`userService: User document created successfully for ${userId}`);
         info(LogCategory.USER, 'User document created successfully', { userId });
       }
     } catch (docError) {
       console.error(`userService: Error checking/updating user document for ${userId}:`, docError);
-      
+
       // Log specific Firestore errors
       if (docError instanceof FirestoreError) {
         console.error(`userService: Firestore error code: ${docError.code}`);
-        logError(LogCategory.USER, `Firestore error (${docError.code}) checking/updating user document`, docError);
+        logError(
+          LogCategory.USER,
+          `Firestore error (${docError.code}) checking/updating user document`,
+          docError
+        );
       } else {
         logError(LogCategory.USER, 'Error checking/updating user document', docError as Error);
       }
-      
+
       safeErrorCapture(docError as Error);
       throw docError;
     }
   } catch (error) {
     console.error(`userService: Error updating user profile for ${userId}:`, error);
-    
+
     // Log the error with our logging service
     if (error instanceof FirebaseError) {
       console.error(`userService: Firebase error code: ${error.code}`);
@@ -90,10 +105,10 @@ export const updateUserProfile = async (userId: string, data: any): Promise<void
     } else {
       logError(LogCategory.USER, 'Error updating user profile', error as Error);
     }
-    
+
     // Track the error with our error tracking service
     safeErrorCapture(error as Error);
-    
+
     // Re-throw the error for the caller to handle
     throw error;
   }
@@ -108,11 +123,17 @@ export const updateUserProfile = async (userId: string, data: any): Promise<void
  */
 export const saveVerificationData = async (
   userId: string,
-  verificationType: 'ageVerification' | 'selfExclusionCheck' | 'responsibleGamblingAcknowledgment' | 'waiverAcceptance' | 'gdprConsent' | 'cookieConsent',
+  verificationType:
+    | 'ageVerification'
+    | 'selfExclusionCheck'
+    | 'responsibleGamblingAcknowledgment'
+    | 'waiverAcceptance'
+    | 'gdprConsent'
+    | 'cookieConsent',
   data: any
 ): Promise<void> => {
   console.log(`userService: Saving ${verificationType} data for user ${userId}`);
-  
+
   try {
     // Validate inputs
     if (!userId) {
@@ -122,7 +143,7 @@ export const saveVerificationData = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     if (!verificationType) {
       const error = new Error('Verification type is required');
       console.error('userService: Missing verification type');
@@ -130,7 +151,7 @@ export const saveVerificationData = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     if (!data || Object.keys(data).length === 0) {
       const error = new Error('Verification data is required');
       console.error('userService: Empty verification data');
@@ -138,87 +159,119 @@ export const saveVerificationData = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     const db = getFirestore();
     const userRef = doc(db, 'users', userId);
-    
+
     console.log(`userService: Updating user document with ${verificationType} data`);
     info(LogCategory.USER, `Updating user with ${verificationType} data`, { userId });
-    
+
     try {
       // Update user document
       await updateDoc(userRef, {
         [verificationType]: {
           ...data,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
-      
+
       console.log(`userService: Successfully updated user document with ${verificationType} data`);
       info(LogCategory.USER, `Successfully updated user with ${verificationType} data`, { userId });
     } catch (updateError) {
-      console.error(`userService: Error updating user document with ${verificationType} data:`, updateError);
-      
+      console.error(
+        `userService: Error updating user document with ${verificationType} data:`,
+        updateError
+      );
+
       // Log specific Firestore errors
       if (updateError instanceof FirestoreError) {
         console.error(`userService: Firestore error code: ${updateError.code}`);
-        logError(LogCategory.USER, `Firestore error (${updateError.code}) updating user with ${verificationType} data`, updateError);
+        logError(
+          LogCategory.USER,
+          `Firestore error (${updateError.code}) updating user with ${verificationType} data`,
+          updateError
+        );
       } else {
-        logError(LogCategory.USER, `Error updating user with ${verificationType} data`, updateError as Error);
+        logError(
+          LogCategory.USER,
+          `Error updating user with ${verificationType} data`,
+          updateError as Error
+        );
       }
-      
+
       safeErrorCapture(updateError as Error);
       throw updateError;
     }
-    
+
     // Also log to a separate collection for audit purposes
     console.log(`userService: Logging ${verificationType} data to audit collection`);
     info(LogCategory.USER, `Logging ${verificationType} data to audit collection`, { userId });
-    
+
     try {
-      const verificationRef = doc(db, 'verifications', `${userId}_${verificationType}_${Date.now()}`);
+      const verificationRef = doc(
+        db,
+        'verifications',
+        `${userId}_${verificationType}_${Date.now()}`
+      );
       await setDoc(verificationRef, {
         userId,
         verificationType,
         data: {
           ...data,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
-      
+
       console.log(`userService: Successfully logged ${verificationType} data to audit collection`);
-      info(LogCategory.USER, `Successfully logged ${verificationType} data to audit collection`, { userId });
+      info(LogCategory.USER, `Successfully logged ${verificationType} data to audit collection`, {
+        userId,
+      });
     } catch (auditError) {
-      console.error(`userService: Error logging ${verificationType} data to audit collection:`, auditError);
-      
+      console.error(
+        `userService: Error logging ${verificationType} data to audit collection:`,
+        auditError
+      );
+
       // Log specific Firestore errors
       if (auditError instanceof FirestoreError) {
         console.error(`userService: Firestore error code: ${auditError.code}`);
-        logError(LogCategory.USER, `Firestore error (${auditError.code}) logging ${verificationType} data to audit collection`, auditError);
+        logError(
+          LogCategory.USER,
+          `Firestore error (${auditError.code}) logging ${verificationType} data to audit collection`,
+          auditError
+        );
       } else {
-        logError(LogCategory.USER, `Error logging ${verificationType} data to audit collection`, auditError as Error);
+        logError(
+          LogCategory.USER,
+          `Error logging ${verificationType} data to audit collection`,
+          auditError as Error
+        );
       }
-      
+
       safeErrorCapture(auditError as Error);
       // Don't throw here, as the main update was successful
       console.warn(`userService: Continuing despite audit logging error for ${verificationType}`);
     }
   } catch (error) {
     console.error(`userService: Error saving ${verificationType} data for user ${userId}:`, error);
-    
+
     // Log the error with our logging service
     if (error instanceof FirebaseError) {
       console.error(`userService: Firebase error code: ${error.code}`);
-      logError(LogCategory.USER, `Firebase error (${error.code}) saving ${verificationType} data`, error);
+      logError(
+        LogCategory.USER,
+        `Firebase error (${error.code}) saving ${verificationType} data`,
+        error
+      );
     } else {
       logError(LogCategory.USER, `Error saving ${verificationType} data`, error as Error);
     }
-    
+
     // Track the error with our error tracking service
     safeErrorCapture(error as Error);
-    
+
     // Re-throw the error for the caller to handle
     throw error;
   }
@@ -232,44 +285,60 @@ export const saveVerificationData = async (
  */
 export const hasCompletedVerification = async (
   userId: string,
-  verificationType: 'ageVerification' | 'selfExclusionCheck' | 'responsibleGamblingAcknowledgment' | 'waiverAcceptance' | 'gdprConsent' | 'cookieConsent'
+  verificationType:
+    | 'ageVerification'
+    | 'selfExclusionCheck'
+    | 'responsibleGamblingAcknowledgment'
+    | 'waiverAcceptance'
+    | 'gdprConsent'
+    | 'cookieConsent'
 ): Promise<boolean> => {
   console.log(`userService: Checking if user ${userId} has completed ${verificationType}`);
-  
+
   try {
     // Validate inputs
     if (!userId) {
       console.error('userService: Missing user ID for verification check');
-      logError(LogCategory.USER, 'Missing user ID for verification check', new Error('User ID is required'));
+      logError(
+        LogCategory.USER,
+        'Missing user ID for verification check',
+        new Error('User ID is required')
+      );
       return false;
     }
-    
+
     if (!verificationType) {
       console.error('userService: Missing verification type for check');
-      logError(LogCategory.USER, 'Missing verification type for check', new Error('Verification type is required'));
+      logError(
+        LogCategory.USER,
+        'Missing verification type for check',
+        new Error('Verification type is required')
+      );
       return false;
     }
-    
+
     const db = getFirestore();
     const userRef = doc(db, 'users', userId);
-    
+
     console.log(`userService: Fetching user document for ${userId}`);
-    
+
     try {
       const userDoc = await getDoc(userRef);
-      
+
       if (!userDoc.exists()) {
         console.log(`userService: User document does not exist for ${userId}`);
         info(LogCategory.USER, 'User document not found for verification check', { userId });
         return false;
       }
-      
+
       const userData = userDoc.data();
-      console.log(`userService: User document fetched for ${userId}, checking ${verificationType} status`);
-      
+      console.log(
+        `userService: User document fetched for ${userId}, checking ${verificationType} status`
+      );
+
       // Check if verification exists and is complete
       let result = false;
-      
+
       switch (verificationType) {
         case 'ageVerification':
           result = userData?.ageVerification?.confirmed === true;
@@ -293,43 +362,61 @@ export const hasCompletedVerification = async (
           result = false;
           break;
       }
-      
-      console.log(`userService: ${verificationType} status for user ${userId}: ${result ? 'Completed' : 'Not completed'}`);
-      info(LogCategory.USER, `Verification check result: ${result ? 'Completed' : 'Not completed'}`, {
-        userId,
-        verificationType,
-        result
-      });
-      
+
+      console.log(
+        `userService: ${verificationType} status for user ${userId}: ${result ? 'Completed' : 'Not completed'}`
+      );
+      info(
+        LogCategory.USER,
+        `Verification check result: ${result ? 'Completed' : 'Not completed'}`,
+        {
+          userId,
+          verificationType,
+          result,
+        }
+      );
+
       return result;
     } catch (docError) {
       console.error(`userService: Error fetching user document for ${userId}:`, docError);
-      
+
       // Log specific Firestore errors
       if (docError instanceof FirestoreError) {
         console.error(`userService: Firestore error code: ${docError.code}`);
-        logError(LogCategory.USER, `Firestore error (${docError.code}) fetching user document for verification check`, docError);
+        logError(
+          LogCategory.USER,
+          `Firestore error (${docError.code}) fetching user document for verification check`,
+          docError
+        );
       } else {
-        logError(LogCategory.USER, 'Error fetching user document for verification check', docError as Error);
+        logError(
+          LogCategory.USER,
+          'Error fetching user document for verification check',
+          docError as Error
+        );
       }
-      
+
       safeErrorCapture(docError as Error);
       return false;
     }
   } catch (error) {
     console.error(`userService: Error checking ${verificationType} for user ${userId}:`, error);
-    
+
     // Log the error with our logging service
     if (error instanceof FirebaseError) {
       console.error(`userService: Firebase error code: ${error.code}`);
-      logError(LogCategory.USER, `Firebase error (${error.code}) checking verification status`, error);
+      logError(
+        LogCategory.USER,
+        `Firebase error (${error.code}) checking verification status`,
+        error
+      );
     } else {
       logError(LogCategory.USER, 'Error checking verification status', error as Error);
     }
-    
+
     // Track the error with our error tracking service
     safeErrorCapture(error as Error);
-    
+
     // Return false on error
     return false;
   }
@@ -342,41 +429,45 @@ export const hasCompletedVerification = async (
  */
 export const getUserVerificationData = async (userId: string): Promise<any> => {
   console.log(`userService: Getting all verification data for user ${userId}`);
-  
+
   try {
     // Validate inputs
     if (!userId) {
       console.error('userService: Missing user ID for getting verification data');
-      logError(LogCategory.USER, 'Missing user ID for getting verification data', new Error('User ID is required'));
+      logError(
+        LogCategory.USER,
+        'Missing user ID for getting verification data',
+        new Error('User ID is required')
+      );
       return {};
     }
-    
+
     const db = getFirestore();
     const userRef = doc(db, 'users', userId);
-    
+
     console.log(`userService: Fetching user document for ${userId}`);
-    
+
     try {
       const userDoc = await getDoc(userRef);
-      
+
       if (!userDoc.exists()) {
         console.log(`userService: User document does not exist for ${userId}`);
         info(LogCategory.USER, 'User document not found for getting verification data', { userId });
         return {};
       }
-      
+
       const userData = userDoc.data();
       console.log(`userService: User document fetched for ${userId}, extracting verification data`);
-      
+
       const verificationData = {
         gdprConsent: userData?.gdprConsent || null,
         cookieConsent: userData?.cookieConsent || null,
         ageVerification: userData?.ageVerification || null,
         selfExclusionCheck: userData?.selfExclusionCheck || null,
         responsibleGamblingAcknowledgment: userData?.responsibleGamblingAcknowledgment || null,
-        waiverAcceptance: userData?.waiverAcceptance || null
+        waiverAcceptance: userData?.waiverAcceptance || null,
       };
-      
+
       console.log(`userService: Verification data extracted for user ${userId}`);
       info(LogCategory.USER, 'Verification data retrieved successfully', {
         userId,
@@ -385,27 +476,35 @@ export const getUserVerificationData = async (userId: string): Promise<any> => {
         hasAgeVerification: !!verificationData.ageVerification,
         hasSelfExclusionCheck: !!verificationData.selfExclusionCheck,
         hasResponsibleGamblingAcknowledgment: !!verificationData.responsibleGamblingAcknowledgment,
-        hasWaiverAcceptance: !!verificationData.waiverAcceptance
+        hasWaiverAcceptance: !!verificationData.waiverAcceptance,
       });
-      
+
       return verificationData;
     } catch (docError) {
       console.error(`userService: Error fetching user document for ${userId}:`, docError);
-      
+
       // Log specific Firestore errors
       if (docError instanceof FirestoreError) {
         console.error(`userService: Firestore error code: ${docError.code}`);
-        logError(LogCategory.USER, `Firestore error (${docError.code}) fetching user document for verification data`, docError);
+        logError(
+          LogCategory.USER,
+          `Firestore error (${docError.code}) fetching user document for verification data`,
+          docError
+        );
       } else {
-        logError(LogCategory.USER, 'Error fetching user document for verification data', docError as Error);
+        logError(
+          LogCategory.USER,
+          'Error fetching user document for verification data',
+          docError as Error
+        );
       }
-      
+
       safeErrorCapture(docError as Error);
       return {};
     }
   } catch (error) {
     console.error(`userService: Error getting verification data for user ${userId}:`, error);
-    
+
     // Log the error with our logging service
     if (error instanceof FirebaseError) {
       console.error(`userService: Firebase error code: ${error.code}`);
@@ -413,10 +512,10 @@ export const getUserVerificationData = async (userId: string): Promise<any> => {
     } else {
       logError(LogCategory.USER, 'Error getting verification data', error as Error);
     }
-    
+
     // Track the error with our error tracking service
     safeErrorCapture(error as Error);
-    
+
     // Return empty object on error
     return {};
   }

@@ -5,13 +5,12 @@
  * a complete environment validation solution.
  */
 
+import { validateConfig, isDevelopment } from '../atoms/envConfig';
 import {
   checkEnvVars,
   getMissingEnvVarsMessage,
   getCategoryInstructions,
 } from '../atoms/envValidator';
-import { validateConfig } from '../atoms/envConfig';
-import { isDevelopment } from '../atoms/envConfig';
 
 /**
  * Validate environment at startup

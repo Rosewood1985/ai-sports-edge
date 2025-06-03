@@ -1,3 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useStripe } from '@stripe/stripe-react-native';
+import { httpsCallable } from 'firebase/functions';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -9,21 +14,24 @@ import {
   ActivityIndicator,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import { auth, functions } from '../config/firebase';
-import { httpsCallable } from 'firebase/functions';
-import { createGroupSubscription, addGroupMember, removeGroupMember, getGroupSubscription, transferGroupOwnership, MAX_GROUP_MEMBERS } from '../services/groupSubscriptionService';
-import { useStripe } from '@stripe/stripe-react-native';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
 import { useTheme } from '../contexts/ThemeContext';
 // Import analytics service
 import { analyticsService } from '../services/analyticsService';
 import { AnalyticsEventType } from '../services/analyticsService';
+import {
+  createGroupSubscription,
+  addGroupMember,
+  removeGroupMember,
+  getGroupSubscription,
+  transferGroupOwnership,
+  MAX_GROUP_MEMBERS,
+} from '../services/groupSubscriptionService';
 // Import error styles
 import { errorStyles } from '../styles/groupSubscriptionStyles';
 
@@ -35,7 +43,7 @@ const GroupSubscriptionScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { colors } = useTheme();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  
+
   const [loading, setLoading] = useState<boolean>(false);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [groupData, setGroupData] = useState<any>(null);
@@ -44,27 +52,27 @@ const GroupSubscriptionScreen: React.FC = () => {
   const [transferringOwnership, setTransferringOwnership] = useState<boolean>(false);
   const [step, setStep] = useState<'info' | 'payment' | 'manage'>('info');
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
-  
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
+
   // Refs for accessibility focus management
-  const emailInputRefs = useRef<Array<TextInput | null>>([null, null]);
+  const emailInputRefs = useRef<(TextInput | null)[]>([null, null]);
   const newMemberInputRef = useRef<TextInput | null>(null);
-  
+
   // Load existing group subscription if any
   useEffect(() => {
     const loadGroupSubscription = async () => {
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           navigation.navigate('Login');
           return;
         }
-        
+
         // Check if user already has a group subscription
         const userDoc = await getGroupSubscription(userId);
-        
+
         if (userDoc) {
           setGroupId(userDoc.id);
           setGroupData(userDoc);
@@ -76,17 +84,17 @@ const GroupSubscriptionScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadGroupSubscription();
   }, [navigation]);
-  
+
   // Handle member email input change
   const handleMemberEmailChange = (text: string, index: number) => {
     const newEmails = [...memberEmails];
     newEmails[index] = text;
     setMemberEmails(newEmails);
   };
-  
+
   // Validate email function
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,63 +106,63 @@ const GroupSubscriptionScreen: React.FC = () => {
     // Reset errors
     setError(null);
     setValidationErrors({});
-    
+
     // Filter out empty emails
     const validEmails = memberEmails.filter(email => email.trim() !== '');
-    
+
     // Validate emails
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const newValidationErrors: {[key: string]: string} = {};
+    const newValidationErrors: { [key: string]: string } = {};
     let hasErrors = false;
-    
+
     validEmails.forEach((email, index) => {
       if (!emailRegex.test(email)) {
         newValidationErrors[`email_${index}`] = `Email ${index + 1} is invalid`;
         hasErrors = true;
       }
     });
-    
+
     if (hasErrors) {
       setValidationErrors(newValidationErrors);
       setError('Please correct the invalid email addresses.');
-      
+
       // Focus the first invalid input
-      const firstInvalidIndex = memberEmails.findIndex((email, index) =>
-        email.trim() !== '' && !emailRegex.test(email)
+      const firstInvalidIndex = memberEmails.findIndex(
+        (email, index) => email.trim() !== '' && !emailRegex.test(email)
       );
-      
+
       if (firstInvalidIndex >= 0 && emailInputRefs.current[firstInvalidIndex]) {
         emailInputRefs.current[firstInvalidIndex]?.focus();
       }
-      
+
       return;
     }
-    
+
     // Set valid emails and continue to payment
     setMemberEmails(validEmails);
     setStep('payment');
-    
+
     // Track analytics
     analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_STARTED, {
       subscription_type: 'group_pro',
       member_count: validEmails.length + 1, // +1 for owner
-      is_group: true
+      is_group: true,
     });
   };
-  
+
   // Handle create group subscription
   const handleCreateGroupSubscription = async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         navigation.navigate('Login');
         return;
       }
-      
+
       // Inform user about the 24-hour registration requirement
       Alert.alert(
         'Registration Time Limit',
@@ -163,22 +171,25 @@ const GroupSubscriptionScreen: React.FC = () => {
           {
             text: 'Cancel',
             style: 'cancel',
-            onPress: () => setLoading(false)
+            onPress: () => setLoading(false),
           },
           {
             text: 'Continue',
             style: 'default',
-            onPress: () => processGroupSubscription(userId)
-          }
+            onPress: () => processGroupSubscription(userId),
+          },
         ]
       );
     } catch (error: any) {
       console.error('Error creating group subscription:', error);
-      Alert.alert('Error', error.message || 'Failed to create group subscription. Please try again.');
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to create group subscription. Please try again.'
+      );
       setLoading(false);
     }
   };
-  
+
   // Process the group subscription after confirmation
   const processGroupSubscription = async (userId: string) => {
     try {
@@ -193,16 +204,16 @@ const GroupSubscriptionScreen: React.FC = () => {
             clientSecret: string;
           }
         >(functions, 'prepareGroupSubscriptionPayment');
-        
+
         const paymentData = await preparePaymentFn({
           userId,
-          memberEmails: memberEmails
+          memberEmails,
         });
-        
+
         if (!paymentData.data || !paymentData.data.clientSecret || !paymentData.data.ephemeralKey) {
           throw new Error('Invalid payment data received from server');
         }
-        
+
         // Initialize payment sheet with dynamic values from backend
         const { error: initError, paymentOption } = await initPaymentSheet({
           merchantDisplayName: 'AI Sports Edge',
@@ -213,54 +224,56 @@ const GroupSubscriptionScreen: React.FC = () => {
             name: auth.currentUser?.displayName || '',
           },
           allowsDelayedPaymentMethods: false,
-          style: 'automatic'
+          style: 'automatic',
         });
-        
+
         if (initError) {
           console.error('Error initializing payment sheet:', initError);
-          Alert.alert('Payment Error', `Failed to initialize payment: ${initError.message}. Please try again.`);
+          Alert.alert(
+            'Payment Error',
+            `Failed to initialize payment: ${initError.message}. Please try again.`
+          );
           setLoading(false);
           return;
         }
       } catch (error: any) {
         console.error('Error preparing payment:', error);
-        Alert.alert('Payment Setup Error', `Failed to prepare payment: ${error.message}. Please try again.`);
+        Alert.alert(
+          'Payment Setup Error',
+          `Failed to prepare payment: ${error.message}. Please try again.`
+        );
         setLoading(false);
         return;
       }
-      
+
       // Present payment sheet
       const { error: presentError } = await presentPaymentSheet();
-      
+
       if (presentError) {
         console.error('Error presenting payment sheet:', presentError);
         Alert.alert('Error', presentError.message || 'Payment failed. Please try again.');
         setLoading(false);
         return;
       }
-      
+
       // For production, we would get the payment method ID from the Stripe API
       // Since we're using a test environment, we'll use a test payment method ID
       const paymentMethodId = 'pm_' + Date.now().toString(); // Generate a unique ID for testing
-      
+
       // Create group subscription
-      const result = await createGroupSubscription(
-        userId,
-        paymentMethodId,
-        memberEmails
-      );
-      
+      const result = await createGroupSubscription(userId, paymentMethodId, memberEmails);
+
       // Track event
       analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_COMPLETED, {
         member_count: memberEmails.length + 1, // +1 for the owner
         subscription_type: 'group_pro',
-        is_group: true
+        is_group: true,
       });
-      
+
       // Set group ID and data
       setGroupId(result.subscriptionId);
       setGroupData(result);
-      
+
       // Show success message
       Alert.alert(
         'Group Subscription Created',
@@ -274,49 +287,55 @@ const GroupSubscriptionScreen: React.FC = () => {
       );
     } catch (error: any) {
       console.error('Error creating group subscription:', error);
-      Alert.alert('Error', error.message || 'Failed to create group subscription. Please try again.');
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to create group subscription. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
   };
-  
+
   // Handle add member
   const handleAddMember = async () => {
     try {
       if (!groupId) return;
-      
+
       // Validate email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(newMemberEmail)) {
         Alert.alert('Invalid Email', 'Please enter a valid email address.');
         return;
       }
-      
+
       setLoading(true);
-      
+
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         navigation.navigate('Login');
         return;
       }
-      
+
       // Check if group is at max capacity
       if (groupData.members.length >= MAX_GROUP_MEMBERS) {
-        Alert.alert('Group Full', `Your group subscription is limited to ${MAX_GROUP_MEMBERS} members.`);
+        Alert.alert(
+          'Group Full',
+          `Your group subscription is limited to ${MAX_GROUP_MEMBERS} members.`
+        );
         setLoading(false);
         return;
       }
-      
+
       // Add member to group
       const result = await addGroupMember(groupId, newMemberEmail, userId);
-      
+
       // Update group data
       setGroupData(result);
-      
+
       // Clear input
       setNewMemberEmail('');
-      
+
       // Show success message
       Alert.alert('Member Added', 'The member has been added to your group subscription.');
     } catch (error: any) {
@@ -326,21 +345,21 @@ const GroupSubscriptionScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   // Handle transfer ownership
   const handleTransferOwnership = async (email: string) => {
     try {
       if (!groupId) return;
-      
+
       setLoading(true);
-      
+
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         navigation.navigate('Login');
         return;
       }
-      
+
       // Confirm transfer
       Alert.alert(
         'Transfer Ownership',
@@ -357,13 +376,13 @@ const GroupSubscriptionScreen: React.FC = () => {
             onPress: async () => {
               try {
                 setTransferringOwnership(true);
-                
+
                 // Transfer ownership
                 const result = await transferGroupOwnership(groupId, email, userId);
-                
+
                 // Update group data
                 setGroupData(result);
-                
+
                 // Show success message
                 Alert.alert(
                   'Ownership Transferred',
@@ -377,7 +396,10 @@ const GroupSubscriptionScreen: React.FC = () => {
                 );
               } catch (error: any) {
                 console.error('Error transferring ownership:', error);
-                Alert.alert('Error', error.message || 'Failed to transfer ownership. Please try again.');
+                Alert.alert(
+                  'Error',
+                  error.message || 'Failed to transfer ownership. Please try again.'
+                );
               } finally {
                 setTransferringOwnership(false);
                 setLoading(false);
@@ -397,16 +419,16 @@ const GroupSubscriptionScreen: React.FC = () => {
   const handleRemoveMember = async (email: string) => {
     try {
       if (!groupId) return;
-      
+
       setLoading(true);
-      
+
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         navigation.navigate('Login');
         return;
       }
-      
+
       // Confirm removal
       Alert.alert(
         'Remove Member',
@@ -424,12 +446,15 @@ const GroupSubscriptionScreen: React.FC = () => {
               try {
                 // Remove member from group
                 const result = await removeGroupMember(groupId, email, userId);
-                
+
                 // Update group data
                 setGroupData(result);
-                
+
                 // Show success message
-                Alert.alert('Member Removed', 'The member has been removed from your group subscription.');
+                Alert.alert(
+                  'Member Removed',
+                  'The member has been removed from your group subscription.'
+                );
               } catch (error: any) {
                 console.error('Error removing member:', error);
                 Alert.alert('Error', error.message || 'Failed to remove member. Please try again.');
@@ -446,14 +471,14 @@ const GroupSubscriptionScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   // Render info step
   const renderInfoStep = () => (
     <ScrollView style={styles.scrollContent}>
       <View style={styles.section}>
         <ThemedText style={styles.title}>Edge Collective</ThemedText>
         <ThemedText style={styles.subtitle}>$189.99/month for up to 3 users</ThemedText>
-        
+
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
             <Ionicons name="people" size={24} color={colors.primary} />
@@ -461,21 +486,21 @@ const GroupSubscriptionScreen: React.FC = () => {
               Share premium features with up to 2 friends or family members
             </ThemedText>
           </View>
-          
+
           <View style={styles.infoRow}>
             <Ionicons name="cash" size={24} color={colors.primary} />
             <ThemedText style={styles.infoText}>
               Split the cost and save compared to individual subscriptions
             </ThemedText>
           </View>
-          
+
           <View style={styles.infoRow}>
             <Ionicons name="time" size={24} color={colors.primary} />
             <ThemedText style={styles.infoText}>
               All members must register within 24 hours for the deal to activate
             </ThemedText>
           </View>
-          
+
           <View style={styles.infoRow}>
             <Ionicons name="shield-checkmark" size={24} color={colors.primary} />
             <ThemedText style={styles.infoText}>
@@ -483,31 +508,31 @@ const GroupSubscriptionScreen: React.FC = () => {
             </ThemedText>
           </View>
         </View>
-        
+
         <ThemedText style={styles.sectionTitle}>Add Group Members</ThemedText>
         <ThemedText style={styles.description}>
           Enter the email addresses of up to 2 people you want to invite to your group subscription.
           They will receive an invitation and get immediate access once you complete payment.
         </ThemedText>
-        
+
         {memberEmails.map((email, index) => (
           <View key={index} style={styles.inputContainer}>
             <TextInput
-              ref={ref => emailInputRefs.current[index] = ref}
+              ref={ref => (emailInputRefs.current[index] = ref)}
               style={[
                 styles.input,
                 { color: colors.text },
-                validationErrors[`email_${index}`] ? errorStyles.inputError : {}
+                validationErrors[`email_${index}`] ? errorStyles.inputError : {},
               ]}
               placeholder={`Member ${index + 1} email`}
               placeholderTextColor={colors.secondary}
               value={email}
-              onChangeText={(text) => handleMemberEmailChange(text, index)}
+              onChangeText={text => handleMemberEmailChange(text, index)}
               keyboardType="email-address"
               autoCapitalize="none"
               accessibilityLabel={`Member ${index + 1} email input`}
               accessibilityHint="Enter the email address of a group member"
-              returnKeyType={index < memberEmails.length - 1 ? "next" : "done"}
+              returnKeyType={index < memberEmails.length - 1 ? 'next' : 'done'}
               onSubmitEditing={() => {
                 if (index < memberEmails.length - 1 && emailInputRefs.current[index + 1]) {
                   emailInputRefs.current[index + 1]?.focus();
@@ -515,19 +540,17 @@ const GroupSubscriptionScreen: React.FC = () => {
               }}
             />
             {validationErrors[`email_${index}`] && (
-              <Text style={errorStyles.errorText}>
-                {validationErrors[`email_${index}`]}
-              </Text>
+              <Text style={errorStyles.errorText}>{validationErrors[`email_${index}`]}</Text>
             )}
           </View>
         ))}
-        
+
         {error && (
           <View style={errorStyles.errorContainer}>
             <Text style={errorStyles.errorText}>{error}</Text>
           </View>
         )}
-        
+
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}
           onPress={handleContinueToPayment}
@@ -535,42 +558,42 @@ const GroupSubscriptionScreen: React.FC = () => {
         >
           <ThemedText style={styles.buttonText}>Continue to Payment</ThemedText>
         </TouchableOpacity>
-        
+
         <ThemedText style={styles.disclaimer}>
-          By continuing, you agree to be charged $189.99/month for your group subscription.
-          You can cancel anytime from the subscription management screen.
+          By continuing, you agree to be charged $189.99/month for your group subscription. You can
+          cancel anytime from the subscription management screen.
         </ThemedText>
       </View>
     </ScrollView>
   );
-  
+
   // Render payment step
   const renderPaymentStep = () => (
     <ScrollView style={styles.scrollContent}>
       <View style={styles.section}>
         <ThemedText style={styles.title}>Complete Your Purchase</ThemedText>
-        
+
         <View style={styles.summaryCard}>
           <ThemedText style={styles.summaryTitle}>Order Summary</ThemedText>
-          
+
           <View style={styles.summaryRow}>
             <ThemedText>Edge Collective</ThemedText>
             <ThemedText>$189.99/month</ThemedText>
           </View>
-          
+
           <View style={styles.summaryRow}>
             <ThemedText>Members</ThemedText>
             <ThemedText>{memberEmails.length + 1} users</ThemedText>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.summaryRow}>
             <ThemedText style={styles.totalLabel}>Total</ThemedText>
             <ThemedText style={styles.totalAmount}>$189.99/month</ThemedText>
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}
           onPress={handleCreateGroupSubscription}
@@ -582,7 +605,7 @@ const GroupSubscriptionScreen: React.FC = () => {
             <ThemedText style={styles.buttonText}>Complete Purchase</ThemedText>
           )}
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => setStep('info')}
@@ -595,16 +618,16 @@ const GroupSubscriptionScreen: React.FC = () => {
       </View>
     </ScrollView>
   );
-  
+
   // Render manage step
   const renderManageStep = () => {
     if (!groupData) return null;
-    
+
     return (
       <ScrollView style={styles.scrollContent}>
         <View style={styles.section}>
           <ThemedText style={styles.title}>Manage Group Subscription</ThemedText>
-          
+
           <View style={styles.statusCard}>
             <View style={styles.statusRow}>
               <ThemedText style={styles.statusLabel}>Status:</ThemedText>
@@ -614,65 +637,67 @@ const GroupSubscriptionScreen: React.FC = () => {
                 </ThemedText>
               </View>
             </View>
-            
+
             <View style={styles.statusRow}>
               <ThemedText style={styles.statusLabel}>Next Billing:</ThemedText>
               <ThemedText>
-                {groupData.currentPeriodEnd ? new Date(groupData.currentPeriodEnd.seconds * 1000).toLocaleDateString() : 'N/A'}
+                {groupData.currentPeriodEnd
+                  ? new Date(groupData.currentPeriodEnd.seconds * 1000).toLocaleDateString()
+                  : 'N/A'}
               </ThemedText>
             </View>
-            
+
             <View style={styles.statusRow}>
               <ThemedText style={styles.statusLabel}>Price:</ThemedText>
               <ThemedText>$189.99/month</ThemedText>
             </View>
           </View>
-          
+
           <ThemedText style={styles.sectionTitle}>Group Members</ThemedText>
           <ThemedText style={styles.description}>
             Your group can have up to {MAX_GROUP_MEMBERS} members (including you).
           </ThemedText>
-          
+
           <View style={styles.membersCard}>
             {/* Owner (current user) */}
             <View style={styles.memberRow}>
               <View style={styles.memberInfo}>
                 <Ionicons name="person" size={24} color={colors.primary} />
-                <ThemedText style={styles.memberEmail}>
-                  {auth.currentUser?.email} (You)
-                </ThemedText>
+                <ThemedText style={styles.memberEmail}>{auth.currentUser?.email} (You)</ThemedText>
               </View>
               <View style={styles.ownerBadge}>
                 <ThemedText style={styles.ownerText}>Owner</ThemedText>
               </View>
             </View>
-            
+
             {/* Other members */}
-            {groupData.members.filter((email: string) => email !== auth.currentUser?.email).map((email: string, index: number) => (
-              <View key={index} style={styles.memberRow}>
-                <View style={styles.memberInfo}>
-                  <Ionicons name="person" size={24} color={colors.primary} />
-                  <ThemedText style={styles.memberEmail}>{email}</ThemedText>
+            {groupData.members
+              .filter((email: string) => email !== auth.currentUser?.email)
+              .map((email: string, index: number) => (
+                <View key={index} style={styles.memberRow}>
+                  <View style={styles.memberInfo}>
+                    <Ionicons name="person" size={24} color={colors.primary} />
+                    <ThemedText style={styles.memberEmail}>{email}</ThemedText>
+                  </View>
+                  <View style={styles.memberActions}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleTransferOwnership(email)}
+                      disabled={loading || transferringOwnership}
+                    >
+                      <Ionicons name="swap-horizontal" size={24} color={colors.primary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleRemoveMember(email)}
+                      disabled={loading}
+                    >
+                      <Ionicons name="close-circle" size={24} color={colors.error} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View style={styles.memberActions}>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => handleTransferOwnership(email)}
-                    disabled={loading || transferringOwnership}
-                  >
-                    <Ionicons name="swap-horizontal" size={24} color={colors.primary} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => handleRemoveMember(email)}
-                    disabled={loading}
-                  >
-                    <Ionicons name="close-circle" size={24} color={colors.error} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-            
+              ))}
+
             {/* Add new member if not at max capacity */}
             {groupData.members.length < MAX_GROUP_MEMBERS && (
               <KeyboardAvoidingView
@@ -702,7 +727,7 @@ const GroupSubscriptionScreen: React.FC = () => {
               </KeyboardAvoidingView>
             )}
           </View>
-          
+
           <TouchableOpacity
             style={[styles.cancelButton, { borderColor: colors.error }]}
             onPress={() => {
@@ -720,17 +745,17 @@ const GroupSubscriptionScreen: React.FC = () => {
                     onPress: async () => {
                       try {
                         setLoading(true);
-                        
+
                         const userId = auth.currentUser?.uid;
-                        
+
                         if (!userId || !groupId) {
                           setLoading(false);
                           return;
                         }
-                        
+
                         // Cancel subscription
                         await removeGroupMember(groupId, userId, userId);
-                        
+
                         // Show success message
                         Alert.alert(
                           'Subscription Canceled',
@@ -744,7 +769,10 @@ const GroupSubscriptionScreen: React.FC = () => {
                         );
                       } catch (error: any) {
                         console.error('Error canceling subscription:', error);
-                        Alert.alert('Error', error.message || 'Failed to cancel subscription. Please try again.');
+                        Alert.alert(
+                          'Error',
+                          error.message || 'Failed to cancel subscription. Please try again.'
+                        );
                       } finally {
                         setLoading(false);
                       }
@@ -763,7 +791,7 @@ const GroupSubscriptionScreen: React.FC = () => {
       </ScrollView>
     );
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       {loading && !groupData && (
@@ -772,7 +800,7 @@ const GroupSubscriptionScreen: React.FC = () => {
           <ThemedText style={styles.loadingText}>Loading...</ThemedText>
         </View>
       )}
-      
+
       {!loading && step === 'info' && renderInfoStep()}
       {!loading && step === 'payment' && renderPaymentStep()}
       {step === 'manage' && renderManageStep()}

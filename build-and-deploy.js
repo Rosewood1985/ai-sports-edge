@@ -18,7 +18,7 @@ try {
 
   // Copy the necessary files
   console.log('Copying files...');
-  
+
   // Create the HTML files
   const indexHtml = `
 <!DOCTYPE html>
@@ -36,7 +36,7 @@ try {
 </html>
 `;
   fs.writeFileSync(path.join('build', 'index.html'), indexHtml);
-  
+
   // Create a simple CSS file
   const css = `
 body {

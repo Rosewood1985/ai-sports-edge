@@ -8,6 +8,7 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
+
 import { useMobileCamera, useHaptics } from '../../../hooks/useMobile';
 import MobileButton from '../../atoms/mobile/MobileButton';
 

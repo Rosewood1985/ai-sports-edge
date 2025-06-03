@@ -1,6 +1,6 @@
-const axios = require('axios');
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const axios = require("axios");
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
 /**
  * NotificationService class
@@ -9,9 +9,9 @@ const admin = require('firebase-admin');
 class NotificationService {
   constructor() {
     // Get OneSignal API key and app IDs from environment variables
-    this.oneSignalApiKey = functions.config().onesignal?.api_key || 'YOUR_ONESIGNAL_API_KEY';
-    this.oneSignalWebAppId = functions.config().onesignal?.web_app_id || 'YOUR_ONESIGNAL_WEB_APP_ID';
-    this.oneSignalMobileAppId = functions.config().onesignal?.mobile_app_id || 'YOUR_ONESIGNAL_MOBILE_APP_ID';
+    this.oneSignalApiKey = functions.config().onesignal?.api_key || "YOUR_ONESIGNAL_API_KEY";
+    this.oneSignalWebAppId = functions.config().onesignal?.web_app_id || "YOUR_ONESIGNAL_WEB_APP_ID";
+    this.oneSignalMobileAppId = functions.config().onesignal?.mobile_app_id || "YOUR_ONESIGNAL_MOBILE_APP_ID";
   }
 
   /**
@@ -24,14 +24,14 @@ class NotificationService {
    * @param {string} options.platform - 'web', 'mobile', or 'all'
    * @returns {Promise} - Promise that resolves when notification is sent
    */
-  async sendToAll({ title, message, data = {}, url, platform = 'all' }) {
+  async sendToAll({ title, message, data = {}, url, platform = "all" }) {
     const appIds = [];
     
-    if (platform === 'web' || platform === 'all') {
+    if (platform === "web" || platform === "all") {
       appIds.push(this.oneSignalWebAppId);
     }
     
-    if (platform === 'mobile' || platform === 'all') {
+    if (platform === "mobile" || platform === "all") {
       appIds.push(this.oneSignalMobileAppId);
     }
     
@@ -42,7 +42,7 @@ class NotificationService {
         contents: { en: message },
         data,
         url,
-        included_segments: ['All']
+        included_segments: ["All"]
       });
     });
     
@@ -60,14 +60,14 @@ class NotificationService {
    * @param {string} options.platform - 'web', 'mobile', or 'all'
    * @returns {Promise} - Promise that resolves when notification is sent
    */
-  async sendToUsers({ title, message, data = {}, url, userIds, platform = 'all' }) {
+  async sendToUsers({ title, message, data = {}, url, userIds, platform = "all" }) {
     const appIds = [];
     
-    if (platform === 'web' || platform === 'all') {
+    if (platform === "web" || platform === "all") {
       appIds.push(this.oneSignalWebAppId);
     }
     
-    if (platform === 'mobile' || platform === 'all') {
+    if (platform === "mobile" || platform === "all") {
       appIds.push(this.oneSignalMobileAppId);
     }
     
@@ -96,14 +96,14 @@ class NotificationService {
    * @param {string} options.platform - 'web', 'mobile', or 'all'
    * @returns {Promise} - Promise that resolves when notification is sent
    */
-  async sendToFilters({ title, message, data = {}, url, filters, platform = 'all' }) {
+  async sendToFilters({ title, message, data = {}, url, filters, platform = "all" }) {
     const appIds = [];
     
-    if (platform === 'web' || platform === 'all') {
+    if (platform === "web" || platform === "all") {
       appIds.push(this.oneSignalWebAppId);
     }
     
-    if (platform === 'mobile' || platform === 'all') {
+    if (platform === "mobile" || platform === "all") {
       appIds.push(this.oneSignalMobileAppId);
     }
     
@@ -129,19 +129,19 @@ class NotificationService {
   async sendNotification(payload) {
     try {
       const response = await axios.post(
-        'https://onesignal.com/api/v1/notifications',
+        "https://onesignal.com/api/v1/notifications",
         payload,
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${this.oneSignalApiKey}`
+            "Content-Type": "application/json",
+            "Authorization": `Basic ${this.oneSignalApiKey}`
           }
         }
       );
       
       return response.data;
     } catch (error) {
-      console.error('Error sending OneSignal notification:', error);
+      console.error("Error sending OneSignal notification:", error);
       throw error;
     }
   }

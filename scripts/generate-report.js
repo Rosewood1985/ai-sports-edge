@@ -2,9 +2,9 @@
 
 /**
  * Report Generator Script
- * 
+ *
  * This script generates a revenue report for a specified period.
- * 
+ *
  * Usage:
  *   node generate-report.js --type=monthly --start=2025-03-01 --end=2025-03-31
  */
@@ -14,12 +14,16 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Import required modules
 const { program } = require('commander');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 // Parse command line arguments
 program
-  .option('--type <type>', 'Report type (daily, weekly, monthly, quarterly, annual, tax)', 'monthly')
+  .option(
+    '--type <type>',
+    'Report type (daily, weekly, monthly, quarterly, annual, tax)',
+    'monthly'
+  )
   .option('--start <date>', 'Start date (YYYY-MM-DD)')
   .option('--end <date>', 'End date (YYYY-MM-DD)')
   .option('--format <format>', 'Report format (html, json, csv)', 'json')
@@ -31,7 +35,9 @@ const options = program.opts();
 // Validate options
 if (!options.start || !options.end) {
   console.error('Start and end dates are required');
-  console.error('Usage: node generate-report.js --type=monthly --start=2025-03-01 --end=2025-03-31');
+  console.error(
+    'Usage: node generate-report.js --type=monthly --start=2025-03-01 --end=2025-03-31'
+  );
   process.exit(1);
 }
 
@@ -69,7 +75,7 @@ try {
   revenueReportingService = require('../dist/services/revenueReportingService').default;
 } catch (error) {
   console.error('Could not load compiled service. Trying to use ts-node...');
-  
+
   try {
     // Try to use ts-node to load the TypeScript file directly
     require('ts-node/register');
@@ -86,42 +92,43 @@ try {
 async function generateReport() {
   try {
     console.log(`Generating ${options.type} report from ${options.start} to ${options.end}...`);
-    
+
     const report = await revenueReportingService.generateReport({
       startDate,
       endDate,
       type: options.type,
       format: options.format,
     });
-    
+
     console.log(`Report generated successfully!`);
     console.log(`Report ID: ${report.id}`);
     console.log(`Total Revenue: $${report.totalRevenue.toFixed(2)}`);
     console.log(`Total Tax: $${report.totalTax.toFixed(2)}`);
     console.log(`Net Revenue: $${report.netRevenue.toFixed(2)}`);
     console.log(`Transaction Count: ${report.transactionCount}`);
-    
+
     // Output the report
     if (options.output) {
       const outputPath = path.resolve(process.cwd(), options.output);
-      
+
       let outputContent;
-      
+
       switch (options.format) {
         case 'json':
           outputContent = JSON.stringify(report, null, 2);
           break;
         case 'csv':
           // Simple CSV conversion for the report summary
-          outputContent = 'Report ID,Type,Start Date,End Date,Generation Date,Total Revenue,Total Tax,Net Revenue,Transaction Count\n';
+          outputContent =
+            'Report ID,Type,Start Date,End Date,Generation Date,Total Revenue,Total Tax,Net Revenue,Transaction Count\n';
           outputContent += `${report.id},${report.type},${report.startDate.toISOString()},${report.endDate.toISOString()},${report.generationDate.toISOString()},${report.totalRevenue},${report.totalTax},${report.netRevenue},${report.transactionCount}\n`;
-          
+
           // Add categories
           outputContent += '\nCategory,Gross Revenue,Tax,Net Revenue,Percentage\n';
           report.categories.forEach(category => {
             outputContent += `${category.name},${category.grossRevenue},${category.tax},${category.netRevenue},${category.percentage}%\n`;
           });
-          
+
           // Add daily breakdown if available
           if (report.days && report.days.length > 0) {
             outputContent += '\nDate,Transaction Count,Gross Revenue,Tax,Net Revenue\n';
@@ -170,7 +177,9 @@ async function generateReport() {
       <th>Net Revenue</th>
       <th>Percentage</th>
     </tr>
-    ${report.categories.map(category => `
+    ${report.categories
+      .map(
+        category => `
     <tr>
       <td>${category.name}</td>
       <td>$${category.grossRevenue.toFixed(2)}</td>
@@ -178,7 +187,9 @@ async function generateReport() {
       <td>$${category.netRevenue.toFixed(2)}</td>
       <td>${category.percentage}%</td>
     </tr>
-    `).join('')}
+    `
+      )
+      .join('')}
     <tr class="total-row">
       <td>Total</td>
       <td>$${report.totalRevenue.toFixed(2)}</td>
@@ -188,7 +199,9 @@ async function generateReport() {
     </tr>
   </table>
   
-  ${report.days && report.days.length > 0 ? `
+  ${
+    report.days && report.days.length > 0
+      ? `
   <h2>Revenue by Day</h2>
   <table>
     <tr>
@@ -198,7 +211,9 @@ async function generateReport() {
       <th>Tax</th>
       <th>Net Revenue</th>
     </tr>
-    ${report.days.map(day => `
+    ${report.days
+      .map(
+        day => `
     <tr>
       <td>${day.date.toISOString().split('T')[0]}</td>
       <td>${day.transactionCount}</td>
@@ -206,7 +221,9 @@ async function generateReport() {
       <td>$${day.tax.toFixed(2)}</td>
       <td>$${day.netRevenue.toFixed(2)}</td>
     </tr>
-    `).join('')}
+    `
+      )
+      .join('')}
     <tr class="total-row">
       <td>Total</td>
       <td>${report.transactionCount}</td>
@@ -215,13 +232,15 @@ async function generateReport() {
       <td>$${report.netRevenue.toFixed(2)}</td>
     </tr>
   </table>
-  ` : ''}
+  `
+      : ''
+  }
 </body>
 </html>
           `;
           break;
       }
-      
+
       fs.writeFileSync(outputPath, outputContent);
       console.log(`Report saved to: ${outputPath}`);
     } else {

@@ -24,10 +24,21 @@ class WeatherAdjustmentService {
       }
 
       // Validate supported sports
-      const supportedSports = ['MLB', 'NFL', 'NBA', 'WNBA', 'NCAA_MENS', 'NCAA_WOMENS',
-                              'NHL', 'FORMULA_1', 'SOCCER_EPL', 'SOCCER_MLS',
-                              'HORSE_RACING', 'UFC'];
-      
+      const supportedSports = [
+        'MLB',
+        'NFL',
+        'NBA',
+        'WNBA',
+        'NCAA_MENS',
+        'NCAA_WOMENS',
+        'NHL',
+        'FORMULA_1',
+        'SOCCER_EPL',
+        'SOCCER_MLS',
+        'HORSE_RACING',
+        'UFC',
+      ];
+
       if (!supportedSports.includes(sport)) {
         console.error('Unsupported sport:', sport);
         return { factor: 1.0, impact: 'none', description: 'Unsupported sport' };
@@ -45,62 +56,68 @@ class WeatherAdjustmentService {
 
       // Get the weather condition with safe defaults
       const condition = weatherData.condition || 'Unknown';
-      const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
+      const temperature =
+        typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
       const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
-      const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-      
+      const precipitation =
+        typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+
       // Default adjustment (no impact)
-      let factor = 1.0;
-      let impact = 'none';
-      let description = 'Weather has no significant impact on this sport';
-      
+      const factor = 1.0;
+      const impact = 'none';
+      const description = 'Weather has no significant impact on this sport';
+
       // Adjust based on sport and weather condition
       switch (sport) {
         case 'MLB':
           return this.getBaseballWeatherAdjustment(weatherData);
-        
+
         case 'NFL':
           return this.getFootballWeatherAdjustment(weatherData);
-        
+
         case 'NBA':
         case 'WNBA':
         case 'NCAA_MENS':
         case 'NCAA_WOMENS':
           // Basketball is mostly played indoors
-          return { 
-            factor: 1.0, 
-            impact: 'none', 
-            description: 'Basketball is played indoors and not affected by weather' 
+          return {
+            factor: 1.0,
+            impact: 'none',
+            description: 'Basketball is played indoors and not affected by weather',
           };
-        
+
         case 'NHL':
           // Hockey is mostly played indoors
-          return { 
-            factor: 1.0, 
-            impact: 'none', 
-            description: 'Hockey is played indoors and not affected by weather' 
+          return {
+            factor: 1.0,
+            impact: 'none',
+            description: 'Hockey is played indoors and not affected by weather',
           };
-        
+
         case 'FORMULA_1':
           return this.getFormula1WeatherAdjustment(weatherData);
-        
+
         case 'SOCCER_EPL':
         case 'SOCCER_MLS':
           return this.getSoccerWeatherAdjustment(weatherData);
-        
+
         case 'HORSE_RACING':
           return this.getHorseRacingWeatherAdjustment(weatherData);
-        
+
         case 'UFC':
           // UFC is indoors
-          return { 
-            factor: 1.0, 
-            impact: 'none', 
-            description: 'UFC events are held indoors and not affected by weather' 
+          return {
+            factor: 1.0,
+            impact: 'none',
+            description: 'UFC events are held indoors and not affected by weather',
           };
-        
+
         default:
-          return { factor: 1.0, impact: 'none', description: 'No specific weather adjustment for this sport' };
+          return {
+            factor: 1.0,
+            impact: 'none',
+            description: 'No specific weather adjustment for this sport',
+          };
       }
     } catch (error) {
       console.error('Error getting weather adjustment factor:', error);
@@ -119,7 +136,7 @@ class WeatherAdjustmentService {
       return {
         factor: 1.0,
         impact: 'none',
-        description: 'Invalid weather data for baseball adjustment'
+        description: 'Invalid weather data for baseball adjustment',
       };
     }
 
@@ -127,8 +144,9 @@ class WeatherAdjustmentService {
     const condition = weatherData.condition || 'Unknown';
     const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
     const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
-    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-    
+    const precipitation =
+      typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal baseball conditions';
@@ -175,7 +193,7 @@ class WeatherAdjustmentService {
       return {
         factor: 1.0,
         impact: 'none',
-        description: 'Invalid weather data for football adjustment'
+        description: 'Invalid weather data for football adjustment',
       };
     }
 
@@ -183,8 +201,9 @@ class WeatherAdjustmentService {
     const condition = weatherData.condition || 'Unknown';
     const temperature = typeof weatherData.temperature === 'number' ? weatherData.temperature : 70;
     const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
-    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-    
+    const precipitation =
+      typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal football conditions';
@@ -227,14 +246,15 @@ class WeatherAdjustmentService {
       return {
         factor: 1.0,
         impact: 'none',
-        description: 'Invalid weather data for Formula 1 adjustment'
+        description: 'Invalid weather data for Formula 1 adjustment',
       };
     }
 
     // Extract weather properties with safe defaults
     const condition = weatherData.condition || 'Unknown';
-    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-    
+    const precipitation =
+      typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal racing conditions';
@@ -267,15 +287,16 @@ class WeatherAdjustmentService {
       return {
         factor: 1.0,
         impact: 'none',
-        description: 'Invalid weather data for soccer adjustment'
+        description: 'Invalid weather data for soccer adjustment',
       };
     }
 
     // Extract weather properties with safe defaults
     const condition = weatherData.condition || 'Unknown';
     const windSpeed = typeof weatherData.windSpeed === 'number' ? weatherData.windSpeed : 0;
-    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-    
+    const precipitation =
+      typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal soccer conditions';
@@ -311,14 +332,15 @@ class WeatherAdjustmentService {
       return {
         factor: 1.0,
         impact: 'none',
-        description: 'Invalid weather data for horse racing adjustment'
+        description: 'Invalid weather data for horse racing adjustment',
       };
     }
 
     // Extract weather properties with safe defaults
     const condition = weatherData.condition || 'Unknown';
-    const precipitation = typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
-    
+    const precipitation =
+      typeof weatherData.precipitation === 'number' ? weatherData.precipitation : 0;
+
     let factor = 1.0;
     let impact = 'none';
     let description = 'Normal track conditions';
@@ -357,8 +379,8 @@ class WeatherAdjustmentService {
           weatherAdjustment: {
             factor: 1.0,
             impact: 'none',
-            description: 'Invalid game ID'
-          }
+            description: 'Invalid game ID',
+          },
         };
       }
 
@@ -369,8 +391,8 @@ class WeatherAdjustmentService {
           weatherAdjustment: {
             factor: 1.0,
             impact: 'none',
-            description: 'Invalid sport parameter'
-          }
+            description: 'Invalid sport parameter',
+          },
         };
       }
 
@@ -381,28 +403,28 @@ class WeatherAdjustmentService {
           weatherAdjustment: {
             factor: 1.0,
             impact: 'none',
-            description: 'Invalid odds data'
-          }
+            description: 'Invalid odds data',
+          },
         };
       }
 
       // Get weather data for the game
       const weatherData = await weatherService.getGameWeather(gameId);
-      
+
       if (!weatherData) {
         return {
           odds,
           weatherAdjustment: {
             factor: 1.0,
             impact: 'none',
-            description: 'No weather data available'
-          }
+            description: 'No weather data available',
+          },
         };
       }
-      
+
       // Get weather adjustment factor
       const adjustment = await this.getWeatherAdjustmentFactor(sport, weatherData);
-      
+
       // Apply adjustment to odds
       const adjustedOdds = odds.map(outcome => {
         // Validate outcome object
@@ -414,19 +436,19 @@ class WeatherAdjustmentService {
         if (adjustment.impact === 'none' || adjustment.impact === 'mild') {
           return outcome;
         }
-        
+
         // Calculate adjusted price (ensure price is a number)
         const originalPrice = typeof outcome.price === 'number' ? outcome.price : 0;
         const adjustedPrice = originalPrice * adjustment.factor;
-        
+
         return {
           ...outcome,
           originalPrice,
           price: adjustedPrice,
-          weatherAdjusted: true
+          weatherAdjusted: true,
         };
       });
-      
+
       // Sanitize weather data before returning (remove any sensitive information)
       const sanitizedWeatherData = {
         temperature: weatherData.temperature,
@@ -438,26 +460,28 @@ class WeatherAdjustmentService {
         condition: weatherData.condition,
         conditionIcon: weatherData.conditionIcon,
         location: weatherData.location,
-        timestamp: weatherData.timestamp
+        timestamp: weatherData.timestamp,
       };
-      
+
       return {
         odds: adjustedOdds,
         weatherAdjustment: adjustment,
-        weatherData: sanitizedWeatherData
+        weatherData: sanitizedWeatherData,
       };
     } catch (error) {
       // Log error without exposing sensitive details
-      console.error(`Error getting weather-adjusted odds for game ${gameId}:`,
-                    error.message || 'Unknown error');
-      
+      console.error(
+        `Error getting weather-adjusted odds for game ${gameId}:`,
+        error.message || 'Unknown error'
+      );
+
       return {
         odds,
         weatherAdjustment: {
           factor: 1.0,
           impact: 'none',
-          description: 'Error calculating weather adjustment'
-        }
+          description: 'Error calculating weather adjustment',
+        },
       };
     }
   }

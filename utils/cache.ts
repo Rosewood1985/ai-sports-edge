@@ -1,6 +1,6 @@
 /**
  * Cache Utility
- * 
+ *
  * A simple in-memory cache with TTL support.
  */
 
@@ -29,36 +29,36 @@ class MemoryCache implements Cache {
 
   /**
    * Get a value from the cache
-   * 
+   *
    * @param key - Cache key
    * @returns The cached value or undefined if not found or expired
    */
   get<T>(key: string): T | undefined {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return undefined;
     }
-    
+
     // Check if the item has expired
     if (item.expiry !== null && item.expiry < Date.now()) {
       this.cache.delete(key);
       return undefined;
     }
-    
+
     return item.value;
   }
 
   /**
    * Set a value in the cache
-   * 
+   *
    * @param key - Cache key
    * @param value - Value to cache
    * @param ttl - Time to live in milliseconds (optional)
    */
   set<T>(key: string, value: T, ttl?: number): void {
     const expiry = ttl ? Date.now() + ttl : null;
-    
+
     this.cache.set(key, {
       value,
       expiry,
@@ -67,7 +67,7 @@ class MemoryCache implements Cache {
 
   /**
    * Delete a value from the cache
-   * 
+   *
    * @param key - Cache key
    * @returns True if the key was found and deleted, false otherwise
    */
@@ -87,7 +87,7 @@ class MemoryCache implements Cache {
    */
   private cleanup(): void {
     const now = Date.now();
-    
+
     // Use forEach instead of for...of to avoid TypeScript downlevelIteration issues
     this.cache.forEach((item, key) => {
       if (item.expiry !== null && item.expiry < now) {

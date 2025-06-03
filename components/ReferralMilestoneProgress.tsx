@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity 
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
 import NeonText from './ui/NeonText';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { ReferralMilestone } from '../types/rewards';
@@ -23,31 +19,31 @@ interface ReferralMilestoneProgressProps {
  */
 const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
   currentReferrals,
-  onInfoPress
+  onInfoPress,
 }) => {
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
-  
+
   // State for milestones
   const [milestones, setMilestones] = useState<ReferralMilestone[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   // Load milestones based on A/B test variant
   useEffect(() => {
     const loadMilestones = async () => {
       try {
         setLoading(true);
-        
+
         // Get reward structure from A/B testing utility
         const rewardStructure = await getUserRewardStructure();
-        
+
         // Convert reward structure to milestones
         const newMilestones: ReferralMilestone[] = rewardStructure.map(reward => {
-          let rewardDetails: any = {
+          const rewardDetails: any = {
             type: reward.type,
-            description: getRewardDescription(reward.type, reward.value)
+            description: getRewardDescription(reward.type, reward.value),
           };
-          
+
           // Add specific properties based on reward type
           if (reward.type === 'subscription_extension' || reward.type === 'premium_trial') {
             rewardDetails.duration = reward.value;
@@ -55,18 +51,18 @@ const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
             rewardDetails.amount = reward.value;
             rewardDetails.upgradeDuration = Math.floor(reward.value / 0.83); // Approximate days based on value
           }
-          
+
           return {
             count: reward.count,
             reward: rewardDetails,
-            isUnlocked: currentReferrals >= reward.count
+            isUnlocked: currentReferrals >= reward.count,
           };
         });
-        
+
         setMilestones(newMilestones);
       } catch (error) {
         console.error('Error loading milestones:', error);
-        
+
         // Fallback to default milestones
         setMilestones([
           {
@@ -74,18 +70,18 @@ const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
             reward: {
               type: 'subscription_extension',
               description: 'Get 1 month free subscription',
-              duration: 30
+              duration: 30,
             },
-            isUnlocked: currentReferrals >= 3
+            isUnlocked: currentReferrals >= 3,
           },
           {
             count: 5,
             reward: {
               type: 'premium_trial',
               description: 'Premium upgrade for 2 months',
-              duration: 60
+              duration: 60,
             },
-            isUnlocked: currentReferrals >= 5
+            isUnlocked: currentReferrals >= 5,
           },
           {
             count: 10,
@@ -93,27 +89,27 @@ const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
               type: 'cash_or_upgrade',
               description: '$25 or free Pro subscription',
               amount: 25,
-              upgradeDuration: 30
+              upgradeDuration: 30,
             },
-            isUnlocked: currentReferrals >= 10
+            isUnlocked: currentReferrals >= 10,
           },
           {
             count: 20,
             reward: {
               type: 'elite_status',
-              description: 'Elite status + special badge'
+              description: 'Elite status + special badge',
             },
-            isUnlocked: currentReferrals >= 20
-          }
+            isUnlocked: currentReferrals >= 20,
+          },
         ]);
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadMilestones();
   }, [currentReferrals]);
-  
+
   // Get reward description based on type and value
   const getRewardDescription = (type: string, value: number): string => {
     switch (type) {
@@ -131,19 +127,21 @@ const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
         return 'Special reward';
     }
   };
-  
+
   // Find next milestone
   const nextMilestone = milestones.find(m => !m.isUnlocked);
-  
+
   // Calculate progress to next milestone
   const calculateProgress = () => {
     if (!nextMilestone) return 100;
-    
-    const prevMilestoneCount = milestones[milestones.findIndex(m => m === nextMilestone) - 1]?.count || 0;
-    const progress = ((currentReferrals - prevMilestoneCount) / (nextMilestone.count - prevMilestoneCount)) * 100;
+
+    const prevMilestoneCount =
+      milestones[milestones.findIndex(m => m === nextMilestone) - 1]?.count || 0;
+    const progress =
+      ((currentReferrals - prevMilestoneCount) / (nextMilestone.count - prevMilestoneCount)) * 100;
     return Math.min(Math.max(progress, 0), 100);
   };
-  
+
   // Get icon for milestone
   const getMilestoneIcon = (milestone: ReferralMilestone): string => {
     switch (milestone.reward.type) {
@@ -159,27 +157,25 @@ const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
         return 'gift';
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <NeonText type="subheading" glow={true} style={styles.title}>
+        <NeonText type="subheading" glow style={styles.title}>
           Referral Milestones
         </NeonText>
-        
+
         {onInfoPress && (
           <TouchableOpacity onPress={onInfoPress}>
             <Ionicons name="information-circle-outline" size={20} color={primaryColor} />
           </TouchableOpacity>
         )}
       </View>
-      
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <Ionicons name="hourglass-outline" size={32} color={primaryColor} />
-          <Text style={[styles.loadingText, { color: textColor }]}>
-            Loading milestones...
-          </Text>
+          <Text style={[styles.loadingText, { color: textColor }]}>Loading milestones...</Text>
         </View>
       ) : (
         <>
@@ -187,51 +183,60 @@ const ReferralMilestoneProgress: React.FC<ReferralMilestoneProgressProps> = ({
           {nextMilestone && (
             <View style={styles.nextMilestoneContainer}>
               <Text style={[styles.nextMilestoneText, { color: textColor }]}>
-                {currentReferrals}/{nextMilestone.count} referrals to unlock {nextMilestone.reward.description}
+                {currentReferrals}/{nextMilestone.count} referrals to unlock{' '}
+                {nextMilestone.reward.description}
               </Text>
-              
+
               <View style={styles.progressBarContainer}>
-                <View 
+                <View
                   style={[
-                    styles.progressBar, 
-                    { width: `${calculateProgress()}%`, backgroundColor: primaryColor }
-                  ]} 
+                    styles.progressBar,
+                    { width: `${calculateProgress()}%`, backgroundColor: primaryColor },
+                  ]}
                 />
               </View>
             </View>
           )}
-          
+
           {/* Milestone list */}
           <View style={styles.milestonesList}>
             {milestones.map((milestone, index) => (
               <View key={index} style={styles.milestoneItem}>
-                <View style={[
-                  styles.milestoneIconContainer,
-                  milestone.isUnlocked ? { backgroundColor: primaryColor } : { backgroundColor: '#444' }
-                ]}>
-                  <Ionicons 
-                    name={getMilestoneIcon(milestone) as any} 
-                    size={16} 
-                    color={milestone.isUnlocked ? '#fff' : '#888'} 
+                <View
+                  style={[
+                    styles.milestoneIconContainer,
+                    milestone.isUnlocked
+                      ? { backgroundColor: primaryColor }
+                      : { backgroundColor: '#444' },
+                  ]}
+                >
+                  <Ionicons
+                    name={getMilestoneIcon(milestone) as any}
+                    size={16}
+                    color={milestone.isUnlocked ? '#fff' : '#888'}
                   />
                 </View>
-                
+
                 <View style={styles.milestoneContent}>
-                  <Text style={[
-                    styles.milestoneCount, 
-                    { color: milestone.isUnlocked ? primaryColor : textColor }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.milestoneCount,
+                      { color: milestone.isUnlocked ? primaryColor : textColor },
+                    ]}
+                  >
                     {milestone.count} Referrals
                   </Text>
-                  
-                  <Text style={[
-                    styles.milestoneReward, 
-                    { color: textColor, opacity: milestone.isUnlocked ? 1 : 0.6 }
-                  ]}>
+
+                  <Text
+                    style={[
+                      styles.milestoneReward,
+                      { color: textColor, opacity: milestone.isUnlocked ? 1 : 0.6 },
+                    ]}
+                  >
                     {milestone.reward.description}
                   </Text>
                 </View>
-                
+
                 {milestone.isUnlocked && (
                   <Ionicons name="checkmark-circle" size={20} color={primaryColor} />
                 )}

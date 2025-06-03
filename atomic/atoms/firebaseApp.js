@@ -8,15 +8,15 @@
 import { initializeApp } from 'firebase/app';
 
 // Internal imports
-import { firebaseConfig } from './serviceConfig';
 import { validateConfig } from './envConfig';
+import { firebaseConfig } from './serviceConfig';
 
 // Firebase app instance (singleton)
 let firebaseApp = null;
 
 /**
  * Initialize Firebase app
- * 
+ *
  * @param {Object} config - Firebase configuration object (optional, uses default if not provided)
  * @returns {Object|null} Firebase app instance or null if initialization failed
  */
@@ -40,7 +40,7 @@ export const initializeFirebaseApp = (config = firebaseConfig) => {
 /**
  * Get Firebase app instance
  * Initializes the app if it hasn't been initialized yet
- * 
+ *
  * @returns {Object|null} Firebase app instance or null if initialization failed
  */
 export const getFirebaseApp = () => {

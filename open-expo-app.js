@@ -1,15 +1,15 @@
 /**
  * Script to open the AI Sports Edge app in Expo Go
- * 
+ *
  * This script will:
  * 1. Generate a QR code for the app
  * 2. Open the QR code in a browser
  * 3. Provide instructions for opening the app in Expo Go
  */
 
+const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
 
 // App URL
 const APP_URL = 'exp://exp.host/@aisportsedge/ai-sports-edge';
@@ -117,40 +117,41 @@ const createQRCodeHTML = () => {
 
   // Write HTML to file
   fs.writeFileSync(path.join(__dirname, 'expo-qr.html'), html);
-  
+
   return path.join(__dirname, 'expo-qr.html');
-}
+};
 
 // Main function
 const main = async () => {
   console.log('Generating QR code for AI Sports Edge app...');
-  
+
   // Create QR code HTML
   const htmlPath = createQRCodeHTML();
-  
+
   // Open in browser
   console.log('Opening QR code in browser...');
-  
+
   // Open the HTML file in the default browser
-  const openCommand = process.platform === 'win32' 
-    ? `start ${htmlPath}`
-    : process.platform === 'darwin' 
-      ? `open ${htmlPath}` 
-      : `xdg-open ${htmlPath}`;
-  
-  exec(openCommand, (error) => {
+  const openCommand =
+    process.platform === 'win32'
+      ? `start ${htmlPath}`
+      : process.platform === 'darwin'
+        ? `open ${htmlPath}`
+        : `xdg-open ${htmlPath}`;
+
+  exec(openCommand, error => {
     if (error) {
       console.error('Error opening browser:', error);
       return;
     }
-    
+
     console.log('\nInstructions:');
-    console.log('1. Scan the QR code with your mobile device\'s camera');
+    console.log("1. Scan the QR code with your mobile device's camera");
     console.log('2. Open the link in Expo Go');
     console.log('3. Alternatively, you can open Expo Go and enter the URL manually:');
     console.log(`   ${APP_URL}`);
   });
-}
+};
 
 // Run the main function
 main().catch(console.error);

@@ -1,14 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
+import { AccessibleThemedText } from '../../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../../atomic/atoms/AccessibleThemedView';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-
-import { AccessibleThemedView } from '../../atomic/atoms/AccessibleThemedView';
-import { AccessibleThemedText } from '../../atomic/atoms/AccessibleThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
 
@@ -111,7 +110,7 @@ const GDPRConsentScreen = () => {
           <TouchableOpacity
             style={styles.consentSection}
             onPress={() => setAnalyticsConsent(!analyticsConsent)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.analytics_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: analyticsConsent }}
@@ -152,7 +151,7 @@ const GDPRConsentScreen = () => {
           <TouchableOpacity
             style={styles.consentSection}
             onPress={() => setMarketingConsent(!marketingConsent)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.marketing_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: marketingConsent }}
@@ -193,7 +192,7 @@ const GDPRConsentScreen = () => {
           <TouchableOpacity
             style={styles.consentSection}
             onPress={() => setThirdPartyConsent(!thirdPartyConsent)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.third_party_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: thirdPartyConsent }}
@@ -242,7 +241,7 @@ const GDPRConsentScreen = () => {
           <TouchableOpacity
             style={styles.termsCheckboxContainer}
             onPress={() => setTermsAccepted(!termsAccepted)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.terms_checkbox_label')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: termsAccepted }}
@@ -270,7 +269,7 @@ const GDPRConsentScreen = () => {
           <TouchableOpacity
             style={[styles.continueButton, { backgroundColor: colors.primary }]}
             onPress={handleContinue}
-            accessible={true}
+            accessible
             accessibilityLabel={t('gdpr.continue')}
             accessibilityRole="button"
           >
@@ -284,7 +283,7 @@ const GDPRConsentScreen = () => {
                 // Navigate to privacy policy
                 navigation.navigate('Legal', { type: 'privacy-policy' });
               }}
-              accessible={true}
+              accessible
               accessibilityLabel={t('gdpr.view_privacy_policy')}
               accessibilityRole="link"
             >
@@ -304,7 +303,7 @@ const GDPRConsentScreen = () => {
                 // Navigate to terms of service
                 navigation.navigate('Legal', { type: 'terms-of-service' });
               }}
-              accessible={true}
+              accessible
               accessibilityLabel={t('gdpr.view_terms')}
               accessibilityRole="link"
             >

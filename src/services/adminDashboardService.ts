@@ -1,9 +1,10 @@
-import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+
+import { TrendDirection } from '../components/dashboard/metrics/MetricCard';
 import { ConversionFunnelData } from '../types/conversionFunnel';
-import { ReportTemplate, ScheduledReport, ReportType } from '../types/reporting';
 import { ExportConfig, ExportFormat, ExportHistory } from '../types/export';
+import { ReportTemplate, ScheduledReport, ReportType } from '../types/reporting';
 import {
   User,
   UserListResponse,
@@ -702,7 +703,7 @@ const fetcher = async <T>(url: string): Promise<T> => {
     } catch (error) {
       console.error(`API fetch attempt ${attempt} failed:`, error);
       lastError = error as Error;
-      
+
       if (attempt < maxRetries) {
         // Exponential backoff: 1s, 2s, 4s
         await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt - 1) * 1000));
@@ -729,9 +730,10 @@ class WebSocketService {
   }
 
   connect(): void {
-    const wsUrl = process.env.NODE_ENV === 'production' 
-      ? 'wss://api.aisportsedge.app/ws/admin'
-      : 'ws://localhost:8080/ws/admin';
+    const wsUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'wss://api.aisportsedge.app/ws/admin'
+        : 'ws://localhost:8080/ws/admin';
 
     try {
       this.ws = new WebSocket(wsUrl);
@@ -745,7 +747,7 @@ class WebSocketService {
         }
       };
 
-      this.ws.onmessage = (event) => {
+      this.ws.onmessage = event => {
         try {
           const message = JSON.parse(event.data);
           this.notifySubscribers(message.type, message.data);
@@ -760,7 +762,7 @@ class WebSocketService {
         this.scheduleReconnect();
       };
 
-      this.ws.onerror = (error) => {
+      this.ws.onerror = error => {
         console.error('Admin WebSocket error:', error);
       };
     } catch (error) {
@@ -771,7 +773,7 @@ class WebSocketService {
 
   private scheduleReconnect(): void {
     if (this.reconnectTimer) return;
-    
+
     this.reconnectTimer = setTimeout(() => {
       this.connect();
     }, 5000);
@@ -841,7 +843,7 @@ export const useBetSlipPerformanceData = (shouldFetch = true) => {
     const wsService = WebSocketService.getInstance();
     wsService.connect();
 
-    const unsubscribe = wsService.subscribe('bet-slip-performance', (newData) => {
+    const unsubscribe = wsService.subscribe('bet-slip-performance', newData => {
       mutate({ data: newData, status: 200, message: 'Real-time update' } as any, false);
     });
 

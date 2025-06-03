@@ -4,27 +4,27 @@
  */
 
 // Odds Services
-import oddsService from './OddsService';
-import nbaOddsService from './NbaOddsService';
-import wnbaOddsService from './WnbaOddsService';
-import ncaaOddsService from './NcaaOddsService';
-import mlbOddsService from './MlbOddsService';
-import nhlOddsService from './NhlOddsService';
-import ufcOddsService from './UfcOddsService';
 import formula1OddsService from './Formula1OddsService';
-import soccerOddsService from './SoccerOddsService';
 import horseRacingOddsService from './HorseRacingOddsService';
+import mlbOddsService from './MlbOddsService';
+import nbaOddsService from './NbaOddsService';
+import ncaaOddsService from './NcaaOddsService';
+import nhlOddsService from './NhlOddsService';
+import oddsService from './OddsService';
+import soccerOddsService from './SoccerOddsService';
+import ufcOddsService from './UfcOddsService';
 
 // Weather Services
-import weatherService from './weatherService';
 import weatherAdjustmentService from './WeatherAdjustmentService';
+import wnbaOddsService from './WnbaOddsService';
 
 // Other Services
 import analyticsService from './analyticsService';
 import firebaseService from './firebaseService';
 import firebaseSubscriptionService from './firebaseSubscriptionService';
-import personalizationService from './personalizationService';
 import mlSportsEdgeService from './ml-sports-edge/MLSportsEdgeService';
+import personalizationService from './personalizationService';
+import weatherService from './weatherService';
 
 // Export all services
 export {
@@ -39,15 +39,15 @@ export {
   formula1OddsService,
   soccerOddsService,
   horseRacingOddsService,
-  
+
   // Weather Services
   weatherService,
   weatherAdjustmentService,
-  
+
   // Other Services
   analyticsService,
   firebaseService,
   firebaseSubscriptionService,
   personalizationService,
-  mlSportsEdgeService
+  mlSportsEdgeService,
 };

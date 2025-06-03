@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+
 import { auth, signIn, signInWithGoogle, createUser, logOut, onAuthChange } from '../auth';
 
 /**
@@ -14,10 +15,10 @@ const AuthExample = () => {
 
   // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthChange((user) => {
+    const unsubscribe = onAuthChange(user => {
       setUser(user);
     });
-    
+
     // Clean up subscription on unmount
     return () => unsubscribe();
   }, []);
@@ -28,11 +29,11 @@ const AuthExample = () => {
       Alert.alert('Error', 'Please enter email and password');
       return;
     }
-    
+
     setLoading(true);
     const { user, error } = await signIn(email, password);
     setLoading(false);
-    
+
     if (error) {
       Alert.alert('Sign In Error', error.message);
     } else {
@@ -47,11 +48,11 @@ const AuthExample = () => {
       Alert.alert('Error', 'Please enter email and password');
       return;
     }
-    
+
     setLoading(true);
     const { user, error } = await createUser(email, password);
     setLoading(false);
-    
+
     if (error) {
       Alert.alert('Sign Up Error', error.message);
     } else {
@@ -66,7 +67,7 @@ const AuthExample = () => {
     setLoading(true);
     const { user, error } = await signInWithGoogle();
     setLoading(false);
-    
+
     if (error) {
       Alert.alert('Google Sign In Error', error.message);
     }
@@ -77,7 +78,7 @@ const AuthExample = () => {
     setLoading(true);
     const { error } = await logOut();
     setLoading(false);
-    
+
     if (error) {
       Alert.alert('Sign Out Error', error.message);
     }
@@ -86,19 +87,15 @@ const AuthExample = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Firebase Auth Example</Text>
-      
+
       {user ? (
         // User is signed in
         <View style={styles.userContainer}>
           <Text style={styles.userInfo}>Signed in as:</Text>
           <Text style={styles.userEmail}>{user.email}</Text>
           <Text style={styles.userId}>UID: {user.uid}</Text>
-          
-          <Button 
-            title="Sign Out" 
-            onPress={handleSignOut} 
-            disabled={loading} 
-          />
+
+          <Button title="Sign Out" onPress={handleSignOut} disabled={loading} />
         </View>
       ) : (
         // User is not signed in
@@ -111,7 +108,7 @@ const AuthExample = () => {
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          
+
           <TextInput
             style={styles.input}
             placeholder="Password"
@@ -119,29 +116,17 @@ const AuthExample = () => {
             onChangeText={setPassword}
             secureTextEntry
           />
-          
+
           <View style={styles.buttonContainer}>
-            <Button 
-              title="Sign In" 
-              onPress={handleSignIn} 
-              disabled={loading} 
-            />
-            
-            <Button 
-              title="Sign Up" 
-              onPress={handleSignUp} 
-              disabled={loading} 
-            />
+            <Button title="Sign In" onPress={handleSignIn} disabled={loading} />
+
+            <Button title="Sign Up" onPress={handleSignUp} disabled={loading} />
           </View>
-          
-          <Button 
-            title="Sign In with Google" 
-            onPress={handleGoogleSignIn} 
-            disabled={loading} 
-          />
+
+          <Button title="Sign In with Google" onPress={handleGoogleSignIn} disabled={loading} />
         </View>
       )}
-      
+
       {loading && <Text style={styles.loading}>Loading...</Text>}
     </View>
   );

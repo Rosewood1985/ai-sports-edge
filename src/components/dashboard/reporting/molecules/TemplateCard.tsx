@@ -4,11 +4,12 @@
  * A molecule component that displays a report template as a card.
  */
 
-import React from 'react';
-import { Card, CardContent, CardActions, Typography, Box, IconButton, Button } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { Card, CardContent, CardActions, Typography, Box, IconButton, Button } from '@mui/material';
+import React from 'react';
+
 import { ReportTemplate, ReportType } from '../../../../types/reporting';
 import TemplateStatusBadge from '../atoms/TemplateStatusBadge';
 import WidgetChip from '../atoms/WidgetChip';

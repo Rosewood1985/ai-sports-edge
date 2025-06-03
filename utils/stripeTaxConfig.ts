@@ -4,6 +4,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+
 import logger from './logger';
 
 // Configuration interface
@@ -28,18 +29,18 @@ export interface StripeTaxConfig {
     requireCertificate: boolean;
     certificateStorage: string;
   };
-  registrations: Array<{
+  registrations: {
     country: string;
     state?: string;
     type: string;
     registrationId: string;
-  }>;
-  thresholds: Array<{
+  }[];
+  thresholds: {
     country: string;
     threshold: number;
     currency: string;
     period: string;
-  }>;
+  }[];
 }
 
 // Default configuration
@@ -120,12 +121,12 @@ export function getDefaultTaxBehavior(): string {
 /**
  * Get the tax registrations for a country
  */
-export function getRegistrationsForCountry(country: string): Array<{
+export function getRegistrationsForCountry(country: string): {
   country: string;
   state?: string;
   type: string;
   registrationId: string;
-}> {
+}[] {
   return config.registrations.filter(reg => reg.country === country);
 }
 

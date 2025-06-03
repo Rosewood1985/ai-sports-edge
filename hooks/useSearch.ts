@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import searchService, { 
-  SearchFilters, 
-  SearchResults, 
-  NewsSearchResult, 
-  TeamSearchResult, 
-  PlayerSearchResult, 
-  OddsSearchResult 
+
+import searchService, {
+  SearchFilters,
+  SearchResults,
+  NewsSearchResult,
+  TeamSearchResult,
+  PlayerSearchResult,
+  OddsSearchResult,
 } from '../services/searchService';
 
 interface UseSearchProps {
@@ -39,7 +40,7 @@ interface UseSearchReturn {
 export const useSearch = ({
   initialQuery = '',
   initialFilters = {},
-  autoSearch = false
+  autoSearch = false,
 }: UseSearchProps = {}): UseSearchReturn => {
   const [query, setQuery] = useState(initialQuery);
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
@@ -48,7 +49,7 @@ export const useSearch = ({
     teams: [],
     players: [],
     odds: [],
-    totalResults: 0
+    totalResults: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -61,7 +62,7 @@ export const useSearch = ({
         teams: [],
         players: [],
         odds: [],
-        totalResults: 0
+        totalResults: 0,
       });
       return;
     }
@@ -87,7 +88,7 @@ export const useSearch = ({
       teams: [],
       players: [],
       odds: [],
-      totalResults: 0
+      totalResults: 0,
     });
   }, []);
 
@@ -123,6 +124,6 @@ export const useSearch = ({
     teamsResults: results.teams,
     playersResults: results.players,
     oddsResults: results.odds,
-    totalResults: results.totalResults
+    totalResults: results.totalResults,
   };
 };

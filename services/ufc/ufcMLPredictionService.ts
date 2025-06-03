@@ -3,9 +3,10 @@
 // Deep Focus Architecture with Advanced Machine Learning Integration
 // =============================================================================
 
+import * as Sentry from '@sentry/node';
+
 import { firebaseService } from '../firebaseService';
 import { UFCAnalyticsService } from './ufcAnalyticsService';
-import * as Sentry from '@sentry/node';
 
 export class UFCMLPredictionService {
   private analyticsService: UFCAnalyticsService;
@@ -55,7 +56,7 @@ export class UFCMLPredictionService {
         bettingIntelligence: await this.generateBettingInsights(predictions, fightDetails),
         confidence: predictions.confidence,
         modelVersion: '2.1.0',
-        features: features,
+        features,
         lastUpdated: new Date(),
       };
 
@@ -204,9 +205,9 @@ export class UFCMLPredictionService {
     const strikingBias = (features.f1_striking_accuracy + features.f2_striking_accuracy) / 2;
     const grapplingBias = (features.f1_takedown_accuracy + features.f2_takedown_accuracy) / 2;
 
-    let koProb = 0.25 + strikingBias * 0.3;
-    let subProb = 0.15 + grapplingBias * 0.2;
-    let decisionProb = 1 - koProb - subProb;
+    const koProb = 0.25 + strikingBias * 0.3;
+    const subProb = 0.15 + grapplingBias * 0.2;
+    const decisionProb = 1 - koProb - subProb;
 
     // Round prediction
     const cardioAvg = (features.f1_cardio_rating + features.f2_cardio_rating) / 2;

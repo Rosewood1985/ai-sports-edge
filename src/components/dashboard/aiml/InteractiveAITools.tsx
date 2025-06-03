@@ -14,9 +14,10 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+
 import { Card, Button, TextInput, Picker } from '../../../atomic';
-import { useThemeColor } from '../../../hooks/useThemeColor';
 import { useEnhancedInsights } from '../../../hooks/useEnhancedInsights';
+import { useThemeColor } from '../../../hooks/useThemeColor';
 import {
   ScenarioAnalysis,
   WhatIfAnalysis,
@@ -24,9 +25,9 @@ import {
   InteractiveVisualization,
   ScenarioComparison,
 } from '../../../types/interactiveAI';
-import { ChartComponent } from '../charts/ChartComponent';
 import { LoadingState } from '../../atoms/LoadingState';
 import { ErrorBoundary } from '../../organisms/ErrorBoundary';
+import { ChartComponent } from '../charts/ChartComponent';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -34,16 +35,16 @@ interface InteractiveAIToolsProps {
   className?: string;
 }
 
-export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
-  className,
-}) => {
+export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({ className }) => {
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
-  
+
   // State management
-  const [activeTab, setActiveTab] = useState<'scenario' | 'whatif' | 'simulation' | 'comparison'>('scenario');
+  const [activeTab, setActiveTab] = useState<'scenario' | 'whatif' | 'simulation' | 'comparison'>(
+    'scenario'
+  );
   const [selectedMetric, setSelectedMetric] = useState<string>('revenue');
   const [scenarioParams, setScenarioParams] = useState<Record<string, number>>({});
   const [simulationResults, setSimulationResults] = useState<ModelSimulation | null>(null);
@@ -101,18 +102,14 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
   // Render scenario builder
   const renderScenarioBuilder = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        Scenario Builder
-      </Text>
+      <Text style={[styles.sectionTitle, { color: textColor }]}>Scenario Builder</Text>
       <Text style={[styles.sectionDescription, { color: textColor }]}>
         Create and analyze custom scenarios to understand potential outcomes
       </Text>
 
       {/* Metric Selection */}
       <Card style={styles.parameterCard}>
-        <Text style={[styles.cardTitle, { color: textColor }]}>
-          Primary Metric
-        </Text>
+        <Text style={[styles.cardTitle, { color: textColor }]}>Primary Metric</Text>
         <Picker
           selectedValue={selectedMetric}
           onValueChange={setSelectedMetric}
@@ -123,18 +120,14 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
 
       {/* Parameter Inputs */}
       <Card style={styles.parameterCard}>
-        <Text style={[styles.cardTitle, { color: textColor }]}>
-          Scenario Parameters
-        </Text>
-        
+        <Text style={[styles.cardTitle, { color: textColor }]}>Scenario Parameters</Text>
+
         <View style={styles.parameterGrid}>
           <View style={styles.parameterInput}>
-            <Text style={[styles.parameterLabel, { color: textColor }]}>
-              Growth Rate (%)
-            </Text>
+            <Text style={[styles.parameterLabel, { color: textColor }]}>Growth Rate (%)</Text>
             <TextInput
               value={scenarioParams.growthRate?.toString() || ''}
-              onChangeText={(text) => updateScenarioParam('growthRate', parseFloat(text) || 0)}
+              onChangeText={text => updateScenarioParam('growthRate', parseFloat(text) || 0)}
               placeholder="15"
               keyboardType="numeric"
               style={styles.input}
@@ -142,12 +135,10 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
           </View>
 
           <View style={styles.parameterInput}>
-            <Text style={[styles.parameterLabel, { color: textColor }]}>
-              Market Factor
-            </Text>
+            <Text style={[styles.parameterLabel, { color: textColor }]}>Market Factor</Text>
             <TextInput
               value={scenarioParams.marketFactor?.toString() || ''}
-              onChangeText={(text) => updateScenarioParam('marketFactor', parseFloat(text) || 0)}
+              onChangeText={text => updateScenarioParam('marketFactor', parseFloat(text) || 0)}
               placeholder="1.0"
               keyboardType="numeric"
               style={styles.input}
@@ -155,12 +146,10 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
           </View>
 
           <View style={styles.parameterInput}>
-            <Text style={[styles.parameterLabel, { color: textColor }]}>
-              Seasonality
-            </Text>
+            <Text style={[styles.parameterLabel, { color: textColor }]}>Seasonality</Text>
             <TextInput
               value={scenarioParams.seasonality?.toString() || ''}
-              onChangeText={(text) => updateScenarioParam('seasonality', parseFloat(text) || 0)}
+              onChangeText={text => updateScenarioParam('seasonality', parseFloat(text) || 0)}
               placeholder="0.2"
               keyboardType="numeric"
               style={styles.input}
@@ -168,12 +157,10 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
           </View>
 
           <View style={styles.parameterInput}>
-            <Text style={[styles.parameterLabel, { color: textColor }]}>
-              External Impact
-            </Text>
+            <Text style={[styles.parameterLabel, { color: textColor }]}>External Impact</Text>
             <TextInput
               value={scenarioParams.externalImpact?.toString() || ''}
-              onChangeText={(text) => updateScenarioParam('externalImpact', parseFloat(text) || 0)}
+              onChangeText={text => updateScenarioParam('externalImpact', parseFloat(text) || 0)}
               placeholder="0"
               keyboardType="numeric"
               style={styles.input}
@@ -192,37 +179,38 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
       {/* Results Visualization */}
       {simulationResults && (
         <Card style={styles.resultsCard}>
-          <Text style={[styles.cardTitle, { color: textColor }]}>
-            Scenario Results
-          </Text>
-          
+          <Text style={[styles.cardTitle, { color: textColor }]}>Scenario Results</Text>
+
           <View style={styles.resultsSummary}>
             <View style={styles.resultItem}>
-              <Text style={[styles.resultLabel, { color: textColor }]}>
-                Predicted Value
-              </Text>
+              <Text style={[styles.resultLabel, { color: textColor }]}>Predicted Value</Text>
               <Text style={[styles.resultValue, { color: primaryColor }]}>
                 {simulationResults.predictedOutcome.value.toLocaleString()}
               </Text>
             </View>
 
             <View style={styles.resultItem}>
-              <Text style={[styles.resultLabel, { color: textColor }]}>
-                Confidence
-              </Text>
+              <Text style={[styles.resultLabel, { color: textColor }]}>Confidence</Text>
               <Text style={[styles.resultValue, { color: primaryColor }]}>
                 {(simulationResults.predictedOutcome.confidence * 100).toFixed(1)}%
               </Text>
             </View>
 
             <View style={styles.resultItem}>
-              <Text style={[styles.resultLabel, { color: textColor }]}>
-                Risk Level
-              </Text>
-              <Text style={[styles.resultValue, { 
-                color: simulationResults.riskAssessment.level === 'high' ? '#ff4757' : 
-                       simulationResults.riskAssessment.level === 'medium' ? '#ffa502' : '#2ed573'
-              }]}>
+              <Text style={[styles.resultLabel, { color: textColor }]}>Risk Level</Text>
+              <Text
+                style={[
+                  styles.resultValue,
+                  {
+                    color:
+                      simulationResults.riskAssessment.level === 'high'
+                        ? '#ff4757'
+                        : simulationResults.riskAssessment.level === 'medium'
+                          ? '#ffa502'
+                          : '#2ed573',
+                  },
+                ]}
+              >
                 {simulationResults.riskAssessment.level.toUpperCase()}
               </Text>
             </View>
@@ -233,13 +221,15 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
             type="line"
             data={{
               labels: simulationResults.timeSeriesData.timestamps,
-              datasets: [{
-                label: 'Predicted Outcome',
-                data: simulationResults.timeSeriesData.values,
-                borderColor: primaryColor,
-                backgroundColor: `${primaryColor}20`,
-                fill: true,
-              }],
+              datasets: [
+                {
+                  label: 'Predicted Outcome',
+                  data: simulationResults.timeSeriesData.values,
+                  borderColor: primaryColor,
+                  backgroundColor: `${primaryColor}20`,
+                  fill: true,
+                },
+              ],
             }}
             options={{
               responsive: true,
@@ -265,14 +255,18 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
             </Text>
             {simulationResults.influencingFactors.map((factor, index) => (
               <View key={index} style={styles.factorItem}>
-                <Text style={[styles.factorName, { color: textColor }]}>
-                  {factor.name}
-                </Text>
+                <Text style={[styles.factorName, { color: textColor }]}>{factor.name}</Text>
                 <View style={styles.factorDetails}>
-                  <Text style={[styles.factorImpact, { 
-                    color: factor.impact > 0 ? '#2ed573' : '#ff4757'
-                  }]}>
-                    {factor.impact > 0 ? '+' : ''}{factor.impact.toFixed(1)}%
+                  <Text
+                    style={[
+                      styles.factorImpact,
+                      {
+                        color: factor.impact > 0 ? '#2ed573' : '#ff4757',
+                      },
+                    ]}
+                  >
+                    {factor.impact > 0 ? '+' : ''}
+                    {factor.impact.toFixed(1)}%
                   </Text>
                   <Text style={[styles.factorConfidence, { color: textColor }]}>
                     ({(factor.confidence * 100).toFixed(0)}% confidence)
@@ -289,50 +283,36 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
   // Render what-if analysis
   const renderWhatIfAnalysis = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        What-If Analysis
-      </Text>
+      <Text style={[styles.sectionTitle, { color: textColor }]}>What-If Analysis</Text>
       <Text style={[styles.sectionDescription, { color: textColor }]}>
         Explore the impact of specific changes on your metrics
       </Text>
 
       <Card style={styles.parameterCard}>
-        <Text style={[styles.cardTitle, { color: textColor }]}>
-          Change Variables
-        </Text>
-        
+        <Text style={[styles.cardTitle, { color: textColor }]}>Change Variables</Text>
+
         <View style={styles.whatIfGrid}>
           <TouchableOpacity style={styles.whatIfOption}>
-            <Text style={[styles.whatIfTitle, { color: textColor }]}>
-              Increase Marketing Spend
-            </Text>
+            <Text style={[styles.whatIfTitle, { color: textColor }]}>Increase Marketing Spend</Text>
             <Text style={[styles.whatIfSubtitle, { color: textColor }]}>
               +25% budget allocation
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.whatIfOption}>
-            <Text style={[styles.whatIfTitle, { color: textColor }]}>
-              Feature Launch
-            </Text>
-            <Text style={[styles.whatIfSubtitle, { color: textColor }]}>
-              New premium feature
-            </Text>
+            <Text style={[styles.whatIfTitle, { color: textColor }]}>Feature Launch</Text>
+            <Text style={[styles.whatIfSubtitle, { color: textColor }]}>New premium feature</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.whatIfOption}>
-            <Text style={[styles.whatIfTitle, { color: textColor }]}>
-              Price Adjustment
-            </Text>
+            <Text style={[styles.whatIfTitle, { color: textColor }]}>Price Adjustment</Text>
             <Text style={[styles.whatIfSubtitle, { color: textColor }]}>
               ±10% subscription cost
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.whatIfOption}>
-            <Text style={[styles.whatIfTitle, { color: textColor }]}>
-              Market Expansion
-            </Text>
+            <Text style={[styles.whatIfTitle, { color: textColor }]}>Market Expansion</Text>
             <Text style={[styles.whatIfSubtitle, { color: textColor }]}>
               Enter new geographic market
             </Text>
@@ -345,21 +325,17 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
   // Render model simulation
   const renderModelSimulation = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        Model Simulation
-      </Text>
+      <Text style={[styles.sectionTitle, { color: textColor }]}>Model Simulation</Text>
       <Text style={[styles.sectionDescription, { color: textColor }]}>
         Run advanced simulations using machine learning models
       </Text>
 
       <Card style={styles.simulationCard}>
-        <Text style={[styles.cardTitle, { color: textColor }]}>
-          Monte Carlo Simulation
-        </Text>
+        <Text style={[styles.cardTitle, { color: textColor }]}>Monte Carlo Simulation</Text>
         <Text style={[styles.cardDescription, { color: textColor }]}>
           Run thousands of scenarios to understand outcome distribution
         </Text>
-        
+
         <Button
           title="Run Simulation"
           onPress={() => {}}
@@ -368,13 +344,11 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
       </Card>
 
       <Card style={styles.simulationCard}>
-        <Text style={[styles.cardTitle, { color: textColor }]}>
-          Sensitivity Analysis
-        </Text>
+        <Text style={[styles.cardTitle, { color: textColor }]}>Sensitivity Analysis</Text>
         <Text style={[styles.cardDescription, { color: textColor }]}>
           Identify which variables have the highest impact
         </Text>
-        
+
         <Button
           title="Analyze Sensitivity"
           onPress={() => {}}
@@ -387,41 +361,29 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
   // Render scenario comparison
   const renderScenarioComparison = () => (
     <View style={styles.tabContent}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        Scenario Comparison
-      </Text>
+      <Text style={[styles.sectionTitle, { color: textColor }]}>Scenario Comparison</Text>
       <Text style={[styles.sectionDescription, { color: textColor }]}>
         Compare multiple scenarios side by side
       </Text>
 
       <Card style={styles.comparisonCard}>
-        <Text style={[styles.cardTitle, { color: textColor }]}>
-          Select Scenarios to Compare
-        </Text>
-        
+        <Text style={[styles.cardTitle, { color: textColor }]}>Select Scenarios to Compare</Text>
+
         <View style={styles.comparisonGrid}>
           <TouchableOpacity style={[styles.scenarioOption, { borderColor: primaryColor }]}>
-            <Text style={[styles.scenarioName, { color: textColor }]}>
-              Conservative Growth
-            </Text>
-            <Text style={[styles.scenarioDescription, { color: textColor }]}>
-              5% annual growth
-            </Text>
+            <Text style={[styles.scenarioName, { color: textColor }]}>Conservative Growth</Text>
+            <Text style={[styles.scenarioDescription, { color: textColor }]}>5% annual growth</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.scenarioOption, { borderColor: primaryColor }]}>
-            <Text style={[styles.scenarioName, { color: textColor }]}>
-              Aggressive Expansion
-            </Text>
+            <Text style={[styles.scenarioName, { color: textColor }]}>Aggressive Expansion</Text>
             <Text style={[styles.scenarioDescription, { color: textColor }]}>
               25% growth with investment
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.scenarioOption, { borderColor: primaryColor }]}>
-            <Text style={[styles.scenarioName, { color: textColor }]}>
-              Market Downturn
-            </Text>
+            <Text style={[styles.scenarioName, { color: textColor }]}>Market Downturn</Text>
             <Text style={[styles.scenarioDescription, { color: textColor }]}>
               -10% external impact
             </Text>
@@ -464,21 +426,23 @@ export const InteractiveAITools: React.FC<InteractiveAIToolsProps> = ({
       <View style={[styles.container, { backgroundColor }]} className={className}>
         {/* Tab Navigation */}
         <View style={styles.tabBar}>
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <TouchableOpacity
               key={tab.key}
               style={[
                 styles.tab,
                 activeTab === tab.key && styles.activeTab,
-                { borderBottomColor: activeTab === tab.key ? primaryColor : 'transparent' }
+                { borderBottomColor: activeTab === tab.key ? primaryColor : 'transparent' },
               ]}
               onPress={() => setActiveTab(tab.key as any)}
             >
               <Text style={styles.tabIcon}>{tab.icon}</Text>
-              <Text style={[
-                styles.tabLabel,
-                { color: activeTab === tab.key ? primaryColor : textColor }
-              ]}>
+              <Text
+                style={[
+                  styles.tabLabel,
+                  { color: activeTab === tab.key ? primaryColor : textColor },
+                ]}
+              >
                 {tab.label}
               </Text>
             </TouchableOpacity>

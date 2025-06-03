@@ -1,11 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import LocalTeamOdds from '../components/LocalTeamOdds';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import LocalTeamOdds from '../components/LocalTeamOdds';
 
 /**
  * Screen that displays local team odds based on user's location
@@ -16,10 +17,7 @@ const LocalTeamOddsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Local Team Odds</ThemedText>
@@ -29,8 +27,8 @@ const LocalTeamOddsScreen: React.FC = () => {
         <ThemedView style={styles.infoCard}>
           <ThemedText style={styles.infoTitle}>Location-Based Odds</ThemedText>
           <ThemedText style={styles.infoText}>
-            We use your location to find local teams and provide personalized odds suggestions.
-            This helps you find the best betting opportunities for teams in your area.
+            We use your location to find local teams and provide personalized odds suggestions. This
+            helps you find the best betting opportunities for teams in your area.
           </ThemedText>
         </ThemedView>
 

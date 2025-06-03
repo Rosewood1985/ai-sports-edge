@@ -3,6 +3,7 @@
  * Button component with neon glow effect using UI theme system
  * Location: /atomic/atoms/ui/NeonButton.tsx
  */
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
   TouchableOpacity,
@@ -15,8 +16,8 @@ import {
   View,
   Animated,
 } from 'react-native';
+
 import { useUITheme } from '../../../components/UIThemeProvider';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useHoverEffect, useGlowHoverEffect } from '../../../utils/animationUtils';
 
 interface NeonButtonProps {
@@ -52,10 +53,10 @@ export const NeonButton: React.FC<NeonButtonProps> = ({
   gradientColors,
 }) => {
   const { theme } = useUITheme();
-  
+
   // Apply hover effect animation
   const { animatedStyle, onPressIn, onPressOut } = useHoverEffect(1.05);
-  
+
   // Apply glow hover effect
   const baseIntensity = type === 'primary' ? 'medium' : 'low';
   const hoverIntensity = type === 'primary' ? 'high' : 'medium';
@@ -136,14 +137,13 @@ export const NeonButton: React.FC<NeonButtonProps> = ({
 
   // Get button colors
   const buttonColors = getButtonColors();
-  
+
   // Get gradient colors based on type or use provided colors
   const getGradientColors = (): readonly [string, string] => {
     if (gradientColors && gradientColors.length >= 2)
       return [gradientColors[0], gradientColors[1]] as const;
-    if (disabled)
-      return [theme.colors.surfaceBackground, theme.colors.surfaceBackground] as const;
-    
+    if (disabled) return [theme.colors.surfaceBackground, theme.colors.surfaceBackground] as const;
+
     switch (type) {
       case 'primary':
         return [theme.colors.primary, theme.colors.primary] as const;
@@ -161,11 +161,7 @@ export const NeonButton: React.FC<NeonButtonProps> = ({
     return (
       <View style={styles.contentContainer}>
         {loading ? (
-          <ActivityIndicator
-            size="small"
-            color={buttonColors.text}
-            style={styles.loader}
-          />
+          <ActivityIndicator size="small" color={buttonColors.text} style={styles.loader} />
         ) : (
           <>
             {icon && iconPosition === 'left' && (
@@ -200,7 +196,8 @@ export const NeonButton: React.FC<NeonButtonProps> = ({
     const animatedShadowStyle = {
       shadowOpacity: glowOpacity,
       shadowRadius: glowRadius,
-      shadowColor: buttonColors.background === 'transparent' ? buttonColors.text : buttonColors.background,
+      shadowColor:
+        buttonColors.background === 'transparent' ? buttonColors.text : buttonColors.background,
       shadowOffset: { width: 0, height: 0 },
       elevation: glowRadius,
     };

@@ -14,13 +14,14 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
+
+import { useUITheme } from './UIThemeProvider'; // Use the hook inside the component
 import { AccessibleTouchableOpacity } from '../atomic/atoms';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
-import { useUITheme } from './UIThemeProvider'; // Use the hook inside the component
-import themeObject from '../styles/theme'; // Import the theme object directly for StyleSheet
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { fanduelCookieService } from '../services/fanduelCookieService';
 import { microtransactionService } from '../services/microtransactionService';
+import themeObject from '../styles/theme'; // Import the theme object directly for StyleSheet
 
 interface BetNowButtonProps {
   size?: 'small' | 'medium' | 'large';

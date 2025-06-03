@@ -4,14 +4,15 @@
  * A molecule component that provides actions for a report template.
  */
 
-import React from 'react';
-import { Menu, MenuItem, Divider, IconButton, ListItemIcon, ListItemText } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EditIcon from '@mui/icons-material/Edit';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import { Menu, MenuItem, Divider, IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import React from 'react';
+
 import { ReportTemplate } from '../../../../types/reporting';
 
 interface TemplateActionsProps {

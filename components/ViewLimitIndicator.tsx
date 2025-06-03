@@ -1,10 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+
 import { ThemedText } from './ThemedText';
-import { Ionicons } from '@expo/vector-icons';
-import { getUserViewCount, ViewCountData } from '../services/viewCounterService';
-import { useTheme } from '../contexts/ThemeContext';
 import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { getUserViewCount, ViewCountData } from '../services/viewCounterService';
 
 interface ViewLimitIndicatorProps {
   onUpgradePress: () => void;
@@ -17,13 +18,13 @@ interface ViewLimitIndicatorProps {
  */
 const ViewLimitIndicator: React.FC<ViewLimitIndicatorProps> = ({
   onUpgradePress,
-  compact = false
+  compact = false,
 }) => {
   const [viewData, setViewData] = useState<ViewCountData | null>(null);
   const [expanded, setExpanded] = useState(false);
   const { colors, isDark } = useTheme();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  
+
   // Load view count data
   useEffect(() => {
     const loadViewData = async () => {
@@ -31,7 +32,7 @@ const ViewLimitIndicator: React.FC<ViewLimitIndicatorProps> = ({
         const userId = auth.currentUser?.uid;
         const data = await getUserViewCount(userId);
         setViewData(data);
-        
+
         // Animate in
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -42,21 +43,21 @@ const ViewLimitIndicator: React.FC<ViewLimitIndicatorProps> = ({
         console.error('Error loading view data:', error);
       }
     };
-    
+
     loadViewData();
   }, []);
-  
+
   // Don't show anything if we don't have data yet
   if (!viewData) {
     return null;
   }
-  
+
   // Don't show if user has plenty of views remaining (less than 50% used)
   // unless in compact mode which is always shown
   if (!compact && viewData.percentageUsed < 50) {
     return null;
   }
-  
+
   // Determine color based on remaining views
   const getStatusColor = () => {
     if (viewData.remainingViews <= 0) {
@@ -67,9 +68,9 @@ const ViewLimitIndicator: React.FC<ViewLimitIndicatorProps> = ({
       return '#34C759'; // Green
     }
   };
-  
+
   const statusColor = getStatusColor();
-  
+
   // Compact version (just shows the indicator dot)
   if (compact && !expanded) {
     return (
@@ -85,17 +86,17 @@ const ViewLimitIndicator: React.FC<ViewLimitIndicatorProps> = ({
       </Animated.View>
     );
   }
-  
+
   // Full or expanded version
   return (
-    <Animated.View 
+    <Animated.View
       style={[
-        styles.container, 
-        { 
+        styles.container,
+        {
           backgroundColor: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.9)',
           borderColor: statusColor,
-          opacity: fadeAnim
-        }
+          opacity: fadeAnim,
+        },
       ]}
     >
       {compact && (
@@ -107,44 +108,44 @@ const ViewLimitIndicator: React.FC<ViewLimitIndicatorProps> = ({
           <Ionicons name="close" size={16} color={colors.text} />
         </TouchableOpacity>
       )}
-      
+
       <View style={styles.header}>
-        <Ionicons 
-          name={viewData.remainingViews <= 0 ? "alert-circle" : "eye"} 
-          size={18} 
-          color={statusColor} 
+        <Ionicons
+          name={viewData.remainingViews <= 0 ? 'alert-circle' : 'eye'}
+          size={18}
+          color={statusColor}
         />
         <ThemedText style={[styles.title, { color: statusColor }]}>
-          {viewData.remainingViews <= 0 
-            ? 'Free Views Used' 
+          {viewData.remainingViews <= 0
+            ? 'Free Views Used'
             : `${viewData.remainingViews} Free ${viewData.remainingViews === 1 ? 'View' : 'Views'} Left`}
         </ThemedText>
       </View>
-      
+
       <View style={styles.progressContainer}>
-        <View 
+        <View
           style={[
-            styles.progressBar, 
-            { 
+            styles.progressBar,
+            {
               width: `${viewData.percentageUsed}%`,
-              backgroundColor: statusColor
-            }
-          ]} 
+              backgroundColor: statusColor,
+            },
+          ]}
         />
       </View>
-      
+
       <ThemedText style={styles.description}>
-        {viewData.remainingViews <= 0 
-          ? 'You\'ve used all your free views for this month.' 
+        {viewData.remainingViews <= 0
+          ? "You've used all your free views for this month."
           : `You've used ${viewData.count} of your ${viewData.maxViews + viewData.bonusViews} free views${viewData.nextReset ? ' this month' : ''}.`}
       </ThemedText>
-      
+
       {viewData.nextReset && (
         <ThemedText style={styles.resetInfo}>
           Resets on {viewData.nextReset.toLocaleDateString()}
         </ThemedText>
       )}
-      
+
       <TouchableOpacity
         style={[styles.upgradeButton, { backgroundColor: colors.primary }]}
         onPress={onUpgradePress}

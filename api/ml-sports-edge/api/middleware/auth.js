@@ -16,39 +16,39 @@ const authenticate = (req, res, next) => {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        error: { 
+      return res.status(401).json({
+        error: {
           message: 'Authentication required',
-          status: 401
-        } 
+          status: 401,
+        },
       });
     }
 
     // Extract token
     const token = authHeader.split(' ')[1];
-    
+
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     // Add user data to request
     req.user = decoded;
-    
+
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
-        error: { 
+      return res.status(401).json({
+        error: {
           message: 'Token expired',
-          status: 401
-        } 
+          status: 401,
+        },
       });
     }
-    
-    return res.status(401).json({ 
-      error: { 
+
+    return res.status(401).json({
+      error: {
         message: 'Invalid token',
-        status: 401
-      } 
+        status: 401,
+      },
     });
   }
 };
@@ -61,18 +61,18 @@ const authenticate = (req, res, next) => {
  */
 const authorizeAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ 
-      error: { 
+    return res.status(403).json({
+      error: {
         message: 'Admin access required',
-        status: 403
-      } 
+        status: 403,
+      },
     });
   }
-  
+
   next();
 };
 
 module.exports = {
   authenticate,
-  authorizeAdmin
+  authorizeAdmin,
 };

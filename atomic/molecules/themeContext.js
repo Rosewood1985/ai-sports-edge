@@ -5,8 +5,8 @@
  */
 
 // External imports
-import React, { memo, useCallback, useMemo, createContext, useContext } from 'react';
 import { DefaultTheme, DarkTheme } from '@react-navigation/native';
+import React, { memo, useCallback, useMemo, createContext, useContext } from 'react';
 import { useColorScheme } from 'react-native';
 
 // Internal imports
@@ -58,7 +58,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 /**
  * Resolve theme type to effective theme
- * 
+ *
  * @param {ThemeType} theme - Theme type
  * @param {string|null} systemTheme - System theme from useColorScheme
  * @returns {ThemeType} Effective theme ('light' or 'dark')
@@ -72,7 +72,7 @@ export const resolveTheme = (theme, systemTheme) => {
 
 /**
  * Get theme colors based on theme type
- * 
+ *
  * @param {ThemeType} themeType - Theme type
  * @returns {Object} Theme colors
  */
@@ -82,7 +82,7 @@ export const getThemeColors = themeType => {
 
 /**
  * Get navigation theme based on theme type
- * 
+ *
  * @param {ThemeType} themeType - Theme type
  * @returns {Object} Navigation theme
  */
@@ -101,7 +101,7 @@ export const getNavigationTheme = themeType => {
       },
     };
   }
-  
+
   return {
     ...DefaultTheme,
     colors: {
@@ -118,7 +118,7 @@ export const getNavigationTheme = themeType => {
 
 /**
  * Get shadow style based on theme and size
- * 
+ *
  * @param {ThemeType} themeType - Theme type
  * @param {string} size - Shadow size ('none', 'xs', 'sm', 'md', 'lg', 'xl')
  * @returns {Object} Shadow style
@@ -130,7 +130,7 @@ export const getShadow = (themeType, size = 'md') => {
 
 /**
  * Create text style based on variant
- * 
+ *
  * @param {ThemeType} themeType - Theme type
  * @param {string} variant - Text variant ('heading1', 'heading2', 'heading3', 'heading4', 'heading5', 'body', 'bodySmall', 'caption', 'button', 'label')
  * @param {Object} additionalStyle - Additional style to merge
@@ -140,10 +140,10 @@ export const createTextStyle = (themeType, variant = 'body', additionalStyle = {
   const colors = getThemeColors(themeType);
   const isDark = themeType === 'dark';
   const { fontSize, lineHeight, fontFamily, fontWeight } = ThemeTokens;
-  
+
   // Apply variant-specific styles
   let variantStyle = {};
-  
+
   if (variant.startsWith('heading')) {
     variantStyle = {
       fontFamily: fontFamily.bold,
@@ -168,14 +168,14 @@ export const createTextStyle = (themeType, variant = 'body', additionalStyle = {
       fontWeight: fontWeight.medium,
     };
   }
-  
+
   const baseStyle = {
     fontFamily: fontFamily.regular,
     fontSize: fontSize[variant] || fontSize.body,
     lineHeight: lineHeight[variant] || lineHeight.body,
     color: colors.text,
   };
-  
+
   return {
     ...baseStyle,
     ...variantStyle,

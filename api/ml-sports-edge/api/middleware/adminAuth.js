@@ -17,13 +17,13 @@ const adminAuth = (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
-    
+
     // Check if user has admin role
     if (!req.user.roles || !req.user.roles.includes('admin')) {
       logger.warn(`Unauthorized admin access attempt by user ${req.user.id}`);
       return res.status(403).json({ error: 'Insufficient privileges' });
     }
-    
+
     // User is an admin, continue to next middleware
     next();
   } catch (error) {

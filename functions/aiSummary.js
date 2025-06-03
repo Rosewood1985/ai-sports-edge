@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const axios = require('axios');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const axios = require("axios");
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -16,43 +16,43 @@ exports.generateAISummary = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Validate required fields
   if (!data.content) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Content is required.'
+      "invalid-argument",
+      "Content is required."
     );
   }
 
   const content = data.content;
   const maxLength = data.maxLength || 150;
-  const focusOn = data.focusOn || 'betting';
+  const focusOn = data.focusOn || "betting";
 
   try {
     // Production OpenAI API integration
     if (!process.env.OPENAI_API_KEY) {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.'
+        "failed-precondition",
+        "OpenAI API key not configured. Please set OPENAI_API_KEY environment variable."
       );
     }
 
     const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
+      "https://api.openai.com/v1/chat/completions",
       {
-        model: 'gpt-4',
+        model: "gpt-4",
         messages: [
           {
-            role: 'system',
-            content: `You are a sports analyst specializing in summarizing sports news. Focus on how this might affect betting odds, point spreads, and game outcomes. Be concise and focus on facts.`
+            role: "system",
+            content: "You are a sports analyst specializing in summarizing sports news. Focus on how this might affect betting odds, point spreads, and game outcomes. Be concise and focus on facts."
           },
           {
-            role: 'user',
+            role: "user",
             content: `Summarize the following sports news in ${maxLength} words or less:\n\n${content}`
           }
         ],
@@ -61,8 +61,8 @@ exports.generateAISummary = functions.https.onCall(async (data, context) => {
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json"
         }
       }
     );
@@ -71,7 +71,7 @@ exports.generateAISummary = functions.https.onCall(async (data, context) => {
     
     // Store the summary in Firestore for caching
     const db = admin.firestore();
-    const summaryRef = db.collection('aiSummaries').doc();
+    const summaryRef = db.collection("aiSummaries").doc();
     
     await summaryRef.set({
       content,
@@ -87,8 +87,8 @@ exports.generateAISummary = functions.https.onCall(async (data, context) => {
       summaryId: summaryRef.id
     };
   } catch (error) {
-    console.error('Error generating AI summary:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error generating AI summary:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 

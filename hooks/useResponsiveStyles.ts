@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import { DeviceType, Orientation, getDeviceType, getOrientation, useResponsiveDimensions } from '../utils/responsiveUtils';
+
+import {
+  DeviceType,
+  Orientation,
+  getDeviceType,
+  getOrientation,
+  useResponsiveDimensions,
+} from '../utils/responsiveUtils';
 
 type StylesFunction<T> = (params: {
   deviceType: DeviceType;
@@ -17,7 +24,7 @@ type StylesFunction<T> = (params: {
  */
 export function useResponsiveStyles<T>(stylesFunction: StylesFunction<T>): T {
   const dimensions = useResponsiveDimensions();
-  
+
   return useMemo(() => {
     return stylesFunction({
       deviceType: dimensions.deviceType,
@@ -49,11 +56,11 @@ export function createResponsiveStyles<T>(
   phoneStyles: Partial<T> = {}
 ): T {
   const deviceType = getDeviceType();
-  
+
   if (deviceType === DeviceType.TABLET) {
     return { ...baseStyles, ...tabletStyles };
   }
-  
+
   return { ...baseStyles, ...phoneStyles };
 }
 
@@ -70,11 +77,11 @@ export function createOrientationStyles<T>(
   portraitStyles: Partial<T> = {}
 ): T {
   const orientation = getOrientation();
-  
+
   if (orientation === Orientation.LANDSCAPE) {
     return { ...baseStyles, ...landscapeStyles };
   }
-  
+
   return { ...baseStyles, ...portraitStyles };
 }
 
@@ -96,22 +103,22 @@ export function createFullyResponsiveStyles<T>(
 ): T {
   const deviceType = getDeviceType();
   const orientation = getOrientation();
-  
+
   let styles = { ...baseStyles };
-  
+
   // Apply device-specific styles
   if (deviceType === DeviceType.TABLET) {
     styles = { ...styles, ...tabletStyles };
   } else {
     styles = { ...styles, ...phoneStyles };
   }
-  
+
   // Apply orientation-specific styles
   if (orientation === Orientation.LANDSCAPE) {
     styles = { ...styles, ...landscapeStyles };
   } else {
     styles = { ...styles, ...portraitStyles };
   }
-  
+
   return styles;
 }

@@ -3,9 +3,10 @@
 // Firestore Optimization, Indexing, and Performance Monitoring
 // =============================================================================
 
-import { enableNetwork, disableNetwork, connectFirestoreEmulator } from 'firebase/firestore';
-import { firestore as db } from './firebase';
 import * as Sentry from '@sentry/react-native';
+import { enableNetwork, disableNetwork, connectFirestoreEmulator } from 'firebase/firestore';
+
+import { firestore as db } from './firebase';
 
 // =============================================================================
 // PERFORMANCE CONFIGURATION
@@ -280,7 +281,6 @@ export class FirebasePerformanceService {
           metricsEnabled: this.config.queries.enableMetrics,
         },
       });
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error initializing Firebase Performance Service:', error);
@@ -295,8 +295,10 @@ export class FirebasePerformanceService {
     try {
       // Note: In production, this would be configured in firebase.ts
       // For now, we'll log the configuration
-      console.log('Firebase offline persistence enabled with cache size:', this.config.cache.cacheSizeBytes);
-      
+      console.log(
+        'Firebase offline persistence enabled with cache size:',
+        this.config.cache.cacheSizeBytes
+      );
     } catch (error) {
       // Persistence may already be enabled
       console.warn('Firebase persistence already enabled or not supported:', error);
@@ -317,9 +319,12 @@ export class FirebasePerformanceService {
     }, 60000); // Analyze every minute
 
     // Report to Sentry every 5 minutes
-    setInterval(() => {
-      this.reportPerformanceToSentry();
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        this.reportPerformanceToSentry();
+      },
+      5 * 60 * 1000
+    );
   }
 
   /**
@@ -357,7 +362,7 @@ export class FirebasePerformanceService {
       const collection = key.replace('query_', '');
       const avg = metrics.reduce((sum, time) => sum + time, 0) / metrics.length;
       const max = Math.max(...metrics);
-      
+
       analysis[collection] = {
         avg: Math.round(avg),
         max,
@@ -373,7 +378,7 @@ export class FirebasePerformanceService {
    */
   private reportPerformanceToSentry(): void {
     const summary: { [collection: string]: number } = {};
-    
+
     this.performanceMetrics.forEach((metrics, key) => {
       const collection = key.replace('query_', '');
       const avg = metrics.reduce((sum, time) => sum + time, 0) / metrics.length;
@@ -411,12 +416,12 @@ export class FirebasePerformanceService {
    */
   private async validateIndexes(): Promise<void> {
     console.log('Validating Firebase indexes...');
-    
+
     // In production, this would check actual index status
     // For now, we'll log the required indexes
     console.log('Required composite indexes:', this.config.indexes.compositeIndexes.length);
     console.log('Required single field indexes:', this.config.indexes.singleFieldIndexes.length);
-    
+
     Sentry.addBreadcrumb({
       message: 'Firebase indexes validated',
       category: 'firebase.performance.indexes',
@@ -431,15 +436,19 @@ export class FirebasePerformanceService {
   /**
    * Get performance statistics
    */
-  getPerformanceStats(): { [collection: string]: { avg: number; max: number; min: number; count: number } } {
-    const stats: { [collection: string]: { avg: number; max: number; min: number; count: number } } = {};
+  getPerformanceStats(): {
+    [collection: string]: { avg: number; max: number; min: number; count: number };
+  } {
+    const stats: {
+      [collection: string]: { avg: number; max: number; min: number; count: number };
+    } = {};
 
     this.performanceMetrics.forEach((metrics, key) => {
       const collection = key.replace('query_', '');
       const avg = metrics.reduce((sum, time) => sum + time, 0) / metrics.length;
       const max = Math.max(...metrics);
       const min = Math.min(...metrics);
-      
+
       stats[collection] = {
         avg: Math.round(avg),
         max,
@@ -588,7 +597,7 @@ export const firebasePerformanceService = new FirebasePerformanceService();
  */
 export function generateIndexCommands(): string[] {
   const commands: string[] = [];
-  
+
   FIREBASE_PERFORMANCE_CONFIG.indexes.compositeIndexes.forEach(index => {
     const fields = index.fields.map(f => `"${f.field}":${f.direction.toUpperCase()}`).join(',');
     commands.push(

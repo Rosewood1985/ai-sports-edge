@@ -3,11 +3,22 @@
 // Real AI-Powered Player Prop Predictions for Multiple Sports
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { firestore as db } from '../config/firebase';
 import * as Sentry from '@sentry/react-native';
-import { nbaMLPredictionService } from './nba/nbaMLPredictionService';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+
 import { firebaseOptimizationService, optimizedQuery } from './firebaseOptimizationService';
+import { firestore as db } from '../config/firebase';
+import { nbaMLPredictionService } from './nba/nbaMLPredictionService';
 
 export interface PropBet {
   id: string;
@@ -32,7 +43,7 @@ export interface PropBet {
   lastGames: number[];
   aiAnalysis: string;
   recommendation: 'OVER' | 'UNDER';
-  
+
   // Advanced metrics
   advancedMetrics: {
     matchupRating: number; // 0-100 scale
@@ -51,7 +62,7 @@ export interface PropBet {
       recentUsage: number;
     };
   };
-  
+
   // Statistical analysis
   statistics: {
     overUnderRecord: { over: number; under: number; total: number };
@@ -64,7 +75,7 @@ export interface PropBet {
       gameTotal: number;
     };
   };
-  
+
   createdAt: Date;
   gameDate: Date;
   lastUpdated: Date;
@@ -135,7 +146,7 @@ export class PropPredictionService {
     try {
       const cacheKey = JSON.stringify(filters);
       const cached = this.predictionCache.get(cacheKey);
-      
+
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
         return cached.data;
       }
@@ -148,7 +159,7 @@ export class PropPredictionService {
       });
 
       const predictions = await this.generateCurrentPropPredictions(filters);
-      
+
       // Cache the results
       this.predictionCache.set(cacheKey, {
         data: predictions,
@@ -156,7 +167,6 @@ export class PropPredictionService {
       });
 
       return predictions;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error fetching prop predictions:', error);
@@ -170,16 +180,15 @@ export class PropPredictionService {
   async getFeaturedPropPrediction(sport: string = 'nba'): Promise<PropBet | null> {
     try {
       const predictions = await this.getPropPredictions({ sport });
-      
+
       if (predictions.length === 0) {
         return this.generateFallbackFeaturedProp(sport);
       }
 
       // Return the highest confidence prediction
-      return predictions.reduce((best, current) => 
+      return predictions.reduce((best, current) =>
         current.confidence > best.confidence ? current : best
       );
-
     } catch (error) {
       Sentry.captureException(error);
       return this.generateFallbackFeaturedProp(sport);
@@ -192,13 +201,12 @@ export class PropPredictionService {
   async getTopPropPredictions(limit: number = 3, sport: string = 'nba'): Promise<TopPropBet[]> {
     try {
       const allPredictions = await this.getPropPredictions({ sport });
-      
+
       return allPredictions
         .filter(prop => prop.confidence >= 65) // High confidence only
         .sort((a, b) => b.confidence - a.confidence)
         .slice(0, limit)
         .map(this.convertToTopPropBet);
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackTopProps(limit, sport);
@@ -234,7 +242,7 @@ export class PropPredictionService {
       // Get today's NBA games
       const today = new Date();
       const todayGames = await this.getTodaysNBAGames();
-      
+
       if (todayGames.length === 0) {
         return this.generateNBAFallbackProps();
       }
@@ -245,15 +253,14 @@ export class PropPredictionService {
         try {
           // Get game prediction from NBA ML service
           const gamePrediction = await nbaMLPredictionService.predictGame(
-            game.homeTeam, 
-            game.awayTeam, 
+            game.homeTeam,
+            game.awayTeam,
             game.gameDate
           );
 
           // Generate player props for this game
           const gameProps = await this.generateGamePlayerProps(game, gamePrediction);
           predictions.push(...gameProps);
-
         } catch (error) {
           console.error(`Error generating props for game ${game.id}:`, error);
           continue;
@@ -261,7 +268,6 @@ export class PropPredictionService {
       }
 
       return this.filterAndSortPredictions(predictions, filters);
-
     } catch (error) {
       Sentry.captureException(error);
       return this.generateNBAFallbackProps();
@@ -273,7 +279,7 @@ export class PropPredictionService {
    */
   private async generateGamePlayerProps(game: any, gamePrediction: any): Promise<PropBet[]> {
     const props: PropBet[] = [];
-    
+
     // Get key players for both teams
     const homeTeamPlayers = await this.getTeamKeyPlayers(game.homeTeam);
     const awayTeamPlayers = await this.getTeamKeyPlayers(game.awayTeam);
@@ -296,7 +302,11 @@ export class PropPredictionService {
   /**
    * Generate individual player props
    */
-  private async generatePlayerProps(player: any, game: any, homeAway: 'HOME' | 'AWAY'): Promise<PropBet[]> {
+  private async generatePlayerProps(
+    player: any,
+    game: any,
+    homeAway: 'HOME' | 'AWAY'
+  ): Promise<PropBet[]> {
     const props: PropBet[] = [];
     const propTypes = ['points', 'rebounds', 'assists', 'pra', 'threes'];
 
@@ -319,9 +329,9 @@ export class PropPredictionService {
    * Generate a single player prop prediction
    */
   private async generateSinglePlayerProp(
-    player: any, 
-    game: any, 
-    propType: string, 
+    player: any,
+    game: any,
+    propType: string,
     homeAway: 'HOME' | 'AWAY'
   ): Promise<PropBet | null> {
     try {
@@ -335,14 +345,19 @@ export class PropPredictionService {
       }
 
       // Calculate prediction using ML model
-      const prediction = this.calculatePropPrediction(playerStats, recentGames, matchupData, propType);
-      
+      const prediction = this.calculatePropPrediction(
+        playerStats,
+        recentGames,
+        matchupData,
+        propType
+      );
+
       // Generate prop line (would normally come from sportsbooks)
       const line = this.generatePropLine(prediction.value, propType);
-      
+
       // Calculate confidence
       const confidence = this.calculatePropConfidence(prediction, playerStats, matchupData);
-      
+
       // Generate AI analysis
       const aiAnalysis = this.generateAIAnalysis(player, propType, prediction, matchupData);
 
@@ -400,7 +415,6 @@ export class PropPredictionService {
         gameDate: game.gameDate,
         lastUpdated: new Date(),
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -410,8 +424,13 @@ export class PropPredictionService {
   /**
    * Helper methods for calculations
    */
-  
-  private calculatePropPrediction(playerStats: any, recentGames: any[], matchupData: any, propType: string): any {
+
+  private calculatePropPrediction(
+    playerStats: any,
+    recentGames: any[],
+    matchupData: any,
+    propType: string
+  ): any {
     const seasonAvg = playerStats.averages[propType] || 0;
     const recentAvg = this.calculateLast10Average(recentGames, propType);
     const matchupFactor = matchupData.factor || 1.0;
@@ -444,10 +463,15 @@ export class PropPredictionService {
     return Math.max(45, Math.min(95, confidence));
   }
 
-  private generateAIAnalysis(player: any, propType: string, prediction: any, matchupData: any): string {
+  private generateAIAnalysis(
+    player: any,
+    propType: string,
+    prediction: any,
+    matchupData: any
+  ): string {
     const propName = this.formatPropType(propType);
     const trend = prediction.value > player.seasonAverage ? 'exceeded' : 'fallen short of';
-    
+
     return `${player.name} has ${trend} this ${propName.toLowerCase()} line in ${matchupData.recentRecord} recent games. He faces a ${matchupData.defensiveDescription} defense that ranks ${matchupData.defensiveRank} against opposing ${player.position}s. His usage rate increases to ${Math.round(prediction.projectedUsage)}% in similar matchups.`;
   }
 
@@ -476,18 +500,18 @@ export class PropPredictionService {
 
   private calculateOverRate(games: any[], line: number, propType: string): string {
     if (games.length === 0) return '0% (0/0 games)';
-    
+
     const recentGames = games.slice(0, 13);
     const overCount = recentGames.filter(game => (game[propType] || 0) > line).length;
     const percentage = Math.round((overCount / recentGames.length) * 100);
-    
+
     return `${percentage}% (${overCount}/${recentGames.length} games)`;
   }
 
   /**
    * Data fetching methods (would connect to real APIs in production)
    */
-  
+
   private async getTodaysNBAGames(): Promise<any[]> {
     // In production, this would fetch from NBA API or database
     const today = new Date();
@@ -513,24 +537,24 @@ export class PropPredictionService {
   private async getTeamKeyPlayers(teamId: string): Promise<any[]> {
     // Mock data - would fetch from player database
     const playersByTeam = {
-      'LAL': [
+      LAL: [
         { id: 'lebron', name: 'LeBron James', position: 'F', team: 'Lakers' },
         { id: 'ad', name: 'Anthony Davis', position: 'F/C', team: 'Lakers' },
       ],
-      'GSW': [
+      GSW: [
         { id: 'curry', name: 'Stephen Curry', position: 'G', team: 'Warriors' },
         { id: 'thompson', name: 'Klay Thompson', position: 'G', team: 'Warriors' },
       ],
-      'BOS': [
+      BOS: [
         { id: 'tatum', name: 'Jayson Tatum', position: 'F', team: 'Celtics' },
         { id: 'brown', name: 'Jaylen Brown', position: 'G/F', team: 'Celtics' },
       ],
-      'MIA': [
+      MIA: [
         { id: 'butler', name: 'Jimmy Butler', position: 'G/F', team: 'Heat' },
         { id: 'adebayo', name: 'Bam Adebayo', position: 'F/C', team: 'Heat' },
       ],
     };
-    
+
     return playersByTeam[teamId] || [];
   }
 
@@ -559,12 +583,12 @@ export class PropPredictionService {
       pra: 0,
       threes: Math.round(Math.random() * 5),
     }));
-    
+
     // Calculate PRA for each game
     mockGames.forEach(game => {
       game.pra = game.points + game.rebounds + game.assists;
     });
-    
+
     return mockGames;
   }
 
@@ -583,7 +607,7 @@ export class PropPredictionService {
   /**
    * Fallback data methods
    */
-  
+
   private getFallbackPredictions(filters: PropPredictionFilters): PropBet[] {
     // Return cached predictions or generate mock data as fallback
     return this.generateNBAFallbackProps();
@@ -610,7 +634,8 @@ export class PropPredictionService {
       last10Average: 33.7,
       overRate: '62% (8/13 games)',
       lastGames: [38, 26, 34, 29, 42, 31, 36, 28, 35, 33],
-      aiAnalysis: 'Dončić has exceeded this points line in 7 of his last 10 games. He faces a Warriors defense that ranks 18th against opposing guards, allowing 48.3 points per game to the position.',
+      aiAnalysis:
+        'Dončić has exceeded this points line in 7 of his last 10 games. He faces a Warriors defense that ranks 18th against opposing guards, allowing 48.3 points per game to the position.',
       recommendation: 'OVER',
       advancedMetrics: {
         matchupRating: 75,
@@ -706,27 +731,30 @@ export class PropPredictionService {
 
   private generateKeyFactors(prop: PropBet): string[] {
     const factors = [];
-    
+
     if (prop.advancedMetrics.matchupRating > 70) {
       factors.push('Favorable matchup');
     }
-    
+
     if (prop.advancedMetrics.recentForm > 1.05) {
       factors.push('Recent form trending up');
     }
-    
+
     if (prop.statistics.recentTrend === 'Over trending') {
       factors.push('Over trending');
     }
-    
+
     return factors.length > 0 ? factors : ['Solid value'];
   }
 
   /**
    * Additional helper methods
    */
-  
-  private filterAndSortPredictions(predictions: PropBet[], filters: PropPredictionFilters): PropBet[] {
+
+  private filterAndSortPredictions(
+    predictions: PropBet[],
+    filters: PropPredictionFilters
+  ): PropBet[] {
     let filtered = predictions;
 
     if (filters.propType) {
@@ -738,7 +766,9 @@ export class PropPredictionService {
     }
 
     if (filters.team) {
-      filtered = filtered.filter(p => p.player.team.toLowerCase().includes(filters.team.toLowerCase()));
+      filtered = filtered.filter(p =>
+        p.player.team.toLowerCase().includes(filters.team.toLowerCase())
+      );
     }
 
     // Sort by confidence descending
@@ -762,20 +792,22 @@ export class PropPredictionService {
 
   private calculateRecentForm(games: any[]): number {
     if (games.length < 5) return 1.0;
-    
+
     const recent5 = games.slice(0, 5);
     const previous5 = games.slice(5, 10);
-    
+
     if (previous5.length === 0) return 1.0;
-    
+
     const recentAvg = recent5.reduce((sum, g) => sum + (g.points || 0), 0) / recent5.length;
     const prevAvg = previous5.reduce((sum, g) => sum + (g.points || 0), 0) / previous5.length;
-    
+
     return prevAvg > 0 ? recentAvg / prevAvg : 1.0;
   }
 
   private calculateRecentUsage(games: any[]): number {
-    return games.slice(0, 5).reduce((sum, g) => sum + (g.usage || 25), 0) / Math.min(5, games.length);
+    return (
+      games.slice(0, 5).reduce((sum, g) => sum + (g.usage || 25), 0) / Math.min(5, games.length)
+    );
   }
 
   private calculateOverUnderRecord(games: any[], line: number, propType: string): any {
@@ -786,13 +818,13 @@ export class PropPredictionService {
 
   private calculateRecentTrend(games: any[], propType: string): string {
     if (games.length < 6) return 'Stable';
-    
+
     const recent3 = games.slice(0, 3);
     const previous3 = games.slice(3, 6);
-    
+
     const recentAvg = recent3.reduce((sum, g) => sum + (g[propType] || 0), 0) / 3;
     const prevAvg = previous3.reduce((sum, g) => sum + (g[propType] || 0), 0) / 3;
-    
+
     if (recentAvg > prevAvg * 1.1) return 'Over trending';
     if (recentAvg < prevAvg * 0.9) return 'Under trending';
     return 'Stable';
@@ -800,21 +832,21 @@ export class PropPredictionService {
 
   private calculateVolatility(games: any[], propType: string): number {
     if (games.length < 3) return 0.1;
-    
+
     const values = games.map(g => g[propType] || 0);
     const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
     const variance = values.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / values.length;
-    
+
     return Math.sqrt(variance) / avg;
   }
 
   private calculateFloorCeiling(games: any[], propType: string): any {
     if (games.length < 5) return { floor: 0, ceiling: 50 };
-    
+
     const values = games.map(g => g[propType] || 0).sort((a, b) => a - b);
     const floor = values[Math.floor(values.length * 0.1)]; // 10th percentile
     const ceiling = values[Math.floor(values.length * 0.9)]; // 90th percentile
-    
+
     return { floor, ceiling };
   }
 

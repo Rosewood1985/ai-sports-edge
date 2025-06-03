@@ -32,25 +32,22 @@ class CacheService {
     try {
       const cached = await AsyncStorage.getItem(config.key);
       if (!cached) return null;
-      
+
       const entry: CacheEntry<T> = JSON.parse(cached);
-      
+
       // Check if cache is expired or version mismatch
-      if (
-        Date.now() - entry.timestamp > config.ttl ||
-        entry.version !== config.version
-      ) {
+      if (Date.now() - entry.timestamp > config.ttl || entry.version !== config.version) {
         await AsyncStorage.removeItem(config.key);
         return null;
       }
-      
+
       return entry.data;
     } catch (error) {
       console.error('Cache read error:', error);
       return null;
     }
   }
-  
+
   /**
    * Set data in cache
    * @param config Cache configuration
@@ -61,15 +58,15 @@ class CacheService {
       const entry: CacheEntry<T> = {
         data,
         timestamp: Date.now(),
-        version: config.version
+        version: config.version,
       };
-      
+
       await AsyncStorage.setItem(config.key, JSON.stringify(entry));
     } catch (error) {
       console.error('Cache write error:', error);
     }
   }
-  
+
   /**
    * Remove data from cache
    * @param key Cache key
@@ -81,7 +78,7 @@ class CacheService {
       console.error('Cache remove error:', error);
     }
   }
-  
+
   /**
    * Clear all cache
    */
@@ -92,7 +89,7 @@ class CacheService {
       console.error('Cache clear error:', error);
     }
   }
-  
+
   /**
    * Get all cache keys
    * @returns Promise resolving to array of cache keys

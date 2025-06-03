@@ -1,25 +1,28 @@
 /**
  * Betting Slip Import Service
- * 
+ *
  * This service provides functionality for importing betting slips from various sportsbooks.
  */
 
-import { firestore } from '../config/firebase';
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  getDoc, 
-  getDocs, 
-  query, 
-  where, 
-  orderBy, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
   limit,
   Timestamp,
-  serverTimestamp
+  serverTimestamp,
 } from 'firebase/firestore';
-import { 
+import { v4 as uuidv4 } from 'uuid';
+
+import { analyticsService, AnalyticsEventType } from './analyticsService';
+import { firestore } from '../config/firebase';
+import {
   Sportsbook,
   ImportMethod,
   ImportedBetType,
@@ -31,10 +34,8 @@ import {
   AISuggestion,
   ImportResult,
   ImportHistory,
-  SubscriptionRequirements
+  SubscriptionRequirements,
 } from '../types/bettingSlipImport';
-import { analyticsService, AnalyticsEventType } from './analyticsService';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Betting Slip Import Service
@@ -44,7 +45,7 @@ class BettingSlipImportService {
   private readonly IMPORT_HISTORY_COLLECTION = 'importHistory';
   private readonly USER_COLLECTION = 'users';
   private readonly SUBSCRIPTION_COLLECTION = 'subscriptions';
-  
+
   /**
    * Check if the user is eligible to use the betting slip import feature
    * @param userId User ID
@@ -54,35 +55,35 @@ class BettingSlipImportService {
     try {
       // Get user document
       const userDoc = await getDoc(doc(firestore, this.USER_COLLECTION, userId));
-      
+
       if (!userDoc.exists()) {
         throw new Error('User not found');
       }
-      
+
       const userData = userDoc.data();
       const currentTier = userData.subscriptionTier || 'free';
-      
+
       // Check if the user has an active subscription
       const subscriptionsQuery = query(
         collection(firestore, this.SUBSCRIPTION_COLLECTION),
         where('userId', '==', userId),
         where('status', '==', 'active')
       );
-      
+
       const subscriptionsSnapshot = await getDocs(subscriptionsQuery);
       const hasActiveSubscription = !subscriptionsSnapshot.empty;
-      
+
       // Define subscription requirements
       const requiredTier = 'premium';
       const isEligible = hasActiveSubscription && currentTier === requiredTier;
-      
+
       return {
         isFeatureEnabled: true,
         requiredTier,
         currentTier,
         isEligible,
         upgradeMessage: isEligible ? undefined : 'Upgrade to Premium to import betting slips',
-        upgradeUrl: isEligible ? undefined : '/subscription?feature=betting-slip-import'
+        upgradeUrl: isEligible ? undefined : '/subscription?feature=betting-slip-import',
       };
     } catch (error) {
       console.error('Error checking subscription requirements:', error);
@@ -90,7 +91,7 @@ class BettingSlipImportService {
       throw new Error(`Failed to check subscription requirements: ${errorMessage}`);
     }
   }
-  
+
   /**
    * Import a betting slip from a screenshot
    * @param userId User ID
@@ -106,20 +107,20 @@ class BettingSlipImportService {
     try {
       // Check subscription requirements
       const subscriptionRequirements = await this.checkSubscriptionRequirements(userId);
-      
+
       if (!subscriptionRequirements.isEligible) {
         return {
           success: false,
           message: subscriptionRequirements.upgradeMessage || 'Subscription required',
           bets: [],
-          errorDetails: 'User does not have the required subscription tier'
+          errorDetails: 'User does not have the required subscription tier',
         };
       }
-      
+
       // Create imported bets
       const importId = uuidv4();
       const importTimestamp = Date.now();
-      
+
       // Mock data for demonstration
       const mockBets: ImportedBet[] = [
         {
@@ -144,16 +145,16 @@ class BettingSlipImportService {
             confidence: 0.85,
             alternativeOdds: -105,
             alternativeSportsbook: Sportsbook.FANDUEL,
-            potentialAdditionalWinnings: 2.38
-          }
-        }
+            potentialAdditionalWinnings: 2.38,
+          },
+        },
       ];
-      
+
       // Save imported bets to Firestore
       for (const bet of mockBets) {
         await addDoc(collection(firestore, this.IMPORTED_BETS_COLLECTION), bet);
       }
-      
+
       // Save import history
       await addDoc(collection(firestore, this.IMPORT_HISTORY_COLLECTION), {
         id: importId,
@@ -162,31 +163,31 @@ class BettingSlipImportService {
         sportsbook,
         importMethod: ImportMethod.SCREENSHOT,
         betCount: mockBets.length,
-        totalAmount: mockBets.reduce((sum: number, bet) => sum + bet.amount, 0)
+        totalAmount: mockBets.reduce((sum: number, bet) => sum + bet.amount, 0),
       });
-      
+
       // Track analytics
       analyticsService.trackEvent(AnalyticsEventType.CUSTOM, {
         event_name: 'betting_slip_import',
         method: ImportMethod.SCREENSHOT,
         sportsbook,
-        bet_count: mockBets.length
+        bet_count: mockBets.length,
       } as any);
-      
+
       return {
         success: true,
         message: `Successfully imported ${mockBets.length} bets from ${sportsbook}`,
-        bets: mockBets
+        bets: mockBets,
       };
     } catch (error) {
       console.error('Error importing betting slip from screenshot:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       return {
         success: false,
         message: 'Failed to import betting slip',
         bets: [],
-        errorDetails: errorMessage
+        errorDetails: errorMessage,
       };
     }
   }

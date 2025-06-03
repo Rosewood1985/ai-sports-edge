@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  View,
-  Platform,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { Animated, StyleSheet, Text, View, Platform, ViewStyle, TextStyle } from 'react-native';
+
 import { colors } from '../styles/theme';
 
 interface ToastProps {
@@ -98,14 +91,7 @@ const ToastMessage: React.FC<ToastProps> = ({
   const positionStyle = position === 'top' ? styles.top : styles.bottom;
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        positionStyle,
-        { opacity },
-        style,
-      ]}
-    >
+    <Animated.View style={[styles.container, positionStyle, { opacity }, style]}>
       <View style={styles.content}>
         <Text style={[styles.text, textStyle]}>{message}</Text>
       </View>

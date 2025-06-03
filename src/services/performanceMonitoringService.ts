@@ -89,19 +89,19 @@ export class PerformanceMonitoringService {
    */
   recordMetric(metric: PerformanceMetric): void {
     const key = `${metric.name}_${JSON.stringify(metric.tags)}`;
-    
+
     if (!this.metrics.has(key)) {
       this.metrics.set(key, []);
     }
-    
+
     const metricArray = this.metrics.get(key)!;
     metricArray.push(metric);
-    
+
     // Keep only recent metrics
     if (metricArray.length > this.MAX_METRICS_PER_TYPE) {
       metricArray.splice(0, metricArray.length - this.MAX_METRICS_PER_TYPE);
     }
-    
+
     // Check for threshold violations
     this.checkThresholds(metric);
   }
@@ -151,13 +151,13 @@ export class PerformanceMonitoringService {
    */
   startMonitoring(): void {
     if (this.isMonitoring) return;
-    
+
     this.isMonitoring = true;
     this.monitoringInterval = setInterval(() => {
       this.collectSystemMetrics();
       this.runHealthChecks();
     }, this.MONITORING_INTERVAL);
-    
+
     console.log('Performance monitoring started');
   }
 
@@ -166,13 +166,13 @@ export class PerformanceMonitoringService {
    */
   stopMonitoring(): void {
     if (!this.isMonitoring) return;
-    
+
     this.isMonitoring = false;
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = undefined;
     }
-    
+
     console.log('Performance monitoring stopped');
   }
 
@@ -180,13 +180,13 @@ export class PerformanceMonitoringService {
    * Get metrics for a specific name and time range
    */
   getMetrics(
-    name: string, 
-    startTime?: number, 
+    name: string,
+    startTime?: number,
     endTime?: number,
     tags?: Record<string, string>
   ): PerformanceMetric[] {
     const allMetrics: PerformanceMetric[] = [];
-    
+
     for (const [key, metrics] of this.metrics.entries()) {
       if (key.startsWith(name)) {
         // Apply time filter
@@ -198,25 +198,28 @@ export class PerformanceMonitoringService {
             return true;
           });
         }
-        
+
         // Apply tag filter
         if (tags) {
           filteredMetrics = filteredMetrics.filter(m => {
             return Object.entries(tags).every(([key, value]) => m.tags[key] === value);
           });
         }
-        
+
         allMetrics.push(...filteredMetrics);
       }
     }
-    
+
     return allMetrics.sort((a, b) => a.timestamp - b.timestamp);
   }
 
   /**
    * Get aggregated statistics for a metric
    */
-  getMetricStats(name: string, timeWindow: number = 300000): {
+  getMetricStats(
+    name: string,
+    timeWindow: number = 300000
+  ): {
     count: number;
     min: number;
     max: number;
@@ -227,21 +230,21 @@ export class PerformanceMonitoringService {
   } {
     const cutoff = Date.now() - timeWindow;
     const metrics = this.getMetrics(name, cutoff);
-    
+
     if (metrics.length === 0) {
       return { count: 0, min: 0, max: 0, avg: 0, p50: 0, p95: 0, p99: 0 };
     }
-    
+
     const values = metrics.map(m => m.value).sort((a, b) => a - b);
     const count = values.length;
     const min = values[0];
     const max = values[count - 1];
     const avg = values.reduce((sum, val) => sum + val, 0) / count;
-    
+
     const p50 = values[Math.floor(count * 0.5)];
     const p95 = values[Math.floor(count * 0.95)];
     const p99 = values[Math.floor(count * 0.99)];
-    
+
     return { count, min, max, avg, p50, p95, p99 };
   }
 
@@ -255,17 +258,17 @@ export class PerformanceMonitoringService {
       api: await this.checkApiHealth(),
       database: await this.checkDatabaseHealth(),
     };
-    
+
     // Determine overall health
     const componentStatuses = Object.values(components).map(c => c.status);
     let overall: SystemHealth['overall'] = 'healthy';
-    
+
     if (componentStatuses.includes('critical')) {
       overall = 'critical';
     } else if (componentStatuses.includes('degraded')) {
       overall = 'degraded';
     }
-    
+
     return {
       overall,
       components,
@@ -283,7 +286,7 @@ export class PerformanceMonitoringService {
     health: SystemHealth;
   } {
     const cutoff = Date.now() - timeWindow;
-    
+
     return {
       metrics: {
         inference: this.getMetricStats('inference_duration', timeWindow),
@@ -310,15 +313,16 @@ export class PerformanceMonitoringService {
     message: string
   ): void {
     const alertId = `${metric}_${level}_${Date.now()}`;
-    
+
     // Check cooldown
-    const existingAlert = Array.from(this.alerts.values())
-      .find(a => a.metric === metric && a.level === level && !a.resolved);
-    
+    const existingAlert = Array.from(this.alerts.values()).find(
+      a => a.metric === metric && a.level === level && !a.resolved
+    );
+
     if (existingAlert && Date.now() - existingAlert.timestamp < this.ALERT_COOLDOWN) {
       return;
     }
-    
+
     const alert: PerformanceAlert = {
       id: alertId,
       level,
@@ -329,16 +333,16 @@ export class PerformanceMonitoringService {
       timestamp: Date.now(),
       resolved: false,
     };
-    
+
     this.alerts.set(alertId, alert);
-    
+
     // Log alert
     console.warn(`Performance Alert [${level.toUpperCase()}]: ${message}`, {
       metric,
       threshold,
       currentValue,
     });
-    
+
     // In a real implementation, this would trigger external alerting
     this.sendAlert(alert);
   }
@@ -366,14 +370,14 @@ export class PerformanceMonitoringService {
   private async checkInferenceHealth(): Promise<ComponentHealth> {
     const stats = this.getMetricStats('inference_duration');
     const errorStats = this.getMetricStats('inference_errors');
-    
+
     let status: ComponentHealth['status'] = 'healthy';
     if (stats.avg > this.thresholds.inferenceLatency.critical) {
       status = 'critical';
     } else if (stats.avg > this.thresholds.inferenceLatency.warning) {
       status = 'degraded';
     }
-    
+
     return {
       status,
       responseTime: stats.avg,
@@ -385,14 +389,14 @@ export class PerformanceMonitoringService {
 
   private async checkCacheHealth(): Promise<ComponentHealth> {
     const hitRateStats = this.getMetricStats('cache_hit_rate');
-    
+
     let status: ComponentHealth['status'] = 'healthy';
     if (hitRateStats.avg < this.thresholds.cacheHitRate.critical) {
       status = 'critical';
     } else if (hitRateStats.avg < this.thresholds.cacheHitRate.warning) {
       status = 'degraded';
     }
-    
+
     return {
       status,
       responseTime: 0, // Cache access is instant
@@ -405,14 +409,14 @@ export class PerformanceMonitoringService {
   private async checkApiHealth(): Promise<ComponentHealth> {
     const responseStats = this.getMetricStats('api_response_time');
     const errorStats = this.getMetricStats('api_errors');
-    
+
     let status: ComponentHealth['status'] = 'healthy';
     if (responseStats.avg > this.thresholds.apiResponseTime.critical) {
       status = 'critical';
     } else if (responseStats.avg > this.thresholds.apiResponseTime.warning) {
       status = 'degraded';
     }
-    
+
     return {
       status,
       responseTime: responseStats.avg,
@@ -425,14 +429,15 @@ export class PerformanceMonitoringService {
   private async checkDatabaseHealth(): Promise<ComponentHealth> {
     const queryStats = this.getMetricStats('database_query_time');
     const errorStats = this.getMetricStats('database_errors');
-    
+
     let status: ComponentHealth['status'] = 'healthy';
-    if (queryStats.avg > 1000) { // 1 second threshold
+    if (queryStats.avg > 1000) {
+      // 1 second threshold
       status = 'critical';
     } else if (queryStats.avg > 500) {
       status = 'degraded';
     }
-    
+
     return {
       status,
       responseTime: queryStats.avg,
@@ -445,7 +450,7 @@ export class PerformanceMonitoringService {
   private checkThresholds(metric: PerformanceMetric): void {
     const thresholdConfig = this.getThresholdConfig(metric.name);
     if (!thresholdConfig) return;
-    
+
     for (const [level, threshold] of Object.entries(thresholdConfig)) {
       if (this.violatesThreshold(metric.value, threshold, metric.name)) {
         this.createAlert(
@@ -494,10 +499,13 @@ export class PerformanceMonitoringService {
   private collectSystemMetrics(): void {
     // Collect memory usage
     if (typeof performance.memory !== 'undefined') {
-      this.recordGauge('memory_usage', performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize);
+      this.recordGauge(
+        'memory_usage',
+        performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize
+      );
       this.recordGauge('memory_total', performance.memory.totalJSHeapSize);
     }
-    
+
     // Collect timing information
     if (typeof performance.now === 'function') {
       this.recordGauge('system_uptime', performance.now());
@@ -520,22 +528,25 @@ export class PerformanceMonitoringService {
 
   private healthToScore(status: ComponentHealth['status']): number {
     switch (status) {
-      case 'healthy': return 1;
-      case 'degraded': return 0.5;
-      case 'critical': return 0;
+      case 'healthy':
+        return 1;
+      case 'degraded':
+        return 0.5;
+      case 'critical':
+        return 0;
     }
   }
 
   private sendAlert(alert: PerformanceAlert): void {
     // In a real implementation, this would send to external systems
     // For now, just console.warn was called in createAlert
-    
+
     // Could integrate with:
     // - PagerDuty
     // - Slack webhooks
     // - Email notifications
     // - Push notifications
-    
+
     if (alert.level === 'critical') {
       // Simulate urgent notification
       console.error('CRITICAL ALERT:', alert.message);

@@ -4,8 +4,9 @@
 // Following UFC Analytics Pattern for Consistency
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class NFLAnalyticsService {
   async analyzePlayerPerformance(playerId: string): Promise<PlayerAnalysis> {
@@ -28,9 +29,18 @@ export class NFLAnalyticsService {
       const analysis: PlayerAnalysis = {
         playerId,
         position: playerData?.position?.abbreviation || 'Unknown',
-        offensiveAnalysis: await this.analyzeOffensivePerformance(gameHistory, playerData?.position),
-        defensiveAnalysis: await this.analyzeDefensivePerformance(gameHistory, playerData?.position),
-        specialTeamsAnalysis: await this.analyzeSpecialTeamsPerformance(gameHistory, playerData?.position),
+        offensiveAnalysis: await this.analyzeOffensivePerformance(
+          gameHistory,
+          playerData?.position
+        ),
+        defensiveAnalysis: await this.analyzeDefensivePerformance(
+          gameHistory,
+          playerData?.position
+        ),
+        specialTeamsAnalysis: await this.analyzeSpecialTeamsPerformance(
+          gameHistory,
+          playerData?.position
+        ),
         durabilityAnalysis: await this.analyzeDurability(gameHistory),
         clutchPerformance: await this.analyzeClutchPerformance(gameHistory),
         weatherPerformance: await this.analyzeWeatherPerformance(gameHistory),
@@ -51,7 +61,10 @@ export class NFLAnalyticsService {
     }
   }
 
-  private async analyzeOffensivePerformance(gameHistory: any[], position: any): Promise<OffensiveAnalysis> {
+  private async analyzeOffensivePerformance(
+    gameHistory: any[],
+    position: any
+  ): Promise<OffensiveAnalysis> {
     try {
       const positionGroup = this.getPositionGroup(position?.abbreviation);
 
@@ -199,7 +212,10 @@ export class NFLAnalyticsService {
     };
   }
 
-  private async analyzeDefensivePerformance(gameHistory: any[], position: any): Promise<DefensiveAnalysis> {
+  private async analyzeDefensivePerformance(
+    gameHistory: any[],
+    position: any
+  ): Promise<DefensiveAnalysis> {
     try {
       const positionGroup = this.getPositionGroup(position?.abbreviation);
 
@@ -286,7 +302,6 @@ export class NFLAnalyticsService {
 
       await this.storeTeamAnalysis(teamId, analysis);
       return analysis;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Team analysis failed: ${error.message}`);
@@ -376,7 +391,10 @@ export class NFLAnalyticsService {
         homeTeam: homeTeamId,
         awayTeam: awayTeamId,
         winProbability: this.calculateWinProbability(homeTeamAnalysis, awayTeamAnalysis),
-        spreadRecommendation: this.calculateSpreadRecommendation(homeTeamAnalysis, awayTeamAnalysis),
+        spreadRecommendation: this.calculateSpreadRecommendation(
+          homeTeamAnalysis,
+          awayTeamAnalysis
+        ),
         totalRecommendation: this.calculateTotalRecommendation(homeTeamAnalysis, awayTeamAnalysis),
         keyMatchups: this.identifyKeyMatchups(homeTeamAnalysis, awayTeamAnalysis),
         weatherFactor: await this.calculateWeatherFactor(homeTeamId),
@@ -398,43 +416,58 @@ export class NFLAnalyticsService {
   private calculateAverage(stats: any[], field: string): number {
     const validStats = stats.filter(stat => stat[field] !== undefined && stat[field] !== null);
     if (validStats.length === 0) return 0;
-    
+
     const sum = validStats.reduce((acc, stat) => acc + stat[field], 0);
     return sum / validStats.length;
   }
 
   private getPositionGroup(position: string): string {
     const positionGroups: { [key: string]: string } = {
-      'QB': 'QB',
-      'RB': 'RB', 'FB': 'RB',
-      'WR': 'WR', 'TE': 'TE',
-      'LT': 'OL', 'LG': 'OL', 'C': 'OL', 'RG': 'OL', 'RT': 'OL',
-      'DE': 'DL', 'DT': 'DL', 'NT': 'DL',
-      'OLB': 'LB', 'ILB': 'LB', 'MLB': 'LB',
-      'CB': 'DB', 'S': 'DB', 'FS': 'DB', 'SS': 'DB',
-      'K': 'ST', 'P': 'ST', 'LS': 'ST',
+      QB: 'QB',
+      RB: 'RB',
+      FB: 'RB',
+      WR: 'WR',
+      TE: 'TE',
+      LT: 'OL',
+      LG: 'OL',
+      C: 'OL',
+      RG: 'OL',
+      RT: 'OL',
+      DE: 'DL',
+      DT: 'DL',
+      NT: 'DL',
+      OLB: 'LB',
+      ILB: 'LB',
+      MLB: 'LB',
+      CB: 'DB',
+      S: 'DB',
+      FS: 'DB',
+      SS: 'DB',
+      K: 'ST',
+      P: 'ST',
+      LS: 'ST',
     };
-    
+
     return positionGroups[position] || 'Unknown';
   }
 
   private calculateOverallRating(analysis: PlayerAnalysis): number {
     // Weighted rating based on position and performance
     let rating = 50; // Base rating
-    
+
     if (analysis.offensiveAnalysis && analysis.offensiveAnalysis.primaryMetrics) {
       // Position-specific rating calculations
       rating += this.calculatePositionSpecificRating(analysis);
     }
-    
+
     if (analysis.clutchPerformance) {
       rating += analysis.clutchPerformance.clutchRating * 10;
     }
-    
+
     if (analysis.durabilityAnalysis) {
       rating += analysis.durabilityAnalysis.healthScore * 15;
     }
-    
+
     return Math.max(0, Math.min(100, Math.round(rating)));
   }
 
@@ -470,7 +503,10 @@ export class NFLAnalyticsService {
 
   private calculateFumbleRate(rbStats: any[]): number {
     const totalFumbles = rbStats.reduce((sum, stat) => sum + stat.fumbles, 0);
-    const totalTouches = rbStats.reduce((sum, stat) => sum + stat.rushingAttempts + stat.receptions, 0);
+    const totalTouches = rbStats.reduce(
+      (sum, stat) => sum + stat.rushingAttempts + stat.receptions,
+      0
+    );
     return totalTouches > 0 ? (totalFumbles / totalTouches) * 100 : 0;
   }
 
@@ -495,7 +531,8 @@ export class NFLAnalyticsService {
   // Data retrieval methods
   private async getGameHistory(playerId: string): Promise<any[]> {
     try {
-      const gamesRef = firebaseService.collection('nfl_games')
+      const gamesRef = firebaseService
+        .collection('nfl_games')
         .where('players', 'array-contains', playerId)
         .orderBy('date', 'desc')
         .limit(17); // Full NFL season
@@ -510,7 +547,8 @@ export class NFLAnalyticsService {
 
   private async getTeamGameHistory(teamId: string): Promise<any[]> {
     try {
-      const gamesRef = firebaseService.collection('nfl_games')
+      const gamesRef = firebaseService
+        .collection('nfl_games')
         .where('teams', 'array-contains', teamId)
         .orderBy('date', 'desc')
         .limit(17); // Full NFL season

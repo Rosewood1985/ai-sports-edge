@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+
 import '@testing-library/jest-dom';
 import { LineChart } from '../../../../atomic/molecules/charts/LineChart';
 
@@ -14,7 +15,7 @@ jest.mock('react-chartjs-2', () => ({
       <div data-testid="chart-data">{JSON.stringify(data)}</div>
       <div data-testid="chart-options">{JSON.stringify(options)}</div>
     </div>
-  )
+  ),
 }));
 
 jest.mock('chart.js', () => ({
@@ -71,7 +72,7 @@ describe('LineChart', () => {
   it('applies custom colors when provided', () => {
     const customColors = ['#ff0000', '#00ff00'];
     render(<LineChart {...defaultProps} colors={customColors} />);
-    
+
     const chartData = screen.getByTestId('chart-data');
     expect(chartData.textContent).toContain('#ff0000');
   });
@@ -82,7 +83,7 @@ describe('LineChart', () => {
       { label: 'Feb', value: null },
       { label: 'Mar', value: 150 },
     ];
-    
+
     render(<LineChart {...defaultProps} data={dataWithMissing as any} />);
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
   });
@@ -113,13 +114,13 @@ describe('LineChart', () => {
       { label: 'Feb', value: 200 },
       { label: 'Mar', value: -50 },
     ];
-    
+
     render(<LineChart {...defaultProps} data={dataWithNegatives} />);
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
   });
 
   it('applies responsive sizing correctly', () => {
-    render(<LineChart {...defaultProps} responsive={true} />);
+    render(<LineChart {...defaultProps} responsive />);
     const chartOptions = screen.getByTestId('chart-options');
     expect(chartOptions.textContent).toContain('responsive');
   });

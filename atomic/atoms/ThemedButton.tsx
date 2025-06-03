@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+
 import { useUITheme } from '../../components/UIThemeProvider';
 
 interface ThemedButtonProps {
@@ -152,15 +153,8 @@ export function ThemedButton({
       disabled={disabled || loading}
       activeOpacity={0.8}
     >
-      {loading && (
-        <ActivityIndicator 
-          size="small" 
-          color={getTextColor()} 
-        />
-      )}
-      <Text style={[buttonTextStyle, textStyle]}>
-        {title}
-      </Text>
+      {loading && <ActivityIndicator size="small" color={getTextColor()} />}
+      <Text style={[buttonTextStyle, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
 }

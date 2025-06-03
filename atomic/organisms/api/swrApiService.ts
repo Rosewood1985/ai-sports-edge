@@ -3,9 +3,9 @@
  * AI Sports Edge - Modern data fetching with real-time capabilities
  */
 
+import { useEffect, useRef, useState } from 'react';
 import useSWR, { SWRConfiguration, mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { useEffect, useRef, useState } from 'react';
 
 // Types
 interface ApiResponse<T = any> {
@@ -35,7 +35,8 @@ interface WebSocketConfig {
 
 // Default configuration
 const DEFAULT_CONFIG: ApiConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://us-central1-ai-sports-edge.cloudfunctions.net',
+  baseUrl:
+    process.env.NEXT_PUBLIC_API_URL || 'https://us-central1-ai-sports-edge.cloudfunctions.net',
   revalidateOnFocus: false,
   revalidateOnReconnect: true,
   refreshInterval: 30000, // 30 seconds
@@ -47,7 +48,7 @@ const DEFAULT_CONFIG: ApiConfig = {
 const fetcher = async (url: string, options: RequestInit = {}): Promise<any> => {
   const config = { ...DEFAULT_CONFIG, ...options };
   const fullUrl = url.startsWith('http') ? url : `${config.baseUrl}${url}`;
-  
+
   // Add authentication headers
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -111,15 +112,16 @@ const mutationFetcher = async (
  * Hook for fetching subscription analytics with caching
  */
 export const useSubscriptionAnalytics = (timeRange: string = '30d', config?: ApiConfig) => {
-  const { data, error, isLoading, mutate: revalidate } = useSWR(
-    `/subscriptionAnalytics?timeRange=${timeRange}`,
-    fetcher,
-    {
-      ...DEFAULT_CONFIG,
-      ...config,
-      refreshInterval: 60000, // Refresh every minute for analytics
-    }
-  );
+  const {
+    data,
+    error,
+    isLoading,
+    mutate: revalidate,
+  } = useSWR(`/subscriptionAnalytics?timeRange=${timeRange}`, fetcher, {
+    ...DEFAULT_CONFIG,
+    ...config,
+    refreshInterval: 60000, // Refresh every minute for analytics
+  });
 
   return {
     data: data?.data,
@@ -134,15 +136,16 @@ export const useSubscriptionAnalytics = (timeRange: string = '30d', config?: Api
  * Hook for fetching featured games with real-time updates
  */
 export const useFeaturedGames = (config?: ApiConfig) => {
-  const { data, error, isLoading, mutate: revalidate } = useSWR(
-    '/featuredGames',
-    fetcher,
-    {
-      ...DEFAULT_CONFIG,
-      ...config,
-      refreshInterval: 15000, // Refresh every 15 seconds for live games
-    }
-  );
+  const {
+    data,
+    error,
+    isLoading,
+    mutate: revalidate,
+  } = useSWR('/featuredGames', fetcher, {
+    ...DEFAULT_CONFIG,
+    ...config,
+    refreshInterval: 15000, // Refresh every 15 seconds for live games
+  });
 
   return {
     games: data?.games || [],
@@ -157,15 +160,11 @@ export const useFeaturedGames = (config?: ApiConfig) => {
  * Hook for fetching trending topics
  */
 export const useTrendingTopics = (config?: ApiConfig) => {
-  const { data, error, isLoading } = useSWR(
-    '/trendingTopics',
-    fetcher,
-    {
-      ...DEFAULT_CONFIG,
-      ...config,
-      refreshInterval: 120000, // Refresh every 2 minutes
-    }
-  );
+  const { data, error, isLoading } = useSWR('/trendingTopics', fetcher, {
+    ...DEFAULT_CONFIG,
+    ...config,
+    refreshInterval: 120000, // Refresh every 2 minutes
+  });
 
   return {
     topics: data?.topics || [],
@@ -219,10 +218,7 @@ export const usePersonalizedRecommendations = (userId: string, config?: ApiConfi
  * Hook for mutation operations (POST, PUT, DELETE)
  */
 export const useApiMutation = (endpoint: string) => {
-  const { trigger, isMutating, error, data } = useSWRMutation(
-    endpoint,
-    mutationFetcher
-  );
+  const { trigger, isMutating, error, data } = useSWRMutation(endpoint, mutationFetcher);
 
   const post = (data: any, headers?: Record<string, string>) =>
     trigger({ method: 'POST', data, headers });
@@ -230,8 +226,7 @@ export const useApiMutation = (endpoint: string) => {
   const put = (data: any, headers?: Record<string, string>) =>
     trigger({ method: 'PUT', data, headers });
 
-  const del = (headers?: Record<string, string>) =>
-    trigger({ method: 'DELETE', headers });
+  const del = (headers?: Record<string, string>) => trigger({ method: 'DELETE', headers });
 
   return {
     post,
@@ -248,10 +243,12 @@ export const useApiMutation = (endpoint: string) => {
  */
 export const useWebSocket = (config: WebSocketConfig) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [connectionState, setConnectionState] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+  const [connectionState, setConnectionState] = useState<
+    'connecting' | 'connected' | 'disconnected'
+  >('disconnected');
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  
+
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = config.maxReconnectAttempts || 5;
   const reconnectInterval = config.reconnectInterval || 5000;
@@ -260,26 +257,26 @@ export const useWebSocket = (config: WebSocketConfig) => {
     try {
       setConnectionState('connecting');
       setError(null);
-      
+
       const ws = new WebSocket(config.url, config.protocols);
-      
+
       ws.onopen = () => {
         setConnectionState('connected');
         reconnectAttempts.current = 0;
       };
-      
-      ws.onmessage = (event) => {
+
+      ws.onmessage = event => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
           setLastMessage(message);
-          
+
           // Invalidate relevant SWR cache based on message type
           switch (message.type) {
             case 'GAME_UPDATE':
               mutate('/featuredGames');
               break;
             case 'ANALYTICS_UPDATE':
-              mutate((key) => typeof key === 'string' && key.includes('/subscriptionAnalytics'));
+              mutate(key => typeof key === 'string' && key.includes('/subscriptionAnalytics'));
               break;
             case 'TRENDING_UPDATE':
               mutate('/trendingTopics');
@@ -291,15 +288,15 @@ export const useWebSocket = (config: WebSocketConfig) => {
           console.error('Failed to parse WebSocket message:', err);
         }
       };
-      
-      ws.onerror = (event) => {
+
+      ws.onerror = event => {
         setError(new Error('WebSocket error occurred'));
       };
-      
-      ws.onclose = (event) => {
+
+      ws.onclose = event => {
         setConnectionState('disconnected');
         setSocket(null);
-        
+
         // Attempt to reconnect if not manually closed
         if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
           setTimeout(() => {
@@ -308,7 +305,7 @@ export const useWebSocket = (config: WebSocketConfig) => {
           }, reconnectInterval);
         }
       };
-      
+
       setSocket(ws);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to create WebSocket connection'));
@@ -332,7 +329,7 @@ export const useWebSocket = (config: WebSocketConfig) => {
 
   useEffect(() => {
     connect();
-    
+
     return () => {
       if (socket) {
         socket.close();
@@ -355,7 +352,7 @@ export const useWebSocket = (config: WebSocketConfig) => {
  */
 export const useRealTimeFeaturedGames = () => {
   const gamesData = useFeaturedGames();
-  
+
   const webSocket = useWebSocket({
     url: process.env.NEXT_PUBLIC_WS_URL || 'wss://ai-sports-edge.cloudfunctions.net/gameUpdates',
     reconnectInterval: 3000,

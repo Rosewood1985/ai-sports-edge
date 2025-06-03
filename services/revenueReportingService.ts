@@ -1,12 +1,12 @@
 /**
  * Revenue Reporting Service
- * 
+ *
  * This service provides functions for revenue reporting and analysis.
  */
 
+import cache from '../utils/cache';
 import db from '../utils/db';
 import logger from '../utils/logger';
-import cache from '../utils/cache';
 
 // Cache TTL for reports (1 hour)
 const REPORT_CACHE_TTL = 60 * 60 * 1000;
@@ -84,29 +84,29 @@ export interface RevenueReport {
 
 /**
  * Generate a revenue report
- * 
+ *
  * @param options - Report options
  * @returns Generated report
  */
 export async function generateReport(options: ReportOptions): Promise<RevenueReport> {
   try {
     const { startDate, endDate, type, format = 'json', userId } = options;
-    
+
     // Validate dates
     if (startDate > endDate) {
       throw new Error('Start date must be before end date');
     }
-    
+
     // Generate cache key
     const cacheKey = `report_${type}_${startDate.toISOString()}_${endDate.toISOString()}_${format}`;
-    
+
     // Check cache
     const cachedReport = cache.get<RevenueReport>(cacheKey);
     if (cachedReport) {
       logger.debug('Using cached report', { type, startDate, endDate });
       return cachedReport;
     }
-    
+
     // Create report record
     const reportRecord = await db.query(
       `INSERT INTO revenue_reports (
@@ -121,9 +121,9 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
       RETURNING id`,
       [type, startDate, endDate, 0, 0, ReportStatus.GENERATING, userId]
     );
-    
+
     const reportId = reportRecord.rows[0].id;
-    
+
     try {
       // Get transactions for the period
       const transactions = await db.query(
@@ -139,23 +139,23 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
         ORDER BY t.created_at`,
         [startDate, endDate]
       );
-      
+
       // Calculate totals
       let totalRevenue = 0;
       let totalTax = 0;
-      let transactionCount = transactions.rows.length;
-      
+      const transactionCount = transactions.rows.length;
+
       // Process transactions by category
       const categoriesMap: Record<string, CategoryRevenue> = {};
-      
+
       transactions.rows.forEach((transaction: any) => {
         const amount = parseFloat(transaction.amount) || 0;
         const taxAmount = parseFloat(transaction.tax_amount) || 0;
         const category = transaction.category_name || 'Uncategorized';
-        
+
         totalRevenue += amount;
         totalTax += taxAmount;
-        
+
         if (!categoriesMap[category]) {
           categoriesMap[category] = {
             name: category,
@@ -165,30 +165,29 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
             percentage: 0,
           };
         }
-        
+
         categoriesMap[category].grossRevenue += amount;
         categoriesMap[category].tax += taxAmount;
-        categoriesMap[category].netRevenue += (amount - taxAmount);
+        categoriesMap[category].netRevenue += amount - taxAmount;
       });
-      
+
       // Calculate percentages
       const categories = Object.values(categoriesMap);
       categories.forEach(category => {
-        category.percentage = totalRevenue > 0 
-          ? Math.round((category.grossRevenue / totalRevenue) * 100) 
-          : 0;
+        category.percentage =
+          totalRevenue > 0 ? Math.round((category.grossRevenue / totalRevenue) * 100) : 0;
       });
-      
+
       // Process transactions by day for daily breakdown
       const daysMap: Record<string, DailyRevenue> = {};
-      
+
       if (type !== ReportType.DAILY) {
         transactions.rows.forEach((transaction: any) => {
           const date = new Date(transaction.created_at);
           const dateString = date.toISOString().split('T')[0];
           const amount = parseFloat(transaction.amount) || 0;
           const taxAmount = parseFloat(transaction.tax_amount) || 0;
-          
+
           if (!daysMap[dateString]) {
             daysMap[dateString] = {
               date: new Date(dateString),
@@ -198,40 +197,40 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
               netRevenue: 0,
             };
           }
-          
+
           daysMap[dateString].transactionCount += 1;
           daysMap[dateString].grossRevenue += amount;
           daysMap[dateString].tax += taxAmount;
-          daysMap[dateString].netRevenue += (amount - taxAmount);
+          daysMap[dateString].netRevenue += amount - taxAmount;
         });
       }
-      
-      const days = Object.values(daysMap).sort((a, b) => 
-        a.date.getTime() - b.date.getTime()
-      );
-      
+
+      const days = Object.values(daysMap).sort((a, b) => a.date.getTime() - b.date.getTime());
+
       // Get comparison data for previous period
       let comparisonPercentage: number | undefined;
-      
+
       if (type !== ReportType.DAILY) {
         const periodLength = endDate.getTime() - startDate.getTime();
         const previousStartDate = new Date(startDate.getTime() - periodLength);
         const previousEndDate = new Date(endDate.getTime() - periodLength);
-        
+
         const previousPeriod = await db.query(
           `SELECT SUM(amount) as total_revenue
           FROM transactions
           WHERE created_at BETWEEN $1 AND $2`,
           [previousStartDate, previousEndDate]
         );
-        
+
         const previousRevenue = parseFloat(previousPeriod.rows[0]?.total_revenue) || 0;
-        
+
         if (previousRevenue > 0) {
-          comparisonPercentage = Math.round(((totalRevenue - previousRevenue) / previousRevenue) * 100);
+          comparisonPercentage = Math.round(
+            ((totalRevenue - previousRevenue) / previousRevenue) * 100
+          );
         }
       }
-      
+
       // Create report object
       const report: RevenueReport = {
         id: reportId,
@@ -247,7 +246,7 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
         days: type !== ReportType.DAILY ? days : undefined,
         comparisonPercentage,
       };
-      
+
       // Update report record
       await db.query(
         `UPDATE revenue_reports
@@ -259,10 +258,10 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
         WHERE id = $5`,
         [totalRevenue, totalTax, ReportStatus.COMPLETED, JSON.stringify(report), reportId]
       );
-      
+
       // Cache report
       cache.set(cacheKey, report, REPORT_CACHE_TTL);
-      
+
       return report;
     } catch (error) {
       // Update report status to failed
@@ -272,7 +271,7 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
         WHERE id = $2`,
         [ReportStatus.FAILED, reportId]
       );
-      
+
       throw error;
     }
   } catch (error) {
@@ -286,7 +285,7 @@ export async function generateReport(options: ReportOptions): Promise<RevenueRep
 
 /**
  * Get a list of reports
- * 
+ *
  * @param type - Report type filter (optional)
  * @param limit - Maximum number of reports to return (optional)
  * @param offset - Offset for pagination (optional)
@@ -312,13 +311,11 @@ export async function getReports(
         FROM revenue_reports
         ORDER BY generation_date DESC
         LIMIT $1 OFFSET $2`;
-    
-    const params = type
-      ? [type, limit, offset]
-      : [limit, offset];
-    
+
+    const params = type ? [type, limit, offset] : [limit, offset];
+
     const result = await db.query(query, params);
-    
+
     return result.rows.map((row: any) => ({
       id: row.id,
       type: row.report_type,
@@ -343,7 +340,7 @@ export async function getReports(
 
 /**
  * Get a report by ID
- * 
+ *
  * @param id - Report ID
  * @returns Report or null if not found
  */
@@ -355,13 +352,13 @@ export async function getReportById(id: string): Promise<RevenueReport | null> {
       WHERE id = $1`,
       [id]
     );
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     const row = result.rows[0];
-    
+
     // If report data is available, return it
     if (row.report_data) {
       return {
@@ -376,7 +373,7 @@ export async function getReportById(id: string): Promise<RevenueReport | null> {
         netRevenue: parseFloat(row.total_revenue) - parseFloat(row.total_tax),
       };
     }
-    
+
     // Otherwise, regenerate the report
     return generateReport({
       startDate: new Date(row.start_date),
@@ -394,7 +391,7 @@ export async function getReportById(id: string): Promise<RevenueReport | null> {
 
 /**
  * Delete a report
- * 
+ *
  * @param id - Report ID
  * @returns True if deleted, false if not found
  */
@@ -406,7 +403,7 @@ export async function deleteReport(id: string): Promise<boolean> {
       RETURNING id`,
       [id]
     );
-    
+
     return result.rows.length > 0;
   } catch (error) {
     logger.error('Failed to delete report', {

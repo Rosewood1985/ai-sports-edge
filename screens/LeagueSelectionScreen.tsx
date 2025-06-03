@@ -1,16 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+
+import { EmptyState } from '../atomic/atoms';
+import { LeagueFilters } from '../atomic/molecules';
+import { Header } from '../atomic/organisms';
+import LeagueItem from '../components/LeagueItem';
 import { useTheme } from '../contexts/ThemeContext';
+import { trackScreenView } from '../services/analyticsService';
 import { sportsDataService } from '../services/sportsDataService';
 import { userPreferencesService } from '../services/userPreferencesService';
 import { League, LeagueFilter } from '../types/sports';
-import { Header } from '../atomic/organisms';
-import LeagueItem from '../components/LeagueItem';
-import { LeagueFilters } from '../atomic/molecules';
-import { EmptyState } from '../atomic/atoms';
-import { Ionicons } from '@expo/vector-icons';
-import { trackScreenView } from '../services/analyticsService';
 
 type LeagueSelectionScreenProps = {
   navigation: StackNavigationProp<any, 'LeagueSelection'>;
@@ -40,11 +41,11 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
     const loadData = async () => {
       try {
         setLoading(true);
-        
+
         // Load user's selected leagues
         const userSelectedLeagueIds = await userPreferencesService.getSelectedLeagueIds();
         setSelectedLeagueIds(userSelectedLeagueIds);
-        
+
         // Load all leagues
         const allLeagues = await sportsDataService.fetchAllLeagues();
         setLeagues(allLeagues);
@@ -65,13 +66,13 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
     const applyFilters = async () => {
       try {
         setLoading(true);
-        
+
         // If no filters are set, show all leagues
         if (!filters.country && !filters.sport && filters.isCollege === undefined) {
           setFilteredLeagues(leagues);
           return;
         }
-        
+
         const filtered = await sportsDataService.fetchLeaguesByFilter(filters);
         setFilteredLeagues(filtered);
       } catch (err) {
@@ -94,7 +95,7 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
   const handleLeagueSelect = async (league: League) => {
     try {
       const isSelected = await userPreferencesService.toggleLeagueSelection(league);
-      
+
       // Update local state
       if (isSelected) {
         setSelectedLeagueIds([...selectedLeagueIds, league.idLeague]);
@@ -110,16 +111,16 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
   const handleRefresh = async () => {
     try {
       setLoading(true);
-      
+
       // Clear cache and reload leagues
       sportsDataService.clearCache();
       const allLeagues = await sportsDataService.fetchAllLeagues();
       setLeagues(allLeagues);
-      
+
       // Reload user selections
       const userSelectedLeagueIds = await userPreferencesService.getSelectedLeagueIds();
       setSelectedLeagueIds(userSelectedLeagueIds);
-      
+
       // Apply current filters
       if (filters.country || filters.sport || filters.isCollege !== undefined) {
         const filtered = await sportsDataService.fetchLeaguesByFilter(filters);
@@ -139,16 +140,10 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header
-          title="Select Leagues"
-          onRefresh={() => {}}
-          isLoading={loading}
-        />
+        <Header title="Select Leagues" onRefresh={() => {}} isLoading={loading} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            Loading leagues...
-          </Text>
+          <Text style={[styles.loadingText, { color: colors.text }]}>Loading leagues...</Text>
         </View>
       </View>
     );
@@ -158,11 +153,7 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
   if (error) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header
-          title="Select Leagues"
-          onRefresh={handleRefresh}
-          isLoading={false}
-        />
+        <Header title="Select Leagues" onRefresh={handleRefresh} isLoading={false} />
         <EmptyState
           message={error}
           icon={<Ionicons name="alert-circle-outline" size={40} color={colors.primary} />}
@@ -173,17 +164,10 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
-        title="Select Leagues"
-        onRefresh={handleRefresh}
-        isLoading={false}
-      />
-      
-      <LeagueFilters
-        filters={filters}
-        onFilterChange={handleFilterChange}
-      />
-      
+      <Header title="Select Leagues" onRefresh={handleRefresh} isLoading={false} />
+
+      <LeagueFilters filters={filters} onFilterChange={handleFilterChange} />
+
       {filteredLeagues.length === 0 ? (
         <EmptyState
           message="No leagues found matching your filters. Try adjusting your filters."
@@ -192,7 +176,7 @@ const LeagueSelectionScreen: React.FC<LeagueSelectionScreenProps> = ({ navigatio
       ) : (
         <FlatList
           data={filteredLeagues}
-          keyExtractor={(item) => item.idLeague}
+          keyExtractor={item => item.idLeague}
           renderItem={({ item }) => (
             <LeagueItem
               league={item}

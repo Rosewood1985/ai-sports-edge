@@ -1,13 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { ThemeToggle } from 'atomic/molecules/theme';
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View, Switch, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { usePersonalization } from '../contexts/PersonalizationContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { Colors } from '../constants/Colors';
-import { ThemeToggle } from 'atomic/molecules/theme';
+import { usePersonalization } from '../contexts/PersonalizationContext';
 
 // Use the dark theme colors
 const colors = Colors.dark;

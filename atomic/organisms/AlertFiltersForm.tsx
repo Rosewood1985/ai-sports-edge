@@ -1,9 +1,10 @@
+import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, ViewStyle, StyleProp, View, ScrollView } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+
 import { AccessibleThemedView, FilterTag, Slider, CheckboxWithLabel } from '../atoms';
-import { FilterSection } from '../molecules';
 import { AlertType } from '../atoms/AlertTypeIcon';
+import { FilterSection } from '../molecules';
 import { useI18n } from './i18n/I18nContext';
 
 /**

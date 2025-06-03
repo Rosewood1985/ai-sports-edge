@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Clipboard,
-  Alert
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Alert } from 'react-native';
+
+import ReferralShareOptions from './ReferralShareOptions';
 import { auth } from '../config/firebase';
-import { rewardsService } from '../services/rewardsService';
 import { useThemeColor } from '../hooks/useThemeColor';
+import { rewardsService } from '../services/rewardsService';
+import NeonButton from './ui/NeonButton';
 import NeonCard from './ui/NeonCard';
 import NeonText from './ui/NeonText';
-import NeonButton from './ui/NeonButton';
-import ReferralShareOptions from './ReferralShareOptions';
 
 interface ReferralProgramCardProps {
   onViewLeaderboard?: () => void;
@@ -28,49 +22,49 @@ interface ReferralProgramCardProps {
  */
 const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({
   onViewLeaderboard,
-  onViewMilestones
+  onViewMilestones,
 }) => {
   const [referralCode, setReferralCode] = useState<string>('');
   const [referralCount, setReferralCount] = useState<number>(0);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [shareModalVisible, setShareModalVisible] = useState<boolean>(false);
-  
+
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
-  
+
   useEffect(() => {
     loadReferralData();
   }, []);
-  
+
   const loadReferralData = async () => {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) return;
-      
+
       // Get user rewards data
       const rewards = await rewardsService.getUserRewards(userId);
-      
+
       // Set referral code if it exists
       if (rewards?.referralCode) {
         setReferralCode(rewards.referralCode);
       }
-      
+
       // Set referral count
       setReferralCount(rewards?.referralCount || 0);
-      
+
       // Check if user is subscribed (simplified for now)
       setIsSubscribed(true); // In a real app, check subscription status
     } catch (error) {
       console.error('Error loading referral data:', error);
     }
   };
-  
+
   const handleGenerateReferralCode = async () => {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) return;
-      
+
       setIsGenerating(true);
       const code = await rewardsService.generateReferralCode(userId);
       setReferralCode(code);
@@ -81,63 +75,53 @@ const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({
       setIsGenerating(false);
     }
   };
-  
+
   const handleCopyReferralCode = () => {
     Clipboard.setString(referralCode);
     Alert.alert('Copied!', 'Referral code copied to clipboard');
   };
-  
+
   const handleShareReferralCode = () => {
     setShareModalVisible(true);
   };
-  
+
   const handleCloseShareModal = () => {
     setShareModalVisible(false);
   };
-  
+
   return (
     <NeonCard style={styles.container}>
       <View style={styles.header}>
-        <NeonText type="subheading" glow={true}>
+        <NeonText type="subheading" glow>
           Refer Friends & Earn Rewards
         </NeonText>
-        
+
         {onViewLeaderboard && (
           <TouchableOpacity onPress={onViewLeaderboard} style={styles.leaderboardButton}>
             <Ionicons name="trophy" size={20} color={primaryColor} />
           </TouchableOpacity>
         )}
       </View>
-      
+
       <Text style={[styles.description, { color: textColor }]}>
         Invite friends to join AI Sports Edge. You'll both receive rewards when they subscribe!
       </Text>
-      
+
       {isSubscribed ? (
         <>
           {referralCode ? (
             <View style={styles.codeSection}>
-              <Text style={[styles.codeLabel, { color: textColor }]}>
-                Your Referral Code:
-              </Text>
-              
+              <Text style={[styles.codeLabel, { color: textColor }]}>Your Referral Code:</Text>
+
               <View style={styles.codeContainer}>
-                <Text style={[styles.code, { color: primaryColor }]}>
-                  {referralCode}
-                </Text>
-                
+                <Text style={[styles.code, { color: primaryColor }]}>{referralCode}</Text>
+
                 <View style={styles.codeActions}>
-                  <TouchableOpacity 
-                    onPress={handleCopyReferralCode}
-                    style={styles.iconButton}
-                  >
+                  <TouchableOpacity onPress={handleCopyReferralCode} style={styles.iconButton}>
                     <Ionicons name="copy-outline" size={20} color={primaryColor} />
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    onPress={handleShareReferralCode}
-                    style={styles.iconButton}
-                  >
+
+                  <TouchableOpacity onPress={handleShareReferralCode} style={styles.iconButton}>
                     <Ionicons name="share-social-outline" size={20} color={primaryColor} />
                   </TouchableOpacity>
                 </View>
@@ -145,28 +129,21 @@ const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({
             </View>
           ) : (
             <NeonButton
-              title={isGenerating ? "Generating..." : "Generate Referral Code"}
+              title={isGenerating ? 'Generating...' : 'Generate Referral Code'}
               onPress={handleGenerateReferralCode}
               disabled={isGenerating}
               style={styles.generateButton}
             />
           )}
-          
+
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: primaryColor }]}>
-                {referralCount}
-              </Text>
-              <Text style={[styles.statLabel, { color: textColor }]}>
-                Friends Referred
-              </Text>
+              <Text style={[styles.statValue, { color: primaryColor }]}>{referralCount}</Text>
+              <Text style={[styles.statLabel, { color: textColor }]}>Friends Referred</Text>
             </View>
-            
+
             {onViewMilestones && (
-              <TouchableOpacity 
-                style={styles.viewMilestonesButton}
-                onPress={onViewMilestones}
-              >
+              <TouchableOpacity style={styles.viewMilestonesButton} onPress={onViewMilestones}>
                 <Text style={[styles.viewMilestonesText, { color: primaryColor }]}>
                   View Milestones
                 </Text>
@@ -180,7 +157,7 @@ const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({
           <Text style={[styles.subscribeText, { color: textColor }]}>
             Subscribe to generate your own referral code and start earning rewards!
           </Text>
-          
+
           <NeonButton
             title="Subscribe Now"
             onPress={() => {}} // Navigate to subscription screen
@@ -188,7 +165,7 @@ const ReferralProgramCard: React.FC<ReferralProgramCardProps> = ({
           />
         </View>
       )}
-      
+
       {/* Share Options Modal */}
       <ReferralShareOptions
         visible={shareModalVisible}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Card, DataTable } from 'react-native-paper';
-import MLSportsEdgeService from '../../services/ml-sports-edge/MLSportsEdgeService';
+
 import { useTheme } from '../../contexts/ThemeContext';
+import MLSportsEdgeService from '../../services/ml-sports-edge/MLSportsEdgeService';
 
 interface Prediction {
   home_team_name: string;
@@ -59,14 +60,19 @@ const PredictionsTable: React.FC<PredictionsTableProps> = ({ sport, league }) =>
 
   return (
     <Card style={[styles.card, { backgroundColor: theme.colors.background }]}>
-      <Card.Title title="AI Predictions" subtitle={`${sport.toUpperCase()} - ${league.toUpperCase()}`} />
+      <Card.Title
+        title="AI Predictions"
+        subtitle={`${sport.toUpperCase()} - ${league.toUpperCase()}`}
+      />
       <Card.Content>
         {loading ? (
           <ActivityIndicator size="large" color={theme.colors.primary} />
         ) : error ? (
           <Text style={[styles.error, { color: theme.colors.error }]}>{error}</Text>
         ) : predictions.length === 0 ? (
-          <Text style={[styles.noData, { color: theme.colors.text }]}>No predictions available</Text>
+          <Text style={[styles.noData, { color: theme.colors.text }]}>
+            No predictions available
+          </Text>
         ) : (
           <ScrollView horizontal>
             <DataTable style={styles.table}>
@@ -86,13 +92,14 @@ const PredictionsTable: React.FC<PredictionsTableProps> = ({ sport, league }) =>
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
-                    <Text style={{ color: theme.colors.text }}>
-                      {formatDate(prediction.date)}
-                    </Text>
+                    <Text style={{ color: theme.colors.text }}>{formatDate(prediction.date)}</Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
                     <Text style={{ color: theme.colors.primary }}>
-                      {getPredictionText(prediction.ensemble_prediction, prediction.ensemble_probability)}
+                      {getPredictionText(
+                        prediction.ensemble_prediction,
+                        prediction.ensemble_probability
+                      )}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell numeric>

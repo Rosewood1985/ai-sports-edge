@@ -4,9 +4,10 @@
  * This file tests the accessibility features of the AccessibleTouchable component.
  */
 
+import { render } from '@testing-library/react-native';
 import React from 'react';
 import { Text } from 'react-native';
-import { render } from '@testing-library/react-native';
+
 import { axeReactNative as axe, toHaveNoViolations } from './axe-react-native';
 import AccessibleTouchable from '../../components/AccessibleTouchable';
 
@@ -24,7 +25,7 @@ describe('AccessibleTouchable Accessibility Tests', () => {
 
     const results = await axe(
       <AccessibleTouchable onPress={onPress} accessibilityLabel="Test button">
-        <Text accessible={true} accessibilityLabel="Press me text" accessibilityRole="text">
+        <Text accessible accessibilityLabel="Press me text" accessibilityRole="text">
           Press me
         </Text>
       </AccessibleTouchable>
@@ -42,7 +43,7 @@ describe('AccessibleTouchable Accessibility Tests', () => {
         accessibilityHint="This is a custom hint"
         accessibilityRole="button"
       >
-        <Text accessible={true} accessibilityLabel="Custom text" accessibilityRole="text">
+        <Text accessible accessibilityLabel="Custom text" accessibilityRole="text">
           Custom Button
         </Text>
       </AccessibleTouchable>

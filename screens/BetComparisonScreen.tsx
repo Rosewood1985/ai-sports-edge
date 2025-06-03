@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  ActivityIndicator 
-} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Game } from '../types/odds';
-import { getGameResult } from '../services/aiPredictionService';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+
 import PremiumFeature from '../components/PremiumFeature';
+import { getGameResult } from '../services/aiPredictionService';
+import { Game } from '../types/odds';
 
 type RootStackParamList = {
   PickComparison: { games: Game[] };
@@ -35,34 +36,34 @@ const PickComparisonScreen = (): JSX.Element => {
     byConfidence: {
       high: { total: 0, correct: 0, accuracy: 0 },
       medium: { total: 0, correct: 0, accuracy: 0 },
-      low: { total: 0, correct: 0, accuracy: 0 }
-    }
+      low: { total: 0, correct: 0, accuracy: 0 },
+    },
   });
-  
+
   const navigation = useNavigation<PickComparisonScreenNavigationProp>();
   const route = useRoute<PickComparisonScreenRouteProp>();
-  
+
   useEffect(() => {
     const loadResults = async () => {
       try {
         setLoading(true);
-        
+
         // Get games from route params or use empty array if not provided
         const games = route.params?.games || [];
-        
+
         // Get results for each game
         const gamesWithResultsData = await Promise.all(
-          games.map(async (game) => {
+          games.map(async game => {
             const result = await getGameResult(game.id);
             return {
               ...game,
-              game_result: result || undefined
+              game_result: result || undefined,
             } as Game;
           })
         );
-        
+
         setGamesWithResults(gamesWithResultsData);
-        
+
         // Calculate stats
         calculateStats(gamesWithResultsData);
       } catch (error) {
@@ -71,91 +72,93 @@ const PickComparisonScreen = (): JSX.Element => {
         setLoading(false);
       }
     };
-    
+
     loadResults();
   }, [route.params?.games]);
-  
+
   const calculateStats = (games: Game[]) => {
     // Filter games that have both predictions and results
     const completedGames = games.filter(
       game => game.ai_prediction && game.game_result && game.game_result.status === 'finished'
     );
-    
+
     if (completedGames.length === 0) {
       return;
     }
-    
+
     let correct = 0;
     const byConfidence = {
       high: { total: 0, correct: 0, accuracy: 0 },
       medium: { total: 0, correct: 0, accuracy: 0 },
-      low: { total: 0, correct: 0, accuracy: 0 }
+      low: { total: 0, correct: 0, accuracy: 0 },
     };
-    
+
     // Calculate correct predictions
     completedGames.forEach(game => {
       if (!game.ai_prediction || !game.game_result) return;
-      
+
       const prediction = game.ai_prediction.predicted_winner;
       const result = game.game_result.winner;
       const confidence = game.ai_prediction.confidence;
-      
+
       // Increment confidence level counters
       byConfidence[confidence].total++;
-      
+
       // Check if prediction was correct
-      const isCorrect = 
-        (result === 'home' && prediction === game.home_team) || 
+      const isCorrect =
+        (result === 'home' && prediction === game.home_team) ||
         (result === 'away' && prediction === game.away_team);
-      
+
       if (isCorrect) {
         correct++;
         byConfidence[confidence].correct++;
       }
     });
-    
+
     // Calculate accuracy percentages
     const accuracy = (correct / completedGames.length) * 100;
-    
+
     Object.keys(byConfidence).forEach(level => {
       const confidenceLevel = level as keyof typeof byConfidence;
       const { total, correct } = byConfidence[confidenceLevel];
       byConfidence[confidenceLevel].accuracy = total > 0 ? (correct / total) * 100 : 0;
     });
-    
+
     setStats({
       total: completedGames.length,
       correct,
       accuracy,
-      byConfidence
+      byConfidence,
     });
   };
-  
+
   // Get color based on accuracy percentage
   const getAccuracyColor = (accuracy: number): string => {
     if (accuracy >= 70) return '#4CAF50'; // Green
     if (accuracy >= 50) return '#FFC107'; // Yellow
     return '#F44336'; // Red
   };
-  
+
   // Get icon based on prediction correctness
   const getPredictionIcon = (game: Game): JSX.Element => {
     if (!game.ai_prediction || !game.game_result || game.game_result.status !== 'finished') {
       return <Ionicons name="help-circle" size={24} color="#757575" />;
     }
-    
+
     const prediction = game.ai_prediction.predicted_winner;
     const result = game.game_result.winner;
-    
-    const isCorrect = 
-      (result === 'home' && prediction === game.home_team) || 
+
+    const isCorrect =
+      (result === 'home' && prediction === game.home_team) ||
       (result === 'away' && prediction === game.away_team);
-    
-    return isCorrect ? 
-      <Ionicons name="checkmark-circle" size={24} color="#4CAF50" /> : 
-      <Ionicons name="close-circle" size={24} color="#F44336" />;
+
+    return isCorrect ? (
+      <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+    ) : (
+      <Ionicons name="close-circle" size={24} color="#F44336" />
+    );
   };
-  
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -164,56 +167,48 @@ const PickComparisonScreen = (): JSX.Element => {
       </View>
     );
   }
-  
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Bet Comparison</Text>
-      <Text style={styles.subtitle}>
-        Compare AI predictions with actual game results
-      </Text>
-      
+      <Text style={styles.subtitle}>Compare AI predictions with actual game results</Text>
+
       <PremiumFeature>
         {/* Overall Stats Card */}
         <View style={styles.statsCard}>
           <Text style={styles.statsTitle}>Prediction Accuracy</Text>
-          
+
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{stats.total}</Text>
               <Text style={styles.statLabel}>Total Games</Text>
             </View>
-            
+
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{stats.correct}</Text>
               <Text style={styles.statLabel}>Correct Picks</Text>
             </View>
-            
+
             <View style={styles.statItem}>
-              <Text 
-                style={[
-                  styles.statValue, 
-                  { color: getAccuracyColor(stats.accuracy) }
-                ]}
-              >
+              <Text style={[styles.statValue, { color: getAccuracyColor(stats.accuracy) }]}>
                 {stats.accuracy.toFixed(1)}%
               </Text>
               <Text style={styles.statLabel}>Accuracy</Text>
             </View>
           </View>
-          
+
           <Text style={styles.confidenceTitle}>Accuracy by Confidence Level</Text>
-          
+
           <View style={styles.confidenceContainer}>
             {Object.entries(stats.byConfidence).map(([level, data]) => (
               <View key={level} style={styles.confidenceItem}>
-                <View 
+                <View
                   style={[
                     styles.confidenceIndicator,
-                    { 
-                      backgroundColor: 
-                        level === 'high' ? '#4CAF50' : 
-                        level === 'medium' ? '#FFC107' : '#F44336'
-                    }
+                    {
+                      backgroundColor:
+                        level === 'high' ? '#4CAF50' : level === 'medium' ? '#FFC107' : '#F44336',
+                    },
                   ]}
                 />
                 <Text style={styles.confidenceLevel}>
@@ -226,10 +221,10 @@ const PickComparisonScreen = (): JSX.Element => {
             ))}
           </View>
         </View>
-        
+
         {/* Game Comparisons */}
         <Text style={styles.sectionTitle}>Game by Game Comparison</Text>
-        
+
         {gamesWithResults.length === 0 ? (
           <Text style={styles.noGamesText}>No games available for comparison</Text>
         ) : (
@@ -241,26 +236,29 @@ const PickComparisonScreen = (): JSX.Element => {
                 </Text>
                 {getPredictionIcon(game)}
               </View>
-              
+
               <View style={styles.comparisonContainer}>
                 <View style={styles.predictionSide}>
                   <Text style={styles.sideTitle}>AI Prediction</Text>
-                  
+
                   {game.ai_prediction ? (
                     <>
                       <Text style={styles.predictionText}>
                         <Text style={styles.bold}>Pick: </Text>
                         {game.ai_prediction.predicted_winner}
                       </Text>
-                      
-                      <View 
+
+                      <View
                         style={[
                           styles.confidenceTag,
-                          { 
-                            backgroundColor: 
-                              game.ai_prediction.confidence === 'high' ? '#4CAF50' : 
-                              game.ai_prediction.confidence === 'medium' ? '#FFC107' : '#F44336'
-                          }
+                          {
+                            backgroundColor:
+                              game.ai_prediction.confidence === 'high'
+                                ? '#4CAF50'
+                                : game.ai_prediction.confidence === 'medium'
+                                  ? '#FFC107'
+                                  : '#F44336',
+                          },
                         ]}
                       >
                         <Text style={styles.confidenceTagText}>
@@ -272,20 +270,21 @@ const PickComparisonScreen = (): JSX.Element => {
                     <Text style={styles.noPredictionText}>No prediction available</Text>
                   )}
                 </View>
-                
+
                 <View style={styles.divider} />
-                
+
                 <View style={styles.resultSide}>
                   <Text style={styles.sideTitle}>Actual Result</Text>
-                  
+
                   {game.game_result ? (
                     game.game_result.status === 'finished' ? (
                       <>
                         <Text style={styles.resultText}>
                           <Text style={styles.bold}>Score: </Text>
-                          {game.home_team} {game.game_result.home_score} - {game.game_result.away_score} {game.away_team}
+                          {game.home_team} {game.game_result.home_score} -{' '}
+                          {game.game_result.away_score} {game.away_team}
                         </Text>
-                        
+
                         <Text style={styles.resultText}>
                           <Text style={styles.bold}>Winner: </Text>
                           {game.game_result.winner === 'home' ? game.home_team : game.away_team}
@@ -499,7 +498,7 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold',
-  }
+  },
 });
 
 export default PickComparisonScreen;

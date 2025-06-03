@@ -4,8 +4,9 @@
  * An atomic component that displays a badge indicating the template type/status.
  */
 
-import React from 'react';
 import { Chip, ChipProps } from '@mui/material';
+import React from 'react';
+
 import { ReportType } from '../../../../types/reporting';
 
 interface TemplateStatusBadgeProps {

@@ -1,31 +1,45 @@
 /**
  * Advanced Stripe Components
- * 
+ *
  * UI components for advanced Stripe features including proration calculator,
  * tax calculator, and multi-currency pricing
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { StyleSheet } from 'react-native';
-import { advancedStripeService, ProrationDetails, TaxCalculation, CustomerDetails } from '../services/advancedStripeService';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+} from 'react-native';
+
+import {
+  advancedStripeService,
+  ProrationDetails,
+  TaxCalculation,
+  CustomerDetails,
+} from '../services/advancedStripeService';
 
 interface ProrationCalculatorProps {
   currentSubscriptionId: string;
-  availablePlans: Array<{
+  availablePlans: {
     id: string;
     name: string;
     price: number;
     currency: string;
     interval: string;
-  }>;
+  }[];
   onPlanChange?: (prorationDetails: ProrationDetails) => void;
 }
 
 export const ProrationCalculator: React.FC<ProrationCalculatorProps> = ({
   currentSubscriptionId,
   availablePlans,
-  onPlanChange
+  onPlanChange,
 }) => {
   const [selectedPlanId, setSelectedPlanId] = useState<string>('');
   const [prorationDetails, setProrationDetails] = useState<ProrationDetails | null>(null);
@@ -44,7 +58,7 @@ export const ProrationCalculator: React.FC<ProrationCalculatorProps> = ({
         newPriceId,
         true // preview only
       );
-      
+
       setProrationDetails(details);
       onPlanChange?.(details);
     } catch (err) {
@@ -68,16 +82,13 @@ export const ProrationCalculator: React.FC<ProrationCalculatorProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Plan Change Calculator</Text>
-      
+
       <Text style={styles.label}>Select New Plan:</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.planSelector}>
-        {availablePlans.map((plan) => (
+        {availablePlans.map(plan => (
           <TouchableOpacity
             key={plan.id}
-            style={[
-              styles.planCard,
-              selectedPlanId === plan.id && styles.selectedPlan
-            ]}
+            style={[styles.planCard, selectedPlanId === plan.id && styles.selectedPlan]}
             onPress={() => setSelectedPlanId(plan.id)}
           >
             <Text style={styles.planName}>{plan.name}</Text>
@@ -104,16 +115,19 @@ export const ProrationCalculator: React.FC<ProrationCalculatorProps> = ({
       {prorationDetails && !loading && (
         <View style={styles.prorationContainer}>
           <Text style={styles.sectionTitle}>Proration Details</Text>
-          
+
           <View style={styles.comparisonRow}>
             <View style={styles.planComparison}>
               <Text style={styles.comparisonLabel}>Current Plan</Text>
               <Text style={styles.comparisonValue}>{prorationDetails.currentPlan.name}</Text>
               <Text style={styles.comparisonPrice}>
-                {formatCurrency(prorationDetails.currentPlan.amount, prorationDetails.currentPlan.currency)}
+                {formatCurrency(
+                  prorationDetails.currentPlan.amount,
+                  prorationDetails.currentPlan.currency
+                )}
               </Text>
             </View>
-            
+
             <View style={styles.planComparison}>
               <Text style={styles.comparisonLabel}>New Plan</Text>
               <Text style={styles.comparisonValue}>{prorationDetails.newPlan.name}</Text>
@@ -128,16 +142,22 @@ export const ProrationCalculator: React.FC<ProrationCalculatorProps> = ({
               <View style={styles.chargeRow}>
                 <Text style={styles.chargeLabel}>Immediate Charge:</Text>
                 <Text style={styles.chargeAmount}>
-                  {formatCurrency(prorationDetails.proration.immediateCharge, prorationDetails.proration.currency)}
+                  {formatCurrency(
+                    prorationDetails.proration.immediateCharge,
+                    prorationDetails.proration.currency
+                  )}
                 </Text>
               </View>
             )}
-            
+
             {prorationDetails.proration.immediateCredit > 0 && (
               <View style={styles.creditRow}>
                 <Text style={styles.creditLabel}>Immediate Credit:</Text>
                 <Text style={styles.creditAmount}>
-                  {formatCurrency(prorationDetails.proration.immediateCredit, prorationDetails.proration.currency)}
+                  {formatCurrency(
+                    prorationDetails.proration.immediateCredit,
+                    prorationDetails.proration.currency
+                  )}
                 </Text>
               </View>
             )}
@@ -145,7 +165,10 @@ export const ProrationCalculator: React.FC<ProrationCalculatorProps> = ({
             <View style={styles.nextInvoiceRow}>
               <Text style={styles.nextInvoiceLabel}>Next Invoice:</Text>
               <Text style={styles.nextInvoiceAmount}>
-                {formatCurrency(prorationDetails.nextInvoice.amount, prorationDetails.nextInvoice.currency)}
+                {formatCurrency(
+                  prorationDetails.nextInvoice.amount,
+                  prorationDetails.nextInvoice.currency
+                )}
               </Text>
               <Text style={styles.nextInvoiceDate}>
                 on {new Date(prorationDetails.nextInvoice.periodEnd * 1000).toLocaleDateString()}
@@ -163,18 +186,15 @@ interface TaxCalculatorProps {
   onTaxCalculated?: (taxCalculation: TaxCalculation) => void;
 }
 
-export const TaxCalculator: React.FC<TaxCalculatorProps> = ({
-  priceId,
-  onTaxCalculated
-}) => {
+export const TaxCalculator: React.FC<TaxCalculatorProps> = ({ priceId, onTaxCalculated }) => {
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
     address: {
       country: 'US',
       state: '',
       postal_code: '',
       city: '',
-      line1: ''
-    }
+      line1: '',
+    },
   });
   const [taxCalculation, setTaxCalculation] = useState<TaxCalculation | null>(null);
   const [loading, setLoading] = useState(false);
@@ -210,16 +230,18 @@ export const TaxCalculator: React.FC<TaxCalculatorProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tax Calculator</Text>
-      
+
       <View style={styles.addressForm}>
         <Text style={styles.label}>Country:</Text>
         <TextInput
           style={styles.input}
           value={customerDetails.address.country}
-          onChangeText={(text) => setCustomerDetails(prev => ({
-            ...prev,
-            address: { ...prev.address, country: text }
-          }))}
+          onChangeText={text =>
+            setCustomerDetails(prev => ({
+              ...prev,
+              address: { ...prev.address, country: text },
+            }))
+          }
           placeholder="US"
         />
 
@@ -227,10 +249,12 @@ export const TaxCalculator: React.FC<TaxCalculatorProps> = ({
         <TextInput
           style={styles.input}
           value={customerDetails.address.state}
-          onChangeText={(text) => setCustomerDetails(prev => ({
-            ...prev,
-            address: { ...prev.address, state: text }
-          }))}
+          onChangeText={text =>
+            setCustomerDetails(prev => ({
+              ...prev,
+              address: { ...prev.address, state: text },
+            }))
+          }
           placeholder="CA"
         />
 
@@ -238,18 +262,16 @@ export const TaxCalculator: React.FC<TaxCalculatorProps> = ({
         <TextInput
           style={styles.input}
           value={customerDetails.address.postal_code}
-          onChangeText={(text) => setCustomerDetails(prev => ({
-            ...prev,
-            address: { ...prev.address, postal_code: text }
-          }))}
+          onChangeText={text =>
+            setCustomerDetails(prev => ({
+              ...prev,
+              address: { ...prev.address, postal_code: text },
+            }))
+          }
           placeholder="90210"
         />
 
-        <TouchableOpacity 
-          style={styles.calculateButton}
-          onPress={calculateTax}
-          disabled={loading}
-        >
+        <TouchableOpacity style={styles.calculateButton} onPress={calculateTax} disabled={loading}>
           {loading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
@@ -267,7 +289,7 @@ export const TaxCalculator: React.FC<TaxCalculatorProps> = ({
       {taxCalculation && (
         <View style={styles.taxContainer}>
           <Text style={styles.sectionTitle}>Tax Breakdown</Text>
-          
+
           <View style={styles.taxRow}>
             <Text style={styles.taxLabel}>Subtotal:</Text>
             <Text style={styles.taxAmount}>
@@ -316,7 +338,7 @@ interface CurrencySelectorProps {
 
 export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
   productId,
-  onCurrencySelected
+  onCurrencySelected,
 }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [pricing, setPricing] = useState<any>(null);
@@ -351,14 +373,14 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Currency & Pricing</Text>
-      
+
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.currencySelector}>
-        {supportedCurrencies.map((currency) => (
+        {supportedCurrencies.map(currency => (
           <TouchableOpacity
             key={currency.code}
             style={[
               styles.currencyCard,
-              selectedCurrency === currency.code && styles.selectedCurrency
+              selectedCurrency === currency.code && styles.selectedCurrency,
             ]}
             onPress={() => handleCurrencyChange(currency.code)}
           >
@@ -377,9 +399,7 @@ export const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 
       {pricing && !loading && (
         <View style={styles.pricingContainer}>
-          <Text style={styles.pricingAmount}>
-            {pricing.pricing.formattedAmount}
-          </Text>
+          <Text style={styles.pricingAmount}>{pricing.pricing.formattedAmount}</Text>
           {pricing.fallback && (
             <Text style={styles.fallbackNotice}>
               * Showing USD pricing (requested currency not available)

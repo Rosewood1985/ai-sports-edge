@@ -1,11 +1,12 @@
 /**
  * Security Headers Module
- * 
+ *
  * This module provides security headers configuration for the AI Sports Edge application.
  * It implements best practices for web security headers to protect against various attacks.
  */
 
 const helmet = require('helmet');
+
 const { createLogger } = require('./loggingService');
 
 // Create a logger for security events
@@ -23,7 +24,13 @@ const configureSecurityHeaders = (options = {}) => {
     reportOnly = false,
     // Default CSP directives
     defaultSrc = ["'self'"],
-    scriptSrc = ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://www.google-analytics.com', 'https://cdn.jsdelivr.net'],
+    scriptSrc = [
+      "'self'",
+      "'unsafe-inline'",
+      "'unsafe-eval'",
+      'https://www.google-analytics.com',
+      'https://cdn.jsdelivr.net',
+    ],
     styleSrc = ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
     imgSrc = ["'self'", 'data:', 'https://www.google-analytics.com', 'https://cdn.jsdelivr.net'],
     fontSrc = ["'self'", 'https://fonts.gstatic.com'],

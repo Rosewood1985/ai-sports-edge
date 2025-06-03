@@ -1,29 +1,24 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../config/firebase";
-import { useNavigation } from "@react-navigation/native";
-import { useUITheme } from "../../components/UIThemeProvider";
+import { useNavigation } from '@react-navigation/native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+
 import ThemeToggle from '../../atomic/molecules/theme/ThemeToggle';
+import { useUITheme } from '../../components/UIThemeProvider';
+import { auth } from '../../config/firebase';
 
 const LoginScreen: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigation = useNavigation();
   const { theme } = useUITheme();
 
   const handleLogin = async () => {
-    setError("");
+    setError('');
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate("Home" as never); // or 'Dashboard', etc.
+      navigation.navigate('Home' as never); // or 'Dashboard', etc.
     } catch (err: any) {
       setError(err.message);
     }
@@ -33,8 +28,8 @@ const LoginScreen: React.FC = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.primaryBackground,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       padding: theme.spacing.lg,
     },
     title: {
@@ -45,7 +40,7 @@ const LoginScreen: React.FC = () => {
       marginBottom: theme.spacing.lg,
     },
     input: {
-      width: "100%",
+      width: '100%',
       backgroundColor: theme.colors.surfaceBackground,
       padding: theme.spacing.md,
       borderRadius: theme.borders.radius.md,
@@ -54,28 +49,28 @@ const LoginScreen: React.FC = () => {
       fontSize: theme.typography.fontSize.bodyStd,
     },
     button: {
-      width: "100%",
+      width: '100%',
       backgroundColor: theme.colors.primary,
       padding: theme.spacing.md,
       borderRadius: theme.borders.radius.md,
-      alignItems: "center",
+      alignItems: 'center',
     },
-    buttonText: { 
-      color: theme.colors.onPrimary, 
-      fontWeight: theme.typography.fontWeight.semiBold as '600', 
-      fontSize: theme.typography.fontSize.button 
+    buttonText: {
+      color: theme.colors.onPrimary,
+      fontWeight: theme.typography.fontWeight.semiBold as '600',
+      fontSize: theme.typography.fontSize.button,
     },
-    link: { 
-      marginTop: theme.spacing.md, 
-      color: theme.colors.textSecondary, 
-      textDecorationLine: "underline",
+    link: {
+      marginTop: theme.spacing.md,
+      color: theme.colors.textSecondary,
+      textDecorationLine: 'underline',
       fontSize: theme.typography.fontSize.bodyStd,
     },
     error: {
       color: theme.colors.error,
       marginBottom: theme.spacing.sm,
       fontSize: theme.typography.fontSize.small,
-      textAlign: "center",
+      textAlign: 'center',
     },
   });
 
@@ -105,16 +100,14 @@ const LoginScreen: React.FC = () => {
         <Text style={styles.buttonText}>Log In</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Signup" as never)}>
+      <TouchableOpacity onPress={() => navigation.navigate('Signup' as never)}>
         <Text style={styles.link}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => navigation.navigate("ForgotPassword" as never)}
-      >
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword' as never)}>
         <Text style={styles.link}>Forgot password?</Text>
       </TouchableOpacity>
-      
+
       {/* Theme Toggle */}
       <ThemeToggle />
     </View>

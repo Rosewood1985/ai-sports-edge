@@ -1,6 +1,6 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 
 // Import atomic architecture pages
 import { HomePage, SignupPage, ForgotPasswordPage, LoginScreen } from './atomic/pages';

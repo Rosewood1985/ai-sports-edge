@@ -3,26 +3,26 @@
  * This module provides functions for sending location-based notifications to users
  */
 
-const admin = require('firebase-admin');
-const functions = require('firebase-functions');
-const cloudGeolocationService = require('./cloudGeolocationService');
-const personalizedNotificationService = require('./personalizedNotificationService');
+const admin = require("firebase-admin");
+const functions = require("firebase-functions");
+const cloudGeolocationService = require("./cloudGeolocationService");
+const personalizedNotificationService = require("./personalizedNotificationService");
 
 /**
  * Process location-based notifications for all users
  * @returns {Promise} Promise that resolves when notifications are processed
  */
 async function processLocationBasedNotifications() {
-  console.log('Processing location-based notifications');
+  console.log("Processing location-based notifications");
   
   // Get users with location-based notifications enabled
   const usersSnapshot = await admin.firestore()
-    .collection('users')
-    .where('preferences.notifications.locationBased.enabled', '==', true)
+    .collection("users")
+    .where("preferences.notifications.locationBased.enabled", "==", true)
     .get();
   
   if (usersSnapshot.empty) {
-    console.log('No users have location-based notifications enabled');
+    console.log("No users have location-based notifications enabled");
     return null;
   }
   
@@ -87,7 +87,7 @@ async function processUserLocationNotifications(userId, userData) {
       location = await geolocationService.getUserLocation();
       
       // Save location to user document
-      await admin.firestore().collection('users').doc(userId).update({
+      await admin.firestore().collection("users").doc(userId).update({
         location: {
           ...location,
           timestamp: admin.firestore.Timestamp.now()
@@ -114,9 +114,9 @@ async function processUserLocationNotifications(userId, userData) {
     
     // Check if user has already been notified about these teams
     const notificationsSnapshot = await admin.firestore()
-      .collection('notificationLogs')
-      .where('userId', '==', userId)
-      .where('type', '==', 'localTeam')
+      .collection("notificationLogs")
+      .where("userId", "==", userId)
+      .where("type", "==", "localTeam")
       .get();
     
     const notifiedTeams = new Set();
@@ -142,7 +142,7 @@ async function processUserLocationNotifications(userId, userData) {
     const promises = newTeams.map(team => 
       personalizedNotificationService.sendPersonalizedNotification({
         userId,
-        type: 'localTeam',
+        type: "localTeam",
         data: {
           team,
           teams: [team],
@@ -163,7 +163,7 @@ async function processUserLocationNotifications(userId, userData) {
         promises.push(
           personalizedNotificationService.sendPersonalizedNotification({
             userId,
-            type: 'localOdds',
+            type: "localOdds",
             data: {
               team: odds.team,
               teams: [odds.team],
@@ -188,7 +188,7 @@ async function processUserLocationNotifications(userId, userData) {
  * Cloud function to process location-based notifications
  */
 exports.processLocationNotifications = functions.pubsub
-  .schedule('every 24 hours')
+  .schedule("every 24 hours")
   .onRun(async (context) => {
     return processLocationBasedNotifications();
   });
@@ -197,7 +197,7 @@ exports.processLocationNotifications = functions.pubsub
  * Cloud function to process location-based notifications when a user's location changes
  */
 exports.processLocationNotificationsOnLocationChange = functions.firestore
-  .document('users/{userId}')
+  .document("users/{userId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
     const after = change.after.data();
@@ -220,7 +220,7 @@ exports.processLocationNotificationsOnLocationChange = functions.firestore
  * Cloud function to process location-based notifications when a user enables location-based notifications
  */
 exports.processLocationNotificationsOnPreferenceChange = functions.firestore
-  .document('users/{userId}')
+  .document("users/{userId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
     const after = change.after.data();

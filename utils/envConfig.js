@@ -14,23 +14,23 @@ export const getEnvVar = (key, defaultValue = '') => {
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
     return process.env[key];
   }
-  
+
   // Check if we have a global __FIREBASE_DEFAULTS__ object (used in some environments)
   try {
-    const defaults = 
-      typeof window !== 'undefined' && window.__FIREBASE_DEFAULTS__ ? 
-      window.__FIREBASE_DEFAULTS__ : 
-      typeof global !== 'undefined' && global.__FIREBASE_DEFAULTS__ ?
-      global.__FIREBASE_DEFAULTS__ : 
-      {};
-      
+    const defaults =
+      typeof window !== 'undefined' && window.__FIREBASE_DEFAULTS__
+        ? window.__FIREBASE_DEFAULTS__
+        : typeof global !== 'undefined' && global.__FIREBASE_DEFAULTS__
+          ? global.__FIREBASE_DEFAULTS__
+          : {};
+
     if (defaults && defaults[key]) {
       return defaults[key];
     }
   } catch (e) {
     console.warn(`Error accessing Firebase defaults: ${e.message}`);
   }
-  
+
   return defaultValue;
 };
 
@@ -42,7 +42,7 @@ export const getEnvVar = (key, defaultValue = '') => {
  */
 export const validateConfig = (config, requiredKeys) => {
   const missingKeys = requiredKeys.filter(key => !config[key]);
-  
+
   if (missingKeys.length > 0) {
     console.error(`Missing required configuration: ${missingKeys.join(', ')}`);
     console.error('Please check your .env file or environment variables');
@@ -59,33 +59,33 @@ export const firebaseConfig = {
   storageBucket: getEnvVar('FIREBASE_STORAGE_BUCKET'),
   messagingSenderId: getEnvVar('FIREBASE_MESSAGING_SENDER_ID'),
   appId: getEnvVar('FIREBASE_APP_ID'),
-  measurementId: getEnvVar('FIREBASE_MEASUREMENT_ID')
+  measurementId: getEnvVar('FIREBASE_MEASUREMENT_ID'),
 };
 
 // Stripe configuration
 export const stripeConfig = {
   publishableKey: getEnvVar('STRIPE_PUBLISHABLE_KEY'),
   secretKey: getEnvVar('STRIPE_SECRET_KEY'),
-  webhookSecret: getEnvVar('STRIPE_WEBHOOK_SECRET')
+  webhookSecret: getEnvVar('STRIPE_WEBHOOK_SECRET'),
 };
 
 // Sports data API configuration
 export const sportsDataConfig = {
   sportsDataApiKey: getEnvVar('SPORTS_DATA_API_KEY'),
   oddsApiKey: getEnvVar('ODDS_API_KEY'),
-  sportradarApiKey: getEnvVar('SPORTRADAR_API_KEY')
+  sportradarApiKey: getEnvVar('SPORTRADAR_API_KEY'),
 };
 
 // OneSignal configuration
 export const oneSignalConfig = {
   apiKey: getEnvVar('ONESIGNAL_API_KEY'),
-  appId: getEnvVar('ONESIGNAL_APP_ID')
+  appId: getEnvVar('ONESIGNAL_APP_ID'),
 };
 
 // ML model configuration
 export const mlConfig = {
   modelPath: getEnvVar('ML_MODEL_PATH', 'https://ai-sports-edge-com.web.app/models/model.pkl'),
-  minConfidenceThreshold: parseInt(getEnvVar('MIN_CONFIDENCE_THRESHOLD', '65'), 10)
+  minConfidenceThreshold: parseInt(getEnvVar('MIN_CONFIDENCE_THRESHOLD', '65'), 10),
 };
 
 // Environment

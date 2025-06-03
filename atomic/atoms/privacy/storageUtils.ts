@@ -5,10 +5,10 @@
  * and data anonymization for privacy-related data.
  */
 
-import CryptoJS from 'crypto-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import CryptoJS from 'crypto-js';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 // Prefix for privacy-related storage keys
 const PRIVACY_STORAGE_PREFIX = 'privacy_';

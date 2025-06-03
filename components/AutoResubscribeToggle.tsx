@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Switch, Alert } from 'react-native';
-import { auth } from '../config/firebase';
-import { toggleAutoResubscribe, getUserSubscription } from '../services/firebaseSubscriptionService';
-import { trackEvent } from '../services/analyticsService';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
+import { auth } from '../config/firebase';
 import { useThemeColor } from '../hooks/useThemeColor';
+import { trackEvent } from '../services/analyticsService';
+import {
+  toggleAutoResubscribe,
+  getUserSubscription,
+} from '../services/firebaseSubscriptionService';
 
 interface AutoResubscribeToggleProps {
   subscriptionId?: string;
@@ -14,13 +18,13 @@ interface AutoResubscribeToggleProps {
 export const AutoResubscribeToggle: React.FC<AutoResubscribeToggleProps> = ({ subscriptionId }) => {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   const tintColor = useThemeColor({}, 'tint');
-  
+
   useEffect(() => {
     loadAutoResubscribeStatus();
   }, [subscriptionId]);
-  
+
   const loadAutoResubscribeStatus = async () => {
     try {
       setIsLoading(true);
@@ -29,7 +33,7 @@ export const AutoResubscribeToggle: React.FC<AutoResubscribeToggleProps> = ({ su
         setIsLoading(false);
         return;
       }
-      
+
       // Get the subscription details
       const subscription = await getUserSubscription(userId);
       if (subscription) {
@@ -41,28 +45,28 @@ export const AutoResubscribeToggle: React.FC<AutoResubscribeToggleProps> = ({ su
       setIsLoading(false);
     }
   };
-  
+
   const handleToggle = async (value: boolean) => {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId || !subscriptionId) return;
-      
+
       // Update the auto-resubscribe setting
       const result = await toggleAutoResubscribe(userId, subscriptionId, value);
-      
+
       if (result && result.updated) {
         setIsEnabled(value);
-        
+
         // Track the event
         trackEvent(
-          value ? 'auto_resubscribe_enabled' as any : 'auto_resubscribe_disabled' as any,
+          value ? ('auto_resubscribe_enabled' as any) : ('auto_resubscribe_disabled' as any),
           { subscriptionId }
         );
-        
+
         // Show confirmation
         Alert.alert(
           value ? 'Auto-Resubscribe Enabled' : 'Auto-Resubscribe Disabled',
-          value 
+          value
             ? 'Your subscription will automatically renew when it expires.'
             : 'Your subscription will not automatically renew when it expires.'
         );
@@ -74,20 +78,20 @@ export const AutoResubscribeToggle: React.FC<AutoResubscribeToggleProps> = ({ su
       setIsEnabled(!value);
     }
   };
-  
+
   if (!subscriptionId) {
     return null;
   }
-  
+
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.title}>Auto-Resubscribe</ThemedText>
-      
+
       <View style={styles.row}>
         <ThemedText style={styles.description}>
           Automatically renew your subscription when it expires
         </ThemedText>
-        
+
         <Switch
           trackColor={{ false: '#767577', true: tintColor }}
           thumbColor="#f4f3f4"
@@ -97,9 +101,9 @@ export const AutoResubscribeToggle: React.FC<AutoResubscribeToggleProps> = ({ su
           disabled={isLoading}
         />
       </View>
-      
+
       <ThemedText style={styles.note}>
-        {isEnabled 
+        {isEnabled
           ? 'Your subscription will automatically renew when it expires.'
           : 'Your subscription will not automatically renew when it expires.'}
       </ThemedText>

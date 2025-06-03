@@ -1,7 +1,8 @@
+import * as FileSystem from 'expo-file-system';
 import React, { useState, useEffect } from 'react';
 import { Image, View, StyleSheet, ActivityIndicator, Platform, Text } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
-import * as FileSystem from 'expo-file-system';
 
 interface CachedPlayerImageProps {
   playerId: string;
@@ -18,7 +19,7 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
   sport,
   size = 100,
   style,
-  fallbackImageUrl
+  fallbackImageUrl,
 }) => {
   const { colors, isDark } = useTheme();
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -31,13 +32,15 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
     basketball_ncaab: 'https://cdn.ncaa.com/headshots/basketball/latest/1040x760/',
     football_nfl: 'https://static.www.nfl.com/image/private/t_player_profile_landscape/',
     hockey_nhl: 'https://cms.nhl.bamgrid.com/images/headshots/current/1024x1024/',
-    baseball_mlb: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/',
+    baseball_mlb:
+      'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/',
     soccer_epl: 'https://resources.premierleague.com/premierleague/photos/players/250x250/',
     soccer_mls: 'https://images.mlssoccer.com/image/private/t_q-best/prd-mlsdigital/headshots/',
-    soccer_womens_nwsl: 'https://images.nwslsoccer.com/image/private/t_q-best/prd-nwsldigital/headshots/',
+    soccer_womens_nwsl:
+      'https://images.nwslsoccer.com/image/private/t_q-best/prd-nwsldigital/headshots/',
     soccer_laliga: 'https://assets.laliga.com/squad/2023/t178/p',
     soccer_bundesliga: 'https://img.bundesliga.com/tachyon/sites/2/2019/08/',
-    mma_ufc: 'https://dmxg5wxfqgb4u.cloudfront.net/styles/athlete_bio_full_body/s3/'
+    mma_ufc: 'https://dmxg5wxfqgb4u.cloudfront.net/styles/athlete_bio_full_body/s3/',
   };
 
   // Get cache directory
@@ -50,12 +53,12 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32bit integer
       }
       return Math.abs(hash).toString(16);
     };
-    
+
     return `${hashString(`${id}_${sportKey}`)}.jpg`;
   };
 
@@ -82,7 +85,7 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
 
       // Check if image exists in cache
       const fileInfo = await FileSystem.getInfoAsync(cacheFilePath);
-      
+
       if (fileInfo.exists) {
         // Use cached image
         setImageUri(cacheFilePath);
@@ -100,10 +103,7 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
       const remoteUrl = `${baseUrl}${playerId}.jpg`;
 
       // Download the image
-      const downloadResult = await FileSystem.downloadAsync(
-        remoteUrl,
-        cacheFilePath
-      );
+      const downloadResult = await FileSystem.downloadAsync(remoteUrl, cacheFilePath);
 
       if (downloadResult.status === 200) {
         setImageUri(cacheFilePath);
@@ -113,19 +113,19 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
     } catch (err) {
       console.warn(`Error loading player image for ${playerName}:`, err);
       setError(true);
-      
+
       // Try fallback image if provided
       if (fallbackImageUrl) {
         try {
           const filename = generateCacheFilename(`fallback_${playerId}`, sport);
           const fallbackCachePath = `${cacheDirectory}${filename}`;
-          
+
           // Download fallback image
           const fallbackResult = await FileSystem.downloadAsync(
             fallbackImageUrl,
             fallbackCachePath
           );
-          
+
           if (fallbackResult.status === 200) {
             setImageUri(fallbackCachePath);
           }
@@ -156,10 +156,10 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
   // Render loading state
   if (isLoading) {
     return (
-      <View 
+      <View
         style={[
-          styles.container, 
-          { width: size, height: size, backgroundColor: isDark ? '#333' : '#e0e0e0' }
+          styles.container,
+          { width: size, height: size, backgroundColor: isDark ? '#333' : '#e0e0e0' },
         ]}
       >
         <ActivityIndicator size="small" color={colors.primary} />
@@ -169,13 +169,7 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
 
   // Render image or fallback
   return (
-    <View 
-      style={[
-        styles.container, 
-        { width: size, height: size },
-        style
-      ]}
-    >
+    <View style={[styles.container, { width: size, height: size }, style]}>
       {imageUri ? (
         <Image
           source={{ uri: imageUri }}
@@ -184,10 +178,7 @@ const CachedPlayerImage: React.FC<CachedPlayerImageProps> = ({
           accessibilityLabel={`${playerName} photo`}
         />
       ) : (
-        <View style={[
-          styles.fallbackContainer, 
-          { backgroundColor: isDark ? '#555' : '#ccc' }
-        ]}>
+        <View style={[styles.fallbackContainer, { backgroundColor: isDark ? '#555' : '#ccc' }]}>
           <Text style={styles.initialsText}>{getPlayerInitials()}</Text>
         </View>
       )}
@@ -216,7 +207,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-  }
+  },
 });
 
 export default CachedPlayerImage;

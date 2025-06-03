@@ -4,44 +4,48 @@
  * Part of Racing Data Integration Plan
  */
 
-import { 
-  MLFeatureExtractor, 
-  MLFeatureVector, 
-  FeatureValidationResult, 
+import {
+  MLFeatureExtractor,
+  MLFeatureVector,
+  FeatureValidationResult,
   TransformedFeatureVector,
-  RacingSport
+  RacingSport,
 } from '../../types/racing/commonTypes';
-import { 
-  StandardizedNascarDriver, 
-  StandardizedNascarRace, 
-  NascarMLFeatures 
-} from '../../types/racing/nascarTypes';
-import { 
-  StandardizedHorse, 
-  StandardizedHorseRace, 
+import {
+  StandardizedHorse,
+  StandardizedHorseRace,
   StandardizedHorseRunner,
-  HorseRacingMLFeatures 
+  HorseRacingMLFeatures,
 } from '../../types/racing/horseRacingTypes';
+import {
+  StandardizedNascarDriver,
+  StandardizedNascarRace,
+  NascarMLFeatures,
+} from '../../types/racing/nascarTypes';
 
 /**
  * NASCAR Feature Extractor
  * Converts NASCAR race and driver data to ML-compatible features
  */
-export class NascarFeatureExtractor implements MLFeatureExtractor<{race: StandardizedNascarRace, driver: StandardizedNascarDriver}> {
-  
-  async extractFeatures(rawData: {race: StandardizedNascarRace, driver: StandardizedNascarDriver}): Promise<MLFeatureVector> {
+export class NascarFeatureExtractor
+  implements MLFeatureExtractor<{ race: StandardizedNascarRace; driver: StandardizedNascarDriver }>
+{
+  async extractFeatures(rawData: {
+    race: StandardizedNascarRace;
+    driver: StandardizedNascarDriver;
+  }): Promise<MLFeatureVector> {
     const { race, driver } = rawData;
-    
+
     // Extract NASCAR-specific features
     const nascarFeatures = await this.extractNascarSpecificFeatures(race, driver);
-    
+
     // Convert to generic ML feature vector
     return {
       id: `nascar_${race.id}_${driver.id}`,
       sport: 'nascar',
       eventId: race.id,
       participantId: driver.id,
-      
+
       features: {
         driver: this.extractDriverFeatures(driver),
         track: this.extractTrackFeatures(race, driver),
@@ -50,9 +54,9 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
         weather: this.extractWeatherFeatures(race),
         historical: this.extractHistoricalFeatures(driver),
         performance: this.extractPerformanceFeatures(driver),
-        competition: this.extractCompetitionFeatures(race, driver)
+        competition: this.extractCompetitionFeatures(race, driver),
       },
-      
+
       metadata: {
         version: '2.0.0',
         extractedAt: new Date().toISOString(),
@@ -62,10 +66,10 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
         normalizationApplied: true,
         scalingMethod: 'standard',
         missingValueStrategy: 'mean_imputation',
-        outlierHandling: 'clip_to_percentile'
+        outlierHandling: 'clip_to_percentile',
       },
-      
-      targets: this.extractNascarTargets(race, driver)
+
+      targets: this.extractNascarTargets(race, driver),
     };
   }
 
@@ -74,15 +78,15 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       completeness: this.validateNascarCompleteness(features),
       accuracy: this.validateNascarAccuracy(features),
       consistency: this.validateNascarConsistency(features),
-      timeliness: this.validateNascarTimeliness(features)
+      timeliness: this.validateNascarTimeliness(features),
     };
 
-    const overallScore = (
-      validation.completeness.score + 
-      validation.accuracy.score + 
-      validation.consistency.score + 
-      validation.timeliness.score
-    ) / 4;
+    const overallScore =
+      (validation.completeness.score +
+        validation.accuracy.score +
+        validation.consistency.score +
+        validation.timeliness.score) /
+      4;
 
     return {
       isValid: overallScore >= 0.7,
@@ -90,11 +94,14 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       score: overallScore,
       validation,
       recommendations: this.generateNascarRecommendations(validation),
-      featureImportance: this.calculateNascarFeatureImportance(features)
+      featureImportance: this.calculateNascarFeatureImportance(features),
     };
   }
 
-  async transformForModel(features: MLFeatureVector, modelType: string): Promise<TransformedFeatureVector> {
+  async transformForModel(
+    features: MLFeatureVector,
+    modelType: string
+  ): Promise<TransformedFeatureVector> {
     switch (modelType) {
       case 'xgboost':
         return this.transformForXGBoost(features);
@@ -110,11 +117,14 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
   /**
    * Extract NASCAR-specific features
    */
-  private async extractNascarSpecificFeatures(race: StandardizedNascarRace, driver: StandardizedNascarDriver): Promise<NascarMLFeatures> {
+  private async extractNascarSpecificFeatures(
+    race: StandardizedNascarRace,
+    driver: StandardizedNascarDriver
+  ): Promise<NascarMLFeatures> {
     return {
       raceId: race.id,
       driverId: driver.id,
-      
+
       driverFeatures: {
         // Current season performance
         currentSeasonWins: driver.stats.wins,
@@ -123,97 +133,100 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
         currentSeasonAverageFinish: driver.stats.averageFinish,
         currentSeasonPoints: driver.currentPoints,
         currentSeasonPosition: driver.seasonPosition,
-        
+
         // Career statistics
         careerWins: driver.stats.wins, // This would be expanded with full career data
-        careerStarts: Math.max(driver.stats.wins + driver.stats.top5Finishes + driver.stats.top10Finishes, 1),
+        careerStarts: Math.max(
+          driver.stats.wins + driver.stats.top5Finishes + driver.stats.top10Finishes,
+          1
+        ),
         careerWinRate: driver.stats.winRate,
         careerTop5Rate: driver.stats.top5Rate,
         careerTop10Rate: driver.stats.top10Rate,
         careerDnfRate: driver.stats.dnfRate,
-        
+
         // Recent form
         last5AverageFinish: driver.recentForm?.averageFinish || driver.stats.averageFinish,
         last10AverageFinish: driver.stats.averageFinish, // Simplified
         formTrend: this.encodeFormTrend(driver.recentForm?.trend),
-        
+
         // Experience
         yearsExperience: this.estimateNascarExperience(driver),
-        startsThisSeason: this.estimateSeasonStarts(driver)
+        startsThisSeason: this.estimateSeasonStarts(driver),
       },
-      
+
       trackFeatures: {
         trackType: this.encodeTrackType(race.track.type),
         trackLength: race.track.length,
         trackBanking: race.track.bankingDegrees || 0,
-        
+
         // Driver performance at this track
         driverTrackStarts: this.getDriverTrackStarts(driver, race.track.id),
         driverTrackWins: this.getDriverTrackWins(driver, race.track.id),
         driverTrackAverageFinish: this.getDriverTrackAverageFinish(driver, race.track.id),
         driverTrackBestFinish: this.getDriverTrackBestFinish(driver, race.track.id),
         driverTrackWinRate: this.getDriverTrackWinRate(driver, race.track.id),
-        
+
         // Similar track performance
-        similarTrackPerformance: this.getSimilarTrackPerformance(driver, race.track.type)
+        similarTrackPerformance: this.getSimilarTrackPerformance(driver, race.track.type),
       },
-      
+
       teamFeatures: {
         manufacturer: this.encodeManufacturer(driver.manufacturer),
         teamWinsThisSeason: this.estimateTeamWins(driver.team),
         teamTop5ThisSeason: this.estimateTeamTop5(driver.team),
         teamAverageFinishThisSeason: this.estimateTeamAverageFinish(driver.team),
-        teamResourceRating: this.getTeamResourceRating(driver.team)
+        teamResourceRating: this.getTeamResourceRating(driver.team),
       },
-      
+
       raceFeatures: {
         raceNumber: race.raceNumber,
         seasonProgress: race.raceNumber / 36, // Assuming 36 race season
         playoffRace: race.raceNumber > 26, // Simplified playoff determination
         stageRace: !!race.specs.stages,
         nightRace: this.isNightRace(race.schedule.startTime),
-        
+
         // Starting position effects (would come from qualifying data)
         startPosition: this.estimateStartPosition(driver),
         qualifyingSpeed: this.estimateQualifyingSpeed(driver),
         qualifyingPosition: this.estimateStartPosition(driver),
-        
+
         // Field strength
         fieldStrength: this.calculateFieldStrength(race),
-        competitionLevel: this.calculateCompetitionLevel(race)
+        competitionLevel: this.calculateCompetitionLevel(race),
       },
-      
+
       weatherFeatures: {
         temperature: race.weather?.temperature || 75,
         windSpeed: race.weather?.windSpeed || 5,
         windDirection: this.encodeWindDirection(race.weather?.windDirection),
         precipitationRisk: race.weather?.precipitation ? 1 : 0,
-        weatherImpact: this.calculateWeatherImpact(race.weather)
+        weatherImpact: this.calculateWeatherImpact(race.weather),
       },
-      
+
       historicalFeatures: {
         // Head-to-head comparisons
         vsTopDriversRecord: this.calculateVsTopDrivers(driver),
         vsTeammateRecord: this.calculateVsTeammates(driver),
-        
+
         // Situational performance
         frontRowStarts: this.estimateFrontRowStarts(driver),
         backRowStarts: this.estimateBackRowStarts(driver),
         frontRowAverageFinish: this.estimateFrontRowFinish(driver),
         backRowAverageFinish: this.estimateBackRowFinish(driver),
-        
+
         // Momentum indicators
         momentumScore: this.calculateMomentumScore(driver),
         consistencyScore: this.calculateConsistencyScore(driver),
-        clutchPerformance: this.calculateClutchPerformance(driver)
+        clutchPerformance: this.calculateClutchPerformance(driver),
       },
-      
+
       metadata: {
         featureVersion: '2.0.0',
         dataQuality: this.assessNascarDataQuality(race, driver),
         lastUpdated: new Date().toISOString(),
-        sourceReliability: 0.95 // NASCAR has high-quality data
-      }
+        sourceReliability: 0.95, // NASCAR has high-quality data
+      },
     };
   }
 
@@ -233,7 +246,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       points: driver.currentPoints,
       position: driver.seasonPosition,
       lapsLed: driver.stats.lapsLed,
-      poles: driver.stats.poles
+      poles: driver.stats.poles,
     };
   }
 
@@ -243,7 +256,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       trackLength: race.track.length,
       banking: race.track.bankingDegrees || 0,
       surface: race.track.surface === 'asphalt' ? 1 : 0,
-      driverTrackPerformance: this.getDriverTrackPerformance(driver, race.track.id)
+      driverTrackPerformance: this.getDriverTrackPerformance(driver, race.track.id),
     };
   }
 
@@ -251,7 +264,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     return {
       manufacturer: this.encodeManufacturer(driver.manufacturer),
       teamQuality: this.getTeamResourceRating(driver.team),
-      manufacturerStrength: this.getManufacturerStrength(driver.manufacturer)
+      manufacturerStrength: this.getManufacturerStrength(driver.manufacturer),
     };
   }
 
@@ -263,7 +276,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       laps: race.specs.totalLaps,
       isPlayoff: race.raceNumber > 26 ? 1 : 0,
       hasStages: race.specs.stages ? 1 : 0,
-      isNight: this.isNightRace(race.schedule.startTime) ? 1 : 0
+      isNight: this.isNightRace(race.schedule.startTime) ? 1 : 0,
     };
   }
 
@@ -274,7 +287,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       windSpeed: weather?.windSpeed || 5,
       windDirection: this.encodeWindDirection(weather?.windDirection),
       precipitation: weather?.precipitation ? 1 : 0,
-      weatherImpact: this.calculateWeatherImpact(weather)
+      weatherImpact: this.calculateWeatherImpact(weather),
     };
   }
 
@@ -283,25 +296,30 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       recentFormTrend: this.encodeFormTrend(driver.recentForm?.trend),
       momentumScore: this.calculateMomentumScore(driver),
       consistencyRating: this.calculateConsistencyScore(driver),
-      experienceLevel: this.estimateNascarExperience(driver)
+      experienceLevel: this.estimateNascarExperience(driver),
     };
   }
 
   private extractPerformanceFeatures(driver: StandardizedNascarDriver) {
     return {
-      qualityStarts: (driver.stats.top5Finishes + driver.stats.top10Finishes) / Math.max(driver.seasonPosition, 1),
-      finishingAbility: Math.max(0, 1 - (driver.stats.dnfRate / 100)),
+      qualityStarts:
+        (driver.stats.top5Finishes + driver.stats.top10Finishes) /
+        Math.max(driver.seasonPosition, 1),
+      finishingAbility: Math.max(0, 1 - driver.stats.dnfRate / 100),
       speedRating: this.calculateSpeedRating(driver),
-      raceManagement: this.calculateRaceManagement(driver)
+      raceManagement: this.calculateRaceManagement(driver),
     };
   }
 
-  private extractCompetitionFeatures(race: StandardizedNascarRace, driver: StandardizedNascarDriver) {
+  private extractCompetitionFeatures(
+    race: StandardizedNascarRace,
+    driver: StandardizedNascarDriver
+  ) {
     return {
       fieldSize: 36, // Standard NASCAR field
       fieldStrength: this.calculateFieldStrength(race),
       competitionLevel: this.calculateCompetitionLevel(race),
-      driverRanking: driver.seasonPosition
+      driverRanking: driver.seasonPosition,
     };
   }
 
@@ -314,7 +332,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       willTop10: undefined,
       willLead: undefined,
       lapsLedPrediction: undefined,
-      pointsPrediction: undefined
+      pointsPrediction: undefined,
     };
   }
 
@@ -323,29 +341,29 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
    */
   private encodeTrackType(trackType: string): number {
     const typeMap: { [key: string]: number } = {
-      'superspeedway': 0,
-      'intermediate': 1,
-      'short': 2,
-      'road_course': 3,
-      'dirt': 4
+      superspeedway: 0,
+      intermediate: 1,
+      short: 2,
+      road_course: 3,
+      dirt: 4,
     };
     return typeMap[trackType] || 1;
   }
 
   private encodeManufacturer(manufacturer: string): number {
     const mfgMap: { [key: string]: number } = {
-      'Ford': 0,
-      'Chevrolet': 1,
-      'Toyota': 2
+      Ford: 0,
+      Chevrolet: 1,
+      Toyota: 2,
     };
     return mfgMap[manufacturer] || 0;
   }
 
   private encodeFormTrend(trend?: string): number {
     const trendMap: { [key: string]: number } = {
-      'declining': -1,
-      'stable': 0,
-      'improving': 1
+      declining: -1,
+      stable: 0,
+      improving: 1,
     };
     return trendMap[trend || 'stable'] || 0;
   }
@@ -354,8 +372,14 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     if (!direction) return 0;
     // Convert wind direction to degrees (simplified)
     const directionMap: { [key: string]: number } = {
-      'N': 0, 'NE': 45, 'E': 90, 'SE': 135,
-      'S': 180, 'SW': 225, 'W': 270, 'NW': 315
+      N: 0,
+      NE: 45,
+      E: 90,
+      SE: 135,
+      S: 180,
+      SW: 225,
+      W: 270,
+      NW: 315,
     };
     return directionMap[direction] || 0;
   }
@@ -365,12 +389,12 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
    */
   private calculateWeatherImpact(weather?: any): number {
     if (!weather) return 0;
-    
+
     let impact = 0;
     if (weather.precipitation) impact += 0.5;
     if (weather.windSpeed > 15) impact += 0.3;
     if (weather.temperature < 50 || weather.temperature > 90) impact += 0.2;
-    
+
     return Math.min(impact, 1);
   }
 
@@ -388,17 +412,18 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
 
   private calculateMomentumScore(driver: StandardizedNascarDriver): number {
     if (!driver.recentForm) return 0.5;
-    
+
     const trendScore = this.encodeFormTrend(driver.recentForm.trend) * 0.3 + 0.5;
-    const avgFinishScore = Math.max(0, 1 - (driver.recentForm.averageFinish / 40));
-    
+    const avgFinishScore = Math.max(0, 1 - driver.recentForm.averageFinish / 40);
+
     return (trendScore + avgFinishScore) / 2;
   }
 
   private calculateConsistencyScore(driver: StandardizedNascarDriver): number {
-    const topFinishRate = (driver.stats.top5Finishes + driver.stats.top10Finishes) / Math.max(driver.seasonPosition, 1);
-    const reliabilityScore = Math.max(0, 1 - (driver.stats.dnfRate / 100));
-    
+    const topFinishRate =
+      (driver.stats.top5Finishes + driver.stats.top10Finishes) / Math.max(driver.seasonPosition, 1);
+    const reliabilityScore = Math.max(0, 1 - driver.stats.dnfRate / 100);
+
     return (topFinishRate + reliabilityScore) / 2;
   }
 
@@ -410,8 +435,8 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
   private calculateSpeedRating(driver: StandardizedNascarDriver): number {
     // Based on poles and average finish
     const poleRate = driver.stats.poles / Math.max(driver.seasonPosition, 1);
-    const finishQuality = Math.max(0, 1 - (driver.stats.averageFinish / 40));
-    
+    const finishQuality = Math.max(0, 1 - driver.stats.averageFinish / 40);
+
     return (poleRate + finishQuality) / 2;
   }
 
@@ -419,7 +444,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     // Based on laps led vs wins ratio and consistency
     const lapsLedEfficiency = driver.stats.wins / Math.max(driver.stats.lapsLed / 100, 1);
     const consistencyFactor = this.calculateConsistencyScore(driver);
-    
+
     return Math.min((lapsLedEfficiency + consistencyFactor) / 2, 1);
   }
 
@@ -477,7 +502,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
 
   private estimateQualifyingSpeed(driver: StandardizedNascarDriver): number {
     // Simplified speed estimate
-    return 180 - (driver.stats.averageFinish * 2); // MPH estimate
+    return 180 - driver.stats.averageFinish * 2; // MPH estimate
   }
 
   private estimateTeamWins(team: string): number {
@@ -495,15 +520,20 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
 
   private getTeamResourceRating(team: string): number {
     // Top teams get higher ratings
-    const topTeams = ['Hendrick Motorsports', 'Joe Gibbs Racing', 'Team Penske', 'Stewart-Haas Racing'];
+    const topTeams = [
+      'Hendrick Motorsports',
+      'Joe Gibbs Racing',
+      'Team Penske',
+      'Stewart-Haas Racing',
+    ];
     return topTeams.includes(team) ? 9 : 6;
   }
 
   private getManufacturerStrength(manufacturer: string): number {
     const strengthMap: { [key: string]: number } = {
-      'Chevrolet': 0.9,
-      'Ford': 0.85,
-      'Toyota': 0.87
+      Chevrolet: 0.9,
+      Ford: 0.85,
+      Toyota: 0.87,
     };
     return strengthMap[manufacturer] || 0.8;
   }
@@ -513,7 +543,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
   }
 
   private estimateBackRowStarts(driver: StandardizedNascarDriver): number {
-    return Math.max(0, driver.seasonPosition - driver.stats.poles - (driver.stats.poles * 2));
+    return Math.max(0, driver.seasonPosition - driver.stats.poles - driver.stats.poles * 2);
   }
 
   private estimateFrontRowFinish(driver: StandardizedNascarDriver): number {
@@ -526,7 +556,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
 
   private calculateVsTopDrivers(driver: StandardizedNascarDriver): number {
     // Simplified calculation based on position
-    return Math.max(0, 1 - (driver.seasonPosition / 40));
+    return Math.max(0, 1 - driver.seasonPosition / 40);
   }
 
   private calculateVsTeammates(driver: StandardizedNascarDriver): number {
@@ -542,25 +572,39 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
   /**
    * Data quality assessment methods
    */
-  private assessNascarDataQuality(race: StandardizedNascarRace, driver: StandardizedNascarDriver): number {
+  private assessNascarDataQuality(
+    race: StandardizedNascarRace,
+    driver: StandardizedNascarDriver
+  ): number {
     let quality = 1.0;
-    
+
     // Check for missing critical data
     if (!race.track.type) quality -= 0.1;
     if (!race.specs.totalLaps) quality -= 0.1;
     if (!driver.stats.averageFinish) quality -= 0.2;
     if (!driver.currentPoints) quality -= 0.1;
-    
+
     return Math.max(quality, 0);
   }
 
-  private calculateNascarCompleteness(race: StandardizedNascarRace, driver: StandardizedNascarDriver): number {
+  private calculateNascarCompleteness(
+    race: StandardizedNascarRace,
+    driver: StandardizedNascarDriver
+  ): number {
     const requiredFields = [
-      race.id, race.track.type, race.specs.totalLaps, race.specs.distance,
-      driver.id, driver.stats.wins, driver.stats.averageFinish, driver.currentPoints
+      race.id,
+      race.track.type,
+      race.specs.totalLaps,
+      race.specs.distance,
+      driver.id,
+      driver.stats.wins,
+      driver.stats.averageFinish,
+      driver.currentPoints,
     ];
-    
-    const presentFields = requiredFields.filter(field => field !== undefined && field !== null).length;
+
+    const presentFields = requiredFields.filter(
+      field => field !== undefined && field !== null
+    ).length;
     return presentFields / requiredFields.length;
   }
 
@@ -570,11 +614,12 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
   private validateNascarCompleteness(features: MLFeatureVector) {
     const requiredCategories = ['driver', 'track', 'team', 'race'];
     const presentCategories = requiredCategories.filter(cat => features.features[cat]).length;
-    
+
     return {
       score: presentCategories / requiredCategories.length,
       missingFeatures: requiredCategories.filter(cat => !features.features[cat]),
-      missingPercentage: ((requiredCategories.length - presentCategories) / requiredCategories.length) * 100
+      missingPercentage:
+        ((requiredCategories.length - presentCategories) / requiredCategories.length) * 100,
     };
   }
 
@@ -582,42 +627,42 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     // Check for reasonable value ranges
     const outliers: string[] = [];
     const anomalies: string[] = [];
-    
+
     // Check driver features
     if (features.features.driver?.winRate > 1) outliers.push('driver.winRate');
     if (features.features.driver?.averageFinish > 50) anomalies.push('driver.averageFinish');
-    
+
     return {
       score: Math.max(0, 1 - (outliers.length + anomalies.length) * 0.1),
       outliers,
       anomalies,
-      suspiciousValues: []
+      suspiciousValues: [],
     };
   }
 
   private validateNascarConsistency(features: MLFeatureVector) {
     const inconsistencies: string[] = [];
-    
+
     // Check for logical consistency
     if (features.features.driver?.wins > features.features.driver?.top5) {
       inconsistencies.push('wins > top5');
     }
-    
+
     return {
       score: Math.max(0, 1 - inconsistencies.length * 0.2),
       inconsistencies,
-      logicalErrors: inconsistencies
+      logicalErrors: inconsistencies,
     };
   }
 
   private validateNascarTimeliness(features: MLFeatureVector) {
     const lastUpdated = new Date(features.metadata.extractedAt);
     const ageHours = (Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60);
-    
+
     return {
-      score: Math.max(0, 1 - (ageHours / 168)), // 1 week = full penalty
+      score: Math.max(0, 1 - ageHours / 168), // 1 week = full penalty
       staleFeatures: ageHours > 24 ? ['all'] : [],
-      lastUpdated: { all: features.metadata.extractedAt }
+      lastUpdated: { all: features.metadata.extractedAt },
     };
   }
 
@@ -625,21 +670,21 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     const recommendations = {
       critical: [] as string[],
       warning: [] as string[],
-      info: [] as string[]
+      info: [] as string[],
     };
-    
+
     if (validation.completeness.score < 0.8) {
       recommendations.critical.push('Missing critical feature categories');
     }
-    
+
     if (validation.accuracy.score < 0.9) {
       recommendations.warning.push('Data accuracy issues detected');
     }
-    
+
     if (validation.timeliness.score < 0.9) {
       recommendations.info.push('Consider updating data more frequently');
     }
-    
+
     return recommendations;
   }
 
@@ -647,13 +692,13 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     // Simplified feature importance based on NASCAR domain knowledge
     return {
       'driver.winRate': 0.25,
-      'driver.averageFinish': 0.20,
+      'driver.averageFinish': 0.2,
       'track.driverTrackPerformance': 0.15,
       'driver.recentForm': 0.12,
-      'team.teamQuality': 0.10,
+      'team.teamQuality': 0.1,
       'race.competitionLevel': 0.08,
       'weather.weatherImpact': 0.05,
-      'driver.consistencyRating': 0.05
+      'driver.consistencyRating': 0.05,
     };
   }
 
@@ -664,14 +709,14 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
     // Flatten features for XGBoost
     const flatFeatures: number[] = [];
     const featureNames: string[] = [];
-    
+
     Object.entries(features.features).forEach(([category, categoryFeatures]) => {
       Object.entries(categoryFeatures).forEach(([featureName, value]) => {
-        flatFeatures.push(typeof value === 'number' ? value : (value ? 1 : 0));
+        flatFeatures.push(typeof value === 'number' ? value : value ? 1 : 0);
         featureNames.push(`${category}.${featureName}`);
       });
     });
-    
+
     return {
       originalId: features.id,
       modelType: 'xgboost',
@@ -680,20 +725,22 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       categoricalFeatures: [],
       featureNames,
       categoricalIndices: [],
-      numericIndices: Array.from({length: flatFeatures.length}, (_, i) => i),
+      numericIndices: Array.from({ length: flatFeatures.length }, (_, i) => i),
       transformations: {
         normalization: { method: 'none', parameters: {} },
         encoding: { categoricalEncoding: 'none', encodingMaps: {} },
-        scaling: { method: 'none', scalingFactors: {} }
-      }
+        scaling: { method: 'none', scalingFactors: {} },
+      },
     };
   }
 
-  private async transformForNeuralNetwork(features: MLFeatureVector): Promise<TransformedFeatureVector> {
+  private async transformForNeuralNetwork(
+    features: MLFeatureVector
+  ): Promise<TransformedFeatureVector> {
     // Normalize all features for neural network
     const flatFeatures: number[] = [];
     const featureNames: string[] = [];
-    
+
     Object.entries(features.features).forEach(([category, categoryFeatures]) => {
       Object.entries(categoryFeatures).forEach(([featureName, value]) => {
         let normalizedValue: number;
@@ -706,7 +753,7 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
         featureNames.push(`${category}.${featureName}`);
       });
     });
-    
+
     return {
       originalId: features.id,
       modelType: 'neural_network',
@@ -715,16 +762,18 @@ export class NascarFeatureExtractor implements MLFeatureExtractor<{race: Standar
       categoricalFeatures: [],
       featureNames,
       categoricalIndices: [],
-      numericIndices: Array.from({length: flatFeatures.length}, (_, i) => i),
+      numericIndices: Array.from({ length: flatFeatures.length }, (_, i) => i),
       transformations: {
         normalization: { method: 'minmax', parameters: { min: 0, max: 1 } },
         encoding: { categoricalEncoding: 'none', encodingMaps: {} },
-        scaling: { method: 'minmax', scalingFactors: {} }
-      }
+        scaling: { method: 'minmax', scalingFactors: {} },
+      },
     };
   }
 
-  private async transformForRandomForest(features: MLFeatureVector): Promise<TransformedFeatureVector> {
+  private async transformForRandomForest(
+    features: MLFeatureVector
+  ): Promise<TransformedFeatureVector> {
     // Random Forest can handle mixed feature types well
     return this.transformForXGBoost(features); // Similar to XGBoost
   }

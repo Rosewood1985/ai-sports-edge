@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { StyleSheet, View, StatusBar, Platform } from 'react-native';
-import theme from '../styles/theme'; // Import the centralized theme object
+
 import { useTheme as useAppTheme } from '../contexts/ThemeContext'; // Alias to avoid naming conflict
+import theme from '../styles/theme'; // Import the centralized theme object
 
 // Define the structure of the theme context
 // It will now provide the whole theme object
@@ -12,7 +13,7 @@ interface UIThemeContextType {
 
 // Create UI theme context with default values matching the theme structure
 const UIThemeContext = createContext<UIThemeContextType>({
-  theme: theme, // Provide the imported theme as default
+  theme, // Provide the imported theme as default
   isDark: true, // Assume dark mode default for context structure
 });
 
@@ -44,14 +45,12 @@ export const UIThemeProvider: React.FC<UIThemeProviderProps> = ({ children }) =>
   return (
     <UIThemeContext.Provider
       value={{
-        theme: theme, // Provide the full theme object
-        isDark: isDark,
+        theme, // Provide the full theme object
+        isDark,
       }}
     >
       {/* Apply base background color if desired, or handle in screen components */}
-      <View style={{ flex: 1, backgroundColor: theme.colors.primaryBackground }}>
-        {children}
-      </View>
+      <View style={{ flex: 1, backgroundColor: theme.colors.primaryBackground }}>{children}</View>
     </UIThemeContext.Provider>
   );
 };

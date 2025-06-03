@@ -1,5 +1,6 @@
-import React, { ReactNode, ReactElement } from 'react';
 import { StripeProvider as StripeSDKProvider } from '@stripe/stripe-react-native';
+import React, { ReactNode, ReactElement } from 'react';
+
 import { STRIPE_PUBLISHABLE_KEY } from '../config/stripe';
 
 interface StripeProviderProps {

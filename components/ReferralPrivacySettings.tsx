@@ -1,13 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Modal,
-  Alert
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
+
 import { useThemeColor } from '../hooks/useThemeColor';
 import { rewardsService } from '../services/rewardsService';
 import NeonButton from './ui/NeonButton';
@@ -28,27 +22,27 @@ interface ReferralPrivacySettingsProps {
 const ReferralPrivacySettings: React.FC<ReferralPrivacySettingsProps> = ({
   visible,
   onClose,
-  onPrivacyChanged
+  onPrivacyChanged,
 }) => {
   const [currentPrivacy, setCurrentPrivacy] = useState<LeaderboardPrivacy>('public');
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
-  
+
   useEffect(() => {
     if (visible) {
       loadPrivacySettings();
     }
   }, [visible]);
-  
+
   const loadPrivacySettings = async () => {
     try {
       // In a real app, this would fetch from the user's settings
       const userId = 'current-user-id'; // In a real app, get from auth
       const userRewards = await rewardsService.getUserRewards(userId);
-      
+
       if (userRewards && userRewards.leaderboardPrivacy) {
         setCurrentPrivacy(userRewards.leaderboardPrivacy);
       }
@@ -56,23 +50,23 @@ const ReferralPrivacySettings: React.FC<ReferralPrivacySettingsProps> = ({
       console.error('Error loading privacy settings:', error);
     }
   };
-  
+
   const handlePrivacyChange = async (privacy: LeaderboardPrivacy) => {
     setCurrentPrivacy(privacy);
   };
-  
+
   const handleSaveSettings = async () => {
     try {
       setLoading(true);
-      
+
       // In a real app, this would update the user's settings
       const userId = 'current-user-id'; // In a real app, get from auth
       await rewardsService.updateLeaderboardPrivacy(userId, currentPrivacy);
-      
+
       if (onPrivacyChanged) {
         onPrivacyChanged(currentPrivacy);
       }
-      
+
       onClose();
     } catch (error) {
       console.error('Error updating privacy settings:', error);
@@ -81,105 +75,89 @@ const ReferralPrivacySettings: React.FC<ReferralPrivacySettingsProps> = ({
       setLoading(false);
     }
   };
-  
+
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <NeonCard style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: textColor }]}>
-              Privacy Settings
-            </Text>
-            
-            <TouchableOpacity 
-              onPress={onClose}
-              style={styles.closeButton}
-            >
+            <Text style={[styles.modalTitle, { color: textColor }]}>Privacy Settings</Text>
+
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={textColor} />
             </TouchableOpacity>
           </View>
-          
+
           <Text style={[styles.modalDescription, { color: textColor }]}>
             Choose how you appear on the leaderboard:
           </Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[
               styles.privacyOption,
-              currentPrivacy === 'public' && { backgroundColor: 'rgba(52, 152, 219, 0.1)' }
+              currentPrivacy === 'public' && { backgroundColor: 'rgba(52, 152, 219, 0.1)' },
             ]}
             onPress={() => handlePrivacyChange('public')}
           >
             <View style={styles.privacyOptionContent}>
               <Ionicons name="person" size={24} color={textColor} />
               <View style={styles.privacyOptionText}>
-                <Text style={[styles.privacyOptionTitle, { color: textColor }]}>
-                  Public
-                </Text>
+                <Text style={[styles.privacyOptionTitle, { color: textColor }]}>Public</Text>
                 <Text style={[styles.privacyOptionDescription, { color: textColor }]}>
                   Show your name and referral count
                 </Text>
               </View>
             </View>
-            
+
             {currentPrivacy === 'public' && (
               <Ionicons name="checkmark-circle" size={24} color={primaryColor} />
             )}
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[
               styles.privacyOption,
-              currentPrivacy === 'anonymous' && { backgroundColor: 'rgba(52, 152, 219, 0.1)' }
+              currentPrivacy === 'anonymous' && { backgroundColor: 'rgba(52, 152, 219, 0.1)' },
             ]}
             onPress={() => handlePrivacyChange('anonymous')}
           >
             <View style={styles.privacyOptionContent}>
               <Ionicons name="person-outline" size={24} color={textColor} />
               <View style={styles.privacyOptionText}>
-                <Text style={[styles.privacyOptionTitle, { color: textColor }]}>
-                  Anonymous
-                </Text>
+                <Text style={[styles.privacyOptionTitle, { color: textColor }]}>Anonymous</Text>
                 <Text style={[styles.privacyOptionDescription, { color: textColor }]}>
                   Hide your name but show referral count
                 </Text>
               </View>
             </View>
-            
+
             {currentPrivacy === 'anonymous' && (
               <Ionicons name="checkmark-circle" size={24} color={primaryColor} />
             )}
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[
               styles.privacyOption,
-              currentPrivacy === 'private' && { backgroundColor: 'rgba(52, 152, 219, 0.1)' }
+              currentPrivacy === 'private' && { backgroundColor: 'rgba(52, 152, 219, 0.1)' },
             ]}
             onPress={() => handlePrivacyChange('private')}
           >
             <View style={styles.privacyOptionContent}>
               <Ionicons name="eye-off" size={24} color={textColor} />
               <View style={styles.privacyOptionText}>
-                <Text style={[styles.privacyOptionTitle, { color: textColor }]}>
-                  Private
-                </Text>
+                <Text style={[styles.privacyOptionTitle, { color: textColor }]}>Private</Text>
                 <Text style={[styles.privacyOptionDescription, { color: textColor }]}>
                   Don't appear on the leaderboard at all
                 </Text>
               </View>
             </View>
-            
+
             {currentPrivacy === 'private' && (
               <Ionicons name="checkmark-circle" size={24} color={primaryColor} />
             )}
           </TouchableOpacity>
-          
+
           <View style={styles.buttonContainer}>
             <NeonButton
               title="Cancel"
@@ -188,7 +166,7 @@ const ReferralPrivacySettings: React.FC<ReferralPrivacySettingsProps> = ({
               textStyle={{ color: textColor }}
               type="outline"
             />
-            
+
             <NeonButton
               title="Save Settings"
               onPress={handleSaveSettings}

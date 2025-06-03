@@ -1,6 +1,6 @@
 /**
  * Security Audit Logging Module
- * 
+ *
  * This module provides comprehensive security audit logging for the AI Sports Edge application.
  * It logs security-relevant events and provides tools for monitoring and analyzing security incidents.
  */
@@ -20,7 +20,7 @@ if (!fs.existsSync(DEFAULT_LOG_DIR)) {
 }
 
 // Create a secure hash for log integrity
-const createLogHash = (logEntry) => {
+const createLogHash = logEntry => {
   return crypto.createHash('sha256').update(JSON.stringify(logEntry)).digest('hex');
 };
 
@@ -99,10 +99,10 @@ const createSecurityLogger = (options = {}) => {
         ...meta,
         timestamp: new Date().toISOString(),
       };
-      
+
       // Add a hash for tamper detection
       logEntry.hash = createLogHash(logEntry);
-      
+
       return originalLog(level, message, meta);
     };
   }
@@ -121,34 +121,34 @@ const SecurityEventType = {
   MFA_ENABLED: 'mfa_enabled',
   MFA_DISABLED: 'mfa_disabled',
   MFA_CHALLENGE: 'mfa_challenge',
-  
+
   // Authorization events
   ACCESS_DENIED: 'access_denied',
   PERMISSION_CHANGE: 'permission_change',
   ROLE_CHANGE: 'role_change',
-  
+
   // Data access events
   DATA_ACCESS: 'data_access',
   DATA_MODIFICATION: 'data_modification',
   DATA_DELETION: 'data_deletion',
   SENSITIVE_DATA_ACCESS: 'sensitive_data_access',
-  
+
   // System events
   SYSTEM_START: 'system_start',
   SYSTEM_STOP: 'system_stop',
   CONFIG_CHANGE: 'config_change',
-  
+
   // Security events
   SECURITY_ALERT: 'security_alert',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
   SUSPICIOUS_ACTIVITY: 'suspicious_activity',
   BRUTE_FORCE_ATTEMPT: 'brute_force_attempt',
-  
+
   // API events
   API_KEY_CREATED: 'api_key_created',
   API_KEY_DELETED: 'api_key_deleted',
   API_REQUEST: 'api_request',
-  
+
   // User management events
   USER_CREATED: 'user_created',
   USER_UPDATED: 'user_updated',
@@ -197,18 +197,18 @@ const createAuditMiddleware = (options = {}) => {
 
     // Capture the original end method
     const originalEnd = res.end;
-    
+
     // Get the start time
     const startTime = Date.now();
-    
+
     // Override the end method to log the response
     res.end = function (chunk, encoding) {
       // Restore the original end method
       res.end = originalEnd;
-      
+
       // Calculate response time
       const responseTime = Date.now() - startTime;
-      
+
       // Prepare request data
       const requestData = {
         method: req.method,
@@ -219,23 +219,23 @@ const createAuditMiddleware = (options = {}) => {
         responseTime,
         statusCode: res.statusCode,
       };
-      
+
       // Add headers if enabled
       if (logHeaders) {
         requestData.headers = sanitizeObject(req.headers, sensitiveHeaders);
       }
-      
+
       // Add body if enabled and present
       if (logBody && req.body) {
         requestData.body = sanitizeObject(req.body, sensitiveParams);
       }
-      
+
       // Add user if authenticated
       if (req.user) {
         requestData.userId = req.user.id;
         requestData.userRole = req.user.role;
       }
-      
+
       // Determine log level based on status code
       let logLevel = 'info';
       if (res.statusCode >= 400 && res.statusCode < 500) {
@@ -243,7 +243,7 @@ const createAuditMiddleware = (options = {}) => {
       } else if (res.statusCode >= 500) {
         logLevel = 'error';
       }
-      
+
       // Log the request
       logSecurityEvent(
         'api_request',
@@ -251,11 +251,11 @@ const createAuditMiddleware = (options = {}) => {
         requestData,
         logLevel
       );
-      
+
       // Call the original end method
       return originalEnd.call(this, chunk, encoding);
     };
-    
+
     next();
   };
 };
@@ -270,15 +270,15 @@ const sanitizeObject = (obj, sensitiveFields = []) => {
   if (!obj || typeof obj !== 'object') {
     return obj;
   }
-  
+
   const sanitized = { ...obj };
-  
+
   for (const field of sensitiveFields) {
     if (sanitized[field]) {
       sanitized[field] = '********';
     }
   }
-  
+
   return sanitized;
 };
 
@@ -287,16 +287,17 @@ const sanitizeObject = (obj, sensitiveFields = []) => {
  * @param {String} logFilePath - Path to the log file
  * @returns {Object} Verification results
  */
-const verifyLogIntegrity = async (logFilePath) => {
+const verifyLogIntegrity = async logFilePath => {
   try {
     // Read the log file
     const logContent = await fs.promises.readFile(logFilePath, 'utf8');
-    
+
     // Parse each line as JSON
-    const logEntries = logContent.split('\n')
+    const logEntries = logContent
+      .split('\n')
       .filter(line => line.trim())
       .map(line => JSON.parse(line));
-    
+
     // Verify each log entry
     const results = {
       totalEntries: logEntries.length,
@@ -304,22 +305,22 @@ const verifyLogIntegrity = async (logFilePath) => {
       invalidEntries: 0,
       tamperedEntries: [],
     };
-    
+
     for (let i = 0; i < logEntries.length; i++) {
       const entry = logEntries[i];
-      
+
       // Skip entries without a hash
       if (!entry.hash) {
         continue;
       }
-      
+
       // Create a copy without the hash
       const entryWithoutHash = { ...entry };
       delete entryWithoutHash.hash;
-      
+
       // Calculate the hash
       const calculatedHash = createLogHash(entryWithoutHash);
-      
+
       // Compare the hashes
       if (calculatedHash === entry.hash) {
         results.validEntries++;
@@ -331,7 +332,7 @@ const verifyLogIntegrity = async (logFilePath) => {
         });
       }
     }
-    
+
     return results;
   } catch (error) {
     return {
@@ -349,41 +350,33 @@ const verifyLogIntegrity = async (logFilePath) => {
 const applyAuditLogging = (app, options = {}) => {
   const middleware = createAuditMiddleware(options);
   app.use(middleware);
-  
+
   // Log application start
-  logSecurityEvent(
-    SecurityEventType.SYSTEM_START,
-    'Application started',
-    {
-      nodeEnv: process.env.NODE_ENV,
-      nodeVersion: process.version,
-      platform: process.platform,
-      arch: process.arch,
-      pid: process.pid,
-    }
-  );
-  
+  logSecurityEvent(SecurityEventType.SYSTEM_START, 'Application started', {
+    nodeEnv: process.env.NODE_ENV,
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    pid: process.pid,
+  });
+
   // Log application shutdown
   process.on('SIGINT', () => {
-    logSecurityEvent(
-      SecurityEventType.SYSTEM_STOP,
-      'Application stopping due to SIGINT',
-      { pid: process.pid }
-    );
+    logSecurityEvent(SecurityEventType.SYSTEM_STOP, 'Application stopping due to SIGINT', {
+      pid: process.pid,
+    });
     process.exit(0);
   });
-  
+
   process.on('SIGTERM', () => {
-    logSecurityEvent(
-      SecurityEventType.SYSTEM_STOP,
-      'Application stopping due to SIGTERM',
-      { pid: process.pid }
-    );
+    logSecurityEvent(SecurityEventType.SYSTEM_STOP, 'Application stopping due to SIGTERM', {
+      pid: process.pid,
+    });
     process.exit(0);
   });
-  
+
   // Log uncaught exceptions
-  process.on('uncaughtException', (error) => {
+  process.on('uncaughtException', error => {
     logSecurityEvent(
       SecurityEventType.SECURITY_ALERT,
       'Uncaught exception',
@@ -395,7 +388,7 @@ const applyAuditLogging = (app, options = {}) => {
       'error'
     );
   });
-  
+
   // Log unhandled promise rejections
   process.on('unhandledRejection', (reason, promise) => {
     logSecurityEvent(

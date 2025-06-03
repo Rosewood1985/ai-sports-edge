@@ -12,7 +12,7 @@ const config = {
   mlApiDir: path.join(__dirname, '..', 'api', 'ml-sports-edge'),
   webDir: path.join(__dirname, '..', 'web'),
   publicDir: path.join(__dirname, '..', 'public'),
-  deployCommand: 'npx surge public aisportsedge.app'
+  deployCommand: 'npx surge public aisportsedge.app',
 };
 
 // Colors for console output
@@ -25,7 +25,7 @@ const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   magenta: '\x1b[35m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 /**
@@ -37,14 +37,14 @@ const colors = {
 function executeCommand(command, cwd, label) {
   console.log(`\n${colors.bright}${colors.cyan}=== ${label} ===${colors.reset}\n`);
   console.log(`${colors.dim}$ ${command}${colors.reset}\n`);
-  
+
   try {
-    const output = execSync(command, { 
-      cwd, 
+    const output = execSync(command, {
+      cwd,
       stdio: 'pipe',
-      encoding: 'utf-8'
+      encoding: 'utf-8',
     });
-    
+
     console.log(output);
     console.log(`${colors.green}✓ Command completed successfully${colors.reset}\n`);
     return true;
@@ -72,54 +72,56 @@ function directoryExists(dir) {
  * Main function to update the web app
  */
 async function updateWebApp() {
-  console.log(`${colors.bright}${colors.magenta}Starting Web App Update with ML API Integration${colors.reset}\n`);
-  
+  console.log(
+    `${colors.bright}${colors.magenta}Starting Web App Update with ML API Integration${colors.reset}\n`
+  );
+
   // Step 1: Check if directories exist
   if (!directoryExists(config.mlApiDir)) {
     console.error(`${colors.red}ML API directory not found: ${config.mlApiDir}${colors.reset}`);
     process.exit(1);
   }
-  
+
   if (!directoryExists(config.webDir)) {
     console.error(`${colors.red}Web directory not found: ${config.webDir}${colors.reset}`);
     process.exit(1);
   }
-  
+
   if (!directoryExists(config.publicDir)) {
     console.error(`${colors.red}Public directory not found: ${config.publicDir}${colors.reset}`);
     process.exit(1);
   }
-  
+
   // Step 2: Install ML API dependencies
   console.log(`${colors.yellow}Installing ML API dependencies...${colors.reset}`);
   if (!executeCommand('npm install', config.mlApiDir, 'Installing ML API Dependencies')) {
     console.error(`${colors.red}Failed to install ML API dependencies${colors.reset}`);
     process.exit(1);
   }
-  
+
   // Step 3: Start ML API server in background
   console.log(`${colors.yellow}Starting ML API server...${colors.reset}`);
   executeCommand('node server.js > ml-api.log 2>&1 &', config.mlApiDir, 'Starting ML API Server');
-  
+
   // Wait for server to start
   console.log(`${colors.yellow}Waiting for ML API server to start...${colors.reset}`);
   await new Promise(resolve => setTimeout(resolve, 5000));
-  
+
   // Step 4: Build web app
   console.log(`${colors.yellow}Building web app...${colors.reset}`);
   if (!executeCommand('npm run build', config.webDir, 'Building Web App')) {
     console.error(`${colors.red}Failed to build web app${colors.reset}`);
     process.exit(1);
   }
-  
+
   // Step 5: Copy ML API client to public directory
   console.log(`${colors.yellow}Copying ML API client to public directory...${colors.reset}`);
   const mlApiClientDir = path.join(config.publicDir, 'ml-api');
-  
+
   if (!directoryExists(mlApiClientDir)) {
     fs.mkdirSync(mlApiClientDir, { recursive: true });
   }
-  
+
   // Create a simple client-side script to access the ML API
   const clientScript = `
 /**
@@ -268,18 +270,20 @@ async function updateWebApp() {
   window.MLSportsEdgeAPI = MLSportsEdgeAPI;
 })(window);
   `;
-  
+
   fs.writeFileSync(path.join(mlApiClientDir, 'client.js'), clientScript);
   console.log(`${colors.green}✓ ML API client script created${colors.reset}\n`);
-  
+
   // Step 6: Deploy web app
   console.log(`${colors.yellow}Deploying web app...${colors.reset}`);
   if (!executeCommand(config.deployCommand, __dirname, 'Deploying Web App')) {
     console.error(`${colors.red}Failed to deploy web app${colors.reset}`);
     process.exit(1);
   }
-  
-  console.log(`\n${colors.bright}${colors.green}Web App Update Completed Successfully!${colors.reset}\n`);
+
+  console.log(
+    `\n${colors.bright}${colors.green}Web App Update Completed Successfully!${colors.reset}\n`
+  );
   console.log(`${colors.cyan}ML API is running at: http://localhost:3001${colors.reset}`);
   console.log(`${colors.cyan}Web App is deployed at: https://aisportsedge.app${colors.reset}\n`);
 }

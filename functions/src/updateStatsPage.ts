@@ -1,7 +1,7 @@
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import * as admin from 'firebase-admin';
-import { logger } from 'firebase-functions/v2';
-import { wrapScheduledFunction, trackDatabaseOperation } from '../sentryCronConfig';
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import * as admin from "firebase-admin";
+import { logger } from "firebase-functions/v2";
+import { wrapScheduledFunction, trackDatabaseOperation } from "../sentryCronConfig";
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -20,13 +20,13 @@ interface Game {
   startTime: admin.firestore.Timestamp;
   aiConfidence?: number;
   aiPredictedWinner?: string;
-  result?: 'win' | 'loss' | 'push' | 'pending';
+  result?: "win" | "loss" | "push" | "pending";
   actualWinner?: string;
   [key: string]: any; // Allow for additional properties
 }
 
 interface ConfidenceTierStats {
-  tier: 'high' | 'medium' | 'low';
+  tier: "high" | "medium" | "low";
   range: string;
   winPercentage: number;
   totalPicks: number;
@@ -82,28 +82,28 @@ interface StatsData {
  * Firebase Cloud Function that runs weekly to update stats page data
  */
 export const updateStatsPage = onSchedule({
-  schedule: '0 0 * * 0', // Run at midnight every Sunday
-  timeZone: 'America/New_York'
+  schedule: "0 0 * * 0", // Run at midnight every Sunday
+  timeZone: "America/New_York"
 }, wrapScheduledFunction(
-  'updateStatsPage',
-  '0 0 * * 0',
+  "updateStatsPage",
+  "0 0 * * 0",
   async (event) => {
-    logger.info('Starting updateStatsPage function');
+    logger.info("Starting updateStatsPage function");
     
     try {
       // Get all completed games with AI predictions
-      const gamesRef = firestore.collection('games');
+      const gamesRef = firestore.collection("games");
       const gamesQuery = gamesRef
-        .where('aiConfidence', '>', 0) // Only games with predictions
-        .where('result', 'in', ['win', 'loss', 'push']); // Only completed games
+        .where("aiConfidence", ">", 0) // Only games with predictions
+        .where("result", "in", ["win", "loss", "push"]); // Only completed games
       
       const gamesSnapshot = await trackDatabaseOperation(
-        'query_completed_games_with_predictions',
+        "query_completed_games_with_predictions",
         () => gamesQuery.get()
       );
       
       if (gamesSnapshot.empty) {
-        logger.info('No completed games with predictions found');
+        logger.info("No completed games with predictions found");
         return null;
       }
       
@@ -117,10 +117,10 @@ export const updateStatsPage = onSchedule({
       
       // Calculate overall stats
       const totalPicks = games.length;
-      const wins = games.filter(game => game.result === 'win').length;
-      const losses = games.filter(game => game.result === 'loss').length;
-      const pushes = games.filter(game => game.result === 'push').length;
-      const pending = games.filter(game => game.result === 'pending' || !game.result).length;
+      const wins = games.filter(game => game.result === "win").length;
+      const losses = games.filter(game => game.result === "loss").length;
+      const pushes = games.filter(game => game.result === "push").length;
+      const pending = games.filter(game => game.result === "pending" || !game.result).length;
       
       const overallWinPercentage = totalPicks > 0 
         ? Math.round((wins / (wins + losses)) * 100) 
@@ -129,8 +129,8 @@ export const updateStatsPage = onSchedule({
       // Calculate confidence tier stats
       const confidenceTiers: ConfidenceTierStats[] = [
         {
-          tier: 'high',
-          range: '80-100%',
+          tier: "high",
+          range: "80-100%",
           winPercentage: 0,
           totalPicks: 0,
           wins: 0,
@@ -139,8 +139,8 @@ export const updateStatsPage = onSchedule({
           pending: 0
         },
         {
-          tier: 'medium',
-          range: '60-79%',
+          tier: "medium",
+          range: "60-79%",
           winPercentage: 0,
           totalPicks: 0,
           wins: 0,
@@ -149,8 +149,8 @@ export const updateStatsPage = onSchedule({
           pending: 0
         },
         {
-          tier: 'low',
-          range: '0-59%',
+          tier: "low",
+          range: "0-59%",
           winPercentage: 0,
           totalPicks: 0,
           wins: 0,
@@ -175,11 +175,11 @@ export const updateStatsPage = onSchedule({
         
         tier.totalPicks++;
         
-        if (game.result === 'win') {
+        if (game.result === "win") {
           tier.wins++;
-        } else if (game.result === 'loss') {
+        } else if (game.result === "loss") {
           tier.losses++;
-        } else if (game.result === 'push') {
+        } else if (game.result === "push") {
           tier.pushes++;
         } else {
           tier.pending++;
@@ -197,7 +197,7 @@ export const updateStatsPage = onSchedule({
       const sportMap = new Map<string, SportStats>();
       
       games.forEach(game => {
-        const sport = game.sport || 'Unknown';
+        const sport = game.sport || "Unknown";
         
         if (!sportMap.has(sport)) {
           sportMap.set(sport, {
@@ -214,11 +214,11 @@ export const updateStatsPage = onSchedule({
         const sportStat = sportMap.get(sport)!;
         sportStat.totalPicks++;
         
-        if (game.result === 'win') {
+        if (game.result === "win") {
           sportStat.wins++;
-        } else if (game.result === 'loss') {
+        } else if (game.result === "loss") {
           sportStat.losses++;
-        } else if (game.result === 'push') {
+        } else if (game.result === "push") {
           sportStat.pushes++;
         } else {
           sportStat.pending++;
@@ -250,8 +250,8 @@ export const updateStatsPage = onSchedule({
         game.startTime && game.startTime.seconds >= sevenDaysAgo.seconds
       );
       
-      const last7DaysWins = last7DaysGames.filter(game => game.result === 'win').length;
-      const last7DaysLosses = last7DaysGames.filter(game => game.result === 'loss').length;
+      const last7DaysWins = last7DaysGames.filter(game => game.result === "win").length;
+      const last7DaysLosses = last7DaysGames.filter(game => game.result === "loss").length;
       const last7DaysWinPercentage = (last7DaysWins + last7DaysLosses) > 0 
         ? Math.round((last7DaysWins / (last7DaysWins + last7DaysLosses)) * 100) 
         : 0;
@@ -261,8 +261,8 @@ export const updateStatsPage = onSchedule({
         game.startTime && game.startTime.seconds >= thirtyDaysAgo.seconds
       );
       
-      const last30DaysWins = last30DaysGames.filter(game => game.result === 'win').length;
-      const last30DaysLosses = last30DaysGames.filter(game => game.result === 'loss').length;
+      const last30DaysWins = last30DaysGames.filter(game => game.result === "win").length;
+      const last30DaysLosses = last30DaysGames.filter(game => game.result === "loss").length;
       const last30DaysWinPercentage = (last30DaysWins + last30DaysLosses) > 0 
         ? Math.round((last30DaysWins / (last30DaysWins + last30DaysLosses)) * 100) 
         : 0;
@@ -302,26 +302,26 @@ export const updateStatsPage = onSchedule({
       
       // Save stats to Firestore
       await trackDatabaseOperation(
-        'save_stats_data',
-        () => firestore.collection('stats').doc('aiPicks').set(statsData)
+        "save_stats_data",
+        () => firestore.collection("stats").doc("aiPicks").set(statsData)
       );
       
-      logger.info('Successfully updated stats page data');
+      logger.info("Successfully updated stats page data");
       
       // Also save a historical record
       await trackDatabaseOperation(
-        'save_stats_history',
-        () => firestore.collection('statsHistory').add({
+        "save_stats_history",
+        () => firestore.collection("statsHistory").add({
           ...statsData,
           timestamp: admin.firestore.Timestamp.now()
         })
       );
       
-      logger.info('Added entry to statsHistory collection');
+      logger.info("Added entry to statsHistory collection");
       
       return statsData;
     } catch (error) {
-      logger.error('Error in updateStatsPage function:', error);
+      logger.error("Error in updateStatsPage function:", error);
       throw error;
     }
   }));

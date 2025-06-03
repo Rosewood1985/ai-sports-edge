@@ -1,20 +1,21 @@
 /**
  * Stripe Tax Service
- * 
+ *
  * This service provides functions for tax calculation, transaction recording,
  * and tax reporting using the Stripe Tax API.
  */
 
 import Stripe from 'stripe';
-import logger from '../utils/logger';
+
+import apiKeys from '../utils/apiKeys';
 import cache from '../utils/cache';
 import db from '../utils/db';
+import logger from '../utils/logger';
 import stripeTaxConfig from '../utils/stripeTaxConfig';
 
 // Initialize Stripe with API key from centralized management
-import apiKeys from '../utils/apiKeys';
 const stripe = new Stripe(apiKeys.getStripeSecretKey(), {
-  apiVersion: '2025-02-24.acacia' // Use the latest API version
+  apiVersion: '2025-02-24.acacia', // Use the latest API version
 });
 
 // Get configuration
@@ -102,7 +103,7 @@ interface ReportOptions {
 
 /**
  * Calculate tax for a transaction
- * 
+ *
  * @param options - Tax calculation options
  * @returns Tax calculation result
  */
@@ -111,7 +112,7 @@ async function calculateTax({
   customerId,
   customerDetails,
   lineItems,
-  useCache = true
+  useCache = true,
 }: TaxCalculationOptions): Promise<any> {
   // Check if Stripe Tax is enabled
   if (!stripeTaxConfig.isEnabled()) {
@@ -127,10 +128,10 @@ async function calculateTax({
     // Validate inputs
     if (!currency) throw new Error('Currency is required');
     if (!lineItems || !lineItems.length) throw new Error('Line items are required');
-    
+
     // Generate cache key
     const cacheKey = `tax_calc_${customerId}_${JSON.stringify(lineItems)}_${currency}`;
-    
+
     // Check cache if enabled
     if (useCache && stripeTaxConfig.getConfig().taxCalculation.cacheEnabled) {
       const cachedResult = cache.get(cacheKey);
@@ -139,15 +140,16 @@ async function calculateTax({
         return cachedResult;
       }
     }
-    
+
     // Prepare line items for Stripe Tax API
     const taxLineItems = lineItems.map(item => ({
       amount: Math.round(item.amount * 100), // Convert to cents
       reference: item.id || `item_${Date.now()}`,
-      tax_code: item.taxCode || stripeTaxConfig.getTaxCode(item.id ? 'oneTimePurchase' : 'subscription'),
+      tax_code:
+        item.taxCode || stripeTaxConfig.getTaxCode(item.id ? 'oneTimePurchase' : 'subscription'),
       tax_behavior: item.taxBehavior || DEFAULT_TAX_BEHAVIOR,
     }));
-    
+
     // Create tax calculation
     // Use type assertion to work around type incompatibilities
     const taxCalculation = await stripe.tax.calculations.create({
@@ -156,19 +158,19 @@ async function calculateTax({
       customer_details: customerDetails as any,
       line_items: taxLineItems as any,
     });
-    
+
     // Cache the result
     if (useCache && stripeTaxConfig.getConfig().taxCalculation.cacheEnabled) {
       cache.set(cacheKey, taxCalculation, TAX_CALCULATION_CACHE_TTL);
     }
-    
+
     // Log success
     logger.info('Tax calculation completed', {
       calculationId: taxCalculation.id,
       customerId,
       totalTax: taxCalculation.tax_amount_exclusive,
     });
-    
+
     return taxCalculation;
   } catch (error) {
     logger.error('Tax calculation failed', {
@@ -182,7 +184,7 @@ async function calculateTax({
 
 /**
  * Create a payment intent with tax calculation
- * 
+ *
  * @param options - Payment options
  * @returns Payment intent with tax
  */
@@ -191,16 +193,16 @@ async function createPaymentIntentWithTax({
   customerId,
   customerDetails,
   lineItems,
-  metadata = {}
+  metadata = {},
 }: PaymentWithTaxOptions): Promise<any> {
   try {
     // Calculate subtotal (pre-tax amount)
     const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
-    
+
     // Calculate tax if enabled
     let taxCalculation;
     let taxAmount = 0;
-    
+
     if (stripeTaxConfig.isEnabled()) {
       taxCalculation = await calculateTax({
         currency,
@@ -210,10 +212,10 @@ async function createPaymentIntentWithTax({
       });
       taxAmount = taxCalculation.tax_amount_exclusive;
     }
-    
+
     // Calculate total amount (including tax)
     const totalAmount = Math.round(subtotal * 100) + taxAmount;
-    
+
     // Create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
@@ -226,7 +228,7 @@ async function createPaymentIntentWithTax({
         tax_amount: String(taxAmount),
       },
     });
-    
+
     // Log success
     logger.info('Payment intent with tax created', {
       paymentIntentId: paymentIntent.id,
@@ -234,7 +236,7 @@ async function createPaymentIntentWithTax({
       amount: totalAmount,
       taxAmount,
     });
-    
+
     return {
       paymentIntent,
       taxCalculation,
@@ -251,7 +253,7 @@ async function createPaymentIntentWithTax({
 
 /**
  * Record a tax transaction for reporting
- * 
+ *
  * @param options - Transaction options
  * @returns Tax transaction
  */
@@ -272,23 +274,23 @@ async function recordTaxTransaction({
     // Validate inputs
     if (!calculationId) throw new Error('Tax calculation ID is required');
     if (!reference) throw new Error('Reference ID is required');
-    
+
     // Create tax transaction
     const taxTransaction = await stripe.tax.transactions.createFromCalculation({
       calculation: calculationId,
       reference,
     });
-    
+
     // Log success
     logger.info('Tax transaction recorded', {
       transactionId: taxTransaction.id,
       calculationId,
       reference,
     });
-    
+
     // Store transaction in database
     await storeTransactionInDatabase(taxTransaction, reference);
-    
+
     return taxTransaction;
   } catch (error) {
     logger.error('Failed to record tax transaction', {
@@ -302,26 +304,23 @@ async function recordTaxTransaction({
 
 /**
  * Store tax transaction in database
- * 
+ *
  * @param taxTransaction - Tax transaction from Stripe
  * @param reference - Reference ID (e.g., payment intent ID)
  */
-async function storeTransactionInDatabase(
-  taxTransaction: any,
-  reference: string
-): Promise<void> {
+async function storeTransactionInDatabase(taxTransaction: any, reference: string): Promise<void> {
   try {
     // Get transaction details from database
     const transaction = await db.query(
       'SELECT id FROM transactions WHERE stripe_payment_intent_id = $1',
       [reference]
     );
-    
+
     if (transaction.rows.length === 0) {
       logger.warn('Transaction not found in database', { reference });
       return;
     }
-    
+
     // In a real implementation, we would update the transaction with tax details
     logger.debug('Tax transaction stored in database', {
       taxTransactionId: taxTransaction.id,
@@ -339,7 +338,7 @@ async function storeTransactionInDatabase(
 
 /**
  * Get tax rates for a specific location
- * 
+ *
  * @param options - Location options
  * @returns Tax rates for the location
  */
@@ -363,7 +362,7 @@ async function getTaxRatesForLocation({
   try {
     // Generate cache key
     const cacheKey = `tax_rates_${countryCode}_${stateCode || ''}_${postalCode || ''}_${city || ''}`;
-    
+
     // Check cache
     if (stripeTaxConfig.getConfig().taxCalculation.cacheEnabled) {
       const cachedRates = cache.get(cacheKey);
@@ -371,7 +370,7 @@ async function getTaxRatesForLocation({
         return cachedRates;
       }
     }
-    
+
     // Create a test calculation to get tax rates
     const testCalculation = await stripe.tax.calculations.create({
       currency: 'usd',
@@ -388,12 +387,12 @@ async function getTaxRatesForLocation({
           country: countryCode,
           state: stateCode,
           postal_code: postalCode,
-          city: city,
+          city,
         },
         address_source: 'billing',
       } as any,
     });
-    
+
     // Extract tax rates from calculation
     // Use type assertion to work around property access issues
     const taxRates = {
@@ -404,12 +403,12 @@ async function getTaxRatesForLocation({
       // but it exists in the actual API response
       jurisdictions: (testCalculation as any).jurisdictions || [],
     };
-    
+
     // Cache the result (1 day TTL)
     if (stripeTaxConfig.getConfig().taxCalculation.cacheEnabled) {
       cache.set(cacheKey, taxRates, 24 * 60 * 60 * 1000);
     }
-    
+
     return taxRates;
   } catch (error) {
     logger.error('Failed to get tax rates for location', {
@@ -424,14 +423,11 @@ async function getTaxRatesForLocation({
 
 /**
  * Generate a tax report for a specific period
- * 
+ *
  * @param options - Report options
  * @returns Tax report data
  */
-async function generateTaxReport({
-  startDate,
-  endDate,
-}: ReportOptions): Promise<any> {
+async function generateTaxReport({ startDate, endDate }: ReportOptions): Promise<any> {
   // Check if Stripe Tax is enabled
   if (!stripeTaxConfig.isEnabled() || !stripeTaxConfig.getConfig().taxReporting.enabled) {
     logger.warn('Stripe Tax reporting is disabled', { startDate, endDate });
@@ -449,17 +445,17 @@ async function generateTaxReport({
     // Validate inputs
     if (!startDate) throw new Error('Start date is required');
     if (!endDate) throw new Error('End date is required');
-    
+
     // Format dates for Stripe API
     const formattedStartDate = startDate.toISOString().split('T')[0];
     const formattedEndDate = endDate.toISOString().split('T')[0];
-    
+
     // In a real implementation, we would:
     // 1. Get transactions from database
     // 2. Get tax transactions from Stripe
     // 3. Process transactions for reporting
     // 4. Store report in database
-    
+
     // For now, return a mock report
     return {
       report_id: `report_${Date.now()}`,

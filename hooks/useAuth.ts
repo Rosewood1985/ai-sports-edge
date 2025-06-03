@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getAuth, onAuthStateChanged, User, AuthError } from 'firebase/auth';
-import { updateUserProfile as updateUserProfileService } from '../services/userService';
-import { info, error as logError, LogCategory } from '../services/loggingService';
-import { safeErrorCapture } from '../services/errorUtils';
 import { FirebaseError } from 'firebase/app';
+import { getAuth, onAuthStateChanged, User, AuthError } from 'firebase/auth';
+import { useState, useEffect, useCallback } from 'react';
+
+import { safeErrorCapture } from '../services/errorUtils';
+import { info, error as logError, LogCategory } from '../services/loggingService';
+import { updateUserProfile as updateUserProfileService } from '../services/userService';
 
 interface AuthState {
   user: User | null;
@@ -24,60 +25,60 @@ export const useAuth = () => {
 
   useEffect(() => {
     console.log('useAuth: Initializing authentication state listener');
-    
+
     try {
       const auth = getAuth();
-      
+
       // Log authentication initialization
       info(LogCategory.AUTH, 'Setting up authentication state listener');
-      
+
       // Subscribe to auth state changes with enhanced error handling
       const unsubscribe = onAuthStateChanged(
         auth,
-        (user) => {
+        user => {
           console.log(`useAuth: Auth state changed, user ${user ? 'logged in' : 'logged out'}`);
-          
+
           if (user) {
             info(LogCategory.AUTH, 'User authenticated', {
               userId: user.uid,
               email: user.email || 'no email',
               emailVerified: user.emailVerified,
               isAnonymous: user.isAnonymous,
-              providerIds: user.providerData.map(p => p.providerId)
+              providerIds: user.providerData.map(p => p.providerId),
             });
           } else {
             info(LogCategory.AUTH, 'User signed out or no user authenticated');
           }
-          
+
           setAuthState({
             user,
             loading: false,
             error: null,
           });
         },
-        (error) => {
+        error => {
           console.error('useAuth: Error in auth state change listener:', error);
-          
+
           // Log the error with our logging service
           logError(LogCategory.AUTH, 'Authentication state listener error', error as Error);
-          
+
           // Track the error with our error tracking service
           safeErrorCapture(error as Error);
-          
+
           // Provide more detailed error information based on the error type
           let errorMessage = 'Unknown authentication error';
-          
+
           if (error instanceof FirebaseError) {
             errorMessage = `Firebase Auth Error (${error.code}): ${error.message}`;
-            
+
             // Log specific Firebase error codes for better debugging
             console.error(`useAuth: Firebase error code: ${error.code}`);
           } else if (error instanceof Error) {
             errorMessage = error.message;
           }
-          
+
           console.error(`useAuth: ${errorMessage}`);
-          
+
           setAuthState({
             user: null,
             loading: false,
@@ -85,7 +86,7 @@ export const useAuth = () => {
           });
         }
       );
-      
+
       // Cleanup subscription
       return () => {
         console.log('useAuth: Cleaning up authentication state listener');
@@ -93,20 +94,24 @@ export const useAuth = () => {
       };
     } catch (setupError) {
       console.error('useAuth: Error setting up auth state listener:', setupError);
-      
+
       // Log the error with our logging service
-      logError(LogCategory.AUTH, 'Error setting up authentication state listener', setupError as Error);
-      
+      logError(
+        LogCategory.AUTH,
+        'Error setting up authentication state listener',
+        setupError as Error
+      );
+
       // Track the error with our error tracking service
       safeErrorCapture(setupError as Error);
-      
+
       // Update auth state with the error
       setAuthState({
         user: null,
         loading: false,
         error: setupError as Error,
       });
-      
+
       // Return empty cleanup function
       return () => {};
     }
@@ -116,50 +121,53 @@ export const useAuth = () => {
    * Update the user's profile with enhanced error handling
    * @param data Data to update
    */
-  const updateUserProfile = useCallback(async (data: any) => {
-    console.log('useAuth: Updating user profile');
-    
-    try {
-      if (!authState.user) {
-        console.error('useAuth: Cannot update profile, user not authenticated');
-        const error = new Error('User not authenticated');
-        logError(LogCategory.AUTH, 'Profile update failed - user not authenticated', error);
-        safeErrorCapture(error);
+  const updateUserProfile = useCallback(
+    async (data: any) => {
+      console.log('useAuth: Updating user profile');
+
+      try {
+        if (!authState.user) {
+          console.error('useAuth: Cannot update profile, user not authenticated');
+          const error = new Error('User not authenticated');
+          logError(LogCategory.AUTH, 'Profile update failed - user not authenticated', error);
+          safeErrorCapture(error);
+          throw error;
+        }
+
+        const userId = authState.user.uid;
+        console.log(`useAuth: Updating profile for user ${userId}`);
+        info(LogCategory.AUTH, 'Updating user profile', { userId });
+
+        // Attempt to update the profile
+        const result = await updateUserProfileService(userId, data);
+
+        console.log('useAuth: Profile updated successfully');
+        info(LogCategory.AUTH, 'User profile updated successfully', { userId });
+
+        return result;
+      } catch (error) {
+        console.error('useAuth: Error updating user profile:', error);
+
+        // Log the error with our logging service
+        logError(LogCategory.AUTH, 'Error updating user profile', error as Error);
+
+        // Track the error with our error tracking service
+        safeErrorCapture(error as Error);
+
+        // Provide more detailed error information based on the error type
+        if (error instanceof FirebaseError) {
+          console.error(`useAuth: Firebase error code: ${error.code}`);
+        }
+
+        // Re-throw the error for the caller to handle
         throw error;
       }
-      
-      const userId = authState.user.uid;
-      console.log(`useAuth: Updating profile for user ${userId}`);
-      info(LogCategory.AUTH, 'Updating user profile', { userId });
-      
-      // Attempt to update the profile
-      const result = await updateUserProfileService(userId, data);
-      
-      console.log('useAuth: Profile updated successfully');
-      info(LogCategory.AUTH, 'User profile updated successfully', { userId });
-      
-      return result;
-    } catch (error) {
-      console.error('useAuth: Error updating user profile:', error);
-      
-      // Log the error with our logging service
-      logError(LogCategory.AUTH, 'Error updating user profile', error as Error);
-      
-      // Track the error with our error tracking service
-      safeErrorCapture(error as Error);
-      
-      // Provide more detailed error information based on the error type
-      if (error instanceof FirebaseError) {
-        console.error(`useAuth: Firebase error code: ${error.code}`);
-      }
-      
-      // Re-throw the error for the caller to handle
-      throw error;
-    }
-  }, [authState.user]);
+    },
+    [authState.user]
+  );
 
   return {
     ...authState,
-    updateUserProfile
+    updateUserProfile,
   };
 };

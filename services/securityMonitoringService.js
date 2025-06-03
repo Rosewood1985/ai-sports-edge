@@ -1,6 +1,6 @@
 /**
  * Security Monitoring Service
- * 
+ *
  * Comprehensive security incident logging and monitoring system
  * for OCR processing and file upload security events.
  */
@@ -14,9 +14,9 @@ const path = require('path');
  */
 const SEVERITY_LEVELS = {
   LOW: 'low',
-  MEDIUM: 'medium', 
+  MEDIUM: 'medium',
   HIGH: 'high',
-  CRITICAL: 'critical'
+  CRITICAL: 'critical',
 };
 
 /**
@@ -30,7 +30,7 @@ const INCIDENT_TYPES = {
   UNAUTHORIZED_ACCESS: 'unauthorized_access',
   MALICIOUS_FILE: 'malicious_file',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
-  SUSPICIOUS_ACTIVITY: 'suspicious_activity'
+  SUSPICIOUS_ACTIVITY: 'suspicious_activity',
 };
 
 /**
@@ -66,7 +66,7 @@ class SecurityMonitoringService {
   async logIncident(incident) {
     const incidentId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    
+
     const incidentRecord = {
       id: incidentId,
       timestamp,
@@ -81,7 +81,7 @@ class SecurityMonitoringService {
       uploadId: incident.uploadId,
       processingId: incident.processingId,
       errorCode: incident.errorCode,
-      stackTrace: incident.stackTrace
+      stackTrace: incident.stackTrace,
     };
 
     try {
@@ -91,12 +91,12 @@ class SecurityMonitoringService {
         severity: incidentRecord.severity,
         type: incidentRecord.type,
         message: incidentRecord.message,
-        source: incidentRecord.source
+        source: incidentRecord.source,
       });
 
       // Store in memory for quick access
       this.recentIncidents.set(incidentId, incidentRecord);
-      
+
       // Limit memory storage
       if (this.recentIncidents.size > 1000) {
         const oldestId = this.recentIncidents.keys().next().value;
@@ -110,7 +110,6 @@ class SecurityMonitoringService {
       await this.checkForCriticalPatterns(incidentRecord);
 
       return incidentId;
-
     } catch (error) {
       console.error('[SECURITY MONITOR] Failed to log incident:', error);
       return null;
@@ -125,11 +124,10 @@ class SecurityMonitoringService {
     try {
       const logFileName = `security_${new Date().toISOString().split('T')[0]}.log`;
       const logFilePath = path.join(this.logDirectory, logFileName);
-      
+
       const logEntry = JSON.stringify(incident) + '\n';
-      
+
       await fs.appendFile(logFilePath, logEntry, { mode: 0o600 });
-      
     } catch (error) {
       console.error('[SECURITY MONITOR] Failed to write to log file:', error);
     }
@@ -145,7 +143,7 @@ class SecurityMonitoringService {
       if (incident.ipAddress || incident.userId) {
         const key = incident.ipAddress || incident.userId;
         const recentCount = this.countRecentIncidents(key, 300000); // 5 minutes
-        
+
         if (recentCount >= 5) {
           await this.logIncident({
             severity: SEVERITY_LEVELS.CRITICAL,
@@ -155,8 +153,8 @@ class SecurityMonitoringService {
             details: {
               incidentCount: recentCount,
               timeWindow: '5 minutes',
-              originalIncident: incident.id
-            }
+              originalIncident: incident.id,
+            },
           });
         }
       }
@@ -170,7 +168,6 @@ class SecurityMonitoringService {
       if (incident.type === INCIDENT_TYPES.PATH_TRAVERSAL) {
         await this.alertPathTraversalAttempt(incident);
       }
-
     } catch (error) {
       console.error('[SECURITY MONITOR] Error checking patterns:', error);
     }
@@ -185,15 +182,14 @@ class SecurityMonitoringService {
   countRecentIncidents(source, timeWindow) {
     const cutoff = Date.now() - timeWindow;
     let count = 0;
-    
+
     for (const incident of this.recentIncidents.values()) {
       const incidentTime = new Date(incident.timestamp).getTime();
-      if (incidentTime >= cutoff && 
-          (incident.ipAddress === source || incident.userId === source)) {
+      if (incidentTime >= cutoff && (incident.ipAddress === source || incident.userId === source)) {
         count++;
       }
     }
-    
+
     return count;
   }
 
@@ -206,9 +202,9 @@ class SecurityMonitoringService {
       incidentId: incident.id,
       details: incident.details,
       source: incident.source,
-      timestamp: incident.timestamp
+      timestamp: incident.timestamp,
     });
-    
+
     // In production, this would integrate with alerting systems
     // await this.sendCriticalAlert('Command injection attempt', incident);
   }
@@ -222,9 +218,9 @@ class SecurityMonitoringService {
       incidentId: incident.id,
       details: incident.details,
       source: incident.source,
-      timestamp: incident.timestamp
+      timestamp: incident.timestamp,
     });
-    
+
     // In production, this would integrate with alerting systems
     // await this.sendCriticalAlert('Path traversal attempt', incident);
   }
@@ -239,16 +235,16 @@ class SecurityMonitoringService {
   checkRateLimit(identifier, maxRequests = 10, windowMs = 60000) {
     const now = Date.now();
     const windowStart = now - windowMs;
-    
+
     if (!this.rateLimitTracking.has(identifier)) {
       this.rateLimitTracking.set(identifier, []);
     }
-    
+
     const requests = this.rateLimitTracking.get(identifier);
-    
+
     // Remove old requests outside the window
     const validRequests = requests.filter(timestamp => timestamp > windowStart);
-    
+
     if (validRequests.length >= maxRequests) {
       // Rate limit exceeded
       this.logIncident({
@@ -260,17 +256,17 @@ class SecurityMonitoringService {
           identifier,
           requestCount: validRequests.length,
           maxRequests,
-          windowMs
-        }
+          windowMs,
+        },
       });
-      
+
       return false;
     }
-    
+
     // Add current request
     validRequests.push(now);
     this.rateLimitTracking.set(identifier, validRequests);
-    
+
     return true;
   }
 
@@ -286,18 +282,18 @@ class SecurityMonitoringService {
       severityBreakdown: {},
       typeBreakdown: {},
       topSources: {},
-      recentCritical: []
+      recentCritical: [],
     };
-    
+
     // Initialize counters
     Object.values(SEVERITY_LEVELS).forEach(level => {
       stats.severityBreakdown[level] = 0;
     });
-    
+
     Object.values(INCIDENT_TYPES).forEach(type => {
       stats.typeBreakdown[type] = 0;
     });
-    
+
     // Analyze recent incidents
     for (const incident of this.recentIncidents.values()) {
       const incidentTime = new Date(incident.timestamp).getTime();
@@ -305,23 +301,23 @@ class SecurityMonitoringService {
         stats.totalIncidents++;
         stats.severityBreakdown[incident.severity]++;
         stats.typeBreakdown[incident.type]++;
-        
+
         // Track sources
         const source = incident.ipAddress || incident.userId || 'unknown';
         stats.topSources[source] = (stats.topSources[source] || 0) + 1;
-        
+
         // Collect critical incidents
         if (incident.severity === SEVERITY_LEVELS.CRITICAL) {
           stats.recentCritical.push({
             id: incident.id,
             timestamp: incident.timestamp,
             type: incident.type,
-            message: incident.message
+            message: incident.message,
           });
         }
       }
     }
-    
+
     return stats;
   }
 
@@ -333,14 +329,14 @@ class SecurityMonitoringService {
    */
   getRecentIncidents(limit = 50, severity = null) {
     let incidents = Array.from(this.recentIncidents.values());
-    
+
     if (severity) {
       incidents = incidents.filter(incident => incident.severity === severity);
     }
-    
+
     // Sort by timestamp (newest first)
     incidents.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     return incidents.slice(0, limit);
   }
 
@@ -348,9 +344,10 @@ class SecurityMonitoringService {
    * Clears old incidents from memory
    * @param {number} maxAge - Maximum age in milliseconds
    */
-  cleanupOldIncidents(maxAge = 86400000) { // 24 hours default
+  cleanupOldIncidents(maxAge = 86400000) {
+    // 24 hours default
     const cutoff = Date.now() - maxAge;
-    
+
     for (const [id, incident] of this.recentIncidents.entries()) {
       const incidentTime = new Date(incident.timestamp).getTime();
       if (incidentTime < cutoff) {
@@ -367,7 +364,7 @@ class SecurityMonitoringService {
     const validation = {
       valid: true,
       issues: [],
-      recommendations: []
+      recommendations: [],
     };
 
     // Check log directory permissions
@@ -391,5 +388,5 @@ module.exports = {
   SecurityMonitoringService,
   securityMonitoringService,
   SEVERITY_LEVELS,
-  INCIDENT_TYPES
+  INCIDENT_TYPES,
 };

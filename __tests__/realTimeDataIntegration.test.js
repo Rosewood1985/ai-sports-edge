@@ -1,15 +1,15 @@
 /**
  * Comprehensive Real-Time Data Integration Tests
- * 
+ *
  * Tests all real-time sports data services and integration points
  */
 
-const { realTimeDataService } = require('../services/realTimeDataService');
-const { nbaRealTimeStatsService } = require('../services/nba/nbaRealTimeStatsService');
-const { ufcRealTimeDataService } = require('../services/ufc/ufcRealTimeDataService');
 const { liveOddsTrackingService } = require('../services/liveOddsTrackingService');
-const { realTimeIntegrationService } = require('../services/realTimeIntegrationService');
+const { nbaRealTimeStatsService } = require('../services/nba/nbaRealTimeStatsService');
 const { oddsCacheService } = require('../services/oddsCacheService');
+const { realTimeDataService } = require('../services/realTimeDataService');
+const { realTimeIntegrationService } = require('../services/realTimeIntegrationService');
+const { ufcRealTimeDataService } = require('../services/ufc/ufcRealTimeDataService');
 
 // Mock dependencies
 jest.mock('../utils/apiKeys', () => ({
@@ -37,7 +37,7 @@ global.fetch = jest.fn();
 describe('Real-Time Data Integration Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default cache mock responses
     oddsCacheService.getCachedData.mockResolvedValue(null);
     oddsCacheService.setCachedData.mockResolvedValue(true);
@@ -56,21 +56,19 @@ describe('Real-Time Data Integration Tests', () => {
     test('should subscribe to live scores', async () => {
       const mockWs = new WebSocket();
       WebSocket.mockImplementation(() => mockWs);
-      
+
       await realTimeDataService.initialize();
       await realTimeDataService.subscribeToLiveScores('game123', 'NBA');
 
-      expect(mockWs.send).toHaveBeenCalledWith(
-        expect.stringContaining('"type":"live_scores"')
-      );
+      expect(mockWs.send).toHaveBeenCalledWith(expect.stringContaining('"type":"live_scores"'));
     });
 
     test('should handle WebSocket messages correctly', async () => {
       const mockWs = new WebSocket();
       WebSocket.mockImplementation(() => mockWs);
-      
+
       await realTimeDataService.initialize();
-      
+
       // Simulate receiving a live score update
       const mockMessage = {
         data: JSON.stringify({
@@ -114,7 +112,7 @@ describe('Real-Time Data Integration Tests', () => {
     test('should implement rate limiting', async () => {
       const mockWs = new WebSocket();
       WebSocket.mockImplementation(() => mockWs);
-      
+
       await realTimeDataService.initialize();
 
       // Simulate rapid message processing
@@ -151,7 +149,7 @@ describe('Real-Time Data Integration Tests', () => {
             Rebounds: 7.3,
             Assists: 7.5,
             FieldGoalsPercentage: 0.545,
-            ThreePointersPercentage: 0.410,
+            ThreePointersPercentage: 0.41,
             FreeThrowsPercentage: 0.731,
           },
         ]),
@@ -370,7 +368,7 @@ describe('Real-Time Data Integration Tests', () => {
       );
 
       const trackingData = liveOddsTrackingService.getGameTrackingData('game123');
-      
+
       expect(trackingData).toEqual(
         expect.objectContaining({
           gameId: 'game123',
@@ -383,9 +381,9 @@ describe('Real-Time Data Integration Tests', () => {
 
     test('should detect significant odds movements', async () => {
       await liveOddsTrackingService.initialize();
-      
+
       // Mock a significant odds movement
-      const alertEmitted = new Promise((resolve) => {
+      const alertEmitted = new Promise(resolve => {
         liveOddsTrackingService.once('odds_alert', resolve);
       });
 
@@ -422,14 +420,14 @@ describe('Real-Time Data Integration Tests', () => {
       await realTimeIntegrationService.initialize();
 
       expect(realTimeIntegrationService.isServiceInitialized()).toBe(true);
-      
+
       const statuses = realTimeIntegrationService.getServiceStatuses();
       expect(statuses.length).toBeGreaterThan(0);
     });
 
     test('should start comprehensive game tracking', async () => {
       await realTimeIntegrationService.initialize();
-      
+
       await realTimeIntegrationService.startGameTracking(
         'game123',
         'NBA',
@@ -474,7 +472,7 @@ describe('Real-Time Data Integration Tests', () => {
     test('should forward events between services', async () => {
       await realTimeIntegrationService.initialize();
 
-      const eventReceived = new Promise((resolve) => {
+      const eventReceived = new Promise(resolve => {
         realTimeIntegrationService.once('live_score_update', resolve);
       });
 
@@ -585,7 +583,7 @@ describe('Real-Time Data Integration Tests', () => {
 
     test('should cleanup resources properly', async () => {
       await realTimeIntegrationService.initialize();
-      
+
       await realTimeIntegrationService.startGameTracking(
         'game123',
         'NBA',
@@ -659,7 +657,7 @@ describe('Integration Test Scenarios', () => {
 
     // Get UFC fight data
     const fightData = await realTimeIntegrationService.getUFCFightData('fight123');
-    
+
     expect(fightData || {}).toEqual(expect.any(Object));
   });
 

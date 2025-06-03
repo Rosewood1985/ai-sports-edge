@@ -11,14 +11,31 @@ const SPORTS_KEYWORDS = {
   hockey: ['nhl', 'hockey', 'goal', 'puck', 'ice', 'stanley cup'],
   soccer: ['soccer', 'football', 'goal', 'pitch', 'fifa', 'world cup'],
   mma: ['ufc', 'mma', 'fighter', 'knockout', 'submission', 'octagon'],
-  formula1: ['f1', 'formula 1', 'racing', 'driver', 'circuit', 'grand prix']
+  formula1: ['f1', 'formula 1', 'racing', 'driver', 'circuit', 'grand prix'],
 };
 
 // Keywords for betting content
 const BETTING_KEYWORDS = [
-  'odds', 'betting', 'wager', 'bet', 'gamble', 'sportsbook', 'bookmaker',
-  'spread', 'line', 'moneyline', 'parlay', 'prop', 'over/under',
-  'underdog', 'favorite', 'prediction', 'pick', 'forecast', 'handicap', 'vegas'
+  'odds',
+  'betting',
+  'wager',
+  'bet',
+  'gamble',
+  'sportsbook',
+  'bookmaker',
+  'spread',
+  'line',
+  'moneyline',
+  'parlay',
+  'prop',
+  'over/under',
+  'underdog',
+  'favorite',
+  'prediction',
+  'pick',
+  'forecast',
+  'handicap',
+  'vegas',
 ];
 
 /**
@@ -30,16 +47,16 @@ const BETTING_KEYWORDS = [
  */
 function filterByRelevance(items, userPreferences, threshold = 30) {
   if (!items || !items.length) return [];
-  
+
   // Calculate relevance score for each item
   const scoredItems = items.map(item => {
     const score = calculateRelevanceScore(item, userPreferences);
     return { ...item, relevanceScore: score };
   });
-  
+
   // Filter items by threshold
   const filteredItems = scoredItems.filter(item => item.relevanceScore >= threshold);
-  
+
   // Sort by relevance score (descending)
   return filteredItems.sort((a, b) => b.relevanceScore - a.relevanceScore);
 }
@@ -54,7 +71,7 @@ function calculateRelevanceScore(item, userPreferences) {
   let score = 0;
   const { title, description, categories } = item;
   const content = `${title} ${description}`.toLowerCase();
-  
+
   // Check for preferred sports
   if (userPreferences.sports && userPreferences.sports.length) {
     userPreferences.sports.forEach(sport => {
@@ -67,7 +84,7 @@ function calculateRelevanceScore(item, userPreferences) {
       }
     });
   }
-  
+
   // Check for betting content if user prefers it
   if (userPreferences.bettingContentOnly) {
     let hasBettingKeyword = false;
@@ -77,13 +94,13 @@ function calculateRelevanceScore(item, userPreferences) {
         score += 20;
       }
     });
-    
+
     // If betting content is required but none found, significantly reduce score
     if (!hasBettingKeyword) {
       score -= 50;
     }
   }
-  
+
   // Check for favorite teams
   if (userPreferences.favoriteTeams && userPreferences.favoriteTeams.length) {
     userPreferences.favoriteTeams.forEach(team => {
@@ -92,7 +109,7 @@ function calculateRelevanceScore(item, userPreferences) {
       }
     });
   }
-  
+
   // Boost score for local teams if available
   if (userPreferences.localTeams && userPreferences.localTeams.length) {
     userPreferences.localTeams.forEach(team => {
@@ -101,13 +118,13 @@ function calculateRelevanceScore(item, userPreferences) {
       }
     });
   }
-  
+
   // Check for recency (if available)
   if (item.pubDate) {
     const now = new Date();
     const pubDate = new Date(item.pubDate);
     const hoursDiff = (now - pubDate) / (1000 * 60 * 60);
-    
+
     // Newer content gets higher score
     if (hoursDiff < 6) {
       score += 15;
@@ -117,7 +134,7 @@ function calculateRelevanceScore(item, userPreferences) {
       score += 5;
     }
   }
-  
+
   // Ensure score is within 0-100 range
   return Math.max(0, Math.min(100, score));
 }
@@ -130,7 +147,7 @@ function calculateRelevanceScore(item, userPreferences) {
 function isBettingContent(item) {
   const { title, description } = item;
   const content = `${title} ${description}`.toLowerCase();
-  
+
   return BETTING_KEYWORDS.some(keyword => content.includes(keyword.toLowerCase()));
 }
 
@@ -139,5 +156,5 @@ module.exports = {
   calculateRelevanceScore,
   isBettingContent,
   SPORTS_KEYWORDS,
-  BETTING_KEYWORDS
+  BETTING_KEYWORDS,
 };

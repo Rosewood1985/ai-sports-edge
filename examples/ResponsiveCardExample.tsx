@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewProps, ViewStyle, TextStyle } from 'react-native';
+
 import { ResponsiveText } from '../atomic/atoms/ResponsiveText';
 import { useResponsiveDimensions, DeviceType, Orientation } from '../utils/responsiveUtils';
 

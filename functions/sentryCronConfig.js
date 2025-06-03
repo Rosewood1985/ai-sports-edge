@@ -1,4 +1,4 @@
-const Sentry = require('@sentry/google-cloud-serverless');
+const Sentry = require("@sentry/google-cloud-serverless");
 
 /**
  * Enhanced Sentry configuration for Firebase Cloud Functions with Cron Monitoring
@@ -6,12 +6,12 @@ const Sentry = require('@sentry/google-cloud-serverless');
  */
 
 // Initialize Sentry with Cron Monitoring support
-const SENTRY_DSN = 'https://95b0deae4cc462e0d6f16c40a7417255@o4509368605081600.ingest.us.sentry.io/4509385370894336';
+const SENTRY_DSN = "https://95b0deae4cc462e0d6f16c40a7417255@o4509368605081600.ingest.us.sentry.io/4509385370894336";
 
 function initSentryWithCron() {
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NODE_ENV || "development",
     tracesSampleRate: 1.0,
     profilesSampleRate: 1.0,
     
@@ -21,12 +21,12 @@ function initSentryWithCron() {
     // Additional context for Firebase Functions
     initialScope: {
       tags: {
-        platform: 'firebase-functions',
-        runtime: 'node',
+        platform: "firebase-functions",
+        runtime: "node",
       },
       contexts: {
         serverless: {
-          provider: 'firebase',
+          provider: "firebase",
           runtime: process.version,
         }
       }
@@ -52,7 +52,7 @@ function initSentryWithCron() {
     ],
   });
 
-  console.log('Sentry initialized with Cron Monitoring support');
+  console.log("Sentry initialized with Cron Monitoring support");
 }
 
 /**
@@ -67,15 +67,15 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
   return async (context) => {
     const checkInId = Sentry.captureCheckIn({
       monitorSlug: cronName,
-      status: 'in_progress',
+      status: "in_progress",
     });
 
     const transaction = Sentry.startTransaction({
       name: cronName,
-      op: 'scheduled_function',
+      op: "scheduled_function",
       tags: {
         schedule,
-        execution_type: 'scheduled',
+        execution_type: "scheduled",
       },
     });
 
@@ -86,10 +86,10 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
     try {
       // Set transaction context
       Sentry.getCurrentHub().configureScope((scope) => {
-        scope.setTag('function_name', cronName);
-        scope.setTag('schedule', schedule);
-        scope.setTag('execution_time', new Date().toISOString());
-        scope.setContext('execution_context', {
+        scope.setTag("function_name", cronName);
+        scope.setTag("schedule", schedule);
+        scope.setTag("execution_time", new Date().toISOString());
+        scope.setContext("execution_context", {
           eventId: context.eventId,
           timestamp: context.timestamp,
           resource: context.resource,
@@ -99,8 +99,8 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
       // Add breadcrumb for function start
       Sentry.addBreadcrumb({
         message: `Starting scheduled function: ${cronName}`,
-        category: 'scheduled_function',
-        level: 'info',
+        category: "scheduled_function",
+        level: "info",
         data: {
           cronName,
           schedule,
@@ -117,8 +117,8 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
       // Log successful execution
       Sentry.addBreadcrumb({
         message: `Completed scheduled function: ${cronName}`,
-        category: 'scheduled_function',
-        level: 'info',
+        category: "scheduled_function",
+        level: "info",
         data: {
           cronName,
           duration,
@@ -130,7 +130,7 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
       Sentry.captureCheckIn({
         checkInId,
         monitorSlug: cronName,
-        status: 'ok',
+        status: "ok",
         duration: duration / 1000, // Convert to seconds
       });
 
@@ -166,7 +166,7 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
       Sentry.captureCheckIn({
         checkInId,
         monitorSlug: cronName,
-        status: 'error',
+        status: "error",
         duration: duration / 1000,
       });
 
@@ -175,11 +175,11 @@ function wrapScheduledFunction(cronName, schedule, handler, options = {}) {
 
     } finally {
       // Finish transaction
-      transaction.setStatus(success ? 'ok' : 'internal_error');
-      transaction.setData('duration', Date.now() - startTime);
-      transaction.setData('success', success);
+      transaction.setStatus(success ? "ok" : "internal_error");
+      transaction.setData("duration", Date.now() - startTime);
+      transaction.setData("success", success);
       if (errorDetails) {
-        transaction.setData('error', errorDetails);
+        transaction.setData("error", errorDetails);
       }
       transaction.finish();
 
@@ -199,8 +199,8 @@ const scheduledFunctionTrackers = {
   trackMLPredictionFunction: (functionName, gameCount, processingTime, success) => {
     Sentry.addBreadcrumb({
       message: `ML Prediction Function: ${functionName}`,
-      category: 'ml_prediction',
-      level: success ? 'info' : 'error',
+      category: "ml_prediction",
+      level: success ? "info" : "error",
       data: {
         functionName,
         gameCount,
@@ -211,8 +211,8 @@ const scheduledFunctionTrackers = {
     });
 
     // Track custom metrics
-    Sentry.setTag('ml_function_type', 'prediction');
-    Sentry.setContext('ml_execution', {
+    Sentry.setTag("ml_function_type", "prediction");
+    Sentry.setContext("ml_execution", {
       functionName,
       gameCount,
       processingTime,
@@ -227,8 +227,8 @@ const scheduledFunctionTrackers = {
   trackNotificationFunction: (functionName, notificationCount, processingTime, success) => {
     Sentry.addBreadcrumb({
       message: `Notification Function: ${functionName}`,
-      category: 'notification',
-      level: success ? 'info' : 'error',
+      category: "notification",
+      level: success ? "info" : "error",
       data: {
         functionName,
         notificationCount,
@@ -238,8 +238,8 @@ const scheduledFunctionTrackers = {
       },
     });
 
-    Sentry.setTag('notification_function_type', 'scheduled');
-    Sentry.setContext('notification_execution', {
+    Sentry.setTag("notification_function_type", "scheduled");
+    Sentry.setContext("notification_execution", {
       functionName,
       notificationCount,
       processingTime,
@@ -254,8 +254,8 @@ const scheduledFunctionTrackers = {
   trackLeaderboardFunction: (functionName, userCount, processingTime, success) => {
     Sentry.addBreadcrumb({
       message: `Leaderboard Function: ${functionName}`,
-      category: 'leaderboard',
-      level: success ? 'info' : 'error',
+      category: "leaderboard",
+      level: success ? "info" : "error",
       data: {
         functionName,
         userCount,
@@ -265,8 +265,8 @@ const scheduledFunctionTrackers = {
       },
     });
 
-    Sentry.setTag('leaderboard_function_type', 'update');
-    Sentry.setContext('leaderboard_execution', {
+    Sentry.setTag("leaderboard_function_type", "update");
+    Sentry.setContext("leaderboard_execution", {
       functionName,
       userCount,
       processingTime,
@@ -280,8 +280,8 @@ const scheduledFunctionTrackers = {
   trackBackupFunction: (functionName, backupSize, processingTime, success) => {
     Sentry.addBreadcrumb({
       message: `Backup Function: ${functionName}`,
-      category: 'backup',
-      level: success ? 'info' : 'error',
+      category: "backup",
+      level: success ? "info" : "error",
       data: {
         functionName,
         backupSize,
@@ -291,8 +291,8 @@ const scheduledFunctionTrackers = {
       },
     });
 
-    Sentry.setTag('backup_function_type', 'scheduled');
-    Sentry.setContext('backup_execution', {
+    Sentry.setTag("backup_function_type", "scheduled");
+    Sentry.setContext("backup_execution", {
       functionName,
       backupSize,
       processingTime,
@@ -306,8 +306,8 @@ const scheduledFunctionTrackers = {
   trackRSSFunction: (functionName, feedCount, itemCount, processingTime, success) => {
     Sentry.addBreadcrumb({
       message: `RSS Function: ${functionName}`,
-      category: 'rss_feed',
-      level: success ? 'info' : 'error',
+      category: "rss_feed",
+      level: success ? "info" : "error",
       data: {
         functionName,
         feedCount,
@@ -318,8 +318,8 @@ const scheduledFunctionTrackers = {
       },
     });
 
-    Sentry.setTag('rss_function_type', 'scheduled');
-    Sentry.setContext('rss_execution', {
+    Sentry.setTag("rss_function_type", "scheduled");
+    Sentry.setContext("rss_execution", {
       functionName,
       feedCount,
       itemCount,
@@ -336,8 +336,8 @@ const scheduledFunctionTrackers = {
 function trackScheduledAPICall(apiName, endpoint, duration, statusCode, success) {
   Sentry.addBreadcrumb({
     message: `Scheduled API Call: ${apiName}`,
-    category: 'scheduled_api_call',
-    level: success ? 'info' : 'error',
+    category: "scheduled_api_call",
+    level: success ? "info" : "error",
     data: {
       apiName,
       endpoint,
@@ -350,12 +350,12 @@ function trackScheduledAPICall(apiName, endpoint, duration, statusCode, success)
 
   // Track API performance in scheduled context
   if (!success || statusCode >= 400) {
-    Sentry.captureMessage(`Scheduled API call failed: ${apiName}`, 'warning', {
+    Sentry.captureMessage(`Scheduled API call failed: ${apiName}`, "warning", {
       tags: {
         api_name: apiName,
         endpoint,
         status_code: statusCode,
-        context: 'scheduled_function',
+        context: "scheduled_function",
       },
       contexts: {
         api_call: {
@@ -373,11 +373,11 @@ function trackScheduledAPICall(apiName, endpoint, duration, statusCode, success)
 /**
  * Create Sentry monitor configuration for a scheduled function
  */
-function createMonitorConfig(cronName, schedule, timezone = 'America/New_York') {
+function createMonitorConfig(cronName, schedule, timezone = "America/New_York") {
   return {
     monitorSlug: cronName,
     schedule: {
-      type: 'crontab',
+      type: "crontab",
       value: schedule,
     },
     timezone,

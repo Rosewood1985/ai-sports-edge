@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Image, ImageProps, StyleSheet, View, ActivityIndicator } from 'react-native';
+
 import {
   getResponsiveImageSource,
   getResponsiveDimensions,
@@ -24,22 +25,20 @@ const ResponsiveImage: React.FC<ResponsiveImageProps & Omit<ImageProps, 'source'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
-  
+
   // Get responsive image source
-  const source = useFallback && fallbackBasePath
-    ? getResponsiveImageSource(fallbackBasePath, extension)
-    : getResponsiveImageSource(basePath, extension);
-  
+  const source =
+    useFallback && fallbackBasePath
+      ? getResponsiveImageSource(fallbackBasePath, extension)
+      : getResponsiveImageSource(basePath, extension);
+
   // Calculate responsive dimensions if width and height are provided
-  const dimensions = width && height
-    ? getResponsiveDimensions(width, height, baseWidth, baseHeight)
-    : undefined;
-  
+  const dimensions =
+    width && height ? getResponsiveDimensions(width, height, baseWidth, baseHeight) : undefined;
+
   // Combine calculated dimensions with provided style
-  const combinedStyle = dimensions
-    ? [dimensions, style]
-    : style;
-  
+  const combinedStyle = dimensions ? [dimensions, style] : style;
+
   const handleError = () => {
     if (!useFallback && fallbackBasePath) {
       // Try fallback image
@@ -51,7 +50,7 @@ const ResponsiveImage: React.FC<ResponsiveImageProps & Omit<ImageProps, 'source'
       setLoading(false);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <Image
@@ -62,19 +61,16 @@ const ResponsiveImage: React.FC<ResponsiveImageProps & Omit<ImageProps, 'source'
         onError={handleError}
         {...props}
       />
-      
+
       {loading && (
         <View style={[styles.loaderContainer, dimensions]}>
           <ActivityIndicator size="small" color="#3498db" />
         </View>
       )}
-      
+
       {error && (
         <View style={[styles.errorContainer, dimensions]}>
-          <Image
-            source={require('../assets/images/image-error.png')}
-            style={styles.errorIcon}
-          />
+          <Image source={require('../assets/images/image-error.png')} style={styles.errorIcon} />
         </View>
       )}
     </View>

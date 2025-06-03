@@ -291,10 +291,7 @@ export class AIMLService extends AdminDashboardService {
   /**
    * Mark anomaly as resolved
    */
-  static async resolveAnomaly(
-    anomalyId: string,
-    rootCause?: string
-  ): Promise<boolean> {
+  static async resolveAnomaly(anomalyId: string, rootCause?: string): Promise<boolean> {
     try {
       await this.request(`${this.AI_ML_ENDPOINT}/anomalies/${anomalyId}/resolve`, {
         method: 'POST',
@@ -326,10 +323,7 @@ export class AIMLService extends AdminDashboardService {
   /**
    * Start a training job
    */
-  static async startTrainingJob(
-    modelId: string,
-    config: any
-  ): Promise<TrainingJob> {
+  static async startTrainingJob(modelId: string, config: any): Promise<TrainingJob> {
     try {
       return await this.request(`${this.AI_ML_ENDPOINT}/training-jobs`, {
         method: 'POST',
@@ -406,7 +400,7 @@ export class AIMLService extends AdminDashboardService {
         deployedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
         metrics: {
           accuracy: 0.876,
-          precision: 0.870,
+          precision: 0.87,
           recall: 0.882,
           f1Score: 0.876,
           mse: 0.034,
@@ -501,7 +495,8 @@ export class AIMLService extends AdminDashboardService {
         confidence: 0.78,
         metadata: { version: '1.0', source: 'mock' },
       },
-      explanation: 'Based on historical patterns and current features, the model predicts a positive outcome with high confidence.',
+      explanation:
+        'Based on historical patterns and current features, the model predicts a positive outcome with high confidence.',
       processingTime: 45,
     };
   }
@@ -618,7 +613,8 @@ export class AIMLService extends AdminDashboardService {
         id: 'insight_001',
         type: 'trend',
         title: 'Increasing User Engagement',
-        description: 'User engagement has increased by 15% over the past week, primarily driven by new feature adoption.',
+        description:
+          'User engagement has increased by 15% over the past week, primarily driven by new feature adoption.',
         severity: 'medium',
         confidence: 0.89,
         data: { metric: 'engagement', change: 0.15, period: '7d' },
@@ -636,7 +632,11 @@ export class AIMLService extends AdminDashboardService {
         confidence: 0.96,
         data: { metric: 'response_time', current: 2.3, baseline: 0.68, deviation: 3.4 },
         actionable: true,
-        suggestedActions: ['Check server resources', 'Review recent deployments', 'Scale infrastructure'],
+        suggestedActions: [
+          'Check server resources',
+          'Review recent deployments',
+          'Scale infrastructure',
+        ],
         createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
         readBy: [],
       },
@@ -644,12 +644,17 @@ export class AIMLService extends AdminDashboardService {
         id: 'insight_003',
         type: 'recommendation',
         title: 'Optimize Model Retraining Schedule',
-        description: 'User Engagement Predictor accuracy has dropped to 84%. Recommend retraining with recent data.',
+        description:
+          'User Engagement Predictor accuracy has dropped to 84%. Recommend retraining with recent data.',
         severity: 'medium',
         confidence: 0.78,
         data: { modelId: 'model_001', currentAccuracy: 0.84, targetAccuracy: 0.89 },
         actionable: true,
-        suggestedActions: ['Schedule model retraining', 'Review feature importance', 'Validate data quality'],
+        suggestedActions: [
+          'Schedule model retraining',
+          'Review feature importance',
+          'Validate data quality',
+        ],
         createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
         readBy: [],
       },
@@ -676,7 +681,8 @@ export class AIMLService extends AdminDashboardService {
         id: 'rec_001',
         type: 'optimization',
         title: 'Scale Infrastructure During Peak Hours',
-        description: 'System experiences 40% higher load between 2-4 PM EST. Auto-scaling could reduce response times by 25%.',
+        description:
+          'System experiences 40% higher load between 2-4 PM EST. Auto-scaling could reduce response times by 25%.',
         priority: 'high',
         confidence: 0.91,
         estimatedImpact: '25% response time improvement, $200/month cost increase',
@@ -705,7 +711,8 @@ export class AIMLService extends AdminDashboardService {
         id: 'rec_002',
         type: 'alert',
         title: 'Model Accuracy Degradation',
-        description: 'Revenue Forecaster accuracy dropped to 82%. Consider retraining with Q4 data.',
+        description:
+          'Revenue Forecaster accuracy dropped to 82%. Consider retraining with Q4 data.',
         priority: 'medium',
         confidence: 0.85,
         estimatedImpact: '5-7% accuracy improvement',

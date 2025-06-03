@@ -1,8 +1,9 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import React from 'react';
+
 import { I18nProvider, useI18n } from '../../../atomic/organisms/i18n/I18nContext';
 import LanguageSelector from '../../components/LanguageSelector';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -136,7 +137,7 @@ describe('Language Support', () => {
     // Mock navigator.language to return 'es-ES' (Spanish)
     Object.defineProperty(navigator, 'language', {
       get: () => 'es-ES',
-      configurable: true
+      configurable: true,
     });
 
     const { getByTestId } = render(

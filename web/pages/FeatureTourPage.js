@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import featureTourService from '../services/featureTourService';
 
 /**
@@ -23,7 +24,7 @@ const FeatureTourPage = () => {
         setLoading(true);
         const tourSteps = await featureTourService.getFeatureTourSteps(i18n.language);
         setSteps(tourSteps);
-        
+
         // Track page view
         if (window.gtag) {
           window.gtag('event', 'page_view', {
@@ -40,7 +41,7 @@ const FeatureTourPage = () => {
         setLoading(false);
       }
     };
-    
+
     loadSteps();
   }, [i18n.language, t]);
 
@@ -48,25 +49,25 @@ const FeatureTourPage = () => {
   useEffect(() => {
     // Set page title
     document.title = t('onboarding:featureTour.pageTitle');
-    
+
     // Update meta description
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', t('onboarding:featureTour.metaDescription'));
     }
-    
+
     // Update Open Graph meta tags
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const ogDescription = document.querySelector('meta[property="og:description"]');
-    
+
     if (ogTitle) {
       ogTitle.setAttribute('content', t('onboarding:featureTour.pageTitle'));
     }
-    
+
     if (ogDescription) {
       ogDescription.setAttribute('content', t('onboarding:featureTour.metaDescription'));
     }
-    
+
     // Update canonical and hreflang links
     const canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
@@ -77,15 +78,15 @@ const FeatureTourPage = () => {
     } else {
       canonicalLink.href = `https://aisportsedge.app${languagePrefix}/feature-tour`;
     }
-    
+
     // Update hreflang links
     const hreflangEn = document.querySelector('link[hreflang="en"]');
     const hreflangEs = document.querySelector('link[hreflang="es"]');
-    
+
     if (hreflangEn) {
       hreflangEn.href = 'https://aisportsedge.app/feature-tour';
     }
-    
+
     if (hreflangEs) {
       hreflangEs.href = 'https://aisportsedge.app/es/feature-tour';
     }
@@ -97,22 +98,22 @@ const FeatureTourPage = () => {
       console.error('No steps available or invalid step index');
       return;
     }
-    
+
     const currentStep = steps[currentStepIndex];
-    
+
     try {
       // Validate step ID to prevent security issues
       if (!currentStep.id || typeof currentStep.id !== 'string') {
         throw new Error('Invalid step ID');
       }
-      
+
       // Mark step as completed with proper error handling
       const success = await featureTourService.markFeatureTourStepCompleted(currentStep.id);
-      
+
       if (!success) {
         console.warn('Failed to mark step as completed, but continuing tour');
       }
-      
+
       // Update local state - create a new array to avoid mutation
       const updatedSteps = steps.map((step, index) => {
         if (index === currentStepIndex) {
@@ -120,19 +121,19 @@ const FeatureTourPage = () => {
         }
         return step;
       });
-      
+
       setSteps(updatedSteps);
-      
+
       // Move to next step or complete tour
       if (currentStepIndex < steps.length - 1) {
         setAnimating(true);
-        
+
         // Use a more reliable approach for animations
         const animationTimeout = setTimeout(() => {
           setCurrentStepIndex(currentStepIndex + 1);
           setAnimating(false);
         }, 300);
-        
+
         // Clean up timeout to prevent memory leaks
         return () => clearTimeout(animationTimeout);
       } else {
@@ -140,11 +141,11 @@ const FeatureTourPage = () => {
       }
     } catch (error) {
       console.error('Error completing feature tour step:', error);
-      
+
       // Show user-friendly error message
       // Use a toast notification or other non-blocking UI instead of alert in production
       alert(t('common:error'));
-      
+
       // Continue to next step anyway to prevent user from getting stuck
       if (currentStepIndex < steps.length - 1) {
         setCurrentStepIndex(currentStepIndex + 1);
@@ -159,10 +160,10 @@ const FeatureTourPage = () => {
   const handleCompleteTour = async () => {
     try {
       await featureTourService.markFeatureTourCompleted();
-      
+
       // Show completion message
       alert(t('onboarding:featureTour.completion.message'));
-      
+
       // Navigate to home
       navigate(`${languagePrefix}/`);
     } catch (error) {
@@ -177,13 +178,13 @@ const FeatureTourPage = () => {
       // Track skip event
       if (window.gtag) {
         window.gtag('event', 'feature_tour_skipped', {
-          'event_category': 'engagement',
-          'event_label': 'feature_tour',
-          'step_index': currentStepIndex,
-          'step_id': steps[currentStepIndex]?.id
+          event_category: 'engagement',
+          event_label: 'feature_tour',
+          step_index: currentStepIndex,
+          step_id: steps[currentStepIndex]?.id,
         });
       }
-      
+
       // Navigate to home
       navigate(`${languagePrefix}/`);
     }
@@ -193,7 +194,7 @@ const FeatureTourPage = () => {
   if (loading) {
     return (
       <div className="feature-tour-loading">
-        <div className="loading-spinner"></div>
+        <div className="loading-spinner" />
         <p>{t('onboarding:featureTour.loading')}</p>
       </div>
     );
@@ -213,14 +214,10 @@ const FeatureTourPage = () => {
         className={`feature-tour-content ${animating ? 'fade-out' : 'fade-in'}`}
         aria-live="polite"
       >
-        <h1
-          className="feature-tour-title"
-          id="feature-tour-heading"
-          tabIndex="-1"
-        >
+        <h1 className="feature-tour-title" id="feature-tour-heading" tabIndex="-1">
           {t('onboarding:featureTour.title')}
         </h1>
-        
+
         <div
           className="feature-step"
           role="region"
@@ -233,25 +230,22 @@ const FeatureTourPage = () => {
               aria-hidden="true" // Decorative image, main content is in the text
             />
           </div>
-          
+
           <div className="feature-step-content">
-            <h2
-              className="feature-step-title"
-              id={`feature-step-heading-${currentStepIndex}`}
-            >
+            <h2 className="feature-step-title" id={`feature-step-heading-${currentStepIndex}`}>
               {currentStep.title}
             </h2>
             <p className="feature-step-description">{currentStep.description}</p>
-            
+
             <div
               className="feature-step-hint"
               role="note"
               aria-label={t('onboarding:featureTour.hintLabel')}
             >
-              <i className="fas fa-lightbulb" aria-hidden="true"></i>
+              <i className="fas fa-lightbulb" aria-hidden="true" />
               <p>{currentStep.hint}</p>
             </div>
-            
+
             <div className="feature-step-demo">
               <button
                 className="try-it-button"
@@ -262,7 +256,7 @@ const FeatureTourPage = () => {
             </div>
           </div>
         </div>
-        
+
         <div
           className="feature-tour-progress"
           role="navigation"
@@ -275,9 +269,9 @@ const FeatureTourPage = () => {
               role="button"
               tabIndex={index === currentStepIndex ? 0 : -1}
               aria-label={`${t('onboarding:step')} ${index + 1} ${index === currentStepIndex ? t('onboarding:current') : index < currentStepIndex ? t('onboarding:completed') : ''}`}
-              aria-current={index === currentStepIndex ? "step" : undefined}
+              aria-current={index === currentStepIndex ? 'step' : undefined}
               onClick={() => setCurrentStepIndex(index)}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   setCurrentStepIndex(index);
                   e.preventDefault();
@@ -286,7 +280,7 @@ const FeatureTourPage = () => {
             />
           ))}
         </div>
-        
+
         <div
           className="feature-tour-buttons"
           role="group"

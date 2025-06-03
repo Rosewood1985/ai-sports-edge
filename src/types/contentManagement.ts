@@ -153,7 +153,14 @@ export interface ContentUpdateRequest extends Partial<ContentCreateRequest> {
 }
 
 export interface ContentBulkOperation {
-  action: 'publish' | 'unpublish' | 'archive' | 'delete' | 'change_category' | 'add_tags' | 'remove_tags';
+  action:
+    | 'publish'
+    | 'unpublish'
+    | 'archive'
+    | 'delete'
+    | 'change_category'
+    | 'add_tags'
+    | 'remove_tags';
   contentIds: string[];
   params?: {
     category?: ContentCategory;

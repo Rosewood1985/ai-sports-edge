@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -6,12 +8,11 @@ import {
   Modal,
   FlatList,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../contexts/LanguageContext';
+
 import { ThemedText, ThemedView } from './ThemedComponents';
-import { useTheme } from '@react-navigation/native';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LanguageOption {
   code: string;
@@ -34,7 +35,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
   const languageOptions = Object.values(availableLanguages);
 
   // Get current language name
-  const currentLanguageName = availableLanguages[language as keyof typeof availableLanguages]?.name || 'English';
+  const currentLanguageName =
+    availableLanguages[language as keyof typeof availableLanguages]?.name || 'English';
 
   // Handle language change
   const handleLanguageChange = async (languageCode: string) => {
@@ -42,20 +44,16 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
       setLoading(languageCode);
       await setLanguage(languageCode);
       setModalVisible(false);
-      
+
       // Show success message
-      Alert.alert(
-        t('language.language_changed'),
-        t('language.restart_required'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('language.language_changed'), t('language.restart_required'), [
+        { text: t('common.ok') },
+      ]);
     } catch (error) {
       console.error('Error changing language:', error);
-      Alert.alert(
-        t('common.error'),
-        'Failed to change language. Please try again.',
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), 'Failed to change language. Please try again.', [
+        { text: t('common.ok') },
+      ]);
     } finally {
       setLoading(null);
     }
@@ -64,77 +62,63 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ showLabel = true, s
   // Render language option
   const renderLanguageOption = ({ item }: { item: LanguageOption }) => {
     const isSelected = item.code === language;
-    
+
     return (
       <TouchableOpacity
         style={[
           styles.languageOption,
           isSelected && { backgroundColor: colors.primary + '20' },
-          { borderBottomColor: colors.border }
+          { borderBottomColor: colors.border },
         ]}
         onPress={() => handleLanguageChange(item.code)}
         disabled={loading !== null}
       >
-        <ThemedText style={[
-          styles.languageName,
-          isSelected ? { fontWeight: 'bold', color: colors.primary } : {}
-        ]}>
+        <ThemedText
+          style={[
+            styles.languageName,
+            isSelected ? { fontWeight: 'bold', color: colors.primary } : {},
+          ]}
+        >
           {item.name}
         </ThemedText>
-        
-        {isSelected && (
-          <Ionicons name="checkmark" size={24} color={colors.primary} />
-        )}
-        
-        {loading === item.code && (
-          <ActivityIndicator size="small" color={colors.primary} />
-        )}
+
+        {isSelected && <Ionicons name="checkmark" size={24} color={colors.primary} />}
+
+        {loading === item.code && <ActivityIndicator size="small" color={colors.primary} />}
       </TouchableOpacity>
     );
   };
 
   return (
     <View style={[styles.container, style]}>
-      <TouchableOpacity
-        style={styles.selectorButton}
-        onPress={() => setModalVisible(true)}
-      >
+      <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true)}>
         <Ionicons name="language" size={24} color={colors.text} />
-        
-        {showLabel && (
-          <ThemedText style={styles.currentLanguage}>
-            {currentLanguageName}
-          </ThemedText>
-        )}
-        
+
+        {showLabel && <ThemedText style={styles.currentLanguage}>{currentLanguageName}</ThemedText>}
+
         <Ionicons name="chevron-down" size={16} color={colors.text} />
       </TouchableOpacity>
-      
+
       <Modal
         visible={modalVisible}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
           <ThemedView style={[styles.modalContent, { borderColor: colors.border }]}>
             <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>
-                {t('language.select_language')}
-              </ThemedText>
-              
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
+              <ThemedText style={styles.modalTitle}>{t('language.select_language')}</ThemedText>
+
+              <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
-            
+
             <FlatList
               data={languageOptions}
               renderItem={renderLanguageOption}
-              keyExtractor={(item) => item.code}
+              keyExtractor={item => item.code}
               style={styles.languageList}
             />
           </ThemedView>

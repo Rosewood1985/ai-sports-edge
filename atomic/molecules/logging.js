@@ -63,7 +63,7 @@ let isFlushingLogs = false;
 
 /**
  * Map log level to Sentry level
- * 
+ *
  * @param {string} level - Log level
  * @returns {string} Sentry level
  */
@@ -88,7 +88,7 @@ const mapLogLevelToSentryLevel = level => {
 
 /**
  * Check if a log level is at least a minimum level
- * 
+ *
  * @param {string} level - Level to check
  * @param {string} minLevel - Minimum level
  * @returns {boolean} Whether the level is at least the minimum
@@ -102,23 +102,23 @@ const isLevelAtLeast = (level, minLevel) => {
     LogLevel.ERROR,
     LogLevel.FATAL,
   ];
-  
+
   const levelIndex = levelOrder.indexOf(level);
   const minLevelIndex = levelOrder.indexOf(minLevel);
-  
+
   return levelIndex >= minLevelIndex;
 };
 
 /**
  * Log to console
- * 
+ *
  * @param {LogEntry} entry - Log entry
  */
 const logToConsole = entry => {
   try {
     const timestamp = entry.timestamp.split('T')[1].split('.')[0];
     const prefix = `[${timestamp}] [${entry.level.toUpperCase()}] [${entry.category}]`;
-    
+
     switch (entry.level) {
       case LogLevel.TRACE:
       case LogLevel.DEBUG:
@@ -144,7 +144,7 @@ const logToConsole = entry => {
 
 /**
  * Log to Sentry
- * 
+ *
  * @param {LogEntry} entry - Log entry
  */
 const logToSentry = entry => {
@@ -153,7 +153,7 @@ const logToSentry = entry => {
     if (!isLevelAtLeast(entry.level, LogLevel.WARN)) {
       return;
     }
-    
+
     // Add breadcrumb to Sentry
     addBreadcrumb({
       category: entry.category,
@@ -161,7 +161,7 @@ const logToSentry = entry => {
       level: mapLogLevelToSentryLevel(entry.level),
       data: entry.data,
     });
-    
+
     // Capture exception in Sentry
     if (entry.error) {
       safeErrorCapture(entry.error);
@@ -174,19 +174,19 @@ const logToSentry = entry => {
 
 /**
  * Log to remote
- * 
+ *
  * @param {LogEntry} entry - Log entry
  */
 const logToRemote = entry => {
   try {
     // Add log to buffer
     logBuffer.push(entry);
-    
+
     // Trim buffer if it gets too large
     while (logBuffer.length > MAX_BUFFER_SIZE) {
       logBuffer.shift();
     }
-    
+
     // Flush logs immediately for errors and fatals
     if (isLevelAtLeast(entry.level, LogLevel.ERROR) && !isFlushingLogs) {
       flushLogs();
@@ -198,7 +198,7 @@ const logToRemote = entry => {
 
 /**
  * Flush logs to remote
- * 
+ *
  * @returns {Promise<void>}
  */
 const flushLogs = async () => {
@@ -207,27 +207,27 @@ const flushLogs = async () => {
     if (logBuffer.length === 0 || isFlushingLogs) {
       return;
     }
-    
+
     isFlushingLogs = true;
-    
+
     // Get logs to flush
     const logsToFlush = [...logBuffer];
-    
+
     // Clear buffer
     logBuffer.length = 0;
-    
+
     // In a real implementation, this would send logs to a remote logging service
     // For now, just log the count
     console.log(`Would flush ${logsToFlush.length} logs to remote`);
-    
+
     // Simulate remote logging
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     isFlushingLogs = false;
   } catch (error) {
     console.error('Failed to flush logs:', error);
     isFlushingLogs = false;
-    
+
     // Put logs back in buffer
     logBuffer.unshift(...logBuffer);
   }
@@ -235,7 +235,7 @@ const flushLogs = async () => {
 
 /**
  * Log a message
- * 
+ *
  * @param {string} level - Log level
  * @param {string} category - Log category
  * @param {string} message - Log message
@@ -246,12 +246,12 @@ export const log = (level, category, message, data, tags) => {
   try {
     // Get logger configuration
     const config = loggerConfigs[category] || defaultLoggerConfig;
-    
+
     // Check if log level meets minimum threshold
     if (!isLevelAtLeast(level, config.minLevel)) {
       return;
     }
-    
+
     // Create log entry
     const entry = {
       timestamp: new Date().toISOString(),
@@ -261,17 +261,17 @@ export const log = (level, category, message, data, tags) => {
       data,
       tags,
     };
-    
+
     // Log to console
     if (config.enableConsole) {
       logToConsole(entry);
     }
-    
+
     // Log to Sentry
     if (config.enableSentry) {
       logToSentry(entry);
     }
-    
+
     // Log to remote
     if (config.enableRemote) {
       logToRemote(entry);
@@ -284,7 +284,7 @@ export const log = (level, category, message, data, tags) => {
 
 /**
  * Log a trace message
- * 
+ *
  * @param {string} category - Log category
  * @param {string} message - Log message
  * @param {Object} [data] - Additional data
@@ -296,7 +296,7 @@ export const trace = (category, message, data, tags) => {
 
 /**
  * Log a debug message
- * 
+ *
  * @param {string} category - Log category
  * @param {string} message - Log message
  * @param {Object} [data] - Additional data
@@ -308,7 +308,7 @@ export const debug = (category, message, data, tags) => {
 
 /**
  * Log an info message
- * 
+ *
  * @param {string} category - Log category
  * @param {string} message - Log message
  * @param {Object} [data] - Additional data
@@ -320,7 +320,7 @@ export const info = (category, message, data, tags) => {
 
 /**
  * Log a warning message
- * 
+ *
  * @param {string} category - Log category
  * @param {string} message - Log message
  * @param {Object} [data] - Additional data
@@ -332,7 +332,7 @@ export const warn = (category, message, data, tags) => {
 
 /**
  * Log an error message
- * 
+ *
  * @param {string} category - Log category
  * @param {string} message - Log message
  * @param {Error} [error] - Error object
@@ -344,13 +344,13 @@ export const error = (category, message, error, data, tags) => {
     ...data,
     error: error ? formatError(error) : undefined,
   };
-  
+
   log(LogLevel.ERROR, category, message, combinedData, tags);
 };
 
 /**
  * Log a fatal message
- * 
+ *
  * @param {string} category - Log category
  * @param {string} message - Log message
  * @param {Error} [error] - Error object
@@ -362,13 +362,13 @@ export const fatal = (category, message, error, data, tags) => {
     ...data,
     error: error ? formatError(error) : undefined,
   };
-  
+
   log(LogLevel.FATAL, category, message, combinedData, tags);
 };
 
 /**
  * Create a logger for a specific category
- * 
+ *
  * @param {string} category - Log category
  * @returns {Object} Logger object
  */
@@ -385,7 +385,7 @@ export const createLogger = category => {
 
 /**
  * Set minimum log level for a category
- * 
+ *
  * @param {string} category - Log category
  * @param {string} level - Minimum log level
  */
@@ -397,7 +397,7 @@ export const setMinLogLevel = (category, level) => {
 
 /**
  * Set global minimum log level
- * 
+ *
  * @param {string} level - Minimum log level
  */
 export const setGlobalMinLogLevel = level => {
@@ -408,7 +408,7 @@ export const setGlobalMinLogLevel = level => {
 
 /**
  * Enable or disable console logging for a category
- * 
+ *
  * @param {string} category - Log category
  * @param {boolean} enabled - Whether to enable console logging
  */
@@ -420,7 +420,7 @@ export const enableConsoleLogging = (category, enabled) => {
 
 /**
  * Enable or disable remote logging for a category
- * 
+ *
  * @param {string} category - Log category
  * @param {boolean} enabled - Whether to enable remote logging
  */
@@ -432,7 +432,7 @@ export const enableRemoteLogging = (category, enabled) => {
 
 /**
  * Enable or disable Sentry logging for a category
- * 
+ *
  * @param {string} category - Log category
  * @param {boolean} enabled - Whether to enable Sentry logging
  */
@@ -444,7 +444,7 @@ export const enableSentryLogging = (category, enabled) => {
 
 /**
  * Manually flush logs
- * 
+ *
  * @returns {Promise<void>}
  */
 export const manualFlushLogs = () => {
@@ -453,7 +453,7 @@ export const manualFlushLogs = () => {
 
 /**
  * Initialize logging service
- * 
+ *
  * @param {Object} [options] - Initialization options
  * @param {boolean} [options.enableConsole] - Whether to enable console logging
  * @param {boolean} [options.enableRemote] - Whether to enable remote logging
@@ -464,42 +464,42 @@ export const manualFlushLogs = () => {
 export const initLogging = (options = {}) => {
   try {
     console.log('initLogging: Starting initialization');
-    
+
     // Update default configuration with options
     if (options.enableConsole !== undefined) {
       defaultLoggerConfig.enableConsole = options.enableConsole;
     }
-    
+
     if (options.enableRemote !== undefined) {
       defaultLoggerConfig.enableRemote = options.enableRemote;
     }
-    
+
     if (options.enableSentry !== undefined) {
       defaultLoggerConfig.enableSentry = options.enableSentry;
     }
-    
+
     // Set up periodic log flushing
     if (defaultLoggerConfig.enableRemote) {
       console.log('initLogging: Remote logging enabled, setting up flush interval');
       console.log('initLogging: Setting up periodic log flushing');
-      
+
       const flushInterval = options.flushInterval || 30000; // Default: 30 seconds
       setInterval(flushLogs, flushInterval);
     } else {
       console.log('initLogging: Remote logging disabled');
     }
-    
+
     console.log('initLogging: Initialization completed successfully');
     return true;
   } catch (error) {
     console.error('initLogging: Failed to initialize logging:', error);
-    
+
     try {
       safeErrorCapture(error);
     } catch (captureError) {
       console.error('initLogging: Failed to use safeErrorCapture:', captureError);
     }
-    
+
     return false;
   }
 };

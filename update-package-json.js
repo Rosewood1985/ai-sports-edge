@@ -8,8 +8,9 @@ try {
 
   // Add the build:optimized script if it doesn't exist
   if (!packageJson.scripts['build:optimized']) {
-    packageJson.scripts['build:optimized'] = 'NODE_ENV=production webpack --config webpack.prod.optimized.js';
-    
+    packageJson.scripts['build:optimized'] =
+      'NODE_ENV=production webpack --config webpack.prod.optimized.js';
+
     // Write the updated package.json back to disk
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
     console.log('Added build:optimized script to package.json');

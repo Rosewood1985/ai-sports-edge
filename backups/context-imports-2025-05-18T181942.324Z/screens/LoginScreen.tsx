@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
-import { auth } from "../config/firebase";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { StackNavigationProp } from "@react-navigation/stack";
-import MobileAppDownload from "../components/MobileAppDownload";
-import { appDownloadService } from "../services/appDownloadService";
-import { useI18n } from "../contexts/I18nContext";
-import ThemeToggle from "../components/ThemeToggle";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+
+import MobileAppDownload from '../components/MobileAppDownload';
+import ThemeToggle from '../components/ThemeToggle';
+import { auth } from '../config/firebase';
+import { useI18n } from '../contexts/I18nContext';
+import { appDownloadService } from '../services/appDownloadService';
 
 // Define the navigation prop type
 type RootStackParamList = {
@@ -22,17 +23,17 @@ type Props = {
 };
 
 export default function LoginScreen({ navigation }: Props): JSX.Element {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [showDownloadPrompt, setShowDownloadPrompt] = useState<boolean>(false);
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
-  
+
   // Get translations
   const { t } = useI18n();
-  
+
   // Get app store URLs
   const { appStoreUrl, playStoreUrl, webAppUrl } = appDownloadService.getAppStoreUrls();
-  
+
   // Check if we should show the download prompt after registration
   useEffect(() => {
     if (isNewUser && auth.currentUser) {
@@ -44,11 +45,11 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
           setShowDownloadPrompt(shouldShow);
         }
       };
-      
+
       checkDownloadPrompt();
     }
   }, [isNewUser]);
-  
+
   // Handle closing the download prompt
   const handleCloseDownloadPrompt = async () => {
     // Fix: Add proper null check and error handling
@@ -66,52 +67,52 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
   const handleSignUp = async (): Promise<void> => {
     // Validate inputs
     if (!email.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.emailRequired"));
+      Alert.alert(t('common.error'), t('login.errors.emailRequired'));
       return;
     }
-    
+
     if (!password.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.passwordRequired"));
+      Alert.alert(t('common.error'), t('login.errors.passwordRequired'));
       return;
     }
-    
+
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert(t("common.error"), t("login.errors.invalidEmail"));
+      Alert.alert(t('common.error'), t('login.errors.invalidEmail'));
       return;
     }
-    
+
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert(t("login.features.signUp"), t("login.alerts.accountCreated"));
+      Alert.alert(t('login.features.signUp'), t('login.alerts.accountCreated'));
       setIsNewUser(true);
-      
+
       // We'll navigate after the user has seen the download prompt
       // or immediately if the prompt isn't shown
       const userId = auth.currentUser?.uid;
       if (userId) {
         if (!(await appDownloadService.shouldShowDownloadPrompt(userId))) {
-          navigation.replace("Main");
+          navigation.replace('Main');
         }
       } else {
         // If for some reason we don't have a user ID, navigate anyway
-        navigation.replace("Main");
+        navigation.replace('Main');
       }
     } catch (error: any) {
       // Sanitize error messages to avoid exposing sensitive information
-      let errorMessage = t("login.errors.signUpFailed");
-      
+      let errorMessage = t('login.errors.signUpFailed');
+
       // Only show specific error messages for known error codes
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = t("login.errors.emailInUse");
+        errorMessage = t('login.errors.emailInUse');
       } else if (error.code === 'auth/weak-password') {
-        errorMessage = t("login.errors.weakPassword");
+        errorMessage = t('login.errors.weakPassword');
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t("login.errors.invalidEmail");
+        errorMessage = t('login.errors.invalidEmail');
       }
-      
-      Alert.alert(t("common.error"), errorMessage);
+
+      Alert.alert(t('common.error'), errorMessage);
       console.error('Sign up error:', error);
     }
   };
@@ -119,35 +120,35 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
   const handleLogin = async (): Promise<void> => {
     // Validate inputs
     if (!email.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.emailRequired"));
+      Alert.alert(t('common.error'), t('login.errors.emailRequired'));
       return;
     }
-    
+
     if (!password.trim()) {
-      Alert.alert(t("common.error"), t("login.errors.passwordRequired"));
+      Alert.alert(t('common.error'), t('login.errors.passwordRequired'));
       return;
     }
-    
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert(t("common.success"), t("login.alerts.loggedIn"));
-      navigation.replace("Main");
+      Alert.alert(t('common.success'), t('login.alerts.loggedIn'));
+      navigation.replace('Main');
     } catch (error: any) {
       // Sanitize error messages to avoid exposing sensitive information
-      let errorMessage = t("login.errors.loginFailed");
-      
+      let errorMessage = t('login.errors.loginFailed');
+
       // Only show specific error messages for known error codes
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = t("login.errors.invalidCredentials");
+        errorMessage = t('login.errors.invalidCredentials');
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t("login.errors.invalidEmail");
+        errorMessage = t('login.errors.invalidEmail');
       } else if (error.code === 'auth/user-disabled') {
-        errorMessage = t("login.errors.accountDisabled");
+        errorMessage = t('login.errors.accountDisabled');
       } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = t("login.errors.tooManyAttempts");
+        errorMessage = t('login.errors.tooManyAttempts');
       }
-      
-      Alert.alert(t("common.error"), errorMessage);
+
+      Alert.alert(t('common.error'), errorMessage);
       console.error('Login error:', error);
     }
   };
@@ -159,19 +160,19 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
         <MobileAppDownload
           onClose={() => {
             handleCloseDownloadPrompt();
-            navigation.replace("Main");
+            navigation.replace('Main');
           }}
           appStoreUrl={appStoreUrl}
           playStoreUrl={playStoreUrl}
           webAppUrl={webAppUrl}
         />
       )}
-      
-      <Text style={styles.title}>{t("login.title")}</Text>
-      <Text style={styles.subtitle}>{t("login.subtitle")}</Text>
+
+      <Text style={styles.title}>{t('login.title')}</Text>
+      <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
       <TextInput
         style={styles.input}
-        placeholder={t("login.email")}
+        placeholder={t('login.email')}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -179,16 +180,18 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
       />
       <TextInput
         style={styles.input}
-        placeholder={t("login.password")}
+        placeholder={t('login.password')}
         value={password}
         secureTextEntry
         onChangeText={setPassword}
       />
-      <Button title={t("login.signIn")} onPress={handleLogin} />
-      <Button title={t("login.signUp")} onPress={handleSignUp} />
-      <Text style={styles.forgotPassword}>{t("login.forgotPassword")}</Text>
-      <Text style={styles.dontHaveAccount}>{t("login.dontHaveAccount")} <Text style={styles.signUpLink}>{t("login.signUp")}</Text></Text>
-      
+      <Button title={t('login.signIn')} onPress={handleLogin} />
+      <Button title={t('login.signUp')} onPress={handleSignUp} />
+      <Text style={styles.forgotPassword}>{t('login.forgotPassword')}</Text>
+      <Text style={styles.dontHaveAccount}>
+        {t('login.dontHaveAccount')} <Text style={styles.signUpLink}>{t('login.signUp')}</Text>
+      </Text>
+
       {/* Theme Toggle */}
       <ThemeToggle />
     </View>
@@ -198,43 +201,43 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#121212",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#121212',
     padding: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFD700",
+    fontWeight: 'bold',
+    color: '#FFD700',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: "#CCCCCC",
+    color: '#CCCCCC',
     marginBottom: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   input: {
-    width: "80%",
+    width: '80%',
     padding: 10,
-    backgroundColor: "#333",
-    color: "#fff",
+    backgroundColor: '#333',
+    color: '#fff',
     borderRadius: 5,
     marginBottom: 10,
   },
   forgotPassword: {
-    color: "#FFD700",
+    color: '#FFD700',
     marginTop: 15,
     fontSize: 14,
   },
   dontHaveAccount: {
-    color: "#CCCCCC",
+    color: '#CCCCCC',
     marginTop: 20,
     fontSize: 14,
   },
   signUpLink: {
-    color: "#FFD700",
-    fontWeight: "bold",
-  }
+    color: '#FFD700',
+    fontWeight: 'bold',
+  },
 });

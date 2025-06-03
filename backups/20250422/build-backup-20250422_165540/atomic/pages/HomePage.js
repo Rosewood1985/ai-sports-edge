@@ -9,14 +9,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 // Import template
+import { useTheme } from '../molecules/themeContext';
+import firebase from '../organisms/firebaseService';
+import monitoring from '../organisms/monitoringService';
 import MainLayout from '../templates/MainLayout';
 
 // Import organisms
-import firebase from '../organisms/firebaseService';
-import monitoring from '../organisms/monitoringService';
 
 // Import molecules
-import { useTheme } from '../molecules/themeContext';
 
 // Create logger
 const logger = monitoring.logging.createLogger(monitoring.logging.LogCategory.APP);
@@ -216,7 +216,7 @@ const HomePage = ({ navigation }) => {
     <MainLayout
       header={<Header onThemeToggle={toggleTheme} />}
       footer={<Footer onLogout={handleLogout} />}
-      scrollable={true}
+      scrollable
     >
       {renderContent()}
     </MainLayout>

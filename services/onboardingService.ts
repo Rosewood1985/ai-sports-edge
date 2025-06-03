@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { info, error as logError, LogCategory } from './loggingService';
+
 import { safeErrorCapture } from './errorUtils';
+import { info, error as logError, LogCategory } from './loggingService';
 
 // Storage keys
 const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
@@ -8,7 +9,7 @@ const ONBOARDING_STEPS_KEY = 'onboarding_steps_completed';
 
 /**
  * Onboarding Service
- * 
+ *
  * Manages the onboarding state of the application, including tracking which
  * onboarding steps have been completed and whether the entire onboarding
  * process has been completed.
@@ -109,7 +110,11 @@ export const markOnboardingStepCompleted = async (stepId: string): Promise<void>
     }
   } catch (error) {
     console.error(`onboardingService: Error marking step ${stepId} as completed:`, error);
-    logError(LogCategory.APP, `Error marking onboarding step ${stepId} as completed`, error as Error);
+    logError(
+      LogCategory.APP,
+      `Error marking onboarding step ${stepId} as completed`,
+      error as Error
+    );
     safeErrorCapture(error as Error);
     throw error;
   }
@@ -129,7 +134,11 @@ export const isOnboardingStepCompleted = async (stepId: string): Promise<boolean
     return completed;
   } catch (error) {
     console.error(`onboardingService: Error checking if step ${stepId} is completed:`, error);
-    logError(LogCategory.APP, `Error checking if onboarding step ${stepId} is completed`, error as Error);
+    logError(
+      LogCategory.APP,
+      `Error checking if onboarding step ${stepId} is completed`,
+      error as Error
+    );
     safeErrorCapture(error as Error);
     // Default to not completed if there's an error
     return false;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
+
 import { Badge } from '../../ui/Badge';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
 import { Input } from '../../ui/Input';
 import { Select } from '../../ui/Select';
 
@@ -51,7 +52,7 @@ export interface SmartAlertingSystemProps {
  */
 export function SmartAlertingSystem({
   className = '',
-  showCreateForm = false
+  showCreateForm = false,
 }: SmartAlertingSystemProps) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [rules, setRules] = useState<AlertRule[]>([]);
@@ -76,7 +77,7 @@ export function SmartAlertingSystem({
       cooldown: 30,
       createdAt: '2025-05-27T10:00:00Z',
       lastTriggered: '2025-05-27T18:30:00Z',
-      triggerCount: 3
+      triggerCount: 3,
     },
     {
       id: 'rule-002',
@@ -92,7 +93,7 @@ export function SmartAlertingSystem({
       recipients: ['admin@aisportsedge.app', 'finance@aisportsedge.app'],
       cooldown: 15,
       createdAt: '2025-05-27T09:15:00Z',
-      triggerCount: 1
+      triggerCount: 1,
     },
     {
       id: 'rule-003',
@@ -108,8 +109,8 @@ export function SmartAlertingSystem({
       recipients: ['product@aisportsedge.app'],
       cooldown: 120,
       createdAt: '2025-05-26T16:20:00Z',
-      triggerCount: 0
-    }
+      triggerCount: 0,
+    },
   ];
 
   // Mock active alerts
@@ -129,8 +130,8 @@ export function SmartAlertingSystem({
         'Check application logs for error patterns',
         'Review recent deployments',
         'Monitor server resources',
-        'Escalate to engineering team if persistent'
-      ]
+        'Escalate to engineering team if persistent',
+      ],
     },
     {
       id: 'alert-002',
@@ -144,14 +145,15 @@ export function SmartAlertingSystem({
       triggeredAt: '2025-05-27T19:30:00Z',
       acknowledgedAt: '2025-05-27T19:35:00Z',
       acknowledgedBy: 'admin@aisportsedge.app',
-      description: 'Critical: Payment failure rate has spiked to 18.5%, well above the 15% threshold',
+      description:
+        'Critical: Payment failure rate has spiked to 18.5%, well above the 15% threshold',
       suggestedActions: [
         'Contact payment processor immediately',
         'Check payment gateway status',
         'Review API error logs',
-        'Notify customer support team'
-      ]
-    }
+        'Notify customer support team',
+      ],
+    },
   ];
 
   const loadData = useCallback(async () => {
@@ -177,20 +179,29 @@ export function SmartAlertingSystem({
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'low': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      case 'critical':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'high':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'low':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'acknowledged': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'resolved': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      case 'active':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'acknowledged':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'resolved':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
 
@@ -199,41 +210,43 @@ export function SmartAlertingSystem({
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   const acknowledgeAlert = (alertId: string) => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === alertId
-        ? {
-            ...alert,
-            status: 'acknowledged' as const,
-            acknowledgedAt: new Date().toISOString(),
-            acknowledgedBy: 'current-user@aisportsedge.app'
-          }
-        : alert
-    ));
+    setAlerts(prev =>
+      prev.map(alert =>
+        alert.id === alertId
+          ? {
+              ...alert,
+              status: 'acknowledged' as const,
+              acknowledgedAt: new Date().toISOString(),
+              acknowledgedBy: 'current-user@aisportsedge.app',
+            }
+          : alert
+      )
+    );
   };
 
   const resolveAlert = (alertId: string) => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === alertId
-        ? {
-            ...alert,
-            status: 'resolved' as const,
-            resolvedAt: new Date().toISOString()
-          }
-        : alert
-    ));
+    setAlerts(prev =>
+      prev.map(alert =>
+        alert.id === alertId
+          ? {
+              ...alert,
+              status: 'resolved' as const,
+              resolvedAt: new Date().toISOString(),
+            }
+          : alert
+      )
+    );
   };
 
   const toggleRule = (ruleId: string) => {
-    setRules(prev => prev.map(rule => 
-      rule.id === ruleId
-        ? { ...rule, isEnabled: !rule.isEnabled }
-        : rule
-    ));
+    setRules(prev =>
+      prev.map(rule => (rule.id === ruleId ? { ...rule, isEnabled: !rule.isEnabled } : rule))
+    );
   };
 
   return (
@@ -249,19 +262,10 @@ export function SmartAlertingSystem({
           </p>
         </div>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowRuleForm(!showRuleForm)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowRuleForm(!showRuleForm)}>
             {showRuleForm ? 'Cancel' : 'New Rule'}
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={loadData}
-            isLoading={isLoading}
-          >
+          <Button variant="secondary" size="sm" onClick={loadData} isLoading={isLoading}>
             Refresh
           </Button>
         </div>
@@ -304,7 +308,7 @@ export function SmartAlertingSystem({
             {[
               { key: 'active', label: 'Active Alerts', count: activeAlerts.length },
               { key: 'rules', label: 'Alert Rules', count: rules.length },
-              { key: 'history', label: 'Alert History', count: alerts.length }
+              { key: 'history', label: 'Alert History', count: alerts.length },
             ].map(tab => (
               <button
                 key={tab.key}
@@ -339,92 +343,91 @@ export function SmartAlertingSystem({
                   </p>
                 </div>
               ) : (
-                alerts.filter(alert => alert.status !== 'resolved').map(alert => (
-                  <Card key={alert.id} className="p-4 border-l-4 border-l-red-500">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="text-lg font-medium text-gray-900 dark:text-white">
-                          {alert.ruleName}
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Triggered {formatTimestamp(alert.triggeredAt)}
-                        </p>
+                alerts
+                  .filter(alert => alert.status !== 'resolved')
+                  .map(alert => (
+                    <Card key={alert.id} className="p-4 border-l-4 border-l-red-500">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+                            {alert.ruleName}
+                          </h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Triggered {formatTimestamp(alert.triggeredAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge className={getSeverityColor(alert.severity)}>
+                            {alert.severity.toUpperCase()}
+                          </Badge>
+                          <Badge className={getStatusColor(alert.status)}>
+                            {alert.status.toUpperCase()}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getSeverityColor(alert.severity)}>
-                          {alert.severity.toUpperCase()}
-                        </Badge>
-                        <Badge className={getStatusColor(alert.status)}>
-                          {alert.status.toUpperCase()}
-                        </Badge>
-                      </div>
-                    </div>
 
-                    <p className="text-gray-900 dark:text-white mb-4">
-                      {alert.description}
-                    </p>
+                      <p className="text-gray-900 dark:text-white mb-4">{alert.description}</p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                          Current Value
-                        </p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {alert.currentValue}
-                        </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Current Value
+                          </p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {alert.currentValue}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Threshold
+                          </p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {alert.threshold}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            Metric
+                          </p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {alert.metric.replace('_', ' ')}
+                          </p>
+                        </div>
                       </div>
-                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                          Threshold
-                        </p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {alert.threshold}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                          Metric
-                        </p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {alert.metric.replace('_', ' ')}
-                        </p>
-                      </div>
-                    </div>
 
-                    <div className="mb-4">
-                      <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                        Suggested Actions
-                      </h5>
-                      <ul className="space-y-1">
-                        {alert.suggestedActions.map((action, index) => (
-                          <li key={index} className="flex items-start space-x-2 text-sm text-gray-700 dark:text-gray-300">
-                            <span className="text-blue-500 mt-1">•</span>
-                            <span>{action}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                      <div className="mb-4">
+                        <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                          Suggested Actions
+                        </h5>
+                        <ul className="space-y-1">
+                          {alert.suggestedActions.map((action, index) => (
+                            <li
+                              key={index}
+                              className="flex items-start space-x-2 text-sm text-gray-700 dark:text-gray-300"
+                            >
+                              <span className="text-blue-500 mt-1">•</span>
+                              <span>{action}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
-                    <div className="flex justify-end space-x-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-                      {alert.status === 'active' && (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => acknowledgeAlert(alert.id)}
-                        >
-                          Acknowledge
+                      <div className="flex justify-end space-x-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        {alert.status === 'active' && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => acknowledgeAlert(alert.id)}
+                          >
+                            Acknowledge
+                          </Button>
+                        )}
+                        <Button variant="primary" size="sm" onClick={() => resolveAlert(alert.id)}>
+                          Resolve
                         </Button>
-                      )}
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => resolveAlert(alert.id)}
-                      >
-                        Resolve
-                      </Button>
-                    </div>
-                  </Card>
-                ))
+                      </div>
+                    </Card>
+                  ))
               )}
             </div>
           )}
@@ -440,7 +443,13 @@ export function SmartAlertingSystem({
                         <h4 className="text-lg font-medium text-gray-900 dark:text-white">
                           {rule.name}
                         </h4>
-                        <Badge className={rule.isEnabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}>
+                        <Badge
+                          className={
+                            rule.isEnabled
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                          }
+                        >
                           {rule.isEnabled ? 'Enabled' : 'Disabled'}
                         </Badge>
                         <Badge className={getSeverityColor(rule.severity)}>
@@ -457,7 +466,9 @@ export function SmartAlertingSystem({
                         </div>
                         <div>
                           <span className="text-gray-500 dark:text-gray-400">Condition:</span>
-                          <span className="ml-1 font-medium">{rule.condition} {rule.threshold}</span>
+                          <span className="ml-1 font-medium">
+                            {rule.condition} {rule.threshold}
+                          </span>
                         </div>
                         <div>
                           <span className="text-gray-500 dark:text-gray-400">Window:</span>
@@ -470,11 +481,7 @@ export function SmartAlertingSystem({
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toggleRule(rule.id)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => toggleRule(rule.id)}>
                         {rule.isEnabled ? 'Disable' : 'Enable'}
                       </Button>
                       <Button variant="secondary" size="sm">
@@ -482,11 +489,13 @@ export function SmartAlertingSystem({
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     <span>Channels: {rule.channels.join(', ')}</span>
                     {rule.lastTriggered && (
-                      <span className="ml-4">Last triggered: {formatTimestamp(rule.lastTriggered)}</span>
+                      <span className="ml-4">
+                        Last triggered: {formatTimestamp(rule.lastTriggered)}
+                      </span>
                     )}
                   </div>
                 </Card>
@@ -498,11 +507,12 @@ export function SmartAlertingSystem({
           {selectedTab === 'history' && (
             <div className="space-y-3">
               {alerts.map(alert => (
-                <div key={alert.id} className="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div
+                  key={alert.id}
+                  className="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
                   <div className="flex items-center space-x-4">
-                    <Badge className={getSeverityColor(alert.severity)}>
-                      {alert.severity}
-                    </Badge>
+                    <Badge className={getSeverityColor(alert.severity)}>{alert.severity}</Badge>
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {alert.ruleName}
@@ -512,9 +522,7 @@ export function SmartAlertingSystem({
                       </p>
                     </div>
                   </div>
-                  <Badge className={getStatusColor(alert.status)}>
-                    {alert.status}
-                  </Badge>
+                  <Badge className={getStatusColor(alert.status)}>{alert.status}</Badge>
                 </div>
               ))}
             </div>

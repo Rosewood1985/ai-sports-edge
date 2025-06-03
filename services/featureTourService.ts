@@ -1,6 +1,7 @@
-import { resetOnboardingStatus } from './onboardingService';
-import { analyticsService, AnalyticsEventType } from './analyticsService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { analyticsService, AnalyticsEventType } from './analyticsService';
+import { resetOnboardingStatus } from './onboardingService';
 
 // Keys for AsyncStorage
 const FEATURE_TOUR_COMPLETED_KEY = '@AISportsEdge:featureTourCompleted';
@@ -39,11 +40,11 @@ export const isFeatureTourCompleted = async (): Promise<boolean> => {
 export const markFeatureTourCompleted = async (): Promise<void> => {
   try {
     await AsyncStorage.setItem(FEATURE_TOUR_COMPLETED_KEY, 'true');
-    
+
     // Track analytics event
     analyticsService.trackEvent(AnalyticsEventType.FEATURE_USED, {
       feature_name: 'feature_tour_completed',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   } catch (error) {
     console.error('Error marking feature tour as completed:', error);
@@ -60,16 +61,16 @@ export const resetFeatureTour = async (source: string = 'unknown'): Promise<void
   try {
     // Reset onboarding status
     await resetOnboardingStatus();
-    
+
     // Reset feature tour status
     await AsyncStorage.removeItem(FEATURE_TOUR_COMPLETED_KEY);
     await AsyncStorage.removeItem(FEATURE_TOUR_STEPS_KEY);
-    
+
     // Track analytics event
     analyticsService.trackEvent(AnalyticsEventType.FEATURE_USED, {
       feature_name: 'feature_tour_reset',
       source,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   } catch (error) {
     console.error('Error resetting feature tour:', error);
@@ -117,25 +118,25 @@ export const markFeatureTourStepCompleted = async (stepId: string): Promise<void
         return {
           ...step,
           completed: true,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
       }
       return step;
     });
-    
+
     await saveFeatureTourSteps(updatedSteps);
-    
+
     // Check if all steps are completed
     const allCompleted = updatedSteps.every(step => step.completed);
     if (allCompleted) {
       await markFeatureTourCompleted();
     }
-    
+
     // Track analytics event
     analyticsService.trackEvent(AnalyticsEventType.FEATURE_USED, {
       feature_name: 'feature_tour_step_completed',
       step_id: stepId,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   } catch (error) {
     console.error('Error marking feature tour step as completed:', error);
@@ -151,38 +152,43 @@ const getDefaultFeatureTourSteps = (): FeatureTourStep[] => {
     {
       id: 'ai_predictions',
       title: 'AI Predictions',
-      description: 'Our AI doesn\'t just predict winners—it finds VALUE. See exactly where the bookmakers have set odds that don\'t match the real probabilities.',
+      description:
+        "Our AI doesn't just predict winners—it finds VALUE. See exactly where the bookmakers have set odds that don't match the real probabilities.",
       featureId: 'ai_predictions',
-      completed: false
+      completed: false,
     },
     {
       id: 'real_time_odds',
       title: 'Real-Time Odds',
-      description: 'Watch odds move in real-time across all major sportsbooks. Get alerts when there\'s value to be found.',
+      description:
+        "Watch odds move in real-time across all major sportsbooks. Get alerts when there's value to be found.",
       featureId: 'odds_comparison',
-      completed: false
+      completed: false,
     },
     {
       id: 'performance_dashboard',
       title: 'Performance Dashboard',
-      description: 'Track performance over time, see where you\'re making and losing money, and get AI-powered suggestions to improve.',
+      description:
+        "Track performance over time, see where you're making and losing money, and get AI-powered suggestions to improve.",
       featureId: 'performance_dashboard',
-      completed: false
+      completed: false,
     },
     {
       id: 'personalized_insights',
       title: 'Personalized Insights',
-      description: 'Receive custom insights based on your favorite teams, betting history, and preferences.',
+      description:
+        'Receive custom insights based on your favorite teams, betting history, and preferences.',
       featureId: 'personalized_insights',
-      completed: false
+      completed: false,
     },
     {
       id: 'premium_features',
       title: 'Premium Features',
-      description: 'Preview our premium tools like parlay optimizers, prop bet analyzers, and weather impact analysis.',
+      description:
+        'Preview our premium tools like parlay optimizers, prop bet analyzers, and weather impact analysis.',
       featureId: 'premium_features',
-      completed: false
-    }
+      completed: false,
+    },
   ];
 };
 
@@ -193,5 +199,5 @@ export default {
   resetFeatureTour,
   getFeatureTourSteps,
   saveFeatureTourSteps,
-  markFeatureTourStepCompleted
+  markFeatureTourStepCompleted,
 };

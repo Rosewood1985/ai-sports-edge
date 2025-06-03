@@ -8,12 +8,12 @@ const LOG_LEVELS = {
   ERROR: 0,
   WARN: 1,
   INFO: 2,
-  DEBUG: 3
+  DEBUG: 3,
 };
 
 // Current log level (can be set via environment variable)
-const currentLogLevel = process.env.LOG_LEVEL 
-  ? LOG_LEVELS[process.env.LOG_LEVEL.toUpperCase()] 
+const currentLogLevel = process.env.LOG_LEVEL
+  ? LOG_LEVELS[process.env.LOG_LEVEL.toUpperCase()]
   : LOG_LEVELS.INFO;
 
 /**
@@ -26,11 +26,11 @@ const currentLogLevel = process.env.LOG_LEVEL
 const formatLogMessage = (level, message, data) => {
   const timestamp = new Date().toISOString();
   const formattedMessage = `[${timestamp}] [${level}] ${message}`;
-  
+
   if (data) {
     return `${formattedMessage} ${JSON.stringify(data, null, 2)}`;
   }
-  
+
   return formattedMessage;
 };
 
@@ -42,10 +42,12 @@ const formatLogMessage = (level, message, data) => {
 const error = (message, error) => {
   if (currentLogLevel >= LOG_LEVELS.ERROR) {
     if (error instanceof Error) {
-      console.error(formatLogMessage('ERROR', message, { 
-        message: error.message, 
-        stack: error.stack 
-      }));
+      console.error(
+        formatLogMessage('ERROR', message, {
+          message: error.message,
+          stack: error.stack,
+        })
+      );
     } else {
       console.error(formatLogMessage('ERROR', message, error));
     }
@@ -103,14 +105,14 @@ const performance = (operation, startTime) => {
  * @param {string} prefix - Prefix for log messages
  * @returns {Object} Child logger
  */
-const createChildLogger = (prefix) => {
+const createChildLogger = prefix => {
   return {
     error: (message, error) => error(`[${prefix}] ${message}`, error),
     warn: (message, data) => warn(`[${prefix}] ${message}`, data),
     info: (message, data) => info(`[${prefix}] ${message}`, data),
     debug: (message, data) => debug(`[${prefix}] ${message}`, data),
     performance: (operation, startTime) => performance(`[${prefix}] ${operation}`, startTime),
-    createChildLogger: (childPrefix) => createChildLogger(`${prefix}:${childPrefix}`)
+    createChildLogger: childPrefix => createChildLogger(`${prefix}:${childPrefix}`),
   };
 };
 
@@ -121,5 +123,5 @@ module.exports = {
   debug,
   performance,
   createChildLogger,
-  LOG_LEVELS
+  LOG_LEVELS,
 };

@@ -18,11 +18,11 @@ class MLSportsEdgeService {
     try {
       const url = `${this.baseUrl}/predictions?sport=${sport}&league=${league}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch predictions: ${response.statusText}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Error fetching predictions:', error);
@@ -40,11 +40,11 @@ class MLSportsEdgeService {
     try {
       const url = `${this.baseUrl}/value_bets?sport=${sport}&league=${league}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch value bets: ${response.statusText}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Error fetching value bets:', error);
@@ -61,11 +61,11 @@ class MLSportsEdgeService {
     try {
       const url = `${this.baseUrl}/models?sport=${sport}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch models: ${response.statusText}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Error fetching models:', error);
@@ -96,11 +96,11 @@ class MLSportsEdgeService {
           train,
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to run pipeline: ${response.statusText}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Error running pipeline:', error);

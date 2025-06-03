@@ -23,7 +23,7 @@ export default class League {
     this.country = country;
     this.metadata = metadata;
   }
-  
+
   /**
    * Create a League instance from API data
    * @param {Object} apiLeague - League data from API
@@ -40,7 +40,7 @@ export default class League {
       apiLeague.metadata || {}
     );
   }
-  
+
   /**
    * Get the league's display name
    * @returns {string} Display name (e.g., "National Basketball Association (NBA)")
@@ -48,7 +48,7 @@ export default class League {
   getDisplayName() {
     return `${this.name} (${this.abbreviation})`;
   }
-  
+
   /**
    * Get the league's full display name with sport
    * @returns {string} Full display name (e.g., "National Basketball Association (NBA, Basketball)")
@@ -56,7 +56,7 @@ export default class League {
   getFullDisplayName() {
     return `${this.name} (${this.abbreviation}, ${this.sport})`;
   }
-  
+
   /**
    * Check if the league is international
    * @returns {boolean} Whether the league is international
@@ -64,7 +64,7 @@ export default class League {
   isInternational() {
     return this.country !== 'USA';
   }
-  
+
   /**
    * Get league season information
    * @returns {Object|null} Season information if available
@@ -72,7 +72,7 @@ export default class League {
   getSeasonInfo() {
     return this.metadata.season || null;
   }
-  
+
   /**
    * Check if the league is currently in season
    * @returns {boolean} Whether the league is in season
@@ -82,14 +82,14 @@ export default class League {
     if (!seasonInfo || !seasonInfo.startDate || !seasonInfo.endDate) {
       return false;
     }
-    
+
     const now = new Date();
     const startDate = new Date(seasonInfo.startDate);
     const endDate = new Date(seasonInfo.endDate);
-    
+
     return now >= startDate && now <= endDate;
   }
-  
+
   /**
    * Convert to JSON object
    * @returns {Object} JSON representation of the league
@@ -102,10 +102,10 @@ export default class League {
       abbreviation: this.abbreviation,
       logo: this.logo,
       country: this.country,
-      metadata: this.metadata
+      metadata: this.metadata,
     };
   }
-  
+
   /**
    * Create a League instance from JSON
    * @param {Object} json - JSON representation of a league

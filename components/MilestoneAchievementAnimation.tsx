@@ -1,15 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Easing,
-  Dimensions
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ReferralMilestone } from '../types/rewards';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
+
 import { useThemeColor } from '../hooks/useThemeColor';
+import { ReferralMilestone } from '../types/rewards';
 
 interface MilestoneAchievementAnimationProps {
   milestone: ReferralMilestone;
@@ -23,19 +17,19 @@ interface MilestoneAchievementAnimationProps {
  */
 const MilestoneAchievementAnimation: React.FC<MilestoneAchievementAnimationProps> = ({
   milestone,
-  onAnimationComplete
+  onAnimationComplete,
 }) => {
   // Animation values
   const scale = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
-  
+
   // Screen dimensions
   const { width, height } = Dimensions.get('window');
-  
+
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
-  
+
   // Get icon based on milestone type
   const getIcon = () => {
     switch (milestone.reward.type) {
@@ -51,7 +45,7 @@ const MilestoneAchievementAnimation: React.FC<MilestoneAchievementAnimationProps
         return 'gift';
     }
   };
-  
+
   useEffect(() => {
     // Run animation sequence
     Animated.sequence([
@@ -61,48 +55,48 @@ const MilestoneAchievementAnimation: React.FC<MilestoneAchievementAnimationProps
           toValue: 1,
           duration: 500,
           useNativeDriver: true,
-          easing: Easing.out(Easing.back(1.5))
+          easing: Easing.out(Easing.back(1.5)),
         }),
         Animated.timing(scale, {
           toValue: 1,
           duration: 500,
           useNativeDriver: true,
-          easing: Easing.out(Easing.back(1.5))
-        })
+          easing: Easing.out(Easing.back(1.5)),
+        }),
       ]),
-      
+
       // Rotate slightly back and forth
       Animated.sequence([
         Animated.timing(rotate, {
           toValue: 1,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.inOut(Easing.quad)
+          easing: Easing.inOut(Easing.quad),
         }),
         Animated.timing(rotate, {
           toValue: -1,
           duration: 400,
           useNativeDriver: true,
-          easing: Easing.inOut(Easing.quad)
+          easing: Easing.inOut(Easing.quad),
         }),
         Animated.timing(rotate, {
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.inOut(Easing.quad)
-        })
+          easing: Easing.inOut(Easing.quad),
+        }),
       ]),
-      
+
       // Hold for a moment
       Animated.delay(1000),
-      
+
       // Fade out if needed
       Animated.timing(opacity, {
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
-        easing: Easing.in(Easing.quad)
-      })
+        easing: Easing.in(Easing.quad),
+      }),
     ]).start(() => {
       // Call onAnimationComplete callback
       if (onAnimationComplete) {
@@ -110,28 +104,30 @@ const MilestoneAchievementAnimation: React.FC<MilestoneAchievementAnimationProps
       }
     });
   }, []);
-  
+
   // Convert rotate value to degrees
   const spin = rotate.interpolate({
     inputRange: [-1, 0, 1],
-    outputRange: ['-10deg', '0deg', '10deg']
+    outputRange: ['-10deg', '0deg', '10deg'],
   });
-  
+
   // Create particle animation
-  const particles = Array(20).fill(0).map((_, i) => ({
-    translateY: useRef(new Animated.Value(0)).current,
-    translateX: useRef(new Animated.Value(0)).current,
-    opacity: useRef(new Animated.Value(0)).current,
-    scale: useRef(new Animated.Value(0)).current,
-  }));
-  
+  const particles = Array(20)
+    .fill(0)
+    .map((_, i) => ({
+      translateY: useRef(new Animated.Value(0)).current,
+      translateX: useRef(new Animated.Value(0)).current,
+      opacity: useRef(new Animated.Value(0)).current,
+      scale: useRef(new Animated.Value(0)).current,
+    }));
+
   useEffect(() => {
     // Animate particles
     particles.forEach((particle, i) => {
       const angle = (i / particles.length) * 2 * Math.PI;
       const distance = 100 + Math.random() * 100;
       const delay = i * 50;
-      
+
       Animated.sequence([
         Animated.delay(delay),
         Animated.parallel([
@@ -139,37 +135,37 @@ const MilestoneAchievementAnimation: React.FC<MilestoneAchievementAnimationProps
             toValue: Math.cos(angle) * distance,
             duration: 1000,
             useNativeDriver: true,
-            easing: Easing.out(Easing.quad)
+            easing: Easing.out(Easing.quad),
           }),
           Animated.timing(particle.translateY, {
             toValue: Math.sin(angle) * distance,
             duration: 1000,
             useNativeDriver: true,
-            easing: Easing.out(Easing.quad)
+            easing: Easing.out(Easing.quad),
           }),
           Animated.sequence([
             Animated.timing(particle.opacity, {
               toValue: 1,
               duration: 200,
-              useNativeDriver: true
+              useNativeDriver: true,
             }),
             Animated.delay(500),
             Animated.timing(particle.opacity, {
               toValue: 0,
               duration: 300,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           ]),
           Animated.timing(particle.scale, {
             toValue: 1,
             duration: 1000,
-            useNativeDriver: true
-          })
-        ])
+            useNativeDriver: true,
+          }),
+        ]),
       ]).start();
     });
   }, []);
-  
+
   return (
     <View style={[styles.container, { width, height }]}>
       {/* Particles */}
@@ -184,34 +180,31 @@ const MilestoneAchievementAnimation: React.FC<MilestoneAchievementAnimationProps
               transform: [
                 { translateX: particle.translateX },
                 { translateY: particle.translateY },
-                { scale: particle.scale }
-              ]
-            }
+                { scale: particle.scale },
+              ],
+            },
           ]}
         />
       ))}
-      
+
       {/* Main animation */}
       <Animated.View
         style={[
           styles.animationContainer,
           {
             opacity,
-            transform: [
-              { scale },
-              { rotate: spin }
-            ]
-          }
+            transform: [{ scale }, { rotate: spin }],
+          },
         ]}
       >
         <View style={styles.iconContainer}>
           <Ionicons name={getIcon() as any} size={80} color={primaryColor} />
         </View>
-        
+
         <Text style={[styles.milestoneText, { color: textColor }]}>
           {milestone.count} Referrals Achieved!
         </Text>
-        
+
         <Text style={[styles.rewardText, { color: primaryColor }]}>
           {milestone.reward.description}
         </Text>

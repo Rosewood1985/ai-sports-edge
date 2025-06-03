@@ -1,6 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define theme colors
 export interface ThemeColors {
@@ -80,14 +80,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       try {
         const savedThemePreset = await AsyncStorage.getItem(THEME_STORAGE_KEY);
         const savedTeamId = await AsyncStorage.getItem(TEAM_ID_STORAGE_KEY);
-        
+
         if (savedThemePreset) {
           setThemePreset(savedThemePreset as ThemePreset);
         } else if (colorScheme) {
           // Use system preference if no saved preference
           setThemePreset(colorScheme === 'dark' ? 'dark' : 'light');
         }
-        
+
         if (savedTeamId) {
           setTeamId(savedTeamId);
         }
@@ -95,7 +95,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.error('Error loading theme preference:', error);
       }
     };
-    
+
     loadThemePreference();
   }, [colorScheme]);
 
@@ -112,7 +112,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const teamColors = getTeamColors(teamId);
         setTheme(teamColors);
       }
-      
+
       // Save preference
       try {
         await AsyncStorage.setItem(THEME_STORAGE_KEY, themePreset);
@@ -123,7 +123,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.error('Error saving theme preference:', error);
       }
     };
-    
+
     updateTheme();
   }, [themePreset, teamId]);
 
@@ -138,31 +138,31 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // In a real app, you would fetch team colors from an API or database
     // For now, we'll use some predefined team colors
     const teamColorMap: Record<string, ThemeColors> = {
-      'lakers': {
+      lakers: {
         ...darkTheme,
         primary: '#552583',
         secondary: '#FDB927',
         cardBackground: '#2A2A2A',
       },
-      'celtics': {
+      celtics: {
         ...darkTheme,
         primary: '#007A33',
         secondary: '#BA9653',
         cardBackground: '#2A2A2A',
       },
-      'heat': {
+      heat: {
         ...darkTheme,
         primary: '#98002E',
         secondary: '#F9A01B',
         cardBackground: '#2A2A2A',
       },
-      'default': {
+      default: {
         ...lightTheme,
         primary: '#0066FF',
         secondary: '#E6F0FF',
       },
     };
-    
+
     return teamColorMap[teamId] || teamColorMap['default'];
   };
 

@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { isOnboardingCompleted } from '../services/onboardingService';
-import { info, error as logError, LogCategory } from '../services/loggingService';
+
 import { safeErrorCapture } from '../services/errorUtils';
+import { info, error as logError, LogCategory } from '../services/loggingService';
+import { isOnboardingCompleted } from '../services/onboardingService';
 
 // Define the initial route types
 export type InitialRoute = 'Main' | 'Auth' | 'Onboarding';
@@ -36,12 +37,12 @@ export const NavigationStateProvider: React.FC<{ children: React.ReactNode }> = 
     const determineInitialRoute = async () => {
       console.log('NavigationStateContext: Determining initial route');
       setIsLoading(true);
-      
+
       try {
         // Check if onboarding has been completed
         console.log('NavigationStateContext: Checking onboarding status');
         const onboardingCompleted = await isOnboardingCompleted();
-        
+
         // Determine the initial route based on onboarding status
         // In a real app, you would also check authentication status here
         let route: InitialRoute;
@@ -49,13 +50,17 @@ export const NavigationStateProvider: React.FC<{ children: React.ReactNode }> = 
           // If onboarding is completed, go to Main or Auth based on auth status
           // For now, we'll just go to Main
           route = 'Main';
-          console.log('NavigationStateContext: Onboarding completed, setting initial route to Main');
+          console.log(
+            'NavigationStateContext: Onboarding completed, setting initial route to Main'
+          );
         } else {
           // If onboarding is not completed, go to Onboarding
           route = 'Onboarding';
-          console.log('NavigationStateContext: Onboarding not completed, setting initial route to Onboarding');
+          console.log(
+            'NavigationStateContext: Onboarding not completed, setting initial route to Onboarding'
+          );
         }
-        
+
         // Update the state
         setInitialRoute(route);
         info(LogCategory.NAVIGATION, `Initial route set to ${route}`);
@@ -64,10 +69,10 @@ export const NavigationStateProvider: React.FC<{ children: React.ReactNode }> = 
         console.error('NavigationStateContext: Error determining initial route:', err);
         logError(LogCategory.NAVIGATION, 'Error determining initial route', err as Error);
         safeErrorCapture(err as Error);
-        
+
         // Set error state
         setError(err as Error);
-        
+
         // Default to Onboarding on error
         setInitialRoute('Onboarding');
         info(LogCategory.NAVIGATION, 'Defaulting to Onboarding route due to error');
@@ -84,7 +89,7 @@ export const NavigationStateProvider: React.FC<{ children: React.ReactNode }> = 
   const resetNavigation = async () => {
     console.log('NavigationStateContext: Resetting navigation state');
     setIsLoading(true);
-    
+
     try {
       // Reset to onboarding
       setInitialRoute('Onboarding');

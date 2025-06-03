@@ -3,9 +3,9 @@
  * Basic toast notification component
  * Location: /atomic/atoms/Toast.tsx
  */
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 interface ToastProps {
   message: string;
@@ -95,21 +95,11 @@ export function Toast({
 
   return (
     <Animated.View
-      style={[
-        containerStyle,
-        { opacity: fadeAnim, transform: [{ translateY: fadeAnim }] }
-      ]}
+      style={[containerStyle, { opacity: fadeAnim, transform: [{ translateY: fadeAnim }] }]}
       className={className}
     >
-      <Ionicons
-        name={getIcon()}
-        size={20}
-        color={colors.icon}
-        style={styles.icon}
-      />
-      <Text style={[styles.message, { color: colors.icon }]}>
-        {message}
-      </Text>
+      <Ionicons name={getIcon()} size={20} color={colors.icon} style={styles.icon} />
+      <Text style={[styles.message, { color: colors.icon }]}>{message}</Text>
     </Animated.View>
   );
 }

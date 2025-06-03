@@ -19,16 +19,16 @@ async function runPipeline(options = {}) {
     normalizeData: true,
     extractFeatures: true,
     trainModels: true,
-    sports: ['NBA', 'WNBA', 'MLB', 'NHL', 'NCAA_MENS', 'NCAA_WOMENS', 'FORMULA1', 'UFC']
+    sports: ['NBA', 'WNBA', 'MLB', 'NHL', 'NCAA_MENS', 'NCAA_WOMENS', 'FORMULA1', 'UFC'],
   };
-  
+
   const pipelineOptions = { ...defaultOptions, ...options };
-  
+
   console.log('Starting ML Sports Edge Pipeline...');
   console.log('Pipeline options:', pipelineOptions);
-  
+
   const startTime = Date.now();
-  
+
   try {
     // Step 1: Fetch data from all APIs
     if (pipelineOptions.fetchData) {
@@ -37,7 +37,7 @@ async function runPipeline(options = {}) {
     } else {
       console.log('\n=== STEP 1: FETCHING DATA [SKIPPED] ===\n');
     }
-    
+
     // Step 2: Normalize data
     if (pipelineOptions.normalizeData) {
       console.log('\n=== STEP 2: NORMALIZING DATA ===\n');
@@ -45,7 +45,7 @@ async function runPipeline(options = {}) {
     } else {
       console.log('\n=== STEP 2: NORMALIZING DATA [SKIPPED] ===\n');
     }
-    
+
     // Step 3: Extract features
     if (pipelineOptions.extractFeatures) {
       console.log('\n=== STEP 3: EXTRACTING FEATURES ===\n');
@@ -53,7 +53,7 @@ async function runPipeline(options = {}) {
     } else {
       console.log('\n=== STEP 3: EXTRACTING FEATURES [SKIPPED] ===\n');
     }
-    
+
     // Step 4: Train models
     if (pipelineOptions.trainModels) {
       console.log('\n=== STEP 4: TRAINING MODELS ===\n');
@@ -61,24 +61,24 @@ async function runPipeline(options = {}) {
     } else {
       console.log('\n=== STEP 4: TRAINING MODELS [SKIPPED] ===\n');
     }
-    
+
     const endTime = Date.now();
     const duration = (endTime - startTime) / 1000 / 60; // in minutes
-    
+
     console.log(`\nPipeline completed successfully in ${duration.toFixed(2)} minutes`);
-    
+
     return {
       success: true,
       duration,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Error running pipeline:', error);
-    
+
     return {
       success: false,
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
@@ -91,7 +91,7 @@ async function runPipeline(options = {}) {
 async function runPipelineForSport(sport, options = {}) {
   return runPipeline({
     ...options,
-    sports: [sport]
+    sports: [sport],
   });
 }
 
@@ -103,26 +103,26 @@ function parseArgs() {
     normalizeData: true,
     extractFeatures: true,
     trainModels: true,
-    sports: ['NBA', 'WNBA', 'MLB', 'NHL', 'NCAA_MENS', 'NCAA_WOMENS', 'FORMULA1', 'UFC']
+    sports: ['NBA', 'WNBA', 'MLB', 'NHL', 'NCAA_MENS', 'NCAA_WOMENS', 'FORMULA1', 'UFC'],
   };
-  
+
   // Check for step flags
   if (args.includes('--no-fetch')) {
     options.fetchData = false;
   }
-  
+
   if (args.includes('--no-normalize')) {
     options.normalizeData = false;
   }
-  
+
   if (args.includes('--no-features')) {
     options.extractFeatures = false;
   }
-  
+
   if (args.includes('--no-train')) {
     options.trainModels = false;
   }
-  
+
   // Check for sport filter
   const sportIndex = args.findIndex(arg => arg === '--sport');
   if (sportIndex !== -1 && args.length > sportIndex + 1) {
@@ -133,14 +133,14 @@ function parseArgs() {
       console.warn(`Warning: Unknown sport "${sport}". Using all sports.`);
     }
   }
-  
+
   return options;
 }
 
 // Execute if run directly
 if (require.main === module) {
   const options = parseArgs();
-  
+
   runPipeline(options)
     .then(result => {
       if (result.success) {
@@ -159,5 +159,5 @@ if (require.main === module) {
 
 module.exports = {
   runPipeline,
-  runPipelineForSport
+  runPipelineForSport,
 };

@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -9,10 +11,17 @@ import {
   SafeAreaView,
   Dimensions,
   StatusBar,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+
+import OnboardingSlide from '../components/OnboardingSlide';
+import { useI18n } from '../contexts/I18nContext';
+import {
+  isOnboardingCompleted,
+  markOnboardingCompleted,
+  initOnboardingAnalytics,
+  updateOnboardingProgress,
+} from '../services/onboardingService';
 
 // Define the navigation types
 type RootStackParamList = {
@@ -22,14 +31,6 @@ type RootStackParamList = {
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-import { useI18n } from '../contexts/I18nContext';
-import OnboardingSlide from '../components/OnboardingSlide';
-import { 
-  isOnboardingCompleted, 
-  markOnboardingCompleted,
-  initOnboardingAnalytics,
-  updateOnboardingProgress
-} from '../services/onboardingService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -43,7 +44,7 @@ const OnboardingScreen = (): JSX.Element => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation<NavigationProp>();
   const { t, language } = useI18n();
-  
+
   // Define the onboarding slides with translations
   const translatedSlides = [
     {
@@ -53,7 +54,7 @@ const OnboardingScreen = (): JSX.Element => {
       image: require('../assets/images/onboarding/welcome.png'),
       backgroundColor: '#3498db',
       titleColor: '#ffffff',
-      descriptionColor: '#f0f0f0'
+      descriptionColor: '#f0f0f0',
     },
     {
       id: '2',
@@ -62,7 +63,7 @@ const OnboardingScreen = (): JSX.Element => {
       image: require('../assets/images/onboarding/ai-predictions.png'),
       backgroundColor: '#2ecc71',
       titleColor: '#ffffff',
-      descriptionColor: '#f0f0f0'
+      descriptionColor: '#f0f0f0',
     },
     {
       id: '3',
@@ -71,7 +72,7 @@ const OnboardingScreen = (): JSX.Element => {
       image: require('../assets/images/onboarding/live-odds.png'),
       backgroundColor: '#9b59b6',
       titleColor: '#ffffff',
-      descriptionColor: '#f0f0f0'
+      descriptionColor: '#f0f0f0',
     },
     {
       id: '4',
@@ -80,7 +81,7 @@ const OnboardingScreen = (): JSX.Element => {
       image: require('../assets/images/onboarding/performance.png'),
       backgroundColor: '#e74c3c',
       titleColor: '#ffffff',
-      descriptionColor: '#f0f0f0'
+      descriptionColor: '#f0f0f0',
     },
     {
       id: '5',
@@ -94,22 +95,18 @@ const OnboardingScreen = (): JSX.Element => {
         text: t('groupSubscription.actionButton'),
         onPress: () => {
           // Show 24-hour registration requirement alert before navigating
-          Alert.alert(
-            t('groupSubscription.title'),
-            t('groupSubscription.timeRequirement'),
-            [
-              {
-                text: t('common.cancel'),
-                style: 'cancel'
-              },
-              {
-                text: t('common.confirm'),
-                onPress: () => navigation.navigate('GroupSubscription')
-              }
-            ]
-          );
-        }
-      }
+          Alert.alert(t('groupSubscription.title'), t('groupSubscription.timeRequirement'), [
+            {
+              text: t('common.cancel'),
+              style: 'cancel',
+            },
+            {
+              text: t('common.confirm'),
+              onPress: () => navigation.navigate('GroupSubscription'),
+            },
+          ]);
+        },
+      },
     },
     {
       id: '6',
@@ -118,8 +115,8 @@ const OnboardingScreen = (): JSX.Element => {
       image: require('../assets/images/onboarding/get-started.png'),
       backgroundColor: '#f39c12',
       titleColor: '#ffffff',
-      descriptionColor: '#f0f0f0'
-    }
+      descriptionColor: '#f0f0f0',
+    },
   ];
 
   // Initialize analytics when component mounts
@@ -133,7 +130,7 @@ const OnboardingScreen = (): JSX.Element => {
         // Continue with onboarding even if analytics fails
       }
     };
-    
+
     initAnalytics();
   }, []);
 
@@ -147,7 +144,7 @@ const OnboardingScreen = (): JSX.Element => {
         // Continue with onboarding even if analytics update fails
       }
     };
-    
+
     updateAnalytics();
   }, [currentIndex]);
 
@@ -157,7 +154,7 @@ const OnboardingScreen = (): JSX.Element => {
         index: translatedSlides.length - 1,
         animated: true,
         viewOffset: 0,
-        viewPosition: 0
+        viewPosition: 0,
       });
     } catch (error) {
       console.error('Error skipping to last slide:', error);
@@ -173,7 +170,7 @@ const OnboardingScreen = (): JSX.Element => {
           index: currentIndex + 1,
           animated: true,
           viewOffset: 0,
-          viewPosition: 0
+          viewPosition: 0,
         });
       } catch (error) {
         console.error('Error navigating to next slide:', error);
@@ -191,48 +188,46 @@ const OnboardingScreen = (): JSX.Element => {
         Alert.alert(
           t('common.error'),
           t('errors.saveFailed', {
-            defaultValue: 'We couldn\'t save your onboarding progress. Some features may ask you to complete onboarding again.'
+            defaultValue:
+              "We couldn't save your onboarding progress. Some features may ask you to complete onboarding again.",
           }),
           [
             {
               text: t('common.ok'),
-              onPress: () => navigation.navigate('Main')
-            }
+              onPress: () => navigation.navigate('Main'),
+            },
           ]
         );
         return;
       }
-      
+
       // Success case
-      Alert.alert(
-        t('completion.title'),
-        t('completion.message'),
-        [
-          {
-            text: t('completion.gotIt'),
-            onPress: () => navigation.navigate('Main')
-          }
-        ]
-      );
+      Alert.alert(t('completion.title'), t('completion.message'), [
+        {
+          text: t('completion.gotIt'),
+          onPress: () => navigation.navigate('Main'),
+        },
+      ]);
     } catch (error) {
       // Handle unexpected errors
       console.error('Error completing onboarding:', error);
       Alert.alert(
         t('common.error'),
         t('errors.generalError', {
-          defaultValue: 'There was a problem completing the onboarding process. You can try again later.'
+          defaultValue:
+            'There was a problem completing the onboarding process. You can try again later.',
         }),
         [
           {
             text: t('common.ok'),
-            onPress: () => navigation.navigate('Main')
-          }
+            onPress: () => navigation.navigate('Main'),
+          },
         ]
       );
     }
   };
 
-  const renderItem = ({ item }: { item: typeof translatedSlides[0] }) => (
+  const renderItem = ({ item }: { item: (typeof translatedSlides)[0] }) => (
     <OnboardingSlide
       title={item.title}
       description={item.description}
@@ -246,7 +241,7 @@ const OnboardingScreen = (): JSX.Element => {
 
   const renderDots = () => {
     const dotPosition = Animated.divide(scrollX, width);
-    
+
     return (
       <View
         style={styles.dotsContainer}
@@ -257,27 +252,26 @@ const OnboardingScreen = (): JSX.Element => {
           const opacity = dotPosition.interpolate({
             inputRange: [index - 1, index, index + 1],
             outputRange: [0.3, 1, 0.3],
-            extrapolate: 'clamp'
+            extrapolate: 'clamp',
           });
-          
+
           const scale = dotPosition.interpolate({
             inputRange: [index - 1, index, index + 1],
             outputRange: [0.8, 1.2, 0.8],
-            extrapolate: 'clamp'
+            extrapolate: 'clamp',
           });
-          
+
           return (
             <Animated.View
               key={`dot-${index}`}
-              style={[
-                styles.dot,
-                { opacity, transform: [{ scale }] }
-              ]}
-              accessibilityLabel={index === currentIndex ?
-                t('currentStep', { defaultValue: 'Current step', number: index + 1 }) :
-                t('step', { defaultValue: 'Step', number: index + 1 })}
+              style={[styles.dot, { opacity, transform: [{ scale }] }]}
+              accessibilityLabel={
+                index === currentIndex
+                  ? t('currentStep', { defaultValue: 'Current step', number: index + 1 })
+                  : t('step', { defaultValue: 'Step', number: index + 1 })
+              }
               accessibilityRole="button"
-              accessible={true}
+              accessible
             />
           );
         })}
@@ -288,32 +282,31 @@ const OnboardingScreen = (): JSX.Element => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar translucent backgroundColor="transparent" />
-      
+
       <FlatList
         ref={flatListRef}
         data={translatedSlides}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(
-            event.nativeEvent.contentOffset.x / width
-          );
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+          useNativeDriver: false,
+        })}
+        onMomentumScrollEnd={event => {
+          const index = Math.round(event.nativeEvent.contentOffset.x / width);
           setCurrentIndex(index);
         }}
-        accessible={true}
+        accessible
         accessibilityLabel={t('progressNav', { defaultValue: 'Onboarding progress' })}
-        accessibilityHint={t('swipeHint', { defaultValue: 'Swipe left or right to navigate between slides' })}
+        accessibilityHint={t('swipeHint', {
+          defaultValue: 'Swipe left or right to navigate between slides',
+        })}
       />
-      
+
       {renderDots()}
-      
+
       <View style={styles.buttonsContainer}>
         {currentIndex < translatedSlides.length - 1 ? (
           <>
@@ -326,7 +319,7 @@ const OnboardingScreen = (): JSX.Element => {
             >
               <Text style={styles.buttonText}>{t('common.skip')}</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.button, styles.nextButton]}
               onPress={handleNext}
@@ -334,9 +327,7 @@ const OnboardingScreen = (): JSX.Element => {
               accessibilityRole="button"
               accessibilityHint={t('nextHint', { defaultValue: 'Go to the next slide' })}
             >
-              <Text style={[styles.buttonText, styles.nextButtonText]}>
-                {t('common.next')}
-              </Text>
+              <Text style={[styles.buttonText, styles.nextButtonText]}>{t('common.next')}</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -345,7 +336,9 @@ const OnboardingScreen = (): JSX.Element => {
             onPress={handleComplete}
             accessibilityLabel={t('common.getStarted')}
             accessibilityRole="button"
-            accessibilityHint={t('getStartedHint', { defaultValue: 'Complete onboarding and go to the main app' })}
+            accessibilityHint={t('getStartedHint', {
+              defaultValue: 'Complete onboarding and go to the main app',
+            })}
           >
             <Text style={[styles.buttonText, styles.getStartedButtonText]}>
               {t('common.getStarted')}

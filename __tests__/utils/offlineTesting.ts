@@ -1,6 +1,6 @@
 /**
  * Offline Testing Utilities
- * 
+ *
  * This file contains utilities for testing components in offline mode
  * and across different browsers.
  */
@@ -13,32 +13,32 @@
 export function mockNetworkCondition(online: boolean): () => void {
   // Store original navigator.onLine value
   const originalOnline = window.navigator.onLine;
-  
+
   // Mock navigator.onLine
   Object.defineProperty(window.navigator, 'onLine', {
     configurable: true,
     value: online,
-    writable: true
+    writable: true,
   });
-  
+
   // Mock fetch to simulate network conditions
   const originalFetch = window.fetch;
   if (!online) {
     window.fetch = jest.fn().mockRejectedValue(new Error('Network request failed'));
   }
-  
+
   // Mock XMLHttpRequest
   const originalXHR = window.XMLHttpRequest;
   if (!online) {
     // @ts-ignore
-    window.XMLHttpRequest = function() {
+    window.XMLHttpRequest = function () {
       const xhr = new originalXHR();
-      
+
       // Override the open method
       const originalOpen = xhr.open;
-      xhr.open = function() {
+      xhr.open = function () {
         originalOpen.apply(xhr, arguments);
-        
+
         // Simulate network error
         setTimeout(() => {
           if (xhr.onreadystatechange) {
@@ -49,23 +49,23 @@ export function mockNetworkCondition(online: boolean): () => void {
           }
         }, 100);
       };
-      
+
       return xhr;
     };
   }
-  
+
   // Return function to restore original network state
   return () => {
     // Restore navigator.onLine
     Object.defineProperty(window.navigator, 'onLine', {
       configurable: true,
       value: originalOnline,
-      writable: true
+      writable: true,
     });
-    
+
     // Restore fetch
     window.fetch = originalFetch;
-    
+
     // Restore XMLHttpRequest
     window.XMLHttpRequest = originalXHR;
   };
@@ -79,28 +79,30 @@ export function mockNetworkCondition(online: boolean): () => void {
 export function mockBrowser(browser: 'chrome' | 'firefox' | 'safari' | 'edge'): () => void {
   // Store original user agent
   const originalUserAgent = window.navigator.userAgent;
-  
+
   // Define browser user agents
   const userAgents = {
-    chrome: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    chrome:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     firefox: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
-    safari: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
-    edge: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
+    safari:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
+    edge: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59',
   };
-  
+
   // Mock navigator.userAgent
   Object.defineProperty(window.navigator, 'userAgent', {
     configurable: true,
     value: userAgents[browser],
-    writable: true
+    writable: true,
   });
-  
+
   // Return function to restore original user agent
   return () => {
     Object.defineProperty(window.navigator, 'userAgent', {
       configurable: true,
       value: originalUserAgent,
-      writable: true
+      writable: true,
     });
   };
 }
@@ -130,8 +132,13 @@ export function crossBrowserTest(
   testName: string,
   testFn: (browser: 'chrome' | 'firefox' | 'safari' | 'edge') => void
 ): void {
-  const browsers: ('chrome' | 'firefox' | 'safari' | 'edge')[] = ['chrome', 'firefox', 'safari', 'edge'];
-  
+  const browsers: ('chrome' | 'firefox' | 'safari' | 'edge')[] = [
+    'chrome',
+    'firefox',
+    'safari',
+    'edge',
+  ];
+
   browsers.forEach(browser => {
     test(`${testName} (${browser})`, () => {
       const restoreBrowser = mockBrowser(browser);
@@ -154,12 +161,12 @@ export function networkSpeedTest(
   testFn: (speed: 'fast' | 'slow' | 'variable') => void
 ): void {
   const speeds: ('fast' | 'slow' | 'variable')[] = ['fast', 'slow', 'variable'];
-  
+
   speeds.forEach(speed => {
     test(`${testName} (${speed} network)`, () => {
       // Mock fetch to simulate different network speeds
       const originalFetch = window.fetch;
-      
+
       if (speed === 'fast') {
         window.fetch = jest.fn().mockImplementation(async (...args) => {
           // Fast network: minimal delay
@@ -180,7 +187,7 @@ export function networkSpeedTest(
           return originalFetch(...args);
         });
       }
-      
+
       try {
         testFn(speed);
       } finally {

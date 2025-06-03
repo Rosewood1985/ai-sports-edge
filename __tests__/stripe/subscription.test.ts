@@ -1,15 +1,19 @@
-import { subscribeToPlan, cancelSubscription, getUserSubscription } from '../../services/firebaseSubscriptionService';
 import { auth } from '../../config/firebase';
 import { STRIPE_PRICE_IDS } from '../../config/stripe';
+import {
+  subscribeToPlan,
+  cancelSubscription,
+  getUserSubscription,
+} from '../../services/firebaseSubscriptionService';
 
 // Mock Firebase auth
 jest.mock('../../config/firebase', () => ({
   auth: {
     currentUser: {
-      uid: 'test-user-id'
-    }
+      uid: 'test-user-id',
+    },
   },
-  firestore: jest.fn()
+  firestore: jest.fn(),
 }));
 
 // Test user ID
@@ -19,12 +23,12 @@ const TEST_USER_ID = 'test-user-id';
 jest.mock('../../services/firebaseSubscriptionService', () => ({
   subscribeToPlan: jest.fn(),
   cancelSubscription: jest.fn(),
-  getUserSubscription: jest.fn()
+  getUserSubscription: jest.fn(),
 }));
 
 /**
  * Stripe Individual Subscription Tests
- * 
+ *
  * These tests verify the subscription functionality for individual plans.
  */
 describe('Stripe Individual Subscriptions', () => {
@@ -38,14 +42,14 @@ describe('Stripe Individual Subscriptions', () => {
     test('should successfully subscribe to Basic Monthly plan', async () => {
       // Mock successful subscription
       (subscribeToPlan as jest.Mock).mockResolvedValue(true);
-      
+
       // Test data
       const planId = 'basic-monthly';
       const paymentMethodId = 'pm_test_card_visa';
-      
+
       // Execute subscription
       const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
-      
+
       // Verify results
       expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
       expect(result).toBe(true);
@@ -54,14 +58,14 @@ describe('Stripe Individual Subscriptions', () => {
     test('should handle failed subscription to Basic Monthly plan', async () => {
       // Mock failed subscription
       (subscribeToPlan as jest.Mock).mockResolvedValue(false);
-      
+
       // Test data
       const planId = 'basic-monthly';
       const paymentMethodId = 'pm_test_card_declined';
-      
+
       // Execute subscription
       const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
-      
+
       // Verify results
       expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
       expect(result).toBe(false);
@@ -73,14 +77,14 @@ describe('Stripe Individual Subscriptions', () => {
     test('should successfully subscribe to Premium Monthly plan', async () => {
       // Mock successful subscription
       (subscribeToPlan as jest.Mock).mockResolvedValue(true);
-      
+
       // Test data
       const planId = 'premium-monthly';
       const paymentMethodId = 'pm_test_card_visa';
-      
+
       // Execute subscription
       const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
-      
+
       // Verify results
       expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
       expect(result).toBe(true);
@@ -92,14 +96,14 @@ describe('Stripe Individual Subscriptions', () => {
     test('should successfully subscribe to Premium Yearly plan', async () => {
       // Mock successful subscription
       (subscribeToPlan as jest.Mock).mockResolvedValue(true);
-      
+
       // Test data
       const planId = 'premium-yearly';
       const paymentMethodId = 'pm_test_card_visa';
-      
+
       // Execute subscription
       const result = await subscribeToPlan(TEST_USER_ID, planId, paymentMethodId);
-      
+
       // Verify results
       expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
       expect(result).toBe(true);
@@ -111,15 +115,16 @@ describe('Stripe Individual Subscriptions', () => {
     test('should handle declined card', async () => {
       // Mock failed subscription
       (subscribeToPlan as jest.Mock).mockRejectedValue(new Error('Your card was declined'));
-      
+
       // Test data
       const planId = 'premium-monthly';
       const paymentMethodId = 'pm_test_card_declined';
-      
+
       // Execute subscription and expect it to throw
-      await expect(subscribeToPlan(TEST_USER_ID, planId, paymentMethodId))
-        .rejects.toThrow('Your card was declined');
-      
+      await expect(subscribeToPlan(TEST_USER_ID, planId, paymentMethodId)).rejects.toThrow(
+        'Your card was declined'
+      );
+
       // Verify the function was called with correct parameters
       expect(subscribeToPlan).toHaveBeenCalledWith(TEST_USER_ID, planId, paymentMethodId);
     });
@@ -130,10 +135,10 @@ describe('Stripe Individual Subscriptions', () => {
     test('should successfully cancel subscription', async () => {
       // Mock successful cancellation
       (cancelSubscription as jest.Mock).mockResolvedValue(true);
-      
+
       // Execute cancellation
       const result = await cancelSubscription(TEST_USER_ID);
-      
+
       // Verify results
       expect(cancelSubscription).toHaveBeenCalledWith(TEST_USER_ID, false);
       expect(result).toBe(true);
@@ -142,13 +147,13 @@ describe('Stripe Individual Subscriptions', () => {
     test('should handle immediate cancellation', async () => {
       // Mock successful cancellation
       (cancelSubscription as jest.Mock).mockResolvedValue(true);
-      
+
       // Test data
       const immediate = true;
-      
+
       // Execute cancellation
       const result = await cancelSubscription(TEST_USER_ID, immediate);
-      
+
       // Verify results
       expect(cancelSubscription).toHaveBeenCalledWith(TEST_USER_ID, immediate);
       expect(result).toBe(true);
@@ -166,15 +171,15 @@ describe('Stripe Individual Subscriptions', () => {
         currentPeriodEnd: Date.now() + 30 * 24 * 60 * 60 * 1000,
         cancelAtPeriodEnd: false,
         trialEnd: null,
-        defaultPaymentMethod: 'pm_test_card_visa'
+        defaultPaymentMethod: 'pm_test_card_visa',
       };
-      
+
       // Mock successful retrieval
       (getUserSubscription as jest.Mock).mockResolvedValue(mockSubscription);
-      
+
       // Execute retrieval
       const result = await getUserSubscription(TEST_USER_ID);
-      
+
       // Verify results
       expect(getUserSubscription).toHaveBeenCalledWith(TEST_USER_ID);
       expect(result).toEqual(mockSubscription);
@@ -184,10 +189,10 @@ describe('Stripe Individual Subscriptions', () => {
     test('should handle no subscription', async () => {
       // Mock no subscription
       (getUserSubscription as jest.Mock).mockResolvedValue(null);
-      
+
       // Execute retrieval
       const result = await getUserSubscription(TEST_USER_ID);
-      
+
       // Verify results
       expect(getUserSubscription).toHaveBeenCalledWith(TEST_USER_ID);
       expect(result).toBeNull();

@@ -6,9 +6,9 @@
  * handling focus events, and managing focus state.
  */
 
-import { StyleSheet } from 'react-native';
-import { useRef, useState, useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
+import { useRef, useState, useEffect } from 'react';
+import { StyleSheet } from 'react-native';
 
 /**
  * Default focus style

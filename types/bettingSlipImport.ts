@@ -15,7 +15,7 @@ export enum Sportsbook {
   WYNN = 'wynn',
   BETRIVERS = 'betrivers',
   FOXBET = 'foxbet',
-  UNIBET = 'unibet'
+  UNIBET = 'unibet',
 }
 
 /**
@@ -26,7 +26,7 @@ export enum ImportMethod {
   COPY_PASTE = 'copy_paste',
   MANUAL_ENTRY = 'manual_entry',
   QR_CODE = 'qr_code',
-  DEEP_LINK = 'deep_link'
+  DEEP_LINK = 'deep_link',
 }
 
 /**
@@ -41,7 +41,7 @@ export enum ImportedBetType {
   TEASER = 'teaser',
   FUTURES = 'futures',
   LIVE = 'live',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
@@ -53,7 +53,7 @@ export enum ImportedBetStatus {
   LOST = 'lost',
   PUSHED = 'pushed',
   CANCELLED = 'cancelled',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
@@ -63,7 +63,7 @@ export enum ValidationStatus {
   VALID = 'valid',
   INVALID = 'invalid',
   NEEDS_REVIEW = 'needs_review',
-  PENDING = 'pending'
+  PENDING = 'pending',
 }
 
 /**
@@ -75,7 +75,7 @@ export enum SuggestionType {
   AVOID = 'avoid',
   GOOD_VALUE = 'good_value',
   ALTERNATIVE_BET = 'alternative_bet',
-  NONE = 'none'
+  NONE = 'none',
 }
 
 /**

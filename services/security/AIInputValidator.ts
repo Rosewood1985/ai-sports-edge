@@ -19,11 +19,7 @@ export class AIInputValidator {
       throw new Error('Invalid content: must be a non-empty string');
     }
 
-    const {
-      maxLength = 5000,
-      allowNewlines = false,
-      allowSpecialChars = false
-    } = options;
+    const { maxLength = 5000, allowNewlines = false, allowSpecialChars = false } = options;
 
     let sanitized = content;
 
@@ -35,7 +31,7 @@ export class AIInputValidator {
       .replace(/javascript:/gi, '') // Remove javascript: URLs
       .replace(/data:/gi, '') // Remove data: URLs
       .replace(/vbscript:/gi, '') // Remove vbscript: URLs
-      .replace(/on\w+\s*=/gi, '') // Remove event handlers
+      .replace(/on\w+\s*=/gi, ''); // Remove event handlers
 
     // Handle newlines
     if (!allowNewlines) {
@@ -97,7 +93,7 @@ export class AIInputValidator {
 
     const content = this.sanitizeContent(request.content, {
       maxLength: 10000,
-      allowNewlines: true
+      allowNewlines: true,
     });
 
     const maxLength = Math.min(

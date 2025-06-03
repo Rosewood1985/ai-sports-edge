@@ -1,8 +1,9 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { Text, TextProps } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { Colors } from '../../constants/Colors';
+
 import { useUITheme } from '../../components/UIThemeProvider';
+import { Colors } from '../../constants/Colors';
 import accessibilityService, {
   AccessibilityPreferences,
 } from '../../services/accessibilityService';

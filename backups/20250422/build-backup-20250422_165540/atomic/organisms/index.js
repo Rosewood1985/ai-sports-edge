@@ -1,6 +1,6 @@
 /**
  * Organisms Index
- * 
+ *
  * This file exports all organism components for easier imports.
  */
 

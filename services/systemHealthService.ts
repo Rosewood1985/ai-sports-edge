@@ -3,10 +3,22 @@
 // Real System Monitoring and Health Metrics Collection
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
-import { firestore as db } from '../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+  Timestamp,
+} from 'firebase/firestore';
+
 import { optimizedQuery } from './firebaseOptimizationService';
+import { firestore as db } from '../config/firebase';
 
 export interface SystemHealthData {
   apiPerformance: {
@@ -109,7 +121,7 @@ export class SystemHealthService {
 
       // Start background metrics collection
       this.startMetricsCollection();
-      
+
       console.log('System Health Service initialized successfully');
     } catch (error) {
       Sentry.captureException(error);
@@ -131,25 +143,20 @@ export class SystemHealthService {
       // Check cache first
       const cacheKey = 'system_health_data';
       const cached = this.metricsCache.get(cacheKey);
-      
+
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
         return cached.data;
       }
 
       // Fetch all metrics in parallel
-      const [
-        apiMetrics,
-        databaseMetrics,
-        infrastructureMetrics,
-        processMetrics,
-        systemActions,
-      ] = await Promise.all([
-        this.getAPIPerformanceMetrics(),
-        this.getDatabasePerformanceMetrics(),
-        this.getInfrastructureCostMetrics(),
-        this.getBackgroundProcessMetrics(),
-        this.getRecentSystemActions(),
-      ]);
+      const [apiMetrics, databaseMetrics, infrastructureMetrics, processMetrics, systemActions] =
+        await Promise.all([
+          this.getAPIPerformanceMetrics(),
+          this.getDatabasePerformanceMetrics(),
+          this.getInfrastructureCostMetrics(),
+          this.getBackgroundProcessMetrics(),
+          this.getRecentSystemActions(),
+        ]);
 
       const healthData: SystemHealthData = {
         apiPerformance: apiMetrics,
@@ -167,7 +174,6 @@ export class SystemHealthService {
       });
 
       return healthData;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error fetching system health data:', error);
@@ -204,7 +210,9 @@ export class SystemHealthService {
 
       const currentResponseTime = this.calculateAverage(responseTimeMetrics.map(m => m.value));
       const currentErrorRate = this.calculateAverage(errorRateMetrics.map(m => m.value));
-      const currentRequestsPerMinute = this.calculateSum(requestsMetrics.slice(0, 1).map(m => m.value));
+      const currentRequestsPerMinute = this.calculateSum(
+        requestsMetrics.slice(0, 1).map(m => m.value)
+      );
 
       // Get historical data for trends with optimized query
       const historicalMetrics = await optimizedQuery(`${this.collectionPrefix}_metrics`)
@@ -238,10 +246,13 @@ export class SystemHealthService {
         errorRate: Math.round(currentErrorRate * 100) / 100,
         errorRateTrend: this.calculateTrend(currentErrorRate, historicalErrorRate, '%'),
         requestsPerMinute: Math.round(currentRequestsPerMinute),
-        requestsPerMinuteTrend: this.calculateTrend(currentRequestsPerMinute, historicalRequestsPerMinute, ''),
+        requestsPerMinuteTrend: this.calculateTrend(
+          currentRequestsPerMinute,
+          historicalRequestsPerMinute,
+          ''
+        ),
         endpointPerformance,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackAPIMetrics();
@@ -313,7 +324,6 @@ export class SystemHealthService {
         writeOperationsTrend: this.calculateTrend(currentWriteOps, historicalWriteOps, ''),
         collectionPerformance,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackDatabaseMetrics();
@@ -340,7 +350,6 @@ export class SystemHealthService {
         costByService,
         costHistory,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackInfrastructureMetrics();
@@ -375,9 +384,8 @@ export class SystemHealthService {
 
       // Count active and failed processes
       const activeProcesses = processes.filter(p => p.status === 'running').length;
-      const failedProcesses = processes.filter(p => 
-        p.status === 'failed' && 
-        new Date(p.lastRun) >= oneDayAgo
+      const failedProcesses = processes.filter(
+        p => p.status === 'failed' && new Date(p.lastRun) >= oneDayAgo
       ).length;
 
       // Get historical data for trends with optimized query
@@ -401,7 +409,6 @@ export class SystemHealthService {
         failedProcessesTrend: this.calculateTrend(failedProcesses, historicalFailed, ''),
         processStatus: processes,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackProcessMetrics();
@@ -434,7 +441,6 @@ export class SystemHealthService {
         status: data.status,
         details: data.details,
       }));
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackSystemActions();
@@ -457,7 +463,6 @@ export class SystemHealthService {
 
       // Clear cache to force refresh
       this.metricsCache.delete('system_health_data');
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error recording metric:', error);
@@ -479,7 +484,6 @@ export class SystemHealthService {
       await setDoc(processRef, processData);
 
       return processId;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to record background process: ${error.message}`);
@@ -489,11 +493,14 @@ export class SystemHealthService {
   /**
    * Update background process status
    */
-  async updateBackgroundProcess(processId: string, updates: Partial<BackgroundProcess>): Promise<void> {
+  async updateBackgroundProcess(
+    processId: string,
+    updates: Partial<BackgroundProcess>
+  ): Promise<void> {
     try {
       const processRef = doc(db, `${this.collectionPrefix}_processes`, processId);
       const currentProcess = await getDoc(processRef);
-      
+
       if (!currentProcess.exists()) {
         throw new Error(`Process ${processId} not found`);
       }
@@ -507,14 +514,15 @@ export class SystemHealthService {
       if (updates.status === 'completed' || updates.status === 'failed') {
         const startTime = currentProcess.data().startTime;
         updatedData.endTime = new Date();
-        updatedData.duration = Math.round((updatedData.endTime.getTime() - startTime.getTime()) / 1000);
+        updatedData.duration = Math.round(
+          (updatedData.endTime.getTime() - startTime.getTime()) / 1000
+        );
       }
 
       await setDoc(processRef, updatedData);
 
       // Clear cache to force refresh
       this.metricsCache.delete('system_health_data');
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to update background process: ${error.message}`);
@@ -537,7 +545,6 @@ export class SystemHealthService {
 
       // Clear cache to force refresh
       this.metricsCache.delete('system_health_data');
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error recording system action:', error);
@@ -559,13 +566,16 @@ export class SystemHealthService {
     }, 30000);
 
     // Collect infrastructure costs daily
-    setInterval(async () => {
-      try {
-        await this.collectInfrastructureMetrics();
-      } catch (error) {
-        console.error('Error collecting infrastructure metrics:', error);
-      }
-    }, 24 * 60 * 60 * 1000);
+    setInterval(
+      async () => {
+        try {
+          await this.collectInfrastructureMetrics();
+        } catch (error) {
+          console.error('Error collecting infrastructure metrics:', error);
+        }
+      },
+      24 * 60 * 60 * 1000
+    );
   }
 
   /**
@@ -598,7 +608,6 @@ export class SystemHealthService {
           unit: 'count',
         }),
       ]);
-
     } catch (error) {
       console.error('Error collecting API metrics:', error);
     }
@@ -634,7 +643,6 @@ export class SystemHealthService {
           unit: 'count',
         }),
       ]);
-
     } catch (error) {
       console.error('Error collecting database metrics:', error);
     }
@@ -654,7 +662,6 @@ export class SystemHealthService {
         value: totalCost,
         unit: 'usd',
       });
-
     } catch (error) {
       console.error('Error collecting infrastructure metrics:', error);
     }
@@ -673,19 +680,23 @@ export class SystemHealthService {
     return values.reduce((sum, value) => sum + value, 0);
   }
 
-  private calculateTrend(current: number, previous: number, unit: string): { direction: 'up' | 'down' | 'stable'; value: string } {
+  private calculateTrend(
+    current: number,
+    previous: number,
+    unit: string
+  ): { direction: 'up' | 'down' | 'stable'; value: string } {
     if (previous === 0) return { direction: 'stable', value: '0' + unit };
-    
+
     const diff = current - previous;
     const percentChange = Math.abs(diff / previous);
-    
+
     if (percentChange < 0.05) {
       return { direction: 'stable', value: '0' + unit };
     }
-    
+
     const direction = diff > 0 ? 'up' : 'down';
     const value = `${direction === 'up' ? '+' : ''}${Math.round(diff * 100) / 100}${unit}`;
-    
+
     return { direction, value };
   }
 
@@ -871,17 +882,17 @@ export class SystemHealthService {
   private generateCostHistory(): { date: string; count: number }[] {
     const history = [];
     const now = new Date();
-    
+
     for (let i = 30; i >= 0; i--) {
       const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
       const cost = Math.round((Math.random() * 200 + 1000 + i * 2) * 100) / 100;
-      
+
       history.push({
         date: date.toISOString().split('T')[0],
         count: cost,
       });
     }
-    
+
     return history;
   }
 }

@@ -1,10 +1,11 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
+import React from 'react';
 import { AccessibilityInfo } from 'react-native';
-import FAQScreen from '../../screens/FAQScreen';
-import QuestionSubmissionForm from '../../atomic/molecules/forms/QuestionSubmissionForm';
+
 import { I18nProvider } from '../../../atomic/organisms/i18n/I18nContext';
+import QuestionSubmissionForm from '../../atomic/molecules/forms/QuestionSubmissionForm';
 import { ThemeProvider } from '../../contexts/ThemeContext';
+import FAQScreen from '../../screens/FAQScreen';
 
 // Mock AccessibilityInfo
 jest.mock('react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo', () => ({
@@ -49,10 +50,10 @@ describe('Spanish FAQ Accessibility Tests', () => {
 
     // Find all buttons (FAQ questions)
     const buttons = await findAllByRole('button');
-    
+
     // Check that we have buttons with accessibility attributes
     expect(buttons.length).toBeGreaterThan(0);
-    
+
     // Check that each button has proper accessibility attributes
     buttons.forEach(button => {
       expect(button.props.accessibilityLabel).toBeTruthy();
@@ -93,12 +94,12 @@ describe('Spanish FAQ Accessibility Tests', () => {
 
     // Find all buttons (FAQ questions)
     const buttons = await findAllByRole('button');
-    
+
     // Simulate pressing the first question
     if (buttons.length > 0) {
       const firstButton = buttons[0];
       firstButton.props.onPress();
-      
+
       // Check that the answer is accessible
       const answerText = await findByLabelText(/Respuesta:/);
       expect(answerText).toBeTruthy();

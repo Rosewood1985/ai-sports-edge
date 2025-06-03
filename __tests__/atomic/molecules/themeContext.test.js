@@ -1,65 +1,51 @@
+/**
+ * Theme Context Molecule Tests
+ * Tests for the theme context molecule.
+ */
+
 // External imports
-import React from 'react';
-
-
 import { renderHook, act } from '@testing-library/react-hooks';
-
+import React from 'react';
 
 // Internal imports
 import { ThemeContext, useTheme } from '../../../atomic/molecules/themeContext';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        value={{ theme: 'light', effectiveTheme: 'light', toggleTheme: jest.fn() }}
-        {children}
-        {children}
-      </ThemeContext.Provider>
-      </ThemeContext.Provider>
+describe('Theme Context Molecule', () => {
+  it('should provide default theme', () => {
+    // Arrange
+    const wrapper = ({ children }) => (
       <ThemeContext.Provider
-      <ThemeContext.Provider value={{ theme: 'light', effectiveTheme: 'light', toggleTheme }}>
+        value={{ theme: 'light', effectiveTheme: 'light', toggleTheme: jest.fn() }}
       >
-      result.current.toggleTheme();
+        {children}
+      </ThemeContext.Provider>
     );
-    );
+
     // Act
-    // Act
-    // Arrange
-    // Arrange
+    const { result } = renderHook(() => useTheme(), { wrapper });
+
     // Assert
-    // Assert
-    act(() => {
+    expect(result.current.theme).toBe('light');
+    expect(result.current.effectiveTheme).toBe('light');
+    expect(typeof result.current.toggleTheme).toBe('function');
+  });
+
+  it('should toggle theme', () => {
+    // Arrange
     const toggleTheme = jest.fn();
     const wrapper = ({ children }) => (
-    const wrapper = ({ children }) => (
-    const { result } = renderHook(() => useTheme(), { wrapper });
-    const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.effectiveTheme).toBe('light');
-    expect(result.current.theme).toBe('light');
-    expect(toggleTheme).toHaveBeenCalledTimes(1);
-    expect(typeof result.current.toggleTheme).toBe('function');
-    });
-  it('should provide default theme', () => {
-  it('should toggle theme', () => {
-  });
-  });
- *
- * Tests for the theme context molecule.
- * Theme Context Molecule Tests
- */
-/**
-// External imports
-// Internal imports
-describe('Theme Context Molecule', () => {
-});
+      <ThemeContext.Provider value={{ theme: 'light', effectiveTheme: 'light', toggleTheme }}>
+        {children}
+      </ThemeContext.Provider>
+    );
 
+    // Act
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => {
+      result.current.toggleTheme();
+    });
+
+    // Assert
+    expect(toggleTheme).toHaveBeenCalledTimes(1);
+  });
+});

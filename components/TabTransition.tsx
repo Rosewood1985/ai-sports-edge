@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, ViewStyle, StyleProp, Easing } from 'react-native';
+
 import { useAccessibilityService } from '../hooks/useAccessibilityService';
 
 interface TabTransitionProps {
@@ -7,12 +8,12 @@ interface TabTransitionProps {
    * Children to be animated
    */
   children: React.ReactNode;
-  
+
   /**
    * Whether the tab is currently active
    */
   active: boolean;
-  
+
   /**
    * Additional styles for the container
    */
@@ -21,28 +22,24 @@ interface TabTransitionProps {
 
 /**
  * TabTransition component for smooth tab transitions
- * 
+ *
  * This component provides smooth transitions between tabs
  * with accessibility considerations (reduced motion when needed).
  */
-const TabTransition: React.FC<TabTransitionProps> = ({
-  children,
-  active,
-  style,
-}) => {
+const TabTransition: React.FC<TabTransitionProps> = ({ children, active, style }) => {
   // Animation values
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const translateXAnim = useRef(new Animated.Value(20)).current;
-  
+
   // Get accessibility preferences
   const { isReducedMotionEnabled } = useAccessibilityService();
-  
+
   // Run animation when active state changes
   useEffect(() => {
     if (active) {
       // Create animations
       const animations = [];
-      
+
       // Fade animation (always used)
       animations.push(
         Animated.timing(opacityAnim, {
@@ -52,7 +49,7 @@ const TabTransition: React.FC<TabTransitionProps> = ({
           easing: Easing.out(Easing.cubic),
         })
       );
-      
+
       // Only add motion animations if reduced motion is not enabled
       if (!isReducedMotionEnabled) {
         // Slide animation
@@ -68,7 +65,7 @@ const TabTransition: React.FC<TabTransitionProps> = ({
         // Immediately set final values for reduced motion
         translateXAnim.setValue(0);
       }
-      
+
       // Run all animations in parallel
       Animated.parallel(animations).start();
     } else {
@@ -77,21 +74,19 @@ const TabTransition: React.FC<TabTransitionProps> = ({
       translateXAnim.setValue(20);
     }
   }, [active, isReducedMotionEnabled]);
-  
+
   // Don't render anything if not active
   if (!active) {
     return null;
   }
-  
+
   return (
     <Animated.View
       style={[
         style,
         {
           opacity: opacityAnim,
-          transform: [
-            { translateX: translateXAnim },
-          ],
+          transform: [{ translateX: translateXAnim }],
         },
       ]}
     >

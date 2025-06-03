@@ -25,7 +25,7 @@ export default class Player {
     this.stats = stats;
     this.metadata = metadata;
   }
-  
+
   /**
    * Create a Player instance from API data
    * @param {Object} apiPlayer - Player data from API
@@ -43,7 +43,7 @@ export default class Player {
       apiPlayer.metadata || {}
     );
   }
-  
+
   /**
    * Get the player's display name
    * @returns {string} Display name (e.g., "LeBron James (SF)")
@@ -51,7 +51,7 @@ export default class Player {
   getDisplayName() {
     return `${this.name} (${this.position})`;
   }
-  
+
   /**
    * Get the player's full display name with sport
    * @returns {string} Full display name (e.g., "LeBron James (SF, NBA)")
@@ -59,7 +59,7 @@ export default class Player {
   getFullDisplayName() {
     return `${this.name} (${this.position}, ${this.sport})`;
   }
-  
+
   /**
    * Get the player's first name
    * @returns {string} First name
@@ -67,7 +67,7 @@ export default class Player {
   getFirstName() {
     return this.name.split(' ')[0];
   }
-  
+
   /**
    * Get the player's last name
    * @returns {string} Last name
@@ -76,7 +76,7 @@ export default class Player {
     const parts = this.name.split(' ');
     return parts.length > 1 ? parts.slice(1).join(' ') : '';
   }
-  
+
   /**
    * Get a specific player statistic
    * @param {string} statName - Name of the statistic
@@ -86,7 +86,7 @@ export default class Player {
   getStat(statName, defaultValue = null) {
     return this.stats[statName] !== undefined ? this.stats[statName] : defaultValue;
   }
-  
+
   /**
    * Check if player has a specific statistic
    * @param {string} statName - Name of the statistic
@@ -95,7 +95,7 @@ export default class Player {
   hasStat(statName) {
     return this.stats[statName] !== undefined;
   }
-  
+
   /**
    * Convert to JSON object
    * @returns {Object} JSON representation of the player
@@ -109,10 +109,10 @@ export default class Player {
       sport: this.sport,
       image: this.image,
       stats: this.stats,
-      metadata: this.metadata
+      metadata: this.metadata,
     };
   }
-  
+
   /**
    * Create a Player instance from JSON
    * @param {Object} json - JSON representation of a player

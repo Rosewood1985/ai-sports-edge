@@ -6,14 +6,15 @@
  * about the status of their report generation or export job.
  */
 
-import React from 'react';
-import { JobStatus } from '../../../types/jobs';
-import { useJobTracking } from '../../../hooks/useJobQueue';
-import { Box, CircularProgress, Typography, Button, Alert, Paper } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import CancelIcon from '@mui/icons-material/Cancel';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import { Box, CircularProgress, Typography, Button, Alert, Paper } from '@mui/material';
+import React from 'react';
+
+import { useJobTracking } from '../../../hooks/useJobQueue';
+import { JobStatus } from '../../../types/jobs';
 
 interface JobProgressIndicatorProps {
   jobId: string;

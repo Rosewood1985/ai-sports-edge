@@ -31,13 +31,13 @@ module.exports = {
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    
+
     // General rules
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     'no-undef': 'error',
     'no-empty': 'warn',
-    
+
     // Jest rules
     'jest/no-disabled-tests': 'warn',
     'jest/no-focused-tests': 'error',

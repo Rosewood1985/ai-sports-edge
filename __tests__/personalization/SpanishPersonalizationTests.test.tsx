@@ -1,9 +1,10 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import PersonalizationSettings from '../../components/PersonalizationSettings';
+import React from 'react';
+
 import { I18nProvider } from '../../../atomic/organisms/i18n/I18nContext';
-import { ThemeProvider } from '../../contexts/ThemeContext';
+import PersonalizationSettings from '../../components/PersonalizationSettings';
 import { PersonalizationProvider } from '../../contexts/PersonalizationContext';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({

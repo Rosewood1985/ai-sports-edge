@@ -1,7 +1,7 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const personalizedNotificationService = require('./personalizedNotificationService');
-const { wrapScheduledFunction, trackDatabaseOperation } = require('./sentryCronConfig');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const personalizedNotificationService = require("./personalizedNotificationService");
+const { wrapScheduledFunction, trackDatabaseOperation } = require("./sentryCronConfig");
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -203,7 +203,7 @@ exports.updateReferralLeaderboard = functions.pubsub
 
 // Placeholder export
 exports.updateReferralLeaderboard = () => {
-  console.log('updateReferralLeaderboard temporarily disabled');
+  console.log("updateReferralLeaderboard temporarily disabled");
 };
 
 // Export the functions

@@ -4,8 +4,9 @@
 // Following UFC ML Pattern for Consistency
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class MLBMLPredictionService {
   private readonly modelConfigs = {
@@ -17,7 +18,7 @@ export class MLBMLPredictionService {
     playerPerformance: {
       features: 75,
       algorithm: 'gradient_boosting',
-      confidence_threshold: 0.70,
+      confidence_threshold: 0.7,
     },
     runLine: {
       features: 40,
@@ -31,7 +32,11 @@ export class MLBMLPredictionService {
     },
   };
 
-  async generateGamePrediction(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<GamePrediction> {
+  async generateGamePrediction(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<GamePrediction> {
     try {
       Sentry.addBreadcrumb({
         message: `Generating MLB game prediction: ${homeTeamId} vs ${awayTeamId}`,
@@ -41,7 +46,7 @@ export class MLBMLPredictionService {
 
       // Gather features for ML model
       const features = await this.extractGameFeatures(homeTeamId, awayTeamId, gameDate);
-      
+
       // Generate predictions using different models
       const predictions = {
         winnerPrediction: await this.predictGameWinner(features),
@@ -76,7 +81,11 @@ export class MLBMLPredictionService {
     }
   }
 
-  private async extractGameFeatures(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<MLFeatures> {
+  private async extractGameFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<MLFeatures> {
     try {
       // Get team analytics
       const homeTeamAnalytics = await this.getTeamAnalytics(homeTeamId);
@@ -104,41 +113,41 @@ export class MLBMLPredictionService {
         // Team offensive features
         homeOffensiveRating: homeTeamAnalytics?.offensiveAnalysis?.runsPerGame || 4.5,
         awayOffensiveRating: awayTeamAnalytics?.offensiveAnalysis?.runsPerGame || 4.5,
-        homeTeamBattingAverage: homeTeamAnalytics?.offensiveAnalysis?.teamBattingAverage || 0.250,
-        awayTeamBattingAverage: awayTeamAnalytics?.offensiveAnalysis?.teamBattingAverage || 0.250,
-        homeOnBasePercentage: homeTeamAnalytics?.offensiveAnalysis?.onBasePercentage || 0.320,
-        awayOnBasePercentage: awayTeamAnalytics?.offensiveAnalysis?.onBasePercentage || 0.320,
-        homeSluggingPercentage: homeTeamAnalytics?.offensiveAnalysis?.sluggingPercentage || 0.400,
-        awaySluggingPercentage: awayTeamAnalytics?.offensiveAnalysis?.sluggingPercentage || 0.400,
+        homeTeamBattingAverage: homeTeamAnalytics?.offensiveAnalysis?.teamBattingAverage || 0.25,
+        awayTeamBattingAverage: awayTeamAnalytics?.offensiveAnalysis?.teamBattingAverage || 0.25,
+        homeOnBasePercentage: homeTeamAnalytics?.offensiveAnalysis?.onBasePercentage || 0.32,
+        awayOnBasePercentage: awayTeamAnalytics?.offensiveAnalysis?.onBasePercentage || 0.32,
+        homeSluggingPercentage: homeTeamAnalytics?.offensiveAnalysis?.sluggingPercentage || 0.4,
+        awaySluggingPercentage: awayTeamAnalytics?.offensiveAnalysis?.sluggingPercentage || 0.4,
 
         // Team defensive/pitching features
-        homeTeamERA: homeTeamAnalytics?.pitchingStaffAnalysis?.starterERA || 4.50,
-        awayTeamERA: awayTeamAnalytics?.pitchingStaffAnalysis?.starterERA || 4.50,
-        homeBullpenERA: homeTeamAnalytics?.bullpenAnalysis?.bullpenERA || 4.00,
-        awayBullpenERA: awayTeamAnalytics?.bullpenAnalysis?.bullpenERA || 4.00,
+        homeTeamERA: homeTeamAnalytics?.pitchingStaffAnalysis?.starterERA || 4.5,
+        awayTeamERA: awayTeamAnalytics?.pitchingStaffAnalysis?.starterERA || 4.5,
+        homeBullpenERA: homeTeamAnalytics?.bullpenAnalysis?.bullpenERA || 4.0,
+        awayBullpenERA: awayTeamAnalytics?.bullpenAnalysis?.bullpenERA || 4.0,
         homeFieldingPercentage: homeTeamAnalytics?.defensiveAnalysis?.fieldingPercentage || 0.985,
         awayFieldingPercentage: awayTeamAnalytics?.defensiveAnalysis?.fieldingPercentage || 0.985,
 
         // Starting pitcher features
-        homeStarterERA: startingPitchers?.home?.era || 4.50,
-        awayStarterERA: startingPitchers?.away?.era || 4.50,
-        homeStarterWHIP: startingPitchers?.home?.whip || 1.30,
-        awayStarterWHIP: startingPitchers?.away?.whip || 1.30,
+        homeStarterERA: startingPitchers?.home?.era || 4.5,
+        awayStarterERA: startingPitchers?.away?.era || 4.5,
+        homeStarterWHIP: startingPitchers?.home?.whip || 1.3,
+        awayStarterWHIP: startingPitchers?.away?.whip || 1.3,
         homeStarterStrikeoutRate: startingPitchers?.home?.strikeoutRate || 8.5,
         awayStarterStrikeoutRate: startingPitchers?.away?.strikeoutRate || 8.5,
         homeStarterInningsPitched: startingPitchers?.home?.averageInnings || 6.0,
         awayStarterInningsPitched: startingPitchers?.away?.averageInnings || 6.0,
 
         // Historical matchup features
-        historicalHomeWinPercentage: historicalMatchups?.homeWinPercentage || 0.50,
+        historicalHomeWinPercentage: historicalMatchups?.homeWinPercentage || 0.5,
         historicalRunsHomeAverage: historicalMatchups?.homeRunsAverage || 4.5,
         historicalRunsAwayAverage: historicalMatchups?.awayRunsAverage || 4.5,
         historicalTotalAverage: historicalMatchups?.totalRunsAverage || 9.0,
         gamesPlayedAgainstEachOther: historicalMatchups?.gamesPlayed || 0,
 
         // Recent form features (last 10 games)
-        homeRecentWinPercentage: recentForm?.home?.winPercentage || 0.50,
-        awayRecentWinPercentage: recentForm?.away?.winPercentage || 0.50,
+        homeRecentWinPercentage: recentForm?.home?.winPercentage || 0.5,
+        awayRecentWinPercentage: recentForm?.away?.winPercentage || 0.5,
         homeRecentRunsPerGame: recentForm?.home?.runsPerGame || 4.5,
         awayRecentRunsPerGame: recentForm?.away?.runsPerGame || 4.5,
         homeRecentRunsAllowed: recentForm?.home?.runsAllowed || 4.5,
@@ -193,14 +202,14 @@ export class MLBMLPredictionService {
       // Simulate ML model prediction - in production, this would call actual ML model
       const homeTeamStrength = this.calculateTeamStrength(features, 'home');
       const awayTeamStrength = this.calculateTeamStrength(features, 'away');
-      
+
       // Apply home field advantage
       const adjustedHomeStrength = homeTeamStrength * 1.03; // 3% home field boost
-      
+
       // Calculate win probability using logistic function
       const strengthDifference = adjustedHomeStrength - awayTeamStrength;
       const homeWinProbability = 1 / (1 + Math.exp(-strengthDifference * 2));
-      
+
       return {
         homeWinProbability,
         awayWinProbability: 1 - homeWinProbability,
@@ -220,14 +229,14 @@ export class MLBMLPredictionService {
       const homeExpectedRuns = this.calculateExpectedRuns(features, 'home');
       const awayExpectedRuns = this.calculateExpectedRuns(features, 'away');
       const expectedDifferential = homeExpectedRuns - awayExpectedRuns;
-      
+
       // Common run lines in MLB
       const runLines = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
       const runLinePredictions = runLines.map(line => ({
         line,
         homeCoverProbability: this.calculateCoverProbability(expectedDifferential, line),
       }));
-      
+
       return {
         expectedRunDifferential: expectedDifferential,
         homeExpectedRuns,
@@ -249,18 +258,21 @@ export class MLBMLPredictionService {
       const homeExpectedRuns = this.calculateExpectedRuns(features, 'home');
       const awayExpectedRuns = this.calculateExpectedRuns(features, 'away');
       const expectedTotal = homeExpectedRuns + awayExpectedRuns;
-      
+
       // Apply environmental adjustments
       const weatherAdjustedTotal = this.applyWeatherAdjustments(expectedTotal, features);
-      const ballparkAdjustedTotal = this.applyBallparkAdjustments(weatherAdjustedTotal, features.homeTeam);
-      
+      const ballparkAdjustedTotal = this.applyBallparkAdjustments(
+        weatherAdjustedTotal,
+        features.homeTeam
+      );
+
       // Common totals in MLB
       const totals = [7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0];
       const totalPredictions = totals.map(total => ({
         total,
         overProbability: this.calculateOverProbability(ballparkAdjustedTotal, total),
       }));
-      
+
       return {
         expectedTotal: ballparkAdjustedTotal,
         homeExpectedRuns,
@@ -283,16 +295,16 @@ export class MLBMLPredictionService {
       // Get key players for both teams
       const homeKeyPlayers = await this.getKeyPlayers(features.homeTeam);
       const awayKeyPlayers = await this.getKeyPlayers(features.awayTeam);
-      
+
       const playerPredictions: PlayerPrediction[] = [];
-      
+
       // Predict performance for key players
       for (const player of [...homeKeyPlayers, ...awayKeyPlayers]) {
         const playerFeatures = await this.extractPlayerFeatures(player.id, features);
         const prediction = await this.predictIndividualPlayerPerformance(player, playerFeatures);
         playerPredictions.push(prediction);
       }
-      
+
       return playerPredictions;
     } catch (error) {
       Sentry.captureException(error);
@@ -300,10 +312,13 @@ export class MLBMLPredictionService {
     }
   }
 
-  private async predictIndividualPlayerPerformance(player: any, features: any): Promise<PlayerPrediction> {
+  private async predictIndividualPlayerPerformance(
+    player: any,
+    features: any
+  ): Promise<PlayerPrediction> {
     try {
       let prediction: PlayerPrediction;
-      
+
       if (player.position === 'P') {
         // Pitcher prediction
         prediction = {
@@ -343,7 +358,7 @@ export class MLBMLPredictionService {
           projectedFantasyPoints: this.calculateFantasyPoints(prediction.predictions, 'batter'),
         };
       }
-      
+
       return prediction;
     } catch (error) {
       Sentry.captureException(error);
@@ -354,94 +369,100 @@ export class MLBMLPredictionService {
   // Utility methods
   private calculateTeamStrength(features: MLFeatures, team: 'home' | 'away'): number {
     const prefix = team === 'home' ? 'home' : 'away';
-    
+
     // Weighted combination of team metrics
     const offenseWeight = 0.4;
     const pitchingWeight = 0.4;
     const defenseWeight = 0.2;
-    
+
     const offenseStrength = (features[`${prefix}OffensiveRating`] - 4.5) / 2.0; // Normalize around league average
-    const pitchingStrength = (4.50 - features[`${prefix}TeamERA`]) / 1.0; // Lower ERA = better
+    const pitchingStrength = (4.5 - features[`${prefix}TeamERA`]) / 1.0; // Lower ERA = better
     const defenseStrength = (features[`${prefix}FieldingPercentage`] - 0.985) * 100; // Above average fielding
-    
-    return (offenseStrength * offenseWeight) + 
-           (pitchingStrength * pitchingWeight) + 
-           (defenseStrength * defenseWeight);
+
+    return (
+      offenseStrength * offenseWeight +
+      pitchingStrength * pitchingWeight +
+      defenseStrength * defenseWeight
+    );
   }
 
   private calculateExpectedRuns(features: MLFeatures, team: 'home' | 'away'): number {
     const prefix = team === 'home' ? 'home' : 'away';
     const oppositePrefix = team === 'home' ? 'away' : 'home';
-    
+
     // Base expected runs from team offensive rating
     let expectedRuns = features[`${prefix}OffensiveRating`];
-    
+
     // Adjust for opposing pitcher
     const opposingERA = features[`${oppositePrefix}StarterERA`];
-    const leagueAverageERA = 4.50;
+    const leagueAverageERA = 4.5;
     const pitcherAdjustment = (leagueAverageERA - opposingERA) * 0.2;
     expectedRuns += pitcherAdjustment;
-    
+
     // Apply weather adjustments
-    if (features.windSpeed > 10 && features.windDirection > 0.5) { // Tailwind
+    if (features.windSpeed > 10 && features.windDirection > 0.5) {
+      // Tailwind
       expectedRuns *= 1.05;
-    } else if (features.windSpeed > 10) { // Headwind
+    } else if (features.windSpeed > 10) {
+      // Headwind
       expectedRuns *= 0.95;
     }
-    
+
     // Apply temperature adjustments
     if (features.temperature > 80) {
       expectedRuns *= 1.02; // Ball travels further in hot weather
     }
-    
+
     return Math.max(1.0, expectedRuns); // Minimum 1 run expected
   }
 
   private applyWeatherAdjustments(total: number, features: MLFeatures): number {
     let adjustedTotal = total;
-    
+
     // Wind adjustments
     if (features.windSpeed > 15) {
-      if (features.windDirection > 0.5) { // Tailwind
+      if (features.windDirection > 0.5) {
+        // Tailwind
         adjustedTotal *= 1.08;
-      } else { // Headwind
+      } else {
+        // Headwind
         adjustedTotal *= 0.92;
       }
     }
-    
+
     // Temperature adjustments
     if (features.temperature > 85) {
       adjustedTotal *= 1.03;
     } else if (features.temperature < 50) {
       adjustedTotal *= 0.97;
     }
-    
+
     // Humidity adjustments
     if (features.humidity > 80) {
       adjustedTotal *= 0.98; // Heavy air
     }
-    
+
     // Precipitation adjustments
     if (features.precipitation > 0) {
       adjustedTotal *= 0.95; // Rain generally reduces scoring
     }
-    
+
     return adjustedTotal;
   }
 
   private applyBallparkAdjustments(total: number, homeTeam: string): number {
     // Ballpark factors - these would come from a database in production
     const ballparkFactors: { [key: string]: number } = {
-      'COL': 1.15, // Coors Field - high altitude
-      'BOS': 1.08, // Fenway - Green Monster
-      'TEX': 1.06, // Globe Life - hot weather
-      'NYY': 1.04, // Yankee Stadium - short porch
-      'SD': 0.92,  // Petco - marine layer
-      'OAK': 0.94, // Oakland Coliseum - foul territory
-      'SEA': 0.96, // T-Mobile Park - marine air
-      'SF': 0.93,  // Oracle Park - marine layer and wind
+      COL: 1.15, // Coors Field - high altitude
+      BOS: 1.08, // Fenway - Green Monster
+      TEX: 1.06, // Globe Life - hot weather
+      NYY: 1.04, // Yankee Stadium - short porch
+      SD: 0.92, // Petco - marine layer
+      OAK: 0.94, // Oakland Coliseum - foul territory
+      SEA: 0.96, // T-Mobile Park - marine air
+      SF: 0.93, // Oracle Park - marine layer and wind
     };
-    
+
     const factor = ballparkFactors[homeTeam] || 1.0;
     return total * factor;
   }
@@ -450,7 +471,7 @@ export class MLBMLPredictionService {
     // Use normal distribution to calculate over probability
     const standardDeviation = 1.5; // Historical standard deviation of total runs
     const zScore = (line - expectedTotal) / standardDeviation;
-    
+
     // Approximate normal CDF
     return 1 - this.normalCDF(zScore);
   }
@@ -459,7 +480,7 @@ export class MLBMLPredictionService {
     // Calculate probability that home team covers the spread
     const standardDeviation = 2.0; // Historical standard deviation of run differential
     const zScore = (line - expectedDiff) / standardDeviation;
-    
+
     return 1 - this.normalCDF(zScore);
   }
 
@@ -470,18 +491,18 @@ export class MLBMLPredictionService {
 
   private erf(x: number): number {
     // Approximation of error function
-    const a1 =  0.254829592;
+    const a1 = 0.254829592;
     const a2 = -0.284496736;
-    const a3 =  1.421413741;
+    const a3 = 1.421413741;
     const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
     const sign = x >= 0 ? 1 : -1;
     x = Math.abs(x);
 
     const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
     return sign * y;
   }
@@ -497,12 +518,16 @@ export class MLBMLPredictionService {
     }
   }
 
-  private async getStartingPitchers(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<any> {
+  private async getStartingPitchers(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<any> {
     try {
       // FLAG: Implement starting pitcher retrieval from probable pitchers or rotation
       return {
-        home: { era: 4.50, whip: 1.30, strikeoutRate: 8.5, averageInnings: 6.0 },
-        away: { era: 4.50, whip: 1.30, strikeoutRate: 8.5, averageInnings: 6.0 },
+        home: { era: 4.5, whip: 1.3, strikeoutRate: 8.5, averageInnings: 6.0 },
+        away: { era: 4.5, whip: 1.3, strikeoutRate: 8.5, averageInnings: 6.0 },
       };
     } catch (error) {
       Sentry.captureException(error);
@@ -514,7 +539,7 @@ export class MLBMLPredictionService {
     try {
       // FLAG: Implement historical matchup data retrieval
       return {
-        homeWinPercentage: 0.50,
+        homeWinPercentage: 0.5,
         homeRunsAverage: 4.5,
         awayRunsAverage: 4.5,
         totalRunsAverage: 9.0,
@@ -530,8 +555,8 @@ export class MLBMLPredictionService {
     try {
       // FLAG: Implement recent form calculation (last 10 games)
       return {
-        home: { winPercentage: 0.60, runsPerGame: 5.2, runsAllowed: 4.1 },
-        away: { winPercentage: 0.40, runsPerGame: 4.8, runsAllowed: 5.3 },
+        home: { winPercentage: 0.6, runsPerGame: 5.2, runsAllowed: 4.1 },
+        away: { winPercentage: 0.4, runsPerGame: 4.8, runsAllowed: 5.3 },
       };
     } catch (error) {
       Sentry.captureException(error);
@@ -556,7 +581,11 @@ export class MLBMLPredictionService {
     }
   }
 
-  private async getBettingMarketData(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<any> {
+  private async getBettingMarketData(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<any> {
     try {
       // FLAG: Implement betting market data retrieval
       return {
@@ -602,12 +631,12 @@ export class MLBMLPredictionService {
   // Helper methods for encoding and calculations
   private encodeWindDirection(direction: string): number {
     const directions: { [key: string]: number } = {
-      'out': 1.0,      // Blowing out to outfield
-      'in': 0.0,       // Blowing in from outfield
-      'cross': 0.5,    // Blowing across field
-      'calm': 0.25,    // Little to no wind
+      out: 1.0, // Blowing out to outfield
+      in: 0.0, // Blowing in from outfield
+      cross: 0.5, // Blowing across field
+      calm: 0.25, // Little to no wind
     };
-    
+
     return directions[direction] || 0.25;
   }
 
@@ -619,15 +648,19 @@ export class MLBMLPredictionService {
   }
 
   private calculatePythagoreanWinPct(teamAnalytics: any): number {
-    if (!teamAnalytics) return 0.50;
-    
+    if (!teamAnalytics) return 0.5;
+
     const runsScored = teamAnalytics.offensiveAnalysis?.runsPerGame || 4.5;
     const runsAllowed = teamAnalytics.defensiveAnalysis?.runsAllowed || 4.5;
-    
-    return (runsScored ** 2) / ((runsScored ** 2) + (runsAllowed ** 2));
+
+    return runsScored ** 2 / (runsScored ** 2 + runsAllowed ** 2);
   }
 
-  private async calculateRestDays(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<number> {
+  private async calculateRestDays(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<number> {
     // FLAG: Implement rest days calculation
     return 1; // Average rest days
   }
@@ -636,10 +669,10 @@ export class MLBMLPredictionService {
   private getWinnerFeatureImportance(): any {
     return {
       teamStrength: 0.25,
-      startingPitching: 0.20,
+      startingPitching: 0.2,
       recentForm: 0.15,
-      homeFieldAdvantage: 0.10,
-      bullpenQuality: 0.10,
+      homeFieldAdvantage: 0.1,
+      bullpenQuality: 0.1,
       historicalMatchups: 0.08,
       weather: 0.07,
       injuries: 0.05,
@@ -648,12 +681,12 @@ export class MLBMLPredictionService {
 
   private getRunLineFeatureImportance(): any {
     return {
-      offensivePower: 0.30,
+      offensivePower: 0.3,
       pitchingMatchup: 0.25,
       bullpenDepth: 0.15,
-      ballparkFactor: 0.10,
-      weather: 0.10,
-      recentScoring: 0.10,
+      ballparkFactor: 0.1,
+      weather: 0.1,
+      recentScoring: 0.1,
     };
   }
 
@@ -661,9 +694,9 @@ export class MLBMLPredictionService {
     return {
       teamOffense: 0.25,
       pitchingStaff: 0.25,
-      weather: 0.20,
+      weather: 0.2,
       ballparkFactor: 0.15,
-      pace: 0.10,
+      pace: 0.1,
       historicalTotals: 0.05,
     };
   }
@@ -674,7 +707,7 @@ export class MLBMLPredictionService {
       const bestEdge = Math.abs(best.homeCoverProbability - 0.5);
       return edge > bestEdge ? current : best;
     });
-    
+
     return {
       line: bestBet.line,
       recommendation: bestBet.homeCoverProbability > 0.52 ? 'home' : 'away',
@@ -689,7 +722,7 @@ export class MLBMLPredictionService {
       const bestEdge = Math.abs(best.overProbability - 0.5);
       return edge > bestEdge ? current : best;
     });
-    
+
     return {
       total: bestBet.total,
       recommendation: bestBet.overProbability > 0.52 ? 'over' : 'under',
@@ -704,7 +737,7 @@ export class MLBMLPredictionService {
       predictions.runLinePrediction?.confidence || 0,
       predictions.totalPrediction?.confidence || 0,
     ];
-    
+
     return confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length;
   }
 
@@ -716,10 +749,10 @@ export class MLBMLPredictionService {
   private calculateTotalConfidence(expectedTotal: number): number {
     // Higher confidence when expected total is further from common betting totals
     const commonTotals = [8.5, 9.0, 9.5, 10.0];
-    const closestTotal = commonTotals.reduce((closest, total) => 
+    const closestTotal = commonTotals.reduce((closest, total) =>
       Math.abs(total - expectedTotal) < Math.abs(closest - expectedTotal) ? total : closest
     );
-    
+
     return Math.min(0.95, Math.abs(expectedTotal - closestTotal) * 2);
   }
 
@@ -794,45 +827,76 @@ export class MLBMLPredictionService {
       playerId: player.id,
       playerName: player.name,
       position: player.position,
-      predictions: player.position === 'P' ? {
-        inningsPitched: 6.0,
-        earnedRuns: 2,
-        strikeouts: 6,
-        walks: 2,
-        hits: 6,
-        pitchCount: 95,
-        winProbability: 0.5,
-        qualityStart: 0.6,
-      } : {
-        atBats: 4,
-        hits: 1,
-        homeRuns: 0.15,
-        rbis: 0.8,
-        runs: 0.6,
-        walks: 0.5,
-        strikeouts: 1.2,
-        stolenBases: 0.1,
-      },
+      predictions:
+        player.position === 'P'
+          ? {
+              inningsPitched: 6.0,
+              earnedRuns: 2,
+              strikeouts: 6,
+              walks: 2,
+              hits: 6,
+              pitchCount: 95,
+              winProbability: 0.5,
+              qualityStart: 0.6,
+            }
+          : {
+              atBats: 4,
+              hits: 1,
+              homeRuns: 0.15,
+              rbis: 0.8,
+              runs: 0.6,
+              walks: 0.5,
+              strikeouts: 1.2,
+              stolenBases: 0.1,
+            },
       confidence: 0.65,
       projectedFantasyPoints: 8.5,
     };
   }
 
   // Individual stat prediction methods (these would use specialized models)
-  private predictInningsPitched(features: any): number { return 6.0; }
-  private predictEarnedRuns(features: any): number { return 2; }
-  private predictStrikeouts(features: any): number { return 6; }
-  private predictWalks(features: any): number { return 2; }
-  private predictHitsAllowed(features: any): number { return 6; }
-  private predictPitchCount(features: any): number { return 95; }
-  private predictWinProbability(features: any): number { return 0.5; }
-  private predictQualityStart(features: any): number { return 0.6; }
-  private predictAtBats(features: any): number { return 4; }
-  private predictHits(features: any): number { return 1; }
-  private predictHomeRuns(features: any): number { return 0.15; }
-  private predictRBIs(features: any): number { return 0.8; }
-  private predictRuns(features: any): number { return 0.6; }
-  private predictStolenBases(features: any): number { return 0.1; }
+  private predictInningsPitched(features: any): number {
+    return 6.0;
+  }
+  private predictEarnedRuns(features: any): number {
+    return 2;
+  }
+  private predictStrikeouts(features: any): number {
+    return 6;
+  }
+  private predictWalks(features: any): number {
+    return 2;
+  }
+  private predictHitsAllowed(features: any): number {
+    return 6;
+  }
+  private predictPitchCount(features: any): number {
+    return 95;
+  }
+  private predictWinProbability(features: any): number {
+    return 0.5;
+  }
+  private predictQualityStart(features: any): number {
+    return 0.6;
+  }
+  private predictAtBats(features: any): number {
+    return 4;
+  }
+  private predictHits(features: any): number {
+    return 1;
+  }
+  private predictHomeRuns(features: any): number {
+    return 0.15;
+  }
+  private predictRBIs(features: any): number {
+    return 0.8;
+  }
+  private predictRuns(features: any): number {
+    return 0.6;
+  }
+  private predictStolenBases(features: any): number {
+    return 0.1;
+  }
 
   private calculatePlayerConfidence(features: any): number {
     return 0.65; // Default player prediction confidence
@@ -840,16 +904,20 @@ export class MLBMLPredictionService {
 
   private calculateFantasyPoints(predictions: any, playerType: 'pitcher' | 'batter'): number {
     if (playerType === 'pitcher') {
-      return (predictions.inningsPitched * 2) + 
-             (predictions.strikeouts * 1) - 
-             (predictions.earnedRuns * 1) +
-             (predictions.winProbability > 0.5 ? 4 : 0);
+      return (
+        predictions.inningsPitched * 2 +
+        predictions.strikeouts * 1 -
+        predictions.earnedRuns * 1 +
+        (predictions.winProbability > 0.5 ? 4 : 0)
+      );
     } else {
-      return (predictions.hits * 1) + 
-             (predictions.homeRuns * 4) + 
-             (predictions.rbis * 1) + 
-             (predictions.runs * 1) + 
-             (predictions.stolenBases * 2);
+      return (
+        predictions.hits * 1 +
+        predictions.homeRuns * 4 +
+        predictions.rbis * 1 +
+        predictions.runs * 1 +
+        predictions.stolenBases * 2
+      );
     }
   }
 
@@ -959,7 +1027,7 @@ interface RunLinePrediction {
   expectedRunDifferential: number;
   homeExpectedRuns: number;
   awayExpectedRuns: number;
-  runLinePredictions: Array<{ line: number; homeCoverProbability: number }>;
+  runLinePredictions: { line: number; homeCoverProbability: number }[];
   recommendedBet: any;
   confidence: number;
   modelFeatureImportance: any;
@@ -969,7 +1037,7 @@ interface TotalPrediction {
   expectedTotal: number;
   homeExpectedRuns: number;
   awayExpectedRuns: number;
-  totalPredictions: Array<{ total: number; overProbability: number }>;
+  totalPredictions: { total: number; overProbability: number }[];
   recommendedBet: any;
   confidence: number;
   weatherImpact: number;

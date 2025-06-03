@@ -4,6 +4,7 @@
 // =============================================================================
 
 import * as Sentry from '@sentry/react-native';
+
 import { BetSelection, Bet } from './betTrackingService';
 import { optimizedQuery } from './firebaseOptimizationService';
 
@@ -15,19 +16,19 @@ export interface ParlayLeg {
   id: string;
   gameId: string;
   selectionType: 'moneyline' | 'spread' | 'total' | 'prop';
-  
+
   // Game information
   homeTeam: string;
   awayTeam: string;
   gameDate: Date;
   league: string;
-  
+
   // Selection details
   selection: string;
   originalOdds: number;
   currentOdds: number;
   line?: number;
-  
+
   // Player prop specific
   player?: {
     id: string;
@@ -37,21 +38,21 @@ export interface ParlayLeg {
   };
   propType?: string;
   propTarget?: number;
-  
+
   // AI insights
   aiPrediction?: number;
   confidence: number;
   reasoning: string;
-  
+
   // Risk assessment
   injury_risk: number; // 0-1 scale
   variance: number; // Statistical variance
   correlation: number; // Correlation with other legs
-  
+
   // Status
   isValid: boolean;
   validationMessages: string[];
-  
+
   createdAt: Date;
 }
 
@@ -60,34 +61,34 @@ export interface ParlayCard {
   userId: string;
   name: string;
   legs: ParlayLeg[];
-  
+
   // Odds and payout
   totalOdds: number;
   impliedProbability: number;
   trueOdds: number; // Calculated without vig
   expectedValue: number;
-  
+
   // Risk metrics
   riskScore: number; // 0-100
   correlationRisk: number;
   varianceScore: number;
   kellyRecommendedStake: number;
-  
+
   // AI analysis
   aiRecommendation: 'strong_play' | 'good_play' | 'fair_play' | 'avoid';
   confidenceScore: number; // Overall confidence 0-100
   successProbability: number; // AI calculated probability
-  
+
   // Strategy insights
   hedgingOpportunities: HedgingOpportunity[];
   cashOutValue?: number;
-  
+
   // Metadata
   tags: string[];
   notes: string;
   isTemplate: boolean;
   shareCode?: string;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -169,7 +170,7 @@ export class ParlayBuilderService {
     try {
       // Load correlation data
       await this.loadCorrelationMatrix();
-      
+
       // Load parlay templates
       await this.loadParlayTemplates();
 
@@ -195,7 +196,7 @@ export class ParlayBuilderService {
    */
   createParlayCard(userId: string, name: string = 'New Parlay'): ParlayCard {
     const parlayId = `parlay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const parlay: ParlayCard = {
       id: parlayId,
       userId,
@@ -221,7 +222,7 @@ export class ParlayBuilderService {
     };
 
     this.activeParlays.set(parlayId, parlay);
-    
+
     Sentry.addBreadcrumb({
       message: 'Parlay card created',
       category: 'parlay.builder.create',
@@ -235,7 +236,10 @@ export class ParlayBuilderService {
   /**
    * Add leg to parlay
    */
-  async addLegToParlay(parlayId: string, legData: Omit<ParlayLeg, 'id' | 'createdAt' | 'isValid' | 'validationMessages'>): Promise<ParlayCard> {
+  async addLegToParlay(
+    parlayId: string,
+    legData: Omit<ParlayLeg, 'id' | 'createdAt' | 'isValid' | 'validationMessages'>
+  ): Promise<ParlayCard> {
     try {
       const parlay = this.activeParlays.get(parlayId);
       if (!parlay) {
@@ -269,10 +273,10 @@ export class ParlayBuilderService {
 
       // Add leg to parlay
       parlay.legs.push(leg);
-      
+
       // Recalculate parlay metrics
       await this.recalculateParlayMetrics(parlay);
-      
+
       this.activeParlays.set(parlayId, parlay);
 
       Sentry.addBreadcrumb({
@@ -288,7 +292,6 @@ export class ParlayBuilderService {
       });
 
       return parlay;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to add leg to parlay: ${error}`);
@@ -312,14 +315,13 @@ export class ParlayBuilderService {
 
       // Remove leg
       parlay.legs.splice(legIndex, 1);
-      
+
       // Recalculate metrics
       await this.recalculateParlayMetrics(parlay);
-      
+
       this.activeParlays.set(parlayId, parlay);
 
       return parlay;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to remove leg from parlay: ${error}`);
@@ -329,7 +331,11 @@ export class ParlayBuilderService {
   /**
    * Update leg in parlay
    */
-  async updateParlayLeg(parlayId: string, legId: string, updates: Partial<ParlayLeg>): Promise<ParlayCard> {
+  async updateParlayLeg(
+    parlayId: string,
+    legId: string,
+    updates: Partial<ParlayLeg>
+  ): Promise<ParlayCard> {
     try {
       const parlay = this.activeParlays.get(parlayId);
       if (!parlay) {
@@ -343,14 +349,13 @@ export class ParlayBuilderService {
 
       // Update leg
       parlay.legs[legIndex] = { ...parlay.legs[legIndex], ...updates };
-      
+
       // Recalculate metrics
       await this.recalculateParlayMetrics(parlay);
-      
+
       this.activeParlays.set(parlayId, parlay);
 
       return parlay;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to update parlay leg: ${error}`);
@@ -364,7 +369,10 @@ export class ParlayBuilderService {
   /**
    * Optimize parlay for better value
    */
-  async optimizeParlay(parlayId: string, optimizationType: 'value' | 'safety' | 'balanced' = 'balanced'): Promise<ParlayOptimization> {
+  async optimizeParlay(
+    parlayId: string,
+    optimizationType: 'value' | 'safety' | 'balanced' = 'balanced'
+  ): Promise<ParlayOptimization> {
     try {
       const originalParlay = this.activeParlays.get(parlayId);
       if (!originalParlay) {
@@ -374,12 +382,19 @@ export class ParlayBuilderService {
       // Create optimized version
       const optimizedParlay = JSON.parse(JSON.stringify(originalParlay)) as ParlayCard;
       optimizedParlay.id = `${parlayId}_optimized`;
-      
+
       // Apply optimization strategies
-      const improvements = await this.applyOptimizationStrategies(optimizedParlay, optimizationType);
-      
+      const improvements = await this.applyOptimizationStrategies(
+        optimizedParlay,
+        optimizationType
+      );
+
       // Generate suggestions
-      const suggestions = this.generateOptimizationSuggestions(originalParlay, optimizedParlay, optimizationType);
+      const suggestions = this.generateOptimizationSuggestions(
+        originalParlay,
+        optimizedParlay,
+        optimizationType
+      );
 
       return {
         originalParlay,
@@ -387,7 +402,6 @@ export class ParlayBuilderService {
         improvements,
         suggestions,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to optimize parlay: ${error}`);
@@ -406,15 +420,18 @@ export class ParlayBuilderService {
 
       // Get available games for today
       const availableGames = await this.getAvailableGames();
-      
+
       // Filter games that don't conflict with existing legs
       const compatibleGames = this.filterCompatibleGames(availableGames, parlay.legs);
-      
-      // Generate suggestions based on AI analysis
-      const suggestions = await this.generateSmartSuggestions(compatibleGames, parlay, maxSuggestions);
-      
-      return suggestions;
 
+      // Generate suggestions based on AI analysis
+      const suggestions = await this.generateSmartSuggestions(
+        compatibleGames,
+        parlay,
+        maxSuggestions
+      );
+
+      return suggestions;
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get smart suggestions: ${error}`);
@@ -432,19 +449,21 @@ export class ParlayBuilderService {
       }
 
       // Create base parlay
-      const parlay = this.createParlayCard(userId, `${template.name} - ${new Date().toLocaleDateString()}`);
+      const parlay = this.createParlayCard(
+        userId,
+        `${template.name} - ${new Date().toLocaleDateString()}`
+      );
       parlay.tags = [template.category, 'template'];
-      
+
       // Apply template criteria to find suitable legs
       const suitableLegs = await this.findLegsForTemplate(template);
-      
+
       // Add legs to parlay
       for (const legData of suitableLegs) {
         await this.addLegToParlay(parlay.id, legData);
       }
 
       return parlay;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to build parlay from template: ${error}`);
@@ -497,16 +516,16 @@ export class ParlayBuilderService {
 
       // Risk assessment
       validation.riskAssessment = this.assessParlayRisk(parlay);
-      
+
       // Generate warnings
       if (parlay.riskScore > 80) {
         validation.warnings.push('This parlay has very high risk');
       }
-      
+
       if (parlay.correlationRisk > 0.7) {
         validation.warnings.push('High correlation between legs reduces true odds');
       }
-      
+
       if (parlay.expectedValue < -0.1) {
         validation.warnings.push('Negative expected value - consider optimization');
       }
@@ -515,13 +534,12 @@ export class ParlayBuilderService {
       if (parlay.legs.length < 4 && parlay.riskScore < 50) {
         validation.suggestions.push('Consider adding more legs for higher payout');
       }
-      
+
       if (parlay.varianceScore > 75) {
         validation.suggestions.push('High variance - consider more consistent selections');
       }
 
       return validation;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to validate parlay: ${error}`);
@@ -531,7 +549,10 @@ export class ParlayBuilderService {
   /**
    * Calculate hedging opportunities
    */
-  async calculateHedgingOpportunities(parlayId: string, currentStake: number): Promise<HedgingOpportunity[]> {
+  async calculateHedgingOpportunities(
+    parlayId: string,
+    currentStake: number
+  ): Promise<HedgingOpportunity[]> {
     try {
       const parlay = this.activeParlays.get(parlayId);
       if (!parlay) {
@@ -539,26 +560,26 @@ export class ParlayBuilderService {
       }
 
       const opportunities: HedgingOpportunity[] = [];
-      
+
       // Calculate hedging for each leg if others win
       for (let i = 0; i < parlay.legs.length; i++) {
         const leg = parlay.legs[i];
-        
+
         // Calculate potential payout if all other legs win
         const otherLegsOdds = parlay.legs
           .filter((_, index) => index !== i)
           .reduce((odds, l) => odds * l.currentOdds, 1);
-        
+
         const potentialPayout = currentStake * otherLegsOdds;
-        
+
         // Find opposite selection odds (simplified - in production would query real odds)
         const oppositeOdds = this.getOppositeSelectionOdds(leg);
-        
+
         if (oppositeOdds) {
           // Calculate hedge stake for guaranteed profit
           const hedgeStake = potentialPayout / (oppositeOdds + 1);
-          const guaranteedProfit = (hedgeStake * oppositeOdds) - currentStake - hedgeStake;
-          
+          const guaranteedProfit = hedgeStake * oppositeOdds - currentStake - hedgeStake;
+
           if (guaranteedProfit > 0) {
             opportunities.push({
               legIndex: i,
@@ -566,14 +587,14 @@ export class ParlayBuilderService {
               hedgeOdds: oppositeOdds,
               hedgeStake,
               guaranteedProfit,
-              recommendation: guaranteedProfit > currentStake * 0.1 ? 'hedge_now' : 'hedge_if_ahead',
+              recommendation:
+                guaranteedProfit > currentStake * 0.1 ? 'hedge_now' : 'hedge_if_ahead',
             });
           }
         }
       }
 
       return opportunities;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -590,35 +611,36 @@ export class ParlayBuilderService {
   private async recalculateParlayMetrics(parlay: ParlayCard): Promise<void> {
     // Calculate total odds
     parlay.totalOdds = parlay.legs.reduce((odds, leg) => odds * leg.currentOdds, 1);
-    
+
     // Calculate implied probability
-    parlay.impliedProbability = parlay.legs.reduce((prob, leg) => {
-      const legProb = 1 / leg.currentOdds;
-      return prob * legProb;
-    }, 1) * 100;
-    
+    parlay.impliedProbability =
+      parlay.legs.reduce((prob, leg) => {
+        const legProb = 1 / leg.currentOdds;
+        return prob * legProb;
+      }, 1) * 100;
+
     // Calculate true odds (removing vig)
     parlay.trueOdds = this.calculateTrueOdds(parlay.legs);
-    
+
     // Calculate expected value
     parlay.expectedValue = await this.calculateExpectedValue(parlay);
-    
+
     // Calculate risk metrics
     parlay.riskScore = this.calculateRiskScore(parlay);
     parlay.correlationRisk = this.calculateCorrelationRisk(parlay.legs);
     parlay.varianceScore = this.calculateVarianceScore(parlay.legs);
-    
+
     // Calculate AI metrics
     parlay.confidenceScore = this.calculateOverallConfidence(parlay.legs);
     parlay.successProbability = this.calculateSuccessProbability(parlay.legs);
     parlay.aiRecommendation = this.getAIRecommendation(parlay);
-    
+
     // Calculate Kelly stake
     parlay.kellyRecommendedStake = this.calculateKellyStake(parlay);
-    
+
     // Find hedging opportunities
     parlay.hedgingOpportunities = await this.calculateHedgingOpportunities(parlay.id, 100); // $100 example stake
-    
+
     parlay.updatedAt = new Date();
   }
 
@@ -669,13 +691,17 @@ export class ParlayBuilderService {
   /**
    * Generate AI insights for leg
    */
-  private async generateAIInsights(leg: ParlayLeg): Promise<{ prediction: number; confidence: number; reasoning: string }> {
+  private async generateAIInsights(
+    leg: ParlayLeg
+  ): Promise<{ prediction: number; confidence: number; reasoning: string }> {
     // In production, this would call AI prediction models
     // For now, generate realistic mock insights
-    
+
     const confidence = 60 + Math.random() * 30; // 60-90% confidence
-    const prediction = leg.propTarget ? leg.propTarget * (0.9 + Math.random() * 0.2) : Math.random();
-    
+    const prediction = leg.propTarget
+      ? leg.propTarget * (0.9 + Math.random() * 0.2)
+      : Math.random();
+
     let reasoning = '';
     if (leg.selectionType === 'prop') {
       reasoning = `${leg.player?.name} averages ${prediction?.toFixed(1)} ${leg.propType} per game. `;
@@ -694,15 +720,17 @@ export class ParlayBuilderService {
    */
   private calculateLegCorrelations(existingLegs: ParlayLeg[], newLeg: ParlayLeg): number {
     if (existingLegs.length === 0) return 0;
-    
+
     let maxCorrelation = 0;
-    
+
     existingLegs.forEach(leg => {
       const correlationKey = `${leg.gameId}_${newLeg.gameId}`;
-      const correlation = this.correlationMatrix[correlationKey]?.[`${leg.selectionType}_${newLeg.selectionType}`] || 0;
+      const correlation =
+        this.correlationMatrix[correlationKey]?.[`${leg.selectionType}_${newLeg.selectionType}`] ||
+        0;
       maxCorrelation = Math.max(maxCorrelation, Math.abs(correlation));
     });
-    
+
     return maxCorrelation;
   }
 
@@ -720,15 +748,15 @@ export class ParlayBuilderService {
    */
   private async calculateExpectedValue(parlay: ParlayCard): Promise<number> {
     if (parlay.legs.length === 0) return 0;
-    
+
     // Calculate true probability based on AI predictions
     const trueProb = parlay.legs.reduce((prob, leg) => {
       const legProb = leg.confidence / 100;
       return prob * legProb;
     }, 1);
-    
+
     // EV = (True Probability × Payout) - 1
-    return (trueProb * parlay.totalOdds) - 1;
+    return trueProb * parlay.totalOdds - 1;
   }
 
   /**
@@ -736,17 +764,17 @@ export class ParlayBuilderService {
    */
   private calculateRiskScore(parlay: ParlayCard): number {
     let riskScore = 0;
-    
+
     // Base risk from number of legs
     riskScore += Math.min(parlay.legs.length * 10, 50);
-    
+
     // Risk from odds
     const avgOdds = parlay.legs.reduce((sum, leg) => sum + leg.currentOdds, 0) / parlay.legs.length;
     riskScore += Math.min((avgOdds - 1) * 10, 30);
-    
+
     // Risk from correlations
     riskScore += parlay.correlationRisk * 20;
-    
+
     return Math.min(riskScore, 100);
   }
 
@@ -755,10 +783,10 @@ export class ParlayBuilderService {
    */
   private calculateCorrelationRisk(legs: ParlayLeg[]): number {
     if (legs.length < 2) return 0;
-    
+
     let totalCorrelation = 0;
     let pairs = 0;
-    
+
     for (let i = 0; i < legs.length; i++) {
       for (let j = i + 1; j < legs.length; j++) {
         const correlation = this.getCorrelation(legs[i], legs[j]);
@@ -766,7 +794,7 @@ export class ParlayBuilderService {
         pairs++;
       }
     }
-    
+
     return pairs > 0 ? totalCorrelation / pairs : 0;
   }
 
@@ -778,17 +806,17 @@ export class ParlayBuilderService {
     if (leg1.gameId === leg2.gameId) {
       return 0.6; // High correlation for same game
     }
-    
+
     // Same player correlations
     if (leg1.player?.id === leg2.player?.id) {
       return 0.8; // Very high correlation for same player
     }
-    
+
     // Team correlations (simplified)
     if (leg1.homeTeam === leg2.homeTeam || leg1.awayTeam === leg2.awayTeam) {
       return 0.3; // Medium correlation for same team
     }
-    
+
     return 0.1; // Low baseline correlation
   }
 
@@ -797,10 +825,10 @@ export class ParlayBuilderService {
    */
   private calculateVarianceScore(legs: ParlayLeg[]): number {
     if (legs.length === 0) return 0;
-    
+
     const variances = legs.map(leg => leg.variance || Math.random() * 0.5);
     const avgVariance = variances.reduce((sum, v) => sum + v, 0) / variances.length;
-    
+
     return avgVariance * 100;
   }
 
@@ -809,7 +837,7 @@ export class ParlayBuilderService {
    */
   private calculateOverallConfidence(legs: ParlayLeg[]): number {
     if (legs.length === 0) return 0;
-    
+
     // Use geometric mean for combined confidence
     const product = legs.reduce((prod, leg) => prod * (leg.confidence / 100), 1);
     return Math.pow(product, 1 / legs.length) * 100;
@@ -820,7 +848,7 @@ export class ParlayBuilderService {
    */
   private calculateSuccessProbability(legs: ParlayLeg[]): number {
     if (legs.length === 0) return 0;
-    
+
     return legs.reduce((prob, leg) => prob * (leg.confidence / 100), 1) * 100;
   }
 
@@ -844,18 +872,18 @@ export class ParlayBuilderService {
    */
   private calculateKellyStake(parlay: ParlayCard): number {
     if (parlay.expectedValue <= 0) return 0;
-    
+
     // Kelly criterion: f = (bp - q) / b
     const b = parlay.totalOdds - 1;
     const p = parlay.successProbability / 100;
     const q = 1 - p;
-    
+
     const kellyFraction = (b * p - q) / b;
-    
+
     // Convert to dollar amount (assuming $10,000 bankroll)
     const bankroll = 10000;
     const kellyStake = bankroll * Math.max(0, Math.min(0.25, kellyFraction)); // Cap at 25%
-    
+
     return Math.round(kellyStake);
   }
 
@@ -863,7 +891,7 @@ export class ParlayBuilderService {
    * Apply optimization strategies
    */
   private async applyOptimizationStrategies(
-    parlay: ParlayCard, 
+    parlay: ParlayCard,
     type: 'value' | 'safety' | 'balanced'
   ): Promise<ParlayOptimization['improvements']> {
     const originalMetrics = {
@@ -903,11 +931,11 @@ export class ParlayBuilderService {
   private async optimizeForValue(parlay: ParlayCard): Promise<void> {
     // Remove low-confidence legs
     parlay.legs = parlay.legs.filter(leg => leg.confidence > 60);
-    
+
     // Add high-value legs if available
     const suggestions = await this.getSmartSuggestions(parlay.id, 3);
     const highValueSuggestions = suggestions.filter(s => s.confidence > 75);
-    
+
     // Add up to 2 high-value legs
     for (let i = 0; i < Math.min(2, highValueSuggestions.length); i++) {
       parlay.legs.push(highValueSuggestions[i]);
@@ -920,15 +948,13 @@ export class ParlayBuilderService {
   private async optimizeForSafety(parlay: ParlayCard): Promise<void> {
     // Keep only high-confidence, low-correlation legs
     parlay.legs = parlay.legs.filter(leg => leg.confidence > 70 && leg.correlation < 0.4);
-    
+
     // Remove legs with high variance
     parlay.legs = parlay.legs.filter(leg => (leg.variance || 0) < 0.3);
-    
+
     // Limit to maximum 4 legs for safety
     if (parlay.legs.length > 4) {
-      parlay.legs = parlay.legs
-        .sort((a, b) => b.confidence - a.confidence)
-        .slice(0, 4);
+      parlay.legs = parlay.legs.sort((a, b) => b.confidence - a.confidence).slice(0, 4);
     }
   }
 
@@ -938,12 +964,12 @@ export class ParlayBuilderService {
   private async optimizeBalanced(parlay: ParlayCard): Promise<void> {
     // Remove legs with confidence < 55% or very high correlation
     parlay.legs = parlay.legs.filter(leg => leg.confidence > 55 && leg.correlation < 0.6);
-    
+
     // Add 1-2 medium confidence legs if parlay is too small
     if (parlay.legs.length < 3) {
       const suggestions = await this.getSmartSuggestions(parlay.id, 2);
       const balancedSuggestions = suggestions.filter(s => s.confidence > 65 && s.confidence < 80);
-      
+
       for (let i = 0; i < Math.min(2, balancedSuggestions.length); i++) {
         parlay.legs.push(balancedSuggestions[i]);
       }
@@ -990,12 +1016,18 @@ export class ParlayBuilderService {
     return games;
   }
 
-  private async generateSmartSuggestions(games: any[], parlay: ParlayCard, maxSuggestions: number): Promise<ParlayLeg[]> {
+  private async generateSmartSuggestions(
+    games: any[],
+    parlay: ParlayCard,
+    maxSuggestions: number
+  ): Promise<ParlayLeg[]> {
     // Generate mock suggestions
     return [];
   }
 
-  private async findLegsForTemplate(template: ParlayTemplate): Promise<Omit<ParlayLeg, 'id' | 'createdAt' | 'isValid' | 'validationMessages'>[]> {
+  private async findLegsForTemplate(
+    template: ParlayTemplate
+  ): Promise<Omit<ParlayLeg, 'id' | 'createdAt' | 'isValid' | 'validationMessages'>[]> {
     // Find suitable legs based on template criteria
     return [];
   }
@@ -1049,24 +1081,28 @@ export class ParlayBuilderService {
   }
 
   private generateOptimizationSuggestions(
-    original: ParlayCard, 
-    optimized: ParlayCard, 
+    original: ParlayCard,
+    optimized: ParlayCard,
     type: string
   ): string[] {
     const suggestions: string[] = [];
-    
+
     if (optimized.legs.length < original.legs.length) {
       suggestions.push(`Removed ${original.legs.length - optimized.legs.length} high-risk legs`);
     }
-    
+
     if (optimized.confidenceScore > original.confidenceScore) {
-      suggestions.push(`Improved overall confidence by ${(optimized.confidenceScore - original.confidenceScore).toFixed(1)}%`);
+      suggestions.push(
+        `Improved overall confidence by ${(optimized.confidenceScore - original.confidenceScore).toFixed(1)}%`
+      );
     }
-    
+
     if (optimized.expectedValue > original.expectedValue) {
-      suggestions.push(`Increased expected value by ${((optimized.expectedValue - original.expectedValue) * 100).toFixed(1)}%`);
+      suggestions.push(
+        `Increased expected value by ${((optimized.expectedValue - original.expectedValue) * 100).toFixed(1)}%`
+      );
     }
-    
+
     return suggestions;
   }
 
@@ -1094,7 +1130,11 @@ export class ParlayBuilderService {
   /**
    * Save parlay as template
    */
-  saveAsTemplate(parlayId: string, templateName: string, isPublic: boolean = false): ParlayTemplate {
+  saveAsTemplate(
+    parlayId: string,
+    templateName: string,
+    isPublic: boolean = false
+  ): ParlayTemplate {
     const parlay = this.activeParlays.get(parlayId);
     if (!parlay) {
       throw new Error(`Parlay not found: ${parlayId}`);

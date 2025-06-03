@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import AccessibleTouchableOpacity from '../../atomic/atoms/AccessibleTouchableOpacity';
+import React from 'react';
 import { Text } from 'react-native';
+
+import AccessibleTouchableOpacity from '../../atomic/atoms/AccessibleTouchableOpacity';
 import accessibilityService from '../../services/accessibilityService';
 
 // Mock the accessibilityService
@@ -106,7 +107,7 @@ describe('AccessibleTouchableOpacity', () => {
 
     // Update with focused state
     update(
-      <AccessibleTouchableOpacity isFocused={true}>
+      <AccessibleTouchableOpacity isFocused>
         <Text>Test Button</Text>
       </AccessibleTouchableOpacity>
     );
@@ -122,7 +123,7 @@ describe('AccessibleTouchableOpacity', () => {
     };
 
     const { getByText } = render(
-      <AccessibleTouchableOpacity isFocused={true} focusedStyle={customFocusStyle}>
+      <AccessibleTouchableOpacity isFocused focusedStyle={customFocusStyle}>
         <Text>Test Button</Text>
       </AccessibleTouchableOpacity>
     );
@@ -158,7 +159,7 @@ describe('AccessibleTouchableOpacity', () => {
     const onPressMock = jest.fn();
 
     const { getByText } = render(
-      <AccessibleTouchableOpacity onPress={onPressMock} disabled={true}>
+      <AccessibleTouchableOpacity onPress={onPressMock} disabled>
         <Text>Test Button</Text>
       </AccessibleTouchableOpacity>
     );

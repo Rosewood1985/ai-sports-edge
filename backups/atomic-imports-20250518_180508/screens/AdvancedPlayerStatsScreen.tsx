@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,29 +9,28 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { useColorScheme } from '../hooks/useColorScheme';
-import { StackScreenProps } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { auth } from '../config/firebase';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import AdvancedPlayerMetricsCard from '../components/AdvancedPlayerMetricsCard';
+import EmptyState from '../components/EmptyState';
+import EnhancedPlayerComparison from '../components/EnhancedPlayerComparison';
+import ErrorMessage from '../components/ErrorMessage';
 import PlayerComparisonView from '../components/PlayerComparisonView';
-import * as subscriptionService from '../services/subscriptionService';
+import UpgradePrompt from '../components/UpgradePrompt';
+import ViewLimitIndicator from '../components/ViewLimitIndicator';
+import { auth } from '../config/firebase';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { useThemeColor } from '../hooks/useThemeColor';
 import advancedPlayerStatsService from '../services/advancedPlayerStatsService';
 import {
   AdvancedPlayerMetrics,
   getGameAdvancedMetrics,
   getAdvancedPlayerMetrics,
-  comparePlayerMetrics
+  comparePlayerMetrics,
 } from '../services/playerStatsService';
-import AdvancedPlayerMetricsCard from '../components/AdvancedPlayerMetricsCard';
-import EnhancedPlayerComparison from '../components/EnhancedPlayerComparison';
-import EmptyState from '../components/EmptyState';
-import ErrorMessage from '../components/ErrorMessage';
-import UpgradePrompt from '../components/UpgradePrompt';
-import ViewLimitIndicator from '../components/ViewLimitIndicator';
+import * as subscriptionService from '../services/subscriptionService';
 
 // Import the RootStackParamList from the navigator file
 type RootStackParamList = {
@@ -47,7 +48,7 @@ type AdvancedPlayerStatsScreenProps = StackScreenProps<RootStackParamList, 'Adva
  */
 const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
   route,
-  navigation
+  navigation,
 }) => {
   const { gameId, gameTitle = 'Advanced Stats' } = route.params;
   const [players, setPlayers] = useState<AdvancedPlayerMetrics[]>([]);
@@ -67,23 +68,23 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [showViewWarning, setShowViewWarning] = useState(false);
   const [hasReachedViewLimit, setHasReachedViewLimit] = useState(false);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const colorScheme = useColorScheme() ?? 'light';
   const primaryColor = '#0a7ea4';
-  
+
   // Modal background and card colors
   const modalBackgroundColor = colorScheme === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.7)';
   const cardBackgroundColor = colorScheme === 'light' ? '#fff' : '#1c1c1e';
   const cardBorderColor = colorScheme === 'light' ? '#e1e1e1' : '#38383A';
-  
+
   // Check if user has access to advanced player metrics
   useEffect(() => {
     const checkAccess = async () => {
       setLoading(true);
       const user = auth?.currentUser;
-      
+
       if (!user) {
         setHasAccess(false);
         setHasComparisonAccess(false);
@@ -96,14 +97,20 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       setViewsRemaining(viewLimitCheck.viewsRemaining);
       setShowViewWarning(viewLimitCheck.showWarning);
       setHasReachedViewLimit(viewLimitCheck.hasReachedLimit);
-      
+
       // Check if user has access to features
-      const metricsAccess = await advancedPlayerStatsService.hasAdvancedPlayerMetricsAccess(user.uid, gameId);
-      const comparisonAccess = await advancedPlayerStatsService.hasPlayerComparisonAccess(user.uid, gameId);
-      
+      const metricsAccess = await advancedPlayerStatsService.hasAdvancedPlayerMetricsAccess(
+        user.uid,
+        gameId
+      );
+      const comparisonAccess = await advancedPlayerStatsService.hasPlayerComparisonAccess(
+        user.uid,
+        gameId
+      );
+
       setHasAccess(metricsAccess);
       setHasComparisonAccess(comparisonAccess);
-      
+
       if (metricsAccess) {
         // Load player data if user has access
         try {
@@ -119,40 +126,42 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
         try {
           // Increment view count
           const newViewCount = await advancedPlayerStatsService.incrementFreeViewCount(user.uid);
-          
+
           // Update remaining views
-          const remainingViews = Math.max(0, advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT - newViewCount);
+          const remainingViews = Math.max(
+            0,
+            advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT - newViewCount
+          );
           setViewsRemaining(remainingViews);
-          
+
           // Show warning if approaching limit
-          if (remainingViews <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && remainingViews > 0) {
+          if (
+            remainingViews <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD &&
+            remainingViews > 0
+          ) {
             setShowViewWarning(true);
           } else if (remainingViews <= 0) {
             setHasReachedViewLimit(true);
           }
-          
+
           // Load player data
           const playerData = await getGameAdvancedMetrics(gameId);
           setPlayers(playerData);
-          
+
           // Track feature usage
-          await advancedPlayerStatsService.trackFeatureUsage(
-            user.uid,
-            gameId,
-            'advanced_metrics'
-          );
+          await advancedPlayerStatsService.trackFeatureUsage(user.uid, gameId, 'advanced_metrics');
         } catch (error) {
           console.error('Error loading advanced player metrics:', error);
           Alert.alert('Error', 'Failed to load advanced player statistics');
         }
       }
-      
+
       setLoading(false);
     };
-    
+
     checkAccess();
   }, [gameId]);
-  
+
   // Show upgrade prompt when view limit is reached or warning is shown
   useEffect(() => {
     if (hasReachedViewLimit) {
@@ -163,11 +172,11 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       const timer = setTimeout(() => {
         setShowUpgradePrompt(true);
       }, 1500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [hasReachedViewLimit, showViewWarning, viewsRemaining]);
-  
+
   // Handle player selection
   const handlePlayerPress = (player: AdvancedPlayerMetrics) => {
     if (comparisonMode) {
@@ -191,30 +200,30 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       }
     }
   };
-  
+
   // Toggle comparison mode
   const toggleComparisonMode = () => {
     setComparisonMode(!comparisonMode);
     setSelectedPlayerIds([]);
     setExpandedPlayerId(null);
   };
-  
+
   // Start player comparison
   const startComparison = async () => {
     if (selectedPlayerIds.length !== 2) {
       Alert.alert('Error', 'Please select two players to compare');
       return;
     }
-    
+
     setComparisonLoading(true);
-    
+
     try {
       const comparison = await comparePlayerMetrics(
         gameId,
         selectedPlayerIds[0],
         selectedPlayerIds[1]
       );
-      
+
       if (comparison) {
         setComparisonData(comparison);
         setComparisonModalVisible(true);
@@ -228,65 +237,73 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       setComparisonLoading(false);
     }
   };
-  
+
   // Close the modal
   const closeModal = () => {
     setModalVisible(false);
   };
-  
+
   // Show upgrade modal
   const showUpgradeModal = () => {
     setUpgradeModalVisible(true);
   };
-  
+
   // Close upgrade modal
   const closeUpgradeModal = () => {
     setUpgradeModalVisible(false);
   };
-  
+
   // Close upgrade prompt
   const closeUpgradePrompt = () => {
     setShowUpgradePrompt(false);
   };
-  
+
   // Navigate to subscription screen
   const navigateToSubscription = () => {
     closeUpgradeModal();
     navigation.navigate('Subscription');
   };
-  
+
   // Purchase advanced metrics access
   const purchaseAdvancedMetrics = async () => {
     const user = auth?.currentUser;
-    
+
     if (!user) {
       Alert.alert('Error', 'You must be logged in to make a purchase.');
       return;
     }
-    
+
     try {
-      const success = await advancedPlayerStatsService.purchaseAdvancedPlayerMetrics(user.uid, gameId);
-      
+      const success = await advancedPlayerStatsService.purchaseAdvancedPlayerMetrics(
+        user.uid,
+        gameId
+      );
+
       if (success) {
         Alert.alert(
           'Purchase Successful',
           'You now have access to advanced player metrics for this game.',
-          [{ text: 'OK', onPress: async () => {
-            setHasAccess(true);
-            closeUpgradeModal();
-            
-            // Load player data
-            setLoading(true);
-            try {
-              const playerData = await getGameAdvancedMetrics(gameId);
-              setPlayers(playerData);
-            } catch (error) {
-              console.error('Error loading advanced player metrics:', error);
-              Alert.alert('Error', 'Failed to load advanced player statistics');
-            } finally {
-              setLoading(false);
-            }
-          }}]
+          [
+            {
+              text: 'OK',
+              onPress: async () => {
+                setHasAccess(true);
+                closeUpgradeModal();
+
+                // Load player data
+                setLoading(true);
+                try {
+                  const playerData = await getGameAdvancedMetrics(gameId);
+                  setPlayers(playerData);
+                } catch (error) {
+                  console.error('Error loading advanced player metrics:', error);
+                  Alert.alert('Error', 'Failed to load advanced player statistics');
+                } finally {
+                  setLoading(false);
+                }
+              },
+            },
+          ]
         );
       } else {
         Alert.alert('Error', 'Failed to process your purchase. Please try again.');
@@ -296,27 +313,32 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
     }
   };
-  
+
   // Purchase player comparison access
   const purchasePlayerComparison = async () => {
     const user = auth?.currentUser;
-    
+
     if (!user) {
       Alert.alert('Error', 'You must be logged in to make a purchase.');
       return;
     }
-    
+
     try {
       const success = await advancedPlayerStatsService.purchasePlayerComparison(user.uid, gameId);
-      
+
       if (success) {
         Alert.alert(
           'Purchase Successful',
           'You now have access to the player comparison tool for this game.',
-          [{ text: 'OK', onPress: () => {
-            setHasComparisonAccess(true);
-            closeUpgradeModal();
-          }}]
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setHasComparisonAccess(true);
+                closeUpgradeModal();
+              },
+            },
+          ]
         );
       } else {
         Alert.alert('Error', 'Failed to process your purchase. Please try again.');
@@ -326,7 +348,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
     }
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -342,7 +364,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       </SafeAreaView>
     );
   }
-  
+
   // Render locked state for users without access
   if (!hasAccess) {
     return (
@@ -351,68 +373,65 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           <ThemedText style={styles.title}>{gameTitle}</ThemedText>
           <ThemedText style={styles.subtitle}>Advanced Player Metrics</ThemedText>
         </View>
-        
+
         {/* Compact View Limit Indicator for locked state */}
-        {viewsRemaining !== null && viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && (
-          <ViewLimitIndicator
-            onUpgradePress={showUpgradeModal}
-            compact={true}
-          />
-        )}
-        
+        {viewsRemaining !== null &&
+          viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && (
+            <ViewLimitIndicator onUpgradePress={showUpgradeModal} compact />
+          )}
+
         <View style={styles.lockedContainer}>
-          <Ionicons 
-            name="analytics" 
-            size={64} 
-            color={colorScheme === 'light' ? '#999' : '#666'} 
+          <Ionicons
+            name="analytics"
+            size={64}
+            color={colorScheme === 'light' ? '#999' : '#666'}
             style={styles.lockIcon}
           />
           <ThemedText style={styles.lockedTitle}>Premium Feature</ThemedText>
           <ThemedText style={styles.lockedDescription}>
             Advanced player metrics are available to Premium subscribers or as a one-time purchase.
           </ThemedText>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.upgradeButton, { backgroundColor: primaryColor }]}
             onPress={showUpgradeModal}
           >
             <ThemedText style={styles.upgradeButtonText}>Unlock Advanced Metrics</ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         {/* Upgrade Modal */}
         <Modal
           animationType="fade"
-          transparent={true}
+          transparent
           visible={upgradeModalVisible}
           onRequestClose={closeUpgradeModal}
         >
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.modalOverlay, { backgroundColor: modalBackgroundColor }]}
             activeOpacity={1}
             onPress={closeUpgradeModal}
           >
-            <View 
+            <View
               style={[
-                styles.modalContent, 
-                { 
+                styles.modalContent,
+                {
                   backgroundColor: cardBackgroundColor,
-                  borderColor: cardBorderColor
-                }
+                  borderColor: cardBorderColor,
+                },
               ]}
             >
-              <ThemedText style={styles.modalTitle}>
-                Unlock Advanced Player Metrics
-              </ThemedText>
-              
+              <ThemedText style={styles.modalTitle}>Unlock Advanced Player Metrics</ThemedText>
+
               <ThemedText style={styles.modalDescription}>
                 Get deep insights into player performance with advanced analytics.
               </ThemedText>
-              
+
               <View style={styles.optionContainer}>
                 <ThemedText style={styles.optionTitle}>Option 1: Subscribe</ThemedText>
                 <ThemedText style={styles.optionDescription}>
-                  Get full access to all premium features including advanced player metrics for all games.
+                  Get full access to all premium features including advanced player metrics for all
+                  games.
                 </ThemedText>
                 <View style={styles.planRow}>
                   <ThemedText style={styles.planName}>Premium Monthly</ThemedText>
@@ -422,14 +441,14 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
                   <ThemedText style={styles.planName}>Premium Annual</ThemedText>
                   <ThemedText style={styles.planPrice}>$99.99/year</ThemedText>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.optionButton, { backgroundColor: primaryColor }]}
                   onPress={navigateToSubscription}
                 >
                   <ThemedText style={styles.optionButtonText}>View Plans</ThemedText>
                 </TouchableOpacity>
               </View>
-              
+
               <View style={[styles.optionContainer, styles.optionContainerAlt]}>
                 <ThemedText style={styles.optionTitle}>Option 2: One-Time Purchase</ThemedText>
                 <ThemedText style={styles.optionDescription}>
@@ -439,18 +458,15 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
                   <ThemedText style={styles.planName}>Single Game Access</ThemedText>
                   <ThemedText style={styles.planPrice}>$0.99</ThemedText>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.optionButton, { backgroundColor: '#34C759' }]}
                   onPress={purchaseAdvancedMetrics}
                 >
                   <ThemedText style={styles.optionButtonText}>Purchase</ThemedText>
                 </TouchableOpacity>
               </View>
-              
-              <TouchableOpacity 
-                style={styles.closeButton}
-                onPress={closeUpgradeModal}
-              >
+
+              <TouchableOpacity style={styles.closeButton} onPress={closeUpgradeModal}>
                 <ThemedText style={styles.closeButtonText}>Close</ThemedText>
               </TouchableOpacity>
             </View>
@@ -459,7 +475,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
       </SafeAreaView>
     );
   }
-  
+
   // Render player stats for users with access
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -467,38 +483,37 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
         <ThemedText style={styles.title}>{gameTitle}</ThemedText>
         <ThemedText style={styles.subtitle}>Advanced Player Metrics</ThemedText>
       </View>
-      
+
       {/* View Limit Indicator for free users */}
-      {!hasReachedViewLimit && viewsRemaining !== null && viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && (
-        <ViewLimitIndicator
-          onUpgradePress={() => setShowUpgradePrompt(true)}
-          compact={false}
-        />
-      )}
-      
+      {!hasReachedViewLimit &&
+        viewsRemaining !== null &&
+        viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD && (
+          <ViewLimitIndicator onUpgradePress={() => setShowUpgradePrompt(true)} compact={false} />
+        )}
+
       <View style={styles.actionsContainer}>
         {hasComparisonAccess ? (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
-              styles.comparisonButton, 
-              { 
+              styles.comparisonButton,
+              {
                 backgroundColor: comparisonMode ? primaryColor : 'transparent',
-                borderColor: primaryColor
-              }
+                borderColor: primaryColor,
+              },
             ]}
             onPress={toggleComparisonMode}
           >
-            <ThemedText 
+            <ThemedText
               style={[
-                styles.comparisonButtonText, 
-                { color: comparisonMode ? 'white' : primaryColor }
+                styles.comparisonButtonText,
+                { color: comparisonMode ? 'white' : primaryColor },
               ]}
             >
               {comparisonMode ? 'Cancel Comparison' : 'Compare Players'}
             </ThemedText>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.comparisonButton, { borderColor: primaryColor }]}
             onPress={() => {
               Alert.alert(
@@ -506,7 +521,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
                 'Would you like to unlock the player comparison tool for $0.99?',
                 [
                   { text: 'Cancel', style: 'cancel' },
-                  { text: 'Purchase', onPress: purchasePlayerComparison }
+                  { text: 'Purchase', onPress: purchasePlayerComparison },
                 ]
               );
             }}
@@ -516,9 +531,9 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
             </ThemedText>
           </TouchableOpacity>
         )}
-        
+
         {comparisonMode && selectedPlayerIds.length === 2 && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.compareNowButton, { backgroundColor: '#34C759' }]}
             onPress={startComparison}
             disabled={comparisonLoading}
@@ -526,24 +541,22 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
             {comparisonLoading ? (
               <ActivityIndicator size="small" color="white" />
             ) : (
-              <ThemedText style={styles.compareNowButtonText}>
-                Compare Now
-              </ThemedText>
+              <ThemedText style={styles.compareNowButtonText}>Compare Now</ThemedText>
             )}
           </TouchableOpacity>
         )}
       </View>
-      
+
       {comparisonMode && (
         <View style={styles.selectionInfo}>
           <ThemedText style={styles.selectionText}>
-            {selectedPlayerIds.length === 0 
-              ? 'Select two players to compare' 
-              : selectedPlayerIds.length === 1 
-                ? 'Select one more player' 
+            {selectedPlayerIds.length === 0
+              ? 'Select two players to compare'
+              : selectedPlayerIds.length === 1
+                ? 'Select one more player'
                 : 'Ready to compare'}
           </ThemedText>
-          
+
           {selectedPlayerIds.length > 0 && (
             <View style={styles.selectedPlayersContainer}>
               {selectedPlayerIds.map((id, index) => {
@@ -568,12 +581,10 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           )}
         </View>
       )}
-      
+
       <ScrollView style={styles.scrollView}>
         {players.length === 0 ? (
-          <EmptyState
-            message="No advanced player metrics available for this game."
-          />
+          <EmptyState message="No advanced player metrics available for this game." />
         ) : (
           players.map(player => (
             <AdvancedPlayerMetricsCard
@@ -585,41 +596,39 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           ))
         )}
       </ScrollView>
-      
+
       {/* Player Comparison Modal */}
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={comparisonModalVisible}
         onRequestClose={() => setComparisonModalVisible(false)}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.modalOverlay, { backgroundColor: modalBackgroundColor }]}
           activeOpacity={1}
           onPress={() => setComparisonModalVisible(false)}
         >
-          <View 
+          <View
             style={[
-              styles.comparisonModalContent, 
-              { 
+              styles.comparisonModalContent,
+              {
                 backgroundColor: cardBackgroundColor,
-                borderColor: cardBorderColor
-              }
+                borderColor: cardBorderColor,
+              },
             ]}
           >
             <View style={styles.comparisonModalHeader}>
-              <ThemedText style={styles.comparisonModalTitle}>
-                Player Comparison
-              </ThemedText>
-              
-              <TouchableOpacity 
+              <ThemedText style={styles.comparisonModalTitle}>Player Comparison</ThemedText>
+
+              <TouchableOpacity
                 onPress={() => setComparisonModalVisible(false)}
                 style={styles.closeModalButton}
               >
                 <Ionicons name="close" size={24} color={textColor} />
               </TouchableOpacity>
             </View>
-            
+
             {comparisonData && (
               <EnhancedPlayerComparison
                 comparisonData={comparisonData}
@@ -629,7 +638,7 @@ const AdvancedPlayerStatsScreen: React.FC<AdvancedPlayerStatsScreenProps> = ({
           </View>
         </TouchableOpacity>
       </Modal>
-      
+
       {/* Upgrade Prompt */}
       {showUpgradePrompt && (
         <UpgradePrompt

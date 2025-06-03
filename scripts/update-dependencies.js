@@ -496,8 +496,8 @@ function checkLockfileAge() {
   const lockfilePath = fs.existsSync('package-lock.json')
     ? 'package-lock.json'
     : fs.existsSync('yarn.lock')
-    ? 'yarn.lock'
-    : null;
+      ? 'yarn.lock'
+      : null;
 
   if (!lockfilePath) {
     console.log('No lockfile found.');

@@ -1,27 +1,28 @@
 /**
  * Game Detail Screen
- * 
+ *
  * Displays detailed information about a game, including odds if purchased.
  * Includes the OddsButton component for purchasing odds and betting on FanDuel.
  */
 
+import { Ionicons } from '@expo/vector-icons';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { httpsCallable } from 'firebase/functions';
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
   ActivityIndicator,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '../config/firebase';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import OddsButton from '../components/OddsButton';
+import { functions } from '../config/firebase';
 import Colors from '../constants/Colors';
 import { useThemeColor } from '../hooks/useThemeColor';
 
@@ -60,7 +61,7 @@ const GameDetailScreen = () => {
       overUnder: '220.5',
       homeLine: '-4.5',
       awayLine: '+4.5',
-    }
+    },
   };
 
   // Define game stats interface
@@ -91,22 +92,22 @@ const GameDetailScreen = () => {
   const [hasPurchasedOdds, setHasPurchasedOdds] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [gameStats, setGameStats] = useState<GameStats | null>(null);
-  
+
   // Theme colors
   const backgroundColor = useThemeColor({ light: '#f5f5f5', dark: '#151718' }, 'background');
   const cardBackground = useThemeColor({ light: '#ffffff', dark: '#1e1f20' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#ffffff' }, 'text');
   const secondaryTextColor = useThemeColor({ light: '#666666', dark: '#a0a0a0' }, 'text');
-  
+
   // Check if user has purchased odds for this game
   useEffect(() => {
     const checkPurchaseStatus = async () => {
       try {
         setIsLoading(true);
-        
+
         // In a real app, this would use the actual user ID
         const userId = MOCK_USER.id;
-        
+
         // Call Firebase function to check purchase status
         if (functions) {
           const checkStatus = httpsCallable(functions, 'checkPurchaseStatus');
@@ -114,12 +115,12 @@ const GameDetailScreen = () => {
             userId,
             gameId: game.id,
           });
-          
+
           // Type assertion for result.data
           const data = result.data as { hasPurchased: boolean };
           setHasPurchasedOdds(data.hasPurchased);
         }
-        
+
         // Fetch game stats
         // In a real app, this would call an API to get live stats
         setGameStats({
@@ -150,89 +151,88 @@ const GameDetailScreen = () => {
         setIsLoading(false);
       }
     };
-    
+
     checkPurchaseStatus();
   }, [game.id]);
-  
+
   // Handle purchase success
   const handlePurchaseSuccess = () => {
     console.log('GameDetailScreen: Purchase success callback triggered');
     setHasPurchasedOdds(true);
     console.log('GameDetailScreen: hasPurchasedOdds set to true');
   };
-  
+
   // Render game header
   const renderGameHeader = () => (
     <View style={[styles.card, { backgroundColor: cardBackground }]}>
       <View style={styles.gameStatus}>
         <ThemedText style={styles.gameStatusText}>
-          {game.status === 'in-progress' 
+          {game.status === 'in-progress'
             ? `Q${game.quarter} - ${game.timeRemaining}`
-            : `${game.date} - ${game.time}`
-          }
+            : `${game.date} - ${game.time}`}
         </ThemedText>
       </View>
-      
+
       <View style={styles.teamsContainer}>
         <View style={styles.teamContainer}>
           <Image source={{ uri: game.homeTeamLogo }} style={styles.teamLogo} />
           <ThemedText style={styles.teamName}>{game.homeTeam}</ThemedText>
           <ThemedText style={styles.teamScore}>{game.homeScore}</ThemedText>
         </View>
-        
+
         <View style={styles.vsContainer}>
           <ThemedText style={styles.vsText}>VS</ThemedText>
         </View>
-        
+
         <View style={styles.teamContainer}>
           <Image source={{ uri: game.awayTeamLogo }} style={styles.teamLogo} />
           <ThemedText style={styles.teamName}>{game.awayTeam}</ThemedText>
           <ThemedText style={styles.teamScore}>{game.awayScore}</ThemedText>
         </View>
       </View>
-      
+
       <ThemedText style={styles.venueText}>{game.venue}</ThemedText>
     </View>
   );
-  
+
   // Render game stats
   const renderGameStats = () => {
     if (!gameStats) return null;
-    
+
     return (
       <View style={[styles.card, { backgroundColor: cardBackground }]}>
         <ThemedText style={styles.sectionTitle}>Game Stats</ThemedText>
-        
+
         <View style={styles.statsHeader}>
-          <ThemedText style={[styles.statsHeaderText, { flex: 2 }]}></ThemedText>
+          <ThemedText style={[styles.statsHeaderText, { flex: 2 }]} />
           <ThemedText style={styles.statsHeaderText}>{game.homeTeam}</ThemedText>
           <ThemedText style={styles.statsHeaderText}>{game.awayTeam}</ThemedText>
         </View>
-        
+
         <View style={styles.statsRow}>
           <ThemedText style={[styles.statLabel, { flex: 2 }]}>Points</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.home.points}</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.away.points}</ThemedText>
         </View>
-        
+
         <View style={styles.statsRow}>
           <ThemedText style={[styles.statLabel, { flex: 2 }]}>Rebounds</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.home.rebounds}</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.away.rebounds}</ThemedText>
         </View>
-        
+
         <View style={styles.statsRow}>
           <ThemedText style={[styles.statLabel, { flex: 2 }]}>Assists</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.home.assists}</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.away.assists}</ThemedText>
         </View>
-        
+
         <View style={styles.statsRow}>
           <ThemedText style={[styles.statLabel, { flex: 2 }]}>FG%</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.home.fieldGoalPercentage}</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.away.fieldGoalPercentage}</ThemedText>
         </View>
-        
+
         <View style={styles.statsRow}>
           <ThemedText style={[styles.statLabel, { flex: 2 }]}>3PT%</ThemedText>
           <ThemedText style={styles.statValue}>{gameStats.home.threePointPercentage}</ThemedText>
@@ -241,21 +241,21 @@ const GameDetailScreen = () => {
       </View>
     );
   };
-  
+
   // Render odds section
   const renderOddsSection = () => {
     console.log(`Rendering odds section. hasPurchasedOdds: ${hasPurchasedOdds}`);
-    
+
     return (
       <View style={[styles.card, { backgroundColor: cardBackground }]}>
         <ThemedText style={styles.sectionTitle}>Betting Odds</ThemedText>
-        
+
         {!hasPurchasedOdds ? (
           <View style={styles.oddsButtonContainer}>
             <ThemedText style={styles.oddsPromptText}>
               Get exclusive betting odds and insights for this game
             </ThemedText>
-            
+
             <OddsButton
               key={`odds-button-${hasPurchasedOdds}`}
               game={game}
@@ -274,14 +274,18 @@ const GameDetailScreen = () => {
               </View>
               <View style={styles.oddsValueContainer}>
                 <ThemedText style={styles.oddsTeam}>{game.homeTeam}</ThemedText>
-                <ThemedText style={styles.oddsValue}>{game.homeLine} ({game.homeOdds})</ThemedText>
+                <ThemedText style={styles.oddsValue}>
+                  {game.homeLine} ({game.homeOdds})
+                </ThemedText>
               </View>
               <View style={styles.oddsValueContainer}>
                 <ThemedText style={styles.oddsTeam}>{game.awayTeam}</ThemedText>
-                <ThemedText style={styles.oddsValue}>{game.awayLine} ({game.awayOdds})</ThemedText>
+                <ThemedText style={styles.oddsValue}>
+                  {game.awayLine} ({game.awayOdds})
+                </ThemedText>
               </View>
             </View>
-            
+
             <View style={styles.oddsRow}>
               <View style={styles.oddsLabelContainer}>
                 <ThemedText style={styles.oddsLabel}>Total</ThemedText>
@@ -295,7 +299,7 @@ const GameDetailScreen = () => {
                 <ThemedText style={styles.oddsValue}>{game.overUnder} (-110)</ThemedText>
               </View>
             </View>
-            
+
             <View style={styles.oddsRow}>
               <View style={styles.oddsLabelContainer}>
                 <ThemedText style={styles.oddsLabel}>Moneyline</ThemedText>
@@ -309,7 +313,7 @@ const GameDetailScreen = () => {
                 <ThemedText style={styles.oddsValue}>+150</ThemedText>
               </View>
             </View>
-            
+
             <View style={styles.betNowContainer}>
               <OddsButton
                 key={`bet-now-button-${hasPurchasedOdds}`}
@@ -325,7 +329,7 @@ const GameDetailScreen = () => {
       </View>
     );
   };
-  
+
   // Render loading state
   if (isLoading) {
     return (
@@ -335,7 +339,7 @@ const GameDetailScreen = () => {
       </ThemedView>
     );
   }
-  
+
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
       <ScrollView style={styles.scrollView}>

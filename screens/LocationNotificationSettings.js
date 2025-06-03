@@ -1,13 +1,14 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, Slider, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { getUserPreferences, updatePreference } from '../services/userPreferencesService';
-import { getLocalTeams } from '../services/geolocationService';
-import { auth } from '../config/firebase';
+
 import LoadingIndicator from '../components/LoadingIndicator';
-import ThemedView from '../components/ThemedView';
 import ThemedText from '../components/ThemedText';
+import ThemedView from '../components/ThemedView';
+import { auth } from '../config/firebase';
 import { useTheme } from '../contexts/ThemeContext';
+import { getLocalTeams } from '../services/geolocationService';
+import { getUserPreferences, updatePreference } from '../services/userPreferencesService';
 
 /**
  * Location Notification Settings Screen
@@ -19,22 +20,22 @@ const LocationNotificationSettings = () => {
   const [loading, setLoading] = useState(true);
   const [preferences, setPreferences] = useState(null);
   const [localTeams, setLocalTeams] = useState([]);
-  
+
   // Load user preferences
   useEffect(() => {
     const loadPreferences = async () => {
       try {
         setLoading(true);
         const userId = auth.currentUser?.uid;
-        
+
         if (!userId) {
           navigation.navigate('Login');
           return;
         }
-        
+
         const userPrefs = await getUserPreferences(userId);
         setPreferences(userPrefs);
-        
+
         // Get local teams
         try {
           const teams = await getLocalTeams();
@@ -42,7 +43,7 @@ const LocationNotificationSettings = () => {
         } catch (error) {
           console.error('Error getting local teams:', error);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Error loading preferences:', error);
@@ -50,25 +51,25 @@ const LocationNotificationSettings = () => {
         Alert.alert('Error', 'Failed to load preferences. Please try again.');
       }
     };
-    
+
     loadPreferences();
   }, [navigation]);
-  
+
   // Update a preference
   const updatePref = async (path, value) => {
     try {
       const userId = auth.currentUser?.uid;
-      
+
       if (!userId) {
         navigation.navigate('Login');
         return;
       }
-      
+
       // Update local state
       const newPreferences = { ...preferences };
       setNestedValue(newPreferences, path, value);
       setPreferences(newPreferences);
-      
+
       // Update in database
       await updatePreference(userId, path, value);
     } catch (error) {
@@ -76,12 +77,12 @@ const LocationNotificationSettings = () => {
       Alert.alert('Error', 'Failed to update preference. Please try again.');
     }
   };
-  
+
   // Set a nested value in an object
   const setNestedValue = (obj, path, value) => {
     const keys = path.split('.');
     let current = obj;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
       if (!current[key]) {
@@ -89,87 +90,88 @@ const LocationNotificationSettings = () => {
       }
       current = current[key];
     }
-    
+
     current[keys[keys.length - 1]] = value;
   };
-  
+
   if (loading || !preferences) {
     return <LoadingIndicator />;
   }
-  
+
   const locationPrefs = preferences.notifications.locationBased || {
     enabled: true,
     localTeams: true,
     localGames: true,
     localOdds: true,
-    radius: 50
+    radius: 50,
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView>
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Location-Based Notifications</ThemedText>
-          
+
           <View style={styles.switchRow}>
             <ThemedText style={styles.label}>Enable Location Notifications</ThemedText>
             <Switch
               value={locationPrefs.enabled}
-              onValueChange={(value) => updatePref('notifications.locationBased.enabled', value)}
+              onValueChange={value => updatePref('notifications.locationBased.enabled', value)}
               trackColor={{ false: colors.switchTrackOff, true: colors.primary }}
               thumbColor={locationPrefs.enabled ? colors.switchThumbOn : colors.switchThumbOff}
             />
           </View>
-          
+
           <ThemedText style={styles.description}>
-            Receive personalized notifications based on your location, including local teams, games, and betting opportunities.
+            Receive personalized notifications based on your location, including local teams, games,
+            and betting opportunities.
           </ThemedText>
         </View>
-        
+
         <View style={[styles.section, !locationPrefs.enabled && styles.disabled]}>
           <ThemedText style={styles.sectionTitle}>Notification Types</ThemedText>
-          
+
           <View style={styles.switchRow}>
             <ThemedText style={styles.label}>Local Team Alerts</ThemedText>
             <Switch
               value={locationPrefs.localTeams}
-              onValueChange={(value) => updatePref('notifications.locationBased.localTeams', value)}
+              onValueChange={value => updatePref('notifications.locationBased.localTeams', value)}
               trackColor={{ false: colors.switchTrackOff, true: colors.primary }}
               thumbColor={locationPrefs.localTeams ? colors.switchThumbOn : colors.switchThumbOff}
               disabled={!locationPrefs.enabled}
             />
           </View>
-          
+
           <View style={styles.switchRow}>
             <ThemedText style={styles.label}>Local Game Alerts</ThemedText>
             <Switch
               value={locationPrefs.localGames}
-              onValueChange={(value) => updatePref('notifications.locationBased.localGames', value)}
+              onValueChange={value => updatePref('notifications.locationBased.localGames', value)}
               trackColor={{ false: colors.switchTrackOff, true: colors.primary }}
               thumbColor={locationPrefs.localGames ? colors.switchThumbOn : colors.switchThumbOff}
               disabled={!locationPrefs.enabled}
             />
           </View>
-          
+
           <View style={styles.switchRow}>
             <ThemedText style={styles.label}>Local Betting Opportunities</ThemedText>
             <Switch
               value={locationPrefs.localOdds}
-              onValueChange={(value) => updatePref('notifications.locationBased.localOdds', value)}
+              onValueChange={value => updatePref('notifications.locationBased.localOdds', value)}
               trackColor={{ false: colors.switchTrackOff, true: colors.primary }}
               thumbColor={locationPrefs.localOdds ? colors.switchThumbOn : colors.switchThumbOff}
               disabled={!locationPrefs.enabled}
             />
           </View>
         </View>
-        
+
         <View style={[styles.section, !locationPrefs.enabled && styles.disabled]}>
           <ThemedText style={styles.sectionTitle}>Location Radius</ThemedText>
-          
+
           <ThemedText style={styles.description}>
             Set the radius for location-based notifications (in kilometers)
           </ThemedText>
-          
+
           <View style={styles.sliderContainer}>
             <Slider
               style={styles.slider}
@@ -177,7 +179,7 @@ const LocationNotificationSettings = () => {
               maximumValue={200}
               step={10}
               value={locationPrefs.radius}
-              onValueChange={(value) => updatePref('notifications.locationBased.radius', value)}
+              onValueChange={value => updatePref('notifications.locationBased.radius', value)}
               minimumTrackTintColor={colors.primary}
               maximumTrackTintColor={colors.border}
               thumbTintColor={colors.primary}
@@ -188,14 +190,14 @@ const LocationNotificationSettings = () => {
             </View>
           </View>
         </View>
-        
+
         {localTeams.length > 0 && (
           <View style={styles.section}>
             <ThemedText style={styles.sectionTitle}>Local Teams</ThemedText>
             <ThemedText style={styles.description}>
               We've detected these teams in your area:
             </ThemedText>
-            
+
             {localTeams.map((team, index) => (
               <ThemedText key={index} style={styles.teamItem}>
                 • {team}
@@ -203,10 +205,11 @@ const LocationNotificationSettings = () => {
             ))}
           </View>
         )}
-        
+
         <View style={styles.section}>
           <ThemedText style={styles.privacyNote}>
-            Your location data is only used to provide personalized notifications and is never shared with third parties. You can disable location-based notifications at any time.
+            Your location data is only used to provide personalized notifications and is never
+            shared with third parties. You can disable location-based notifications at any time.
           </ThemedText>
         </View>
       </ScrollView>

@@ -7,11 +7,6 @@
  */
 
 import {
-  validateEnvironment,
-  validateServiceConfig,
-  logEnvironmentInfo,
-} from '../molecules/environmentValidator';
-import {
   firebaseConfig,
   stripeConfig,
   sportsDataConfig,
@@ -19,6 +14,11 @@ import {
   mlConfig,
   sentryConfig,
 } from '../atoms/serviceConfig';
+import {
+  validateEnvironment,
+  validateServiceConfig,
+  logEnvironmentInfo,
+} from '../molecules/environmentValidator';
 
 /**
  * Bootstrap environment configuration

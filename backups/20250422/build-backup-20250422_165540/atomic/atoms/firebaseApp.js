@@ -6,8 +6,9 @@
  */
 
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './serviceConfig';
+
 import { validateConfig } from './envConfig';
+import { firebaseConfig } from './serviceConfig';
 
 /**
  * Initialize Firebase app

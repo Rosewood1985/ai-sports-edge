@@ -1,13 +1,8 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 
 interface TrendingPick {
@@ -26,9 +21,9 @@ interface TrendingPicksProps {
  * @param {TrendingPicksProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const TrendingPicks: React.FC<TrendingPicksProps> = ({ 
+const TrendingPicks: React.FC<TrendingPicksProps> = ({
   trendingPicks,
-  showUpgradePrompt = true
+  showUpgradePrompt = true,
 }) => {
   const navigation = useNavigation();
   const { colors, isDark } = useTheme();
@@ -51,24 +46,21 @@ const TrendingPicks: React.FC<TrendingPicksProps> = ({
     return (
       <View style={styles.betItem}>
         <View style={styles.betInfo}>
-          <Ionicons 
-            name="trending-up" 
-            size={16} 
-            color={getPercentageColor(item.percentage)} 
+          <Ionicons
+            name="trending-up"
+            size={16}
+            color={getPercentageColor(item.percentage)}
             style={styles.trendIcon}
           />
-          <Text style={[styles.betDescription, { color: colors.text }]}>
-            {item.description}
-          </Text>
+          <Text style={[styles.betDescription, { color: colors.text }]}>{item.description}</Text>
         </View>
-        <View style={[
-          styles.percentageContainer,
-          { backgroundColor: getPercentageColor(item.percentage) + '20' } // Add transparency
-        ]}>
-          <Text style={[
-            styles.percentageText,
-            { color: getPercentageColor(item.percentage) }
-          ]}>
+        <View
+          style={[
+            styles.percentageContainer,
+            { backgroundColor: getPercentageColor(item.percentage) + '20' }, // Add transparency
+          ]}
+        >
+          <Text style={[styles.percentageText, { color: getPercentageColor(item.percentage) }]}>
             {item.percentage}%
           </Text>
         </View>
@@ -77,26 +69,19 @@ const TrendingPicks: React.FC<TrendingPicksProps> = ({
   };
 
   return (
-    <View style={[
-      styles.container,
-      { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }
-    ]}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Ionicons name="stats-chart" size={20} color={colors.primary} />
-          <Text style={[styles.title, { color: colors.text }]}>
-            Trending Bets
-          </Text>
+          <Text style={[styles.title, { color: colors.text }]}>Trending Bets</Text>
         </View>
-        <Text style={[styles.subtitle, { color: colors.text }]}>
-          What the public is picking
-        </Text>
+        <Text style={[styles.subtitle, { color: colors.text }]}>What the public is picking</Text>
       </View>
 
       <FlatList
         data={trendingPicks}
         renderItem={renderTrendingPick}
-        keyExtractor={(item) => item.game_id}
+        keyExtractor={item => item.game_id}
         scrollEnabled={false}
         ItemSeparatorComponent={() => (
           <View style={[styles.separator, { backgroundColor: isDark ? '#333' : '#e0e0e0' }]} />
@@ -104,10 +89,12 @@ const TrendingPicks: React.FC<TrendingPicksProps> = ({
       />
 
       {showUpgradePrompt && (
-        <View style={[
-          styles.upgradeContainer,
-          { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)' }
-        ]}>
+        <View
+          style={[
+            styles.upgradeContainer,
+            { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)' },
+          ]}
+        >
           <Text style={[styles.upgradeText, { color: colors.text }]}>
             Premium users see AI Edge % and recommended bets
           </Text>

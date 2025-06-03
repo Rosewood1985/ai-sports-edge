@@ -19,16 +19,16 @@ export const mockUserPreferences = {
     refreshIntervalMinutes: 30,
     keywordFilters: {
       include: [],
-      exclude: []
-    }
+      exclude: [],
+    },
   },
   ui: {
     newsTicker: {
       enabled: true,
       scrollSpeed: 'medium',
-      pauseOnHover: true
-    }
-  }
+      pauseOnHover: true,
+    },
+  },
 };
 
 // Mock RSS feed URLs
@@ -50,5 +50,5 @@ export const mockFormattedItems = mockFeedItems.map((item, index) => ({
   link: item.link,
   pubDate: item.pubDate,
   image: null,
-  description: ''
+  description: '',
 }));

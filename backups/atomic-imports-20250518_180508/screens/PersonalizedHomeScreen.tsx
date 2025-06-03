@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, View, TouchableOpacity, RefreshControl, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { usePersonalization } from '../contexts/PersonalizationContext';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import { colors } from '../styles/theme';
-import LoadingIndicator from '../components/LoadingIndicator';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  TouchableOpacity,
+  RefreshControl,
+  Image,
+} from 'react-native';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import BetNowButton from '../components/BetNowButton';
 import BetNowPopup from '../components/BetNowPopup';
+import LoadingIndicator from '../components/LoadingIndicator';
 import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
+import { usePersonalization } from '../contexts/PersonalizationContext';
+import { colors } from '../styles/theme';
 
 /**
  * Personalized Home Screen
@@ -17,24 +25,19 @@ import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
  */
 const PersonalizedHomeScreen = () => {
   const navigation = useNavigation();
-  const {
-    preferences,
-    userProfile,
-    personalizedContent,
-    refreshPersonalizedContent,
-    isLoading
-  } = usePersonalization();
+  const { preferences, userProfile, personalizedContent, refreshPersonalizedContent, isLoading } =
+    usePersonalization();
   const { showBetButton } = useBettingAffiliate();
-  
+
   const [refreshing, setRefreshing] = useState(false);
   const [greeting, setGreeting] = useState('');
   const [showBetPopup, setShowBetPopup] = useState(false);
-  
+
   // Set greeting based on time of day
   useEffect(() => {
     const hour = new Date().getHours();
     let newGreeting = '';
-    
+
     if (hour < 12) {
       newGreeting = 'Good Morning';
     } else if (hour < 18) {
@@ -42,21 +45,21 @@ const PersonalizedHomeScreen = () => {
     } else {
       newGreeting = 'Good Evening';
     }
-    
+
     if (userProfile?.displayName) {
       newGreeting += `, ${userProfile.displayName}`;
     }
-    
+
     setGreeting(newGreeting);
   }, [userProfile]);
-  
+
   // Handle refresh
   const handleRefresh = async () => {
     setRefreshing(true);
     await refreshPersonalizedContent();
     setRefreshing(false);
   };
-  
+
   // Render section header
   const renderSectionHeader = (title: string) => (
     <View style={styles.sectionHeader}>
@@ -66,7 +69,7 @@ const PersonalizedHomeScreen = () => {
       </TouchableOpacity>
     </View>
   );
-  
+
   // Render recommended bet card
   const renderRecommendedBetCard = (bet: any, index: number) => (
     <TouchableOpacity key={index} style={styles.recommendedBetCard}>
@@ -83,35 +86,35 @@ const PersonalizedHomeScreen = () => {
           <ThemedText style={styles.confidenceLabel}>Confidence</ThemedText>
         </View>
       </View>
-      
+
       <View style={styles.teamsContainer}>
         <View style={styles.teamContainer}>
           <Image source={{ uri: bet.team1.logo }} style={styles.teamLogo} />
           <ThemedText style={styles.teamName}>{bet.team1.name}</ThemedText>
         </View>
-        
+
         <View style={styles.vsContainer}>
           <ThemedText style={styles.vsText}>VS</ThemedText>
         </View>
-        
+
         <View style={styles.teamContainer}>
           <Image source={{ uri: bet.team2.logo }} style={styles.teamLogo} />
           <ThemedText style={styles.teamName}>{bet.team2.name}</ThemedText>
         </View>
       </View>
-      
+
       <View style={styles.betInfoContainer}>
         <View style={styles.betTypeContainer}>
           <ThemedText style={styles.betTypeLabel}>Recommended Bet</ThemedText>
           <ThemedText style={styles.betTypeValue}>{bet.recommendation}</ThemedText>
         </View>
-        
+
         <View style={styles.oddsContainer}>
           <ThemedText style={styles.oddsLabel}>Odds</ThemedText>
           <ThemedText style={styles.oddsValue}>{bet.odds}</ThemedText>
         </View>
       </View>
-      
+
       {showBetButton('game') ? (
         <BetNowButton
           size="medium"
@@ -121,16 +124,13 @@ const PersonalizedHomeScreen = () => {
           style={styles.betNowButton}
         />
       ) : (
-        <TouchableOpacity
-          style={styles.placeBetButton}
-          onPress={() => setShowBetPopup(true)}
-        >
+        <TouchableOpacity style={styles.placeBetButton} onPress={() => setShowBetPopup(true)}>
           <ThemedText style={styles.placeBetButtonText}>PLACE BET</ThemedText>
         </TouchableOpacity>
       )}
     </TouchableOpacity>
   );
-  
+
   // Render upcoming game card
   const renderUpcomingGameCard = (game: any, index: number) => (
     <TouchableOpacity key={index} style={styles.upcomingGameCard}>
@@ -138,17 +138,17 @@ const PersonalizedHomeScreen = () => {
         <ThemedText style={styles.upcomingGameLeague}>{game.league}</ThemedText>
         <ThemedText style={styles.upcomingGameTime}>{game.time}</ThemedText>
       </View>
-      
+
       <View style={styles.teamsContainer}>
         <View style={styles.teamContainer}>
           <Image source={{ uri: game.team1.logo }} style={styles.teamLogo} />
           <ThemedText style={styles.teamName}>{game.team1.name}</ThemedText>
         </View>
-        
+
         <View style={styles.vsContainer}>
           <ThemedText style={styles.vsText}>VS</ThemedText>
         </View>
-        
+
         <View style={styles.teamContainer}>
           <Image source={{ uri: game.team2.logo }} style={styles.teamLogo} />
           <ThemedText style={styles.teamName}>{game.team2.name}</ThemedText>
@@ -156,7 +156,7 @@ const PersonalizedHomeScreen = () => {
       </View>
     </TouchableOpacity>
   );
-  
+
   // Render news item
   const renderNewsItem = (news: any, index: number) => (
     <TouchableOpacity key={index} style={styles.newsItem}>
@@ -170,7 +170,7 @@ const PersonalizedHomeScreen = () => {
       </View>
     </TouchableOpacity>
   );
-  
+
   // Mock data for demonstration
   const mockRecommendedBets = [
     {
@@ -189,7 +189,7 @@ const PersonalizedHomeScreen = () => {
       odds: '-110',
     },
   ];
-  
+
   const mockUpcomingGames = [
     {
       league: 'NFL',
@@ -216,7 +216,7 @@ const PersonalizedHomeScreen = () => {
       },
     },
   ];
-  
+
   const mockNews = [
     {
       title: 'Lakers sign new star player to 3-year contract',
@@ -226,12 +226,13 @@ const PersonalizedHomeScreen = () => {
     },
     {
       title: 'NFL announces new playoff format for upcoming season',
-      image: 'https://static.www.nfl.com/image/private/t_editorial_landscape_12_desktop/league/vmvmxjxe6xdtjwxeosa2',
+      image:
+        'https://static.www.nfl.com/image/private/t_editorial_landscape_12_desktop/league/vmvmxjxe6xdtjwxeosa2',
       source: 'NFL.com',
       time: '5 hours ago',
     },
   ];
-  
+
   if (isLoading) {
     return (
       <ThemedView style={styles.loadingContainer}>
@@ -239,7 +240,7 @@ const PersonalizedHomeScreen = () => {
       </ThemedView>
     );
   }
-  
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView
@@ -256,27 +257,25 @@ const PersonalizedHomeScreen = () => {
         <View style={styles.header}>
           <View>
             <ThemedText style={styles.greeting}>{greeting}</ThemedText>
-            <ThemedText style={styles.welcomeText}>
-              Here's your personalized dashboard
-            </ThemedText>
+            <ThemedText style={styles.welcomeText}>Here's your personalized dashboard</ThemedText>
           </View>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.settingsButton}
             onPress={() => navigation.navigate('Personalization' as never)}
           >
             <Ionicons name="settings-outline" size={24} color={colors.neon.blue} />
           </TouchableOpacity>
         </View>
-        
+
         {/* Recommended Bets */}
         {renderSectionHeader('RECOMMENDED BETS')}
         {mockRecommendedBets.map((bet, index) => renderRecommendedBetCard(bet, index))}
-        
+
         {/* Upcoming Games */}
         {renderSectionHeader('UPCOMING GAMES')}
         {mockUpcomingGames.map((game, index) => renderUpcomingGameCard(game, index))}
-        
+
         {/* News */}
         {renderSectionHeader('LATEST NEWS')}
         {mockNews.map((news, index) => renderNewsItem(news, index))}
@@ -286,7 +285,11 @@ const PersonalizedHomeScreen = () => {
         show={showBetPopup}
         onClose={() => setShowBetPopup(false)}
         message="Ready to place your bets? Use our exclusive FanDuel affiliate link for a special bonus!"
-        teamId={mockRecommendedBets[0]?.team1 ? `nba-${mockRecommendedBets[0].team1.name.toLowerCase()}` : undefined}
+        teamId={
+          mockRecommendedBets[0]?.team1
+            ? `nba-${mockRecommendedBets[0].team1.name.toLowerCase()}`
+            : undefined
+        }
       />
     </ThemedView>
   );

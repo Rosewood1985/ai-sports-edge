@@ -1,7 +1,7 @@
-import React from 'react';
-import { Chip, ChipProps, Tooltip } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import { Chip, ChipProps, Tooltip } from '@mui/material';
+import React from 'react';
 
 interface HistoryStatusBadgeProps {
   status: 'success' | 'failed';

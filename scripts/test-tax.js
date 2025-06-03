@@ -41,25 +41,27 @@ async function testTaxCalculation() {
     lineItems.forEach(item => {
       console.log(`  - ${item.id}: $${item.amount.toFixed(2)}`);
     });
-    
+
     const result = await stripeTaxService.calculateTax({
       currency: 'usd',
       customerId: customer.id,
       customerDetails: customer.details,
-      lineItems: lineItems,
+      lineItems,
     });
-    
+
     console.log('\nTax calculation result:');
     console.log('  Tax amount (exclusive):', `$${(result.tax_amount_exclusive / 100).toFixed(2)}`);
     console.log('  Tax amount (inclusive):', `$${(result.tax_amount_inclusive / 100).toFixed(2)}`);
-    
+
     if (result.tax_breakdown && result.tax_breakdown.length > 0) {
       console.log('\nTax breakdown:');
       result.tax_breakdown.forEach(breakdown => {
-        console.log(`  - ${breakdown.jurisdiction_name}: $${(breakdown.tax_amount / 100).toFixed(2)} (${breakdown.tax_rate_percentage}%)`);
+        console.log(
+          `  - ${breakdown.jurisdiction_name}: $${(breakdown.tax_amount / 100).toFixed(2)} (${breakdown.tax_rate_percentage}%)`
+        );
       });
     }
-    
+
     return result;
   } catch (error) {
     console.error('Tax calculation failed:', error.message);
@@ -72,25 +74,25 @@ async function testTaxRates() {
   try {
     console.log('\nTesting tax rates for location...');
     console.log('Location: San Francisco, CA, US');
-    
+
     const result = await stripeTaxService.getTaxRatesForLocation({
       countryCode: 'US',
       stateCode: 'CA',
       postalCode: '94111',
       city: 'San Francisco',
     });
-    
+
     console.log('\nTax rates result:');
     console.log('  Calculation ID:', result.calculation_id);
     console.log('  Tax date:', result.tax_date);
-    
+
     if (result.tax_breakdown && result.tax_breakdown.length > 0) {
       console.log('\nTax breakdown:');
       result.tax_breakdown.forEach(breakdown => {
         console.log(`  - ${breakdown.jurisdiction_name}: ${breakdown.tax_rate_percentage}%`);
       });
     }
-    
+
     return result;
   } catch (error) {
     console.error('Tax rates lookup failed:', error.message);

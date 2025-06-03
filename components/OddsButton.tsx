@@ -1,10 +1,13 @@
 /**
  * OddsButton Component
- * 
+ *
  * A dynamic button that changes from "Get Odds" to "Bet Now on FanDuel" after purchase.
  * Handles both Stripe payment processing and FanDuel affiliate link redirection.
  */
 
+import { useStripe } from '@stripe/stripe-react-native';
+import axios from 'axios';
+import * as Linking from 'expo-linking';
 import React, { useState, useEffect } from 'react';
 import {
   TouchableOpacity,
@@ -13,21 +16,18 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  View
+  View,
 } from 'react-native';
-import * as Linking from 'expo-linking';
-import { useStripe } from '@stripe/stripe-react-native';
-import axios from 'axios';
 
+import BetNowPopup from './BetNowPopup';
+import { FANDUEL_CONFIG, STRIPE_CONFIG, API_CONFIG } from '../config/affiliateConfig';
+import Colors from '../constants/Colors';
+import { useThemeColor } from '../hooks/useThemeColor';
 import { analyticsService } from '../services/analyticsService';
-import { gameUrlService, BettingSite } from '../services/gameUrlService';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { fanduelCookieService } from '../services/fanduelCookieService';
+import { gameUrlService, BettingSite } from '../services/gameUrlService';
 import { microtransactionService } from '../services/microtransactionService';
-import { FANDUEL_CONFIG, STRIPE_CONFIG, API_CONFIG } from '../config/affiliateConfig';
-import { useThemeColor } from '../hooks/useThemeColor';
-import Colors from '../constants/Colors';
-import BetNowPopup from './BetNowPopup';
 
 // Define the game object structure
 interface Game {
@@ -61,27 +61,33 @@ const OddsButton: React.FC<OddsButtonProps> = ({
   onPurchaseSuccess,
   style,
   size = 'medium',
-  affiliateId = FANDUEL_CONFIG.AFFILIATE_ID
+  affiliateId = FANDUEL_CONFIG.AFFILIATE_ID,
 }) => {
   // Initialize Stripe
   const stripe = useStripe();
-  
+
   // State
   const [isPurchased, setIsPurchased] = useState(hasPurchasedOdds);
   const [isLoading, setIsLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [justPurchased, setJustPurchased] = useState(false);
-  
+
   // Get theme colors
-  const backgroundColor = useThemeColor({
-    light: isPurchased ? Colors.neon.blue : Colors.neon.orange,
-    dark: isPurchased ? Colors.neon.blue : Colors.neon.orange
-  }, 'background');
-  
-  const textColor = useThemeColor({ 
-    light: '#FFFFFF', 
-    dark: '#FFFFFF' 
-  }, 'text');
+  const backgroundColor = useThemeColor(
+    {
+      light: isPurchased ? Colors.neon.blue : Colors.neon.orange,
+      dark: isPurchased ? Colors.neon.blue : Colors.neon.orange,
+    },
+    'background'
+  );
+
+  const textColor = useThemeColor(
+    {
+      light: '#FFFFFF',
+      dark: '#FFFFFF',
+    },
+    'text'
+  );
 
   // Update state when props change
   useEffect(() => {
@@ -97,17 +103,17 @@ const OddsButton: React.FC<OddsButtonProps> = ({
       Alert.alert('Error', 'Stripe is not available. Please try again later.');
       return;
     }
-    
+
     try {
       setIsLoading(true);
-      
+
       // Track analytics event
       analyticsService.trackEvent('odds_purchase_initiated', {
         gameId: game.id,
         userId,
         timestamp: Date.now(),
       });
-      
+
       // Track microtransaction interaction
       const opportunityData = {
         type: 'odds_access',
@@ -117,9 +123,9 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         description: `Odds for ${game.homeTeam} vs ${game.awayTeam}`,
         cookieEnabled: true,
       };
-      
+
       microtransactionService.trackInteraction('click', opportunityData, { id: userId });
-      
+
       // Create payment intent on server
       const { data } = await axios.post(API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.CREATE_PAYMENT, {
         userId,
@@ -153,10 +159,10 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           error: error.message,
           timestamp: Date.now(),
         });
-        
+
         // Track microtransaction cancellation
         microtransactionService.trackInteraction('cancel', opportunityData, { id: userId });
-        
+
         // Only show alert if not cancelled by user
         if (error.code !== 'Canceled') {
           Alert.alert('Payment Failed', error.message);
@@ -169,34 +175,30 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           price: STRIPE_CONFIG.PRICING.ODDS_ACCESS,
           timestamp: Date.now(),
         });
-        
+
         // Track microtransaction purchase
         microtransactionService.trackInteraction('purchase', opportunityData, { id: userId });
-        
+
         // Initialize cookies for FanDuel
-        await fanduelCookieService.initializeCookies(
-          userId,
-          game.id,
-          game.homeTeam
-        );
-        
+        await fanduelCookieService.initializeCookies(userId, game.id, game.homeTeam);
+
         // Update state immediately without showing alert
         console.log('Payment successful, updating button state');
         setIsPurchased(true);
         setJustPurchased(true);
         setShowPopup(true);
-        
+
         // Update Firestore with purchase record in the background
         updatePurchaseRecord(game.id, userId).catch(err =>
           console.error('Background purchase record update failed:', err)
         );
-        
+
         // Call success callback immediately
         if (onPurchaseSuccess) {
           console.log('Calling onPurchaseSuccess callback');
           onPurchaseSuccess();
         }
-        
+
         // No alert - seamless transition to bet button with popup
       }
     } catch (error) {
@@ -207,7 +209,7 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: Date.now(),
       });
-      
+
       Alert.alert('Error', 'Unable to process payment. Please try again later.');
       console.error('Payment error:', error);
     } finally {
@@ -227,11 +229,11 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         timestamp: new Date().toISOString(),
         platform: Platform.OS,
       });
-      
+
       // Also update in cross-platform sync service
       const { crossPlatformSyncService } = require('../services/crossPlatformSyncService');
       await crossPlatformSyncService.recordOddsPurchase(gameId);
-      
+
       console.log('Purchase record updated in both backend and cross-platform sync');
     } catch (error) {
       console.error('Error updating purchase record:', error);
@@ -244,10 +246,16 @@ const OddsButton: React.FC<OddsButtonProps> = ({
   const handleFanDuelRedirect = async () => {
     try {
       setIsLoading(true);
-      
+
       // Track affiliate link click
-      bettingAffiliateService.trackButtonClick('odds_button', affiliateId, game.id, userId, game.id);
-      
+      bettingAffiliateService.trackButtonClick(
+        'odds_button',
+        affiliateId,
+        game.id,
+        userId,
+        game.id
+      );
+
       // Get game-specific URL if available
       let baseUrl = FANDUEL_CONFIG.BASE_URL;
       if (game.fanduelEventId) {
@@ -259,17 +267,17 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           baseUrl = gameUrl;
         }
       }
-      
+
       // Track FanDuel interaction
       await fanduelCookieService.trackInteraction('redirect_initiated', {
         gameId: game.id,
         teamId: game.homeTeam,
         affiliateId,
       });
-      
+
       // Generate URL with cookies
       let affiliateUrl;
-      
+
       // Check if we have cookie data
       const cookieData = await fanduelCookieService.getCookieData();
       if (cookieData) {
@@ -278,7 +286,7 @@ const OddsButton: React.FC<OddsButtonProps> = ({
       } else {
         // Initialize cookies first
         await fanduelCookieService.initializeCookies(userId, game.id, game.homeTeam);
-        
+
         // Then generate affiliate link
         affiliateUrl = await bettingAffiliateService.generateAffiliateLink(
           baseUrl,
@@ -288,22 +296,26 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           game.id
         );
       }
-      
+
       // Track conversion
       bettingAffiliateService.trackConversion('odds_to_bet', 0, userId);
-      
+
       // Track microtransaction conversion
-      microtransactionService.trackInteraction('conversion', {
-        type: 'odds_access',
-        gameId: game.id,
-        cookieEnabled: true,
-      }, { id: userId });
-      
+      microtransactionService.trackInteraction(
+        'conversion',
+        {
+          type: 'odds_access',
+          gameId: game.id,
+          cookieEnabled: true,
+        },
+        { id: userId }
+      );
+
       // Open URL
       const supported = await Linking.canOpenURL(affiliateUrl);
       if (supported) {
         await Linking.openURL(affiliateUrl);
-        
+
         // Track successful redirect
         await fanduelCookieService.trackInteraction('redirect_success', {
           gameId: game.id,
@@ -311,7 +323,7 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         });
       } else {
         Alert.alert('Error', 'Unable to open FanDuel. Please try again.');
-        
+
         // Track failed redirect
         await fanduelCookieService.trackInteraction('redirect_failed', {
           gameId: game.id,
@@ -321,7 +333,7 @@ const OddsButton: React.FC<OddsButtonProps> = ({
     } catch (error) {
       console.error('Error redirecting to FanDuel:', error);
       Alert.alert('Error', 'Unable to open FanDuel. Please try again.');
-      
+
       // Track error
       await fanduelCookieService.trackInteraction('redirect_error', {
         gameId: game.id,
@@ -353,7 +365,7 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           getSizeStyles(),
           { backgroundColor },
           isPurchased ? styles.betButton : styles.oddsButton,
-          style
+          style,
         ]}
         onPress={isPurchased ? handleFanDuelRedirect : handleStripePayment}
         disabled={isLoading}
@@ -366,7 +378,7 @@ const OddsButton: React.FC<OddsButtonProps> = ({
           </Text>
         )}
       </TouchableOpacity>
-      
+
       {/* Auto-show popup for immediate betting after purchase */}
       <BetNowPopup
         show={showPopup}
@@ -375,9 +387,11 @@ const OddsButton: React.FC<OddsButtonProps> = ({
         teamId={game.homeTeam}
         userId={userId}
         gameId={game.id}
-        message={justPurchased
-          ? "Your odds are ready! Place your bet now for the best experience."
-          : "Ready to place your bet? Get started now!"}
+        message={
+          justPurchased
+            ? 'Your odds are ready! Place your bet now for the best experience.'
+            : 'Ready to place your bet? Get started now!'
+        }
       />
     </>
   );

@@ -1,6 +1,6 @@
 /**
  * Comprehensive Geolocation Service Tests
- * 
+ *
  * Tests all geolocation functionality including location detection,
  * local team identification, and odds suggestions
  */
@@ -54,15 +54,15 @@ Object.defineProperty(global.navigator, 'geolocation', {
 describe('Geolocation Service Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default successful responses
     global.localStorage.getItem.mockReturnValue(null);
-    
-    mockGeolocation.getCurrentPosition.mockImplementation((success) => {
+
+    mockGeolocation.getCurrentPosition.mockImplementation(success => {
       success({
         coords: {
           latitude: 40.7128,
-          longitude: -74.0060,
+          longitude: -74.006,
           accuracy: 10,
         },
       });
@@ -86,16 +86,19 @@ describe('Geolocation Service Tests', () => {
       // Mock Google Maps API response
       fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({
-          results: [{
-            address_components: [
-              { types: ['locality'], long_name: 'New York' },
-              { types: ['administrative_area_level_1'], long_name: 'New York' },
-              { types: ['country'], long_name: 'United States' },
-              { types: ['postal_code'], long_name: '10001' },
+        json: () =>
+          Promise.resolve({
+            results: [
+              {
+                address_components: [
+                  { types: ['locality'], long_name: 'New York' },
+                  { types: ['administrative_area_level_1'], long_name: 'New York' },
+                  { types: ['country'], long_name: 'United States' },
+                  { types: ['postal_code'], long_name: '10001' },
+                ],
+              },
             ],
-          }],
-        }),
+          }),
       });
 
       const location = await geolocationService.getCurrentLocation();
@@ -103,7 +106,7 @@ describe('Geolocation Service Tests', () => {
       expect(location).toEqual(
         expect.objectContaining({
           latitude: 40.7128,
-          longitude: -74.0060,
+          longitude: -74.006,
           city: 'New York',
           state: 'New York',
           country: 'United States',
@@ -123,12 +126,12 @@ describe('Geolocation Service Tests', () => {
     test('should use cached location when available', async () => {
       const cachedLocation = {
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
         city: 'New York',
         timestamp: Date.now(),
       };
 
-      global.localStorage.getItem.mockImplementation((key) => {
+      global.localStorage.getItem.mockImplementation(key => {
         if (key === 'geolocation_cache') {
           return JSON.stringify(cachedLocation);
         }
@@ -145,9 +148,9 @@ describe('Geolocation Service Tests', () => {
     test('should refresh expired cached location', async () => {
       const expiredTime = Date.now() - 25 * 60 * 60 * 1000; // 25 hours ago
 
-      global.localStorage.getItem.mockImplementation((key) => {
+      global.localStorage.getItem.mockImplementation(key => {
         if (key === 'geolocation_cache') {
-          return JSON.stringify({ latitude: 40.7128, longitude: -74.0060 });
+          return JSON.stringify({ latitude: 40.7128, longitude: -74.006 });
         }
         if (key === 'geolocation_timestamp') {
           return expiredTime.toString();
@@ -164,7 +167,7 @@ describe('Geolocation Service Tests', () => {
     test('should identify local teams for New York', async () => {
       const location = {
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
         city: 'New York',
         state: 'New York',
       };
@@ -225,7 +228,7 @@ describe('Geolocation Service Tests', () => {
     test('should generate odds suggestions for local teams', async () => {
       const location = {
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
         city: 'New York',
         state: 'New York',
       };
@@ -233,7 +236,7 @@ describe('Geolocation Service Tests', () => {
       const suggestions = await geolocationService.getLocalizedOddsSuggestions(location);
 
       expect(suggestions.length).toBeGreaterThan(0);
-      
+
       suggestions.forEach(suggestion => {
         expect(suggestion).toEqual(
           expect.objectContaining({
@@ -246,7 +249,7 @@ describe('Geolocation Service Tests', () => {
             reasoning: expect.any(String),
           })
         );
-        
+
         expect(suggestion.odds).toBeGreaterThan(0);
         expect(suggestion.confidence).toBeGreaterThanOrEqual(0.7);
         expect(suggestion.confidence).toBeLessThanOrEqual(1.0);
@@ -260,7 +263,7 @@ describe('Geolocation Service Tests', () => {
       };
 
       const suggestions = await geolocationService.getLocalizedOddsSuggestions(location);
-      
+
       // Should have variety in suggestions
       const suggestionTypes = [...new Set(suggestions.map(s => s.suggestion))];
       expect(suggestionTypes.length).toBeGreaterThan(0);
@@ -273,7 +276,7 @@ describe('Geolocation Service Tests', () => {
       };
 
       const suggestions = await geolocationService.getLocalizedOddsSuggestions(location);
-      
+
       const yankeesSuggestion = suggestions.find(s => s.team.includes('Yankees'));
       expect(yankeesSuggestion).toBeDefined();
       expect(yankeesSuggestion.odds).toBeGreaterThan(0);
@@ -294,8 +297,10 @@ describe('Geolocation Service Tests', () => {
     test('should calculate distance between coordinates', () => {
       // Distance from New York to Los Angeles (approx 3,940 km)
       const distance = geolocationService.getDistance(
-        40.7128, -74.0060, // New York
-        34.0522, -118.2437  // Los Angeles
+        40.7128,
+        -74.006, // New York
+        34.0522,
+        -118.2437 // Los Angeles
       );
 
       expect(distance).toBeGreaterThan(3900);
@@ -303,10 +308,7 @@ describe('Geolocation Service Tests', () => {
     });
 
     test('should return zero for same coordinates', () => {
-      const distance = geolocationService.getDistance(
-        40.7128, -74.0060,
-        40.7128, -74.0060
-      );
+      const distance = geolocationService.getDistance(40.7128, -74.006, 40.7128, -74.006);
 
       expect(distance).toBe(0);
     });
@@ -377,10 +379,10 @@ describe('Geolocation Service Tests', () => {
     test('should respect forceRefresh parameter', async () => {
       // First call
       await geolocationService.getUserLocation(false, false);
-      
+
       // Second call with force refresh
       await geolocationService.getUserLocation(false, true);
-      
+
       // Should have made geolocation call due to force refresh
       expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();
     });
@@ -391,7 +393,7 @@ describe('Integration with Venue Service', () => {
   test('should work with venue service for nearby venues', async () => {
     const location = {
       latitude: 40.7128,
-      longitude: -74.0060,
+      longitude: -74.006,
       city: 'New York',
     };
 

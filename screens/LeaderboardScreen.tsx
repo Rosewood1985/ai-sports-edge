@@ -1,3 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  getFirestore,
+} from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,12 +16,10 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  ScrollView
+  ScrollView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { useTheme } from '../src/contexts/ThemeContext';
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
 import { formatDate } from '../utils/dateUtils';
 
 // Define interfaces
@@ -42,14 +50,14 @@ type TimePeriod = '7days' | '30days' | 'alltime';
 
 /**
  * LeaderboardScreen Component
- * 
+ *
  * Displays a ranking of AI picks by performance
  */
 const LeaderboardScreen: React.FC = () => {
   const { theme, themePreset } = useTheme();
   const isDark = themePreset === 'dark';
   const db = getFirestore();
-  
+
   // State
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [stats, setStats] = useState<LeaderboardStats>({
@@ -58,26 +66,26 @@ const LeaderboardScreen: React.FC = () => {
     losses: 0,
     pushes: 0,
     pending: 0,
-    winPercentage: 0
+    winPercentage: 0,
   });
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('7days');
   const [sportFilter, setSportFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'confidence' | 'date'>('date');
-  
+
   // Fetch leaderboard data
   useEffect(() => {
     fetchLeaderboardData();
   }, [timePeriod, sportFilter, sortBy]);
-  
+
   const fetchLeaderboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Calculate date threshold based on time period
       const now = new Date();
       let startDate = new Date();
-      
+
       if (timePeriod === '7days') {
         startDate.setDate(now.getDate() - 7);
       } else if (timePeriod === '30days') {
@@ -86,41 +94,41 @@ const LeaderboardScreen: React.FC = () => {
         // For 'alltime', set a far past date
         startDate = new Date(2020, 0, 1);
       }
-      
+
       // Build query
       const aiPicksRef = collection(db, 'aiPicksOfDay');
       let q = query(aiPicksRef);
-      
+
       // Add filters
       if (sportFilter) {
         q = query(q, where('sport', '==', sportFilter));
       }
-      
+
       // Add sorting
       if (sortBy === 'confidence') {
         q = query(q, orderBy('confidence', 'desc'));
       } else {
         q = query(q, orderBy('createdAt', 'desc'));
       }
-      
+
       // Execute query
       const querySnapshot = await getDocs(q);
-      
+
       // Process results
       const leaderboardEntries: LeaderboardEntry[] = [];
       let wins = 0;
       let losses = 0;
       let pushes = 0;
       let pending = 0;
-      
-      querySnapshot.forEach((doc) => {
+
+      querySnapshot.forEach(doc => {
         const data = doc.data();
-        
+
         // Skip entries outside the time period
         if (data.createdAt && data.createdAt.toDate() < startDate) {
           return;
         }
-        
+
         const entry: LeaderboardEntry = {
           id: doc.id,
           gameId: data.gameId || '',
@@ -131,24 +139,22 @@ const LeaderboardScreen: React.FC = () => {
           sport: data.sport || '',
           createdAt: data.createdAt,
           predictedWinner: data.predictedWinner,
-          actualWinner: data.actualWinner
+          actualWinner: data.actualWinner,
         };
-        
+
         // Count results
         if (entry.result === 'win') wins++;
         else if (entry.result === 'loss') losses++;
         else if (entry.result === 'push') pushes++;
         else pending++;
-        
+
         leaderboardEntries.push(entry);
       });
-      
+
       // Calculate stats
       const totalPicks = wins + losses + pushes + pending;
-      const winPercentage = (wins + losses) > 0 
-        ? Math.round((wins / (wins + losses)) * 100) 
-        : 0;
-      
+      const winPercentage = wins + losses > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
+
       // Update state
       setEntries(leaderboardEntries);
       setStats({
@@ -157,16 +163,16 @@ const LeaderboardScreen: React.FC = () => {
         losses,
         pushes,
         pending,
-        winPercentage
+        winPercentage,
       });
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Error fetching leaderboard data:', error);
       setLoading(false);
     }
   };
-  
+
   // Render time period tabs
   const renderTimePeriodTabs = () => {
     return (
@@ -174,94 +180,82 @@ const LeaderboardScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.tab,
-            timePeriod === '7days' && [styles.activeTab, { backgroundColor: theme.primary }]
+            timePeriod === '7days' && [styles.activeTab, { backgroundColor: theme.primary }],
           ]}
           onPress={() => setTimePeriod('7days')}
         >
-          <Text
-            style={[
-              styles.tabText,
-              timePeriod === '7days' && styles.activeTabText
-            ]}
-          >
+          <Text style={[styles.tabText, timePeriod === '7days' && styles.activeTabText]}>
             7 Days
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            timePeriod === '30days' && [styles.activeTab, { backgroundColor: theme.primary }]
+            timePeriod === '30days' && [styles.activeTab, { backgroundColor: theme.primary }],
           ]}
           onPress={() => setTimePeriod('30days')}
         >
-          <Text
-            style={[
-              styles.tabText,
-              timePeriod === '30days' && styles.activeTabText
-            ]}
-          >
+          <Text style={[styles.tabText, timePeriod === '30days' && styles.activeTabText]}>
             30 Days
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tab,
-            timePeriod === 'alltime' && [styles.activeTab, { backgroundColor: theme.primary }]
+            timePeriod === 'alltime' && [styles.activeTab, { backgroundColor: theme.primary }],
           ]}
           onPress={() => setTimePeriod('alltime')}
         >
-          <Text
-            style={[
-              styles.tabText,
-              timePeriod === 'alltime' && styles.activeTabText
-            ]}
-          >
+          <Text style={[styles.tabText, timePeriod === 'alltime' && styles.activeTabText]}>
             All Time
           </Text>
         </TouchableOpacity>
       </View>
     );
   };
-  
+
   // Render sport filter
   const renderSportFilter = () => {
     const sports = ['NBA', 'NFL', 'MLB', 'NHL', 'NCAAB', 'NCAAF'];
-    
+
     return (
       <View style={styles.sportFilterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
             style={[
               styles.sportFilterItem,
-              sportFilter === null && [styles.activeSportFilter, { backgroundColor: theme.primary }]
+              sportFilter === null && [
+                styles.activeSportFilter,
+                { backgroundColor: theme.primary },
+              ],
             ]}
             onPress={() => setSportFilter(null)}
           >
             <Text
-              style={[
-                styles.sportFilterText,
-                sportFilter === null && styles.activeSportFilterText
-              ]}
+              style={[styles.sportFilterText, sportFilter === null && styles.activeSportFilterText]}
             >
               All
             </Text>
           </TouchableOpacity>
-          
-          {sports.map((sport) => (
+
+          {sports.map(sport => (
             <TouchableOpacity
               key={sport}
               style={[
                 styles.sportFilterItem,
-                sportFilter === sport && [styles.activeSportFilter, { backgroundColor: theme.primary }]
+                sportFilter === sport && [
+                  styles.activeSportFilter,
+                  { backgroundColor: theme.primary },
+                ],
               ]}
               onPress={() => setSportFilter(sport)}
             >
               <Text
                 style={[
                   styles.sportFilterText,
-                  sportFilter === sport && styles.activeSportFilterText
+                  sportFilter === sport && styles.activeSportFilterText,
                 ]}
               >
                 {sport}
@@ -272,7 +266,7 @@ const LeaderboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render stats summary
   const renderStatsSummary = () => {
     return (
@@ -281,17 +275,17 @@ const LeaderboardScreen: React.FC = () => {
           <Text style={[styles.statValue, { color: theme.text }]}>{stats.winPercentage}%</Text>
           <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Win Rate</Text>
         </View>
-        
+
         <View style={styles.statItem}>
           <Text style={[styles.statValue, { color: theme.success }]}>{stats.wins}</Text>
           <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Wins</Text>
         </View>
-        
+
         <View style={styles.statItem}>
           <Text style={[styles.statValue, { color: theme.error }]}>{stats.losses}</Text>
           <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Losses</Text>
         </View>
-        
+
         <View style={styles.statItem}>
           <Text style={[styles.statValue, { color: theme.text }]}>{stats.totalPicks}</Text>
           <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Total</Text>
@@ -299,50 +293,40 @@ const LeaderboardScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render sort options
   const renderSortOptions = () => {
     return (
       <View style={styles.sortContainer}>
         <Text style={[styles.sortLabel, { color: theme.textSecondary }]}>Sort by:</Text>
-        
-        <TouchableOpacity
-          style={styles.sortButton}
-          onPress={() => setSortBy('date')}
-        >
+
+        <TouchableOpacity style={styles.sortButton} onPress={() => setSortBy('date')}>
           <Text
             style={[
               styles.sortButtonText,
-              { color: sortBy === 'date' ? theme.primary : theme.text }
+              { color: sortBy === 'date' ? theme.primary : theme.text },
             ]}
           >
             Date
           </Text>
-          {sortBy === 'date' && (
-            <Ionicons name="checkmark" size={16} color={theme.primary} />
-          )}
+          {sortBy === 'date' && <Ionicons name="checkmark" size={16} color={theme.primary} />}
         </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={styles.sortButton}
-          onPress={() => setSortBy('confidence')}
-        >
+
+        <TouchableOpacity style={styles.sortButton} onPress={() => setSortBy('confidence')}>
           <Text
             style={[
               styles.sortButtonText,
-              { color: sortBy === 'confidence' ? theme.primary : theme.text }
+              { color: sortBy === 'confidence' ? theme.primary : theme.text },
             ]}
           >
             Confidence
           </Text>
-          {sortBy === 'confidence' && (
-            <Ionicons name="checkmark" size={16} color={theme.primary} />
-          )}
+          {sortBy === 'confidence' && <Ionicons name="checkmark" size={16} color={theme.primary} />}
         </TouchableOpacity>
       </View>
     );
   };
-  
+
   // Render leaderboard entry
   const renderLeaderboardEntry = ({ item, index }: { item: LeaderboardEntry; index: number }) => {
     // Get result icon
@@ -357,68 +341,70 @@ const LeaderboardScreen: React.FC = () => {
         return <Ionicons name="time" size={20} color={theme.textSecondary} />;
       }
     };
-    
+
     return (
       <View style={[styles.entryContainer, { backgroundColor: theme.cardBackground }]}>
         <View style={styles.entryHeader}>
           <View style={styles.entryRank}>
             <Text style={[styles.rankText, { color: theme.text }]}>{index + 1}</Text>
           </View>
-          
+
           <View style={styles.entrySport}>
             <Text style={[styles.sportText, { color: theme.textSecondary }]}>{item.sport}</Text>
           </View>
-          
+
           <View style={styles.entryDate}>
             <Text style={[styles.dateText, { color: theme.textSecondary }]}>
               {item.createdAt ? formatDate(item.createdAt.toDate()) : 'N/A'}
             </Text>
           </View>
-          
-          <View style={styles.entryResult}>
-            {getResultIcon()}
-          </View>
+
+          <View style={styles.entryResult}>{getResultIcon()}</View>
         </View>
-        
+
         <View style={styles.entryTeams}>
           <Text style={[styles.teamText, { color: theme.text }]}>
             {item.teamA} vs {item.teamB}
           </Text>
         </View>
-        
+
         <View style={styles.entryDetails}>
           <View style={styles.confidenceContainer}>
-            <Text style={[styles.confidenceLabel, { color: theme.textSecondary }]}>Confidence:</Text>
+            <Text style={[styles.confidenceLabel, { color: theme.textSecondary }]}>
+              Confidence:
+            </Text>
             <Text style={[styles.confidenceValue, { color: theme.text }]}>{item.confidence}%</Text>
           </View>
-          
+
           {item.predictedWinner && (
             <View style={styles.winnerContainer}>
               <Text style={[styles.winnerLabel, { color: theme.textSecondary }]}>Pick:</Text>
-              <Text style={[styles.winnerValue, { color: theme.text }]}>{item.predictedWinner}</Text>
+              <Text style={[styles.winnerValue, { color: theme.text }]}>
+                {item.predictedWinner}
+              </Text>
             </View>
           )}
         </View>
       </View>
     );
   };
-  
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.title, { color: theme.text }]}>AI Picks Leaderboard</Text>
-      
+
       {renderTimePeriodTabs()}
       {renderSportFilter()}
       {renderStatsSummary()}
       {renderSortOptions()}
-      
+
       {loading ? (
         <ActivityIndicator size="large" color={theme.primary} style={styles.loader} />
       ) : (
         <FlatList
           data={entries}
           renderItem={renderLeaderboardEntry}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>

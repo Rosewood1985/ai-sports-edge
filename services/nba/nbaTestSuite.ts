@@ -3,11 +3,11 @@
 // Comprehensive Testing and Validation for NBA System
 // =============================================================================
 
-import { NBADataSyncService } from './nbaDataSyncService';
 import { NBAAnalyticsService } from './nbaAnalyticsService';
+import { NBADataSyncService } from './nbaDataSyncService';
+import { NBAIntegrationService } from './nbaIntegrationService';
 import { NBAMLPredictionService } from './nbaMLPredictionService';
 import { NBAParlayAnalyticsService } from './nbaParlayAnalyticsService';
-import { NBAIntegrationService } from './nbaIntegrationService';
 import { initSentry } from '../sentryConfig';
 
 // Initialize Sentry for monitoring
@@ -85,12 +85,48 @@ export class NBATestSuite {
    */
   async runComprehensiveTests(): Promise<NBATestResults> {
     const results: NBATestResults = {
-      dataSyncTests: { teamSync: false, playerSync: false, gameSync: false, apiAccess: false, errors: [] },
-      analyticsTests: { teamAnalytics: false, playerAnalytics: false, basketballMetrics: false, situationalAnalytics: false, errors: [] },
-      mlPredictionTests: { gamePredict: false, playoffPredict: false, featureExtraction: false, modelAccuracy: false, errors: [] },
-      parlayAnalyticsTests: { sameGameParlays: false, multiGameParlays: false, playerPropParlays: false, correlationAnalysis: false, errors: [] },
-      integrationTests: { systemInit: false, dataFlow: false, realTimeUpdates: false, comprehensiveData: false, errors: [] },
-      performanceTests: { responseTime: false, memoryUsage: false, concurrency: false, caching: false, errors: [] },
+      dataSyncTests: {
+        teamSync: false,
+        playerSync: false,
+        gameSync: false,
+        apiAccess: false,
+        errors: [],
+      },
+      analyticsTests: {
+        teamAnalytics: false,
+        playerAnalytics: false,
+        basketballMetrics: false,
+        situationalAnalytics: false,
+        errors: [],
+      },
+      mlPredictionTests: {
+        gamePredict: false,
+        playoffPredict: false,
+        featureExtraction: false,
+        modelAccuracy: false,
+        errors: [],
+      },
+      parlayAnalyticsTests: {
+        sameGameParlays: false,
+        multiGameParlays: false,
+        playerPropParlays: false,
+        correlationAnalysis: false,
+        errors: [],
+      },
+      integrationTests: {
+        systemInit: false,
+        dataFlow: false,
+        realTimeUpdates: false,
+        comprehensiveData: false,
+        errors: [],
+      },
+      performanceTests: {
+        responseTime: false,
+        memoryUsage: false,
+        concurrency: false,
+        caching: false,
+        errors: [],
+      },
       overallScore: 0,
       passed: false,
     };
@@ -126,7 +162,9 @@ export class NBATestSuite {
       results.overallScore = this.calculateOverallScore(results);
       results.passed = results.overallScore >= 80; // 80% pass threshold
 
-      console.log(`🏀 NBA Test Suite Complete - Score: ${results.overallScore}% - ${results.passed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(
+        `🏀 NBA Test Suite Complete - Score: ${results.overallScore}% - ${results.passed ? '✅ PASSED' : '❌ FAILED'}`
+      );
 
       return results;
     } catch (error) {
@@ -141,7 +179,13 @@ export class NBATestSuite {
    * Test NBA Data Sync Service
    */
   private async testDataSyncService(): Promise<NBATestResults['dataSyncTests']> {
-    const results = { teamSync: false, playerSync: false, gameSync: false, apiAccess: false, errors: [] };
+    const results = {
+      teamSync: false,
+      playerSync: false,
+      gameSync: false,
+      apiAccess: false,
+      errors: [],
+    };
 
     try {
       console.log('  🔍 Testing NBA data sync service...');
@@ -160,7 +204,8 @@ export class NBATestSuite {
       try {
         await this.dataSyncService.syncTeams();
         const teams = await this.dataSyncService.getAllActiveTeams();
-        if (teams && teams.length >= 30) { // NBA has 30 teams
+        if (teams && teams.length >= 30) {
+          // NBA has 30 teams
           results.teamSync = true;
           console.log(`  ✅ Team sync test passed - ${teams.length} teams loaded`);
         } else {
@@ -194,10 +239,15 @@ export class NBATestSuite {
         await this.dataSyncService.syncCurrentSeasonGames();
         const upcomingGames = await this.dataSyncService.getUpcomingGames(7);
         const recentGames = await this.dataSyncService.getRecentGames(7);
-        
-        if ((upcomingGames && upcomingGames.length >= 0) || (recentGames && recentGames.length >= 0)) {
+
+        if (
+          (upcomingGames && upcomingGames.length >= 0) ||
+          (recentGames && recentGames.length >= 0)
+        ) {
           results.gameSync = true;
-          console.log(`  ✅ Game sync test passed - ${upcomingGames.length} upcoming, ${recentGames.length} recent games`);
+          console.log(
+            `  ✅ Game sync test passed - ${upcomingGames.length} upcoming, ${recentGames.length} recent games`
+          );
         } else {
           results.errors.push('Game sync failed to return valid data');
           console.log('  ❌ Game sync test failed');
@@ -206,7 +256,6 @@ export class NBATestSuite {
         results.errors.push(`Game sync failed: ${error.message}`);
         console.log('  ❌ Game sync test failed');
       }
-
     } catch (error) {
       results.errors.push(`Data sync service initialization failed: ${error.message}`);
       console.log('  ❌ Data sync service initialization failed');
@@ -219,7 +268,13 @@ export class NBATestSuite {
    * Test NBA Analytics Service
    */
   private async testAnalyticsService(): Promise<NBATestResults['analyticsTests']> {
-    const results = { teamAnalytics: false, playerAnalytics: false, basketballMetrics: false, situationalAnalytics: false, errors: [] };
+    const results = {
+      teamAnalytics: false,
+      playerAnalytics: false,
+      basketballMetrics: false,
+      situationalAnalytics: false,
+      errors: [],
+    };
 
     try {
       console.log('  📊 Testing NBA analytics service...');
@@ -232,12 +287,17 @@ export class NBATestSuite {
 
       // Test team analytics generation
       try {
-        const teamAnalytics = await this.analyticsService.generateTeamAnalytics(testTeamId, currentSeason);
-        if (teamAnalytics && 
-            teamAnalytics.teamId && 
-            teamAnalytics.offensiveMetrics && 
-            teamAnalytics.defensiveMetrics &&
-            teamAnalytics.advancedMetrics) {
+        const teamAnalytics = await this.analyticsService.generateTeamAnalytics(
+          testTeamId,
+          currentSeason
+        );
+        if (
+          teamAnalytics &&
+          teamAnalytics.teamId &&
+          teamAnalytics.offensiveMetrics &&
+          teamAnalytics.defensiveMetrics &&
+          teamAnalytics.advancedMetrics
+        ) {
           results.teamAnalytics = true;
           console.log('  ✅ Team analytics test passed');
         } else {
@@ -251,11 +311,16 @@ export class NBATestSuite {
 
       // Test player analytics generation
       try {
-        const playerAnalytics = await this.analyticsService.generatePlayerAnalytics(testPlayerId, currentSeason);
-        if (playerAnalytics && 
-            playerAnalytics.playerId && 
-            playerAnalytics.basicMetrics && 
-            playerAnalytics.advancedMetrics) {
+        const playerAnalytics = await this.analyticsService.generatePlayerAnalytics(
+          testPlayerId,
+          currentSeason
+        );
+        if (
+          playerAnalytics &&
+          playerAnalytics.playerId &&
+          playerAnalytics.basicMetrics &&
+          playerAnalytics.advancedMetrics
+        ) {
           results.playerAnalytics = true;
           console.log('  ✅ Player analytics test passed');
         } else {
@@ -269,11 +334,16 @@ export class NBATestSuite {
 
       // Test basketball-specific metrics
       try {
-        const teamAnalytics = await this.analyticsService.getTeamAnalytics(testTeamId, currentSeason);
-        if (teamAnalytics && 
-            teamAnalytics.basketballMetrics && 
-            teamAnalytics.basketballMetrics.reboundRate &&
-            teamAnalytics.basketballMetrics.shootingEfficiency) {
+        const teamAnalytics = await this.analyticsService.getTeamAnalytics(
+          testTeamId,
+          currentSeason
+        );
+        if (
+          teamAnalytics &&
+          teamAnalytics.basketballMetrics &&
+          teamAnalytics.basketballMetrics.reboundRate &&
+          teamAnalytics.basketballMetrics.shootingEfficiency
+        ) {
           results.basketballMetrics = true;
           console.log('  ✅ Basketball metrics test passed');
         } else {
@@ -287,11 +357,16 @@ export class NBATestSuite {
 
       // Test situational analytics
       try {
-        const teamAnalytics = await this.analyticsService.getTeamAnalytics(testTeamId, currentSeason);
-        if (teamAnalytics && 
-            teamAnalytics.situationalMetrics && 
-            teamAnalytics.situationalMetrics.clutchPerformance &&
-            teamAnalytics.situationalMetrics.homeAwayDifferential) {
+        const teamAnalytics = await this.analyticsService.getTeamAnalytics(
+          testTeamId,
+          currentSeason
+        );
+        if (
+          teamAnalytics &&
+          teamAnalytics.situationalMetrics &&
+          teamAnalytics.situationalMetrics.clutchPerformance &&
+          teamAnalytics.situationalMetrics.homeAwayDifferential
+        ) {
           results.situationalAnalytics = true;
           console.log('  ✅ Situational analytics test passed');
         } else {
@@ -302,7 +377,6 @@ export class NBATestSuite {
         results.errors.push(`Situational analytics failed: ${error.message}`);
         console.log('  ❌ Situational analytics test failed');
       }
-
     } catch (error) {
       results.errors.push(`Analytics service initialization failed: ${error.message}`);
       console.log('  ❌ Analytics service initialization failed');
@@ -315,7 +389,13 @@ export class NBATestSuite {
    * Test NBA ML Prediction Service
    */
   private async testMLPredictionService(): Promise<NBATestResults['mlPredictionTests']> {
-    const results = { gamePredict: false, playoffPredict: false, featureExtraction: false, modelAccuracy: false, errors: [] };
+    const results = {
+      gamePredict: false,
+      playoffPredict: false,
+      featureExtraction: false,
+      modelAccuracy: false,
+      errors: [],
+    };
 
     try {
       console.log('  🤖 Testing NBA ML prediction service...');
@@ -324,14 +404,22 @@ export class NBATestSuite {
 
       // Test game prediction
       try {
-        const prediction = await this.mlPredictionService.predictGame('lakers', 'celtics', new Date());
-        if (prediction && 
-            prediction.winProbability !== undefined && 
-            prediction.spreadPrediction !== undefined &&
-            prediction.totalPointsPrediction !== undefined &&
-            prediction.confidence) {
+        const prediction = await this.mlPredictionService.predictGame(
+          'lakers',
+          'celtics',
+          new Date()
+        );
+        if (
+          prediction &&
+          prediction.winProbability !== undefined &&
+          prediction.spreadPrediction !== undefined &&
+          prediction.totalPointsPrediction !== undefined &&
+          prediction.confidence
+        ) {
           results.gamePredict = true;
-          console.log(`  ✅ Game prediction test passed - Win prob: ${prediction.winProbability.toFixed(3)}`);
+          console.log(
+            `  ✅ Game prediction test passed - Win prob: ${prediction.winProbability.toFixed(3)}`
+          );
         } else {
           results.errors.push('Game prediction returned incomplete data');
           console.log('  ❌ Game prediction test failed');
@@ -343,7 +431,12 @@ export class NBATestSuite {
 
       // Test playoff probability calculation
       try {
-        const playoffProbs = await this.mlPredictionService.calculatePlayoffProbabilities(['lakers', 'celtics', 'warriors', 'nets']);
+        const playoffProbs = await this.mlPredictionService.calculatePlayoffProbabilities([
+          'lakers',
+          'celtics',
+          'warriors',
+          'nets',
+        ]);
         if (playoffProbs && Object.keys(playoffProbs).length > 0) {
           const firstTeam = Object.values(playoffProbs)[0];
           if (firstTeam.playoffProbability !== undefined && firstTeam.seedProbabilities) {
@@ -364,20 +457,31 @@ export class NBATestSuite {
 
       // Test feature extraction
       try {
-        const features = await this.mlPredictionService.extractMLFeatures('lakers', 'celtics', new Date());
-        if (features && 
-            features.homeTeamStrength && 
-            features.awayTeamStrength &&
-            features.matchupMetrics &&
-            features.situationalContext &&
-            features.playerFactors &&
-            features.historicalContext) {
+        const features = await this.mlPredictionService.extractMLFeatures(
+          'lakers',
+          'celtics',
+          new Date()
+        );
+        if (
+          features &&
+          features.homeTeamStrength &&
+          features.awayTeamStrength &&
+          features.matchupMetrics &&
+          features.situationalContext &&
+          features.playerFactors &&
+          features.historicalContext
+        ) {
           const totalFeatures = this.countFeatures(features);
-          if (totalFeatures >= 60) { // Should have 70 features
+          if (totalFeatures >= 60) {
+            // Should have 70 features
             results.featureExtraction = true;
-            console.log(`  ✅ Feature extraction test passed - ${totalFeatures} features extracted`);
+            console.log(
+              `  ✅ Feature extraction test passed - ${totalFeatures} features extracted`
+            );
           } else {
-            results.errors.push(`Feature extraction returned insufficient features: ${totalFeatures}`);
+            results.errors.push(
+              `Feature extraction returned insufficient features: ${totalFeatures}`
+            );
             console.log('  ❌ Feature extraction test failed');
           }
         } else {
@@ -392,7 +496,8 @@ export class NBATestSuite {
       // Test model accuracy validation
       try {
         const accuracy = await this.mlPredictionService.validatePredictionAccuracy();
-        if (accuracy >= 0 && accuracy <= 100) { // Valid percentage
+        if (accuracy >= 0 && accuracy <= 100) {
+          // Valid percentage
           results.modelAccuracy = true;
           console.log(`  ✅ Model accuracy test passed - ${accuracy.toFixed(1)}% accuracy`);
         } else {
@@ -403,7 +508,6 @@ export class NBATestSuite {
         results.errors.push(`Model accuracy validation failed: ${error.message}`);
         console.log('  ❌ Model accuracy test failed');
       }
-
     } catch (error) {
       results.errors.push(`ML Prediction service initialization failed: ${error.message}`);
       console.log('  ❌ ML Prediction service initialization failed');
@@ -416,7 +520,13 @@ export class NBATestSuite {
    * Test NBA Parlay Analytics Service
    */
   private async testParlayAnalyticsService(): Promise<NBATestResults['parlayAnalyticsTests']> {
-    const results = { sameGameParlays: false, multiGameParlays: false, playerPropParlays: false, correlationAnalysis: false, errors: [] };
+    const results = {
+      sameGameParlays: false,
+      multiGameParlays: false,
+      playerPropParlays: false,
+      correlationAnalysis: false,
+      errors: [],
+    };
 
     try {
       console.log('  💰 Testing NBA parlay analytics service...');
@@ -427,11 +537,15 @@ export class NBATestSuite {
 
       // Test same-game parlay generation
       try {
-        const sameGameBuilder = await this.parlayAnalyticsService.buildSameGameParlayOptions(testGameIds[0]);
-        if (sameGameBuilder && 
-            sameGameBuilder.availableLegs && 
-            sameGameBuilder.optimalCombinations &&
-            sameGameBuilder.correlationMatrix) {
+        const sameGameBuilder = await this.parlayAnalyticsService.buildSameGameParlayOptions(
+          testGameIds[0]
+        );
+        if (
+          sameGameBuilder &&
+          sameGameBuilder.availableLegs &&
+          sameGameBuilder.optimalCombinations &&
+          sameGameBuilder.correlationMatrix
+        ) {
           results.sameGameParlays = true;
           console.log('  ✅ Same-game parlay test passed');
         } else {
@@ -445,10 +559,13 @@ export class NBATestSuite {
 
       // Test multi-game parlay opportunities
       try {
-        const opportunities = await this.parlayAnalyticsService.analyzeParlayOpportunities(testGameIds);
+        const opportunities =
+          await this.parlayAnalyticsService.analyzeParlayOpportunities(testGameIds);
         if (Array.isArray(opportunities)) {
           results.multiGameParlays = true;
-          console.log(`  ✅ Multi-game parlay test passed - ${opportunities.length} opportunities generated`);
+          console.log(
+            `  ✅ Multi-game parlay test passed - ${opportunities.length} opportunities generated`
+          );
         } else {
           results.errors.push('Multi-game parlay analysis returned invalid data');
           console.log('  ❌ Multi-game parlay test failed');
@@ -463,7 +580,9 @@ export class NBATestSuite {
         const playerProps = await this.parlayAnalyticsService.analyzePlayerProps(testGameIds[0]);
         if (Array.isArray(playerProps)) {
           results.playerPropParlays = true;
-          console.log(`  ✅ Player prop analysis test passed - ${playerProps.length} props analyzed`);
+          console.log(
+            `  ✅ Player prop analysis test passed - ${playerProps.length} props analyzed`
+          );
         } else {
           results.errors.push('Player prop analysis returned invalid data');
           console.log('  ❌ Player prop analysis test failed');
@@ -478,9 +597,11 @@ export class NBATestSuite {
         const opportunities = await this.parlayAnalyticsService.getParlayOpportunities(5);
         if (opportunities.length > 0) {
           const firstOpp = opportunities[0];
-          if (firstOpp.analytics && 
-              firstOpp.analytics.correlationScore !== undefined &&
-              firstOpp.analytics.independenceScore !== undefined) {
+          if (
+            firstOpp.analytics &&
+            firstOpp.analytics.correlationScore !== undefined &&
+            firstOpp.analytics.independenceScore !== undefined
+          ) {
             results.correlationAnalysis = true;
             console.log('  ✅ Correlation analysis test passed');
           } else {
@@ -495,7 +616,6 @@ export class NBATestSuite {
         results.errors.push(`Correlation analysis failed: ${error.message}`);
         console.log('  ❌ Correlation analysis test failed');
       }
-
     } catch (error) {
       results.errors.push(`Parlay Analytics service initialization failed: ${error.message}`);
       console.log('  ❌ Parlay Analytics service initialization failed');
@@ -508,7 +628,13 @@ export class NBATestSuite {
    * Test NBA Integration Service
    */
   private async testIntegrationService(): Promise<NBATestResults['integrationTests']> {
-    const results = { systemInit: false, dataFlow: false, realTimeUpdates: false, comprehensiveData: false, errors: [] };
+    const results = {
+      systemInit: false,
+      dataFlow: false,
+      realTimeUpdates: false,
+      comprehensiveData: false,
+      errors: [],
+    };
 
     try {
       console.log('  🔗 Testing NBA integration service...');
@@ -526,11 +652,13 @@ export class NBATestSuite {
       // Test data flow between services
       try {
         const comprehensiveData = await this.integrationService.getComprehensiveTeamData('lakers');
-        if (comprehensiveData && 
-            comprehensiveData.team && 
-            comprehensiveData.analytics &&
-            comprehensiveData.upcomingGames !== undefined &&
-            comprehensiveData.predictions !== undefined) {
+        if (
+          comprehensiveData &&
+          comprehensiveData.team &&
+          comprehensiveData.analytics &&
+          comprehensiveData.upcomingGames !== undefined &&
+          comprehensiveData.predictions !== undefined
+        ) {
           results.dataFlow = true;
           console.log('  ✅ Data flow test passed');
         } else {
@@ -545,11 +673,13 @@ export class NBATestSuite {
       // Test system status monitoring
       try {
         const status = await this.integrationService.getSystemStatus();
-        if (status && 
-            status.dataSync && 
-            status.analytics && 
-            status.predictions &&
-            status.parlayAnalytics) {
+        if (
+          status &&
+          status.dataSync &&
+          status.analytics &&
+          status.predictions &&
+          status.parlayAnalytics
+        ) {
           results.realTimeUpdates = true;
           console.log('  ✅ System status monitoring test passed');
         } else {
@@ -564,11 +694,13 @@ export class NBATestSuite {
       // Test comprehensive data integration
       try {
         const dailyInsights = await this.integrationService.getDailyGameInsights(new Date());
-        if (dailyInsights && 
-            dailyInsights.date && 
-            dailyInsights.games !== undefined &&
-            dailyInsights.predictions !== undefined &&
-            dailyInsights.parlayOpportunities !== undefined) {
+        if (
+          dailyInsights &&
+          dailyInsights.date &&
+          dailyInsights.games !== undefined &&
+          dailyInsights.predictions !== undefined &&
+          dailyInsights.parlayOpportunities !== undefined
+        ) {
           results.comprehensiveData = true;
           console.log('  ✅ Comprehensive data integration test passed');
         } else {
@@ -579,7 +711,6 @@ export class NBATestSuite {
         results.errors.push(`Comprehensive data integration failed: ${error.message}`);
         console.log('  ❌ Comprehensive data integration test failed');
       }
-
     } catch (error) {
       results.errors.push(`Integration service initialization failed: ${error.message}`);
       console.log('  ❌ Integration service initialization failed');
@@ -592,7 +723,13 @@ export class NBATestSuite {
    * Test NBA System Performance
    */
   private async testPerformance(): Promise<NBATestResults['performanceTests']> {
-    const results = { responseTime: false, memoryUsage: false, concurrency: false, caching: false, errors: [] };
+    const results = {
+      responseTime: false,
+      memoryUsage: false,
+      concurrency: false,
+      caching: false,
+      errors: [],
+    };
 
     try {
       console.log('  ⚡ Testing NBA system performance...');
@@ -602,8 +739,9 @@ export class NBATestSuite {
         const startTime = Date.now();
         await this.integrationService.getSystemStatus();
         const responseTime = Date.now() - startTime;
-        
-        if (responseTime < 5000) { // Less than 5 seconds
+
+        if (responseTime < 5000) {
+          // Less than 5 seconds
           results.responseTime = true;
           console.log(`  ✅ Response time test passed - ${responseTime}ms`);
         } else {
@@ -618,11 +756,16 @@ export class NBATestSuite {
       // Test memory usage (basic check)
       try {
         const memUsage = process.memoryUsage();
-        if (memUsage.heapUsed < 512 * 1024 * 1024) { // Less than 512MB
+        if (memUsage.heapUsed < 512 * 1024 * 1024) {
+          // Less than 512MB
           results.memoryUsage = true;
-          console.log(`  ✅ Memory usage test passed - ${(memUsage.heapUsed / 1024 / 1024).toFixed(1)}MB`);
+          console.log(
+            `  ✅ Memory usage test passed - ${(memUsage.heapUsed / 1024 / 1024).toFixed(1)}MB`
+          );
         } else {
-          results.errors.push(`Memory usage too high: ${(memUsage.heapUsed / 1024 / 1024).toFixed(1)}MB`);
+          results.errors.push(
+            `Memory usage too high: ${(memUsage.heapUsed / 1024 / 1024).toFixed(1)}MB`
+          );
           console.log('  ❌ Memory usage test failed');
         }
       } catch (error) {
@@ -632,10 +775,10 @@ export class NBATestSuite {
 
       // Test concurrency (simplified)
       try {
-        const concurrentRequests = Array(5).fill(null).map(() => 
-          this.integrationService.getSystemStatus()
-        );
-        
+        const concurrentRequests = Array(5)
+          .fill(null)
+          .map(() => this.integrationService.getSystemStatus());
+
         const results_concurrent = await Promise.all(concurrentRequests);
         if (results_concurrent.every(result => result !== null)) {
           results.concurrency = true;
@@ -654,24 +797,27 @@ export class NBATestSuite {
         const startTime1 = Date.now();
         await this.dataSyncService.getTeamById('lakers');
         const firstCallTime = Date.now() - startTime1;
-        
+
         const startTime2 = Date.now();
         await this.dataSyncService.getTeamById('lakers');
         const secondCallTime = Date.now() - startTime2;
-        
+
         // Second call should be faster due to caching (or at least not significantly slower)
         if (secondCallTime <= firstCallTime * 2) {
           results.caching = true;
-          console.log(`  ✅ Caching test passed - First: ${firstCallTime}ms, Second: ${secondCallTime}ms`);
+          console.log(
+            `  ✅ Caching test passed - First: ${firstCallTime}ms, Second: ${secondCallTime}ms`
+          );
         } else {
-          results.errors.push(`Caching test failed - Second call slower: ${secondCallTime}ms vs ${firstCallTime}ms`);
+          results.errors.push(
+            `Caching test failed - Second call slower: ${secondCallTime}ms vs ${firstCallTime}ms`
+          );
           console.log('  ❌ Caching test failed');
         }
       } catch (error) {
         results.errors.push(`Caching test failed: ${error.message}`);
         console.log('  ❌ Caching test failed');
       }
-
     } catch (error) {
       results.errors.push(`Performance testing failed: ${error.message}`);
       console.log('  ❌ Performance testing failed');
@@ -731,37 +877,37 @@ export class NBATestSuite {
    */
   private countFeatures(features: any): number {
     let count = 0;
-    
+
     // Count homeTeamStrength features (10)
     if (features.homeTeamStrength) {
       count += Object.keys(features.homeTeamStrength).length;
     }
-    
+
     // Count awayTeamStrength features (10)
     if (features.awayTeamStrength) {
       count += Object.keys(features.awayTeamStrength).length;
     }
-    
+
     // Count matchupMetrics features (15)
     if (features.matchupMetrics) {
       count += Object.keys(features.matchupMetrics).length;
     }
-    
+
     // Count situationalContext features (15)
     if (features.situationalContext) {
       count += Object.keys(features.situationalContext).length;
     }
-    
+
     // Count playerFactors features (10)
     if (features.playerFactors) {
       count += Object.keys(features.playerFactors).length;
     }
-    
+
     // Count historicalContext features (10)
     if (features.historicalContext) {
       count += Object.keys(features.historicalContext).length;
     }
-    
+
     return count;
   }
 
@@ -785,7 +931,10 @@ export class NBATestSuite {
         return false;
       }
 
-      const testAnalytics = await this.analyticsService.generateTeamAnalytics(teams[0].id, new Date().getFullYear());
+      const testAnalytics = await this.analyticsService.generateTeamAnalytics(
+        teams[0].id,
+        new Date().getFullYear()
+      );
       if (!testAnalytics || !testAnalytics.teamId) {
         console.error('❌ Quick validation failed: Analytics generation failed');
         return false;
@@ -863,9 +1012,11 @@ The NBA system implementation includes:
 - Real-time integration service orchestrating all components
 - Performance optimization and caching mechanisms
 
-${results.passed ? 
-  'The NBA system is ready for production deployment with comprehensive coverage of all basketball analytics and betting features.' : 
-  'The NBA system requires fixes before production deployment. Please review failed tests and implement necessary corrections.'}
+${
+  results.passed
+    ? 'The NBA system is ready for production deployment with comprehensive coverage of all basketball analytics and betting features.'
+    : 'The NBA system requires fixes before production deployment. Please review failed tests and implement necessary corrections.'
+}
 
 ## Feature Highlights
 - **70+ ML Features**: Comprehensive feature extraction for accurate predictions

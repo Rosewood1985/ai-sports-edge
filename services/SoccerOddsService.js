@@ -123,32 +123,32 @@ class SoccerOddsService {
    */
   async getGameOdds(gameId, league = 'EPL', includeWeather = false) {
     try {
-      const allOdds = league === 'EPL'
-        ? await this.getEplMoneylineOdds()
-        : await this.getMlsMoneylineOdds();
-      
+      const allOdds =
+        league === 'EPL' ? await this.getEplMoneylineOdds() : await this.getMlsMoneylineOdds();
+
       const game = allOdds.find(game => game.id === gameId);
-      
+
       if (!game || !includeWeather) {
         return game;
       }
-      
+
       // Get weather-adjusted odds
       const sportKey = league === 'EPL' ? 'SOCCER_EPL' : 'SOCCER_MLS';
       const outcomes = game.bookmakers.flatMap(bookmaker =>
-        bookmaker.markets
-          .filter(market => market.key === 'h2h')
-          .flatMap(market => market.outcomes)
+        bookmaker.markets.filter(market => market.key === 'h2h').flatMap(market => market.outcomes)
       );
-      
-      const { odds: adjustedOdds, weatherAdjustment, weatherData } =
-        await weatherAdjustmentService.getWeatherAdjustedOdds(gameId, sportKey, outcomes);
-      
+
+      const {
+        odds: adjustedOdds,
+        weatherAdjustment,
+        weatherData,
+      } = await weatherAdjustmentService.getWeatherAdjustedOdds(gameId, sportKey, outcomes);
+
       return {
         ...game,
         weatherAdjustedOdds: adjustedOdds,
         weatherAdjustment,
-        weatherData
+        weatherData,
       };
     } catch (error) {
       console.error(`Error fetching ${league} odds for game ${gameId}:`, error);
@@ -195,97 +195,108 @@ class SoccerOddsService {
    * @private
    */
   async processBestOdds(games, sportKey, includeWeather = false) {
-    const processedGames = await Promise.all(games.map(async game => {
-      // Find best odds for home team
-      const homeOdds = game.bookmakers.map(bookmaker => {
-        const market = bookmaker.markets.find(m => m.key === 'h2h');
-        if (!market) return null;
-        
-        const outcome = market.outcomes.find(o => o.name === game.homeTeam);
-        if (!outcome) return null;
-        
-        return {
-          bookmaker: bookmaker.name,
-          price: outcome.price,
+    const processedGames = await Promise.all(
+      games.map(async game => {
+        // Find best odds for home team
+        const homeOdds = game.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === game.homeTeam);
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
+        // Find best odds for away team
+        const awayOdds = game.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === game.awayTeam);
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
+        // Find best odds for draw
+        const drawOdds = game.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === 'Draw');
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
+        // Sort by best price
+        const bestHomeOdds = homeOdds.sort((a, b) => b.price - a.price)[0] || null;
+        const bestAwayOdds = awayOdds.sort((a, b) => b.price - a.price)[0] || null;
+        const bestDrawOdds = drawOdds.sort((a, b) => b.price - a.price)[0] || null;
+
+        const result = {
+          id: game.id,
+          sport: game.sport,
+          homeTeam: game.homeTeam,
+          awayTeam: game.awayTeam,
+          startTime: game.startTime,
+          bestHomeOdds,
+          bestAwayOdds,
+          bestDrawOdds,
         };
-      }).filter(Boolean);
-      
-      // Find best odds for away team
-      const awayOdds = game.bookmakers.map(bookmaker => {
-        const market = bookmaker.markets.find(m => m.key === 'h2h');
-        if (!market) return null;
-        
-        const outcome = market.outcomes.find(o => o.name === game.awayTeam);
-        if (!outcome) return null;
-        
-        return {
-          bookmaker: bookmaker.name,
-          price: outcome.price,
-        };
-      }).filter(Boolean);
-      
-      // Find best odds for draw
-      const drawOdds = game.bookmakers.map(bookmaker => {
-        const market = bookmaker.markets.find(m => m.key === 'h2h');
-        if (!market) return null;
-        
-        const outcome = market.outcomes.find(o => o.name === 'Draw');
-        if (!outcome) return null;
-        
-        return {
-          bookmaker: bookmaker.name,
-          price: outcome.price,
-        };
-      }).filter(Boolean);
-      
-      // Sort by best price
-      const bestHomeOdds = homeOdds.sort((a, b) => b.price - a.price)[0] || null;
-      const bestAwayOdds = awayOdds.sort((a, b) => b.price - a.price)[0] || null;
-      const bestDrawOdds = drawOdds.sort((a, b) => b.price - a.price)[0] || null;
-      
-      const result = {
-        id: game.id,
-        sport: game.sport,
-        homeTeam: game.homeTeam,
-        awayTeam: game.awayTeam,
-        startTime: game.startTime,
-        bestHomeOdds,
-        bestAwayOdds,
-        bestDrawOdds,
-      };
-      
-      // Add weather adjustments if requested
-      if (includeWeather) {
-        const outcomes = [
-          bestHomeOdds && { name: game.homeTeam, price: bestHomeOdds.price },
-          bestAwayOdds && { name: game.awayTeam, price: bestAwayOdds.price },
-          bestDrawOdds && { name: 'Draw', price: bestDrawOdds.price }
-        ].filter(Boolean);
-        
-        const { odds: adjustedOdds, weatherAdjustment, weatherData } =
-          await weatherAdjustmentService.getWeatherAdjustedOdds(game.id, sportKey, outcomes);
-        
-        // Map adjusted odds back to home/away/draw
-        const adjustedHomeOdds = adjustedOdds.find(o => o.name === game.homeTeam);
-        const adjustedAwayOdds = adjustedOdds.find(o => o.name === game.awayTeam);
-        const adjustedDrawOdds = adjustedOdds.find(o => o.name === 'Draw');
-        
-        return {
-          ...result,
-          weatherAdjustedHomeOdds: adjustedHomeOdds,
-          weatherAdjustedAwayOdds: adjustedAwayOdds,
-          weatherAdjustedDrawOdds: adjustedDrawOdds,
-          weatherAdjustment,
-          weatherData
-        };
-      }
-      
-      return result;
-    }));
-    
+
+        // Add weather adjustments if requested
+        if (includeWeather) {
+          const outcomes = [
+            bestHomeOdds && { name: game.homeTeam, price: bestHomeOdds.price },
+            bestAwayOdds && { name: game.awayTeam, price: bestAwayOdds.price },
+            bestDrawOdds && { name: 'Draw', price: bestDrawOdds.price },
+          ].filter(Boolean);
+
+          const {
+            odds: adjustedOdds,
+            weatherAdjustment,
+            weatherData,
+          } = await weatherAdjustmentService.getWeatherAdjustedOdds(game.id, sportKey, outcomes);
+
+          // Map adjusted odds back to home/away/draw
+          const adjustedHomeOdds = adjustedOdds.find(o => o.name === game.homeTeam);
+          const adjustedAwayOdds = adjustedOdds.find(o => o.name === game.awayTeam);
+          const adjustedDrawOdds = adjustedOdds.find(o => o.name === 'Draw');
+
+          return {
+            ...result,
+            weatherAdjustedHomeOdds: adjustedHomeOdds,
+            weatherAdjustedAwayOdds: adjustedAwayOdds,
+            weatherAdjustedDrawOdds: adjustedDrawOdds,
+            weatherAdjustment,
+            weatherData,
+          };
+        }
+
+        return result;
+      })
+    );
+
     return processedGames;
   }
-  
+
   /**
    * Get weather impact for soccer games
    * @param {string} league - League ('EPL' or 'MLS')
@@ -294,42 +305,43 @@ class SoccerOddsService {
   async getWeatherImpact(league = 'EPL') {
     try {
       const sportKey = league === 'EPL' ? 'SOCCER_EPL' : 'SOCCER_MLS';
-      const games = league === 'EPL'
-        ? await this.getEplMoneylineOdds()
-        : await this.getMlsMoneylineOdds();
-      
-      const gamesWithWeatherImpact = await Promise.all(games.map(async game => {
-        try {
-          // Get weather data for the game
-          const { weatherAdjustment, weatherData } =
-            await weatherAdjustmentService.getWeatherAdjustedOdds(game.id, sportKey, []);
-          
-          return {
-            id: game.id,
-            sport: game.sport,
-            homeTeam: game.homeTeam,
-            awayTeam: game.awayTeam,
-            startTime: game.startTime,
-            weatherAdjustment,
-            weatherData
-          };
-        } catch (error) {
-          console.error(`Error getting weather impact for game ${game.id}:`, error);
-          return {
-            id: game.id,
-            sport: game.sport,
-            homeTeam: game.homeTeam,
-            awayTeam: game.awayTeam,
-            startTime: game.startTime,
-            weatherAdjustment: {
-              factor: 1.0,
-              impact: 'none',
-              description: 'Error getting weather data'
-            }
-          };
-        }
-      }));
-      
+      const games =
+        league === 'EPL' ? await this.getEplMoneylineOdds() : await this.getMlsMoneylineOdds();
+
+      const gamesWithWeatherImpact = await Promise.all(
+        games.map(async game => {
+          try {
+            // Get weather data for the game
+            const { weatherAdjustment, weatherData } =
+              await weatherAdjustmentService.getWeatherAdjustedOdds(game.id, sportKey, []);
+
+            return {
+              id: game.id,
+              sport: game.sport,
+              homeTeam: game.homeTeam,
+              awayTeam: game.awayTeam,
+              startTime: game.startTime,
+              weatherAdjustment,
+              weatherData,
+            };
+          } catch (error) {
+            console.error(`Error getting weather impact for game ${game.id}:`, error);
+            return {
+              id: game.id,
+              sport: game.sport,
+              homeTeam: game.homeTeam,
+              awayTeam: game.awayTeam,
+              startTime: game.startTime,
+              weatherAdjustment: {
+                factor: 1.0,
+                impact: 'none',
+                description: 'Error getting weather data',
+              },
+            };
+          }
+        })
+      );
+
       return gamesWithWeatherImpact;
     } catch (error) {
       console.error(`Error fetching ${league} weather impact:`, error);

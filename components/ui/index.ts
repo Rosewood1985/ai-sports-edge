@@ -10,11 +10,7 @@ export { default as AnimatedTransition } from '../AnimatedTransition';
 export { default as PageTransition } from '../PageTransition';
 
 // Theme Components
-export {
-  UIThemeProvider,
-  useUITheme,
-  default as UIThemeContext
-} from '../UIThemeProvider';
+export { UIThemeProvider, useUITheme, default as UIThemeContext } from '../UIThemeProvider';
 export type { UIThemeType } from '../UIThemeProvider';
 
 // Enhanced Analytics Components - Lazy loaded for performance
@@ -24,9 +20,7 @@ export const HistoricalTrendsChart = React.lazy(() => import('../HistoricalTrend
 export { default as DateRangeSelector } from '../DateRangeSelector';
 
 // Enhanced Screens - Lazy loaded for performance
-export const EnhancedAnalyticsDashboardScreen = React.lazy(() =>
-  import('../../screens/EnhancedAnalyticsDashboardScreen')
+export const EnhancedAnalyticsDashboardScreen = React.lazy(
+  () => import('../../screens/EnhancedAnalyticsDashboardScreen')
 );
-export const UIUXDemoScreen = React.lazy(() =>
-  import('../../screens/UIUXDemoScreen')
-);
+export const UIUXDemoScreen = React.lazy(() => import('../../screens/UIUXDemoScreen'));

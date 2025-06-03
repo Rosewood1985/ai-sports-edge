@@ -86,7 +86,7 @@ export const TIER_CONFIG = {
     },
   },
   analyst: {
-    name: 'Analyst', 
+    name: 'Analyst',
     monthlyPrice: 74.99,
     annualPrice: 629.92, // 30% off from $899.88
     features: {
@@ -117,7 +117,7 @@ export const TIER_CONFIG = {
         annual: 1595.92,
       },
       duo: {
-        monthly: 95.00, // $189.99 ÷ 2
+        monthly: 95.0, // $189.99 ÷ 2
         annual: 797.96, // $1595.92 ÷ 2
       },
       trio: {
@@ -158,5 +158,8 @@ export const TIER_CONFIG = {
 export const LEGACY_TIER_CONFIG = {
   insight: { ...TIER_CONFIG.insight, price: TIER_CONFIG.insight.monthlyPrice },
   analyst: { ...TIER_CONFIG.analyst, price: TIER_CONFIG.analyst.monthlyPrice },
-  edge_collective: { ...TIER_CONFIG.edge_collective, price: TIER_CONFIG.edge_collective.monthlyPrice },
+  edge_collective: {
+    ...TIER_CONFIG.edge_collective,
+    price: TIER_CONFIG.edge_collective.monthlyPrice,
+  },
 };

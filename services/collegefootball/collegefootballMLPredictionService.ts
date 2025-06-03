@@ -1,6 +1,6 @@
 /**
  * College Football ML Prediction Service
- * 
+ *
  * Machine Learning predictions for college football with focus on:
  * - Game outcome predictions with CFB-specific factors
  * - Conference championship probabilities
@@ -10,6 +10,7 @@
  */
 
 import * as Sentry from '@sentry/node';
+
 import { CFBAnalytics, GamePrediction } from './collegefootballAnalyticsService';
 import { CollegeFootballTeam, CFBGame } from './collegefootballDataSyncService';
 
@@ -102,7 +103,7 @@ export interface CFBPrediction {
   homeTeam: string;
   awayTeam: string;
   predictedAt: Date;
-  
+
   prediction: {
     winner: string;
     winnerTeamId: string;
@@ -111,7 +112,7 @@ export interface CFBPrediction {
       home: number;
       away: number;
     };
-    
+
     // Spread and Total Predictions
     spread: {
       predicted: number;
@@ -119,7 +120,7 @@ export interface CFBPrediction {
       line?: number; // Market line if available
       edge?: number; // Difference from market
     };
-    
+
     total: {
       predicted: number;
       confidence: number;
@@ -129,7 +130,7 @@ export interface CFBPrediction {
       edge?: number; // Difference from market
     };
   };
-  
+
   // Model Information
   model: {
     version: string;
@@ -137,7 +138,7 @@ export interface CFBPrediction {
     featureImportance: Record<string, number>;
     modelConfidence: number;
   };
-  
+
   // CFB-Specific Factors
   cfbFactors: {
     talentAdvantage: number;
@@ -146,7 +147,7 @@ export interface CFBPrediction {
     homeFieldImpact: number;
     motivationalFactors: number;
   };
-  
+
   // Risk Assessment
   risk: {
     upsetPotential: number;
@@ -162,7 +163,7 @@ export interface PlayoffPrediction {
   teamName: string;
   conference: string;
   currentRecord: string;
-  
+
   probabilities: {
     makeBowl: number;
     winConference: number;
@@ -170,19 +171,19 @@ export interface PlayoffPrediction {
     makeFinal4: number;
     winNationalChampionship: number;
   };
-  
-  pathways: Array<{
+
+  pathways: {
     scenario: string;
     probability: number;
     requirements: string[];
-  }>;
-  
-  keyGames: Array<{
+  }[];
+
+  keyGames: {
     opponent: string;
     date: Date;
     importance: number;
     mustWin: boolean;
-  }>;
+  }[];
 }
 
 export class CollegeFootballMLPredictionService {
@@ -202,7 +203,7 @@ export class CollegeFootballMLPredictionService {
       Sentry.addBreadcrumb({
         message: `Predicting CFB game ${gameId} with ML`,
         category: 'cfb.ml.prediction',
-        level: 'info'
+        level: 'info',
       });
 
       console.log(`🤖 Generating ML prediction for CFB game: ${gameId}`);
@@ -234,15 +235,16 @@ export class CollegeFootballMLPredictionService {
           version: this.modelVersion,
           features,
           featureImportance: this.getFeatureImportance(),
-          modelConfidence: prediction.confidence
+          modelConfidence: prediction.confidence,
         },
         cfbFactors,
-        risk
+        risk,
       };
 
-      console.log(`✅ Generated ML prediction: ${prediction.winner} (${(prediction.confidence * 100).toFixed(1)}% confidence)`);
+      console.log(
+        `✅ Generated ML prediction: ${prediction.winner} (${(prediction.confidence * 100).toFixed(1)}% confidence)`
+      );
       return mlPrediction;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error predicting CFB game with ML:', error);
@@ -277,12 +279,13 @@ export class CollegeFootballMLPredictionService {
         currentRecord: seasonData.record,
         probabilities,
         pathways,
-        keyGames
+        keyGames,
       };
 
-      console.log(`✅ Playoff probability for ${team.name}: ${(probabilities.makePlayoff * 100).toFixed(1)}%`);
+      console.log(
+        `✅ Playoff probability for ${team.name}: ${(probabilities.makePlayoff * 100).toFixed(1)}%`
+      );
       return playoffPrediction;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error calculating playoff probability:', error);
@@ -305,15 +308,17 @@ export class CollegeFootballMLPredictionService {
       const predictions = await Promise.all(
         teams.map(async team => {
           const probability = await this.calculateConferenceChampionshipProbability(
-            team, standings, remainingGames
+            team,
+            standings,
+            remainingGames
           );
-          
+
           return {
             teamId: team.id,
             teamName: team.name,
             currentRecord: standings[team.id]?.record || '0-0',
             probability,
-            pathToChampionship: this.calculateChampionshipPath(team, remainingGames)
+            pathToChampionship: this.calculateChampionshipPath(team, remainingGames),
           };
         })
       );
@@ -321,9 +326,8 @@ export class CollegeFootballMLPredictionService {
       return {
         conferenceId,
         predictions: predictions.sort((a, b) => b.probability - a.probability),
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error predicting conference championship:', error);
@@ -339,8 +343,8 @@ export class CollegeFootballMLPredictionService {
    * Extracts comprehensive ML features for CFB prediction
    */
   private async extractMLFeatures(
-    game: CFBGame, 
-    homeTeam: CollegeFootballTeam, 
+    game: CFBGame,
+    homeTeam: CollegeFootballTeam,
     awayTeam: CollegeFootballTeam
   ): Promise<CFBMLFeatures> {
     console.log('🔧 Extracting ML features for CFB prediction');
@@ -363,28 +367,52 @@ export class CollegeFootballMLPredictionService {
       ...coachingFeatures,
       ...situationalFeatures,
       ...conferenceFeatures,
-      ...historicalFeatures
+      ...historicalFeatures,
     };
 
     console.log(`✅ Extracted ${Object.keys(features).length} ML features`);
     return features;
   }
 
-  private extractPerformanceFeatures(homeAnalytics: CFBAnalytics, awayAnalytics: CFBAnalytics): Partial<CFBMLFeatures> {
+  private extractPerformanceFeatures(
+    homeAnalytics: CFBAnalytics,
+    awayAnalytics: CFBAnalytics
+  ): Partial<CFBMLFeatures> {
     return {
-      offensiveEfficiency: homeAnalytics.offensiveMetrics.pointsPerGame - awayAnalytics.offensiveMetrics.pointsPerGame,
-      defensiveEfficiency: awayAnalytics.defensiveMetrics.pointsAllowedPerGame - homeAnalytics.defensiveMetrics.pointsAllowedPerGame,
+      offensiveEfficiency:
+        homeAnalytics.offensiveMetrics.pointsPerGame - awayAnalytics.offensiveMetrics.pointsPerGame,
+      defensiveEfficiency:
+        awayAnalytics.defensiveMetrics.pointsAllowedPerGame -
+        homeAnalytics.defensiveMetrics.pointsAllowedPerGame,
       specialTeamsEfficiency: 0, // TODO: Implement special teams metrics
-      turnoverMargin: (homeAnalytics.defensiveMetrics.takeaways - homeAnalytics.offensiveMetrics.turnoversLost) -
-                      (awayAnalytics.defensiveMetrics.takeaways - awayAnalytics.offensiveMetrics.turnoversLost),
-      redZoneOffense: homeAnalytics.offensiveMetrics.redZoneEfficiency - awayAnalytics.offensiveMetrics.redZoneEfficiency,
-      redZoneDefense: awayAnalytics.defensiveMetrics.redZoneDefense - homeAnalytics.defensiveMetrics.redZoneDefense,
-      thirdDownOffense: homeAnalytics.offensiveMetrics.thirdDownConversion - awayAnalytics.offensiveMetrics.thirdDownConversion,
-      thirdDownDefense: awayAnalytics.defensiveMetrics.thirdDownDefense - homeAnalytics.defensiveMetrics.thirdDownDefense,
-      rushingOffense: homeAnalytics.offensiveMetrics.rushingYardsPerGame - awayAnalytics.offensiveMetrics.rushingYardsPerGame,
-      rushingDefense: awayAnalytics.defensiveMetrics.rushingYardsAllowed - homeAnalytics.defensiveMetrics.rushingYardsAllowed,
-      passingOffense: homeAnalytics.offensiveMetrics.passingYardsPerGame - awayAnalytics.offensiveMetrics.passingYardsPerGame,
-      passingDefense: awayAnalytics.defensiveMetrics.passingYardsAllowed - homeAnalytics.defensiveMetrics.passingYardsAllowed,
+      turnoverMargin:
+        homeAnalytics.defensiveMetrics.takeaways -
+        homeAnalytics.offensiveMetrics.turnoversLost -
+        (awayAnalytics.defensiveMetrics.takeaways - awayAnalytics.offensiveMetrics.turnoversLost),
+      redZoneOffense:
+        homeAnalytics.offensiveMetrics.redZoneEfficiency -
+        awayAnalytics.offensiveMetrics.redZoneEfficiency,
+      redZoneDefense:
+        awayAnalytics.defensiveMetrics.redZoneDefense -
+        homeAnalytics.defensiveMetrics.redZoneDefense,
+      thirdDownOffense:
+        homeAnalytics.offensiveMetrics.thirdDownConversion -
+        awayAnalytics.offensiveMetrics.thirdDownConversion,
+      thirdDownDefense:
+        awayAnalytics.defensiveMetrics.thirdDownDefense -
+        homeAnalytics.defensiveMetrics.thirdDownDefense,
+      rushingOffense:
+        homeAnalytics.offensiveMetrics.rushingYardsPerGame -
+        awayAnalytics.offensiveMetrics.rushingYardsPerGame,
+      rushingDefense:
+        awayAnalytics.defensiveMetrics.rushingYardsAllowed -
+        homeAnalytics.defensiveMetrics.rushingYardsAllowed,
+      passingOffense:
+        homeAnalytics.offensiveMetrics.passingYardsPerGame -
+        awayAnalytics.offensiveMetrics.passingYardsPerGame,
+      passingDefense:
+        awayAnalytics.defensiveMetrics.passingYardsAllowed -
+        homeAnalytics.defensiveMetrics.passingYardsAllowed,
       scoringOffense: homeAnalytics.offensiveMetrics.pointsPerGame,
       scoringDefense: homeAnalytics.defensiveMetrics.pointsAllowedPerGame,
       timeOfPossession: 0, // TODO: Implement time of possession
@@ -392,49 +420,81 @@ export class CollegeFootballMLPredictionService {
       sackRate: homeAnalytics.defensiveMetrics.sacks,
       pressureRate: 0, // TODO: Implement pressure rate
       explosivePlayRate: 0, // TODO: Implement explosive play rate
-      garbageTimePerformance: 0 // TODO: Implement garbage time performance
+      garbageTimePerformance: 0, // TODO: Implement garbage time performance
     };
   }
 
-  private extractRecruitingFeatures(homeAnalytics: CFBAnalytics, awayAnalytics: CFBAnalytics): Partial<CFBMLFeatures> {
+  private extractRecruitingFeatures(
+    homeAnalytics: CFBAnalytics,
+    awayAnalytics: CFBAnalytics
+  ): Partial<CFBMLFeatures> {
     return {
-      currentRecruitingRank: homeAnalytics.recruitingMetrics.currentClassRanking - awayAnalytics.recruitingMetrics.currentClassRanking,
+      currentRecruitingRank:
+        homeAnalytics.recruitingMetrics.currentClassRanking -
+        awayAnalytics.recruitingMetrics.currentClassRanking,
       averageRecruitingRank3Year: 0, // TODO: Implement 3-year average
-      bluechipRatio: homeAnalytics.recruitingMetrics.bluechipRatio - awayAnalytics.recruitingMetrics.bluechipRatio,
-      transferPortalRating: (homeAnalytics.recruitingMetrics.transferPortalGains - homeAnalytics.recruitingMetrics.transferPortalLosses) -
-                           (awayAnalytics.recruitingMetrics.transferPortalGains - awayAnalytics.recruitingMetrics.transferPortalLosses),
+      bluechipRatio:
+        homeAnalytics.recruitingMetrics.bluechipRatio -
+        awayAnalytics.recruitingMetrics.bluechipRatio,
+      transferPortalRating:
+        homeAnalytics.recruitingMetrics.transferPortalGains -
+        homeAnalytics.recruitingMetrics.transferPortalLosses -
+        (awayAnalytics.recruitingMetrics.transferPortalGains -
+          awayAnalytics.recruitingMetrics.transferPortalLosses),
       depthChartStrength: 0, // TODO: Implement depth chart analysis
       experienceLevel: 0, // TODO: Implement experience level
-      talentRetention: homeAnalytics.recruitingMetrics.inStateRetention - awayAnalytics.recruitingMetrics.inStateRetention,
+      talentRetention:
+        homeAnalytics.recruitingMetrics.inStateRetention -
+        awayAnalytics.recruitingMetrics.inStateRetention,
       developmentRating: 0, // TODO: Implement development rating
       inStateRecruiting: homeAnalytics.recruitingMetrics.inStateRetention,
-      nationalRecruitingReach: homeAnalytics.recruitingMetrics.nationalRecruits - awayAnalytics.recruitingMetrics.nationalRecruits,
+      nationalRecruitingReach:
+        homeAnalytics.recruitingMetrics.nationalRecruits -
+        awayAnalytics.recruitingMetrics.nationalRecruits,
       recruitingMomentum: 0, // TODO: Implement recruiting momentum
-      starRatingAverage: homeAnalytics.recruitingMetrics.averageStarRating - awayAnalytics.recruitingMetrics.averageStarRating,
+      starRatingAverage:
+        homeAnalytics.recruitingMetrics.averageStarRating -
+        awayAnalytics.recruitingMetrics.averageStarRating,
       commitmentStrength: 0, // TODO: Implement commitment strength
       earlySigningSuccess: 0, // TODO: Implement early signing metrics
-      recruitingVisits: 0 // TODO: Implement recruiting visits
+      recruitingVisits: 0, // TODO: Implement recruiting visits
     };
   }
 
-  private extractCoachingFeatures(homeAnalytics: CFBAnalytics, awayAnalytics: CFBAnalytics): Partial<CFBMLFeatures> {
+  private extractCoachingFeatures(
+    homeAnalytics: CFBAnalytics,
+    awayAnalytics: CFBAnalytics
+  ): Partial<CFBMLFeatures> {
     return {
-      headCoachExperience: homeAnalytics.coachingMetrics.headCoachExperience - awayAnalytics.coachingMetrics.headCoachExperience,
+      headCoachExperience:
+        homeAnalytics.coachingMetrics.headCoachExperience -
+        awayAnalytics.coachingMetrics.headCoachExperience,
       headCoachWinPercentage: 0, // TODO: Implement win percentage
-      coordinatorStability: homeAnalytics.coachingMetrics.coachingStability - awayAnalytics.coachingMetrics.coachingStability,
-      gameManagementRating: homeAnalytics.coachingMetrics.gameManagement - awayAnalytics.coachingMetrics.gameManagement,
-      adjustmentRating: homeAnalytics.coachingMetrics.adjustmentRating - awayAnalytics.coachingMetrics.adjustmentRating,
-      playerDevelopment: homeAnalytics.coachingMetrics.developmentIndex - awayAnalytics.coachingMetrics.developmentIndex,
+      coordinatorStability:
+        homeAnalytics.coachingMetrics.coachingStability -
+        awayAnalytics.coachingMetrics.coachingStability,
+      gameManagementRating:
+        homeAnalytics.coachingMetrics.gameManagement - awayAnalytics.coachingMetrics.gameManagement,
+      adjustmentRating:
+        homeAnalytics.coachingMetrics.adjustmentRating -
+        awayAnalytics.coachingMetrics.adjustmentRating,
+      playerDevelopment:
+        homeAnalytics.coachingMetrics.developmentIndex -
+        awayAnalytics.coachingMetrics.developmentIndex,
       recruitingAbility: 0, // TODO: Implement recruiting ability
       coachingTreeStrength: 0, // TODO: Implement coaching tree analysis
       systemFit: 0, // TODO: Implement system fit
       cultureFit: 0, // TODO: Implement culture fit
       pressureHandling: 0, // TODO: Implement pressure handling
-      innovationIndex: 0 // TODO: Implement innovation index
+      innovationIndex: 0, // TODO: Implement innovation index
     };
   }
 
-  private extractSituationalFeatures(game: CFBGame, homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): Partial<CFBMLFeatures> {
+  private extractSituationalFeatures(
+    game: CFBGame,
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): Partial<CFBMLFeatures> {
     return {
       homeFieldAdvantage: homeTeam.facilities.stadiumAdvantage / 10,
       weatherImpact: this.calculateWeatherImpact(game),
@@ -445,30 +505,40 @@ export class CollegeFootballMLPredictionService {
       suspensions: 0, // TODO: Implement suspension tracking
       academicEligibility: 1, // TODO: Implement academic eligibility
       postseasonImplications: game.gameContext.playoffImplications ? 0.3 : 0,
-      emotionalFactors: game.gameContext.revengeGame ? 0.1 : 0
+      emotionalFactors: game.gameContext.revengeGame ? 0.1 : 0,
     };
   }
 
-  private extractConferenceFeatures(homeAnalytics: CFBAnalytics, awayAnalytics: CFBAnalytics): Partial<CFBMLFeatures> {
+  private extractConferenceFeatures(
+    homeAnalytics: CFBAnalytics,
+    awayAnalytics: CFBAnalytics
+  ): Partial<CFBMLFeatures> {
     return {
-      conferenceStrength: homeAnalytics.strengthOfSchedule.conferenceStrength - awayAnalytics.strengthOfSchedule.conferenceStrength,
-      strengthOfSchedule: homeAnalytics.strengthOfSchedule.current - awayAnalytics.strengthOfSchedule.current,
-      strengthOfRecord: homeAnalytics.playoff.strengthOfRecord - awayAnalytics.playoff.strengthOfRecord,
+      conferenceStrength:
+        homeAnalytics.strengthOfSchedule.conferenceStrength -
+        awayAnalytics.strengthOfSchedule.conferenceStrength,
+      strengthOfSchedule:
+        homeAnalytics.strengthOfSchedule.current - awayAnalytics.strengthOfSchedule.current,
+      strengthOfRecord:
+        homeAnalytics.playoff.strengthOfRecord - awayAnalytics.playoff.strengthOfRecord,
       qualityWins: homeAnalytics.playoff.qualityWins - awayAnalytics.playoff.qualityWins,
       badLosses: awayAnalytics.playoff.badLosses - homeAnalytics.playoff.badLosses,
       conferenceRecord: 0, // TODO: Implement conference record
       nonConferenceRecord: 0, // TODO: Implement non-conference record
-      strengthOfVictory: 0 // TODO: Implement strength of victory
+      strengthOfVictory: 0, // TODO: Implement strength of victory
     };
   }
 
-  private extractHistoricalFeatures(homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): Partial<CFBMLFeatures> {
+  private extractHistoricalFeatures(
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): Partial<CFBMLFeatures> {
     return {
       headToHeadRecord: 0, // TODO: Implement head-to-head record
       recentTrend: 0, // TODO: Implement recent trend analysis
       lastMeetingResult: 0, // TODO: Implement last meeting result
       historicalPerformanceLocation: 0, // TODO: Implement location-based performance
-      seasonalTrends: 0 // TODO: Implement seasonal trends
+      seasonalTrends: 0, // TODO: Implement seasonal trends
     };
   }
 
@@ -479,7 +549,10 @@ export class CollegeFootballMLPredictionService {
   /**
    * Runs ML prediction using extracted features
    */
-  private async runMLPrediction(features: CFBMLFeatures, game: CFBGame): Promise<CFBPrediction['prediction']> {
+  private async runMLPrediction(
+    features: CFBMLFeatures,
+    game: CFBGame
+  ): Promise<CFBPrediction['prediction']> {
     console.log('🤖 Running ML prediction model');
 
     // TODO: Implement actual ML model (Random Forest, Gradient Boosting, Neural Network)
@@ -513,18 +586,18 @@ export class CollegeFootballMLPredictionService {
       confidence,
       winProbability: {
         home: homeWinProb,
-        away: awayWinProb
+        away: awayWinProb,
       },
       spread: {
         predicted: spread,
-        confidence: confidence * 0.8
+        confidence: confidence * 0.8,
       },
       total: {
         predicted: total,
         confidence: confidence * 0.7,
         over: total > 52 ? 0.6 : 0.4,
-        under: total < 52 ? 0.6 : 0.4
-      }
+        under: total < 52 ? 0.6 : 0.4,
+      },
     };
   }
 
@@ -532,8 +605,8 @@ export class CollegeFootballMLPredictionService {
    * Monte Carlo simulation for playoff probabilities
    */
   private async runPlayoffSimulation(
-    team: CollegeFootballTeam, 
-    seasonData: any, 
+    team: CollegeFootballTeam,
+    seasonData: any,
     remainingSchedule: CFBGame[]
   ): Promise<PlayoffPrediction['probabilities']> {
     console.log(`🎲 Running playoff simulation for ${team.name}`);
@@ -547,7 +620,7 @@ export class CollegeFootballMLPredictionService {
 
     for (let i = 0; i < simulations; i++) {
       const simulatedSeason = await this.simulateRestOfSeason(team, remainingSchedule);
-      
+
       if (simulatedSeason.bowlEligible) makeBowl++;
       if (simulatedSeason.conferenceChampion) winConference++;
       if (simulatedSeason.playoffBerth) makePlayoff++;
@@ -560,7 +633,7 @@ export class CollegeFootballMLPredictionService {
       winConference: winConference / simulations,
       makePlayoff: makePlayoff / simulations,
       makeFinal4: makeFinal4 / simulations,
-      winNationalChampionship: winNationalChampionship / simulations
+      winNationalChampionship: winNationalChampionship / simulations,
     };
   }
 
@@ -569,23 +642,24 @@ export class CollegeFootballMLPredictionService {
   // ===========================================================================
 
   private calculateCFBFactors(
-    homeTeam: CollegeFootballTeam, 
-    awayTeam: CollegeFootballTeam, 
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam,
     game: CFBGame
   ): CFBPrediction['cfbFactors'] {
     return {
-      talentAdvantage: (homeTeam.recruitingClass.averageRating - awayTeam.recruitingClass.averageRating) / 5,
-      coachingAdvantage: (homeTeam.coaching.winPercentage - awayTeam.coaching.winPercentage),
+      talentAdvantage:
+        (homeTeam.recruitingClass.averageRating - awayTeam.recruitingClass.averageRating) / 5,
+      coachingAdvantage: homeTeam.coaching.winPercentage - awayTeam.coaching.winPercentage,
       experienceAdvantage: (homeTeam.coaching.experience - awayTeam.coaching.experience) / 20,
       homeFieldImpact: homeTeam.facilities.stadiumAdvantage / 10,
-      motivationalFactors: this.calculateMotivationalFactors(game)
+      motivationalFactors: this.calculateMotivationalFactors(game),
     };
   }
 
   private assessPredictionRisk(
-    game: CFBGame, 
-    homeTeam: CollegeFootballTeam, 
-    awayTeam: CollegeFootballTeam, 
+    game: CFBGame,
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam,
     prediction: any
   ): CFBPrediction['risk'] {
     return {
@@ -593,30 +667,30 @@ export class CollegeFootballMLPredictionService {
       volatility: this.calculateVolatility(game),
       keyInjuries: [], // TODO: Implement injury tracking
       weatherConcerns: !!game.weather,
-      lookAheadSpot: game.gameContext.lookAheadSpot
+      lookAheadSpot: game.gameContext.lookAheadSpot,
     };
   }
 
   private calculateWeatherImpact(game: CFBGame): number {
     if (!game.weather) return 0;
-    
+
     // TODO: Implement weather impact calculation
     return 0;
   }
 
   private calculateMotivationalFactors(game: CFBGame): number {
     let motivation = 0;
-    
+
     if (game.isRivalryGame) motivation += 0.2;
     if (game.gameContext.revengeGame) motivation += 0.15;
     if (game.gameContext.playoffImplications) motivation += 0.25;
-    
+
     return Math.min(motivation, 0.5); // Cap at 0.5
   }
 
   private calculateUpsetPotential(
-    homeTeam: CollegeFootballTeam, 
-    awayTeam: CollegeFootballTeam, 
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam,
     prediction: any
   ): number {
     // TODO: Implement upset potential calculation
@@ -678,7 +752,7 @@ export class CollegeFootballMLPredictionService {
       isConferenceGame: true,
       isRivalryGame: false,
       betting: { spread: -3.5, total: 52.5, moneyline: { home: -150, away: 130 } },
-      gameContext: { playoffImplications: false, revengeGame: false, lookAheadSpot: false }
+      gameContext: { playoffImplications: false, revengeGame: false, lookAheadSpot: false },
     };
   }
 
@@ -694,7 +768,7 @@ export class CollegeFootballMLPredictionService {
       rankings: { ap: 15, coaches: 14, cfp: 16 },
       recruitingClass: { year: 2024, ranking: 25, averageRating: 3.2, totalCommits: 22 },
       coaching: { headCoach: 'Coach Sample', experience: 8, winPercentage: 0.68 },
-      facilities: { stadiumCapacity: 80000, trainingFacilityRating: 8.5 }
+      facilities: { stadiumCapacity: 80000, trainingFacilityRating: 8.5 },
     };
   }
 
@@ -729,40 +803,59 @@ export class CollegeFootballMLPredictionService {
     return [];
   }
 
-  private calculateConferenceChampionshipProbability(team: CollegeFootballTeam, standings: any, remainingGames: CFBGame[]): Promise<number> {
+  private calculateConferenceChampionshipProbability(
+    team: CollegeFootballTeam,
+    standings: any,
+    remainingGames: CFBGame[]
+  ): Promise<number> {
     // TODO: Implement conference championship probability calculation
     return Promise.resolve(0.15);
   }
 
-  private calculateChampionshipPath(team: CollegeFootballTeam, remainingGames: CFBGame[]): string[] {
+  private calculateChampionshipPath(
+    team: CollegeFootballTeam,
+    remainingGames: CFBGame[]
+  ): string[] {
     // TODO: Implement championship path calculation
     return ['Win remaining games', 'Win conference championship game'];
   }
 
-  private calculatePlayoffPathways(team: CollegeFootballTeam, remainingSchedule: CFBGame[]): PlayoffPrediction['pathways'] {
+  private calculatePlayoffPathways(
+    team: CollegeFootballTeam,
+    remainingSchedule: CFBGame[]
+  ): PlayoffPrediction['pathways'] {
     // TODO: Implement playoff pathways calculation
     return [
       {
         scenario: 'Win out + win conference championship',
         probability: 0.45,
-        requirements: ['Win all remaining regular season games', 'Win conference championship game']
-      }
+        requirements: [
+          'Win all remaining regular season games',
+          'Win conference championship game',
+        ],
+      },
     ];
   }
 
-  private identifyKeyGames(remainingSchedule: CFBGame[], team: CollegeFootballTeam): PlayoffPrediction['keyGames'] {
+  private identifyKeyGames(
+    remainingSchedule: CFBGame[],
+    team: CollegeFootballTeam
+  ): PlayoffPrediction['keyGames'] {
     // TODO: Implement key games identification
     return [];
   }
 
-  private async simulateRestOfSeason(team: CollegeFootballTeam, remainingSchedule: CFBGame[]): Promise<any> {
+  private async simulateRestOfSeason(
+    team: CollegeFootballTeam,
+    remainingSchedule: CFBGame[]
+  ): Promise<any> {
     // TODO: Implement season simulation
     return {
       bowlEligible: true,
       conferenceChampion: false,
       playoffBerth: false,
       final4: false,
-      nationalChampion: false
+      nationalChampion: false,
     };
   }
 }

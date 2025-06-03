@@ -4,8 +4,9 @@
 // Following UFC ML Pattern for Consistency
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class WNBAMLPredictionService {
   private readonly modelConfigs = {
@@ -15,10 +16,14 @@ export class WNBAMLPredictionService {
     playerPerformance: { features: 60, algorithm: 'ensemble', confidence_threshold: 0.64 },
   };
 
-  async generateGamePrediction(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<GamePrediction> {
+  async generateGamePrediction(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<GamePrediction> {
     try {
       const features = await this.extractGameFeatures(homeTeamId, awayTeamId, gameDate);
-      
+
       const predictions = {
         winnerPrediction: await this.predictGameWinner(features),
         spreadPrediction: await this.predictPointSpread(features),
@@ -49,7 +54,11 @@ export class WNBAMLPredictionService {
     }
   }
 
-  private async extractGameFeatures(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<WNBAMLFeatures> {
+  private async extractGameFeatures(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<WNBAMLFeatures> {
     const homeAnalytics = await this.getTeamAnalytics(homeTeamId);
     const awayAnalytics = await this.getTeamAnalytics(awayTeamId);
     const historicalData = await this.getHistoricalMatchups(homeTeamId, awayTeamId);
@@ -59,16 +68,22 @@ export class WNBAMLPredictionService {
       // Team offensive metrics
       homePointsPerGame: homeAnalytics?.offensiveAnalysis?.scoringMetrics?.pointsPerGame || 80.0,
       awayPointsPerGame: awayAnalytics?.offensiveAnalysis?.scoringMetrics?.pointsPerGame || 80.0,
-      homeFieldGoalPercentage: homeAnalytics?.offensiveAnalysis?.scoringMetrics?.fieldGoalPercentage || 45.0,
-      awayFieldGoalPercentage: awayAnalytics?.offensiveAnalysis?.scoringMetrics?.fieldGoalPercentage || 45.0,
-      homeThreePointPercentage: homeAnalytics?.offensiveAnalysis?.scoringMetrics?.threePointPercentage || 35.0,
-      awayThreePointPercentage: awayAnalytics?.offensiveAnalysis?.scoringMetrics?.threePointPercentage || 35.0,
+      homeFieldGoalPercentage:
+        homeAnalytics?.offensiveAnalysis?.scoringMetrics?.fieldGoalPercentage || 45.0,
+      awayFieldGoalPercentage:
+        awayAnalytics?.offensiveAnalysis?.scoringMetrics?.fieldGoalPercentage || 45.0,
+      homeThreePointPercentage:
+        homeAnalytics?.offensiveAnalysis?.scoringMetrics?.threePointPercentage || 35.0,
+      awayThreePointPercentage:
+        awayAnalytics?.offensiveAnalysis?.scoringMetrics?.threePointPercentage || 35.0,
       homeAssistsPerGame: homeAnalytics?.offensiveAnalysis?.ballMovement?.assistsPerGame || 20.0,
       awayAssistsPerGame: awayAnalytics?.offensiveAnalysis?.ballMovement?.assistsPerGame || 20.0,
 
       // Team defensive metrics
-      homePointsAllowedPerGame: homeAnalytics?.defensiveAnalysis?.defensiveMetrics?.pointsAllowedPerGame || 80.0,
-      awayPointsAllowedPerGame: awayAnalytics?.defensiveAnalysis?.defensiveMetrics?.pointsAllowedPerGame || 80.0,
+      homePointsAllowedPerGame:
+        homeAnalytics?.defensiveAnalysis?.defensiveMetrics?.pointsAllowedPerGame || 80.0,
+      awayPointsAllowedPerGame:
+        awayAnalytics?.defensiveAnalysis?.defensiveMetrics?.pointsAllowedPerGame || 80.0,
       homeStealPerGame: homeAnalytics?.defensiveAnalysis?.pressureMetrics?.stealsPerGame || 8.0,
       awayStealPerGame: awayAnalytics?.defensiveAnalysis?.pressureMetrics?.stealsPerGame || 8.0,
       homeBlocksPerGame: homeAnalytics?.defensiveAnalysis?.pressureMetrics?.blocksPerGame || 3.0,
@@ -77,14 +92,16 @@ export class WNBAMLPredictionService {
       // Pace and style
       homePace: homeAnalytics?.offensiveAnalysis?.paceAndStyle?.pace || 85.0,
       awayPace: awayAnalytics?.offensiveAnalysis?.paceAndStyle?.pace || 85.0,
-      homeFastBreakPoints: homeAnalytics?.offensiveAnalysis?.paceAndStyle?.fastBreakPointsPerGame || 15.0,
-      awayFastBreakPoints: awayAnalytics?.offensiveAnalysis?.paceAndStyle?.fastBreakPointsPerGame || 15.0,
+      homeFastBreakPoints:
+        homeAnalytics?.offensiveAnalysis?.paceAndStyle?.fastBreakPointsPerGame || 15.0,
+      awayFastBreakPoints:
+        awayAnalytics?.offensiveAnalysis?.paceAndStyle?.fastBreakPointsPerGame || 15.0,
 
       // Historical and recent form
-      historicalHomeWinPercentage: historicalData?.homeWinPercentage || 0.50,
+      historicalHomeWinPercentage: historicalData?.homeWinPercentage || 0.5,
       historicalPointDifferential: historicalData?.averagePointDifferential || 0,
-      homeRecentWinPercentage: recentForm?.home?.winPercentage || 0.50,
-      awayRecentWinPercentage: recentForm?.away?.winPercentage || 0.50,
+      homeRecentWinPercentage: recentForm?.home?.winPercentage || 0.5,
+      awayRecentWinPercentage: recentForm?.away?.winPercentage || 0.5,
 
       // Situational factors
       homeCourtAdvantage: 1, // Always 1 for home team
@@ -95,8 +112,10 @@ export class WNBAMLPredictionService {
       // Experience and leadership
       homeExperienceRating: homeAnalytics?.experienceLevel?.averageExperience || 5.0,
       awayExperienceRating: awayAnalytics?.experienceLevel?.averageExperience || 5.0,
-      homeInternationalPlayers: homeAnalytics?.internationalInfluence?.internationalPlayerCount || 2,
-      awayInternationalPlayers: awayAnalytics?.internationalInfluence?.internationalPlayerCount || 2,
+      homeInternationalPlayers:
+        homeAnalytics?.internationalInfluence?.internationalPlayerCount || 2,
+      awayInternationalPlayers:
+        awayAnalytics?.internationalInfluence?.internationalPlayerCount || 2,
     };
   }
 
@@ -104,17 +123,23 @@ export class WNBAMLPredictionService {
     const homeStrength = this.calculateTeamStrength(features, 'home');
     const awayStrength = this.calculateTeamStrength(features, 'away');
     const adjustedHomeStrength = homeStrength + 3.2; // WNBA home court advantage
-    
+
     const strengthDifference = adjustedHomeStrength - awayStrength;
     const homeWinProbability = 1 / (1 + Math.exp(-strengthDifference / 8.0));
-    
+
     return {
       homeWinProbability,
       awayWinProbability: 1 - homeWinProbability,
       predictedWinner: homeWinProbability > 0.5 ? 'home' : 'away',
       confidence: Math.abs(homeWinProbability - 0.5) * 2,
       expectedPointDifferential: strengthDifference,
-      modelFeatureImportance: { teamStrength: 0.4, pace: 0.2, experience: 0.15, homeAdvantage: 0.1, form: 0.15 },
+      modelFeatureImportance: {
+        teamStrength: 0.4,
+        pace: 0.2,
+        experience: 0.15,
+        homeAdvantage: 0.1,
+        form: 0.15,
+      },
     };
   }
 
@@ -122,13 +147,13 @@ export class WNBAMLPredictionService {
     const homeExpectedPoints = this.calculateExpectedPoints(features, 'home');
     const awayExpectedPoints = this.calculateExpectedPoints(features, 'away');
     const expectedPointDifferential = homeExpectedPoints - awayExpectedPoints;
-    
+
     const spreads = [-12, -8, -5, -2, 2, 5, 8, 12];
     const spreadPredictions = spreads.map(spread => ({
       spread,
       homeCoverProbability: this.calculateCoverProbability(expectedPointDifferential, spread, 11.0),
     }));
-    
+
     return {
       expectedPointDifferential,
       homeExpectedPoints,
@@ -144,18 +169,18 @@ export class WNBAMLPredictionService {
     const homeExpectedPoints = this.calculateExpectedPoints(features, 'home');
     const awayExpectedPoints = this.calculateExpectedPoints(features, 'away');
     let expectedTotal = homeExpectedPoints + awayExpectedPoints;
-    
+
     // Apply pace adjustments
     const averagePace = (features.homePace + features.awayPace) / 2;
     if (averagePace > 90) expectedTotal *= 1.05;
     else if (averagePace < 80) expectedTotal *= 0.95;
-    
+
     const totals = [150.5, 155.5, 160.5, 165.5, 170.5, 175.5];
     const totalPredictions = totals.map(total => ({
       total,
       overProbability: this.calculateOverProbability(expectedTotal, total, 12.0),
     }));
-    
+
     return {
       expectedTotal,
       homeExpectedPoints,
@@ -173,19 +198,19 @@ export class WNBAMLPredictionService {
     const offenseStrength = (features[`${prefix}PointsPerGame`] - 80.0) / 15.0;
     const defenseStrength = (80.0 - features[`${prefix}PointsAllowedPerGame`]) / 15.0;
     const experienceBonus = (features[`${prefix}ExperienceRating`] - 5.0) / 5.0;
-    
-    return (offenseStrength * 0.4) + (defenseStrength * 0.4) + (experienceBonus * 0.2);
+
+    return offenseStrength * 0.4 + defenseStrength * 0.4 + experienceBonus * 0.2;
   }
 
   private calculateExpectedPoints(features: WNBAMLFeatures, team: 'home' | 'away'): number {
     const prefix = team === 'home' ? 'home' : 'away';
     const oppositePrefix = team === 'home' ? 'away' : 'home';
-    
+
     let expectedPoints = features[`${prefix}PointsPerGame`];
     const opposingDefense = features[`${oppositePrefix}PointsAllowedPerGame`];
     const defenseAdjustment = (opposingDefense - 80.0) * 0.6;
     expectedPoints += defenseAdjustment;
-    
+
     return Math.max(65.0, expectedPoints);
   }
 
@@ -205,18 +230,18 @@ export class WNBAMLPredictionService {
   }
 
   private erf(x: number): number {
-    const a1 =  0.254829592;
+    const a1 = 0.254829592;
     const a2 = -0.284496736;
-    const a3 =  1.421413741;
+    const a3 = 1.421413741;
     const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
     const sign = x >= 0 ? 1 : -1;
     x = Math.abs(x);
 
     const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
     return sign * y;
   }
@@ -248,11 +273,11 @@ export class WNBAMLPredictionService {
   }
 
   private async getHistoricalMatchups(homeTeamId: string, awayTeamId: string): Promise<any> {
-    return { homeWinPercentage: 0.50, averagePointDifferential: 0 };
+    return { homeWinPercentage: 0.5, averagePointDifferential: 0 };
   }
 
   private async getRecentForm(homeTeamId: string, awayTeamId: string): Promise<any> {
-    return { home: { winPercentage: 0.50 }, away: { winPercentage: 0.50 } };
+    return { home: { winPercentage: 0.5 }, away: { winPercentage: 0.5 } };
   }
 
   private calculateGameNumber(gameDate: Date): number {
@@ -265,7 +290,11 @@ export class WNBAMLPredictionService {
     return gameDate.getMonth() >= 8; // September onwards
   }
 
-  private async calculateRestDays(homeTeamId: string, awayTeamId: string, gameDate: Date): Promise<number> {
+  private async calculateRestDays(
+    homeTeamId: string,
+    awayTeamId: string,
+    gameDate: Date
+  ): Promise<number> {
     return 2; // Average WNBA rest
   }
 
@@ -275,7 +304,7 @@ export class WNBAMLPredictionService {
 
   private calculateTotalConfidence(expectedTotal: number): number {
     const commonTotals = [160.5, 165.5, 170.5];
-    const closestTotal = commonTotals.reduce((closest, total) => 
+    const closestTotal = commonTotals.reduce((closest, total) =>
       Math.abs(total - expectedTotal) < Math.abs(closest - expectedTotal) ? total : closest
     );
     return Math.min(0.95, Math.abs(expectedTotal - closestTotal) / 8.0);
@@ -297,7 +326,10 @@ export class WNBAMLPredictionService {
 
   private async storePrediction(prediction: GamePrediction): Promise<void> {
     try {
-      await firebaseService.collection('wnba_ml_predictions').doc(prediction.gameId).set(prediction);
+      await firebaseService
+        .collection('wnba_ml_predictions')
+        .doc(prediction.gameId)
+        .set(prediction);
     } catch (error) {
       Sentry.captureException(error);
     }

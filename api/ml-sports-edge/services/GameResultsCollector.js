@@ -5,6 +5,7 @@
 
 const axios = require('axios');
 const NodeCache = require('node-cache');
+
 const logger = require('../utils/logger');
 
 // Cache for API responses
@@ -16,35 +17,35 @@ class GameResultsCollector {
     this.apiConfig = {
       NBA: {
         baseUrl: 'https://api.sportsdata.io/v3/nba/scores/json',
-        apiKey: process.env.SPORTSDATA_NBA_API_KEY
+        apiKey: process.env.SPORTSDATA_NBA_API_KEY,
       },
       NFL: {
         baseUrl: 'https://api.sportsdata.io/v3/nfl/scores/json',
-        apiKey: process.env.SPORTSDATA_NFL_API_KEY
+        apiKey: process.env.SPORTSDATA_NFL_API_KEY,
       },
       MLB: {
         baseUrl: 'https://api.sportsdata.io/v3/mlb/scores/json',
-        apiKey: process.env.SPORTSDATA_MLB_API_KEY
+        apiKey: process.env.SPORTSDATA_MLB_API_KEY,
       },
       NHL: {
         baseUrl: 'https://api.sportsdata.io/v3/nhl/scores/json',
-        apiKey: process.env.SPORTSDATA_NHL_API_KEY
+        apiKey: process.env.SPORTSDATA_NHL_API_KEY,
       },
       WNBA: {
         baseUrl: 'https://api.sportsdata.io/v3/wnba/scores/json',
-        apiKey: process.env.SPORTSDATA_WNBA_API_KEY
+        apiKey: process.env.SPORTSDATA_WNBA_API_KEY,
       },
       NCAA: {
         baseUrl: 'https://api.sportsdata.io/v3/cbb/scores/json',
-        apiKey: process.env.SPORTSDATA_NCAA_API_KEY
+        apiKey: process.env.SPORTSDATA_NCAA_API_KEY,
       },
       F1: {
         baseUrl: 'https://api.sportsdata.io/v3/formula1/scores/json',
-        apiKey: process.env.SPORTSDATA_F1_API_KEY
-      }
+        apiKey: process.env.SPORTSDATA_F1_API_KEY,
+      },
     };
   }
-  
+
   /**
    * Fetch game results for a specific game
    * @param {Object} game - Game to fetch results for
@@ -54,41 +55,41 @@ class GameResultsCollector {
     try {
       const sport = game.sport;
       const gameDate = new Date(game.date);
-      
+
       // Check if we have a configured API for this sport
       if (!this.apiConfig[sport]) {
         logger.warn(`No API configuration for sport: ${sport}`);
         return null;
       }
-      
+
       // Format date for API
       const formattedDate = this.formatDateForApi(gameDate, sport);
-      
+
       // Check cache first
       const cacheKey = `${sport}_${game._id}`;
       const cachedResults = resultsCache.get(cacheKey);
-      
+
       if (cachedResults) {
         logger.info(`Using cached results for ${sport} game ${game._id}`);
         return cachedResults;
       }
-      
+
       // Fetch results from API
       const results = await this.fetchFromApi(sport, formattedDate, game);
-      
+
       if (results) {
         // Cache results
         resultsCache.set(cacheKey, results);
         return results;
       }
-      
+
       return null;
     } catch (error) {
       logger.error(`Error fetching results for ${game.sport} game ${game._id}:`, error);
       return null;
     }
   }
-  
+
   /**
    * Fetch results from API
    * @param {string} sport - Sport key
@@ -99,11 +100,11 @@ class GameResultsCollector {
   async fetchFromApi(sport, date, game) {
     try {
       const config = this.apiConfig[sport];
-      
+
       // Build API URL based on sport
       let url;
-      let params = { key: config.apiKey };
-      
+      const params = { key: config.apiKey };
+
       switch (sport) {
         case 'NBA':
         case 'WNBA':
@@ -125,34 +126,34 @@ class GameResultsCollector {
           logger.warn(`Unsupported sport for API: ${sport}`);
           return null;
       }
-      
+
       // Make API request
       logger.info(`Fetching ${sport} results from ${url}`);
       const response = await axios.get(url, { params });
-      
+
       if (response.status !== 200) {
         logger.error(`API error: ${response.status} ${response.statusText}`);
         return null;
       }
-      
+
       // Find the matching game in the response
       const games = response.data;
-      
+
       if (!Array.isArray(games)) {
         logger.error('API response is not an array');
         return null;
       }
-      
+
       logger.info(`Received ${games.length} games from ${sport} API`);
-      
+
       // Match game based on teams
       const matchedGame = this.matchGame(games, game);
-      
+
       if (!matchedGame) {
         logger.warn(`No matching game found for ${game.homeTeam.name} vs ${game.awayTeam.name}`);
         return null;
       }
-      
+
       // Extract results
       return this.extractResults(matchedGame, sport);
     } catch (error) {
@@ -160,7 +161,7 @@ class GameResultsCollector {
       return null;
     }
   }
-  
+
   /**
    * Match game from API response to our game
    * @param {Array} apiGames - Games from API
@@ -170,19 +171,21 @@ class GameResultsCollector {
   matchGame(apiGames, ourGame) {
     // This matching logic would be more sophisticated in a real system
     // For now, we'll just match on team names
-    
+
     return apiGames.find(apiGame => {
       const homeTeam = apiGame.HomeTeam || apiGame.HomeTeamName;
       const awayTeam = apiGame.AwayTeam || apiGame.AwayTeamName;
-      
+
       // Check if team names match (case insensitive)
-      const homeMatch = homeTeam && ourGame.homeTeam.name.toLowerCase().includes(homeTeam.toLowerCase());
-      const awayMatch = awayTeam && ourGame.awayTeam.name.toLowerCase().includes(awayTeam.toLowerCase());
-      
+      const homeMatch =
+        homeTeam && ourGame.homeTeam.name.toLowerCase().includes(homeTeam.toLowerCase());
+      const awayMatch =
+        awayTeam && ourGame.awayTeam.name.toLowerCase().includes(awayTeam.toLowerCase());
+
       return homeMatch && awayMatch;
     });
   }
-  
+
   /**
    * Extract results from API game
    * @param {Object} apiGame - Game from API
@@ -192,7 +195,7 @@ class GameResultsCollector {
   extractResults(apiGame, sport) {
     // Extract scores based on sport
     let homeScore, awayScore;
-    
+
     switch (sport) {
       case 'NBA':
       case 'WNBA':
@@ -219,20 +222,20 @@ class GameResultsCollector {
         homeScore = 0;
         awayScore = 0;
     }
-    
+
     // Extract additional statistics if available
     const stats = this.extractGameStats(apiGame, sport);
-    
+
     return {
       homeScore,
       awayScore,
       status: 'final',
       source: `${sport} API`,
       stats,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
-  
+
   /**
    * Extract detailed game statistics
    * @param {Object} apiGame - Game from API
@@ -242,7 +245,7 @@ class GameResultsCollector {
   extractGameStats(apiGame, sport) {
     // This would extract detailed statistics based on the sport
     // For now, we'll just return a placeholder
-    
+
     switch (sport) {
       case 'NBA':
       case 'WNBA':
@@ -254,7 +257,7 @@ class GameResultsCollector {
           homeAssists: apiGame.HomeAssists,
           awayAssists: apiGame.AwayAssists,
           homeTurnovers: apiGame.HomeTurnovers,
-          awayTurnovers: apiGame.AwayTurnovers
+          awayTurnovers: apiGame.AwayTurnovers,
         };
       case 'NFL':
         return {
@@ -263,7 +266,7 @@ class GameResultsCollector {
           homeTotalYards: apiGame.HomeTotalYards,
           awayTotalYards: apiGame.AwayTotalYards,
           homeTurnovers: apiGame.HomeTurnovers,
-          awayTurnovers: apiGame.AwayTurnovers
+          awayTurnovers: apiGame.AwayTurnovers,
         };
       case 'MLB':
         return {
@@ -272,7 +275,7 @@ class GameResultsCollector {
           homeErrors: apiGame.HomeErrors,
           awayErrors: apiGame.AwayErrors,
           homeLeftOnBase: apiGame.HomeLeftOnBase,
-          awayLeftOnBase: apiGame.AwayLeftOnBase
+          awayLeftOnBase: apiGame.AwayLeftOnBase,
         };
       case 'NHL':
         return {
@@ -281,20 +284,20 @@ class GameResultsCollector {
           homePowerPlays: apiGame.HomePowerPlays,
           awayPowerPlays: apiGame.AwayPowerPlays,
           homePowerPlayGoals: apiGame.HomePowerPlayGoals,
-          awayPowerPlayGoals: apiGame.AwayPowerPlayGoals
+          awayPowerPlayGoals: apiGame.AwayPowerPlayGoals,
         };
       case 'F1':
         return {
           fastestLap: apiGame.FastestLap,
           polePosition: apiGame.PolePosition,
           weather: apiGame.Weather,
-          trackCondition: apiGame.TrackCondition
+          trackCondition: apiGame.TrackCondition,
         };
       default:
         return {};
     }
   }
-  
+
   /**
    * Format date for API
    * @param {Date} date - Date to format
@@ -316,7 +319,7 @@ class GameResultsCollector {
         return date.toISOString().split('T')[0];
     }
   }
-  
+
   /**
    * Get NFL week from date
    * @param {Date} date - Date to get week for
@@ -325,27 +328,32 @@ class GameResultsCollector {
   getNflWeek(date) {
     // This would be a more complex calculation in a real system
     // For now, we'll just return a placeholder
-    
+
     // NFL season typically starts in September
     const month = date.getMonth(); // 0-based (0 = January)
     const day = date.getDate();
-    
-    if (month < 8) { // Before September
+
+    if (month < 8) {
+      // Before September
       return 1; // Preseason
     }
-    
+
     // Rough calculation of week based on month and day
-    if (month === 8) { // September
+    if (month === 8) {
+      // September
       return Math.ceil(day / 7);
-    } else if (month === 9) { // October
+    } else if (month === 9) {
+      // October
       return Math.ceil(day / 7) + 4;
-    } else if (month === 10) { // November
+    } else if (month === 10) {
+      // November
       return Math.ceil(day / 7) + 8;
-    } else { // December or later
+    } else {
+      // December or later
       return Math.ceil(day / 7) + 12;
     }
   }
-  
+
   /**
    * Fetch results for multiple games
    * @param {Array} games - Games to fetch results for
@@ -353,18 +361,18 @@ class GameResultsCollector {
    */
   async fetchMultipleGameResults(games) {
     const results = [];
-    
+
     for (const game of games) {
       const result = await this.fetchGameResults(game);
-      
+
       if (result) {
         results.push({
           gameId: game._id,
-          result
+          result,
         });
       }
     }
-    
+
     return results;
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { ReportResult } from '../types/reporting';
+
 import { ReportingService } from '../services/reportingService';
+import { ReportResult } from '../types/reporting';
 
 interface UseScheduledReportActionsResult {
   pauseScheduledReport: (id: string) => Promise<boolean>;

@@ -1,5 +1,6 @@
-import { AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
+
 import * as analyticsService from './analyticsService';
 
 /**
@@ -136,13 +137,13 @@ class AccessibilityService {
   private isReduceTransparencyEnabled: boolean = false;
   private isInvertColorsEnabled: boolean = false;
   private isGrayscaleEnabled: boolean = false;
-  private listeners: Array<(preferences: AccessibilityPreferences) => void> = [];
-  private systemListeners: Array<() => void> = [];
+  private listeners: ((preferences: AccessibilityPreferences) => void)[] = [];
+  private systemListeners: (() => void)[] = [];
   private keyboardNavigableElements: Record<string, KeyboardNavigableElement> = {};
   private currentFocusedElementId: string | null = null;
   private voiceCommandHandlers: VoiceCommandHandler[] = [];
   private isVoiceRecognitionActive: boolean = false;
-  private voiceRecognitionListeners: Array<(isActive: boolean) => void> = [];
+  private voiceRecognitionListeners: ((isActive: boolean) => void)[] = [];
 
   /**
    * Initialize the accessibility service

@@ -1,16 +1,19 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import pushNotificationService, { NotificationPreferences } from '../services/pushNotificationService';
-import { analyticsService } from '../services/analyticsService';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import Header from '../components/Header';
+import { analyticsService } from '../services/analyticsService';
+import pushNotificationService, {
+  NotificationPreferences,
+} from '../services/pushNotificationService';
 
 /**
  * Notification Settings Screen
- * 
+ *
  * This screen allows users to configure their notification preferences.
  */
 const NotificationSettingsScreen: React.FC = () => {
@@ -25,7 +28,7 @@ const NotificationSettingsScreen: React.FC = () => {
     specialOffers: true,
     newsUpdates: true,
     scoreUpdates: true,
-    playerAlerts: true
+    playerAlerts: true,
   });
 
   // Load notification preferences
@@ -33,15 +36,15 @@ const NotificationSettingsScreen: React.FC = () => {
     const loadPreferences = async () => {
       try {
         setLoading(true);
-        
+
         // Check notification permission
         const permission = await pushNotificationService.requestPermission();
         setHasPermission(permission);
-        
+
         // Get notification preferences
         const prefs = await pushNotificationService.getNotificationPreferences();
         setPreferences(prefs);
-        
+
         // Track screen view
         analyticsService.trackScreenView('notification_settings');
       } catch (error) {
@@ -51,7 +54,7 @@ const NotificationSettingsScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadPreferences();
   }, []);
 
@@ -59,9 +62,9 @@ const NotificationSettingsScreen: React.FC = () => {
   const savePreferences = async () => {
     try {
       setSaving(true);
-      
+
       await pushNotificationService.saveNotificationPreferences(preferences);
-      
+
       // Track event
       analyticsService.trackEvent('notification_settings_updated', {
         enabled: preferences.enabled,
@@ -70,9 +73,9 @@ const NotificationSettingsScreen: React.FC = () => {
         specialOffers: preferences.specialOffers,
         newsUpdates: preferences.newsUpdates,
         scoreUpdates: preferences.scoreUpdates,
-        playerAlerts: preferences.playerAlerts
+        playerAlerts: preferences.playerAlerts,
       });
-      
+
       Alert.alert('Success', 'Notification preferences saved successfully.');
     } catch (error) {
       console.error('Error saving notification preferences:', error);
@@ -97,14 +100,14 @@ const NotificationSettingsScreen: React.FC = () => {
           specialOffers: newEnabled ? prev.specialOffers : false,
           newsUpdates: newEnabled ? prev.newsUpdates : false,
           scoreUpdates: newEnabled ? prev.scoreUpdates : false,
-          playerAlerts: newEnabled ? prev.playerAlerts : false
+          playerAlerts: newEnabled ? prev.playerAlerts : false,
         };
       }
-      
+
       // Otherwise, just toggle the specific preference
       return {
         ...prev,
-        [key]: !prev[key]
+        [key]: !prev[key],
       };
     });
   };
@@ -114,16 +117,14 @@ const NotificationSettingsScreen: React.FC = () => {
     try {
       const permission = await pushNotificationService.requestPermission();
       setHasPermission(permission);
-      
+
       if (permission) {
         Alert.alert('Success', 'Notification permission granted.');
       } else {
         Alert.alert(
           'Permission Denied',
           'Please enable notifications in your device settings to receive updates.',
-          [
-            { text: 'OK' }
-          ]
+          [{ text: 'OK' }]
         );
       }
     } catch (error) {
@@ -143,37 +144,30 @@ const NotificationSettingsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        title="Notification Settings"
-        onRefresh={() => {}}
-        isLoading={loading}
-      />
-      
+      <Header title="Notification Settings" onRefresh={() => {}} isLoading={loading} />
+
       <ScrollView style={styles.scrollView}>
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Notification Status</ThemedText>
-          
+
           <View style={styles.permissionContainer}>
             <ThemedText style={styles.permissionText}>
               {hasPermission
                 ? 'Notifications are enabled for this app'
                 : 'Notifications are disabled for this app'}
             </ThemedText>
-            
+
             {!hasPermission && (
-              <ThemedText
-                style={styles.permissionButton}
-                onPress={requestPermission}
-              >
+              <ThemedText style={styles.permissionButton} onPress={requestPermission}>
                 Enable Notifications
               </ThemedText>
             )}
           </View>
         </ThemedView>
-        
+
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Notification Preferences</ThemedText>
-          
+
           <View style={styles.preferenceItem}>
             <ThemedText style={styles.preferenceLabel}>Enable All Notifications</ThemedText>
             <Switch
@@ -182,11 +176,13 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!hasPermission || saving}
             />
           </View>
-          
+
           <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
-          
+
           <View style={styles.preferenceItem}>
-            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}
+            >
               Game Alerts
             </ThemedText>
             <Switch
@@ -195,17 +191,21 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!preferences.enabled || !hasPermission || saving}
             />
           </View>
-          
+
           <View style={styles.preferenceDescription}>
-            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}
+            >
               Receive alerts for game starts, scores, and results
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
-          
+
           <View style={styles.preferenceItem}>
-            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}
+            >
               Betting Reminders
             </ThemedText>
             <Switch
@@ -214,17 +214,21 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!preferences.enabled || !hasPermission || saving}
             />
           </View>
-          
+
           <View style={styles.preferenceDescription}>
-            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}
+            >
               Receive reminders about upcoming bets and opportunities
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
-          
+
           <View style={styles.preferenceItem}>
-            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}
+            >
               Special Offers
             </ThemedText>
             <Switch
@@ -233,17 +237,21 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!preferences.enabled || !hasPermission || saving}
             />
           </View>
-          
+
           <View style={styles.preferenceDescription}>
-            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}
+            >
               Receive notifications about promotions and special offers
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
-          
+
           <View style={styles.preferenceItem}>
-            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}
+            >
               News Updates
             </ThemedText>
             <Switch
@@ -252,17 +260,21 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!preferences.enabled || !hasPermission || saving}
             />
           </View>
-          
+
           <View style={styles.preferenceDescription}>
-            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}
+            >
               Receive notifications about sports news and updates
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
-          
+
           <View style={styles.preferenceItem}>
-            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}
+            >
               Score Updates
             </ThemedText>
             <Switch
@@ -271,17 +283,21 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!preferences.enabled || !hasPermission || saving}
             />
           </View>
-          
+
           <View style={styles.preferenceDescription}>
-            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}
+            >
               Receive real-time score updates for your favorite teams
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !preferences.enabled && styles.disabled]} />
-          
+
           <View style={styles.preferenceItem}>
-            <ThemedText style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.preferenceLabel, !preferences.enabled && styles.disabledText]}
+            >
               Player Alerts
             </ThemedText>
             <Switch
@@ -290,33 +306,33 @@ const NotificationSettingsScreen: React.FC = () => {
               disabled={!preferences.enabled || !hasPermission || saving}
             />
           </View>
-          
+
           <View style={styles.preferenceDescription}>
-            <ThemedText style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}>
+            <ThemedText
+              style={[styles.descriptionText, !preferences.enabled && styles.disabledText]}
+            >
               Receive alerts about player injuries, trades, and performance
             </ThemedText>
           </View>
         </ThemedView>
-        
+
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>About Notifications</ThemedText>
-          
+
           <ThemedText style={styles.aboutText}>
-            AI Sports Edge sends notifications to keep you updated on games, betting opportunities, and important news.
-            You can customize which notifications you receive using the preferences above.
+            AI Sports Edge sends notifications to keep you updated on games, betting opportunities,
+            and important news. You can customize which notifications you receive using the
+            preferences above.
           </ThemedText>
-          
+
           <ThemedText style={styles.aboutText}>
             You can change your notification settings at any time from this screen.
           </ThemedText>
         </ThemedView>
-        
+
         <ThemedView style={styles.saveButtonContainer}>
           <ThemedText
-            style={[
-              styles.saveButton,
-              (saving || !hasPermission) && styles.disabledButton
-            ]}
+            style={[styles.saveButton, (saving || !hasPermission) && styles.disabledButton]}
             onPress={savePreferences}
             disabled={saving || !hasPermission}
           >

@@ -11,7 +11,7 @@ export const DataStatusIndicator: React.FC<DataStatusIndicatorProps> = ({
   isRealTime,
   lastUpdated,
   connectionStatus = true,
-  className = ''
+  className = '',
 }) => {
   const getStatusColor = () => {
     if (!connectionStatus) return 'bg-red-500';
@@ -31,7 +31,7 @@ export const DataStatusIndicator: React.FC<DataStatusIndicatorProps> = ({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
-    
+
     if (diffMinutes < 1) return 'Just now';
     if (diffMinutes < 60) return `${diffMinutes}m ago`;
     const diffHours = Math.floor(diffMinutes / 60);

@@ -1,25 +1,26 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  SafeAreaView, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   Alert,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { StackScreenProps } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import ncaaBasketballService, { 
-  NcaaBasketballGame, 
-  NcaaBasketballGender,
-  NcaaBasketballRankings
-} from '../services/ncaaBasketballService';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
 import EmptyState from '../components/EmptyState';
 import ErrorMessage from '../components/ErrorMessage';
+import { useThemeColor } from '../hooks/useThemeColor';
+import ncaaBasketballService, {
+  NcaaBasketballGame,
+  NcaaBasketballGender,
+  NcaaBasketballRankings,
+} from '../services/ncaaBasketballService';
 
 // Import the RootStackParamList from the navigator file
 type RootStackParamList = {
@@ -35,10 +36,7 @@ type NcaaBasketballScreenProps = StackScreenProps<RootStackParamList, 'NcaaBaske
 /**
  * Screen to display NCAA Basketball games and data
  */
-const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
-  route,
-  navigation
-}) => {
+const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({ route, navigation }) => {
   const { gender = 'mens' } = route.params || {};
   const [selectedGender, setSelectedGender] = useState<NcaaBasketballGender>(gender);
   const [games, setGames] = useState<NcaaBasketballGame[]>([]);
@@ -46,16 +44,16 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = '#0a7ea4';
-  
+
   // Load NCAA basketball data
   useEffect(() => {
     loadData();
   }, [selectedGender]);
-  
+
   // Load NCAA basketball data
   const loadData = async (refresh = false) => {
     try {
@@ -65,29 +63,21 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
         setLoading(true);
       }
       setError(null);
-      
+
       // Get current date
       const now = new Date();
       const year = now.getFullYear().toString();
       const month = (now.getMonth() + 1).toString().padStart(2, '0');
       const day = now.getDate().toString().padStart(2, '0');
-      
+
       // Fetch schedule for today
-      const gamesData = await ncaaBasketballService.fetchSchedule(
-        year,
-        month,
-        day,
-        selectedGender
-      );
-      
+      const gamesData = await ncaaBasketballService.fetchSchedule(year, month, day, selectedGender);
+
       setGames(gamesData);
-      
+
       // Fetch rankings (AP poll)
       try {
-        const rankingsData = await ncaaBasketballService.fetchRankings(
-          'AP',
-          selectedGender
-        );
+        const rankingsData = await ncaaBasketballService.fetchRankings('AP', selectedGender);
         setRankings(rankingsData);
       } catch (rankingsError) {
         console.error('Error fetching rankings:', rankingsError);
@@ -101,28 +91,28 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
       setRefreshing(false);
     }
   };
-  
+
   // Handle refresh
   const handleRefresh = () => {
     loadData(true);
   };
-  
+
   // Toggle between men's and women's basketball
   const toggleGender = () => {
     setSelectedGender(selectedGender === 'mens' ? 'womens' : 'mens');
   };
-  
+
   // Navigate to player stats screen
   const navigateToPlayerStats = (gameId: string, gameTitle: string) => {
     navigation.navigate('PlayerStats', { gameId, gameTitle });
   };
-  
+
   // Format date for display
   const formatGameTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -131,17 +121,14 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
           <ThemedText style={styles.title}>
             NCAA {selectedGender === 'mens' ? "Men's" : "Women's"} Basketball
           </ThemedText>
-          
-          <TouchableOpacity 
-            style={styles.toggleButton}
-            onPress={toggleGender}
-          >
+
+          <TouchableOpacity style={styles.toggleButton} onPress={toggleGender}>
             <ThemedText style={styles.toggleButtonText}>
               Switch to {selectedGender === 'mens' ? "Women's" : "Men's"}
             </ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={primaryColor} />
           <ThemedText style={styles.loadingText}>Loading games...</ThemedText>
@@ -149,7 +136,7 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
       </SafeAreaView>
     );
   }
-  
+
   // Render error state
   if (error) {
     return (
@@ -158,20 +145,17 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
           <ThemedText style={styles.title}>
             NCAA {selectedGender === 'mens' ? "Men's" : "Women's"} Basketball
           </ThemedText>
-          
-          <TouchableOpacity 
-            style={styles.toggleButton}
-            onPress={toggleGender}
-          >
+
+          <TouchableOpacity style={styles.toggleButton} onPress={toggleGender}>
             <ThemedText style={styles.toggleButtonText}>
               Switch to {selectedGender === 'mens' ? "Women's" : "Men's"}
             </ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         <ErrorMessage message={error} />
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[styles.retryButton, { backgroundColor: primaryColor }]}
           onPress={() => loadData()}
         >
@@ -180,15 +164,15 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
       </SafeAreaView>
     );
   }
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
         <ThemedText style={styles.title}>
           NCAA {selectedGender === 'mens' ? "Men's" : "Women's"} Basketball
         </ThemedText>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[styles.toggleButton, { borderColor: primaryColor }]}
           onPress={toggleGender}
         >
@@ -197,8 +181,8 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         refreshControl={
           <RefreshControl
@@ -212,58 +196,60 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
         {/* Today's Games Section */}
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Today's Games</ThemedText>
-          
+
           {games.length === 0 ? (
-            <EmptyState
-              message="No games scheduled for today."
-            />
+            <EmptyState message="No games scheduled for today." />
           ) : (
-            games.map((game) => (
-              <TouchableOpacity 
+            games.map(game => (
+              <TouchableOpacity
                 key={game.id}
                 style={[styles.gameCard, { borderColor: '#444' }]}
-                onPress={() => navigateToPlayerStats(game.id, `${game.away.name} @ ${game.home.name}`)}
+                onPress={() =>
+                  navigateToPlayerStats(game.id, `${game.away.name} @ ${game.home.name}`)
+                }
               >
                 <View style={styles.gameHeader}>
                   <ThemedText style={styles.gameStatus}>
-                    {game.status === 'scheduled' 
-                      ? formatGameTime(game.scheduled) 
+                    {game.status === 'scheduled'
+                      ? formatGameTime(game.scheduled)
                       : game.status.toUpperCase()}
                   </ThemedText>
-                  
+
                   {game.venue && (
                     <ThemedText style={styles.gameVenue}>
                       {game.venue.name}, {game.venue.city}
                     </ThemedText>
                   )}
                 </View>
-                
+
                 <View style={styles.teamRow}>
                   <View style={styles.teamInfo}>
                     <ThemedText style={styles.teamName}>
-                      {game.away.rank ? `#${game.away.rank} ` : ''}{game.away.name}
+                      {game.away.rank ? `#${game.away.rank} ` : ''}
+                      {game.away.name}
                     </ThemedText>
                     <ThemedText style={styles.teamMarket}>{game.away.market}</ThemedText>
                   </View>
-                  
+
                   <ThemedText style={styles.teamScore}>
                     {game.status !== 'scheduled' ? game.away_points : '-'}
                   </ThemedText>
                 </View>
-                
+
                 <View style={styles.teamRow}>
                   <View style={styles.teamInfo}>
                     <ThemedText style={styles.teamName}>
-                      {game.home.rank ? `#${game.home.rank} ` : ''}{game.home.name}
+                      {game.home.rank ? `#${game.home.rank} ` : ''}
+                      {game.home.name}
                     </ThemedText>
                     <ThemedText style={styles.teamMarket}>{game.home.market}</ThemedText>
                   </View>
-                  
+
                   <ThemedText style={styles.teamScore}>
                     {game.status !== 'scheduled' ? game.home_points : '-'}
                   </ThemedText>
                 </View>
-                
+
                 {game.tournament && (
                   <View style={styles.tournamentTag}>
                     <ThemedText style={styles.tournamentText}>
@@ -271,7 +257,7 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
                     </ThemedText>
                   </View>
                 )}
-                
+
                 <View style={styles.statsButton}>
                   <Ionicons name="stats-chart" size={16} color={primaryColor} />
                   <ThemedText style={[styles.statsButtonText, { color: primaryColor }]}>
@@ -282,40 +268,35 @@ const NcaaBasketballScreen: React.FC<NcaaBasketballScreenProps> = ({
             ))
           )}
         </View>
-        
+
         {/* Rankings Section */}
         {rankings && (
           <View style={styles.section}>
-            <ThemedText style={styles.sectionTitle}>
-              {rankings.poll_name} Rankings
-            </ThemedText>
-            
+            <ThemedText style={styles.sectionTitle}>{rankings.poll_name} Rankings</ThemedText>
+
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {rankings.teams.slice(0, 25).map((team) => (
-                <View 
-                  key={team.id}
-                  style={[styles.rankingCard, { borderColor: '#444' }]}
-                >
+              {rankings.teams.slice(0, 25).map(team => (
+                <View key={team.id} style={[styles.rankingCard, { borderColor: '#444' }]}>
                   <ThemedText style={styles.rankingNumber}>#{team.rank}</ThemedText>
                   <ThemedText style={styles.rankingTeamName}>{team.name}</ThemedText>
                   <ThemedText style={styles.rankingTeamMarket}>{team.market}</ThemedText>
                   <ThemedText style={styles.rankingRecord}>
                     {team.wins}-{team.losses}
                   </ThemedText>
-                  
+
                   {team.previous_rank && team.previous_rank !== team.rank && (
                     <View style={styles.rankingChange}>
-                      <Ionicons 
-                        name={team.previous_rank > team.rank ? "arrow-up" : "arrow-down"} 
-                        size={12} 
-                        color={team.previous_rank > team.rank ? "#34C759" : "#FF3B30"} 
+                      <Ionicons
+                        name={team.previous_rank > team.rank ? 'arrow-up' : 'arrow-down'}
+                        size={12}
+                        color={team.previous_rank > team.rank ? '#34C759' : '#FF3B30'}
                       />
-                      <ThemedText 
+                      <ThemedText
                         style={[
                           styles.rankingChangeText,
-                          { 
-                            color: team.previous_rank > team.rank ? "#34C759" : "#FF3B30" 
-                          }
+                          {
+                            color: team.previous_rank > team.rank ? '#34C759' : '#FF3B30',
+                          },
                         ]}
                       >
                         {Math.abs(team.previous_rank - team.rank)}

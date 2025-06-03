@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,12 +7,12 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
+
 import QuestionSubmissionForm from '../components/QuestionSubmissionForm';
-import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
-import { Timestamp } from 'firebase/firestore';
 import { useI18n } from '../contexts/I18nContext';
+import { getApprovedQuestions, FAQQuestion } from '../services/faqService';
 
 interface FAQItem {
   question: string;
@@ -33,96 +34,96 @@ const FAQScreen = (): JSX.Element => {
   const staticFaqItems: FAQItem[] = [
     {
       question: t('faq.items.general.confidenceIntervals.question'),
-      answer: t('faq.items.general.confidenceIntervals.answer')
+      answer: t('faq.items.general.confidenceIntervals.answer'),
     },
     {
       question: t('faq.items.general.oddsCalculation.question'),
-      answer: t('faq.items.general.oddsCalculation.answer')
+      answer: t('faq.items.general.oddsCalculation.answer'),
     },
     {
       question: t('faq.items.general.aiData.question'),
-      answer: t('faq.items.general.aiData.answer')
+      answer: t('faq.items.general.aiData.answer'),
     },
     {
       question: t('faq.items.general.aiAccuracy.question'),
-      answer: t('faq.items.general.aiAccuracy.answer')
+      answer: t('faq.items.general.aiAccuracy.answer'),
     },
     {
       question: t('faq.items.general.bettingStrategy.question'),
-      answer: t('faq.items.general.bettingStrategy.answer')
-    }
+      answer: t('faq.items.general.bettingStrategy.answer'),
+    },
   ];
 
   // Parlay-specific FAQ items
   const parlayFaqItems: FAQItem[] = [
     {
       question: t('faq.items.parlays.whatIs.question'),
-      answer: t('faq.items.parlays.whatIs.answer')
+      answer: t('faq.items.parlays.whatIs.answer'),
     },
     {
       question: t('faq.items.parlays.oddsCalculation.question'),
-      answer: t('faq.items.parlays.oddsCalculation.answer')
+      answer: t('faq.items.parlays.oddsCalculation.answer'),
     },
     {
       question: t('faq.items.parlays.teaserDifference.question'),
-      answer: t('faq.items.parlays.teaserDifference.answer')
+      answer: t('faq.items.parlays.teaserDifference.answer'),
     },
     {
       question: t('faq.items.parlays.aiGeneration.question'),
-      answer: t('faq.items.parlays.aiGeneration.answer')
+      answer: t('faq.items.parlays.aiGeneration.answer'),
     },
     {
       question: t('faq.items.parlays.strategies.question'),
-      answer: t('faq.items.parlays.strategies.answer')
-    }
+      answer: t('faq.items.parlays.strategies.answer'),
+    },
   ];
 
   // UFC-specific FAQ items
   const ufcFaqItems: FAQItem[] = [
     {
       question: t('faq.items.ufc.rankings.question'),
-      answer: t('faq.items.ufc.rankings.answer')
+      answer: t('faq.items.ufc.rankings.answer'),
     },
     {
       question: t('faq.items.ufc.scoring.question'),
-      answer: t('faq.items.ufc.scoring.answer')
+      answer: t('faq.items.ufc.scoring.answer'),
     },
     {
       question: t('faq.items.ufc.weightClasses.question'),
-      answer: t('faq.items.ufc.weightClasses.answer')
+      answer: t('faq.items.ufc.weightClasses.answer'),
     },
     {
       question: t('faq.items.ufc.betting.question'),
-      answer: t('faq.items.ufc.betting.answer')
+      answer: t('faq.items.ufc.betting.answer'),
     },
     {
       question: t('faq.items.ufc.aiStrategies.question'),
-      answer: t('faq.items.ufc.aiStrategies.answer')
-    }
+      answer: t('faq.items.ufc.aiStrategies.answer'),
+    },
   ];
 
   // Player Prop Bet FAQ items
   const propBetFaqItems: FAQItem[] = [
     {
       question: t('faq.items.propBets.whatAre.question'),
-      answer: t('faq.items.propBets.whatAre.answer')
+      answer: t('faq.items.propBets.whatAre.answer'),
     },
     {
       question: t('faq.items.propBets.aiHelp.question'),
-      answer: t('faq.items.propBets.aiHelp.answer')
+      answer: t('faq.items.propBets.aiHelp.answer'),
     },
     {
       question: t('faq.items.propBets.types.question'),
-      answer: t('faq.items.propBets.types.answer')
+      answer: t('faq.items.propBets.types.answer'),
     },
     {
       question: t('faq.items.propBets.accuracy.question'),
-      answer: t('faq.items.propBets.accuracy.answer')
+      answer: t('faq.items.propBets.accuracy.answer'),
     },
     {
       question: t('faq.items.propBets.strategies.question'),
-      answer: t('faq.items.propBets.strategies.answer')
-    }
+      answer: t('faq.items.propBets.strategies.answer'),
+    },
   ];
 
   // Combine static and dynamic FAQ items
@@ -133,8 +134,8 @@ const FAQScreen = (): JSX.Element => {
     ...propBetFaqItems,
     ...approvedQuestions.map(q => ({
       question: q.question,
-      answer: q.answer || ''
-    }))
+      answer: q.answer || '',
+    })),
   ];
 
   const toggleExpand = (index: number) => {
@@ -171,17 +172,11 @@ const FAQScreen = (): JSX.Element => {
     <ScrollView
       style={styles.container}
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          colors={['#3498db']}
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#3498db']} />
       }
     >
       <Text style={styles.title}>{t('faq.title')}</Text>
-      <Text style={styles.subtitle}>
-        {t('faq.subtitle')}
-      </Text>
+      <Text style={styles.subtitle}>{t('faq.subtitle')}</Text>
 
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -196,22 +191,20 @@ const FAQScreen = (): JSX.Element => {
                 style={styles.questionContainer}
                 onPress={() => toggleExpand(index)}
                 activeOpacity={0.7}
-                accessible={true}
+                accessible
                 accessibilityRole="button"
                 accessibilityLabel={item.question}
                 accessibilityHint={t('faq.accessibility.questionHint')}
                 accessibilityState={{ expanded: expandedIndex === index }}
               >
                 <Text style={styles.question}>{item.question}</Text>
-                <Text style={styles.expandIcon}>
-                  {expandedIndex === index ? '−' : '+'}
-                </Text>
+                <Text style={styles.expandIcon}>{expandedIndex === index ? '−' : '+'}</Text>
               </TouchableOpacity>
-              
+
               {expandedIndex === index && (
                 <View
                   style={styles.answerContainer}
-                  accessible={true}
+                  accessible
                   accessibilityRole="text"
                   accessibilityLabel={`${t('faq.accessibility.answer')}: ${item.answer}`}
                 >

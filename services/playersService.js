@@ -17,29 +17,29 @@ const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
  */
 export async function fetchPlayersBySport(sport) {
   const sportKey = sport.toUpperCase();
-  
+
   // Check cache first
-  if (playersCache[sportKey] && (Date.now() - lastFetchTime[sportKey] < CACHE_TTL)) {
+  if (playersCache[sportKey] && Date.now() - lastFetchTime[sportKey] < CACHE_TTL) {
     return playersCache[sportKey];
   }
-  
+
   try {
     // Fetch players from API
     const response = await fetch(`/api/players/${sportKey.toLowerCase()}`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch players: ${response.status} ${response.statusText}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Convert to Player objects
     const players = data.map(player => Player.fromAPI(player));
-    
+
     // Update cache
     playersCache[sportKey] = players;
     lastFetchTime[sportKey] = Date.now();
-    
+
     return players;
   } catch (error) {
     console.error(`Error fetching players for ${sport}:`, error);
@@ -56,13 +56,13 @@ export async function fetchPlayersByTeam(teamId) {
   try {
     // Fetch players from API
     const response = await fetch(`/api/teams/${teamId}/players`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch players: ${response.status} ${response.statusText}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Convert to Player objects
     return data.map(player => Player.fromAPI(player));
   } catch (error) {
@@ -78,7 +78,7 @@ export async function fetchPlayersByTeam(teamId) {
 export async function fetchAllPlayers() {
   const supportedSports = ['NBA', 'NFL', 'MLB', 'NHL', 'UFC', 'SOCCER', 'TENNIS'];
   const allPlayers = {};
-  
+
   // Fetch players for each sport in parallel
   const promises = supportedSports.map(async sport => {
     try {
@@ -89,9 +89,9 @@ export async function fetchAllPlayers() {
       allPlayers[sport] = [];
     }
   });
-  
+
   await Promise.all(promises);
-  
+
   return allPlayers;
 }
 
@@ -104,35 +104,36 @@ export async function fetchAllPlayers() {
 export async function searchPlayers(query, sportFilters = null) {
   // Determine which sports to search
   const sportsToSearch = sportFilters || ['NBA', 'NFL', 'MLB', 'NHL', 'UFC', 'SOCCER', 'TENNIS'];
-  
+
   // Fetch players for all specified sports
   const allPlayers = {};
-  
+
   for (const sport of sportsToSearch) {
     allPlayers[sport] = await fetchPlayersBySport(sport);
   }
-  
+
   // If no query, return all players
   if (!query) {
     return Object.values(allPlayers).flat();
   }
-  
+
   const normalizedQuery = query.toLowerCase();
-  
+
   // Search across all fetched players
   const results = [];
-  
+
   Object.values(allPlayers).forEach(players => {
-    const matchingPlayers = players.filter(player => 
-      player.name.toLowerCase().includes(normalizedQuery) ||
-      player.position.toLowerCase().includes(normalizedQuery) ||
-      player.getFirstName().toLowerCase().includes(normalizedQuery) ||
-      player.getLastName().toLowerCase().includes(normalizedQuery)
+    const matchingPlayers = players.filter(
+      player =>
+        player.name.toLowerCase().includes(normalizedQuery) ||
+        player.position.toLowerCase().includes(normalizedQuery) ||
+        player.getFirstName().toLowerCase().includes(normalizedQuery) ||
+        player.getLastName().toLowerCase().includes(normalizedQuery)
     );
-    
+
     results.push(...matchingPlayers);
   });
-  
+
   return results;
 }
 
@@ -149,18 +150,18 @@ export async function getPlayerById(id) {
       return player;
     }
   }
-  
+
   try {
     // If not found in cache, fetch directly
     const response = await fetch(`/api/players/${id}`);
-    
+
     if (!response.ok) {
       if (response.status === 404) {
         return null;
       }
       throw new Error(`Failed to fetch player: ${response.status} ${response.statusText}`);
     }
-    
+
     const data = await response.json();
     return Player.fromAPI(data);
   } catch (error) {
@@ -178,16 +179,16 @@ export async function getPlayersByIds(ids) {
   if (!ids || !ids.length) {
     return [];
   }
-  
+
   const players = [];
-  
+
   for (const id of ids) {
     const player = await getPlayerById(id);
     if (player) {
       players.push(player);
     }
   }
-  
+
   return players;
 }
 
@@ -217,28 +218,28 @@ export async function getPopularPlayers(sport = null, limit = 10) {
     // If sport is specified, fetch only for that sport
     if (sport) {
       const players = await fetchPlayersBySport(sport);
-      
+
       // Sort by popularity (assuming stats has a popularity field)
       const sortedPlayers = players.sort((a, b) => {
         const aPopularity = a.stats.popularity || 0;
         const bPopularity = b.stats.popularity || 0;
         return bPopularity - aPopularity;
       });
-      
+
       return sortedPlayers.slice(0, limit);
     }
-    
+
     // Otherwise, fetch for all sports and combine
     const allPlayers = await fetchAllPlayers();
     const combinedPlayers = Object.values(allPlayers).flat();
-    
+
     // Sort by popularity
     const sortedPlayers = combinedPlayers.sort((a, b) => {
       const aPopularity = a.stats.popularity || 0;
       const bPopularity = b.stats.popularity || 0;
       return bPopularity - aPopularity;
     });
-    
+
     return sortedPlayers.slice(0, limit);
   } catch (error) {
     console.error('Error fetching popular players:', error);
@@ -255,20 +256,22 @@ export async function getPopularPlayers(sport = null, limit = 10) {
 export async function getPlayerStatistics(playerId, season = null) {
   try {
     let url = `/api/players/${playerId}/statistics`;
-    
+
     if (season) {
       url += `?season=${encodeURIComponent(season)}`;
     }
-    
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       if (response.status === 404) {
         return null;
       }
-      throw new Error(`Failed to fetch player statistics: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch player statistics: ${response.status} ${response.statusText}`
+      );
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error(`Error fetching statistics for player ${playerId}:`, error);

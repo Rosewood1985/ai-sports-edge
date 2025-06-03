@@ -1,15 +1,27 @@
 /**
  * Machine Learning Prediction Service
- * 
+ *
  * This service provides machine learning predictions for sports betting using TensorFlow.js.
  * It includes integration with TensorFlow.js, model loading, and prediction feedback loop.
  */
 
 import * as tf from '@tensorflow/tfjs';
 import { loadLayersModel } from '@tensorflow/tfjs-layers';
-import { Game, AIPrediction, ConfidenceLevel } from '../types/odds';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+
 import { auth, firestore } from '../config/firebase';
-import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { Game, AIPrediction, ConfidenceLevel } from '../types/odds';
 import { AIInputValidator } from './security/AIInputValidator';
 import { PromptTemplate } from './security/PromptTemplate';
 
@@ -59,7 +71,7 @@ class MLPredictionService {
   private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   private readonly MAX_FEEDBACK_ENTRIES = 1000;
   private readonly MIN_FEEDBACK_FOR_TRAINING = 100;
-  
+
   // Feature generators for different sports
   private featureGenerators: FeatureGenerators = {
     basketball: this.generateBasketballFeatures.bind(this),
@@ -71,7 +83,7 @@ class MLPredictionService {
     formula1: this.generateFormula1Features.bind(this),
     horseracing: this.generateHorseRacingFeatures.bind(this),
   };
-  
+
   /**
    * Get singleton instance
    * @returns MLPredictionService instance
@@ -82,7 +94,7 @@ class MLPredictionService {
     }
     return MLPredictionService.instance;
   }
-  
+
   /**
    * Load model for a specific sport
    * @param sport Sport type
@@ -92,44 +104,44 @@ class MLPredictionService {
     try {
       // Check if model is already loaded and not expired
       if (
-        this.modelCache[sport] && 
-        (Date.now() - this.modelCache[sport]!.lastUpdated) < this.CACHE_TTL
+        this.modelCache[sport] &&
+        Date.now() - this.modelCache[sport]!.lastUpdated < this.CACHE_TTL
       ) {
         console.log(`Using cached model for ${sport}`);
         return this.modelCache[sport]!.model;
       }
-      
+
       // Get model metadata from Firestore
       const modelMetadata = await this.getModelMetadata(sport);
-      
+
       if (!modelMetadata) {
         console.log(`No model metadata found for ${sport}, using default model`);
         return this.createDefaultModel(sport);
       }
-      
+
       // Construct model URL
       const modelUrl = `${this.MODEL_REGISTRY_URL}/${sport}/${modelMetadata.version}/model.json`;
-      
+
       // Load model from URL
       console.log(`Loading model for ${sport} from ${modelUrl}`);
       const model = await loadLayersModel(modelUrl);
-      
+
       // Cache the model
       this.modelCache[sport] = {
         model,
         lastUpdated: Date.now(),
-        version: modelMetadata.version
+        version: modelMetadata.version,
       };
-      
+
       return model;
     } catch (error) {
       console.error(`Error loading model for ${sport}:`, error);
-      
+
       // If loading fails, create a default model
       return this.createDefaultModel(sport);
     }
   }
-  
+
   /**
    * Create a default model for a sport
    * @param sport Sport type
@@ -137,52 +149,60 @@ class MLPredictionService {
    */
   private async createDefaultModel(sport: string): Promise<tf.LayersModel> {
     console.log(`Creating default model for ${sport}`);
-    
+
     // Determine input shape based on sport
     const inputShape = this.getInputShapeForSport(sport);
-    
+
     // Create a simple model
     const model = tf.sequential();
-    
+
     // Add layers
-    model.add(tf.layers.dense({
-      inputShape: [inputShape],
-      units: 32,
-      activation: 'relu'
-    }));
-    
-    model.add(tf.layers.dense({
-      units: 16,
-      activation: 'relu'
-    }));
-    
-    model.add(tf.layers.dense({
-      units: 8,
-      activation: 'relu'
-    }));
-    
-    model.add(tf.layers.dense({
-      units: 1,
-      activation: 'sigmoid' // Output: probability of home team winning
-    }));
-    
+    model.add(
+      tf.layers.dense({
+        inputShape: [inputShape],
+        units: 32,
+        activation: 'relu',
+      })
+    );
+
+    model.add(
+      tf.layers.dense({
+        units: 16,
+        activation: 'relu',
+      })
+    );
+
+    model.add(
+      tf.layers.dense({
+        units: 8,
+        activation: 'relu',
+      })
+    );
+
+    model.add(
+      tf.layers.dense({
+        units: 1,
+        activation: 'sigmoid', // Output: probability of home team winning
+      })
+    );
+
     // Compile the model
     model.compile({
       optimizer: 'adam',
       loss: 'binaryCrossentropy',
-      metrics: ['accuracy']
+      metrics: ['accuracy'],
     });
-    
+
     // Cache the model
     this.modelCache[sport] = {
       model,
       lastUpdated: Date.now(),
-      version: 'default-1.0.0'
+      version: 'default-1.0.0',
     };
-    
+
     return model;
   }
-  
+
   /**
    * Get input shape for a sport
    * @param sport Sport type
@@ -210,7 +230,7 @@ class MLPredictionService {
         return 10; // Default number of features
     }
   }
-  
+
   /**
    * Get model metadata from Firestore
    * @param sport Sport type
@@ -220,18 +240,18 @@ class MLPredictionService {
     try {
       const modelRef = doc(firestore, this.MODEL_REGISTRY_COLLECTION, sport);
       const modelDoc = await getDoc(modelRef);
-      
+
       if (modelDoc.exists()) {
         return modelDoc.data() as ModelMetadata;
       }
-      
+
       return null;
     } catch (error) {
       console.error(`Error getting model metadata for ${sport}:`, error);
       return null;
     }
   }
-  
+
   /**
    * Generate features for a game
    * @param game Game to predict
@@ -241,24 +261,25 @@ class MLPredictionService {
     try {
       // Determine sport type
       const sportKey = game.sport_key.split('_')[0] || 'basketball';
-      
+
       // Get feature generator for this sport
-      const featureGenerator = this.featureGenerators[sportKey] || this.generateDefaultFeatures.bind(this);
-      
+      const featureGenerator =
+        this.featureGenerators[sportKey] || this.generateDefaultFeatures.bind(this);
+
       // Generate features
       const features = await featureGenerator(game);
-      
+
       // Create tensor
       return tf.tensor2d([features]);
     } catch (error) {
       console.error('Error generating features:', error);
-      
+
       // Return default features
       const defaultFeatures = Array.from({ length: 10 }, () => Math.random());
       return tf.tensor2d([defaultFeatures]);
     }
   }
-  
+
   /**
    * Generate default features
    * @param game Game to predict
@@ -269,7 +290,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 10 }, () => Math.random());
   }
-  
+
   /**
    * Generate basketball features
    * @param game Game to predict
@@ -280,7 +301,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 15 }, () => Math.random());
   }
-  
+
   /**
    * Generate football features
    * @param game Game to predict
@@ -291,7 +312,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 20 }, () => Math.random());
   }
-  
+
   /**
    * Generate baseball features
    * @param game Game to predict
@@ -302,7 +323,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 18 }, () => Math.random());
   }
-  
+
   /**
    * Generate hockey features
    * @param game Game to predict
@@ -313,7 +334,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 14 }, () => Math.random());
   }
-  
+
   /**
    * Generate soccer features
    * @param game Game to predict
@@ -324,7 +345,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 16 }, () => Math.random());
   }
-  
+
   /**
    * Generate MMA features
    * @param game Game to predict
@@ -335,7 +356,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 12 }, () => Math.random());
   }
-  
+
   /**
    * Generate Formula 1 features
    * @param game Game to predict
@@ -346,7 +367,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 14 }, () => Math.random());
   }
-  
+
   /**
    * Generate horse racing features
    * @param game Game to predict
@@ -357,7 +378,7 @@ class MLPredictionService {
     // For now, we'll generate random features
     return Array.from({ length: 16 }, () => Math.random());
   }
-  
+
   /**
    * Generate AI prediction for a game
    * @param game Game to predict
@@ -368,32 +389,32 @@ class MLPredictionService {
     try {
       // Determine sport type
       const sportType = game.sport_key.split('_')[0] || 'basketball';
-      
+
       // Load model for this sport
       const model = await this.loadModel(sportType);
-      
+
       let predictedWinner: string;
       let confidenceScore: number;
       let features: number[] = [];
-      
+
       if (model) {
         // Generate features
         const featureTensor = await this.generateFeatures(game);
         features = (await featureTensor.data()) as unknown as number[];
-        
+
         // Make prediction
         const prediction = model.predict(featureTensor) as tf.Tensor;
-        
+
         // Get prediction value (probability of home team winning)
         const homeWinProbability = (await prediction.data())[0] * 100;
-        
+
         // Clean up tensors
         featureTensor.dispose();
         prediction.dispose();
-        
+
         // Determine winner based on probability
         predictedWinner = homeWinProbability > 50 ? game.home_team : game.away_team;
-        
+
         // Set confidence score
         confidenceScore = Math.abs(homeWinProbability - 50) * 2;
       } else {
@@ -403,7 +424,7 @@ class MLPredictionService {
         confidenceScore = Math.floor(Math.random() * 100);
         features = Array.from({ length: 10 }, () => Math.random());
       }
-      
+
       // Determine confidence level based on score
       let confidence: ConfidenceLevel;
       if (confidenceScore >= 70) {
@@ -413,39 +434,40 @@ class MLPredictionService {
       } else {
         confidence = 'low';
       }
-      
+
       // Generate reasoning based on language and sport
       const reasoning = this.generateReasoning(sportType, predictedWinner, language);
-      
+
       // Get historical accuracy
       const historicalAccuracy = await this.getHistoricalAccuracy(sportType);
-      
+
       // Store prediction for feedback loop
       this.storePrediction(game.id, predictedWinner, confidenceScore, sportType, features);
-      
+
       return {
         predicted_winner: predictedWinner,
         confidence,
         confidence_score: confidenceScore,
         reasoning,
-        historical_accuracy: historicalAccuracy
+        historical_accuracy: historicalAccuracy,
       };
     } catch (error) {
       console.error('Error generating AI prediction:', error);
-      
+
       // Return a fallback prediction with error message
       return {
         predicted_winner: game.home_team,
         confidence: 'low', // Always 'low' confidence for error cases
         confidence_score: 30,
-        reasoning: language === 'es'
-          ? 'Error al generar la predicción. Usando predicción de respaldo.'
-          : 'Error generating prediction. Using fallback prediction.',
-        historical_accuracy: 60
+        reasoning:
+          language === 'es'
+            ? 'Error al generar la predicción. Usando predicción de respaldo.'
+            : 'Error generating prediction. Using fallback prediction.',
+        historical_accuracy: 60,
       };
     }
   }
-  
+
   /**
    * Generate reasoning for a prediction (SECURE VERSION)
    * @param sport Sport type
@@ -457,16 +479,16 @@ class MLPredictionService {
     // Validate and sanitize inputs
     const sanitizedTeam = AIInputValidator.sanitizeTeamName(team);
     const validLanguage = AIInputValidator.validateLanguage(language);
-    
+
     // Use secure template system instead of direct string interpolation
     return PromptTemplate.createTeamReasoning(sanitizedTeam, validLanguage, {
       wins: 7,
       games: 10,
       stat: 'offensive',
-      category: 'recent games'
+      category: 'recent games',
     });
   }
-  
+
   /**
    * Get sport-specific reasonings (DEPRECATED - replaced with secure template system)
    * @param sport Sport type
@@ -486,7 +508,7 @@ class MLPredictionService {
             `${team} tiene un buen historial contra su oponente.`,
             `${team} tiene jugadores clave que regresan de lesiones.`,
             `${team} tiene una ventaja estadística en eficiencia ofensiva.`,
-            `${team} ha tenido buen rendimiento en partidos similares.`
+            `${team} ha tenido buen rendimiento en partidos similares.`,
           ];
         case 'football':
           return [
@@ -494,7 +516,7 @@ class MLPredictionService {
             `${team} tiene un buen historial jugando en este estadio.`,
             `${team} tiene una defensa sólida contra el ataque de su oponente.`,
             `${team} tiene una ventaja en el juego terrestre.`,
-            `${team} ha tenido buen rendimiento en condiciones climáticas similares.`
+            `${team} ha tenido buen rendimiento en condiciones climáticas similares.`,
           ];
         case 'baseball':
           return [
@@ -502,7 +524,7 @@ class MLPredictionService {
             `${team} tiene un buen historial contra el lanzador oponente.`,
             `${team} tiene una ventaja estadística en bateo.`,
             `${team} ha tenido buen rendimiento en este parque de pelota.`,
-            `${team} ha ganado 7 de sus últimos 10 juegos.`
+            `${team} ha ganado 7 de sus últimos 10 juegos.`,
           ];
         default:
           return [
@@ -510,7 +532,7 @@ class MLPredictionService {
             `${team} tiene un buen historial contra su oponente.`,
             `${team} tiene jugadores clave que regresan de lesiones.`,
             `${team} tiene una ventaja estadística en eficiencia.`,
-            `${team} ha tenido buen rendimiento en condiciones similares.`
+            `${team} ha tenido buen rendimiento en condiciones similares.`,
           ];
       }
     } else {
@@ -522,7 +544,7 @@ class MLPredictionService {
             `${team} has a strong historical performance against their opponent.`,
             `${team} has key players returning from injury.`,
             `${team} has a statistical advantage in offensive efficiency.`,
-            `${team} has performed well in similar matchups.`
+            `${team} has performed well in similar matchups.`,
           ];
         case 'football':
           return [
@@ -530,7 +552,7 @@ class MLPredictionService {
             `${team} has a strong record playing at this stadium.`,
             `${team} has a solid defense against their opponent's offense.`,
             `${team} has an advantage in the ground game.`,
-            `${team} has performed well in similar weather conditions.`
+            `${team} has performed well in similar weather conditions.`,
           ];
         case 'baseball':
           return [
@@ -538,7 +560,7 @@ class MLPredictionService {
             `${team} has a strong record against the opposing pitcher.`,
             `${team} has a statistical advantage in batting.`,
             `${team} has performed well at this ballpark.`,
-            `${team} has won 7 of their last 10 games.`
+            `${team} has won 7 of their last 10 games.`,
           ];
         default:
           return [
@@ -546,12 +568,12 @@ class MLPredictionService {
             `${team} has a strong historical performance against their opponent.`,
             `${team} has key players returning from injury.`,
             `${team} has a statistical advantage in efficiency.`,
-            `${team} has performed well in similar conditions.`
+            `${team} has performed well in similar conditions.`,
           ];
       }
     }
   }
-  
+
   /**
    * Get historical accuracy for a sport
    * @param sport Sport type
@@ -561,11 +583,11 @@ class MLPredictionService {
     try {
       // Get model metadata
       const modelMetadata = await this.getModelMetadata(sport);
-      
+
       if (modelMetadata) {
         return modelMetadata.accuracy * 100;
       }
-      
+
       // If no metadata, calculate from feedback
       const feedbackRef = collection(firestore, this.FEEDBACK_COLLECTION);
       const q = query(
@@ -574,33 +596,33 @@ class MLPredictionService {
         orderBy('timestamp', 'desc'),
         limit(100)
       );
-      
+
       const querySnapshot = await getDocs(q);
-      
+
       if (querySnapshot.empty) {
         // No feedback data, return default accuracy
         return 60 + Math.floor(Math.random() * 20); // 60-80%
       }
-      
+
       // Calculate accuracy from feedback
       let correctCount = 0;
-      
-      querySnapshot.forEach((doc) => {
+
+      querySnapshot.forEach(doc => {
         const feedback = doc.data() as PredictionFeedback;
         if (feedback.wasCorrect) {
           correctCount++;
         }
       });
-      
+
       return (correctCount / querySnapshot.size) * 100;
     } catch (error) {
       console.error(`Error getting historical accuracy for ${sport}:`, error);
-      
+
       // Return default accuracy
       return 60 + Math.floor(Math.random() * 20); // 60-80%
     }
   }
-  
+
   /**
    * Store prediction for feedback loop
    * @param gameId Game ID
@@ -619,10 +641,10 @@ class MLPredictionService {
     try {
       // Get current user ID
       const userId = auth.currentUser?.uid;
-      
+
       // Create prediction document
       const predictionRef = doc(firestore, 'predictions', gameId);
-      
+
       // Store prediction
       await setDoc(predictionRef, {
         gameId,
@@ -632,13 +654,13 @@ class MLPredictionService {
         features,
         userId,
         timestamp: Date.now(),
-        feedbackReceived: false
+        feedbackReceived: false,
       });
     } catch (error) {
       console.error('Error storing prediction:', error);
     }
   }
-  
+
   /**
    * Record prediction feedback
    * @param gameId Game ID
@@ -650,15 +672,15 @@ class MLPredictionService {
       // Get prediction
       const predictionRef = doc(firestore, 'predictions', gameId);
       const predictionDoc = await getDoc(predictionRef);
-      
+
       if (!predictionDoc.exists()) {
         console.error(`No prediction found for game ${gameId}`);
         return false;
       }
-      
+
       const prediction = predictionDoc.data();
       const wasCorrect = prediction.predictedWinner === actualWinner;
-      
+
       // Create feedback entry
       const feedback: PredictionFeedback = {
         gameId,
@@ -669,30 +691,30 @@ class MLPredictionService {
         timestamp: Date.now(),
         userId: prediction.userId,
         sportType: prediction.sportType,
-        features: prediction.features
+        features: prediction.features,
       };
-      
+
       // Store feedback
       const feedbackRef = doc(firestore, this.FEEDBACK_COLLECTION, gameId);
       await setDoc(feedbackRef, feedback);
-      
+
       // Update prediction
       await updateDoc(predictionRef, {
         feedbackReceived: true,
         actualWinner,
-        wasCorrect
+        wasCorrect,
       });
-      
+
       // Check if we have enough feedback to retrain the model
       await this.checkForRetraining(prediction.sportType);
-      
+
       return true;
     } catch (error) {
       console.error('Error recording prediction feedback:', error);
       return false;
     }
   }
-  
+
   /**
    * Check if we have enough feedback to retrain the model
    * @param sport Sport type
@@ -707,12 +729,12 @@ class MLPredictionService {
         orderBy('timestamp', 'desc'),
         limit(this.MIN_FEEDBACK_FOR_TRAINING + 1)
       );
-      
+
       const querySnapshot = await getDocs(q);
-      
+
       if (querySnapshot.size >= this.MIN_FEEDBACK_FOR_TRAINING) {
         console.log(`Enough feedback for ${sport}, triggering model retraining`);
-        
+
         // In a real implementation, this would trigger a cloud function to retrain the model
         // For now, we'll just log it
         console.log(`Retraining model for ${sport} with ${querySnapshot.size} feedback entries`);

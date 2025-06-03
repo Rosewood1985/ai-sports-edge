@@ -11,22 +11,22 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       return savedTheme;
     }
-    
+
     // Check for system preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
-    
+
     return 'light'; // Default theme
   };
-  
+
   const [theme, setTheme] = useState(getInitialTheme);
-  
+
   // Update theme in localStorage and apply to document when it changes
   useEffect(() => {
     localStorage.setItem('theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
-    
+
     // Add/remove dark class from body
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
@@ -34,17 +34,13 @@ export const ThemeProvider = ({ children }) => {
       document.body.classList.remove('dark-theme');
     }
   }, [theme]);
-  
+
   // Toggle between light and dark themes
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
-  
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 };
 
 // Custom hook to use the theme context

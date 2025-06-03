@@ -1,11 +1,12 @@
 /**
  * Firebase Authentication
- * 
+ *
  * Provides Firebase authentication functionality.
  */
 
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { firebaseApp, getFirebaseApp } from "./firebaseConfig";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
+import { firebaseApp, getFirebaseApp } from './firebaseConfig';
 
 let auth = null;
 
@@ -24,13 +25,17 @@ export const initializeFirebaseAuth = () => {
 
     // Initialize Auth
     auth = getAuth(app);
-    
+
     // Add better error handling for auth operations
-    onAuthStateChanged(auth, (user) => {
-      console.log("Auth state changed:", user ? "User logged in" : "User logged out");
-    }, (error) => {
-      console.error("Auth state change error:", error);
-    });
+    onAuthStateChanged(
+      auth,
+      user => {
+        console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
+      },
+      error => {
+        console.error('Auth state change error:', error);
+      }
+    );
 
     console.log('Firebase Auth initialized successfully');
     return auth;

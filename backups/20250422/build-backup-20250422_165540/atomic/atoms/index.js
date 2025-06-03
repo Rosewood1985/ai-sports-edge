@@ -1,6 +1,6 @@
 /**
  * Atoms Index
- * 
+ *
  * This file exports all atom components for easier imports.
  */
 

@@ -29,7 +29,9 @@ console.log('📋 Sentry Configuration:');
 console.log(`  Organization: ${sentryConfig.organization || 'Not set'}`);
 console.log(`  Project: ${sentryConfig.project || 'Not set'}`);
 console.log(`  Environment: ${sentryConfig.environment || 'Not set'}`);
-console.log(`  DSN: ${sentryConfig.dsn ? sentryConfig.dsn.replace(/:[^@]+@/, ':****@') : 'Not set'}`);
+console.log(
+  `  DSN: ${sentryConfig.dsn ? sentryConfig.dsn.replace(/:[^@]+@/, ':****@') : 'Not set'}`
+);
 console.log(`  Debug: ${sentryConfig.debug || false}`);
 console.log(`  Expo Development: ${sentryConfig.enableInExpoDevelopment || false}`);
 
@@ -48,7 +50,7 @@ if (authToken) {
   console.log('✅ Sentry auth token found (for source maps)');
 } else {
   console.log('⚠️  Sentry auth token not found');
-  console.log('   Source maps won\'t be uploaded automatically');
+  console.log("   Source maps won't be uploaded automatically");
   console.log('   Set SENTRY_AUTH_TOKEN environment variable');
 }
 

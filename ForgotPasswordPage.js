@@ -1,25 +1,26 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../firebase";
-import "../styles/login.css";
+import { sendPasswordResetEmail } from 'firebase/auth';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { auth } from '../firebase';
+import '../styles/login.css';
 
 const ForgotPasswordPage = () => {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const handleReset = async (e) => {
+  const handleReset = async e => {
     e.preventDefault();
-    setMessage("");
-    setError("");
+    setMessage('');
+    setError('');
 
     try {
       await sendPasswordResetEmail(auth, email);
-      setMessage("Check your inbox for the reset link.");
+      setMessage('Check your inbox for the reset link.');
     } catch (err) {
       console.error(err);
-      setError("Failed to send reset email. Please try again.");
+      setError('Failed to send reset email. Please try again.');
     }
   };
 
@@ -42,7 +43,7 @@ const ForgotPasswordPage = () => {
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               autoComplete="email"
             />
           </div>

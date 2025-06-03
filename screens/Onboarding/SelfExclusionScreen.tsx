@@ -1,18 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
 import { useLanguage } from '../../../atomic/organisms/i18n/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 
 type SelfExclusionScreenNavigationProp = StackNavigationProp<
   OnboardingStackParamList,
@@ -24,91 +21,69 @@ const SelfExclusionScreen = () => {
   const { colors } = useTheme();
   const { t } = useLanguage();
   const { user } = useAuth();
-  
+
   const handleResponse = async (isOnSelfExclusionList: boolean) => {
     if (!user) {
-      Alert.alert(
-        t('common.error'),
-        t('common.not_authenticated'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('common.not_authenticated'), [{ text: t('common.ok') }]);
       return;
     }
-    
+
     if (isOnSelfExclusionList) {
       // User is on a self-exclusion list
-      Alert.alert(
-        t('self_exclusion.alert_title'),
-        t('self_exclusion.alert_message'),
-        [{ text: t('common.ok'), onPress: () => navigation.navigate('Welcome') }]
-      );
+      Alert.alert(t('self_exclusion.alert_title'), t('self_exclusion.alert_message'), [
+        { text: t('common.ok'), onPress: () => navigation.navigate('Welcome') },
+      ]);
     } else {
       // User is not on a self-exclusion list
       try {
         // Save response to user profile
         await saveVerificationData(user.uid, 'selfExclusionCheck', {
-          response: false // false = not on self-exclusion list
+          response: false, // false = not on self-exclusion list
         });
-        
+
         // Navigate to next screen
         navigation.navigate('ResponsibleGambling');
       } catch (error) {
         console.error('Error saving self-exclusion response:', error);
-        Alert.alert(
-          t('common.error'),
-          t('self_exclusion.save_error'),
-          [{ text: t('common.ok') }]
-        );
+        Alert.alert(t('common.error'), t('self_exclusion.save_error'), [{ text: t('common.ok') }]);
       }
     }
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          {t('self_exclusion.title')}
-        </ThemedText>
-        
-        <ThemedText style={styles.description}>
-          {t('self_exclusion.description')}
-        </ThemedText>
-        
+        <ThemedText style={styles.title}>{t('self_exclusion.title')}</ThemedText>
+
+        <ThemedText style={styles.description}>{t('self_exclusion.description')}</ThemedText>
+
         <View style={styles.questionContainer}>
-          <ThemedText style={styles.question}>
-            {t('self_exclusion.question')}
-          </ThemedText>
+          <ThemedText style={styles.question}>{t('self_exclusion.question')}</ThemedText>
         </View>
-        
+
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, { borderColor: colors.border }]}
             onPress={() => handleResponse(true)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('common.yes')}
             accessibilityRole="button"
           >
-            <ThemedText style={styles.buttonText}>
-              {t('common.yes')}
-            </ThemedText>
+            <ThemedText style={styles.buttonText}>{t('common.yes')}</ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[styles.button, { backgroundColor: colors.primary }]}
             onPress={() => handleResponse(false)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('common.no')}
             accessibilityRole="button"
           >
-            <Text style={[styles.buttonText, { color: 'white' }]}>
-              {t('common.no')}
-            </Text>
+            <Text style={[styles.buttonText, { color: 'white' }]}>{t('common.no')}</Text>
           </TouchableOpacity>
         </View>
-        
-        <ThemedText style={styles.disclaimer}>
-          {t('self_exclusion.disclaimer')}
-        </ThemedText>
+
+        <ThemedText style={styles.disclaimer}>{t('self_exclusion.disclaimer')}</ThemedText>
       </View>
     </ThemedView>
   );

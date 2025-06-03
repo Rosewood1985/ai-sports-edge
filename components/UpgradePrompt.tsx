@@ -1,3 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,18 +12,15 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
-  Platform
+  Platform,
 } from 'react-native';
+
 import { ThemedText } from './ThemedText';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SUBSCRIPTION_PLANS, MICROTRANSACTIONS } from '../services/firebaseSubscriptionService';
-import advancedPlayerStatsService from '../services/advancedPlayerStatsService';
 import { auth } from '../config/firebase';
-import { analyticsService } from '../services/analyticsService';
 import { useTheme } from '../contexts/ThemeContext';
-import * as Haptics from 'expo-haptics';
+import advancedPlayerStatsService from '../services/advancedPlayerStatsService';
+import { analyticsService } from '../services/analyticsService';
+import { SUBSCRIPTION_PLANS, MICROTRANSACTIONS } from '../services/firebaseSubscriptionService';
 
 interface UpgradePromptProps {
   onClose: () => void;
@@ -39,7 +40,7 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
   showMicrotransactions = true,
   featureType = 'all',
   viewsRemaining = null,
-  hasReachedLimit = false
+  hasReachedLimit = false,
 }) => {
   const navigation = useNavigation();
   const { colors, isDark } = useTheme();
@@ -48,7 +49,7 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
   const successAnim = React.useRef(new Animated.Value(0)).current;
-  
+
   // Track prompt display in analytics
   useEffect(() => {
     const trackPromptDisplay = async () => {
@@ -56,29 +57,29 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
         await analyticsService.trackEvent('upgrade_prompt_displayed', {
           featureType,
           gameId: gameId || 'none',
-          showMicrotransactions
+          showMicrotransactions,
         });
       } catch (error) {
         console.error('Error tracking prompt display:', error);
       }
     };
-    
+
     trackPromptDisplay();
   }, [featureType, gameId, showMicrotransactions]);
-  
+
   // Handle screen dimension changes
   useEffect(() => {
     const updateDimensions = () => {
       setScreenDimensions(Dimensions.get('window'));
     };
-    
+
     const dimensionsListener = Dimensions.addEventListener('change', updateDimensions);
-    
+
     return () => {
       dimensionsListener.remove();
     };
   }, []);
-  
+
   // Pulse animation for popular options
   useEffect(() => {
     Animated.loop(
@@ -96,7 +97,7 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
       ])
     ).start();
   }, []);
-  
+
   // Success animation
   useEffect(() => {
     if (purchaseSuccess) {
@@ -111,7 +112,7 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
           toValue: 0,
           duration: 500,
           useNativeDriver: true,
-        })
+        }),
       ]).start(() => {
         setPurchaseSuccess(false);
         onClose();
@@ -123,16 +124,16 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
     if (Platform.OS === 'ios' || Platform.OS === 'android') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
+
     analyticsService.trackEvent('navigate_to_subscription', {
       fromFeature: featureType,
-      gameId: gameId || 'none'
+      gameId: gameId || 'none',
     });
-    
+
     onClose();
     navigation.navigate('Subscription' as never);
   };
-  
+
   const purchaseMicrotransaction = async (productId: string) => {
     if (!gameId) {
       // If no gameId is provided, navigate to subscription screen
@@ -145,40 +146,39 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
       // Get the current user ID
       const user = auth.currentUser;
       if (!user) {
-        Alert.alert(
-          'Authentication Required',
-          'Please sign in to purchase this feature.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Sign In', onPress: () => {
+        Alert.alert('Authentication Required', 'Please sign in to purchase this feature.', [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Sign In',
+            onPress: () => {
               onClose();
               navigation.navigate('Auth' as never);
-            }}
-          ]
-        );
+            },
+          },
+        ]);
         return;
       }
-      
+
       const userId = user.uid;
-      
+
       // Provide haptic feedback
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
-      
+
       // Track purchase attempt
       await analyticsService.trackEvent('microtransaction_purchase_attempt', {
         productId,
         gameId,
-        featureType
+        featureType,
       });
-      
+
       // Show loading indicator
       setLoading(productId);
 
       // Call the appropriate purchase function based on the product ID
       let success = false;
-      
+
       switch (productId) {
         case 'advanced-player-metrics':
           success = await advancedPlayerStatsService.purchaseAdvancedPlayerMetrics(userId, gameId);
@@ -202,78 +202,76 @@ const UpgradePrompt: React.FC<UpgradePromptProps> = ({
 
       // Hide loading indicator
       setLoading(null);
-if (success) {
-  // Track successful purchase
-  await analyticsService.trackEvent('microtransaction_purchase_success', {
-    productId,
-    gameId,
-    featureType
-  });
-  
-  // Store purchase in history
-  const user = auth.currentUser;
-  if (user) {
-    try {
-      // Get current purchase history
-      const purchaseHistoryKey = `user_purchases_${user.uid}`;
-      const purchaseHistoryJson = await AsyncStorage.getItem(purchaseHistoryKey);
-      let purchaseHistory = purchaseHistoryJson ? JSON.parse(purchaseHistoryJson) : [];
-      
-      // Add new purchase
-      const product = relevantMicrotransactions.find(m => m.id === productId);
-      const purchaseRecord = {
-        id: `purchase_${Date.now()}`,
-        name: product?.name || productId,
-        date: new Date().toISOString(),
-        price: product?.price ? product.price * 100 : undefined, // Convert to cents
-        gameId,
-        productType: featureType,
-        status: 'active'
-      };
-      
-      purchaseHistory.push(purchaseRecord);
-      
-      // Save updated history
-      await AsyncStorage.setItem(purchaseHistoryKey, JSON.stringify(purchaseHistory));
-    } catch (error) {
-      console.error('Error saving purchase history:', error);
-    }
-  }
-  
-  // Show success animation
-  setPurchaseSuccess(true);
+      if (success) {
+        // Track successful purchase
+        await analyticsService.trackEvent('microtransaction_purchase_success', {
+          productId,
+          gameId,
+          featureType,
+        });
+
+        // Store purchase in history
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            // Get current purchase history
+            const purchaseHistoryKey = `user_purchases_${user.uid}`;
+            const purchaseHistoryJson = await AsyncStorage.getItem(purchaseHistoryKey);
+            const purchaseHistory = purchaseHistoryJson ? JSON.parse(purchaseHistoryJson) : [];
+
+            // Add new purchase
+            const product = relevantMicrotransactions.find(m => m.id === productId);
+            const purchaseRecord = {
+              id: `purchase_${Date.now()}`,
+              name: product?.name || productId,
+              date: new Date().toISOString(),
+              price: product?.price ? product.price * 100 : undefined, // Convert to cents
+              gameId,
+              productType: featureType,
+              status: 'active',
+            };
+
+            purchaseHistory.push(purchaseRecord);
+
+            // Save updated history
+            await AsyncStorage.setItem(purchaseHistoryKey, JSON.stringify(purchaseHistory));
+          } catch (error) {
+            console.error('Error saving purchase history:', error);
+          }
+        }
+
+        // Show success animation
+        setPurchaseSuccess(true);
         setPurchaseSuccess(true);
       } else {
         // Track failed purchase
         await analyticsService.trackEvent('microtransaction_purchase_failed', {
           productId,
           gameId,
-          featureType
+          featureType,
         });
-        
+
         // Show error message
         Alert.alert(
           'Purchase Failed',
-          'We couldn\'t process your purchase. Please try again later.',
+          "We couldn't process your purchase. Please try again later.",
           [{ text: 'OK' }]
         );
       }
     } catch (error) {
       setLoading(null);
       console.error('Error purchasing microtransaction:', error);
-      
+
       // Track error
       await analyticsService.trackEvent('microtransaction_purchase_error', {
         productId,
         gameId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
-      Alert.alert(
-        'Error',
-        'An unexpected error occurred. Please try again later.',
-        [{ text: 'OK' }]
-      );
+
+      Alert.alert('Error', 'An unexpected error occurred. Please try again later.', [
+        { text: 'OK' },
+      ]);
     }
   };
 
@@ -281,94 +279,101 @@ if (success) {
   const getRelevantMicrotransactions = () => {
     switch (featureType) {
       case 'advanced-metrics':
-        return MICROTRANSACTIONS.filter(m =>
-          m.id === 'advanced-player-metrics' || m.id === 'player-stats-premium-bundle'
+        return MICROTRANSACTIONS.filter(
+          m => m.id === 'advanced-player-metrics' || m.id === 'player-stats-premium-bundle'
         );
       case 'historical-trends':
-        return MICROTRANSACTIONS.filter(m =>
-          m.id === 'historical-trends-package' || m.id === 'player-stats-premium-bundle'
+        return MICROTRANSACTIONS.filter(
+          m => m.id === 'historical-trends-package' || m.id === 'player-stats-premium-bundle'
         );
       case 'player-comparison':
-        return MICROTRANSACTIONS.filter(m =>
-          m.id === 'player-comparison-tool' || m.id === 'player-stats-premium-bundle'
+        return MICROTRANSACTIONS.filter(
+          m => m.id === 'player-comparison-tool' || m.id === 'player-stats-premium-bundle'
         );
       case 'all':
       default:
         return MICROTRANSACTIONS.filter(m =>
-          ['advanced-player-metrics', 'player-comparison-tool', 'historical-trends-package', 'player-stats-premium-bundle'].includes(m.id)
+          [
+            'advanced-player-metrics',
+            'player-comparison-tool',
+            'historical-trends-package',
+            'player-stats-premium-bundle',
+          ].includes(m.id)
         );
     }
   };
 
   const relevantMicrotransactions = getRelevantMicrotransactions();
-  
+
   // Get feature-specific title and description
   const getFeatureSpecificContent = () => {
     let baseContent = {
       title: '',
-      description: ''
+      description: '',
     };
-    
+
     switch (featureType) {
       case 'advanced-metrics':
         baseContent = {
           title: 'Unlock Advanced Metrics',
-          description: 'Get deep insights into player performance with advanced analytics and metrics.'
+          description:
+            'Get deep insights into player performance with advanced analytics and metrics.',
         };
         break;
       case 'historical-trends':
         baseContent = {
           title: 'Unlock Historical Trends',
-          description: 'Analyze player performance over time with detailed historical trends and patterns.'
+          description:
+            'Analyze player performance over time with detailed historical trends and patterns.',
         };
         break;
       case 'player-comparison':
         baseContent = {
           title: 'Unlock Player Comparison',
-          description: 'Compare players side-by-side with detailed statistical analysis and visualizations.'
+          description:
+            'Compare players side-by-side with detailed statistical analysis and visualizations.',
         };
         break;
       case 'all':
       default:
         baseContent = {
           title: 'Unlock Premium Features',
-          description: 'Get access to advanced player metrics, historical trends, and player comparison tools.'
+          description:
+            'Get access to advanced player metrics, historical trends, and player comparison tools.',
         };
         break;
     }
-    
+
     // Add view limit information if available
     if (hasReachedLimit) {
       return {
         title: baseContent.title,
-        description: `You've reached your free view limit. ${baseContent.description}`
+        description: `You've reached your free view limit. ${baseContent.description}`,
       };
-    } else if (viewsRemaining !== null && viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD) {
+    } else if (
+      viewsRemaining !== null &&
+      viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD
+    ) {
       return {
         title: baseContent.title,
-        description: `You have ${viewsRemaining} free ${viewsRemaining === 1 ? 'view' : 'views'} remaining. ${baseContent.description}`
+        description: `You have ${viewsRemaining} free ${viewsRemaining === 1 ? 'view' : 'views'} remaining. ${baseContent.description}`,
       };
     }
-    
+
     return baseContent;
   };
-  
+
   const { title, description } = getFeatureSpecificContent();
-  
+
   // Determine if we're in landscape mode
   const isLandscape = screenDimensions.width > screenDimensions.height;
-  
+
   // Success animation overlay
   const renderSuccessOverlay = () => {
     if (!purchaseSuccess) return null;
-    
+
     return (
-      <Animated.View
-        style={[
-          styles.successOverlay,
-          { opacity: successAnim }
-        ]}
-      >
+      <Animated.View style={[styles.successOverlay, { opacity: successAnim }]}>
         <View style={styles.successContent}>
           <Ionicons name="checkmark-circle" size={64} color="#34C759" />
           <ThemedText style={styles.successText}>Purchase Successful!</ThemedText>
@@ -385,8 +390,8 @@ if (success) {
           isLandscape && styles.promptCardLandscape,
           {
             backgroundColor: isDark ? '#1c1c1e' : '#f8f8f8',
-            borderColor: colors.primary
-          }
+            borderColor: colors.primary,
+          },
         ]}
       >
         <TouchableOpacity
@@ -397,7 +402,7 @@ if (success) {
         >
           <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
-        
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={isLandscape ? styles.scrollContentLandscape : undefined}
@@ -407,109 +412,123 @@ if (success) {
               styles.title,
               {
                 color: colors.text,
-                textShadowColor: colors.primary
-              }
+                textShadowColor: colors.primary,
+              },
             ]}
           >
             {title}
           </ThemedText>
-          
+
           <ThemedText style={[styles.description, { color: colors.text }]}>
             {description}
           </ThemedText>
-          
+
           {/* View Limit Indicator */}
-          {viewsRemaining !== null && viewsRemaining <= advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT && (
-            <View style={styles.viewLimitContainer}>
-              <View style={styles.viewLimitTrack}>
-                <View
-                  style={[
-                    styles.viewLimitProgress,
-                    {
-                      width: `${(viewsRemaining / advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT) * 100}%`,
-                      backgroundColor: viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD
-                        ? '#FF9500' // Warning color
-                        : '#34C759' // Normal color
-                    }
-                  ]}
-                />
+          {viewsRemaining !== null &&
+            viewsRemaining <= advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT && (
+              <View style={styles.viewLimitContainer}>
+                <View style={styles.viewLimitTrack}>
+                  <View
+                    style={[
+                      styles.viewLimitProgress,
+                      {
+                        width: `${(viewsRemaining / advancedPlayerStatsService.FREE_TIER_VIEW_LIMIT) * 100}%`,
+                        backgroundColor:
+                          viewsRemaining <= advancedPlayerStatsService.FREE_TIER_WARNING_THRESHOLD
+                            ? '#FF9500' // Warning color
+                            : '#34C759', // Normal color
+                      },
+                    ]}
+                  />
+                </View>
+                <ThemedText style={styles.viewLimitText}>
+                  {viewsRemaining} {viewsRemaining === 1 ? 'view' : 'views'} remaining
+                </ThemedText>
               </View>
-              <ThemedText style={styles.viewLimitText}>
-                {viewsRemaining} {viewsRemaining === 1 ? 'view' : 'views'} remaining
-              </ThemedText>
-            </View>
-          )}
-          
-          <View style={[
-            styles.optionsContainer,
-            isLandscape && styles.optionsContainerLandscape
-          ]}>
+            )}
+
+          <View style={[styles.optionsContainer, isLandscape && styles.optionsContainerLandscape]}>
             {/* Subscription Options */}
-            <View style={[
-              styles.subscriptionOptions,
-              isLandscape && styles.subscriptionOptionsLandscape
-            ]}>
+            <View
+              style={[
+                styles.subscriptionOptions,
+                isLandscape && styles.subscriptionOptionsLandscape,
+              ]}
+            >
               <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
                 Subscription Options
               </ThemedText>
-              
-              {SUBSCRIPTION_PLANS.filter(plan =>
-                plan.id === 'premium-monthly' ||
-                plan.id === 'premium-yearly' ||
-                plan.id === 'advanced-analytics-monthly'
-              ).map((plan) => (
-                <View key={plan.id} style={[
-                  styles.subscriptionOption,
-                  { backgroundColor: isDark ? 'rgba(10, 126, 164, 0.1)' : 'rgba(10, 126, 164, 0.05)' },
-                  plan.popular && [
-                    styles.popularOption,
+
+              {SUBSCRIPTION_PLANS.filter(
+                plan =>
+                  plan.id === 'premium-monthly' ||
+                  plan.id === 'premium-yearly' ||
+                  plan.id === 'advanced-analytics-monthly'
+              ).map(plan => (
+                <View
+                  key={plan.id}
+                  style={[
+                    styles.subscriptionOption,
                     {
-                      borderColor: colors.primary,
-                      backgroundColor: isDark ? 'rgba(10, 126, 164, 0.2)' : 'rgba(10, 126, 164, 0.1)'
-                    }
-                  ]
-                ]}>
+                      backgroundColor: isDark
+                        ? 'rgba(10, 126, 164, 0.1)'
+                        : 'rgba(10, 126, 164, 0.05)',
+                    },
+                    plan.popular && [
+                      styles.popularOption,
+                      {
+                        borderColor: colors.primary,
+                        backgroundColor: isDark
+                          ? 'rgba(10, 126, 164, 0.2)'
+                          : 'rgba(10, 126, 164, 0.1)',
+                      },
+                    ],
+                  ]}
+                >
                   {plan.popular && (
                     <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
                       <ThemedText style={styles.popularBadgeText}>MOST POPULAR</ThemedText>
                     </View>
                   )}
-                  
+
                   <ThemedText style={[styles.optionTitle, { color: colors.text }]}>
                     {plan.name}
                   </ThemedText>
-                  
+
                   <ThemedText style={[styles.optionPrice, { color: colors.primary }]}>
                     ${plan.price}/{plan.interval}
                   </ThemedText>
-                  
+
                   <View style={styles.featuresList}>
-                    {plan.features.filter(f =>
-                      f.includes('player') ||
-                      f.includes('metrics') ||
-                      f.includes('analytics') ||
-                      f.includes('comparison') ||
-                      f.includes('historical') ||
-                      f.includes('All')
-                    ).map((feature, index) => (
-                      <View key={index} style={styles.featureItem}>
-                        <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
-                        <ThemedText style={[styles.featureText, { color: colors.text }]}>
-                          {feature}
-                        </ThemedText>
-                      </View>
-                    ))}
+                    {plan.features
+                      .filter(
+                        f =>
+                          f.includes('player') ||
+                          f.includes('metrics') ||
+                          f.includes('analytics') ||
+                          f.includes('comparison') ||
+                          f.includes('historical') ||
+                          f.includes('All')
+                      )
+                      .map((feature, index) => (
+                        <View key={index} style={styles.featureItem}>
+                          <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
+                          <ThemedText style={[styles.featureText, { color: colors.text }]}>
+                            {feature}
+                          </ThemedText>
+                        </View>
+                      ))}
                   </View>
-                  
+
                   <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                     <TouchableOpacity
                       style={[
                         styles.subscribeButton,
                         {
                           backgroundColor: colors.primary,
-                          shadowColor: colors.primary
+                          shadowColor: colors.primary,
                         },
-                        plan.popular && styles.popularButton
+                        plan.popular && styles.popularButton,
                       ]}
                       onPress={navigateToSubscription}
                       accessibilityLabel={`Subscribe to ${plan.name}`}
@@ -521,31 +540,39 @@ if (success) {
                 </View>
               ))}
             </View>
-            
+
             {/* Microtransaction Options */}
             {showMicrotransactions && (
-              <View style={[
-                styles.microtransactionOptions,
-                { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)' },
-                isLandscape && styles.microtransactionOptionsLandscape
-              ]}>
+              <View
+                style={[
+                  styles.microtransactionOptions,
+                  { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)' },
+                  isLandscape && styles.microtransactionOptionsLandscape,
+                ]}
+              >
                 <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
                   One-Time Purchases
                 </ThemedText>
-                
-                {relevantMicrotransactions.map((product) => (
+
+                {relevantMicrotransactions.map(product => (
                   <TouchableOpacity
                     key={product.id}
                     style={[
                       styles.microOption,
-                      { borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
+                      {
+                        borderBottomColor: isDark
+                          ? 'rgba(255, 255, 255, 0.1)'
+                          : 'rgba(0, 0, 0, 0.1)',
+                      },
                       product.id === 'player-stats-premium-bundle' && [
                         styles.bestValue,
                         {
-                          backgroundColor: isDark ? 'rgba(10, 126, 164, 0.2)' : 'rgba(10, 126, 164, 0.1)'
-                        }
+                          backgroundColor: isDark
+                            ? 'rgba(10, 126, 164, 0.2)'
+                            : 'rgba(10, 126, 164, 0.1)',
+                        },
                       ],
-                      loading === product.id && styles.microOptionLoading
+                      loading === product.id && styles.microOptionLoading,
                     ]}
                     onPress={() => purchaseMicrotransaction(product.id)}
                     disabled={loading !== null}
@@ -556,14 +583,16 @@ if (success) {
                       <ThemedText style={[styles.microOptionName, { color: colors.text }]}>
                         {product.name}
                       </ThemedText>
-                      <ThemedText style={[
-                        styles.microOptionDescription,
-                        { color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)' }
-                      ]}>
+                      <ThemedText
+                        style={[
+                          styles.microOptionDescription,
+                          { color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)' },
+                        ]}
+                      >
                         {product.description}
                       </ThemedText>
                     </View>
-                    
+
                     <View style={styles.microOptionPriceContainer}>
                       {loading === product.id ? (
                         <ActivityIndicator size="small" color={colors.primary} />
@@ -587,7 +616,7 @@ if (success) {
           </View>
         </ScrollView>
       </View>
-      
+
       {renderSuccessOverlay()}
     </View>
   );

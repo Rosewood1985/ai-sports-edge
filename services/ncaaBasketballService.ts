@@ -1,6 +1,7 @@
 import axios from 'axios';
-import ncaaBasketballApi from '../config/ncaaBasketballApi';
 import { Alert } from 'react-native';
+
+import ncaaBasketballApi from '../config/ncaaBasketballApi';
 
 // Types for NCAA Basketball data
 export interface NcaaBasketballGame {
@@ -111,15 +112,13 @@ export const fetchGameSummary = async (
     }
 
     // Determine the endpoint based on gender
-    const endpoint = gender === 'mens' 
-      ? ncaaBasketballApi.ENDPOINTS.MENS.GAME_SUMMARY 
-      : ncaaBasketballApi.ENDPOINTS.WOMENS.GAME_SUMMARY;
+    const endpoint =
+      gender === 'mens'
+        ? ncaaBasketballApi.ENDPOINTS.MENS.GAME_SUMMARY
+        : ncaaBasketballApi.ENDPOINTS.WOMENS.GAME_SUMMARY;
 
     // Build API URL
-    const apiUrl = ncaaBasketballApi.buildApiUrl(
-      endpoint,
-      { game_id: gameId }
-    );
+    const apiUrl = ncaaBasketballApi.buildApiUrl(endpoint, { game_id: gameId });
 
     // Configure request with timeout
     const requestConfig = {
@@ -128,16 +127,16 @@ export const fetchGameSummary = async (
 
     // Make API request
     const response = await axios.get(apiUrl, requestConfig);
-    
+
     // Validate response data
     if (!response.data) {
       throw new Error(ncaaBasketballApi.ERROR_MESSAGES.INVALID_RESPONSE_FORMAT);
     }
-    
+
     return response.data;
   } catch (error) {
     console.error(`Error fetching NCAA ${gender} basketball game summary:`, error);
-    
+
     // Handle specific error types
     if (axios.isAxiosError(error)) {
       if (error.code === 'ECONNABORTED') {
@@ -158,7 +157,7 @@ export const fetchGameSummary = async (
     } else {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
-    
+
     throw error;
   }
 };
@@ -180,15 +179,13 @@ export const fetchPlayerProfile = async (
     }
 
     // Determine the endpoint based on gender
-    const endpoint = gender === 'mens' 
-      ? ncaaBasketballApi.ENDPOINTS.MENS.PLAYER_PROFILE 
-      : ncaaBasketballApi.ENDPOINTS.WOMENS.PLAYER_PROFILE;
+    const endpoint =
+      gender === 'mens'
+        ? ncaaBasketballApi.ENDPOINTS.MENS.PLAYER_PROFILE
+        : ncaaBasketballApi.ENDPOINTS.WOMENS.PLAYER_PROFILE;
 
     // Build API URL
-    const apiUrl = ncaaBasketballApi.buildApiUrl(
-      endpoint,
-      { player_id: playerId }
-    );
+    const apiUrl = ncaaBasketballApi.buildApiUrl(endpoint, { player_id: playerId });
 
     // Configure request with timeout
     const requestConfig = {
@@ -197,16 +194,16 @@ export const fetchPlayerProfile = async (
 
     // Make API request
     const response = await axios.get(apiUrl, requestConfig);
-    
+
     // Validate response data
     if (!response.data) {
       throw new Error(ncaaBasketballApi.ERROR_MESSAGES.INVALID_RESPONSE_FORMAT);
     }
-    
+
     return response.data;
   } catch (error) {
     console.error(`Error fetching NCAA ${gender} basketball player profile:`, error);
-    
+
     // Handle specific error types
     if (axios.isAxiosError(error)) {
       if (error.code === 'ECONNABORTED') {
@@ -227,7 +224,7 @@ export const fetchPlayerProfile = async (
     } else {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
-    
+
     throw error;
   }
 };
@@ -253,15 +250,13 @@ export const fetchSchedule = async (
     }
 
     // Determine the endpoint based on gender
-    const endpoint = gender === 'mens' 
-      ? ncaaBasketballApi.ENDPOINTS.MENS.LEAGUE_SCHEDULE 
-      : ncaaBasketballApi.ENDPOINTS.WOMENS.LEAGUE_SCHEDULE;
+    const endpoint =
+      gender === 'mens'
+        ? ncaaBasketballApi.ENDPOINTS.MENS.LEAGUE_SCHEDULE
+        : ncaaBasketballApi.ENDPOINTS.WOMENS.LEAGUE_SCHEDULE;
 
     // Build API URL
-    const apiUrl = ncaaBasketballApi.buildApiUrl(
-      endpoint,
-      { year, month, day }
-    );
+    const apiUrl = ncaaBasketballApi.buildApiUrl(endpoint, { year, month, day });
 
     // Configure request with timeout
     const requestConfig = {
@@ -270,16 +265,16 @@ export const fetchSchedule = async (
 
     // Make API request
     const response = await axios.get(apiUrl, requestConfig);
-    
+
     // Validate response data
     if (!response.data || !response.data.games) {
       throw new Error(ncaaBasketballApi.ERROR_MESSAGES.INVALID_RESPONSE_FORMAT);
     }
-    
+
     return response.data.games;
   } catch (error) {
     console.error(`Error fetching NCAA ${gender} basketball schedule:`, error);
-    
+
     // Handle specific error types
     if (axios.isAxiosError(error)) {
       if (error.code === 'ECONNABORTED') {
@@ -300,7 +295,7 @@ export const fetchSchedule = async (
     } else {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
-    
+
     throw error;
   }
 };
@@ -322,15 +317,13 @@ export const fetchTournamentSummary = async (
     }
 
     // Determine the endpoint based on gender
-    const endpoint = gender === 'mens' 
-      ? ncaaBasketballApi.ENDPOINTS.MENS.TOURNAMENT_SUMMARY 
-      : ncaaBasketballApi.ENDPOINTS.WOMENS.TOURNAMENT_SUMMARY;
+    const endpoint =
+      gender === 'mens'
+        ? ncaaBasketballApi.ENDPOINTS.MENS.TOURNAMENT_SUMMARY
+        : ncaaBasketballApi.ENDPOINTS.WOMENS.TOURNAMENT_SUMMARY;
 
     // Build API URL
-    const apiUrl = ncaaBasketballApi.buildApiUrl(
-      endpoint,
-      { tournament_id: tournamentId }
-    );
+    const apiUrl = ncaaBasketballApi.buildApiUrl(endpoint, { tournament_id: tournamentId });
 
     // Configure request with timeout
     const requestConfig = {
@@ -339,16 +332,16 @@ export const fetchTournamentSummary = async (
 
     // Make API request
     const response = await axios.get(apiUrl, requestConfig);
-    
+
     // Validate response data
     if (!response.data) {
       throw new Error(ncaaBasketballApi.ERROR_MESSAGES.INVALID_RESPONSE_FORMAT);
     }
-    
+
     return response.data;
   } catch (error) {
     console.error(`Error fetching NCAA ${gender} basketball tournament summary:`, error);
-    
+
     // Handle specific error types
     if (axios.isAxiosError(error)) {
       if (error.code === 'ECONNABORTED') {
@@ -369,7 +362,7 @@ export const fetchTournamentSummary = async (
     } else {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
-    
+
     throw error;
   }
 };
@@ -391,15 +384,13 @@ export const fetchRankings = async (
     }
 
     // Determine the endpoint based on gender
-    const endpoint = gender === 'mens' 
-      ? ncaaBasketballApi.ENDPOINTS.MENS.RANKINGS 
-      : ncaaBasketballApi.ENDPOINTS.WOMENS.RANKINGS;
+    const endpoint =
+      gender === 'mens'
+        ? ncaaBasketballApi.ENDPOINTS.MENS.RANKINGS
+        : ncaaBasketballApi.ENDPOINTS.WOMENS.RANKINGS;
 
     // Build API URL
-    const apiUrl = ncaaBasketballApi.buildApiUrl(
-      endpoint,
-      { poll_id: pollId }
-    );
+    const apiUrl = ncaaBasketballApi.buildApiUrl(endpoint, { poll_id: pollId });
 
     // Configure request with timeout
     const requestConfig = {
@@ -408,16 +399,16 @@ export const fetchRankings = async (
 
     // Make API request
     const response = await axios.get(apiUrl, requestConfig);
-    
+
     // Validate response data
     if (!response.data) {
       throw new Error(ncaaBasketballApi.ERROR_MESSAGES.INVALID_RESPONSE_FORMAT);
     }
-    
+
     return response.data;
   } catch (error) {
     console.error(`Error fetching NCAA ${gender} basketball rankings:`, error);
-    
+
     // Handle specific error types
     if (axios.isAxiosError(error)) {
       if (error.code === 'ECONNABORTED') {
@@ -438,7 +429,7 @@ export const fetchRankings = async (
     } else {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
-    
+
     throw error;
   }
 };

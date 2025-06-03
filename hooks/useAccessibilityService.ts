@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+
 import { accessibilityService, AccessibilityPreferences } from '../services/accessibilityService';
 
 /**
@@ -13,7 +14,7 @@ export const useAccessibilityService = () => {
   useEffect(() => {
     // Subscribe to preference changes
     const unsubscribe = accessibilityService.addListener(setPreferences);
-    
+
     // Unsubscribe on cleanup
     return unsubscribe;
   }, []);
@@ -21,11 +22,11 @@ export const useAccessibilityService = () => {
   return {
     // Preferences
     preferences,
-    
+
     // Update methods
     updatePreferences: accessibilityService.updatePreferences.bind(accessibilityService),
     resetPreferences: accessibilityService.resetPreferences.bind(accessibilityService),
-    
+
     // Status checks
     isScreenReaderEnabled: accessibilityService.isScreenReaderActive(),
     isBoldTextEnabled: accessibilityService.isBoldTextActive(),
@@ -33,7 +34,7 @@ export const useAccessibilityService = () => {
     isHighContrastEnabled: accessibilityService.isHighContrastActive(),
     isGrayscaleEnabled: accessibilityService.isGrayscaleActive(),
     isInvertColorsEnabled: accessibilityService.isInvertColorsActive(),
-    
+
     // Helper methods
     getFontScale: accessibilityService.getFontScale.bind(accessibilityService),
     getScreenReaderHint: accessibilityService.getScreenReaderHint.bind(accessibilityService),

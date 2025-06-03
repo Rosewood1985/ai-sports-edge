@@ -8,7 +8,7 @@ function debugInitialization(serviceName) {
   return {
     success: true,
     message: `Service ${serviceName} initialization debugged successfully`,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -18,7 +18,7 @@ function debugDependencies(serviceName) {
     success: true,
     dependencies: findServiceDependencies(serviceName),
     message: `Dependencies for service ${serviceName} analyzed successfully`,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -26,9 +26,9 @@ function debugDependencies(serviceName) {
 function findServiceDependencies(serviceName) {
   const servicesDir = path.join(process.cwd(), 'services');
   const srcServicesDir = path.join(process.cwd(), 'src', 'services');
-  
+
   let serviceFile = null;
-  
+
   // Try to find the service file
   if (fs.existsSync(path.join(servicesDir, `${serviceName}.js`))) {
     serviceFile = path.join(servicesDir, `${serviceName}.js`);
@@ -39,14 +39,14 @@ function findServiceDependencies(serviceName) {
   } else if (fs.existsSync(path.join(srcServicesDir, `${serviceName}.ts`))) {
     serviceFile = path.join(srcServicesDir, `${serviceName}.ts`);
   }
-  
+
   if (!serviceFile) {
     return [];
   }
-  
+
   const content = fs.readFileSync(serviceFile, 'utf8');
   const importMatches = content.match(/import\s+.*\s+from\s+['"]([^'"]+)['"]/g) || [];
-  
+
   return importMatches.map(match => {
     const importPath = match.match(/from\s+['"]([^'"]+)['"]/)[1];
     return importPath;
@@ -56,7 +56,7 @@ function findServiceDependencies(serviceName) {
 // Export functions for use in App.tsx
 module.exports = {
   debugServiceInitialization: debugInitialization,
-  debugServiceDependencies: debugDependencies
+  debugServiceDependencies: debugDependencies,
 };
 
 // Configuration
@@ -68,7 +68,10 @@ const config = {
 };
 
 // Initialize log file
-fs.writeFileSync(config.logFile, `AI Sports Edge Services Debug Log - ${new Date().toISOString()}\n\n`);
+fs.writeFileSync(
+  config.logFile,
+  `AI Sports Edge Services Debug Log - ${new Date().toISOString()}\n\n`
+);
 
 // Helper function to log messages
 function log(message) {
@@ -86,18 +89,18 @@ function findFiles(dir, pattern, results = []) {
   }
 
   const files = fs.readdirSync(dir);
-  
+
   for (const file of files) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
-    
+
     if (stat.isDirectory()) {
       findFiles(filePath, pattern, results);
     } else if (pattern.test(file)) {
       results.push(filePath);
     }
   }
-  
+
   return results;
 }
 
@@ -106,9 +109,9 @@ function analyzeServiceFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const fileName = path.basename(filePath);
   const serviceName = fileName.replace(/\.(js|ts|jsx|tsx)$/, '');
-  
+
   log(`Analyzing service: ${serviceName}`);
-  
+
   const analysis = {
     name: serviceName,
     path: filePath,
@@ -122,47 +125,52 @@ function analyzeServiceFile(filePath) {
     hasErrorHandling: content.includes('try') && content.includes('catch'),
     potentialIssues: [],
   };
-  
+
   // Check for imports/dependencies
   const importMatches = content.match(/import\s+.*\s+from\s+['"]([^'"]+)['"]/g) || [];
   analysis.dependencies = importMatches.map(match => {
     const importPath = match.match(/from\s+['"]([^'"]+)['"]/)[1];
     return importPath;
   });
-  
+
   log(`  - Dependencies: ${analysis.dependencies.join(', ') || 'None'}`);
-  
+
   // Check for potential issues
   if (!analysis.hasExport) {
     analysis.potentialIssues.push('No exports found');
     log(`  - WARNING: No exports found`);
   }
-  
+
   if (analysis.firebaseUsage && !analysis.hasErrorHandling) {
     analysis.potentialIssues.push('Firebase usage without error handling');
     log(`  - WARNING: Firebase usage without error handling`);
   }
-  
-  if (analysis.dependencies.includes('./firebase') || analysis.dependencies.includes('../firebase')) {
+
+  if (
+    analysis.dependencies.includes('./firebase') ||
+    analysis.dependencies.includes('../firebase')
+  ) {
     log(`  - Service depends on local Firebase module`);
   }
-  
+
   // Check for environment variables usage
   if (content.includes('process.env')) {
     log(`  - Service uses environment variables`);
-    
+
     // Check for Firebase API key
     if (content.includes('process.env.FIREBASE_API_KEY')) {
       log(`  - Service uses FIREBASE_API_KEY environment variable`);
     }
   }
-  
+
   // Check for singleton pattern
-  if (content.includes('getInstance') || 
-      (content.includes('instance') && content.includes('return instance'))) {
+  if (
+    content.includes('getInstance') ||
+    (content.includes('instance') && content.includes('return instance'))
+  ) {
     log(`  - Service appears to use singleton pattern`);
   }
-  
+
   return analysis;
 }
 
@@ -174,93 +182,96 @@ async function main() {
     // 1. Find service files
     log('Finding service files');
     let serviceFiles = [];
-    
+
     if (fs.existsSync(config.servicesDir)) {
       const files = findFiles(config.servicesDir, /\.(js|ts|jsx|tsx)$/);
       serviceFiles = serviceFiles.concat(files);
     }
-    
+
     if (fs.existsSync(config.srcServicesDir)) {
       const files = findFiles(config.srcServicesDir, /\.(js|ts|jsx|tsx)$/);
       serviceFiles = serviceFiles.concat(files);
     }
-    
+
     log(`Found ${serviceFiles.length} service files`);
-    
+
     // 2. Analyze each service file
     log('Analyzing service files');
     const servicesAnalysis = serviceFiles.map(analyzeServiceFile);
-    
+
     // 3. Find service usage in other files
     log('Finding service usage in other files');
     const allFiles = findFiles(config.rootDir, /\.(js|ts|jsx|tsx)$/);
-    
+
     for (const service of servicesAnalysis) {
       const serviceName = service.name;
       let usageCount = 0;
-      
+
       for (const file of allFiles) {
         if (file === service.path) continue;
-        
+
         const content = fs.readFileSync(file, 'utf8');
-        if (content.includes(`import`) && 
-            (content.includes(`${serviceName}`) || 
-             content.includes(`from './services/${serviceName}'`) || 
-             content.includes(`from '../services/${serviceName}'`))) {
+        if (
+          content.includes(`import`) &&
+          (content.includes(`${serviceName}`) ||
+            content.includes(`from './services/${serviceName}'`) ||
+            content.includes(`from '../services/${serviceName}'`))
+        ) {
           usageCount++;
         }
       }
-      
+
       log(`Service ${serviceName} is imported in ${usageCount} files`);
       service.usageCount = usageCount;
-      
+
       if (usageCount === 0) {
         service.potentialIssues.push('Service is not imported anywhere');
         log(`  - WARNING: Service ${serviceName} is not imported anywhere`);
       }
     }
-    
+
     // 4. Check for circular dependencies
     log('Checking for circular dependencies');
     const circularDependencies = [];
-    
+
     for (const service of servicesAnalysis) {
       for (const dependency of service.dependencies) {
         // Check if dependency is a local service
         const dependencyName = dependency.replace(/^\.\//, '').replace(/^\.\.\/services\//, '');
-        
-        const dependencyService = servicesAnalysis.find(s => 
-          s.name === dependencyName || 
-          dependency.includes(s.name)
+
+        const dependencyService = servicesAnalysis.find(
+          s => s.name === dependencyName || dependency.includes(s.name)
         );
-        
+
         if (dependencyService) {
           // Check if the dependency also depends on this service
-          const reverseDependency = dependencyService.dependencies.find(d => 
+          const reverseDependency = dependencyService.dependencies.find(d =>
             d.includes(service.name)
           );
-          
+
           if (reverseDependency) {
             circularDependencies.push({
               service1: service.name,
-              service2: dependencyService.name
+              service2: dependencyService.name,
             });
-            
-            log(`  - WARNING: Circular dependency between ${service.name} and ${dependencyService.name}`);
+
+            log(
+              `  - WARNING: Circular dependency between ${service.name} and ${dependencyService.name}`
+            );
           }
         }
       }
     }
-    
+
     // 5. Check for Firebase services
     log('Checking for Firebase services');
     const firebaseServices = servicesAnalysis.filter(service => service.firebaseUsage);
-    
+
     log(`Found ${firebaseServices.length} services using Firebase`);
-    
+
     // 6. Generate report
     log('Generating report');
-    
+
     const report = `
 # AI Sports Edge Services Debug Report
 
@@ -295,11 +306,11 @@ ${servicesAnalysis
 4. Ensure all services properly use environment variables
 5. Implement singleton pattern for services that should be shared
 `;
-    
+
     const reportPath = path.join(config.rootDir, 'services-debug-report.md');
     fs.writeFileSync(reportPath, report);
     log(`Generated report: ${reportPath}`);
-    
+
     log('AI Sports Edge Services Debug completed successfully');
   } catch (error) {
     log(`Error: ${error.message}`);

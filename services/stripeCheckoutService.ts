@@ -1,27 +1,27 @@
 import { httpsCallable } from 'firebase/functions';
+
+import { analyticsService, AnalyticsEventType } from './analyticsService';
 import { functions } from '../config/firebase';
-import { analyticsService } from './analyticsService';
-import { AnalyticsEventType } from './analyticsService';
 
 // Stripe price mappings - CONSOLIDATED SYSTEM #1 (Sportsbook Config)
 const STRIPE_PRICES = {
   // Main subscription tiers - UPDATED PRICING
   insight_monthly: 'price_insight_monthly_1999',
   insight_annual: 'price_insight_annual_16792',
-  analyst_monthly: 'price_analyst_monthly_7499', 
+  analyst_monthly: 'price_analyst_monthly_7499',
   analyst_annual: 'price_analyst_annual_62992',
   edge_collective_monthly_solo: 'price_edge_solo_monthly_18999',
   edge_collective_annual_solo: 'price_edge_solo_annual_159592',
-  
+
   // Edge Collective split payment options - UPDATED PRICING
   edge_collective_monthly_duo: 'price_edge_duo_monthly_9500',
   edge_collective_annual_duo: 'price_edge_duo_annual_79796',
   edge_collective_monthly_trio: 'price_edge_trio_monthly_6333',
   edge_collective_annual_trio: 'price_edge_trio_annual_53197',
-  
+
   // One-time purchases
   weekend_pass: 'price_weekend_pass_499',
-  game_day_pass: 'price_game_day_pass_299'
+  game_day_pass: 'price_game_day_pass_299',
 };
 
 // Educational discount promo code
@@ -49,7 +49,7 @@ export async function startStripeCheckoutSession({
   userId,
   planKey,
   email,
-  metadata = {}
+  metadata = {},
 }: StartCheckoutParams): Promise<string> {
   try {
     // Validate inputs
@@ -63,25 +63,28 @@ export async function startStripeCheckoutSession({
 
     // Check for educational discount eligibility
     const isEdu = email.endsWith('.edu');
-    
+
     console.log(`Starting checkout for ${email} (edu: ${isEdu}) with plan: ${planKey}`);
-    
+
     // Track checkout initiation
     await analyticsService.trackEvent(AnalyticsEventType.CHECKOUT_STARTED, {
       plan_key: planKey,
       price_id: STRIPE_PRICES[planKey],
       is_edu: isEdu,
-      email: email,
-      user_id: userId
+      email,
+      user_id: userId,
     });
 
     // Get Firebase callable function
-    const checkoutSession = httpsCallable<{
-      userId: string;
-      priceId: string;
-      promoCodeId?: string;
-      metadata?: Record<string, string>;
-    }, CheckoutResponse>(functions, 'createCheckoutSession');
+    const checkoutSession = httpsCallable<
+      {
+        userId: string;
+        priceId: string;
+        promoCodeId?: string;
+        metadata?: Record<string, string>;
+      },
+      CheckoutResponse
+    >(functions, 'createCheckoutSession');
 
     // Call the Firebase function
     const { data } = await checkoutSession({
@@ -91,8 +94,8 @@ export async function startStripeCheckoutSession({
       metadata: {
         planKey,
         source: 'web_app',
-        ...metadata
-      }
+        ...metadata,
+      },
     });
 
     // Track successful session creation
@@ -102,23 +105,22 @@ export async function startStripeCheckoutSession({
       price_id: STRIPE_PRICES[planKey],
       is_edu: data.isEdu,
       checkout_url: data.url,
-      user_id: userId
+      user_id: userId,
     });
 
     console.log(`Checkout session created: ${data.sessionId}`);
-    
+
     // Return the checkout URL for redirect
     return data.url;
-
   } catch (error) {
     console.error('Error starting Stripe checkout session:', error);
-    
+
     // Track checkout error
     await analyticsService.trackEvent(AnalyticsEventType.CHECKOUT_ERROR, {
       error_message: error instanceof Error ? error.message : 'Unknown error',
       plan_key: planKey,
-      email: email,
-      user_id: userId
+      email,
+      user_id: userId,
     });
 
     throw error;
@@ -132,7 +134,7 @@ export function getPlanDisplayName(planKey: keyof typeof STRIPE_PRICES): string 
   const displayNames: Record<keyof typeof STRIPE_PRICES, string> = {
     insight_monthly: 'Insight Monthly',
     insight_annual: 'Insight Annual',
-    analyst_monthly: 'Analyst Monthly', 
+    analyst_monthly: 'Analyst Monthly',
     analyst_annual: 'Analyst Annual',
     edge_collective_monthly_solo: 'Edge Collective Monthly (Solo)',
     edge_collective_annual_solo: 'Edge Collective Annual (Solo)',
@@ -141,7 +143,7 @@ export function getPlanDisplayName(planKey: keyof typeof STRIPE_PRICES): string 
     edge_collective_monthly_trio: 'Edge Collective Monthly (3 Users)',
     edge_collective_annual_trio: 'Edge Collective Annual (3 Users)',
     weekend_pass: 'Weekend Pass',
-    game_day_pass: 'Game Day Pass'
+    game_day_pass: 'Game Day Pass',
   };
 
   return displayNames[planKey] || planKey;
@@ -154,7 +156,7 @@ export function isPlanEduEligible(planKey: keyof typeof STRIPE_PRICES): boolean 
   // Define which plans are eligible for educational discounts (all main tiers)
   const eduEligiblePlans: (keyof typeof STRIPE_PRICES)[] = [
     'insight_monthly',
-    'insight_annual', 
+    'insight_annual',
     'analyst_monthly',
     'analyst_annual',
     'edge_collective_monthly_solo',
@@ -162,7 +164,7 @@ export function isPlanEduEligible(planKey: keyof typeof STRIPE_PRICES): boolean 
     'edge_collective_monthly_duo',
     'edge_collective_annual_duo',
     'edge_collective_monthly_trio',
-    'edge_collective_annual_trio'
+    'edge_collective_annual_trio',
   ];
 
   return eduEligiblePlans.includes(planKey);
@@ -177,11 +179,11 @@ export function getEduDiscountInfo(planKey: keyof typeof STRIPE_PRICES): {
   promoCode: string | null;
 } {
   const isEligible = isPlanEduEligible(planKey);
-  
+
   return {
     isEligible,
     discountPercentage: isEligible ? 15 : 0, // 15% educational discount
-    promoCode: isEligible ? EDU_PROMO_CODE_ID : null
+    promoCode: isEligible ? EDU_PROMO_CODE_ID : null,
   };
 }
 
@@ -192,7 +194,7 @@ export async function startStripeCheckoutWithEduValidation({
   userId,
   planKey,
   email,
-  metadata = {}
+  metadata = {},
 }: StartCheckoutParams): Promise<{
   url: string;
   hasEduDiscount: boolean;
@@ -207,30 +209,29 @@ export async function startStripeCheckoutWithEduValidation({
     if (isEdu) {
       await analyticsService.trackEvent(AnalyticsEventType.EDU_DISCOUNT_ELIGIBLE, {
         plan_key: planKey,
-        email: email,
+        email,
         discount_applicable: hasEduDiscount,
         discount_percentage: eduInfo.discountPercentage,
-        user_id: userId
+        user_id: userId,
       });
     }
 
     const checkoutUrl = await startStripeCheckoutSession({
       userId,
-      planKey, 
+      planKey,
       email,
       metadata: {
         ...metadata,
         edu_discount_applied: hasEduDiscount.toString(),
-        discount_percentage: eduInfo.discountPercentage.toString()
-      }
+        discount_percentage: eduInfo.discountPercentage.toString(),
+      },
     });
 
     return {
       url: checkoutUrl,
       hasEduDiscount,
-      discountPercentage: eduInfo.discountPercentage
+      discountPercentage: eduInfo.discountPercentage,
     };
-
   } catch (error) {
     console.error('Error in edu validation checkout:', error);
     throw error;

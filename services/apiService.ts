@@ -7,9 +7,10 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, Auth } from 'firebase/auth';
-import { info, error as logError, LogCategory } from './loggingService';
-import { safeErrorCapture } from './errorUtils';
 import { Platform } from 'react-native';
+
+import { safeErrorCapture } from './errorUtils';
+import { info, error as logError, LogCategory } from './loggingService';
 
 // API base URL
 const API_BASE_URL = 'https://api.aisportsedge.com/v1';
@@ -39,7 +40,7 @@ export enum ApiErrorType {
 export class ApiError extends Error {
   type: ApiErrorType;
   statusCode?: number;
-  
+
   constructor(message: string, type: ApiErrorType, statusCode?: number) {
     super(message);
     this.name = 'ApiError';
@@ -65,13 +66,13 @@ const getCsrfToken = async (): Promise<string> => {
     if (storedToken) {
       return storedToken;
     }
-    
+
     // Generate a new token if not found
     const newToken = Array(32)
       .fill(0)
       .map(() => Math.floor(Math.random() * 16).toString(16))
       .join('');
-    
+
     // Store the token
     await AsyncStorage.setItem('csrf_token', newToken);
     return newToken;
@@ -90,13 +91,13 @@ const getCsrfToken = async (): Promise<string> => {
 const getAuthHeaders = async (method: string = 'GET'): Promise<Record<string, string>> => {
   console.log(`apiService: Getting auth headers for ${method} request`);
   info(LogCategory.API, 'Getting authentication headers', { method });
-  
+
   const auth = getAuth();
   const user = auth.currentUser;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  
+
   // Add authentication token if user is logged in
   if (user) {
     try {
@@ -115,7 +116,7 @@ const getAuthHeaders = async (method: string = 'GET'): Promise<Record<string, st
     console.log('apiService: No authenticated user found');
     info(LogCategory.API, 'No authenticated user for request');
   }
-  
+
   // Add CSRF token for non-GET requests
   if (method !== 'GET') {
     try {
@@ -131,7 +132,7 @@ const getAuthHeaders = async (method: string = 'GET'): Promise<Record<string, st
       // Continue without CSRF token
     }
   }
-  
+
   return headers;
 };
 
@@ -143,14 +144,14 @@ const getAuthHeaders = async (method: string = 'GET'): Promise<Record<string, st
 const isCacheValid = async (key: string): Promise<boolean> => {
   try {
     const cachedData = await AsyncStorage.getItem(key);
-    
+
     if (!cachedData) {
       return false;
     }
-    
+
     const { timestamp } = JSON.parse(cachedData) as CacheItem<any>;
     const now = Date.now();
-    
+
     return now - timestamp < CACHE_TTL;
   } catch (error) {
     console.error('Error checking cache validity:', error);
@@ -166,11 +167,11 @@ const isCacheValid = async (key: string): Promise<boolean> => {
 const getFromCache = async <T>(key: string): Promise<T | null> => {
   try {
     const cachedData = await AsyncStorage.getItem(key);
-    
+
     if (!cachedData) {
       return null;
     }
-    
+
     const { data } = JSON.parse(cachedData) as CacheItem<T>;
     return data;
   } catch (error) {
@@ -190,7 +191,7 @@ const saveToCache = async <T>(key: string, data: T): Promise<void> => {
       data,
       timestamp: Date.now(),
     };
-    
+
     await AsyncStorage.setItem(key, JSON.stringify(cacheItem));
   } catch (error) {
     console.error('Error saving to cache:', error);
@@ -209,7 +210,7 @@ export const clearCache = async (key?: string): Promise<void> => {
       // Clear all API cache
       const keys = await AsyncStorage.getAllKeys();
       const cacheKeys = keys.filter(k => k.startsWith('api_cache_'));
-      
+
       if (cacheKeys.length > 0) {
         await AsyncStorage.multiRemove(cacheKeys);
       }
@@ -233,16 +234,16 @@ const makeRequest = async <T>(
 ): Promise<T> => {
   const url = `${API_BASE_URL}${endpoint}`;
   const method = options.method || 'GET';
-  
+
   console.log(`apiService: Making ${method} request to ${endpoint}`);
   info(LogCategory.API, `Making ${method} request`, { endpoint, method });
-  
+
   const startTime = Date.now();
-  
+
   try {
     // Get authentication headers
     const headers = await getAuthHeaders(method);
-    
+
     // Make the request
     console.log(`apiService: Fetching ${url}`);
     const response = await fetch(url, {
@@ -252,20 +253,22 @@ const makeRequest = async <T>(
         ...options.headers,
       },
     });
-    
+
     const responseTime = Date.now() - startTime;
-    console.log(`apiService: Response received in ${responseTime}ms with status ${response.status}`);
+    console.log(
+      `apiService: Response received in ${responseTime}ms with status ${response.status}`
+    );
     info(LogCategory.API, 'Response received', {
       endpoint,
       status: response.status,
-      responseTime
+      responseTime,
     });
-    
+
     // Handle HTTP errors
     if (!response.ok) {
       let errorType = ApiErrorType.UNKNOWN;
       let errorMessage = 'Unknown error occurred';
-      
+
       switch (response.status) {
         case 401:
           errorType = ApiErrorType.AUTH;
@@ -290,9 +293,9 @@ const makeRequest = async <T>(
           errorMessage = 'Server error';
           break;
       }
-      
+
       console.error(`apiService: HTTP error ${response.status} (${errorType}): ${errorMessage}`);
-      
+
       // Try to get error message from response
       try {
         const errorData = await response.json();
@@ -304,13 +307,13 @@ const makeRequest = async <T>(
         console.error('apiService: Could not parse error response as JSON');
         // Ignore JSON parsing errors
       }
-      
+
       const apiError = new ApiError(errorMessage, errorType, response.status);
       logError(LogCategory.API, `HTTP error ${response.status} (${errorType})`, apiError);
       safeErrorCapture(apiError);
       throw apiError;
     }
-    
+
     // Parse JSON response
     console.log('apiService: Parsing JSON response');
     try {
@@ -321,14 +324,11 @@ const makeRequest = async <T>(
       console.error(`apiService: Error parsing JSON response: ${parseError}`);
       logError(LogCategory.API, 'Error parsing JSON response', parseError as Error);
       safeErrorCapture(parseError as Error);
-      throw new ApiError(
-        'Invalid JSON response from server',
-        ApiErrorType.SERVER
-      );
+      throw new ApiError('Invalid JSON response from server', ApiErrorType.SERVER);
     }
   } catch (error) {
     const responseTime = Date.now() - startTime;
-    
+
     // Handle network errors with retry
     if (
       (error instanceof TypeError && error.message.includes('Network request failed')) ||
@@ -336,7 +336,7 @@ const makeRequest = async <T>(
     ) {
       console.error(`apiService: Network or server error: ${error.message}`);
       logError(LogCategory.API, 'Network or server error', error as Error);
-      
+
       if (retries > 0) {
         // Exponential backoff
         const delay = 1000 * Math.pow(2, 3 - retries);
@@ -344,15 +344,15 @@ const makeRequest = async <T>(
         info(LogCategory.API, 'Retrying request after error', {
           endpoint,
           retriesLeft: retries,
-          delay
+          delay,
         });
-        
+
         await new Promise<void>(resolve => setTimeout(resolve, delay));
-        
+
         // Retry the request
         return makeRequest<T>(endpoint, options, retries - 1);
       }
-      
+
       console.error(`apiService: Request failed after multiple retries: ${endpoint}`);
       const maxRetriesError = new ApiError(
         'Network request failed after multiple retries',
@@ -362,13 +362,13 @@ const makeRequest = async <T>(
       safeErrorCapture(maxRetriesError);
       throw maxRetriesError;
     }
-    
+
     // Re-throw API errors
     if (error instanceof ApiError) {
       console.error(`apiService: API error (${error.type}): ${error.message}`);
       throw error;
     }
-    
+
     // Handle other errors
     console.error(`apiService: Unexpected error: ${error}`);
     const unexpectedError = new ApiError(
@@ -392,24 +392,21 @@ export const getGames = async (
   useCache = true
 ): Promise<any[]> => {
   const cacheKey = `${CACHE_KEYS.GAMES}_${type}`;
-  
+
   // Check cache first if enabled
-  if (useCache && await isCacheValid(cacheKey)) {
+  if (useCache && (await isCacheValid(cacheKey))) {
     const cachedData = await getFromCache<any[]>(cacheKey);
     if (cachedData) {
       return cachedData;
     }
   }
-  
+
   // Make API request
-  const data = await makeRequest<{ games: any[] }>(
-    `/games?type=${type}`,
-    { method: 'GET' }
-  );
-  
+  const data = await makeRequest<{ games: any[] }>(`/games?type=${type}`, { method: 'GET' });
+
   // Save to cache
   await saveToCache(cacheKey, data.games);
-  
+
   return data.games;
 };
 
@@ -419,29 +416,23 @@ export const getGames = async (
  * @param useCache Whether to use cache
  * @returns Game details
  */
-export const getGameDetails = async (
-  gameId: string,
-  useCache = true
-): Promise<any> => {
+export const getGameDetails = async (gameId: string, useCache = true): Promise<any> => {
   const cacheKey = CACHE_KEYS.GAME_DETAILS(gameId);
-  
+
   // Check cache first if enabled
-  if (useCache && await isCacheValid(cacheKey)) {
+  if (useCache && (await isCacheValid(cacheKey))) {
     const cachedData = await getFromCache<any>(cacheKey);
     if (cachedData) {
       return cachedData;
     }
   }
-  
+
   // Make API request
-  const data = await makeRequest<{ game: any }>(
-    `/games/${gameId}`,
-    { method: 'GET' }
-  );
-  
+  const data = await makeRequest<{ game: any }>(`/games/${gameId}`, { method: 'GET' });
+
   // Save to cache
   await saveToCache(cacheKey, data.game);
-  
+
   return data.game;
 };
 
@@ -450,28 +441,23 @@ export const getGameDetails = async (
  * @param useCache Whether to use cache
  * @returns Trending topics
  */
-export const getTrendingTopics = async (
-  useCache = true
-): Promise<any[]> => {
+export const getTrendingTopics = async (useCache = true): Promise<any[]> => {
   const cacheKey = CACHE_KEYS.TRENDING;
-  
+
   // Check cache first if enabled
-  if (useCache && await isCacheValid(cacheKey)) {
+  if (useCache && (await isCacheValid(cacheKey))) {
     const cachedData = await getFromCache<any[]>(cacheKey);
     if (cachedData) {
       return cachedData;
     }
   }
-  
+
   // Make API request
-  const data = await makeRequest<{ trending: any[] }>(
-    '/trending',
-    { method: 'GET' }
-  );
-  
+  const data = await makeRequest<{ trending: any[] }>('/trending', { method: 'GET' });
+
   // Save to cache
   await saveToCache(cacheKey, data.trending);
-  
+
   return data.trending;
 };
 
@@ -481,29 +467,23 @@ export const getTrendingTopics = async (
  * @param useCache Whether to use cache
  * @returns User statistics
  */
-export const getUserStats = async (
-  userId: string,
-  useCache = true
-): Promise<any> => {
+export const getUserStats = async (userId: string, useCache = true): Promise<any> => {
   const cacheKey = CACHE_KEYS.USER_STATS(userId);
-  
+
   // Check cache first if enabled
-  if (useCache && await isCacheValid(cacheKey)) {
+  if (useCache && (await isCacheValid(cacheKey))) {
     const cachedData = await getFromCache<any>(cacheKey);
     if (cachedData) {
       return cachedData;
     }
   }
-  
+
   // Make API request
-  const data = await makeRequest<{ stats: any }>(
-    `/users/${userId}/stats`,
-    { method: 'GET' }
-  );
-  
+  const data = await makeRequest<{ stats: any }>(`/users/${userId}/stats`, { method: 'GET' });
+
   // Save to cache
   await saveToCache(cacheKey, data.stats);
-  
+
   return data.stats;
 };
 
@@ -519,14 +499,14 @@ export const purchaseMicrotransaction = async (
 ): Promise<any> => {
   console.log(`apiService: Initiating purchase for product ${productId}`);
   info(LogCategory.API, 'Initiating microtransaction purchase', { productId });
-  
+
   try {
     // Check network connectivity first
     const networkState = await Platform.select({
       web: Promise.resolve({ isConnected: true }),
-      default: Promise.resolve({ isConnected: true }) // In a real app, use NetInfo.fetch()
+      default: Promise.resolve({ isConnected: true }), // In a real app, use NetInfo.fetch()
     });
-    
+
     if (!networkState.isConnected) {
       console.error('apiService: Network unavailable for purchase');
       const error = new ApiError('Network unavailable', ApiErrorType.NETWORK);
@@ -534,10 +514,10 @@ export const purchaseMicrotransaction = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     const auth = getAuth();
     const user = auth.currentUser;
-    
+
     if (!user) {
       console.error('apiService: User not authenticated for purchase');
       const error = new ApiError('User not authenticated', ApiErrorType.AUTH);
@@ -545,44 +525,41 @@ export const purchaseMicrotransaction = async (
       safeErrorCapture(error);
       throw error;
     }
-    
+
     console.log(`apiService: User ${user.uid} authenticated for purchase`);
     info(LogCategory.API, 'User authenticated for purchase', { userId: user.uid });
-    
+
     // Generate idempotency key to prevent duplicate charges
     const idempotencyKey = `${user.uid}_${productId}_${Date.now()}`;
     console.log(`apiService: Generated idempotency key: ${idempotencyKey}`);
-    
+
     // Make API request
     console.log('apiService: Sending purchase request to API');
-    const data = await makeRequest<{ purchase: any }>(
-      '/purchases',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          productId,
-          paymentMethodId,
-          idempotencyKey,
-        }),
-      }
-    );
-    
+    const data = await makeRequest<{ purchase: any }>('/purchases', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId,
+        paymentMethodId,
+        idempotencyKey,
+      }),
+    });
+
     console.log(`apiService: Purchase successful for product ${productId}`);
     info(LogCategory.API, 'Microtransaction purchase successful', {
       productId,
-      purchaseId: data.purchase.id
+      purchaseId: data.purchase.id,
     });
-    
+
     return data.purchase;
   } catch (error) {
     console.error(`apiService: Purchase failed for product ${productId}:`, error);
-    
+
     if (error instanceof ApiError) {
       logError(LogCategory.API, `Purchase failed with API error (${error.type})`, error);
     } else {
       logError(LogCategory.API, 'Purchase failed with unknown error', error as Error);
     }
-    
+
     safeErrorCapture(error as Error);
     throw error;
   }

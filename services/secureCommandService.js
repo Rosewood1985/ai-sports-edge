@@ -1,6 +1,6 @@
 /**
  * Secure Command Execution Service
- * 
+ *
  * Provides secure command execution for OCR processing with comprehensive
  * protection against command injection attacks. Uses parameterized execution
  * and strict validation.
@@ -17,47 +17,55 @@ const fs = require('fs').promises;
 const COMMAND_SECURITY_CONFIG = {
   // Allowed commands (whitelist approach)
   ALLOWED_COMMANDS: {
-    'tesseract': {
+    tesseract: {
       path: '/usr/bin/tesseract',
       maxArgs: 20,
       allowedArgs: [
-        'stdout', 'stdin', '-l', '--oem', '--psm', '-c', '--user-words',
-        '--user-patterns', '--tessdata-dir'
+        'stdout',
+        'stdin',
+        '-l',
+        '--oem',
+        '--psm',
+        '-c',
+        '--user-words',
+        '--user-patterns',
+        '--tessdata-dir',
       ],
       timeout: 30000, // 30 seconds
-      maxOutputSize: 50 * 1024 * 1024 // 50MB
+      maxOutputSize: 50 * 1024 * 1024, // 50MB
     },
-    'convert': {
+    convert: {
       path: '/usr/bin/convert',
       maxArgs: 30,
       allowedArgs: [
-        '-resize', '-quality', '-compress', '-colorspace', '-format',
-        '-density', '-blur', '-sharpen', '-contrast', '-normalize'
+        '-resize',
+        '-quality',
+        '-compress',
+        '-colorspace',
+        '-format',
+        '-density',
+        '-blur',
+        '-sharpen',
+        '-contrast',
+        '-normalize',
       ],
       timeout: 60000, // 60 seconds
-      maxOutputSize: 100 * 1024 * 1024 // 100MB
+      maxOutputSize: 100 * 1024 * 1024, // 100MB
     },
-    'identify': {
+    identify: {
       path: '/usr/bin/identify',
       maxArgs: 10,
-      allowedArgs: [
-        '-format', '-verbose', '-ping'
-      ],
+      allowedArgs: ['-format', '-verbose', '-ping'],
       timeout: 10000, // 10 seconds
-      maxOutputSize: 1024 * 1024 // 1MB
-    }
+      maxOutputSize: 1024 * 1024, // 1MB
+    },
   },
-  
+
   // Environment variables whitelist
-  SAFE_ENV_VARS: [
-    'PATH', 'HOME', 'USER', 'TESSDATA_PREFIX', 'LC_ALL', 'LANG'
-  ],
-  
+  SAFE_ENV_VARS: ['PATH', 'HOME', 'USER', 'TESSDATA_PREFIX', 'LC_ALL', 'LANG'],
+
   // Working directory restrictions
-  ALLOWED_WORK_DIRS: [
-    '/tmp/secure_uploads',
-    '/tmp/ocr_processing'
-  ]
+  ALLOWED_WORK_DIRS: ['/tmp/secure_uploads', '/tmp/ocr_processing'],
 };
 
 /**
@@ -89,17 +97,17 @@ class SecureCommandService {
    */
   async executeSecureCommand(command, args = [], options = {}) {
     const processId = ++this.processCounter;
-    
+
     try {
       // Step 1: Validate command
       const commandConfig = this.validateCommand(command);
-      
+
       // Step 2: Validate and sanitize arguments
       const sanitizedArgs = this.validateAndSanitizeArgs(args, commandConfig);
-      
+
       // Step 3: Prepare secure execution environment
       const execOptions = this.prepareSecureEnvironment(options, commandConfig);
-      
+
       // Step 4: Execute command with monitoring
       const result = await this.executeWithMonitoring(
         commandConfig.path,
@@ -107,16 +115,15 @@ class SecureCommandService {
         execOptions,
         processId
       );
-      
+
       return {
         success: true,
         stdout: result.stdout,
         stderr: result.stderr,
         exitCode: result.exitCode,
         executionTime: result.executionTime,
-        processId
+        processId,
       };
-      
     } catch (error) {
       throw new CommandSecurityError(
         `Secure command execution failed: ${error.message}`,
@@ -137,7 +144,7 @@ class SecureCommandService {
     if (!command || typeof command !== 'string') {
       throw new CommandSecurityError('Invalid command name', 'INVALID_COMMAND');
     }
-    
+
     const commandConfig = COMMAND_SECURITY_CONFIG.ALLOWED_COMMANDS[command];
     if (!commandConfig) {
       throw new CommandSecurityError(
@@ -145,7 +152,7 @@ class SecureCommandService {
         'COMMAND_NOT_ALLOWED'
       );
     }
-    
+
     return commandConfig;
   }
 
@@ -159,23 +166,23 @@ class SecureCommandService {
     if (!Array.isArray(args)) {
       throw new CommandSecurityError('Arguments must be an array', 'INVALID_ARGS_TYPE');
     }
-    
+
     if (args.length > commandConfig.maxArgs) {
       throw new CommandSecurityError(
         `Too many arguments: ${args.length}. Maximum allowed: ${commandConfig.maxArgs}`,
         'TOO_MANY_ARGS'
       );
     }
-    
+
     const sanitizedArgs = [];
-    
+
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
-      
+
       if (typeof arg !== 'string') {
         throw new CommandSecurityError(`Argument ${i} must be a string`, 'INVALID_ARG_TYPE');
       }
-      
+
       // Check for command injection attempts
       if (this.containsDangerousChars(arg)) {
         throw new CommandSecurityError(
@@ -183,7 +190,7 @@ class SecureCommandService {
           'DANGEROUS_ARG_CHARS'
         );
       }
-      
+
       // Validate file paths
       if (this.isFilePath(arg)) {
         const sanitizedPath = this.validateAndSanitizeFilePath(arg);
@@ -191,13 +198,10 @@ class SecureCommandService {
       } else if (this.isAllowedArg(arg, commandConfig.allowedArgs)) {
         sanitizedArgs.push(arg);
       } else {
-        throw new CommandSecurityError(
-          `Argument not allowed: ${arg}`,
-          'ARG_NOT_ALLOWED'
-        );
+        throw new CommandSecurityError(`Argument not allowed: ${arg}`, 'ARG_NOT_ALLOWED');
       }
     }
-    
+
     return sanitizedArgs;
   }
 
@@ -209,21 +213,21 @@ class SecureCommandService {
   containsDangerousChars(str) {
     // Characters that could be used for command injection
     const dangerousPatterns = [
-      /[;&|`$(){}[\]<>]/,  // Shell metacharacters
-      /\$\(/,              // Command substitution
-      /`[^`]*`/,           // Backtick command substitution  
-      /\|\s*\w+/,          // Pipe to command
-      /;\s*\w+/,           // Command separator
-      /&&\s*\w+/,          // Command chaining
-      /\|\|\s*\w+/,        // Command chaining
-      />\s*\/\w+/,         // Redirect to system paths
-      /<\s*\/\w+/,         // Redirect from system paths
-      /\.\.\//,            // Path traversal
-      /\/etc\//,           // System directory access
-      /\/proc\//,          // Process directory access
-      /\/sys\//,           // System directory access
+      /[;&|`$(){}[\]<>]/, // Shell metacharacters
+      /\$\(/, // Command substitution
+      /`[^`]*`/, // Backtick command substitution
+      /\|\s*\w+/, // Pipe to command
+      /;\s*\w+/, // Command separator
+      /&&\s*\w+/, // Command chaining
+      /\|\|\s*\w+/, // Command chaining
+      />\s*\/\w+/, // Redirect to system paths
+      /<\s*\/\w+/, // Redirect from system paths
+      /\.\.\//, // Path traversal
+      /\/etc\//, // System directory access
+      /\/proc\//, // Process directory access
+      /\/sys\//, // System directory access
     ];
-    
+
     return dangerousPatterns.some(pattern => pattern.test(str));
   }
 
@@ -233,8 +237,7 @@ class SecureCommandService {
    * @returns {boolean} True if appears to be a file path
    */
   isFilePath(arg) {
-    return arg.includes('/') || arg.includes('\\') || 
-           arg.includes('.') || path.isAbsolute(arg);
+    return arg.includes('/') || arg.includes('\\') || arg.includes('.') || path.isAbsolute(arg);
   }
 
   /**
@@ -245,24 +248,24 @@ class SecureCommandService {
   validateAndSanitizeFilePath(filePath) {
     // Resolve to absolute path
     const resolvedPath = path.resolve(filePath);
-    
+
     // Check if path is within allowed directories
     const isAllowed = COMMAND_SECURITY_CONFIG.ALLOWED_WORK_DIRS.some(allowedDir => {
       return resolvedPath.startsWith(path.resolve(allowedDir));
     });
-    
+
     if (!isAllowed) {
       throw new CommandSecurityError(
         `File path not in allowed directories: ${resolvedPath}`,
         'PATH_NOT_ALLOWED'
       );
     }
-    
+
     // Additional path validation
     if (resolvedPath.includes('..')) {
       throw new CommandSecurityError('Path traversal detected', 'PATH_TRAVERSAL');
     }
-    
+
     return resolvedPath;
   }
 
@@ -277,17 +280,17 @@ class SecureCommandService {
     if (allowedArgs.includes(arg)) {
       return true;
     }
-    
+
     // Check if it's a value for a flag (e.g., language code for -l)
     if (/^[a-zA-Z0-9_-]+$/.test(arg) && arg.length <= 20) {
       return true;
     }
-    
+
     // Check if it's a numeric value
     if (/^\d+(\.\d+)?$/.test(arg)) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -305,7 +308,7 @@ class SecureCommandService {
         secureEnv[envVar] = process.env[envVar];
       }
     });
-    
+
     return {
       cwd: options.cwd || COMMAND_SECURITY_CONFIG.ALLOWED_WORK_DIRS[0],
       env: secureEnv,
@@ -313,7 +316,7 @@ class SecureCommandService {
       maxBuffer: commandConfig.maxOutputSize,
       stdio: ['pipe', 'pipe', 'pipe'],
       detached: false,
-      shell: false // Critical: never use shell
+      shell: false, // Critical: never use shell
     };
   }
 
@@ -331,93 +334,94 @@ class SecureCommandService {
       let stdout = '';
       let stderr = '';
       let outputSize = 0;
-      
+
       // Spawn process
       const childProcess = spawn(commandPath, args, execOptions);
-      
+
       // Track active process
       this.activeProcesses.set(processId, {
         process: childProcess,
         startTime,
         command: commandPath,
-        args: args.slice(0, 3) // Only log first 3 args for security
+        args: args.slice(0, 3), // Only log first 3 args for security
       });
-      
+
       // Set up timeout
       const timeoutId = setTimeout(() => {
         childProcess.kill('SIGTERM');
-        
+
         // Force kill after 5 seconds if still running
         setTimeout(() => {
           if (!childProcess.killed) {
             childProcess.kill('SIGKILL');
           }
         }, 5000);
-        
-        reject(new CommandSecurityError(
-          `Command timed out after ${execOptions.timeout}ms`,
-          'COMMAND_TIMEOUT'
-        ));
+
+        reject(
+          new CommandSecurityError(
+            `Command timed out after ${execOptions.timeout}ms`,
+            'COMMAND_TIMEOUT'
+          )
+        );
       }, execOptions.timeout);
-      
+
       // Handle stdout
-      childProcess.stdout.on('data', (data) => {
+      childProcess.stdout.on('data', data => {
         outputSize += data.length;
         if (outputSize > execOptions.maxBuffer) {
           childProcess.kill('SIGTERM');
-          reject(new CommandSecurityError(
-            'Command output exceeded maximum size',
-            'OUTPUT_TOO_LARGE'
-          ));
+          reject(
+            new CommandSecurityError('Command output exceeded maximum size', 'OUTPUT_TOO_LARGE')
+          );
           return;
         }
         stdout += data.toString();
       });
-      
+
       // Handle stderr
-      childProcess.stderr.on('data', (data) => {
+      childProcess.stderr.on('data', data => {
         outputSize += data.length;
         if (outputSize > execOptions.maxBuffer) {
           childProcess.kill('SIGTERM');
-          reject(new CommandSecurityError(
-            'Command output exceeded maximum size',
-            'OUTPUT_TOO_LARGE'
-          ));
+          reject(
+            new CommandSecurityError('Command output exceeded maximum size', 'OUTPUT_TOO_LARGE')
+          );
           return;
         }
         stderr += data.toString();
       });
-      
+
       // Handle process completion
       childProcess.on('close', (code, signal) => {
         clearTimeout(timeoutId);
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         if (signal) {
-          reject(new CommandSecurityError(
-            `Command terminated by signal: ${signal}`,
-            'COMMAND_TERMINATED'
-          ));
+          reject(
+            new CommandSecurityError(
+              `Command terminated by signal: ${signal}`,
+              'COMMAND_TERMINATED'
+            )
+          );
           return;
         }
-        
+
         resolve({
           stdout,
           stderr,
           exitCode: code,
           executionTime,
-          outputSize
+          outputSize,
         });
       });
-      
+
       // Handle process errors
-      childProcess.on('error', (error) => {
+      childProcess.on('error', error => {
         clearTimeout(timeoutId);
-        reject(new CommandSecurityError(
-          `Command execution error: ${error.message}`,
-          'EXECUTION_ERROR'
-        ));
+        reject(
+          new CommandSecurityError(`Command execution error: ${error.message}`, 'EXECUTION_ERROR')
+        );
       });
     });
   }
@@ -435,7 +439,7 @@ class SecureCommandService {
         args: info.args,
         startTime: info.startTime,
         duration: Date.now() - info.startTime,
-        pid: info.process.pid
+        pid: info.process.pid,
       });
     });
     return processes;
@@ -482,5 +486,5 @@ module.exports = {
   SecureCommandService,
   secureCommandService,
   CommandSecurityError,
-  COMMAND_SECURITY_CONFIG
+  COMMAND_SECURITY_CONFIG,
 };

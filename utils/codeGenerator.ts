@@ -6,12 +6,12 @@
 export const generateRandomCode = (length: number): string => {
   const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding similar looking characters like I, 1, O, 0
   let result = '';
-  
+
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     result += characters.charAt(randomIndex);
   }
-  
+
   return result;
 };
 
@@ -23,12 +23,12 @@ export const generateRandomCode = (length: number): string => {
 export const generateNumericCode = (length: number): string => {
   const characters = '0123456789';
   let result = '';
-  
+
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     result += characters.charAt(randomIndex);
   }
-  
+
   return result;
 };
 
@@ -41,13 +41,13 @@ export const formatGiftCode = (code: string): string => {
   if (code.length <= 4) {
     return code;
   }
-  
+
   // Split the code into chunks of 4 characters
   const chunks = [];
   for (let i = 0; i < code.length; i += 4) {
     chunks.push(code.slice(i, i + 4));
   }
-  
+
   return chunks.join('-');
 };
 
@@ -59,7 +59,7 @@ export const formatGiftCode = (code: string): string => {
 export const isValidGiftCode = (code: string): boolean => {
   // Remove any hyphens or spaces
   const cleanCode = code.replace(/[-\s]/g, '');
-  
+
   // Check if the code is alphanumeric and has a valid length
   return /^[A-Z0-9]{6,16}$/i.test(cleanCode);
 };

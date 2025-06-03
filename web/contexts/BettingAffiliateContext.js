@@ -13,7 +13,7 @@ const BettingAffiliateContext = createContext({
     size: 'medium',
     animation: 'pulse',
     position: 'inline',
-    style: 'default'
+    style: 'default',
   },
   favoriteTeams: [],
   primaryTeam: '',
@@ -69,7 +69,7 @@ export const BettingAffiliateProvider = ({ children }) => {
     size: 'medium',
     animation: 'pulse',
     position: 'inline',
-    style: 'default'
+    style: 'default',
   });
   const [favoriteTeams, setFavoriteTeams] = useState([]);
   const [primaryTeam, setPrimaryTeamState] = useState('');
@@ -79,19 +79,19 @@ export const BettingAffiliateProvider = ({ children }) => {
     // Load affiliate code
     const code = getLocalStorage(STORAGE_KEYS.AFFILIATE_CODE, '');
     setAffiliateCode(code);
-    
+
     // Load enabled state
     const enabled = getLocalStorage(STORAGE_KEYS.AFFILIATE_ENABLED, true);
     setIsEnabled(enabled);
-    
+
     // Load button settings
     const settings = getLocalStorage(STORAGE_KEYS.BUTTON_SETTINGS, buttonSettings);
     setButtonSettings(settings);
-    
+
     // Load favorite teams
     const teams = getLocalStorage(STORAGE_KEYS.FAVORITE_TEAMS, []);
     setFavoriteTeams(teams);
-    
+
     // Load primary team
     const primary = getLocalStorage(STORAGE_KEYS.PRIMARY_TEAM, '');
     setPrimaryTeamState(primary);
@@ -100,19 +100,19 @@ export const BettingAffiliateProvider = ({ children }) => {
   // Determine if bet button should be shown
   const showBetButton = (contentType, teamId) => {
     if (!isEnabled) return false;
-    
+
     // Always show on odds pages
     if (contentType === 'odds') return true;
-    
+
     // Always show in header and footer
     if (contentType === 'header' || contentType === 'footer') return true;
-    
+
     // Show for favorite teams
     if (teamId && favoriteTeams.includes(teamId)) return true;
-    
+
     // Don't show on FAQ pages (except header/footer)
     if (contentType === 'faq') return false;
-    
+
     // Show based on content type
     switch (contentType) {
       case 'game':
@@ -137,7 +137,7 @@ export const BettingAffiliateProvider = ({ children }) => {
     console.log('Button click:', { location, teamId, userId, gameId, affiliateCode });
     // In a real implementation, this would send analytics data
   };
-  
+
   // Track conversions (web version - simplified)
   const trackConversion = (conversionType, conversionValue, userId) => {
     console.log('Conversion:', { conversionType, conversionValue, userId });
@@ -145,31 +145,31 @@ export const BettingAffiliateProvider = ({ children }) => {
   };
 
   // Update affiliate code
-  const updateAffiliateCode = async (code) => {
+  const updateAffiliateCode = async code => {
     setLocalStorage(STORAGE_KEYS.AFFILIATE_CODE, code);
     setAffiliateCode(code);
   };
 
   // Update button settings
-  const updateButtonSettings = async (settings) => {
+  const updateButtonSettings = async settings => {
     const newSettings = { ...buttonSettings, ...settings };
     setLocalStorage(STORAGE_KEYS.BUTTON_SETTINGS, newSettings);
     setButtonSettings(newSettings);
   };
 
   // Enable or disable affiliate buttons
-  const setEnabled = async (enabled) => {
+  const setEnabled = async enabled => {
     setLocalStorage(STORAGE_KEYS.AFFILIATE_ENABLED, enabled);
     setIsEnabled(enabled);
   };
 
   // Add favorite team
-  const addFavoriteTeam = async (teamId) => {
+  const addFavoriteTeam = async teamId => {
     if (!favoriteTeams.includes(teamId)) {
       const newFavoriteTeams = [...favoriteTeams, teamId];
       setLocalStorage(STORAGE_KEYS.FAVORITE_TEAMS, newFavoriteTeams);
       setFavoriteTeams(newFavoriteTeams);
-      
+
       // If no primary team is set, set this as primary
       if (!primaryTeam) {
         setLocalStorage(STORAGE_KEYS.PRIMARY_TEAM, teamId);
@@ -179,12 +179,12 @@ export const BettingAffiliateProvider = ({ children }) => {
   };
 
   // Remove favorite team
-  const removeFavoriteTeam = async (teamId) => {
+  const removeFavoriteTeam = async teamId => {
     if (favoriteTeams.includes(teamId)) {
       const newFavoriteTeams = favoriteTeams.filter(id => id !== teamId);
       setLocalStorage(STORAGE_KEYS.FAVORITE_TEAMS, newFavoriteTeams);
       setFavoriteTeams(newFavoriteTeams);
-      
+
       // If primary team is removed, clear primary team
       if (primaryTeam === teamId) {
         setLocalStorage(STORAGE_KEYS.PRIMARY_TEAM, '');
@@ -194,20 +194,20 @@ export const BettingAffiliateProvider = ({ children }) => {
   };
 
   // Set primary team
-  const setPrimaryTeam = async (teamId) => {
+  const setPrimaryTeam = async teamId => {
     // Ensure team is in favorite teams
     if (!favoriteTeams.includes(teamId)) {
       await addFavoriteTeam(teamId);
     }
-    
+
     setLocalStorage(STORAGE_KEYS.PRIMARY_TEAM, teamId);
     setPrimaryTeamState(teamId);
   };
 
   // Get button colors based on team ID (simplified for web)
-  const getButtonColors = (teamId) => {
+  const getButtonColors = teamId => {
     if (!teamId) return null;
-    
+
     // In a real implementation, this would get team colors from a service
     // For now, return default colors
     return {

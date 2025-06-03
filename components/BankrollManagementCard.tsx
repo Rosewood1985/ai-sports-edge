@@ -1,11 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
+
 import { ThemedText } from './ThemedText';
-import { BankrollRecommendation } from '../types/horseRacing';
-import { bankrollManagementService } from '../services/bankrollManagementService';
 import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { bankrollManagementService } from '../services/bankrollManagementService';
+import { BankrollRecommendation } from '../types/horseRacing';
 
 interface BankrollManagementCardProps {
   recommendation: BankrollRecommendation;
@@ -17,11 +18,11 @@ interface BankrollManagementCardProps {
  */
 const BankrollManagementCard: React.FC<BankrollManagementCardProps> = ({
   recommendation,
-  onImplemented
+  onImplemented,
 }) => {
   const { colors, isDark } = useTheme();
   const [implementing, setImplementing] = React.useState(false);
-  
+
   // Get icon based on recommendation type
   const getTypeIcon = () => {
     switch (recommendation.type) {
@@ -43,7 +44,7 @@ const BankrollManagementCard: React.FC<BankrollManagementCardProps> = ({
         return 'bulb-outline';
     }
   };
-  
+
   // Get color based on priority
   const getPriorityColor = () => {
     switch (recommendation.priority) {
@@ -57,24 +58,24 @@ const BankrollManagementCard: React.FC<BankrollManagementCardProps> = ({
         return colors.primary;
     }
   };
-  
+
   // Handle implement button press
   const handleImplement = async () => {
     if (implementing) return;
-    
+
     setImplementing(true);
-    
+
     try {
       const user = auth.currentUser;
       if (!user) {
         return;
       }
-      
+
       const success = await bankrollManagementService.implementRecommendation(
         user.uid,
         recommendation.id
       );
-      
+
       if (success) {
         onImplemented();
       }
@@ -84,49 +85,40 @@ const BankrollManagementCard: React.FC<BankrollManagementCardProps> = ({
       setImplementing(false);
     }
   };
-  
+
   return (
-    <View style={[
-      styles.container,
-      {
-        backgroundColor: isDark ? '#222222' : '#FFFFFF',
-        borderLeftColor: getPriorityColor(),
-      }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? '#222222' : '#FFFFFF',
+          borderLeftColor: getPriorityColor(),
+        },
+      ]}
+    >
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Ionicons
-            name={getTypeIcon()}
-            size={20}
-            color={getPriorityColor()}
-            style={styles.icon}
-          />
+          <Ionicons name={getTypeIcon()} size={20} color={getPriorityColor()} style={styles.icon} />
           <ThemedText style={styles.title}>{recommendation.title}</ThemedText>
         </View>
-        
-        <View style={[
-          styles.priorityBadge,
-          { backgroundColor: getPriorityColor() + '20' }
-        ]}>
+
+        <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() + '20' }]}>
           <ThemedText style={[styles.priorityText, { color: getPriorityColor() }]}>
             {recommendation.priority.toUpperCase()} PRIORITY
           </ThemedText>
         </View>
       </View>
-      
+
       <ThemedText style={styles.description}>{recommendation.description}</ThemedText>
-      
+
       <View style={styles.footer}>
         <View style={styles.impactContainer}>
           <ThemedText style={styles.impactLabel}>Potential Impact:</ThemedText>
           <ThemedText style={styles.impactValue}>{recommendation.potentialImpact}</ThemedText>
         </View>
-        
+
         <TouchableOpacity
-          style={[
-            styles.implementButton,
-            { backgroundColor: colors.primary }
-          ]}
+          style={[styles.implementButton, { backgroundColor: colors.primary }]}
           onPress={handleImplement}
           disabled={implementing}
         >

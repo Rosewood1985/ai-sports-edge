@@ -3,17 +3,28 @@
 // Comprehensive NBA Analytics with Advanced Basketball Metrics
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+
 import { NBATeam, NBAPlayer, NBAGame } from './nbaDataSyncService';
+import { firestore as db } from '../../config/firebase';
 
 // NBA-specific analytics interfaces
 export interface NBATeamAnalytics {
   teamId: string;
   season: number;
   lastUpdated: Date;
-  
+
   // Offensive Metrics
   offensiveMetrics: {
     pointsPerGame: number;
@@ -254,7 +265,7 @@ export class NBAAnalyticsService {
 
       // Get team games for the season
       const teamGames = await this.getTeamGames(teamId, season);
-      
+
       // Generate comprehensive analytics
       const analytics: NBATeamAnalytics = {
         teamId,
@@ -276,7 +287,6 @@ export class NBAAnalyticsService {
 
       console.log(`Generated analytics for NBA team ${teamId}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to generate team analytics for ${teamId}: ${error.message}`);
@@ -302,7 +312,7 @@ export class NBAAnalyticsService {
 
       // Get player games for the season
       const playerGames = await this.getPlayerGames(playerId, season);
-      
+
       // Generate comprehensive analytics
       const analytics: NBAPlayerAnalytics = {
         playerId,
@@ -320,7 +330,6 @@ export class NBAAnalyticsService {
 
       console.log(`Generated analytics for NBA player ${playerId}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to generate player analytics for ${playerId}: ${error.message}`);
@@ -330,7 +339,9 @@ export class NBAAnalyticsService {
   /**
    * Calculate offensive metrics for a team
    */
-  private async calculateOffensiveMetrics(games: NBAGame[]): Promise<NBATeamAnalytics['offensiveMetrics']> {
+  private async calculateOffensiveMetrics(
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['offensiveMetrics']> {
     try {
       const completedGames = games.filter(game => game.status === 'completed');
       if (completedGames.length === 0) {
@@ -354,7 +365,7 @@ export class NBAAnalyticsService {
         if (game.boxScore) {
           // Determine which team's stats to use (home or away)
           const teamStats = game.boxScore.homeTeam; // This would need proper team identification
-          
+
           totalPoints += teamStats.stats.points;
           totalFieldGoals += teamStats.stats.fieldGoals.made;
           totalFieldGoalAttempts += teamStats.stats.fieldGoals.attempted;
@@ -370,23 +381,33 @@ export class NBAAnalyticsService {
       }
 
       const gamesCount = completedGames.length;
-      
+
       return {
         pointsPerGame: totalPoints / gamesCount,
-        fieldGoalPercentage: totalFieldGoalAttempts > 0 ? (totalFieldGoals / totalFieldGoalAttempts) * 100 : 0,
-        threePointPercentage: totalThreePointAttempts > 0 ? (totalThreePointers / totalThreePointAttempts) * 100 : 0,
-        freeThrowPercentage: totalFreeThrowAttempts > 0 ? (totalFreeThrows / totalFreeThrowAttempts) * 100 : 0,
+        fieldGoalPercentage:
+          totalFieldGoalAttempts > 0 ? (totalFieldGoals / totalFieldGoalAttempts) * 100 : 0,
+        threePointPercentage:
+          totalThreePointAttempts > 0 ? (totalThreePointers / totalThreePointAttempts) * 100 : 0,
+        freeThrowPercentage:
+          totalFreeThrowAttempts > 0 ? (totalFreeThrows / totalFreeThrowAttempts) * 100 : 0,
         assistsPerGame: totalAssists / gamesCount,
         turnoversPerGame: totalTurnovers / gamesCount,
         offensiveReboundsPerGame: totalOffensiveRebounds / gamesCount,
         possessions: totalPossessions / gamesCount,
         offensiveRating: totalPossessions > 0 ? (totalPoints / totalPossessions) * 100 : 0,
-        trueShootingPercentage: this.calculateTrueShootingPercentage(totalPoints, totalFieldGoalAttempts, totalFreeThrowAttempts),
-        effectiveFieldGoalPercentage: this.calculateEffectiveFieldGoalPercentage(totalFieldGoals, totalThreePointers, totalFieldGoalAttempts),
+        trueShootingPercentage: this.calculateTrueShootingPercentage(
+          totalPoints,
+          totalFieldGoalAttempts,
+          totalFreeThrowAttempts
+        ),
+        effectiveFieldGoalPercentage: this.calculateEffectiveFieldGoalPercentage(
+          totalFieldGoals,
+          totalThreePointers,
+          totalFieldGoalAttempts
+        ),
         assistToTurnoverRatio: totalTurnovers > 0 ? totalAssists / totalTurnovers : 0,
         pace: this.calculatePace(totalPossessions, gamesCount),
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getDefaultOffensiveMetrics();
@@ -396,7 +417,9 @@ export class NBAAnalyticsService {
   /**
    * Calculate defensive metrics for a team
    */
-  private async calculateDefensiveMetrics(games: NBAGame[]): Promise<NBATeamAnalytics['defensiveMetrics']> {
+  private async calculateDefensiveMetrics(
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['defensiveMetrics']> {
     try {
       const completedGames = games.filter(game => game.status === 'completed');
       if (completedGames.length === 0) {
@@ -418,7 +441,7 @@ export class NBAAnalyticsService {
         if (game.boxScore) {
           // Get opponent stats
           const opponentStats = game.boxScore.awayTeam; // This would need proper opponent identification
-          
+
           totalOpponentPoints += opponentStats.stats.points;
           totalOpponentFieldGoals += opponentStats.stats.fieldGoals.made;
           totalOpponentFieldGoalAttempts += opponentStats.stats.fieldGoals.attempted;
@@ -432,11 +455,17 @@ export class NBAAnalyticsService {
       }
 
       const gamesCount = completedGames.length;
-      
+
       return {
         opponentPointsPerGame: totalOpponentPoints / gamesCount,
-        opponentFieldGoalPercentage: totalOpponentFieldGoalAttempts > 0 ? (totalOpponentFieldGoals / totalOpponentFieldGoalAttempts) * 100 : 0,
-        opponentThreePointPercentage: totalOpponentThreePointAttempts > 0 ? (totalOpponentThreePointers / totalOpponentThreePointAttempts) * 100 : 0,
+        opponentFieldGoalPercentage:
+          totalOpponentFieldGoalAttempts > 0
+            ? (totalOpponentFieldGoals / totalOpponentFieldGoalAttempts) * 100
+            : 0,
+        opponentThreePointPercentage:
+          totalOpponentThreePointAttempts > 0
+            ? (totalOpponentThreePointers / totalOpponentThreePointAttempts) * 100
+            : 0,
         defensiveReboundsPerGame: totalDefensiveRebounds / gamesCount,
         stealsPerGame: totalSteals / gamesCount,
         blocksPerGame: totalBlocks / gamesCount,
@@ -445,7 +474,6 @@ export class NBAAnalyticsService {
         contests: 0, // Would need specific tracking
         forcedTurnovers: totalForcedTurnovers / gamesCount,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getDefaultDefensiveMetrics();
@@ -455,24 +483,34 @@ export class NBAAnalyticsService {
   /**
    * Helper methods for calculations
    */
-  
+
   private estimatePossessions(stats: any): number {
     // Basic possession estimation formula
     const fieldGoalAttempts = stats.fieldGoals.attempted;
     const turnovers = stats.turnovers;
     const freeThrowAttempts = stats.freeThrows.attempted;
     const offensiveRebounds = stats.rebounds; // Would need offensive rebounds specifically
-    
-    return fieldGoalAttempts + turnovers + (0.44 * freeThrowAttempts) - offensiveRebounds;
+
+    return fieldGoalAttempts + turnovers + 0.44 * freeThrowAttempts - offensiveRebounds;
   }
 
-  private calculateTrueShootingPercentage(points: number, fieldGoalAttempts: number, freeThrowAttempts: number): number {
-    const totalShootingAttempts = fieldGoalAttempts + (0.44 * freeThrowAttempts);
+  private calculateTrueShootingPercentage(
+    points: number,
+    fieldGoalAttempts: number,
+    freeThrowAttempts: number
+  ): number {
+    const totalShootingAttempts = fieldGoalAttempts + 0.44 * freeThrowAttempts;
     return totalShootingAttempts > 0 ? (points / (2 * totalShootingAttempts)) * 100 : 0;
   }
 
-  private calculateEffectiveFieldGoalPercentage(fieldGoals: number, threePointers: number, fieldGoalAttempts: number): number {
-    return fieldGoalAttempts > 0 ? ((fieldGoals + (0.5 * threePointers)) / fieldGoalAttempts) * 100 : 0;
+  private calculateEffectiveFieldGoalPercentage(
+    fieldGoals: number,
+    threePointers: number,
+    fieldGoalAttempts: number
+  ): number {
+    return fieldGoalAttempts > 0
+      ? ((fieldGoals + 0.5 * threePointers) / fieldGoalAttempts) * 100
+      : 0;
   }
 
   private calculatePace(possessions: number, games: number): number {
@@ -480,13 +518,13 @@ export class NBAAnalyticsService {
   }
 
   private calculateDefensiveRating(opponentPoints: number, games: number): number {
-    return games > 0 ? (opponentPoints / games) : 0;
+    return games > 0 ? opponentPoints / games : 0;
   }
 
   /**
    * Default metrics for error cases
    */
-  
+
   private getDefaultOffensiveMetrics(): NBATeamAnalytics['offensiveMetrics'] {
     return {
       pointsPerGame: 0,
@@ -523,11 +561,11 @@ export class NBAAnalyticsService {
   /**
    * Data retrieval methods
    */
-  
+
   private async getTeamData(teamId: string): Promise<NBATeam | null> {
     try {
       const teamDoc = await getDoc(doc(db, 'nba_teams', teamId));
-      return teamDoc.exists() ? teamDoc.data() as NBATeam : null;
+      return teamDoc.exists() ? (teamDoc.data() as NBATeam) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -537,7 +575,7 @@ export class NBAAnalyticsService {
   private async getPlayerData(playerId: string): Promise<NBAPlayer | null> {
     try {
       const playerDoc = await getDoc(doc(db, 'nba_players', playerId));
-      return playerDoc.exists() ? playerDoc.data() as NBAPlayer : null;
+      return playerDoc.exists() ? (playerDoc.data() as NBAPlayer) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -546,11 +584,8 @@ export class NBAAnalyticsService {
 
   private async getTeamGames(teamId: string, season: number): Promise<NBAGame[]> {
     try {
-      const gamesQuery = query(
-        collection(db, 'nba_games'),
-        where('season', '==', season)
-      );
-      
+      const gamesQuery = query(collection(db, 'nba_games'), where('season', '==', season));
+
       const gamesSnapshot = await getDocs(gamesQuery);
       return gamesSnapshot.docs
         .map(doc => doc.data() as NBAGame)
@@ -567,7 +602,9 @@ export class NBAAnalyticsService {
   }
 
   // Placeholder methods for additional analytics calculations
-  private async calculateAdvancedTeamMetrics(games: NBAGame[]): Promise<NBATeamAnalytics['advancedMetrics']> {
+  private async calculateAdvancedTeamMetrics(
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['advancedMetrics']> {
     return {
       netRating: 0,
       winPercentage: 0,
@@ -580,7 +617,9 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculateBasketballMetrics(games: NBAGame[]): Promise<NBATeamAnalytics['basketballMetrics']> {
+  private async calculateBasketballMetrics(
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['basketballMetrics']> {
     return {
       reboundRate: { offensive: 0, defensive: 0, total: 0 },
       turnoverRate: 0,
@@ -602,7 +641,9 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculateSituationalMetrics(games: NBAGame[]): Promise<NBATeamAnalytics['situationalMetrics']> {
+  private async calculateSituationalMetrics(
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['situationalMetrics']> {
     return {
       clutchPerformance: {
         offensiveRating: 0,
@@ -627,7 +668,10 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculatePlayerImpactMetrics(teamId: string, games: NBAGame[]): Promise<NBATeamAnalytics['playerImpactMetrics']> {
+  private async calculatePlayerImpactMetrics(
+    teamId: string,
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['playerImpactMetrics']> {
     return {
       starPlayerDependency: 0,
       benchContribution: 0,
@@ -640,7 +684,9 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculateCoachingMetrics(games: NBAGame[]): Promise<NBATeamAnalytics['coachingMetrics']> {
+  private async calculateCoachingMetrics(
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['coachingMetrics']> {
     return {
       timeoutUsage: 0,
       challengeSuccess: 0,
@@ -657,7 +703,10 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculatePredictionFactors(teamId: string, games: NBAGame[]): Promise<NBATeamAnalytics['predictionFactors']> {
+  private async calculatePredictionFactors(
+    teamId: string,
+    games: NBAGame[]
+  ): Promise<NBATeamAnalytics['predictionFactors']> {
     return {
       momentum: 0,
       healthIndex: 0,
@@ -668,7 +717,9 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculateBasicPlayerMetrics(games: any[]): Promise<NBAPlayerAnalytics['basicMetrics']> {
+  private async calculateBasicPlayerMetrics(
+    games: any[]
+  ): Promise<NBAPlayerAnalytics['basicMetrics']> {
     return {
       gamesPlayed: 0,
       minutesPerGame: 0,
@@ -684,7 +735,9 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculateAdvancedPlayerMetrics(games: any[]): Promise<NBAPlayerAnalytics['advancedMetrics']> {
+  private async calculateAdvancedPlayerMetrics(
+    games: any[]
+  ): Promise<NBAPlayerAnalytics['advancedMetrics']> {
     return {
       playerEfficiencyRating: 0,
       trueShootingPercentage: 0,
@@ -701,7 +754,10 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculatePlayerImpactMetrics(playerId: string, games: any[]): Promise<NBAPlayerAnalytics['impactMetrics']> {
+  private async calculatePlayerImpactMetrics(
+    playerId: string,
+    games: any[]
+  ): Promise<NBAPlayerAnalytics['impactMetrics']> {
     return {
       onOffNetRating: 0,
       lineupNetRating: 0,
@@ -711,7 +767,9 @@ export class NBAAnalyticsService {
     };
   }
 
-  private async calculatePlayerBasketballMetrics(games: any[]): Promise<NBAPlayerAnalytics['basketballMetrics']> {
+  private async calculatePlayerBasketballMetrics(
+    games: any[]
+  ): Promise<NBAPlayerAnalytics['basketballMetrics']> {
     return {
       shotSelection: {
         restrictedAreaAttempts: 0,
@@ -738,11 +796,11 @@ export class NBAAnalyticsService {
   /**
    * Public utility methods
    */
-  
+
   async getTeamAnalytics(teamId: string, season: number): Promise<NBATeamAnalytics | null> {
     try {
       const analyticsDoc = await getDoc(doc(db, 'nba_team_analytics', `${teamId}_${season}`));
-      return analyticsDoc.exists() ? analyticsDoc.data() as NBATeamAnalytics : null;
+      return analyticsDoc.exists() ? (analyticsDoc.data() as NBATeamAnalytics) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -752,7 +810,7 @@ export class NBAAnalyticsService {
   async getPlayerAnalytics(playerId: string, season: number): Promise<NBAPlayerAnalytics | null> {
     try {
       const analyticsDoc = await getDoc(doc(db, 'nba_player_analytics', `${playerId}_${season}`));
-      return analyticsDoc.exists() ? analyticsDoc.data() as NBAPlayerAnalytics : null;
+      return analyticsDoc.exists() ? (analyticsDoc.data() as NBAPlayerAnalytics) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -793,8 +851,10 @@ export class NBAAnalyticsService {
 
   private compareTeams(team1: NBATeamAnalytics, team2: NBATeamAnalytics): any {
     return {
-      offensiveRatingDiff: team1.offensiveMetrics.offensiveRating - team2.offensiveMetrics.offensiveRating,
-      defensiveRatingDiff: team1.defensiveMetrics.defensiveRating - team2.defensiveMetrics.defensiveRating,
+      offensiveRatingDiff:
+        team1.offensiveMetrics.offensiveRating - team2.offensiveMetrics.offensiveRating,
+      defensiveRatingDiff:
+        team1.defensiveMetrics.defensiveRating - team2.defensiveMetrics.defensiveRating,
       netRatingDiff: team1.advancedMetrics.netRating - team2.advancedMetrics.netRating,
       paceDiff: team1.offensiveMetrics.pace - team2.offensiveMetrics.pace,
     };

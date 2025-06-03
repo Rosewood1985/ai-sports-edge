@@ -4,8 +4,8 @@
  */
 
 const fs = require('fs');
-const path = require('path');
 const glob = require('glob');
+const path = require('path');
 
 // Define the import mappings
 const importMappings = {
@@ -52,7 +52,7 @@ files.forEach(file => {
     return;
   }
 
-  let originalContent = content;
+  const originalContent = content;
   let hasChanges = false;
 
   // Check for imports from contexts/I18nContext or contexts/LanguageContext

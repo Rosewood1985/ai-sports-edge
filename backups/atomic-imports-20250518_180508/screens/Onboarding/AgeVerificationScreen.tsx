@@ -1,12 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
+import { ThemedView, ThemedText } from '../../components/ThemedComponents';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-import { ThemedView, ThemedText } from '../../components/ThemedComponents';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
 
@@ -21,107 +21,76 @@ const AgeVerificationScreen = () => {
   const { t } = useLanguage();
   const { user, updateUserProfile } = useAuth();
   const [ageConfirmed, setAgeConfirmed] = useState(false);
-  
+
   const handleContinue = async () => {
     if (!user) {
-      Alert.alert(
-        t('common.error'),
-        t('common.not_authenticated'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('common.not_authenticated'), [{ text: t('common.ok') }]);
       return;
     }
-    
+
     if (!ageConfirmed) {
-      Alert.alert(
-        t('age_verification.alert_title'),
-        t('age_verification.alert_message'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('age_verification.alert_title'), t('age_verification.alert_message'), [
+        { text: t('common.ok') },
+      ]);
       return;
     }
-    
+
     try {
       // Save age confirmation to user profile
       await saveVerificationData(user.uid, 'ageVerification', {
-        confirmed: true
+        confirmed: true,
       });
-      
+
       // Navigate to next screen (Self-Exclusion)
       navigation.navigate('SelfExclusion');
     } catch (error) {
       console.error('Error saving age verification:', error);
-      Alert.alert(
-        t('common.error'),
-        t('age_verification.save_error'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('age_verification.save_error'), [{ text: t('common.ok') }]);
     }
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          {t('age_verification.title')}
-        </ThemedText>
-        
-        <ThemedText style={styles.description}>
-          {t('age_verification.description')}
-        </ThemedText>
-        
+        <ThemedText style={styles.title}>{t('age_verification.title')}</ThemedText>
+
+        <ThemedText style={styles.description}>{t('age_verification.description')}</ThemedText>
+
         <TouchableOpacity
           style={styles.checkboxContainer}
           onPress={() => setAgeConfirmed(!ageConfirmed)}
-          accessible={true}
+          accessible
           accessibilityLabel={t('age_verification.confirmation')}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: ageConfirmed }}
         >
-          <View style={[
-            styles.checkbox,
-            { borderColor: colors.text }
-          ]}>
-            {ageConfirmed && (
-              <Ionicons
-                name="checkmark"
-                size={18}
-                color={colors.primary}
-              />
-            )}
+          <View style={[styles.checkbox, { borderColor: colors.text }]}>
+            {ageConfirmed && <Ionicons name="checkmark" size={18} color={colors.primary} />}
           </View>
-          <ThemedText style={styles.checkboxLabel}>
-            {t('age_verification.confirmation')}
-          </ThemedText>
+          <ThemedText style={styles.checkboxLabel}>{t('age_verification.confirmation')}</ThemedText>
         </TouchableOpacity>
-        
-        <ThemedText style={styles.legalText}>
-          {t('age_verification.legal_text')}
-        </ThemedText>
-        
+
+        <ThemedText style={styles.legalText}>{t('age_verification.legal_text')}</ThemedText>
+
         <TouchableOpacity
           style={[
             styles.continueButton,
             {
               backgroundColor: colors.primary,
-              opacity: ageConfirmed ? 1 : 0.5
-            }
+              opacity: ageConfirmed ? 1 : 0.5,
+            },
           ]}
           onPress={handleContinue}
           disabled={!ageConfirmed}
-          accessible={true}
+          accessible
           accessibilityLabel={t('common.continue')}
           accessibilityRole="button"
           accessibilityState={{ disabled: !ageConfirmed }}
         >
-          <Text style={styles.continueButtonText}>
-            {t('common.continue')}
-          </Text>
+          <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
         </TouchableOpacity>
-        
-        <ThemedText style={styles.disclaimer}>
-          {t('age_verification.disclaimer')}
-        </ThemedText>
+
+        <ThemedText style={styles.disclaimer}>{t('age_verification.disclaimer')}</ThemedText>
       </View>
     </ThemedView>
   );

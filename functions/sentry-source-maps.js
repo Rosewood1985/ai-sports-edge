@@ -5,21 +5,21 @@
  * to enable better debugging in Sentry error tracking.
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const { execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 // Sentry configuration
-const SENTRY_ORG = process.env.SENTRY_ORG || 'ai-sports-edge';
-const SENTRY_PROJECT = process.env.SENTRY_PROJECT || 'cloud-functions';
+const SENTRY_ORG = process.env.SENTRY_ORG || "ai-sports-edge";
+const SENTRY_PROJECT = process.env.SENTRY_PROJECT || "cloud-functions";
 const SENTRY_AUTH_TOKEN = process.env.SENTRY_AUTH_TOKEN;
-const SENTRY_DSN = 'https://95b0deae4cc462e0d6f16c40a7417255@o4509368605081600.ingest.us.sentry.io/4509385370894336';
+const SENTRY_DSN = "https://95b0deae4cc462e0d6f16c40a7417255@o4509368605081600.ingest.us.sentry.io/4509385370894336";
 
 /**
  * Configure source map uploading for Cloud Functions
  */
 function configureSentrySourceMaps() {
-  console.log('Configuring Sentry source maps for Cloud Functions...');
+  console.log("Configuring Sentry source maps for Cloud Functions...");
 
   // Create .sentryclirc file for configuration
   const sentryConfig = `
@@ -29,21 +29,21 @@ org=${SENTRY_ORG}
 project=${SENTRY_PROJECT}
 
 [auth]
-token=${SENTRY_AUTH_TOKEN || 'YOUR_SENTRY_AUTH_TOKEN_HERE'}
+token=${SENTRY_AUTH_TOKEN || "YOUR_SENTRY_AUTH_TOKEN_HERE"}
 `;
 
-  fs.writeFileSync(path.join(__dirname, '.sentryclirc'), sentryConfig.trim());
-  console.log('Created .sentryclirc configuration file');
+  fs.writeFileSync(path.join(__dirname, ".sentryclirc"), sentryConfig.trim());
+  console.log("Created .sentryclirc configuration file");
 
   // Update package.json with Sentry CLI and source map scripts
-  const packageJsonPath = path.join(__dirname, 'package.json');
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const packageJsonPath = path.join(__dirname, "package.json");
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
   // Add Sentry CLI as dev dependency
   if (!packageJson.devDependencies) {
     packageJson.devDependencies = {};
   }
-  packageJson.devDependencies['@sentry/cli'] = '^2.21.0';
+  packageJson.devDependencies["@sentry/cli"] = "^2.21.0";
 
   // Add source map scripts
   if (!packageJson.scripts) {
@@ -52,18 +52,18 @@ token=${SENTRY_AUTH_TOKEN || 'YOUR_SENTRY_AUTH_TOKEN_HERE'}
 
   packageJson.scripts = {
     ...packageJson.scripts,
-    'sentry:sourcemaps': 'sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT ./lib && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT ./lib',
-    'build:sentry': 'npm run build && npm run sentry:sourcemaps',
-    'deploy:sentry': 'npm run build:sentry && firebase deploy --only functions',
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT ./lib && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT ./lib",
+    "build:sentry": "npm run build && npm run sentry:sourcemaps",
+    "deploy:sentry": "npm run build:sentry && firebase deploy --only functions",
   };
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-  console.log('Updated package.json with Sentry CLI and source map scripts');
+  console.log("Updated package.json with Sentry CLI and source map scripts");
 
   // Create source map configuration for TypeScript (if using TypeScript)
-  const tsConfigPath = path.join(__dirname, 'tsconfig.json');
+  const tsConfigPath = path.join(__dirname, "tsconfig.json");
   if (fs.existsSync(tsConfigPath)) {
-    const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf8'));
+    const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, "utf8"));
     
     // Enable source maps in TypeScript compilation
     if (!tsConfig.compilerOptions) {
@@ -71,23 +71,23 @@ token=${SENTRY_AUTH_TOKEN || 'YOUR_SENTRY_AUTH_TOKEN_HERE'}
     }
     tsConfig.compilerOptions.sourceMap = true;
     tsConfig.compilerOptions.inlineSourceMap = false;
-    tsConfig.compilerOptions.sourceRoot = '/';
+    tsConfig.compilerOptions.sourceRoot = "/";
 
     fs.writeFileSync(tsConfigPath, JSON.stringify(tsConfig, null, 2));
-    console.log('Updated tsconfig.json to enable source maps');
+    console.log("Updated tsconfig.json to enable source maps");
   }
 
-  console.log('Sentry source maps configuration completed!');
-  console.log('');
-  console.log('Next steps:');
-  console.log('1. Set SENTRY_AUTH_TOKEN environment variable');
-  console.log('2. Run: npm install (to install @sentry/cli)');
-  console.log('3. Use "npm run deploy:sentry" to deploy with source maps');
-  console.log('');
-  console.log('Environment variables needed:');
-  console.log('- SENTRY_ORG=' + SENTRY_ORG);
-  console.log('- SENTRY_PROJECT=' + SENTRY_PROJECT);
-  console.log('- SENTRY_AUTH_TOKEN=<your-sentry-auth-token>');
+  console.log("Sentry source maps configuration completed!");
+  console.log("");
+  console.log("Next steps:");
+  console.log("1. Set SENTRY_AUTH_TOKEN environment variable");
+  console.log("2. Run: npm install (to install @sentry/cli)");
+  console.log("3. Use \"npm run deploy:sentry\" to deploy with source maps");
+  console.log("");
+  console.log("Environment variables needed:");
+  console.log("- SENTRY_ORG=" + SENTRY_ORG);
+  console.log("- SENTRY_PROJECT=" + SENTRY_PROJECT);
+  console.log("- SENTRY_AUTH_TOKEN=<your-sentry-auth-token>");
 }
 
 /**
@@ -136,9 +136,9 @@ echo "Source maps uploaded successfully!"
 echo "Release: $RELEASE_VERSION"
 `;
 
-  fs.writeFileSync(path.join(__dirname, 'upload-sourcemaps.sh'), uploadScript);
-  fs.chmodSync(path.join(__dirname, 'upload-sourcemaps.sh'), '755');
-  console.log('Created upload-sourcemaps.sh script');
+  fs.writeFileSync(path.join(__dirname, "upload-sourcemaps.sh"), uploadScript);
+  fs.chmodSync(path.join(__dirname, "upload-sourcemaps.sh"), "755");
+  console.log("Created upload-sourcemaps.sh script");
 }
 
 /**
@@ -213,8 +213,8 @@ After setup, your functions directory should contain:
 - Updated \`tsconfig.json\` (if using TypeScript)
 `;
 
-  fs.writeFileSync(path.join(__dirname, 'SENTRY_SOURCE_MAPS.md'), instructions);
-  console.log('Created SENTRY_SOURCE_MAPS.md instructions');
+  fs.writeFileSync(path.join(__dirname, "SENTRY_SOURCE_MAPS.md"), instructions);
+  console.log("Created SENTRY_SOURCE_MAPS.md instructions");
 }
 
 // Main execution

@@ -1,13 +1,14 @@
 /**
  * Database Utility
- * 
+ *
  * Provides a connection to the PostgreSQL database using the configuration
  * from config/database.json.
  */
 
-import { Pool, PoolClient } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Pool, PoolClient } from 'pg';
+
 import logger from './logger';
 
 // Load database configuration
@@ -40,13 +41,13 @@ pool.on('connect', () => {
   logger.debug('Connected to PostgreSQL database');
 });
 
-pool.on('error', (err) => {
+pool.on('error', err => {
   logger.error('PostgreSQL pool error', { error: err.message });
 });
 
 /**
  * Execute a query with parameters
- * 
+ *
  * @param text - SQL query text
  * @param params - Query parameters
  * @returns Query result
@@ -56,13 +57,13 @@ async function query(text: string, params: any[] = []) {
   try {
     const result = await pool.query(text, params);
     const duration = Date.now() - start;
-    
+
     logger.debug('Executed query', {
       query: text,
       duration,
       rows: result.rowCount,
     });
-    
+
     return result;
   } catch (error) {
     logger.error('Query error', {
@@ -76,7 +77,7 @@ async function query(text: string, params: any[] = []) {
 
 /**
  * Get a client from the pool and execute a callback with it
- * 
+ *
  * @param callback - Function to execute with the client
  * @returns Result of the callback
  */
@@ -91,12 +92,12 @@ async function withClient<T>(callback: (client: PoolClient) => Promise<T>): Prom
 
 /**
  * Execute a transaction with a callback
- * 
+ *
  * @param callback - Function to execute within the transaction
  * @returns Result of the callback
  */
 async function transaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
-  return withClient(async (client) => {
+  return withClient(async client => {
     try {
       await client.query('BEGIN');
       const result = await callback(client);

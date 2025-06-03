@@ -13,7 +13,7 @@ export enum TrackCondition {
   SOFT = 'SOFT',
   YIELDING = 'YIELDING',
   FROZEN = 'FROZEN',
-  SEALED = 'SEALED'
+  SEALED = 'SEALED',
 }
 
 // Race type enum
@@ -21,7 +21,7 @@ export enum RaceType {
   FLAT = 'FLAT',
   HURDLE = 'HURDLE',
   STEEPLECHASE = 'STEEPLECHASE',
-  HARNESS = 'HARNESS'
+  HARNESS = 'HARNESS',
 }
 
 // Race grade enum
@@ -33,7 +33,7 @@ export enum RaceGrade {
   HANDICAP = 'HANDICAP',
   MAIDEN = 'MAIDEN',
   CLAIMING = 'CLAIMING',
-  ALLOWANCE = 'ALLOWANCE'
+  ALLOWANCE = 'ALLOWANCE',
 }
 
 // Race status enum
@@ -43,7 +43,7 @@ export enum RaceStatus {
   FINISHED = 'FINISHED',
   CANCELLED = 'CANCELLED',
   DELAYED = 'DELAYED',
-  POSTPONED = 'POSTPONED'
+  POSTPONED = 'POSTPONED',
 }
 
 // Bet type enum
@@ -59,7 +59,7 @@ export enum BetType {
   PICK_3 = 'PICK_3',
   PICK_4 = 'PICK_4',
   PICK_5 = 'PICK_5',
-  PICK_6 = 'PICK_6'
+  PICK_6 = 'PICK_6',
 }
 
 // Track interface
@@ -255,7 +255,15 @@ export interface BankrollRecommendation {
   id: string;
   title: string;
   description: string;
-  type: 'bet_sizing' | 'bet_type' | 'track_selection' | 'timing' | 'risk_management' | 'tracking' | 'discipline' | 'general';
+  type:
+    | 'bet_sizing'
+    | 'bet_type'
+    | 'track_selection'
+    | 'timing'
+    | 'risk_management'
+    | 'tracking'
+    | 'discipline'
+    | 'general';
   priority: 'high' | 'medium' | 'low';
   potentialImpact: string;
   isImplemented: boolean;

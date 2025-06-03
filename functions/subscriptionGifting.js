@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -21,30 +21,30 @@ exports.giftSubscription = functions.https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is gifting from their own account
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only gift subscriptions from their own account.'
+      "permission-denied",
+      "Users can only gift subscriptions from their own account."
     );
   }
 
   // Validate required fields
   if (!data.recipientEmail || !data.priceId || !data.paymentMethodId || !data.giftDuration) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Recipient email, price ID, payment method ID, and gift duration are required.'
+      "invalid-argument",
+      "Recipient email, price ID, payment method ID, and gift duration are required."
     );
   }
 
   try {
     const db = admin.firestore();
-    const gifterRef = db.collection('users').doc(data.userId);
+    const gifterRef = db.collection("users").doc(data.userId);
     const gifterDoc = await gifterRef.get();
 
     // Get or create customer for the gifter
@@ -73,13 +73,13 @@ exports.giftSubscription = functions.https.onCall(async (data, context) => {
     const giftCode = `GIFT-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
     // Store the gift in Firestore
-    await db.collection('giftSubscriptions').doc(giftCode).set({
+    await db.collection("giftSubscriptions").doc(giftCode).set({
       giftCode: giftCode,
       gifterId: data.userId,
       recipientEmail: data.recipientEmail,
       priceId: data.priceId,
       giftDuration: data.giftDuration,
-      status: 'active',
+      status: "active",
       redeemed: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -91,8 +91,8 @@ exports.giftSubscription = functions.https.onCall(async (data, context) => {
       giftDuration: data.giftDuration
     };
   } catch (error) {
-    console.error('Error gifting subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error gifting subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -106,16 +106,16 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Validate required fields
   if (!data.giftCode) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Gift code is required.'
+      "invalid-argument",
+      "Gift code is required."
     );
   }
 
@@ -124,13 +124,13 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
     const userId = context.auth.uid;
     
     // Get the gift subscription
-    const giftRef = db.collection('giftSubscriptions').doc(data.giftCode);
+    const giftRef = db.collection("giftSubscriptions").doc(data.giftCode);
     const giftDoc = await giftRef.get();
     
     if (!giftDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'Gift subscription not found.'
+        "not-found",
+        "Gift subscription not found."
       );
     }
     
@@ -139,16 +139,16 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
     // Check if already redeemed
     if (giftData.redeemed) {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'Gift subscription has already been redeemed.'
+        "failed-precondition",
+        "Gift subscription has already been redeemed."
       );
     }
     
     // Check if recipient email matches
     if (giftData.recipientEmail !== context.auth.token.email) {
       throw new functions.https.HttpsError(
-        'permission-denied',
-        'This gift subscription is for a different email address.'
+        "permission-denied",
+        "This gift subscription is for a different email address."
       );
     }
     
@@ -158,11 +158,11 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
     endDate.setMonth(endDate.getMonth() + giftData.giftDuration);
     
     // Create subscription in Firestore
-    const subscriptionRef = db.collection('users').doc(userId)
-      .collection('subscriptions').doc();
+    const subscriptionRef = db.collection("users").doc(userId)
+      .collection("subscriptions").doc();
     
     await subscriptionRef.set({
-      status: 'active',
+      status: "active",
       priceId: giftData.priceId,
       currentPeriodStart: admin.firestore.Timestamp.fromDate(now),
       currentPeriodEnd: admin.firestore.Timestamp.fromDate(endDate),
@@ -174,8 +174,8 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
     });
     
     // Update user's subscription status
-    await db.collection('users').doc(userId).update({
-      subscriptionStatus: 'active',
+    await db.collection("users").doc(userId).update({
+      subscriptionStatus: "active",
       subscriptionId: subscriptionRef.id,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -193,8 +193,8 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
       expiresAt: endDate.getTime()
     };
   } catch (error) {
-    console.error('Error redeeming gift subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error redeeming gift subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 

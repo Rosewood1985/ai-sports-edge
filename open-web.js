@@ -18,7 +18,7 @@ switch (os.platform()) {
 }
 
 // Execute the command
-exec(command, (error) => {
+exec(command, error => {
   if (error) {
     console.error(`Failed to open browser: ${error}`);
     return;

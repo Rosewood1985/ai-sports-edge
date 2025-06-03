@@ -1,8 +1,20 @@
-import { auth } from '../config/firebase';
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { isFirebaseInitialized } from '../utils/environmentUtils';
 import { CardFieldInput } from '@stripe/stripe-react-native';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
+import { auth } from '../config/firebase';
+import { isFirebaseInitialized } from '../utils/environmentUtils';
 
 // Initialize Firestore and Functions
 const firestore = getFirestore();
@@ -26,7 +38,7 @@ const ENV_CONFIG = {
   IS_PRODUCTION: process.env.NODE_ENV === 'production',
   IS_TEST: process.env.NODE_ENV === 'test',
   IS_DEV: process.env.NODE_ENV === 'development' || process.env.NODE_ENV !== 'production',
-  STRIPE_API_VERSION: '2020-08-27'
+  STRIPE_API_VERSION: '2020-08-27',
 };
 
 // Safe logging function
@@ -42,7 +54,7 @@ const safeLog = (level: 'log' | 'warn' | 'error', message: string, data?: any) =
     }
     return;
   }
-  
+
   // In development, log more details
   if (level === 'error') {
     console.error(`[SubscriptionService] ${message}`, data || '');
@@ -153,11 +165,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     interval: 'month',
     productType: 'subscription',
     priceId: 'price_basic_monthly', // Replace with actual Stripe price ID
-    features: [
-      'AI-powered betting predictions',
-      'Real-time odds updates',
-      'Basic analytics'
-    ]
+    features: ['AI-powered betting predictions', 'Real-time odds updates', 'Basic analytics'],
   },
   {
     id: 'premium-monthly',
@@ -174,8 +182,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Advanced analytics and insights',
       'Personalized betting recommendations',
       'Historical performance tracking',
-      'Email and push notifications'
-    ]
+      'Email and push notifications',
+    ],
   },
   {
     id: 'premium-yearly',
@@ -194,13 +202,14 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Exclusive access to Formula 1 data and predictions',
       'Exclusive access to NASCAR data and predictions',
       'Exclusive access to Rugby data and predictions',
-      'Exclusive access to Cricket data and predictions'
-    ]
+      'Exclusive access to Cricket data and predictions',
+    ],
   },
   {
     id: 'group-pro-monthly',
     name: 'Group Pro',
-    description: 'Share premium features with friends or family. All members must register within 24 hours for the deal to activate.',
+    description:
+      'Share premium features with friends or family. All members must register within 24 hours for the deal to activate.',
     price: 149.99,
     amount: 14999, // For backward compatibility (in cents)
     interval: 'month',
@@ -212,9 +221,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Split the cost between up to 3 people',
       'All members must register within 24 hours',
       'Manage members from your account',
-      'Perfect for friends, family, or small groups'
-    ]
-  }
+      'Perfect for friends, family, or small groups',
+    ],
+  },
 ];
 
 // One-time purchase options
@@ -231,8 +240,8 @@ export const ONE_TIME_PURCHASES: OneTimePurchase[] = [
     features: [
       'All premium features for 48 hours',
       'AI predictions for all games',
-      'Real-time updates and alerts'
-    ]
+      'Real-time updates and alerts',
+    ],
   },
   {
     id: 'game-day-pass',
@@ -246,9 +255,9 @@ export const ONE_TIME_PURCHASES: OneTimePurchase[] = [
     features: [
       'All premium features for 24 hours',
       'AI predictions for all games',
-      'Real-time updates and alerts'
-    ]
-  }
+      'Real-time updates and alerts',
+    ],
+  },
 ];
 
 // Microtransaction options
@@ -260,7 +269,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 2.99,
     amount: 299,
     productType: 'microtransaction',
-    priceId: 'price_single_prediction' // Replace with actual Stripe price ID
+    priceId: 'price_single_prediction', // Replace with actual Stripe price ID
   },
   {
     id: 'parlay-suggestion',
@@ -269,7 +278,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 4.99,
     amount: 499,
     productType: 'microtransaction',
-    priceId: 'price_parlay_suggestion' // Replace with actual Stripe price ID
+    priceId: 'price_parlay_suggestion', // Replace with actual Stripe price ID
   },
   {
     id: 'parlay-package',
@@ -278,7 +287,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 9.99,
     amount: 999,
     productType: 'microtransaction',
-    priceId: 'price_parlay_package' // Replace with actual Stripe price ID
+    priceId: 'price_parlay_package', // Replace with actual Stripe price ID
   },
   {
     id: 'alert-package-small',
@@ -287,7 +296,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 4.99,
     amount: 499,
     productType: 'microtransaction',
-    priceId: 'price_alert_package_small' // Replace with actual Stripe price ID
+    priceId: 'price_alert_package_small', // Replace with actual Stripe price ID
   },
   {
     id: 'alert-package-large',
@@ -296,7 +305,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 9.99,
     amount: 999,
     productType: 'microtransaction',
-    priceId: 'price_alert_package_large' // Replace with actual Stripe price ID
+    priceId: 'price_alert_package_large', // Replace with actual Stripe price ID
   },
   {
     id: 'player-plus-minus',
@@ -305,7 +314,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 1.99,
     amount: 199,
     productType: 'microtransaction',
-    priceId: 'price_player_plus_minus' // Replace with actual Stripe price ID
+    priceId: 'price_player_plus_minus', // Replace with actual Stripe price ID
   },
   // Formula 1 microtransactions
   {
@@ -315,7 +324,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 3.99,
     amount: 399,
     productType: 'microtransaction',
-    priceId: 'price_formula1_race_prediction'
+    priceId: 'price_formula1_race_prediction',
   },
   {
     id: 'formula1-driver-stats',
@@ -324,7 +333,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 2.99,
     amount: 299,
     productType: 'microtransaction',
-    priceId: 'price_formula1_driver_stats'
+    priceId: 'price_formula1_driver_stats',
   },
   // NASCAR microtransactions
   {
@@ -334,7 +343,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 3.99,
     amount: 399,
     productType: 'microtransaction',
-    priceId: 'price_nascar_race_prediction'
+    priceId: 'price_nascar_race_prediction',
   },
   {
     id: 'nascar-driver-stats',
@@ -343,7 +352,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 2.99,
     amount: 299,
     productType: 'microtransaction',
-    priceId: 'price_nascar_driver_stats'
+    priceId: 'price_nascar_driver_stats',
   },
   // Rugby microtransactions
   {
@@ -353,16 +362,16 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 2.99,
     amount: 299,
     productType: 'microtransaction',
-    priceId: 'price_rugby_match_prediction'
+    priceId: 'price_rugby_match_prediction',
   },
   {
     id: 'rugby-team-analysis',
     name: 'Rugby Team Analysis',
-    description: 'In-depth analysis of a Rugby team\'s performance and strategy',
+    description: "In-depth analysis of a Rugby team's performance and strategy",
     price: 3.99,
     amount: 399,
     productType: 'microtransaction',
-    priceId: 'price_rugby_team_analysis'
+    priceId: 'price_rugby_team_analysis',
   },
   // Cricket microtransactions
   {
@@ -372,7 +381,7 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 2.99,
     amount: 299,
     productType: 'microtransaction',
-    priceId: 'price_cricket_match_prediction'
+    priceId: 'price_cricket_match_prediction',
   },
   {
     id: 'cricket-player-stats',
@@ -381,16 +390,12 @@ export const MICROTRANSACTIONS: Microtransaction[] = [
     price: 3.99,
     amount: 399,
     productType: 'microtransaction',
-    priceId: 'price_cricket_player_stats'
-  }
+    priceId: 'price_cricket_player_stats',
+  },
 ];
 
 // All available products
-export const ALL_PRODUCTS = [
-  ...SUBSCRIPTION_PLANS,
-  ...ONE_TIME_PURCHASES,
-  ...MICROTRANSACTIONS
-];
+export const ALL_PRODUCTS = [...SUBSCRIPTION_PLANS, ...ONE_TIME_PURCHASES, ...MICROTRANSACTIONS];
 
 /**
  * Check if a user has premium access
@@ -404,43 +409,47 @@ export const hasPremiumAccess = async (userId: string): Promise<boolean> => {
       safeLog('warn', 'Invalid user ID provided for premium access check');
       return false;
     }
-    
+
     // In development/test mode or if Firebase is not initialized, return simulated access
     if (ENV_CONFIG.IS_DEV || !isFirebaseInitialized(firestore)) {
       safeLog('log', 'Development mode: Simulating premium access');
       return true;
     }
-    
+
     // Check for active subscription
     const subscription = await getUserSubscription(userId);
     if (subscription && subscription.status === 'active') {
       return true;
     }
-    
+
     // Check for active one-time purchases
     const db = firestore;
     if (!db) return false;
-    
+
     const now = new Date();
-    
+
     try {
       // @ts-ignore - Firestore types may not be correctly defined
-      const purchasesSnapshot = await db.collection('users').doc(userId)
+      const purchasesSnapshot = await db
+        .collection('users')
+        .doc(userId)
         .collection('purchases')
         .where('status', '==', 'succeeded')
         .where('expiresAt', '>', now)
         .limit(1)
         .get();
-      
+
       return !purchasesSnapshot.empty;
     } catch (dbError) {
-      safeLog('error', `Database error checking purchases for user ${userId}`,
-        ENV_CONFIG.IS_PRODUCTION ? null : dbError);
+      safeLog(
+        'error',
+        `Database error checking purchases for user ${userId}`,
+        ENV_CONFIG.IS_PRODUCTION ? null : dbError
+      );
       return false;
     }
   } catch (error) {
-    safeLog('error', 'Error checking premium access',
-      ENV_CONFIG.IS_PRODUCTION ? null : error);
+    safeLog('error', 'Error checking premium access', ENV_CONFIG.IS_PRODUCTION ? null : error);
     return false;
   }
 };
@@ -454,29 +463,31 @@ export const getSubscriptionStatus = async (userId: string): Promise<Subscriptio
   try {
     const db = firestore;
     const userDoc = await db.collection('users').doc(userId).get();
-    
+
     if (!userDoc.exists || !userDoc.data()?.subscriptionId) {
       return null;
     }
-    
+
     const subscriptionId = userDoc.data()?.subscriptionId;
-    const subscriptionDoc = await db.collection('users').doc(userId)
+    const subscriptionDoc = await db
+      .collection('users')
+      .doc(userId)
       .collection('subscriptions')
       .doc(subscriptionId)
       .get();
-    
+
     if (!subscriptionDoc.exists) {
       return null;
     }
-    
+
     const data = subscriptionDoc.data();
-    
+
     return {
       active: data?.status === 'active' || data?.status === 'trialing',
       planId: data?.priceId || null,
       currentPeriodEnd: data?.currentPeriodEnd?.toMillis() || null,
       cancelAtPeriodEnd: data?.cancelAtPeriodEnd || false,
-      trialEnd: data?.trialEnd?.toMillis() || null
+      trialEnd: data?.trialEnd?.toMillis() || null,
     };
   } catch (error) {
     console.error('Error getting subscription status:', error);
@@ -502,15 +513,15 @@ export const subscribeToPlan = async (
     if (!plan || !plan.priceId) {
       throw new Error(`Plan with ID ${planId} not found or missing priceId`);
     }
-    
+
     // Call the Firebase function to create a subscription
     const createSubscriptionFunc = functions.httpsCallable('createSubscription');
     const result = await createSubscriptionFunc({
       userId,
       paymentMethodId,
-      priceId: plan.priceId
+      priceId: plan.priceId,
     });
-    
+
     return result.data.status === 'active' || result.data.status === 'trialing';
   } catch (error) {
     console.error('Error subscribing to plan:', error);
@@ -532,21 +543,21 @@ export const cancelSubscription = async (
     // Get the user's subscription ID
     const db = firestore;
     const userDoc = await db.collection('users').doc(userId).get();
-    
+
     if (!userDoc.exists || !userDoc.data()?.subscriptionId) {
       throw new Error('User does not have an active subscription');
     }
-    
+
     const subscriptionId = userDoc.data()?.subscriptionId;
-    
+
     // Call the Firebase function to cancel the subscription
     const cancelSubscriptionFunc = functions.httpsCallable('cancelSubscription');
     const result = await cancelSubscriptionFunc({
       userId,
       subscriptionId,
-      immediate
+      immediate,
     });
-    
+
     return result.data.canceled === true;
   } catch (error) {
     console.error('Error canceling subscription:', error);
@@ -583,7 +594,7 @@ export const startFreeTrial = async (
     if (!plan || !plan.priceId) {
       throw new Error(`Plan with ID ${planId} not found or missing priceId`);
     }
-    
+
     // In a real implementation, you would create a subscription with a trial period
     // For now, we'll just create a regular subscription
     return subscribeToPlan(userId, planId, paymentMethodId);
@@ -605,7 +616,7 @@ export const getUserSubscription = async (userId: string): Promise<Subscription 
       safeLog('warn', 'Invalid user ID provided for subscription check');
       return null;
     }
-    
+
     // In development mode or if Firebase is not initialized, return mock subscription
     if (ENV_CONFIG.IS_DEV || !isFirebaseInitialized(firestore)) {
       safeLog('log', 'Development mode: Returning mock subscription');
@@ -619,36 +630,38 @@ export const getUserSubscription = async (userId: string): Promise<Subscription 
         trialEnd: null,
         defaultPaymentMethod: 'mock-payment-method',
         plan: SUBSCRIPTION_PLANS.find(p => p.id === 'premium-yearly'),
-        createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000 // 60 days ago
+        createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000, // 60 days ago
       };
     }
-    
+
     const db = firestore;
     if (!db) return null;
-    
+
     try {
       // @ts-ignore - Firestore types may not be correctly defined
       const userDoc = await db.collection('users').doc(userId).get();
-      
+
       if (!userDoc.exists || !userDoc.data()?.subscriptionId) {
         return null;
       }
-      
+
       const subscriptionId = userDoc.data()?.subscriptionId;
-      
+
       // @ts-ignore - Firestore types may not be correctly defined
-      const subscriptionDoc = await db.collection('users').doc(userId)
+      const subscriptionDoc = await db
+        .collection('users')
+        .doc(userId)
         .collection('subscriptions')
         .doc(subscriptionId)
         .get();
-      
+
       if (!subscriptionDoc.exists) {
         return null;
       }
-      
+
       const data = subscriptionDoc.data();
       const plan = SUBSCRIPTION_PLANS.find(p => p.priceId === data?.priceId);
-      
+
       return {
         id: subscriptionId,
         status: data?.status as 'active' | 'canceled' | 'past_due' | 'trialing',
@@ -657,17 +670,19 @@ export const getUserSubscription = async (userId: string): Promise<Subscription 
         cancelAtPeriodEnd: data?.cancelAtPeriodEnd || false,
         trialEnd: data?.trialEnd?.toMillis() || null,
         defaultPaymentMethod: data?.defaultPaymentMethod || null,
-        plan: plan,
-        createdAt: data?.createdAt?.toMillis() || Date.now()
+        plan,
+        createdAt: data?.createdAt?.toMillis() || Date.now(),
       };
     } catch (dbError) {
-      safeLog('error', `Database error getting subscription for user ${userId}`,
-        ENV_CONFIG.IS_PRODUCTION ? null : dbError);
+      safeLog(
+        'error',
+        `Database error getting subscription for user ${userId}`,
+        ENV_CONFIG.IS_PRODUCTION ? null : dbError
+      );
       return null;
     }
   } catch (error) {
-    safeLog('error', 'Error getting user subscription',
-      ENV_CONFIG.IS_PRODUCTION ? null : error);
+    safeLog('error', 'Error getting user subscription', ENV_CONFIG.IS_PRODUCTION ? null : error);
     return null;
   }
 };
@@ -680,14 +695,16 @@ export const getUserSubscription = async (userId: string): Promise<Subscription 
 export const getUserPaymentMethods = async (userId: string): Promise<PaymentMethod[]> => {
   try {
     const db = firestore;
-    const paymentMethodsSnapshot = await db.collection('users').doc(userId)
+    const paymentMethodsSnapshot = await db
+      .collection('users')
+      .doc(userId)
       .collection('paymentMethods')
       .get();
-    
+
     if (paymentMethodsSnapshot.empty) {
       return [];
     }
-    
+
     return paymentMethodsSnapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
@@ -696,7 +713,7 @@ export const getUserPaymentMethods = async (userId: string): Promise<PaymentMeth
         last4: data.last4 || '0000',
         expiryMonth: data.expiryMonth || 0,
         expiryYear: data.expiryYear || 0,
-        isDefault: data.isDefault || false
+        isDefault: data.isDefault || false,
       };
     });
   } catch (error) {
@@ -757,7 +774,7 @@ export const purchaseOneTimeProduct = async (
     if (!product) {
       throw new Error(`Product with ID ${productId} not found`);
     }
-    
+
     // Call the Firebase function to create a one-time payment
     const createOneTimePayment = functions.httpsCallable('createOneTimePayment');
     const result = await createOneTimePayment({
@@ -765,9 +782,9 @@ export const purchaseOneTimeProduct = async (
       paymentMethodId,
       productId,
       amount: product.amount,
-      duration: product.duration
+      duration: product.duration,
     });
-    
+
     return result.data.status === 'succeeded';
   } catch (error) {
     console.error('Error purchasing one-time product:', error);
@@ -788,14 +805,14 @@ export const purchaseMicrotransaction = async (
   productId: string,
   paymentMethodId: string,
   retryCount: number = 0
-): Promise<{success: boolean, error?: string, errorCode?: string, transactionId?: string}> => {
+): Promise<{ success: boolean; error?: string; errorCode?: string; transactionId?: string }> => {
   try {
     // Validate inputs
     if (!userId) {
       return {
         success: false,
         error: 'User ID is required',
-        errorCode: 'missing_user_id'
+        errorCode: 'missing_user_id',
       };
     }
 
@@ -803,7 +820,7 @@ export const purchaseMicrotransaction = async (
       return {
         success: false,
         error: 'Payment method ID is required',
-        errorCode: 'missing_payment_method'
+        errorCode: 'missing_payment_method',
       };
     }
 
@@ -813,13 +830,13 @@ export const purchaseMicrotransaction = async (
       return {
         success: false,
         error: `Product with ID ${productId} not found`,
-        errorCode: 'product_not_found'
+        errorCode: 'product_not_found',
       };
     }
-    
+
     // Generate idempotency key to prevent duplicate charges
     const idempotencyKey = `${userId}_${productId}_${Date.now()}`;
-    
+
     // Call the Firebase function to create a one-time payment
     const createOneTimePayment = functions.httpsCallable('createOneTimePayment');
     const result = await createOneTimePayment({
@@ -827,46 +844,50 @@ export const purchaseMicrotransaction = async (
       paymentMethodId,
       productId,
       amount: product.amount,
-      idempotencyKey
+      idempotencyKey,
     });
-    
+
     // Track successful transaction
     if (result.data.status === 'succeeded') {
       // Log successful purchase
       safeLog('log', `Successful microtransaction purchase: ${productId} for user ${userId}`);
-      
+
       return {
         success: true,
-        transactionId: result.data.transactionId
+        transactionId: result.data.transactionId,
       };
     } else {
       return {
         success: false,
         error: 'Payment processing failed',
-        errorCode: 'payment_failed'
+        errorCode: 'payment_failed',
       };
     }
   } catch (error: any) {
     // Log detailed error
-    safeLog('error', `Error purchasing microtransaction: ${error.message || 'Unknown error'}`, error);
-    
+    safeLog(
+      'error',
+      `Error purchasing microtransaction: ${error.message || 'Unknown error'}`,
+      error
+    );
+
     // Handle network errors with retry
     if (error.code === 'network-error' && retryCount < 3) {
       // Exponential backoff: wait longer for each retry
       const waitTime = 1000 * Math.pow(2, retryCount);
-      await new Promise<void>((resolve) => {
+      await new Promise<void>(resolve => {
         setTimeout(() => resolve(), waitTime);
       });
-      
+
       // Retry the purchase
       return purchaseMicrotransaction(userId, productId, paymentMethodId, retryCount + 1);
     }
-    
+
     // Return detailed error information
     return {
       success: false,
       error: error.message || 'Unknown error occurred',
-      errorCode: error.code || 'unknown_error'
+      errorCode: error.code || 'unknown_error',
     };
   }
 };
@@ -877,27 +898,26 @@ export const purchaseMicrotransaction = async (
  * @param gameId Game ID
  * @returns Whether the user has access
  */
-export const hasGamePredictionAccess = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
+export const hasGamePredictionAccess = async (userId: string, gameId: string): Promise<boolean> => {
   try {
     // First check if user has premium access
     const hasPremium = await hasPremiumAccess(userId);
     if (hasPremium) {
       return true;
     }
-    
+
     // Check for specific game prediction purchases
     const db = firestore;
-    const purchasesSnapshot = await db.collection('users').doc(userId)
+    const purchasesSnapshot = await db
+      .collection('users')
+      .doc(userId)
       .collection('purchases')
       .where('productId', '==', 'single-prediction')
       .where('gameId', '==', gameId)
       .where('status', '==', 'succeeded')
       .limit(1)
       .get();
-    
+
     return !purchasesSnapshot.empty;
   } catch (error) {
     console.error('Error checking game prediction access:', error);
@@ -914,12 +934,12 @@ export const formatDate = (date?: Date | number): string => {
   if (!date) {
     return 'N/A';
   }
-  
+
   const dateObj = typeof date === 'number' ? new Date(date) : date;
   return dateObj.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 };
 
@@ -938,9 +958,9 @@ export const updatePaymentMethod = async (
     const updatePaymentMethodFunc = functions.httpsCallable('updatePaymentMethod');
     const result = await updatePaymentMethodFunc({
       userId,
-      paymentMethodId
+      paymentMethodId,
     });
-    
+
     return result.data.updated === true;
   } catch (error) {
     console.error('Error updating payment method:', error);
@@ -968,7 +988,7 @@ export const updateSubscription = async (
       userId,
       subscriptionId,
       newPriceId,
-      immediate
+      immediate,
     });
     return result.data;
   } catch (error) {
@@ -994,7 +1014,7 @@ export const pauseSubscription = async (
     const result = await pauseSubscriptionFunc({
       userId,
       subscriptionId,
-      pauseDuration
+      pauseDuration,
     });
     return result.data;
   } catch (error) {
@@ -1009,15 +1029,12 @@ export const pauseSubscription = async (
  * @param subscriptionId Subscription ID
  * @returns Promise with resume result
  */
-export const resumeSubscription = async (
-  userId: string,
-  subscriptionId: string
-): Promise<any> => {
+export const resumeSubscription = async (userId: string, subscriptionId: string): Promise<any> => {
   try {
     const resumeSubscriptionFunc = functions.httpsCallable('resumeSubscription');
     const result = await resumeSubscriptionFunc({
       userId,
-      subscriptionId
+      subscriptionId,
     });
     return result.data;
   } catch (error) {
@@ -1049,7 +1066,7 @@ export const giftSubscription = async (
       recipientEmail,
       priceId,
       paymentMethodId,
-      giftDuration
+      giftDuration,
     });
     return result.data;
   } catch (error) {
@@ -1075,17 +1092,14 @@ export const toggleAutoResubscribe = async (
     const result = await toggleAutoResubscribeFunc({
       userId,
       subscriptionId,
-      enabled
+      enabled,
     });
-    
+
     // Track the event
-    await trackEvent(
-      enabled ? 'auto_resubscribe_enabled' : 'auto_resubscribe_disabled',
-      {
-        subscriptionId
-      }
-    );
-    
+    await trackEvent(enabled ? 'auto_resubscribe_enabled' : 'auto_resubscribe_disabled', {
+      subscriptionId,
+    });
+
     return result.data;
   } catch (error) {
     console.error('Error toggling auto-resubscribe:', error);
@@ -1098,20 +1112,18 @@ export const toggleAutoResubscribe = async (
  * @param userId Firebase user ID
  * @returns Promise with referral code details
  */
-export const generateReferralCode = async (
-  userId: string
-): Promise<any> => {
+export const generateReferralCode = async (userId: string): Promise<any> => {
   try {
     const generateReferralCodeFunc = functions.httpsCallable('generateReferralCode');
     const result = await generateReferralCodeFunc({
-      userId
+      userId,
     });
-    
+
     // Track the event
     await trackEvent('referral_code_generated', {
-      referralCode: result.data.referralCode
+      referralCode: result.data.referralCode,
     });
-    
+
     return result.data;
   } catch (error) {
     console.error('Error generating referral code:', error);
@@ -1125,23 +1137,20 @@ export const generateReferralCode = async (
  * @param referralCode Referral code to apply
  * @returns Promise with referral application result
  */
-export const applyReferralCode = async (
-  userId: string,
-  referralCode: string
-): Promise<any> => {
+export const applyReferralCode = async (userId: string, referralCode: string): Promise<any> => {
   try {
     const applyReferralCodeFunc = functions.httpsCallable('applyReferralCode');
     const result = await applyReferralCodeFunc({
       newUserId: userId,
-      referralCode
+      referralCode,
     });
-    
+
     // Track the event
     await trackEvent('referral_code_applied', {
       referralCode,
-      referrerId: result.data.referrerId
+      referrerId: result.data.referrerId,
     });
-    
+
     return result.data;
   } catch (error) {
     console.error('Error applying referral code:', error);
@@ -1155,21 +1164,18 @@ export const applyReferralCode = async (
  * @param giftCode Gift code to redeem
  * @returns Promise with redemption result
  */
-export const redeemGiftSubscription = async (
-  userId: string,
-  giftCode: string
-): Promise<any> => {
+export const redeemGiftSubscription = async (userId: string, giftCode: string): Promise<any> => {
   try {
     const redeemGiftSubscriptionFunc = functions.httpsCallable('redeemGiftSubscription');
     const result = await redeemGiftSubscriptionFunc({
-      giftCode
+      giftCode,
     });
-    
+
     // Track the event
     await trackEvent('gift_subscription_redeemed', {
-      giftCode
+      giftCode,
     });
-    
+
     return result.data;
   } catch (error) {
     console.error('Error redeeming gift subscription:', error);
@@ -1187,18 +1193,18 @@ export const hasUsedFreeDailyPick = async (userId: string): Promise<boolean> => 
     // Get user document
     const userDocRef = doc(firestore, 'users', userId);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (!userDoc.exists()) {
       return false;
     }
-    
+
     const userData = userDoc.data();
-    
+
     // Check if user has used their free daily pick today
     if (userData.lastFreeDailyPick) {
       const lastPickDate = userData.lastFreeDailyPick.toDate();
       const today = new Date();
-      
+
       // Check if the last pick was today
       return (
         lastPickDate.getDate() === today.getDate() &&
@@ -1206,7 +1212,7 @@ export const hasUsedFreeDailyPick = async (userId: string): Promise<boolean> => 
         lastPickDate.getFullYear() === today.getFullYear()
       );
     }
-    
+
     return false;
   } catch (error) {
     console.error('Error checking if user has used free daily pick:', error);
@@ -1224,18 +1230,18 @@ export const markFreeDailyPickAsUsed = async (userId: string, gameId: string): P
   try {
     // Get user document
     const userDocRef = doc(firestore, 'users', userId);
-    
+
     // Update user document
     await updateDoc(userDocRef, {
       lastFreeDailyPick: serverTimestamp(),
-      lastFreeDailyPickGameId: gameId
+      lastFreeDailyPickGameId: gameId,
     });
-    
+
     // Track the event
     await trackEvent('free_daily_pick_used', {
-      gameId
+      gameId,
     });
-    
+
     return true;
   } catch (error) {
     console.error('Error marking free daily pick as used:', error);
@@ -1272,5 +1278,5 @@ export default {
   SUBSCRIPTION_PLANS,
   ONE_TIME_PURCHASES,
   MICROTRANSACTIONS,
-  ALL_PRODUCTS
+  ALL_PRODUCTS,
 };

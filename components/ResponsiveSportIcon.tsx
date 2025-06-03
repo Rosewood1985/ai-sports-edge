@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, StyleProp, ViewStyle, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import ResponsiveImage from './ResponsiveImage';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -24,29 +25,21 @@ const ResponsiveSportIcon: React.FC<ResponsiveSportIconProps> = ({
   selected = false,
 }) => {
   const { colors, isDark } = useTheme();
-  
+
   // Extract sport category from sportKey (e.g., "basketball" from "basketball_nba")
   const sportCategory = sportKey.split('_')[0] || 'generic';
-  
+
   // Get base path for the icon
   const basePath = `assets/images/sports/${sportCategory}`;
-  
+
   // Determine icon color based on selection state and theme
-  const iconColor = selected 
-    ? '#ffffff' 
-    : (isDark ? '#e0e0e0' : '#333333');
-  
+  const iconColor = selected ? '#ffffff' : isDark ? '#e0e0e0' : '#333333';
+
   // Check if we should use a custom image or fallback to Ionicons
   const useCustomImage = !iconName;
-  
+
   return (
-    <View 
-      style={[
-        styles.container,
-        { width: size, height: size },
-        style
-      ]}
-    >
+    <View style={[styles.container, { width: size, height: size }, style]}>
       {useCustomImage ? (
         <ResponsiveImage
           basePath={basePath}
@@ -57,11 +50,7 @@ const ResponsiveSportIcon: React.FC<ResponsiveSportIconProps> = ({
           fallbackBasePath="assets/images/sports/generic"
         />
       ) : (
-        <Ionicons 
-          name={iconName as any} 
-          size={size} 
-          color={iconColor} 
-        />
+        <Ionicons name={iconName as any} size={size} color={iconColor} />
       )}
     </View>
   );

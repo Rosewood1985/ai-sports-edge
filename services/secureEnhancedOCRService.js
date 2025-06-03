@@ -1,6 +1,6 @@
 /**
  * Secure Enhanced OCR Service
- * 
+ *
  * SECURITY-HARDENED VERSION of the OCR service that addresses critical vulnerabilities:
  * - Command injection prevention through secure command execution
  * - File path validation and sanitization
@@ -9,10 +9,16 @@
  */
 
 const { PrismaClient } = require('@prisma/client');
-const { secureFileUploadService, SecurityError } = require('./secureFileUploadService');
-const { secureCommandService, CommandSecurityError } = require('./secureCommandService');
-const { securityMonitoringService, SEVERITY_LEVELS, INCIDENT_TYPES } = require('./securityMonitoringService');
 const path = require('path');
+
+const { secureCommandService, CommandSecurityError } = require('./secureCommandService');
+const { secureFileUploadService, SecurityError } = require('./secureFileUploadService');
+const {
+  securityMonitoringService,
+  SEVERITY_LEVELS,
+  INCIDENT_TYPES,
+} = require('./securityMonitoringService');
+
 const fs = require('fs').promises;
 const crypto = require('crypto');
 
@@ -47,25 +53,25 @@ class SecureEnhancedOCRService {
       useIntelligentParsing = true,
       providers = ['tesseract'], // Only use local tesseract for security
       preprocessingOptions = {},
-      maxProcessingTime = 300000 // 5 minutes max
+      maxProcessingTime = 300000, // 5 minutes max
     } = options;
 
     const processingId = crypto.randomUUID();
-    
+
     try {
       console.log(`[SECURE OCR] Starting secure OCR processing for upload ${uploadId}`);
-      
+
       // Step 1: Validate upload and get secure file path
       const secureUpload = await this.validateAndSecureUpload(uploadId);
-      
+
       // Step 2: Add to processing queue with timeout
       this.addToProcessingQueue(processingId, uploadId, maxProcessingTime);
-      
+
       // Step 3: Update status with security context
       await this.updateUploadStatus(uploadId, 'processing', {
         processingId,
         securityValidated: true,
-        startTime: new Date().toISOString()
+        startTime: new Date().toISOString(),
       });
 
       let imagePath = secureUpload.securePath;
@@ -74,10 +80,7 @@ class SecureEnhancedOCRService {
       // Step 4: Secure image preprocessing
       if (usePreprocessing) {
         console.log(`[SECURE OCR] Preprocessing image with security validation`);
-        preprocessingResult = await this.secureImagePreprocessing(
-          imagePath, 
-          preprocessingOptions
-        );
+        preprocessingResult = await this.secureImagePreprocessing(imagePath, preprocessingOptions);
         imagePath = preprocessingResult.processedPath;
       }
 
@@ -101,8 +104,8 @@ class SecureEnhancedOCRService {
           processingId,
           securityValidated: true,
           fileHash: secureUpload.fileHash,
-          processingTime: Date.now() - secureUpload.processingStartTime
-        }
+          processingTime: Date.now() - secureUpload.processingStartTime,
+        },
       });
 
       // Step 8: Secure cleanup
@@ -110,15 +113,14 @@ class SecureEnhancedOCRService {
 
       console.log(`[SECURE OCR] Processing completed successfully for upload ${uploadId}`);
       return finalResult;
-
     } catch (error) {
       console.error(`[SECURE OCR] Processing failed for upload ${uploadId}:`, error);
-      
+
       // Update status with error
       await this.updateUploadStatus(uploadId, 'failed', {
         error: error.message,
         errorCode: error.code || 'PROCESSING_FAILED',
-        processingId
+        processingId,
       });
 
       // Security incident logging
@@ -141,7 +143,7 @@ class SecureEnhancedOCRService {
   async validateAndSecureUpload(uploadId) {
     try {
       const upload = await prisma.oCRUpload.findUnique({
-        where: { id: uploadId }
+        where: { id: uploadId },
       });
 
       if (!upload) {
@@ -154,19 +156,18 @@ class SecureEnhancedOCRService {
 
       // Validate file path security
       const securePath = secureFileUploadService.validatePathForOCR(upload.uploadPath);
-      
+
       // Get secure file information
       const fileInfo = await secureFileUploadService.getSecureFileInfo(securePath);
-      
+
       return {
         uploadId,
         securePath,
         fileHash: fileInfo.hash,
         fileSize: fileInfo.size,
         processingStartTime: Date.now(),
-        originalUpload: upload
+        originalUpload: upload,
       };
-      
     } catch (error) {
       throw new SecurityError(
         `Upload validation failed: ${error.message}`,
@@ -185,26 +186,25 @@ class SecureEnhancedOCRService {
     try {
       // Validate image path before processing
       const validatedPath = secureFileUploadService.validatePathForOCR(imagePath);
-      
+
       // Use secure preprocessing service
       const result = await this.imagePreprocessor.preprocessImageSecurely(validatedPath, options);
-      
+
       // Validate result path
       if (result && result !== validatedPath) {
         const processedPath = secureFileUploadService.validatePathForOCR(result);
         return {
           processedPath,
           originalPath: validatedPath,
-          preprocessingApplied: true
+          preprocessingApplied: true,
         };
       }
-      
+
       return {
         processedPath: validatedPath,
         originalPath: validatedPath,
-        preprocessingApplied: false
+        preprocessingApplied: false,
       };
-      
     } catch (error) {
       throw new SecurityError(
         `Secure preprocessing failed: ${error.message}`,
@@ -223,40 +223,39 @@ class SecureEnhancedOCRService {
     try {
       // Validate image path
       const validatedPath = secureFileUploadService.validatePathForOCR(imagePath);
-      
+
       // Only allow tesseract for security
       if (!providers.includes('tesseract')) {
         providers = ['tesseract'];
       }
-      
+
       console.log(`[SECURE OCR] Processing with Tesseract: ${path.basename(validatedPath)}`);
-      
+
       // Execute secure Tesseract command
       const result = await secureCommandService.executeSecureCommand(
         'tesseract',
         [validatedPath, 'stdout', '-l', 'eng'],
         {
           timeout: 60000, // 60 seconds
-          cwd: path.dirname(validatedPath)
+          cwd: path.dirname(validatedPath),
         }
       );
-      
+
       if (result.exitCode !== 0) {
         throw new CommandSecurityError(
           `Tesseract failed with exit code ${result.exitCode}: ${result.stderr}`,
           'TESSERACT_FAILED'
         );
       }
-      
+
       return {
         fullText: result.stdout,
         confidence: this.calculateConfidence(result.stdout, result.stderr),
         provider: 'tesseract',
         executionTime: result.executionTime,
         textBlocks: this.parseTextBlocks(result.stdout),
-        securityValidated: true
+        securityValidated: true,
       };
-      
     } catch (error) {
       throw new CommandSecurityError(
         `Secure OCR processing failed: ${error.message}`,
@@ -276,32 +275,31 @@ class SecureEnhancedOCRService {
       if (!ocrResult || !ocrResult.fullText) {
         throw new SecurityError('Invalid OCR result for parsing', 'INVALID_OCR_RESULT');
       }
-      
+
       // Sanitize text before parsing
       const sanitizedText = this.sanitizeTextForParsing(ocrResult.fullText);
-      
+
       // Use intelligent parser with sanitized input
-      const parsedResult = await this.intelligentParser.parseExtractedText({
-        fullText: sanitizedText,
-        textBlocks: ocrResult.textBlocks || [],
-        confidence: ocrResult.confidence || 0.5
-      }, {
-        useContextualAnalysis: true,
-        validateConsistency: true,
-        enhanceWithMLModel: false // Disable ML for security
-      });
-      
+      const parsedResult = await this.intelligentParser.parseExtractedText(
+        {
+          fullText: sanitizedText,
+          textBlocks: ocrResult.textBlocks || [],
+          confidence: ocrResult.confidence || 0.5,
+        },
+        {
+          useContextualAnalysis: true,
+          validateConsistency: true,
+          enhanceWithMLModel: false, // Disable ML for security
+        }
+      );
+
       return {
         ...parsedResult,
         securityValidated: true,
-        textSanitized: true
+        textSanitized: true,
       };
-      
     } catch (error) {
-      throw new SecurityError(
-        `Secure parsing failed: ${error.message}`,
-        'PARSING_FAILED'
-      );
+      throw new SecurityError(`Secure parsing failed: ${error.message}`, 'PARSING_FAILED');
     }
   }
 
@@ -314,7 +312,7 @@ class SecureEnhancedOCRService {
   async secureResultStorage(uploadId, results) {
     try {
       const { ocrResult, parsedResult, preprocessingResult, securityContext } = results;
-      
+
       // Sanitize results before storage
       const sanitizedResults = {
         ocrText: this.sanitizeForStorage(ocrResult.fullText),
@@ -326,10 +324,10 @@ class SecureEnhancedOCRService {
           processingId: securityContext.processingId,
           fileHash: securityContext.fileHash,
           securityValidated: true,
-          processingTimestamp: new Date().toISOString()
-        }
+          processingTimestamp: new Date().toISOString(),
+        },
       };
-      
+
       // Update database with sanitized results
       const updatedUpload = await prisma.oCRUpload.update({
         where: { id: uploadId },
@@ -339,22 +337,18 @@ class SecureEnhancedOCRService {
           confidence: sanitizedResults.confidence,
           processingTime: sanitizedResults.processingTime,
           metadata: sanitizedResults,
-          completedAt: new Date()
-        }
+          completedAt: new Date(),
+        },
       });
-      
+
       return {
         success: true,
         uploadId,
         results: sanitizedResults,
-        upload: updatedUpload
+        upload: updatedUpload,
       };
-      
     } catch (error) {
-      throw new SecurityError(
-        `Secure storage failed: ${error.message}`,
-        'STORAGE_FAILED'
-      );
+      throw new SecurityError(`Secure storage failed: ${error.message}`, 'STORAGE_FAILED');
     }
   }
 
@@ -366,11 +360,11 @@ class SecureEnhancedOCRService {
   async secureCleanup(imagePath, preprocessingResult) {
     try {
       const filesToClean = [imagePath];
-      
+
       if (preprocessingResult && preprocessingResult.processedPath !== imagePath) {
         filesToClean.push(preprocessingResult.processedPath);
       }
-      
+
       for (const filePath of filesToClean) {
         try {
           await secureFileUploadService.secureFileCleanup(filePath);
@@ -378,7 +372,6 @@ class SecureEnhancedOCRService {
           console.warn(`[SECURE OCR] Warning: Could not clean up file ${filePath}:`, error.message);
         }
       }
-      
     } catch (error) {
       console.error(`[SECURE OCR] Cleanup error:`, error);
       // Don't throw cleanup errors
@@ -396,12 +389,12 @@ class SecureEnhancedOCRService {
     const timeoutId = setTimeout(() => {
       this.handleProcessingTimeout(processingId, uploadId);
     }, maxTime);
-    
+
     this.processingQueue.set(processingId, {
       uploadId,
       startTime,
       timeoutId,
-      maxTime
+      maxTime,
     });
   }
 
@@ -413,16 +406,15 @@ class SecureEnhancedOCRService {
   async handleProcessingTimeout(processingId, uploadId) {
     try {
       console.error(`[SECURE OCR] Processing timeout for upload ${uploadId}`);
-      
+
       await this.updateUploadStatus(uploadId, 'failed', {
         error: 'Processing timeout',
         errorCode: 'PROCESSING_TIMEOUT',
-        processingId
+        processingId,
       });
-      
+
       // Clean up
       this.processingQueue.delete(processingId);
-      
     } catch (error) {
       console.error(`[SECURE OCR] Error handling timeout:`, error);
     }
@@ -442,9 +434,9 @@ class SecureEnhancedOCRService {
           status,
           metadata: {
             ...metadata,
-            lastUpdated: new Date().toISOString()
-          }
-        }
+            lastUpdated: new Date().toISOString(),
+          },
+        },
       });
     } catch (error) {
       console.error(`[SECURE OCR] Failed to update status:`, error);
@@ -462,7 +454,7 @@ class SecureEnhancedOCRService {
       // Determine incident type based on error
       let incidentType = INCIDENT_TYPES.OCR_SECURITY_VIOLATION;
       let severity = SEVERITY_LEVELS.MEDIUM;
-      
+
       if (error instanceof CommandSecurityError) {
         if (error.code === 'COMMAND_NOT_ALLOWED' || error.code === 'DANGEROUS_ARG_CHARS') {
           incidentType = INCIDENT_TYPES.COMMAND_INJECTION;
@@ -477,7 +469,7 @@ class SecureEnhancedOCRService {
           severity = SEVERITY_LEVELS.CRITICAL;
         }
       }
-      
+
       // Log incident with security monitoring service
       await securityMonitoringService.logIncident({
         severity,
@@ -489,13 +481,12 @@ class SecureEnhancedOCRService {
           processingId,
           errorCode: error.code,
           errorType: error.constructor.name,
-          stackTrace: error.stack?.split('\n').slice(0, 5).join('\n') // Limit stack trace
+          stackTrace: error.stack?.split('\n').slice(0, 5).join('\n'), // Limit stack trace
         },
         uploadId,
         processingId,
-        errorCode: error.code
+        errorCode: error.code,
       });
-      
     } catch (logError) {
       console.error(`[SECURE OCR] Failed to log security incident:`, logError);
     }
@@ -510,7 +501,7 @@ class SecureEnhancedOCRService {
     if (!text || typeof text !== 'string') {
       return '';
     }
-    
+
     // Remove potential script injection attempts
     return text
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -529,7 +520,7 @@ class SecureEnhancedOCRService {
     if (!data || typeof data !== 'string') {
       return '';
     }
-    
+
     return data
       .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
       .replace(/[<>]/g, '') // Remove HTML tags
@@ -547,18 +538,18 @@ class SecureEnhancedOCRService {
     if (!stdout || stdout.trim().length === 0) {
       return 0;
     }
-    
+
     // Basic confidence calculation
     let confidence = 0.5;
-    
+
     if (stderr && stderr.includes('Warning')) {
       confidence -= 0.1;
     }
-    
+
     if (stdout.length > 50) {
       confidence += 0.2;
     }
-    
+
     return Math.max(0, Math.min(1, confidence));
   }
 
@@ -569,14 +560,15 @@ class SecureEnhancedOCRService {
    */
   parseTextBlocks(text) {
     if (!text) return [];
-    
-    return text.split('\n')
+
+    return text
+      .split('\n')
       .filter(line => line.trim().length > 0)
       .map((line, index) => ({
         text: line.trim(),
         confidence: 0.8,
         boundingBox: null,
-        blockIndex: index
+        blockIndex: index,
       }));
   }
 
@@ -592,7 +584,7 @@ class SecureEnhancedOCRService {
         uploadId: info.uploadId,
         startTime: info.startTime,
         elapsed: Date.now() - info.startTime,
-        maxTime: info.maxTime
+        maxTime: info.maxTime,
       });
     });
     return status;
@@ -604,5 +596,5 @@ const secureEnhancedOCRService = new SecureEnhancedOCRService();
 
 module.exports = {
   SecureEnhancedOCRService,
-  secureEnhancedOCRService
+  secureEnhancedOCRService,
 };

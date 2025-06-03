@@ -19,9 +19,10 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+
 import { getDataCategory } from '../../atoms/privacy/dataCategories';
-import { DataAccessRequest, DataFormat } from '../../atoms/privacy/privacyTypes';
 import { PrivacyRequestStatus, PrivacyRequestType } from '../../atoms/privacy/gdprConfig';
+import { DataAccessRequest, DataFormat } from '../../atoms/privacy/privacyTypes';
 
 /**
  * Class for managing data access requests

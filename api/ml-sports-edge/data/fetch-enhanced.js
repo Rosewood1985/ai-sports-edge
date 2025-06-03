@@ -7,10 +7,11 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+
+const bet365ApiWrapper = require('./bet365ApiWrapper');
 const apiKeys = require('../../../utils/apiKeys');
 
 // API configuration
-const bet365ApiWrapper = require('./bet365ApiWrapper');
 
 const API_CONFIG = {
   ODDS_API: {
@@ -24,8 +25,8 @@ const API_CONFIG = {
       NCAA_MENS: 'basketball_ncaa',
       NCAA_WOMENS: 'basketball_ncaaw',
       FORMULA1: 'motorsport_f1',
-      UFC: 'mma_mixed_martial_arts'
-    }
+      UFC: 'mma_mixed_martial_arts',
+    },
   },
   BET365_API: {
     SPORTS: {
@@ -36,8 +37,8 @@ const API_CONFIG = {
       NCAA_MENS: 'basketball',
       NCAA_WOMENS: 'basketball',
       FORMULA1: 'motorsport',
-      UFC: 'mma'
-    }
+      UFC: 'mma',
+    },
   },
   ESPN_API: {
     BASE_URL: 'https://site.api.espn.com/apis/site/v2/sports',
@@ -49,7 +50,7 @@ const API_CONFIG = {
         STANDINGS: 'basketball/nba/standings',
         NEWS: 'basketball/nba/news',
         STATISTICS: 'basketball/nba/statistics',
-        ATHLETES: 'basketball/nba/athletes'
+        ATHLETES: 'basketball/nba/athletes',
       },
       WNBA: {
         SCOREBOARD: 'basketball/wnba/scoreboard',
@@ -57,7 +58,7 @@ const API_CONFIG = {
         STANDINGS: 'basketball/wnba/standings',
         NEWS: 'basketball/wnba/news',
         STATISTICS: 'basketball/wnba/statistics',
-        ATHLETES: 'basketball/wnba/athletes'
+        ATHLETES: 'basketball/wnba/athletes',
       },
       MLB: {
         SCOREBOARD: 'baseball/mlb/scoreboard',
@@ -65,7 +66,7 @@ const API_CONFIG = {
         STANDINGS: 'baseball/mlb/standings',
         NEWS: 'baseball/mlb/news',
         STATISTICS: 'baseball/mlb/statistics',
-        ATHLETES: 'baseball/mlb/athletes'
+        ATHLETES: 'baseball/mlb/athletes',
       },
       NHL: {
         SCOREBOARD: 'hockey/nhl/scoreboard',
@@ -73,7 +74,7 @@ const API_CONFIG = {
         STANDINGS: 'hockey/nhl/standings',
         NEWS: 'hockey/nhl/news',
         STATISTICS: 'hockey/nhl/statistics',
-        ATHLETES: 'hockey/nhl/athletes'
+        ATHLETES: 'hockey/nhl/athletes',
       },
       NCAA_MENS: {
         SCOREBOARD: 'basketball/mens-college-basketball/scoreboard',
@@ -81,7 +82,7 @@ const API_CONFIG = {
         STANDINGS: 'basketball/mens-college-basketball/standings',
         NEWS: 'basketball/mens-college-basketball/news',
         STATISTICS: 'basketball/mens-college-basketball/statistics',
-        ATHLETES: 'basketball/mens-college-basketball/athletes'
+        ATHLETES: 'basketball/mens-college-basketball/athletes',
       },
       NCAA_WOMENS: {
         SCOREBOARD: 'basketball/womens-college-basketball/scoreboard',
@@ -89,15 +90,15 @@ const API_CONFIG = {
         STANDINGS: 'basketball/womens-college-basketball/standings',
         NEWS: 'basketball/womens-college-basketball/news',
         STATISTICS: 'basketball/womens-college-basketball/statistics',
-        ATHLETES: 'basketball/womens-college-basketball/athletes'
+        ATHLETES: 'basketball/womens-college-basketball/athletes',
       },
       FORMULA1: {
         SCOREBOARD: 'racing/f1/scoreboard',
         TEAMS: 'racing/f1/teams',
         STANDINGS: 'racing/f1/standings',
         NEWS: 'racing/f1/news',
-        ATHLETES: 'racing/f1/athletes'
-      }
+        ATHLETES: 'racing/f1/athletes',
+      },
     },
     HIDDEN_ENDPOINTS: {
       GAME_DETAILS: '/events/{gameId}',
@@ -105,8 +106,8 @@ const API_CONFIG = {
       ATHLETE_DETAILS: '/athletes/{athleteId}',
       TEAM_ROSTER: '/teams/{teamId}/athletes',
       TEAM_SCHEDULE: '/teams/{teamId}/events',
-      TEAM_STATISTICS: '/teams/{teamId}/statistics'
-    }
+      TEAM_STATISTICS: '/teams/{teamId}/statistics',
+    },
   },
   NHL_API: {
     BASE_URL: 'https://api-web.nhl.com',
@@ -116,8 +117,8 @@ const API_CONFIG = {
       TEAMS: '/api/v1/teams',
       STANDINGS: '/api/v1/standings',
       PLAYER_STATS: '/api/v1/people',
-      GAME_STATS: '/api/v1/game'
-    }
+      GAME_STATS: '/api/v1/game',
+    },
   },
   SPORTRADAR_API: {
     BASE_URL: 'https://api.sportradar.com',
@@ -143,8 +144,8 @@ const API_CONFIG = {
       UFC: {
         EVENT_SUMMARY: '/ufc/trial/v7/en/events/{event_id}/summary.json',
         FIGHTER_PROFILE: '/ufc/trial/v7/en/competitors/{fighter_id}/profile.json',
-      }
-    }
+      },
+    },
   },
   NCAA_BASKETBALL_API: {
     BASE_URL: 'https://api.sportradar.com',
@@ -161,17 +162,17 @@ const API_CONFIG = {
         PLAYER_PROFILE: '/ncaawb/trial/v7/en/players/{player_id}/profile.json',
         LEAGUE_SCHEDULE: '/ncaawb/trial/v7/en/games/{year}/{month}/{day}/schedule.json',
         TOURNAMENT_SUMMARY: '/ncaawb/trial/v7/en/tournaments/{tournament_id}/summary.json',
-      }
-    }
+      },
+    },
   },
   SHERDOG_API: {
     BASE_URL: 'https://sherdog-api.vercel.app/api',
     ENDPOINTS: {
       FIGHTERS: '/fighters',
       EVENTS: '/events',
-      SEARCH: '/search'
-    }
-  }
+      SEARCH: '/search',
+    },
+  },
 };
 
 // Data directory
@@ -190,15 +191,15 @@ if (!fs.existsSync(DATA_DIR)) {
  */
 function createRateLimiter(maxRequests, timeWindow) {
   const requests = [];
-  
+
   return async function rateLimiter() {
     const now = Date.now();
-    
+
     // Remove requests outside the time window
     while (requests.length > 0 && requests[0] < now - timeWindow) {
       requests.shift();
     }
-    
+
     // Check if we've hit the rate limit
     if (requests.length >= maxRequests) {
       const oldestRequest = requests[0];
@@ -206,7 +207,7 @@ function createRateLimiter(maxRequests, timeWindow) {
       console.log(`Rate limit reached. Waiting ${timeToWait}ms before next request.`);
       await new Promise(resolve => setTimeout(resolve, timeToWait));
     }
-    
+
     // Add current request timestamp
     requests.push(now);
   };
@@ -220,7 +221,7 @@ const rateLimiters = {
   SPORTRADAR_API: createRateLimiter(5, 60 * 1000), // 5 requests per minute
   NCAA_BASKETBALL_API: createRateLimiter(5, 60 * 1000), // 5 requests per minute
   SHERDOG_API: createRateLimiter(10, 60 * 1000), // 10 requests per minute
-  BET365_API: createRateLimiter(3, 60 * 1000) // 3 requests per minute (more conservative)
+  BET365_API: createRateLimiter(3, 60 * 1000), // 3 requests per minute (more conservative)
 };
 
 /**
@@ -236,20 +237,22 @@ async function fetchWithRateLimit(url, options = {}, apiName) {
     if (rateLimiters[apiName]) {
       await rateLimiters[apiName]();
     }
-    
+
     // Make request
     const response = await axios(url, {
       ...options,
-      timeout: 10000 // 10 second timeout
+      timeout: 10000, // 10 second timeout
     });
-    
+
     return response.data;
   } catch (error) {
     // Handle different types of errors
     if (axios.isAxiosError(error)) {
       if (error.response) {
         // Server responded with an error status
-        console.error(`API Error (${apiName}): ${error.response.status} - ${error.response.statusText}`);
+        console.error(
+          `API Error (${apiName}): ${error.response.status} - ${error.response.statusText}`
+        );
         console.error(`URL: ${url}`);
         console.error(`Response data:`, error.response.data);
       } else if (error.request) {
@@ -266,7 +269,7 @@ async function fetchWithRateLimit(url, options = {}, apiName) {
       console.error(`General Error (${apiName}): ${error.message}`);
       console.error(`URL: ${url}`);
     }
-    
+
     throw error;
   }
 }
@@ -300,20 +303,16 @@ async function fetchOddsData(sport) {
       apiKey: API_CONFIG.ODDS_API.API_KEY,
       regions: 'us',
       markets: 'h2h,spreads,totals',
-      oddsFormat: 'american'
+      oddsFormat: 'american',
     };
 
     console.log(`Fetching odds data for ${sport}...`);
-    const data = await fetchWithRateLimit(
-      url, 
-      { params }, 
-      'ODDS_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, { params }, 'ODDS_API');
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_odds_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching odds data for ${sport}:`, error.message);
@@ -335,18 +334,14 @@ async function fetchESPNScoreboard(sport) {
     }
 
     const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.SCOREBOARD}`;
-    
+
     console.log(`Fetching ESPN scoreboard data for ${sport}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_espn_scoreboard_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN scoreboard data for ${sport}:`, error.message);
@@ -368,18 +363,14 @@ async function fetchESPNTeams(sport) {
     }
 
     const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.TEAMS}`;
-    
+
     console.log(`Fetching ESPN teams data for ${sport}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_espn_teams_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN teams data for ${sport}:`, error.message);
@@ -401,18 +392,14 @@ async function fetchESPNStandings(sport) {
     }
 
     const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.STANDINGS}`;
-    
+
     console.log(`Fetching ESPN standings data for ${sport}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_espn_standings_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN standings data for ${sport}:`, error.message);
@@ -434,18 +421,14 @@ async function fetchESPNStatistics(sport) {
     }
 
     const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoints.STATISTICS}`;
-    
+
     console.log(`Fetching ESPN statistics data for ${sport}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_espn_statistics_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN statistics data for ${sport}:`, error.message);
@@ -462,18 +445,14 @@ async function fetchESPNGameDetails(gameId) {
   try {
     const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.GAME_DETAILS.replace('{gameId}', gameId);
     const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
-    
+
     console.log(`Fetching ESPN game details for game ${gameId}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `espn_game_${gameId}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN game details for game ${gameId}:`, error.message);
@@ -490,18 +469,14 @@ async function fetchESPNTeamDetails(teamId) {
   try {
     const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_DETAILS.replace('{teamId}', teamId);
     const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
-    
+
     console.log(`Fetching ESPN team details for team ${teamId}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `espn_team_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN team details for team ${teamId}:`, error.message);
@@ -516,20 +491,19 @@ async function fetchESPNTeamDetails(teamId) {
  */
 async function fetchESPNAthleteDetails(athleteId) {
   try {
-    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.ATHLETE_DETAILS.replace('{athleteId}', athleteId);
-    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
-    
-    console.log(`Fetching ESPN athlete details for athlete ${athleteId}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.ATHLETE_DETAILS.replace(
+      '{athleteId}',
+      athleteId
     );
-    
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+
+    console.log(`Fetching ESPN athlete details for athlete ${athleteId}...`);
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `espn_athlete_${athleteId}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN athlete details for athlete ${athleteId}:`, error.message);
@@ -546,18 +520,14 @@ async function fetchESPNTeamRoster(teamId) {
   try {
     const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_ROSTER.replace('{teamId}', teamId);
     const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
-    
+
     console.log(`Fetching ESPN team roster for team ${teamId}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `espn_team_roster_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN team roster for team ${teamId}:`, error.message);
@@ -574,18 +544,14 @@ async function fetchESPNTeamSchedule(teamId) {
   try {
     const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_SCHEDULE.replace('{teamId}', teamId);
     const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
-    
+
     console.log(`Fetching ESPN team schedule for team ${teamId}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `espn_team_schedule_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN team schedule for team ${teamId}:`, error.message);
@@ -600,20 +566,19 @@ async function fetchESPNTeamSchedule(teamId) {
  */
 async function fetchESPNTeamStatistics(teamId) {
   try {
-    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_STATISTICS.replace('{teamId}', teamId);
-    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
-    
-    console.log(`Fetching ESPN team statistics for team ${teamId}...`);
-    const data = await fetchWithRateLimit(
-      url,
-      {},
-      'ESPN_API'
+    const endpoint = API_CONFIG.ESPN_API.HIDDEN_ENDPOINTS.TEAM_STATISTICS.replace(
+      '{teamId}',
+      teamId
     );
-    
+    const url = `${API_CONFIG.ESPN_API.HIDDEN_BASE_URL}${endpoint}`;
+
+    console.log(`Fetching ESPN team statistics for team ${teamId}...`);
+    const data = await fetchWithRateLimit(url, {}, 'ESPN_API');
+
     // Save data to file
     const filename = `espn_team_statistics_${teamId}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching ESPN team statistics for team ${teamId}:`, error.message);
@@ -629,34 +594,34 @@ async function fetchESPNTeamStatistics(teamId) {
 async function fetchESPNData(sport) {
   try {
     console.log(`Fetching all ESPN data for ${sport}...`);
-    
+
     // Create object to store all ESPN data
     const espnData = {
       scoreboard: null,
       teams: null,
       standings: null,
-      statistics: null
+      statistics: null,
     };
-    
+
     // Fetch scoreboard data
     espnData.scoreboard = await fetchESPNScoreboard(sport);
-    
+
     // Fetch teams data
     espnData.teams = await fetchESPNTeams(sport);
-    
+
     // Fetch standings data
     espnData.standings = await fetchESPNStandings(sport);
-    
+
     // Fetch statistics data
     espnData.statistics = await fetchESPNStatistics(sport);
-    
+
     // For each game in the scoreboard, fetch detailed game data
     if (espnData.scoreboard && espnData.scoreboard.events) {
       const gameDetails = [];
-      
+
       // Limit to 5 games to avoid rate limiting
       const games = espnData.scoreboard.events.slice(0, 5);
-      
+
       for (const game of games) {
         const gameId = game.id;
         const gameDetail = await fetchESPNGameDetails(gameId);
@@ -664,58 +629,65 @@ async function fetchESPNData(sport) {
           gameDetails.push(gameDetail);
         }
       }
-      
+
       espnData.gameDetails = gameDetails;
     }
-    
+
     // For each team, fetch detailed team data (limit to 3 teams)
-    if (espnData.teams && espnData.teams.sports && espnData.teams.sports[0] && espnData.teams.sports[0].leagues && espnData.teams.sports[0].leagues[0] && espnData.teams.sports[0].leagues[0].teams) {
+    if (
+      espnData.teams &&
+      espnData.teams.sports &&
+      espnData.teams.sports[0] &&
+      espnData.teams.sports[0].leagues &&
+      espnData.teams.sports[0].leagues[0] &&
+      espnData.teams.sports[0].leagues[0].teams
+    ) {
       const teamDetails = [];
       const teamRosters = [];
       const teamSchedules = [];
       const teamStatistics = [];
-      
+
       // Limit to 3 teams to avoid rate limiting
       const teams = espnData.teams.sports[0].leagues[0].teams.slice(0, 3);
-      
+
       for (const team of teams) {
         const teamId = team.team.id;
-        
+
         // Fetch team details
         const teamDetail = await fetchESPNTeamDetails(teamId);
         if (teamDetail) {
           teamDetails.push(teamDetail);
         }
-        
+
         // Fetch team roster
         const teamRoster = await fetchESPNTeamRoster(teamId);
         if (teamRoster) {
           teamRosters.push(teamRoster);
         }
-        
+
         // Fetch team schedule
         const teamSchedule = await fetchESPNTeamSchedule(teamId);
         if (teamSchedule) {
           teamSchedules.push(teamSchedule);
         }
-        
+
         // Fetch team statistics
         const teamStatistic = await fetchESPNTeamStatistics(teamId);
         if (teamStatistic) {
           teamStatistics.push(teamStatistic);
         }
       }
-      
+
       espnData.teamDetails = teamDetails;
       espnData.teamRosters = teamRosters;
       espnData.teamSchedules = teamSchedules;
       espnData.teamStatistics = teamStatistics;
     }
-    
+
     // Save combined ESPN data to file
     const filename = `${sport.toLowerCase()}_espn_all_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, espnData);
-    
+
     return espnData;
   } catch (error) {
     console.error(`Error fetching all ESPN data for ${sport}:`, error.message);
@@ -731,18 +703,14 @@ async function fetchESPNData(sport) {
 async function fetchNHLStats(date = new Date().toISOString().split('T')[0]) {
   try {
     const url = `${API_CONFIG.NHL_API.BASE_URL}${API_CONFIG.NHL_API.ENDPOINTS.SCHEDULE}?date=${date}&expand=schedule.linescore`;
-    
+
     console.log(`Fetching NHL schedule for ${date}...`);
-    const data = await fetchWithRateLimit(
-      url, 
-      {}, 
-      'NHL_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'NHL_API');
+
     // Save data to file
     const filename = `nhl_stats_${date}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching NHL stats:`, error.message);
@@ -763,32 +731,28 @@ async function fetchSportRadarData(sport, endpoint, params = {}) {
       console.log(`No SportRadar API endpoints for ${sport}`);
       return null;
     }
-    
+
     if (!API_CONFIG.SPORTRADAR_API.ENDPOINTS[sport][endpoint]) {
       console.log(`No SportRadar API endpoint ${endpoint} for ${sport}`);
       return null;
     }
-    
+
     let endpointUrl = API_CONFIG.SPORTRADAR_API.ENDPOINTS[sport][endpoint];
-    
+
     // Replace parameters in the URL
     Object.entries(params).forEach(([key, value]) => {
       endpointUrl = endpointUrl.replace(`{${key}}`, value);
     });
-    
+
     const url = `${API_CONFIG.SPORTRADAR_API.BASE_URL}${endpointUrl}?api_key=${API_CONFIG.SPORTRADAR_API.API_KEY}`;
-    
+
     console.log(`Fetching SportRadar data for ${sport} (${endpoint})...`);
-    const data = await fetchWithRateLimit(
-      url, 
-      {}, 
-      'SPORTRADAR_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'SPORTRADAR_API');
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_sportradar_${endpoint.toLowerCase()}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching SportRadar data for ${sport} (${endpoint}):`, error.message);
@@ -809,32 +773,28 @@ async function fetchNCAAData(gender, endpoint, params = {}) {
       console.log(`No NCAA API endpoints for ${gender}`);
       return null;
     }
-    
+
     if (!API_CONFIG.NCAA_BASKETBALL_API.ENDPOINTS[gender][endpoint]) {
       console.log(`No NCAA API endpoint ${endpoint} for ${gender}`);
       return null;
     }
-    
+
     let endpointUrl = API_CONFIG.NCAA_BASKETBALL_API.ENDPOINTS[gender][endpoint];
-    
+
     // Replace parameters in the URL
     Object.entries(params).forEach(([key, value]) => {
       endpointUrl = endpointUrl.replace(`{${key}}`, value);
     });
-    
+
     const url = `${API_CONFIG.NCAA_BASKETBALL_API.BASE_URL}${endpointUrl}?api_key=${API_CONFIG.NCAA_BASKETBALL_API.API_KEY}`;
-    
+
     console.log(`Fetching NCAA ${gender} data (${endpoint})...`);
-    const data = await fetchWithRateLimit(
-      url, 
-      {}, 
-      'NCAA_BASKETBALL_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, {}, 'NCAA_BASKETBALL_API');
+
     // Save data to file
     const filename = `ncaa_${gender.toLowerCase()}_${endpoint.toLowerCase()}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching NCAA ${gender} data (${endpoint}):`, error.message);
@@ -854,20 +814,16 @@ async function fetchSherdogData(endpoint, params = {}) {
       console.log(`No Sherdog API endpoint ${endpoint}`);
       return null;
     }
-    
+
     const url = `${API_CONFIG.SHERDOG_API.BASE_URL}${API_CONFIG.SHERDOG_API.ENDPOINTS[endpoint]}`;
-    
+
     console.log(`Fetching Sherdog data (${endpoint})...`);
-    const data = await fetchWithRateLimit(
-      url, 
-      { params }, 
-      'SHERDOG_API'
-    );
-    
+    const data = await fetchWithRateLimit(url, { params }, 'SHERDOG_API');
+
     // Save data to file
     const filename = `sherdog_${endpoint.toLowerCase()}_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching Sherdog data (${endpoint}):`, error.message);
@@ -886,9 +842,9 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
   // This is a placeholder function
   // In a real implementation, this would fetch historical results
   // from a sports data provider API
-  
+
   console.log(`Fetching historical results for ${sport} from ${startDate} to ${endDate}...`);
-  
+
   // Mock data for demonstration
   const mockData = {
     sport,
@@ -905,8 +861,8 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
           spread: -3.5,
           overUnder: 224.5,
           homeMoneyline: -150,
-          awayMoneyline: +130
-        }
+          awayMoneyline: +130,
+        },
       },
       {
         date: '2025-03-16',
@@ -918,16 +874,16 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
           spread: -2.5,
           overUnder: 235.5,
           homeMoneyline: -130,
-          awayMoneyline: +110
-        }
-      }
-    ]
+          awayMoneyline: +110,
+        },
+      },
+    ],
   };
-  
+
   // Save mock data to file
   const filename = `${sport.toLowerCase()}_historical_${startDate}_to_${endDate}.json`;
   saveToFile(filename, mockData);
-  
+
   return mockData;
 }
 
@@ -937,32 +893,32 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
  */
 async function fetchAllDataForSport(sport) {
   console.log(`Fetching all data for ${sport}...`);
-  
+
   // Create a data object to store all fetched data
   const sportData = {
     sport,
     timestamp: new Date().toISOString(),
-    sources: {}
+    sources: {},
   };
-  
+
   // Fetch odds data
   const oddsData = await fetchOddsData(sport);
   if (oddsData) {
     sportData.sources.odds = oddsData;
   }
-  
+
   // Fetch Bet365 odds data
   const bet365Data = await fetchBet365Data(sport);
   if (bet365Data) {
     sportData.sources.bet365 = bet365Data;
   }
-  
+
   // Fetch ESPN data
   const espnData = await fetchESPNData(sport);
   if (espnData) {
     sportData.sources.espn = espnData;
   }
-  
+
   // Fetch sport-specific data
   if (sport === 'NHL') {
     const nhlData = await fetchNHLStats();
@@ -970,7 +926,7 @@ async function fetchAllDataForSport(sport) {
       sportData.sources.nhlStats = nhlData;
     }
   }
-  
+
   // Fetch SportRadar data
   if (['NBA', 'NFL', 'MLB', 'NHL', 'UFC'].includes(sport)) {
     // For demonstration, we'll just fetch game summaries
@@ -979,14 +935,14 @@ async function fetchAllDataForSport(sport) {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    
+
     if (sport !== 'UFC') {
       const scheduleData = await fetchSportRadarData(sport, 'LEAGUE_SCHEDULE', {
         year,
         month,
-        day
+        day,
       });
-      
+
       if (scheduleData) {
         sportData.sources.sportRadarSchedule = scheduleData;
       }
@@ -996,27 +952,27 @@ async function fetchAllDataForSport(sport) {
       console.log('UFC SportRadar data would be fetched here');
     }
   }
-  
+
   // Fetch NCAA data
   if (sport === 'NCAA_MENS' || sport === 'NCAA_WOMENS') {
     const gender = sport.replace('NCAA_', '');
-    
+
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    
+
     const scheduleData = await fetchNCAAData(gender, 'LEAGUE_SCHEDULE', {
       year,
       month,
-      day
+      day,
     });
-    
+
     if (scheduleData) {
       sportData.sources.ncaaSchedule = scheduleData;
     }
   }
-  
+
   // Fetch UFC/MMA data
   if (sport === 'UFC') {
     const eventsData = await fetchSherdogData('EVENTS');
@@ -1024,29 +980,25 @@ async function fetchAllDataForSport(sport) {
       sportData.sources.sherdogEvents = eventsData;
     }
   }
-  
+
   // Fetch historical data (last 30 days)
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(today.getDate() - 30);
-  
+
   const startDate = thirtyDaysAgo.toISOString().split('T')[0];
   const endDate = today.toISOString().split('T')[0];
-  
-  const historicalData = await fetchHistoricalResults(
-    sport,
-    startDate,
-    endDate
-  );
-  
+
+  const historicalData = await fetchHistoricalResults(sport, startDate, endDate);
+
   if (historicalData) {
     sportData.sources.historical = historicalData;
   }
-  
+
   // Save combined data
   const filename = `${sport.toLowerCase()}_combined_${new Date().toISOString().split('T')[0]}.json`;
   saveToFile(filename, sportData);
-  
+
   console.log(`Completed data fetch for ${sport}`);
   return sportData;
 }
@@ -1056,10 +1008,10 @@ async function fetchAllDataForSport(sport) {
  */
 async function fetchAllSportsData() {
   console.log('Starting enhanced data fetch process...');
-  
+
   // List of sports to fetch data for
   const sports = ['NBA', 'WNBA', 'MLB', 'NHL', 'NCAA_MENS', 'NCAA_WOMENS', 'FORMULA1', 'UFC'];
-  
+
   // Fetch data for each sport
   for (const sport of sports) {
     try {
@@ -1069,7 +1021,7 @@ async function fetchAllSportsData() {
       // Continue with next sport
     }
   }
-  
+
   console.log('Enhanced data fetch process completed');
 }
 
@@ -1099,17 +1051,17 @@ async function fetchBet365Data(sport) {
     }
 
     console.log(`Fetching Bet365 odds data for ${sport}...`);
-    
+
     // Apply rate limiting
     await rateLimiters.BET365_API();
-    
+
     // Use the Bet365 API wrapper to get odds
     const data = await bet365ApiWrapper.getOdds(sportKey);
-    
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_bet365_odds_${new Date().toISOString().split('T')[0]}.json`;
     saveToFile(filename, data);
-    
+
     return data;
   } catch (error) {
     console.error(`Error fetching Bet365 odds data for ${sport}:`, error.message);
@@ -1137,5 +1089,5 @@ module.exports = {
   fetchHistoricalResults,
   fetchBet365Data,
   fetchAllDataForSport,
-  fetchAllSportsData
+  fetchAllSportsData,
 };

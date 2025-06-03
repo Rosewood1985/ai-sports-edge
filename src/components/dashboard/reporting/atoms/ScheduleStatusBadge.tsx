@@ -1,5 +1,6 @@
-import React from 'react';
 import { Chip, ChipProps } from '@mui/material';
+import React from 'react';
+
 import { ReportStatus } from '../../../../types/reporting';
 
 interface ScheduleStatusBadgeProps {

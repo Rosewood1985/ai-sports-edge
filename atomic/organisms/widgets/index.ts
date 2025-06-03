@@ -8,6 +8,5 @@ export { EnhancedSubscriptionAnalyticsWidget } from './EnhancedSubscriptionAnaly
 export { BettingAnalyticsWidget } from './BettingAnalyticsWidget';
 
 // Export types for convenience
-export type {
-  // Add widget prop types here as they're created
-} from './EnhancedSubscriptionAnalyticsWidget';
+export type {} from // Add widget prop types here as they're created
+'./EnhancedSubscriptionAnalyticsWidget';

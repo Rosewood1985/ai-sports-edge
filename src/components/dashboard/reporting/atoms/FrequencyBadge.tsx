@@ -1,9 +1,10 @@
-import React from 'react';
-import { Chip, ChipProps, Tooltip } from '@mui/material';
-import { ReportFrequency } from '../../../../types/reporting';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import EventIcon from '@mui/icons-material/Event';
+import { Chip, ChipProps, Tooltip } from '@mui/material';
+import React from 'react';
+
+import { ReportFrequency } from '../../../../types/reporting';
 
 interface FrequencyBadgeProps {
   frequency: ReportFrequency;

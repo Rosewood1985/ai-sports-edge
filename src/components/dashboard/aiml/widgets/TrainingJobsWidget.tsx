@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+
 import { TrainingJob } from '../../../../types/aiml';
 
 interface TrainingJobsWidgetProps {
@@ -49,10 +50,10 @@ export function TrainingJobsWidget({ jobs, className = '' }: TrainingJobsWidgetP
 
   const formatDuration = (seconds?: number) => {
     if (!seconds) return 'N/A';
-    
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     } else {
@@ -62,7 +63,7 @@ export function TrainingJobsWidget({ jobs, className = '' }: TrainingJobsWidgetP
 
   const formatTimestamp = (timestamp?: string) => {
     if (!timestamp) return 'N/A';
-    
+
     const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
@@ -86,16 +87,14 @@ export function TrainingJobsWidget({ jobs, className = '' }: TrainingJobsWidgetP
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Training Jobs
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Training Jobs</h3>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               ML model training pipeline status
             </p>
           </div>
           <div className="flex items-center space-x-2">
             {runningJobs.length > 0 && (
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
             )}
             <div className="text-2xl">🔄</div>
           </div>
@@ -133,9 +132,7 @@ export function TrainingJobsWidget({ jobs, className = '' }: TrainingJobsWidgetP
 
         {/* Recent Jobs */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
-            Recent Jobs
-          </h4>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Recent Jobs</h4>
 
           {jobs.length === 0 ? (
             <div className="text-center py-8">
@@ -149,15 +146,15 @@ export function TrainingJobsWidget({ jobs, className = '' }: TrainingJobsWidgetP
             </div>
           ) : (
             <div className="space-y-3">
-              {jobs.slice(0, 5).map((job) => (
+              {jobs.slice(0, 5).map(job => (
                 <div
                   key={job.id}
                   className={`p-4 border rounded-lg ${
                     job.status === 'running'
                       ? 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20'
                       : job.status === 'failed'
-                      ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
-                      : 'border-gray-200 dark:border-gray-700'
+                        ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
+                        : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -176,7 +173,7 @@ export function TrainingJobsWidget({ jobs, className = '' }: TrainingJobsWidgetP
                             {job.status}
                           </span>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
                             <div className="text-gray-600 dark:text-gray-400">Model</div>

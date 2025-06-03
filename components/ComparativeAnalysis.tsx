@@ -1,11 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
+import DateRangeSelector from './DateRangeSelector';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '../hooks/useThemeColor';
-import { bettingAnalyticsService, BetRecord, BettingStats, TimePeriodFilter } from '../services/bettingAnalyticsService';
-import DateRangeSelector from './DateRangeSelector';
+import {
+  bettingAnalyticsService,
+  BetRecord,
+  BettingStats,
+  TimePeriodFilter,
+} from '../services/bettingAnalyticsService';
 
 /**
  * Comparison type enum
@@ -14,7 +20,7 @@ enum ComparisonType {
   TIME_PERIOD = 'time_period',
   BENCHMARK = 'benchmark',
   SPORT = 'sport',
-  BET_TYPE = 'bet_type'
+  BET_TYPE = 'bet_type',
 }
 
 /**
@@ -41,7 +47,7 @@ interface ComparativeAnalysisProps {
 const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
   currentStats,
   currentTimePeriod,
-  onTimePeriodChange
+  onTimePeriodChange,
 }) => {
   const [comparisonType, setComparisonType] = useState<ComparisonType>(ComparisonType.TIME_PERIOD);
   const [comparisonStats, setComparisonStats] = useState<BettingStats | null>(null);
@@ -49,7 +55,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
   const [comparisonTimePeriod, setComparisonTimePeriod] = useState<TimePeriodFilter>({
     period: 'month',
     customStartDate: undefined,
-    customEndDate: undefined
+    customEndDate: undefined,
   });
   const [benchmarks, setBenchmarks] = useState<Benchmark[]>([]);
   const [selectedBenchmark, setSelectedBenchmark] = useState<string>('');
@@ -57,22 +63,22 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
   const [betTypeFilter, setBetTypeFilter] = useState<string>('');
   const [availableSports, setAvailableSports] = useState<string[]>([]);
   const [availableBetTypes, setAvailableBetTypes] = useState<string[]>([]);
-  
+
   const primaryColor = '#0a7ea4';
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'background');
-  
+
   // Load benchmarks and filters on mount
   useEffect(() => {
     loadBenchmarks();
     loadFilters();
   }, []);
-  
+
   // Update comparison stats when comparison type or filters change
   useEffect(() => {
     updateComparisonStats();
   }, [comparisonType, comparisonTimePeriod, selectedBenchmark, sportFilter, betTypeFilter]);
-  
+
   /**
    * Load benchmark data
    */
@@ -96,9 +102,9 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             streaks: {
               currentStreak: 2,
               longestWinStreak: 5,
-              longestLoseStreak: 3
-            }
-          }
+              longestLoseStreak: 3,
+            },
+          },
         },
         {
           id: 'pro_user',
@@ -116,9 +122,9 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             streaks: {
               currentStreak: 4,
               longestWinStreak: 8,
-              longestLoseStreak: 3
-            }
-          }
+              longestLoseStreak: 3,
+            },
+          },
         },
         {
           id: 'industry_average',
@@ -136,12 +142,12 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             streaks: {
               currentStreak: -2,
               longestWinStreak: 4,
-              longestLoseStreak: 5
-            }
-          }
-        }
+              longestLoseStreak: 5,
+            },
+          },
+        },
       ];
-      
+
       setBenchmarks(benchmarkData);
       if (benchmarkData.length > 0) {
         setSelectedBenchmark(benchmarkData[0].id);
@@ -150,7 +156,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       console.error('Error loading benchmarks:', error);
     }
   };
-  
+
   /**
    * Load available filters
    */
@@ -163,7 +169,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       console.error('Error loading filters:', error);
     }
   };
-  
+
   /**
    * Update comparison stats based on selected comparison type and filters
    */
@@ -187,7 +193,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       console.error('Error updating comparison stats:', error);
     }
   };
-  
+
   /**
    * Load stats from previous time period
    */
@@ -195,7 +201,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     try {
       // Calculate previous period based on current period
       const previousPeriod = calculatePreviousPeriod(currentTimePeriod);
-      
+
       // In a real app, this would fetch data from the analytics service
       // For now, we'll simulate it with slightly worse performance
       const previousStats: BettingStats = {
@@ -206,23 +212,30 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
         totalWagered: currentStats.totalWagered * 0.85,
         totalReturns: currentStats.totalReturns * 0.75,
         netProfit: currentStats.totalReturns * 0.75 - currentStats.totalWagered * 0.85,
-        roi: ((currentStats.totalReturns * 0.75 - currentStats.totalWagered * 0.85) / (currentStats.totalWagered * 0.85)) * 100,
-        winRate: (Math.round(currentStats.winningBets * 0.7) / (Math.round(currentStats.winningBets * 0.7) + Math.round(currentStats.losingBets * 0.9))) * 100,
+        roi:
+          ((currentStats.totalReturns * 0.75 - currentStats.totalWagered * 0.85) /
+            (currentStats.totalWagered * 0.85)) *
+          100,
+        winRate:
+          (Math.round(currentStats.winningBets * 0.7) /
+            (Math.round(currentStats.winningBets * 0.7) +
+              Math.round(currentStats.losingBets * 0.9))) *
+          100,
         averageOdds: currentStats.averageOdds * 0.95,
         streaks: {
           currentStreak: 0,
           longestWinStreak: currentStats.streaks.longestWinStreak - 1,
-          longestLoseStreak: currentStats.streaks.longestLoseStreak + 1
-        }
+          longestLoseStreak: currentStats.streaks.longestLoseStreak + 1,
+        },
       };
-      
+
       setComparisonStats(previousStats);
       setComparisonLabel(`Previous ${getPeriodLabel(currentTimePeriod.period)}`);
     } catch (error) {
       console.error('Error loading previous period stats:', error);
     }
   };
-  
+
   /**
    * Load benchmark stats
    */
@@ -237,95 +250,111 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       console.error('Error loading benchmark stats:', error);
     }
   };
-  
+
   /**
    * Load stats filtered by sport
    */
   const loadSportFilteredStats = async () => {
     try {
       if (!sportFilter) return;
-      
+
       // In a real app, this would fetch data from the analytics service
       // For now, we'll simulate it with different performance per sport
       const sportMultipliers: Record<string, number> = {
-        'Football': 1.2,
-        'Basketball': 0.9,
-        'Baseball': 1.1,
-        'Hockey': 0.8,
-        'Soccer': 1.3
+        Football: 1.2,
+        Basketball: 0.9,
+        Baseball: 1.1,
+        Hockey: 0.8,
+        Soccer: 1.3,
       };
-      
+
       const multiplier = sportMultipliers[sportFilter] || 1;
-      
+
       const sportStats: BettingStats = {
         ...currentStats,
         totalBets: Math.round(currentStats.totalBets * 0.3),
         winningBets: Math.round(currentStats.winningBets * 0.3 * multiplier),
-        losingBets: Math.round(currentStats.totalBets * 0.3) - Math.round(currentStats.winningBets * 0.3 * multiplier),
+        losingBets:
+          Math.round(currentStats.totalBets * 0.3) -
+          Math.round(currentStats.winningBets * 0.3 * multiplier),
         totalWagered: currentStats.totalWagered * 0.3,
         totalReturns: currentStats.totalReturns * 0.3 * multiplier,
-        netProfit: (currentStats.totalReturns * 0.3 * multiplier) - (currentStats.totalWagered * 0.3),
-        roi: (((currentStats.totalReturns * 0.3 * multiplier) - (currentStats.totalWagered * 0.3)) / (currentStats.totalWagered * 0.3)) * 100,
-        winRate: (Math.round(currentStats.winningBets * 0.3 * multiplier) / Math.round(currentStats.totalBets * 0.3)) * 100,
+        netProfit: currentStats.totalReturns * 0.3 * multiplier - currentStats.totalWagered * 0.3,
+        roi:
+          ((currentStats.totalReturns * 0.3 * multiplier - currentStats.totalWagered * 0.3) /
+            (currentStats.totalWagered * 0.3)) *
+          100,
+        winRate:
+          (Math.round(currentStats.winningBets * 0.3 * multiplier) /
+            Math.round(currentStats.totalBets * 0.3)) *
+          100,
         averageOdds: currentStats.averageOdds * (multiplier * 0.8 + 0.2),
         streaks: {
           currentStreak: multiplier > 1 ? 2 : -1,
           longestWinStreak: Math.round(currentStats.streaks.longestWinStreak * multiplier),
-          longestLoseStreak: Math.round(currentStats.streaks.longestLoseStreak * (2 - multiplier))
-        }
+          longestLoseStreak: Math.round(currentStats.streaks.longestLoseStreak * (2 - multiplier)),
+        },
       };
-      
+
       setComparisonStats(sportStats);
       setComparisonLabel(`${sportFilter} Bets`);
     } catch (error) {
       console.error('Error loading sport filtered stats:', error);
     }
   };
-  
+
   /**
    * Load stats filtered by bet type
    */
   const loadBetTypeFilteredStats = async () => {
     try {
       if (!betTypeFilter) return;
-      
+
       // In a real app, this would fetch data from the analytics service
       // For now, we'll simulate it with different performance per bet type
       const betTypeMultipliers: Record<string, number> = {
-        'Moneyline': 1.1,
-        'Spread': 0.95,
+        Moneyline: 1.1,
+        Spread: 0.95,
         'Over/Under': 1.05,
-        'Parlay': 0.7,
-        'Prop': 1.2
+        Parlay: 0.7,
+        Prop: 1.2,
       };
-      
+
       const multiplier = betTypeMultipliers[betTypeFilter] || 1;
-      
+
       const betTypeStats: BettingStats = {
         ...currentStats,
         totalBets: Math.round(currentStats.totalBets * 0.25),
         winningBets: Math.round(currentStats.winningBets * 0.25 * multiplier),
-        losingBets: Math.round(currentStats.totalBets * 0.25) - Math.round(currentStats.winningBets * 0.25 * multiplier),
+        losingBets:
+          Math.round(currentStats.totalBets * 0.25) -
+          Math.round(currentStats.winningBets * 0.25 * multiplier),
         totalWagered: currentStats.totalWagered * 0.25,
         totalReturns: currentStats.totalReturns * 0.25 * multiplier,
-        netProfit: (currentStats.totalReturns * 0.25 * multiplier) - (currentStats.totalWagered * 0.25),
-        roi: (((currentStats.totalReturns * 0.25 * multiplier) - (currentStats.totalWagered * 0.25)) / (currentStats.totalWagered * 0.25)) * 100,
-        winRate: (Math.round(currentStats.winningBets * 0.25 * multiplier) / Math.round(currentStats.totalBets * 0.25)) * 100,
+        netProfit: currentStats.totalReturns * 0.25 * multiplier - currentStats.totalWagered * 0.25,
+        roi:
+          ((currentStats.totalReturns * 0.25 * multiplier - currentStats.totalWagered * 0.25) /
+            (currentStats.totalWagered * 0.25)) *
+          100,
+        winRate:
+          (Math.round(currentStats.winningBets * 0.25 * multiplier) /
+            Math.round(currentStats.totalBets * 0.25)) *
+          100,
         averageOdds: currentStats.averageOdds * (multiplier * 0.5 + 0.5),
         streaks: {
           currentStreak: multiplier > 1 ? 3 : -2,
           longestWinStreak: Math.round(currentStats.streaks.longestWinStreak * multiplier),
-          longestLoseStreak: Math.round(currentStats.streaks.longestLoseStreak * (2 - multiplier))
-        }
+          longestLoseStreak: Math.round(currentStats.streaks.longestLoseStreak * (2 - multiplier)),
+        },
       };
-      
+
       setComparisonStats(betTypeStats);
       setComparisonLabel(`${betTypeFilter} Bets`);
     } catch (error) {
       console.error('Error loading bet type filtered stats:', error);
     }
   };
-  
+
   /**
    * Calculate previous time period based on current period
    */
@@ -333,7 +362,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     const now = new Date();
     let startDate: Date | undefined;
     let endDate: Date | undefined;
-    
+
     switch (current.period) {
       case 'today':
         // Previous day
@@ -344,7 +373,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
         endDate.setDate(endDate.getDate() - 1);
         endDate.setHours(23, 59, 59, 999);
         return { period: 'custom', customStartDate: startDate, customEndDate: endDate };
-      
+
       case 'week':
         // Previous week
         startDate = new Date(now);
@@ -354,7 +383,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
         endDate.setDate(endDate.getDate() - 7);
         endDate.setHours(23, 59, 59, 999);
         return { period: 'custom', customStartDate: startDate, customEndDate: endDate };
-      
+
       case 'month':
         // Previous month
         startDate = new Date(now);
@@ -366,7 +395,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
         endDate.setDate(0);
         endDate.setHours(23, 59, 59, 999);
         return { period: 'custom', customStartDate: startDate, customEndDate: endDate };
-      
+
       case 'year':
         // Previous year
         startDate = new Date(now);
@@ -378,7 +407,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
         endDate.setMonth(11, 31);
         endDate.setHours(23, 59, 59, 999);
         return { period: 'custom', customStartDate: startDate, customEndDate: endDate };
-      
+
       case 'custom':
         if (current.customStartDate && current.customEndDate) {
           const duration = current.customEndDate.getTime() - current.customStartDate.getTime();
@@ -387,65 +416,72 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
           return { period: 'custom', customStartDate: startDate, customEndDate: endDate };
         }
         return { period: 'month' };
-      
+
       default:
         return { period: 'month' };
     }
   };
-  
+
   /**
    * Get human-readable label for time period
    */
   const getPeriodLabel = (period: TimePeriodFilter['period']): string => {
     switch (period) {
-      case 'today': return 'Day';
-      case 'week': return 'Week';
-      case 'month': return 'Month';
-      case 'year': return 'Year';
-      case 'all': return 'All Time';
-      case 'custom': return 'Period';
-      default: return 'Period';
+      case 'today':
+        return 'Day';
+      case 'week':
+        return 'Week';
+      case 'month':
+        return 'Month';
+      case 'year':
+        return 'Year';
+      case 'all':
+        return 'All Time';
+      case 'custom':
+        return 'Period';
+      default:
+        return 'Period';
     }
   };
-  
+
   /**
    * Handle comparison type selection
    */
   const handleComparisonTypeSelect = (type: ComparisonType) => {
     setComparisonType(type);
   };
-  
+
   /**
    * Handle benchmark selection
    */
   const handleBenchmarkSelect = (benchmarkId: string) => {
     setSelectedBenchmark(benchmarkId);
   };
-  
+
   /**
    * Handle sport filter selection
    */
   const handleSportSelect = (sport: string) => {
     setSportFilter(sport);
   };
-  
+
   /**
    * Handle bet type filter selection
    */
   const handleBetTypeSelect = (betType: string) => {
     setBetTypeFilter(betType);
   };
-  
+
   /**
    * Handle comparison time period change
    */
   const handleComparisonTimePeriodChange = (period: TimePeriodFilter['period'] | 'custom') => {
     setComparisonTimePeriod({
       ...comparisonTimePeriod,
-      period: period === 'custom' ? 'custom' : period as TimePeriodFilter['period']
+      period: period === 'custom' ? 'custom' : (period as TimePeriodFilter['period']),
     });
   };
-  
+
   /**
    * Handle comparison custom date range selection
    */
@@ -453,10 +489,10 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     setComparisonTimePeriod({
       period: 'custom',
       customStartDate: startDate,
-      customEndDate: endDate
+      customEndDate: endDate,
     });
   };
-  
+
   /**
    * Format currency value
    */
@@ -465,17 +501,17 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
   };
-  
+
   /**
    * Format percentage value
    */
   const formatPercentage = (value: number): string => {
     return `${value.toFixed(1)}%`;
   };
-  
+
   /**
    * Calculate percentage change between two values
    */
@@ -483,7 +519,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     if (previous === 0) return current > 0 ? 100 : 0;
     return ((current - previous) / Math.abs(previous)) * 100;
   };
-  
+
   /**
    * Get color based on change value (green for positive, red for negative)
    */
@@ -492,7 +528,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     const isPositive = change > 0;
     return (isPositive && !inverse) || (!isPositive && inverse) ? '#4CAF50' : '#F44336';
   };
-  
+
   /**
    * Render comparison type selector
    */
@@ -500,69 +536,73 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     return (
       <View style={styles.selectorContainer}>
         <ThemedText style={styles.sectionTitle}>Compare Against</ThemedText>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.selectorScrollView}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.selectorScrollView}
+        >
           <TouchableOpacity
             style={[
               styles.selectorButton,
-              comparisonType === ComparisonType.TIME_PERIOD && styles.selectedSelectorButton
+              comparisonType === ComparisonType.TIME_PERIOD && styles.selectedSelectorButton,
             ]}
             onPress={() => handleComparisonTypeSelect(ComparisonType.TIME_PERIOD)}
           >
             <ThemedText
               style={[
                 styles.selectorButtonText,
-                comparisonType === ComparisonType.TIME_PERIOD && styles.selectedSelectorButtonText
+                comparisonType === ComparisonType.TIME_PERIOD && styles.selectedSelectorButtonText,
               ]}
             >
               Previous Period
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.selectorButton,
-              comparisonType === ComparisonType.BENCHMARK && styles.selectedSelectorButton
+              comparisonType === ComparisonType.BENCHMARK && styles.selectedSelectorButton,
             ]}
             onPress={() => handleComparisonTypeSelect(ComparisonType.BENCHMARK)}
           >
             <ThemedText
               style={[
                 styles.selectorButtonText,
-                comparisonType === ComparisonType.BENCHMARK && styles.selectedSelectorButtonText
+                comparisonType === ComparisonType.BENCHMARK && styles.selectedSelectorButtonText,
               ]}
             >
               Benchmark
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.selectorButton,
-              comparisonType === ComparisonType.SPORT && styles.selectedSelectorButton
+              comparisonType === ComparisonType.SPORT && styles.selectedSelectorButton,
             ]}
             onPress={() => handleComparisonTypeSelect(ComparisonType.SPORT)}
           >
             <ThemedText
               style={[
                 styles.selectorButtonText,
-                comparisonType === ComparisonType.SPORT && styles.selectedSelectorButtonText
+                comparisonType === ComparisonType.SPORT && styles.selectedSelectorButtonText,
               ]}
             >
               By Sport
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.selectorButton,
-              comparisonType === ComparisonType.BET_TYPE && styles.selectedSelectorButton
+              comparisonType === ComparisonType.BET_TYPE && styles.selectedSelectorButton,
             ]}
             onPress={() => handleComparisonTypeSelect(ComparisonType.BET_TYPE)}
           >
             <ThemedText
               style={[
                 styles.selectorButtonText,
-                comparisonType === ComparisonType.BET_TYPE && styles.selectedSelectorButtonText
+                comparisonType === ComparisonType.BET_TYPE && styles.selectedSelectorButtonText,
               ]}
             >
               By Bet Type
@@ -572,7 +612,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       </View>
     );
   };
-  
+
   /**
    * Render comparison options based on selected comparison type
    */
@@ -591,25 +631,29 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             />
           </View>
         );
-      
+
       case ComparisonType.BENCHMARK:
         return (
           <View style={styles.optionsContainer}>
             <ThemedText style={styles.optionsTitle}>Select Benchmark</ThemedText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScrollView}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.optionsScrollView}
+            >
               {benchmarks.map(benchmark => (
                 <TouchableOpacity
                   key={benchmark.id}
                   style={[
                     styles.optionButton,
-                    selectedBenchmark === benchmark.id && styles.selectedOptionButton
+                    selectedBenchmark === benchmark.id && styles.selectedOptionButton,
                   ]}
                   onPress={() => handleBenchmarkSelect(benchmark.id)}
                 >
                   <ThemedText
                     style={[
                       styles.optionButtonText,
-                      selectedBenchmark === benchmark.id && styles.selectedOptionButtonText
+                      selectedBenchmark === benchmark.id && styles.selectedOptionButtonText,
                     ]}
                   >
                     {benchmark.name}
@@ -619,25 +663,29 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             </ScrollView>
           </View>
         );
-      
+
       case ComparisonType.SPORT:
         return (
           <View style={styles.optionsContainer}>
             <ThemedText style={styles.optionsTitle}>Select Sport</ThemedText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScrollView}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.optionsScrollView}
+            >
               {availableSports.map(sport => (
                 <TouchableOpacity
                   key={sport}
                   style={[
                     styles.optionButton,
-                    sportFilter === sport && styles.selectedOptionButton
+                    sportFilter === sport && styles.selectedOptionButton,
                   ]}
                   onPress={() => handleSportSelect(sport)}
                 >
                   <ThemedText
                     style={[
                       styles.optionButtonText,
-                      sportFilter === sport && styles.selectedOptionButtonText
+                      sportFilter === sport && styles.selectedOptionButtonText,
                     ]}
                   >
                     {sport}
@@ -647,25 +695,29 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             </ScrollView>
           </View>
         );
-      
+
       case ComparisonType.BET_TYPE:
         return (
           <View style={styles.optionsContainer}>
             <ThemedText style={styles.optionsTitle}>Select Bet Type</ThemedText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScrollView}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.optionsScrollView}
+            >
               {availableBetTypes.map(betType => (
                 <TouchableOpacity
                   key={betType}
                   style={[
                     styles.optionButton,
-                    betTypeFilter === betType && styles.selectedOptionButton
+                    betTypeFilter === betType && styles.selectedOptionButton,
                   ]}
                   onPress={() => handleBetTypeSelect(betType)}
                 >
                   <ThemedText
                     style={[
                       styles.optionButtonText,
-                      betTypeFilter === betType && styles.selectedOptionButtonText
+                      betTypeFilter === betType && styles.selectedOptionButtonText,
                     ]}
                   >
                     {betType}
@@ -675,27 +727,25 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             </ScrollView>
           </View>
         );
-      
+
       default:
         return null;
     }
   };
-  
+
   /**
    * Render comparison results
    */
   const renderComparisonResults = () => {
     if (!comparisonStats) return null;
-    
+
     return (
       <View style={styles.resultsContainer}>
         <View style={styles.resultsHeader}>
           <ThemedText style={styles.resultsTitle}>Comparison Results</ThemedText>
-          <ThemedText style={styles.resultsSubtitle}>
-            Current vs. {comparisonLabel}
-          </ThemedText>
+          <ThemedText style={styles.resultsSubtitle}>Current vs. {comparisonLabel}</ThemedText>
         </View>
-        
+
         <View style={styles.metricsContainer}>
           {/* ROI */}
           <View style={styles.metricItem}>
@@ -708,13 +758,11 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
                 <ThemedText style={styles.comparisonValueText}>
                   {formatPercentage(comparisonStats.roi)}
                 </ThemedText>
-                {renderChangeIndicator(
-                  calculateChange(currentStats.roi, comparisonStats.roi)
-                )}
+                {renderChangeIndicator(calculateChange(currentStats.roi, comparisonStats.roi))}
               </View>
             </View>
           </View>
-          
+
           {/* Win Rate */}
           <View style={styles.metricItem}>
             <ThemedText style={styles.metricLabel}>Win Rate</ThemedText>
@@ -732,7 +780,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
               </View>
             </View>
           </View>
-          
+
           {/* Net Profit */}
           <View style={styles.metricItem}>
             <ThemedText style={styles.metricLabel}>Net Profit</ThemedText>
@@ -750,7 +798,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
               </View>
             </View>
           </View>
-          
+
           {/* Average Odds */}
           <View style={styles.metricItem}>
             <ThemedText style={styles.metricLabel}>Average Odds</ThemedText>
@@ -768,14 +816,12 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
               </View>
             </View>
           </View>
-          
+
           {/* Total Bets */}
           <View style={styles.metricItem}>
             <ThemedText style={styles.metricLabel}>Total Bets</ThemedText>
             <View style={styles.metricValues}>
-              <ThemedText style={styles.currentValue}>
-                {currentStats.totalBets}
-              </ThemedText>
+              <ThemedText style={styles.currentValue}>{currentStats.totalBets}</ThemedText>
               <View style={styles.comparisonValue}>
                 <ThemedText style={styles.comparisonValueText}>
                   {comparisonStats.totalBets}
@@ -786,7 +832,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
               </View>
             </View>
           </View>
-          
+
           {/* Longest Win Streak */}
           <View style={styles.metricItem}>
             <ThemedText style={styles.metricLabel}>Longest Win Streak</ThemedText>
@@ -808,7 +854,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
             </View>
           </View>
         </View>
-        
+
         <View style={styles.insightsContainer}>
           <ThemedText style={styles.insightsTitle}>Key Insights</ThemedText>
           <View style={styles.insightsList}>
@@ -828,7 +874,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
       </View>
     );
   };
-  
+
   /**
    * Render change indicator (up or down arrow with percentage)
    */
@@ -836,17 +882,15 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     const formattedChange = Math.abs(change).toFixed(1);
     const color = getChangeColor(change, inverse);
     const iconName = change > 0 ? 'arrow-up' : change < 0 ? 'arrow-down' : 'remove';
-    
+
     return (
       <View style={[styles.changeIndicator, { backgroundColor: `${color}20` }]}>
         <Ionicons name={iconName} size={12} color={color} />
-        <ThemedText style={[styles.changeText, { color }]}>
-          {formattedChange}%
-        </ThemedText>
+        <ThemedText style={[styles.changeText, { color }]}>{formattedChange}%</ThemedText>
       </View>
     );
   };
-  
+
   /**
    * Insight interface
    */
@@ -855,95 +899,95 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     color: string;
     text: string;
   }
-  
+
   /**
    * Generate insights based on comparison
    */
   const generateInsights = (): Insight[] => {
     if (!comparisonStats) return [];
-    
+
     const insights: Insight[] = [];
-    
+
     // ROI comparison
     const roiChange = calculateChange(currentStats.roi, comparisonStats.roi);
     if (roiChange > 10) {
       insights.push({
         icon: 'trending-up' as any,
         color: '#4CAF50',
-        text: `Your ROI has improved by ${Math.abs(roiChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`
+        text: `Your ROI has improved by ${Math.abs(roiChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`,
       });
     } else if (roiChange < -10) {
       insights.push({
         icon: 'trending-down' as any,
         color: '#F44336',
-        text: `Your ROI has decreased by ${Math.abs(roiChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`
+        text: `Your ROI has decreased by ${Math.abs(roiChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`,
       });
     }
-    
+
     // Win rate comparison
     const winRateChange = calculateChange(currentStats.winRate, comparisonStats.winRate);
     if (winRateChange > 5) {
       insights.push({
         icon: 'checkmark-circle' as any,
         color: '#4CAF50',
-        text: `Your win rate has improved by ${Math.abs(winRateChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`
+        text: `Your win rate has improved by ${Math.abs(winRateChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`,
       });
     } else if (winRateChange < -5) {
       insights.push({
         icon: 'close-circle' as any,
         color: '#F44336',
-        text: `Your win rate has decreased by ${Math.abs(winRateChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`
+        text: `Your win rate has decreased by ${Math.abs(winRateChange).toFixed(1)}% compared to ${comparisonLabel.toLowerCase()}.`,
       });
     }
-    
+
     // Average odds comparison
     const oddsChange = calculateChange(currentStats.averageOdds, comparisonStats.averageOdds);
     if (oddsChange > 10) {
       insights.push({
         icon: 'stats-chart' as any,
         color: '#FF9800',
-        text: `You're taking more risks with ${Math.abs(oddsChange).toFixed(1)}% higher average odds compared to ${comparisonLabel.toLowerCase()}.`
+        text: `You're taking more risks with ${Math.abs(oddsChange).toFixed(1)}% higher average odds compared to ${comparisonLabel.toLowerCase()}.`,
       });
     } else if (oddsChange < -10) {
       insights.push({
         icon: 'shield-checkmark' as any,
         color: '#2196F3',
-        text: `You're being more conservative with ${Math.abs(oddsChange).toFixed(1)}% lower average odds compared to ${comparisonLabel.toLowerCase()}.`
+        text: `You're being more conservative with ${Math.abs(oddsChange).toFixed(1)}% lower average odds compared to ${comparisonLabel.toLowerCase()}.`,
       });
     }
-    
+
     // Volume comparison
     const volumeChange = calculateChange(currentStats.totalBets, comparisonStats.totalBets);
     if (volumeChange > 20) {
       insights.push({
         icon: 'flash' as any,
         color: '#9C27B0',
-        text: `You're placing ${Math.abs(volumeChange).toFixed(1)}% more bets compared to ${comparisonLabel.toLowerCase()}.`
+        text: `You're placing ${Math.abs(volumeChange).toFixed(1)}% more bets compared to ${comparisonLabel.toLowerCase()}.`,
       });
     } else if (volumeChange < -20) {
       insights.push({
         icon: 'hourglass' as any,
         color: '#607D8B',
-        text: `You're placing ${Math.abs(volumeChange).toFixed(1)}% fewer bets compared to ${comparisonLabel.toLowerCase()}.`
+        text: `You're placing ${Math.abs(volumeChange).toFixed(1)}% fewer bets compared to ${comparisonLabel.toLowerCase()}.`,
       });
     }
-    
+
     // If no significant changes, add a generic insight
     if (insights.length === 0) {
       insights.push({
         icon: 'information-circle' as any,
         color: '#2196F3',
-        text: `Your betting performance is similar to ${comparisonLabel.toLowerCase()} with no significant changes.`
+        text: `Your betting performance is similar to ${comparisonLabel.toLowerCase()} with no significant changes.`,
       });
     }
-    
+
     return insights;
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.title}>Comparative Analysis</ThemedText>
-      
+
       {renderComparisonTypeSelector()}
       {renderComparisonOptions()}
       {renderComparisonResults()}

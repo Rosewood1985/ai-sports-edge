@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -7,19 +9,19 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { Container } from '../components/ResponsiveLayout';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import LoadingIndicator from '../components/LoadingIndicator';
-import ErrorMessage from '../components/ErrorMessage';
-import EmptyState from '../components/EmptyState';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
 import BankrollManagementCard from '../components/BankrollManagementCard';
 import BettingHistoryChart from '../components/BettingHistoryChart';
+import EmptyState from '../components/EmptyState';
+import ErrorMessage from '../components/ErrorMessage';
+import LoadingIndicator from '../components/LoadingIndicator';
+import { Container } from '../components/ResponsiveLayout';
 import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { trackScreenView } from '../services/analyticsService';
 import { bankrollManagementService } from '../services/bankrollManagementService';
 import {
   BankrollData,
@@ -29,9 +31,8 @@ import {
   TrackCondition,
   RaceType,
   RaceGrade,
-  RaceStatus
+  RaceStatus,
 } from '../types/horseRacing';
-import { trackScreenView } from '../services/analyticsService';
 
 // Mock data for development
 const MOCK_TRACKS: Track[] = [
@@ -42,7 +43,7 @@ const MOCK_TRACKS: Track[] = [
     location: 'Arcadia, California',
     country: 'USA',
     timezone: 'America/Los_Angeles',
-    surface: ['dirt', 'turf']
+    surface: ['dirt', 'turf'],
   },
   {
     id: 'track-002',
@@ -51,7 +52,7 @@ const MOCK_TRACKS: Track[] = [
     location: 'Louisville, Kentucky',
     country: 'USA',
     timezone: 'America/New_York',
-    surface: ['dirt', 'turf']
+    surface: ['dirt', 'turf'],
   },
   {
     id: 'track-003',
@@ -60,7 +61,7 @@ const MOCK_TRACKS: Track[] = [
     location: 'Elmont, New York',
     country: 'USA',
     timezone: 'America/New_York',
-    surface: ['dirt', 'turf']
+    surface: ['dirt', 'turf'],
   },
   {
     id: 'track-004',
@@ -69,8 +70,8 @@ const MOCK_TRACKS: Track[] = [
     location: 'Lexington, Kentucky',
     country: 'USA',
     timezone: 'America/New_York',
-    surface: ['dirt', 'turf', 'synthetic']
-  }
+    surface: ['dirt', 'turf', 'synthetic'],
+  },
 ];
 
 // Mock races for development
@@ -93,7 +94,7 @@ const MOCK_RACES: Race[] = [
     entries: [],
     status: RaceStatus.UPCOMING,
     isStakes: true,
-    isGraded: true
+    isGraded: true,
   },
   {
     id: 'race-002',
@@ -110,7 +111,7 @@ const MOCK_RACES: Race[] = [
     entries: [],
     status: RaceStatus.UPCOMING,
     isStakes: false,
-    isGraded: false
+    isGraded: false,
   },
   {
     id: 'race-003',
@@ -130,8 +131,8 @@ const MOCK_RACES: Race[] = [
     entries: [],
     status: RaceStatus.UPCOMING,
     isStakes: true,
-    isGraded: true
-  }
+    isGraded: true,
+  },
 ];
 
 // Navigation prop type
@@ -150,25 +151,25 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { colors, isDark } = useTheme();
-  
+
   // Track screen view
   useEffect(() => {
     trackScreenView('HorseRacingScreen');
   }, []);
-  
+
   // Load bankroll data
   const loadBankrollData = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
       return;
     }
-    
+
     try {
       // Check if bankroll data exists
       let data = await bankrollManagementService.getBankrollData(user.uid);
-      
+
       // Initialize if not exists
       if (!data) {
         const initialized = await bankrollManagementService.initializeBankrollData(user.uid, 1000);
@@ -176,27 +177,27 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
           data = await bankrollManagementService.getBankrollData(user.uid);
         }
       }
-      
+
       setBankrollData(data);
     } catch (error) {
       console.error('Error loading bankroll data:', error);
       setError('Failed to load bankroll data. Please try again.');
     }
   }, []);
-  
+
   // Load data
   const loadData = useCallback(async () => {
     try {
       setError(null);
-      
+
       // In a real app, we would fetch tracks and races from an API
       // For now, we'll use mock data
       setTracks(MOCK_TRACKS);
       setRaces(MOCK_RACES);
-      
+
       // Load bankroll data
       await loadBankrollData();
-      
+
       // Select first track by default if none selected
       if (!selectedTrack && MOCK_TRACKS.length > 0) {
         setSelectedTrack(MOCK_TRACKS[0]);
@@ -209,24 +210,24 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
       setRefreshing(false);
     }
   }, [selectedTrack, loadBankrollData]);
-  
+
   // Initial load
   useEffect(() => {
     loadData();
   }, [loadData]);
-  
+
   // Handle refresh
   const handleRefresh = () => {
     setRefreshing(true);
     loadData();
   };
-  
+
   // Navigate to race detail screen
   const navigateToRaceDetail = (race: Race) => {
     // In a real app, we would navigate to a race detail screen
     Alert.alert('Race Selected', `You selected ${race.track.name} Race ${race.raceNumber}`);
   };
-  
+
   // Render track item
   const renderTrackItem = ({ item }: { item: Track }) => (
     <TouchableOpacity
@@ -243,7 +244,7 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
       <ThemedText style={styles.trackLocation}>{item.location}</ThemedText>
     </TouchableOpacity>
   );
-  
+
   // Render race item
   const renderRaceItem = ({ item }: { item: Race }) => (
     <TouchableOpacity
@@ -259,77 +260,63 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
       <View style={styles.raceHeader}>
         <View>
           <ThemedText style={styles.raceNumber}>Race {item.raceNumber}</ThemedText>
-          {item.name && (
-            <ThemedText style={styles.raceName}>{item.name}</ThemedText>
-          )}
+          {item.name && <ThemedText style={styles.raceName}>{item.name}</ThemedText>}
         </View>
-        
+
         {item.isGraded && (
-          <View style={[
-            styles.gradeBadge,
-            { backgroundColor: isDark ? '#D4AF37' : '#FFD700' }
-          ]}>
+          <View style={[styles.gradeBadge, { backgroundColor: isDark ? '#D4AF37' : '#FFD700' }]}>
             <ThemedText style={[styles.gradeText, { color: '#000000' }]}>
               {item.raceGrade}
             </ThemedText>
           </View>
         )}
       </View>
-      
+
       <View style={styles.raceDetails}>
         <View style={styles.raceDetailRow}>
           <ThemedText style={styles.raceDetailLabel}>Post Time:</ThemedText>
           <ThemedText style={styles.raceDetailValue}>
-            {new Date(`2025-01-01T${item.postTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(`2025-01-01T${item.postTime}`).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </ThemedText>
         </View>
-        
+
         <View style={styles.raceDetailRow}>
           <ThemedText style={styles.raceDetailLabel}>Distance:</ThemedText>
-          <ThemedText style={styles.raceDetailValue}>
-            {item.distance} furlongs
-          </ThemedText>
+          <ThemedText style={styles.raceDetailValue}>{item.distance} furlongs</ThemedText>
         </View>
-        
+
         <View style={styles.raceDetailRow}>
           <ThemedText style={styles.raceDetailLabel}>Surface:</ThemedText>
           <ThemedText style={styles.raceDetailValue}>
             {item.surface.charAt(0).toUpperCase() + item.surface.slice(1)}
           </ThemedText>
         </View>
-        
+
         <View style={styles.raceDetailRow}>
           <ThemedText style={styles.raceDetailLabel}>Purse:</ThemedText>
-          <ThemedText style={styles.raceDetailValue}>
-            ${item.purse.toLocaleString()}
-          </ThemedText>
+          <ThemedText style={styles.raceDetailValue}>${item.purse.toLocaleString()}</ThemedText>
         </View>
       </View>
-      
+
       <View style={styles.raceFooter}>
         <TouchableOpacity
-          style={[
-            styles.viewEntriesButton,
-            { backgroundColor: colors.primary }
-          ]}
+          style={[styles.viewEntriesButton, { backgroundColor: colors.primary }]}
           onPress={() => navigateToRaceDetail(item)}
         >
-          <ThemedText style={styles.viewEntriesButtonText}>
-            View Entries
-          </ThemedText>
+          <ThemedText style={styles.viewEntriesButtonText}>View Entries</ThemedText>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
-  
+
   // Render recommendation item
   const renderRecommendationItem = ({ item }: { item: BankrollRecommendation }) => (
-    <BankrollManagementCard
-      recommendation={item}
-      onImplemented={loadBankrollData}
-    />
+    <BankrollManagementCard recommendation={item} onImplemented={loadBankrollData} />
   );
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -338,7 +325,7 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
       </Container>
     );
   }
-  
+
   // Render error state
   if (error) {
     return (
@@ -355,17 +342,17 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
       </Container>
     );
   }
-  
+
   // Filter races by selected track
   const filteredRaces = selectedTrack
     ? races.filter(race => race.trackId === selectedTrack.id)
     : races;
-  
+
   // Get active recommendations
   const activeRecommendations = bankrollData
     ? bankrollData.recommendations.filter(rec => !rec.isImplemented)
     : [];
-  
+
   return (
     <Container style={{ backgroundColor: colors.background }}>
       {/* Tab selector */}
@@ -375,8 +362,8 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
             styles.tabButton,
             selectedTab === 'races' && [
               styles.activeTabButton,
-              { borderBottomColor: colors.primary }
-            ]
+              { borderBottomColor: colors.primary },
+            ],
           ]}
           onPress={() => setSelectedTab('races')}
         >
@@ -388,20 +375,20 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
           <ThemedText
             style={[
               styles.tabButtonText,
-              selectedTab === 'races' && { color: colors.primary, fontWeight: 'bold' }
+              selectedTab === 'races' && { color: colors.primary, fontWeight: 'bold' },
             ]}
           >
             Races
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.tabButton,
             selectedTab === 'bankroll' && [
               styles.activeTabButton,
-              { borderBottomColor: colors.primary }
-            ]
+              { borderBottomColor: colors.primary },
+            ],
           ]}
           onPress={() => setSelectedTab('bankroll')}
         >
@@ -413,14 +400,14 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
           <ThemedText
             style={[
               styles.tabButtonText,
-              selectedTab === 'bankroll' && { color: colors.primary, fontWeight: 'bold' }
+              selectedTab === 'bankroll' && { color: colors.primary, fontWeight: 'bold' },
             ]}
           >
             Bankroll AI
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
+
       {/* Races tab content */}
       {selectedTab === 'races' && (
         <View style={styles.tabContent}>
@@ -429,17 +416,17 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
             horizontal
             data={tracks}
             renderItem={renderTrackItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             contentContainerStyle={styles.tracksList}
             showsHorizontalScrollIndicator={false}
           />
-          
+
           {/* Races list */}
           {filteredRaces.length > 0 ? (
             <FlatList
               data={filteredRaces}
               renderItem={renderRaceItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={item => item.id}
               contentContainerStyle={styles.racesList}
               showsVerticalScrollIndicator={false}
               refreshControl={
@@ -467,51 +454,59 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
           )}
         </View>
       )}
-      
+
       {/* Bankroll tab content */}
       {selectedTab === 'bankroll' && (
         <View style={styles.tabContent}>
           {/* Bankroll summary */}
           {bankrollData ? (
             <View style={styles.bankrollContent}>
-              <View style={[
-                styles.bankrollSummary,
-                { backgroundColor: isDark ? '#222222' : '#FFFFFF' }
-              ]}>
+              <View
+                style={[
+                  styles.bankrollSummary,
+                  { backgroundColor: isDark ? '#222222' : '#FFFFFF' },
+                ]}
+              >
                 <View style={styles.bankrollHeader}>
                   <ThemedText style={styles.bankrollTitle}>Your Bankroll</ThemedText>
-                  <View style={[
-                    styles.riskProfileBadge,
-                    {
-                      backgroundColor: bankrollData.riskProfile === 'aggressive'
-                        ? '#e74c3c20'
-                        : bankrollData.riskProfile === 'moderate'
-                          ? '#f39c1220'
-                          : '#2ecc7120'
-                    }
-                  ]}>
-                    <ThemedText style={[
-                      styles.riskProfileText,
+                  <View
+                    style={[
+                      styles.riskProfileBadge,
                       {
-                        color: bankrollData.riskProfile === 'aggressive'
-                          ? '#e74c3c'
-                          : bankrollData.riskProfile === 'moderate'
-                            ? '#f39c12'
-                            : '#2ecc71'
-                      }
-                    ]}>
+                        backgroundColor:
+                          bankrollData.riskProfile === 'aggressive'
+                            ? '#e74c3c20'
+                            : bankrollData.riskProfile === 'moderate'
+                              ? '#f39c1220'
+                              : '#2ecc7120',
+                      },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.riskProfileText,
+                        {
+                          color:
+                            bankrollData.riskProfile === 'aggressive'
+                              ? '#e74c3c'
+                              : bankrollData.riskProfile === 'moderate'
+                                ? '#f39c12'
+                                : '#2ecc71',
+                        },
+                      ]}
+                    >
                       {bankrollData.riskProfile.toUpperCase()} RISK
                     </ThemedText>
                   </View>
                 </View>
-                
+
                 <View style={styles.balanceContainer}>
                   <ThemedText style={styles.balanceLabel}>Current Balance</ThemedText>
                   <ThemedText style={styles.balanceAmount}>
                     ${bankrollData.currentBalance.toFixed(2)}
                   </ThemedText>
                 </View>
-                
+
                 <View style={styles.bankrollStats}>
                   <View style={styles.bankrollStat}>
                     <ThemedText style={styles.bankrollStatLabel}>Avg. Bet Size</ThemedText>
@@ -519,60 +514,71 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
                       ${bankrollData.bettingPatterns.averageBetSize.toFixed(2)}
                     </ThemedText>
                   </View>
-                  
+
                   <View style={styles.bankrollStat}>
                     <ThemedText style={styles.bankrollStatLabel}>Win Rate</ThemedText>
                     <ThemedText style={styles.bankrollStatValue}>
                       {bankrollData.bettingHistory.length > 0
-                        ? (bankrollData.bettingHistory.reduce((sum, day) => 
-                            sum + (day.betsPlaced > 0 ? day.betsWon / day.betsPlaced : 0), 0) / 
-                            bankrollData.bettingHistory.length * 100).toFixed(1)
-                        : '0.0'}%
+                        ? (
+                            (bankrollData.bettingHistory.reduce(
+                              (sum, day) =>
+                                sum + (day.betsPlaced > 0 ? day.betsWon / day.betsPlaced : 0),
+                              0
+                            ) /
+                              bankrollData.bettingHistory.length) *
+                            100
+                          ).toFixed(1)
+                        : '0.0'}
+                      %
                     </ThemedText>
                   </View>
-                  
+
                   <View style={styles.bankrollStat}>
                     <ThemedText style={styles.bankrollStatLabel}>ROI</ThemedText>
-                    <ThemedText style={[
-                      styles.bankrollStatValue,
-                      {
-                        color: bankrollData.bettingHistory.length > 0 &&
-                          bankrollData.bettingHistory[0].roi >= 0
-                            ? '#2ecc71'
-                            : '#e74c3c'
-                      }
-                    ]}>
+                    <ThemedText
+                      style={[
+                        styles.bankrollStatValue,
+                        {
+                          color:
+                            bankrollData.bettingHistory.length > 0 &&
+                            bankrollData.bettingHistory[0].roi >= 0
+                              ? '#2ecc71'
+                              : '#e74c3c',
+                        },
+                      ]}
+                    >
                       {bankrollData.bettingHistory.length > 0
                         ? (bankrollData.bettingHistory[0].roi * 100).toFixed(1)
-                        : '0.0'}%
+                        : '0.0'}
+                      %
                     </ThemedText>
                   </View>
                 </View>
-                
+
                 <TouchableOpacity
                   style={[styles.depositButton, { backgroundColor: colors.primary }]}
-                  onPress={() => Alert.alert('Deposit', 'Deposit functionality would be implemented here.')}
+                  onPress={() =>
+                    Alert.alert('Deposit', 'Deposit functionality would be implemented here.')
+                  }
                 >
                   <ThemedText style={styles.depositButtonText}>Deposit Funds</ThemedText>
                 </TouchableOpacity>
               </View>
-              
+
               {/* AI Recommendations */}
               <View style={styles.recommendationsContainer}>
                 <View style={styles.recommendationsHeader}>
-                  <ThemedText style={styles.recommendationsTitle}>
-                    AI Recommendations
-                  </ThemedText>
+                  <ThemedText style={styles.recommendationsTitle}>AI Recommendations</ThemedText>
                   <ThemedText style={styles.recommendationsSubtitle}>
                     Based on your betting patterns
                   </ThemedText>
                 </View>
-                
+
                 {activeRecommendations.length > 0 ? (
                   <FlatList
                     data={activeRecommendations}
                     renderItem={renderRecommendationItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={item => item.id}
                     contentContainerStyle={styles.recommendationsList}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
@@ -586,47 +592,34 @@ const HorseRacingScreen: React.FC<HorseRacingScreenProps> = ({ navigation }) => 
                   />
                 ) : (
                   <View style={styles.emptyRecommendationsContainer}>
-                    <Ionicons
-                      name="checkmark-circle-outline"
-                      size={64}
-                      color={colors.primary}
-                    />
-                    <ThemedText style={styles.emptyRecommendationsTitle}>
-                      All Caught Up!
-                    </ThemedText>
+                    <Ionicons name="checkmark-circle-outline" size={64} color={colors.primary} />
+                    <ThemedText style={styles.emptyRecommendationsTitle}>All Caught Up!</ThemedText>
                     <ThemedText style={styles.emptyRecommendationsMessage}>
-                      You've implemented all recommendations. New ones will appear as your betting patterns evolve.
+                      You've implemented all recommendations. New ones will appear as your betting
+                      patterns evolve.
                     </ThemedText>
                   </View>
                 )}
               </View>
-              
+
               {/* Betting History Chart */}
-              <View style={[
-                styles.chartContainer,
-                { backgroundColor: isDark ? '#222222' : '#FFFFFF' }
-              ]}>
+              <View
+                style={[styles.chartContainer, { backgroundColor: isDark ? '#222222' : '#FFFFFF' }]}
+              >
                 <View style={styles.chartHeader}>
-                  <ThemedText style={styles.chartTitle}>
-                    Betting Performance
-                  </ThemedText>
+                  <ThemedText style={styles.chartTitle}>Betting Performance</ThemedText>
                   <ThemedText style={styles.chartSubtitle}>
                     Track your betting history and performance
                   </ThemedText>
                 </View>
-                
-                <BettingHistoryChart
-                  bankrollData={bankrollData}
-                  timeRange="month"
-                />
+
+                <BettingHistoryChart bankrollData={bankrollData} timeRange="month" />
               </View>
             </View>
           ) : (
             <View style={styles.loginPromptContainer}>
               <Ionicons name="lock-closed-outline" size={64} color={colors.primary} />
-              <ThemedText style={styles.loginPromptTitle}>
-                Sign In Required
-              </ThemedText>
+              <ThemedText style={styles.loginPromptTitle}>Sign In Required</ThemedText>
               <ThemedText style={styles.loginPromptMessage}>
                 Please sign in to access bankroll management features and AI recommendations.
               </ThemedText>

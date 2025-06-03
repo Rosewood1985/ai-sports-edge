@@ -3,21 +3,21 @@ import { ConfidenceLevel } from './odds';
 /**
  * Types of player prop bets
  */
-export type PropBetType = 
-  | 'points' 
-  | 'rebounds' 
-  | 'assists' 
-  | 'threePointers' 
-  | 'blocks' 
-  | 'steals' 
-  | 'passingYards' 
-  | 'rushingYards' 
-  | 'receivingYards' 
-  | 'touchdowns' 
-  | 'goals' 
-  | 'saves' 
-  | 'strikeouts' 
-  | 'hits' 
+export type PropBetType =
+  | 'points'
+  | 'rebounds'
+  | 'assists'
+  | 'threePointers'
+  | 'blocks'
+  | 'steals'
+  | 'passingYards'
+  | 'rushingYards'
+  | 'receivingYards'
+  | 'touchdowns'
+  | 'goals'
+  | 'saves'
+  | 'strikeouts'
+  | 'hits'
   | 'homeRuns';
 
 /**

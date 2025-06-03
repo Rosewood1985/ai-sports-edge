@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
+
 import { useEnhancedInsights } from '../../../../hooks/useEnhancedInsights';
 import { EnhancedInsight, InsightType } from '../../../../types/enhancedInsights';
-import LoadingIndicator from '../../../LoadingIndicator';
 import ErrorMessage from '../../../ErrorMessage';
+import LoadingIndicator from '../../../LoadingIndicator';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -15,12 +16,12 @@ interface InsightAnalyticsWidgetProps {
 
 export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
   dateRange,
-  insightTypes
+  insightTypes,
 }) => {
   const { insights, isLoading, error } = useEnhancedInsights({
     startDate: dateRange[0],
     endDate: dateRange[1],
-    types: insightTypes
+    types: insightTypes,
   });
 
   if (isLoading) return <LoadingIndicator />;
@@ -34,30 +35,41 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
     });
 
     const dailyCounts = last7Days.map(date => {
-      return insights.filter(insight => 
-        new Date(insight.timestamp).toISOString().split('T')[0] === date
+      return insights.filter(
+        insight => new Date(insight.timestamp).toISOString().split('T')[0] === date
       ).length;
     });
 
     return {
       labels: last7Days.map(date => new Date(date).getDate().toString()),
-      datasets: [{
-        data: dailyCounts,
-        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
-        strokeWidth: 2
-      }]
+      datasets: [
+        {
+          data: dailyCounts,
+          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+          strokeWidth: 2,
+        },
+      ],
     };
   };
 
   const getInsightTypeDistribution = () => {
-    const typeCounts = insights.reduce((acc, insight) => {
-      acc[insight.type] = (acc[insight.type] || 0) + 1;
-      return acc;
-    }, {} as Record<InsightType, number>);
+    const typeCounts = insights.reduce(
+      (acc, insight) => {
+        acc[insight.type] = (acc[insight.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<InsightType, number>
+    );
 
     const colors = [
-      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-      '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+      '#FF6384',
+      '#36A2EB',
+      '#FFCE56',
+      '#4BC0C0',
+      '#9966FF',
+      '#FF9F40',
+      '#FF6384',
+      '#C9CBCF',
     ];
 
     return Object.entries(typeCounts).map(([type, count], index) => ({
@@ -65,7 +77,7 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
       population: count,
       color: colors[index % colors.length],
       legendFontColor: '#7F7F7F',
-      legendFontSize: 12
+      legendFontSize: 12,
     }));
   };
 
@@ -73,7 +85,7 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
     const confidenceRanges = {
       'Low (0-0.3)': 0,
       'Medium (0.3-0.7)': 0,
-      'High (0.7-1.0)': 0
+      'High (0.7-1.0)': 0,
     };
 
     insights.forEach(insight => {
@@ -84,39 +96,49 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
 
     return {
       labels: Object.keys(confidenceRanges),
-      datasets: [{
-        data: Object.values(confidenceRanges),
-        backgroundColor: ['#FF6B6B', '#4ECDC4', '#45B7D1'],
-        borderWidth: 1
-      }]
+      datasets: [
+        {
+          data: Object.values(confidenceRanges),
+          backgroundColor: ['#FF6B6B', '#4ECDC4', '#45B7D1'],
+          borderWidth: 1,
+        },
+      ],
     };
   };
 
   const getSeverityMetrics = () => {
-    const severityCounts = insights.reduce((acc, insight) => {
-      acc[insight.severity] = (acc[insight.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const severityCounts = insights.reduce(
+      (acc, insight) => {
+        acc[insight.severity] = (acc[insight.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       labels: Object.keys(severityCounts),
-      datasets: [{
-        data: Object.values(severityCounts),
-        color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
-        strokeWidth: 2
-      }]
+      datasets: [
+        {
+          data: Object.values(severityCounts),
+          color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
+          strokeWidth: 2,
+        },
+      ],
     };
   };
 
   const getTopInsightSources = () => {
-    const sourceCounts = insights.reduce((acc, insight) => {
-      const source = insight.source || 'Unknown';
-      acc[source] = (acc[source] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const sourceCounts = insights.reduce(
+      (acc, insight) => {
+        const source = insight.source || 'Unknown';
+        acc[source] = (acc[source] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return Object.entries(sourceCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
   };
 
@@ -133,8 +155,8 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: '#8641f4'
-    }
+      stroke: '#8641f4',
+    },
   };
 
   return (
@@ -196,7 +218,7 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
           height={220}
           chartConfig={{
             ...chartConfig,
-            color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`
+            color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
           }}
           style={styles.chart}
         />
@@ -228,7 +250,11 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
           </View>
           <View style={styles.metricItem}>
             <Text style={styles.metricValue}>
-              {(insights.reduce((sum, i) => sum + i.confidence, 0) / insights.length * 100).toFixed(1)}%
+              {(
+                (insights.reduce((sum, i) => sum + i.confidence, 0) / insights.length) *
+                100
+              ).toFixed(1)}
+              %
             </Text>
             <Text style={styles.metricLabel}>Avg Confidence</Text>
           </View>
@@ -239,9 +265,7 @@ export const InsightAnalyticsWidget: React.FC<InsightAnalyticsWidgetProps> = ({
             <Text style={styles.metricLabel}>High Severity</Text>
           </View>
           <View style={styles.metricItem}>
-            <Text style={styles.metricValue}>
-              {new Set(insights.map(i => i.source)).size}
-            </Text>
+            <Text style={styles.metricValue}>{new Set(insights.map(i => i.source)).size}</Text>
             <Text style={styles.metricLabel}>Data Sources</Text>
           </View>
         </View>

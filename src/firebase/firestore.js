@@ -14,9 +14,10 @@ import {
   limit,
   startAfter,
   onSnapshot,
-  serverTimestamp
-} from "firebase/firestore";
-import { firestore } from "./config";
+  serverTimestamp,
+} from 'firebase/firestore';
+
+import { firestore } from './config';
 
 /**
  * Create a document in a collection
@@ -30,20 +31,20 @@ export const createDocument = async (collectionName, data) => {
     const docRef = await addDoc(collectionRef, {
       ...data,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
-    
-    return { 
-      id: docRef.id, 
+
+    return {
+      id: docRef.id,
       ref: docRef,
-      error: null 
+      error: null,
     };
   } catch (error) {
     console.error(`Error creating document in ${collectionName}:`, error);
-    return { 
-      id: null, 
-      ref: null, 
-      error: error.message 
+    return {
+      id: null,
+      ref: null,
+      error: error.message,
     };
   }
 };
@@ -61,20 +62,20 @@ export const createDocumentWithId = async (collectionName, documentId, data) => 
     await setDoc(docRef, {
       ...data,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
-    
-    return { 
-      id: documentId, 
+
+    return {
+      id: documentId,
       ref: docRef,
-      error: null 
+      error: null,
     };
   } catch (error) {
     console.error(`Error creating document with ID in ${collectionName}:`, error);
-    return { 
-      id: null, 
-      ref: null, 
-      error: error.message 
+    return {
+      id: null,
+      ref: null,
+      error: error.message,
     };
   }
 };
@@ -89,29 +90,29 @@ export const getDocument = async (collectionName, documentId) => {
   try {
     const docRef = doc(firestore, collectionName, documentId);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
-      return { 
+      return {
         id: documentId,
         data: { id: documentId, ...docSnap.data() },
         exists: true,
-        error: null 
+        error: null,
       };
     } else {
-      return { 
+      return {
         id: documentId,
         data: null,
         exists: false,
-        error: null 
+        error: null,
       };
     }
   } catch (error) {
     console.error(`Error getting document from ${collectionName}:`, error);
-    return { 
+    return {
       id: documentId,
       data: null,
       exists: false,
-      error: error.message 
+      error: error.message,
     };
   }
 };
@@ -128,9 +129,9 @@ export const updateDocument = async (collectionName, documentId, data) => {
     const docRef = doc(firestore, collectionName, documentId);
     await updateDoc(docRef, {
       ...data,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
-    
+
     return { success: true, error: null };
   } catch (error) {
     console.error(`Error updating document in ${collectionName}:`, error);
@@ -148,7 +149,7 @@ export const deleteDocument = async (collectionName, documentId) => {
   try {
     const docRef = doc(firestore, collectionName, documentId);
     await deleteDoc(docRef);
-    
+
     return { success: true, error: null };
   } catch (error) {
     console.error(`Error deleting document from ${collectionName}:`, error);
@@ -166,58 +167,58 @@ export const deleteDocument = async (collectionName, documentId) => {
  * @returns {Promise<Array>} - Array of documents
  */
 export const queryDocuments = async (
-  collectionName, 
-  conditions = [], 
-  orderByFields = [], 
+  collectionName,
+  conditions = [],
+  orderByFields = [],
   limitCount = 0,
   startAfterDoc = null
 ) => {
   try {
-    let collectionRef = collection(firestore, collectionName);
-    let queryConstraints = [];
-    
+    const collectionRef = collection(firestore, collectionName);
+    const queryConstraints = [];
+
     // Add where conditions
     conditions.forEach(condition => {
       queryConstraints.push(where(condition.field, condition.operator, condition.value));
     });
-    
+
     // Add orderBy
     orderByFields.forEach(order => {
       queryConstraints.push(orderBy(order.field, order.direction || 'asc'));
     });
-    
+
     // Add limit
     if (limitCount > 0) {
       queryConstraints.push(limit(limitCount));
     }
-    
+
     // Add startAfter for pagination
     if (startAfterDoc) {
       queryConstraints.push(startAfter(startAfterDoc));
     }
-    
+
     const q = query(collectionRef, ...queryConstraints);
     const querySnapshot = await getDocs(q);
-    
+
     const documents = [];
     querySnapshot.forEach(doc => {
       documents.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       });
     });
-    
-    return { 
-      documents, 
+
+    return {
+      documents,
       count: documents.length,
-      error: null 
+      error: null,
     };
   } catch (error) {
     console.error(`Error querying documents in ${collectionName}:`, error);
-    return { 
-      documents: [], 
+    return {
+      documents: [],
       count: 0,
-      error: error.message 
+      error: error.message,
     };
   }
 };
@@ -231,32 +232,36 @@ export const queryDocuments = async (
  */
 export const subscribeToDocument = (collectionName, documentId, callback) => {
   const docRef = doc(firestore, collectionName, documentId);
-  
-  return onSnapshot(docRef, (doc) => {
-    if (doc.exists()) {
-      callback({ 
-        id: documentId, 
-        data: { id: documentId, ...doc.data() },
-        exists: true,
-        error: null 
-      });
-    } else {
-      callback({ 
-        id: documentId, 
+
+  return onSnapshot(
+    docRef,
+    doc => {
+      if (doc.exists()) {
+        callback({
+          id: documentId,
+          data: { id: documentId, ...doc.data() },
+          exists: true,
+          error: null,
+        });
+      } else {
+        callback({
+          id: documentId,
+          data: null,
+          exists: false,
+          error: null,
+        });
+      }
+    },
+    error => {
+      console.error(`Error subscribing to document in ${collectionName}:`, error);
+      callback({
+        id: documentId,
         data: null,
         exists: false,
-        error: null 
+        error: error.message,
       });
     }
-  }, (error) => {
-    console.error(`Error subscribing to document in ${collectionName}:`, error);
-    callback({ 
-      id: documentId, 
-      data: null,
-      exists: false,
-      error: error.message 
-    });
-  });
+  );
 };
 
 /**
@@ -269,54 +274,58 @@ export const subscribeToDocument = (collectionName, documentId, callback) => {
  * @returns {function} - Unsubscribe function
  */
 export const subscribeToQuery = (
-  collectionName, 
-  conditions = [], 
-  orderByFields = [], 
+  collectionName,
+  conditions = [],
+  orderByFields = [],
   limitCount = 0,
   callback
 ) => {
-  let collectionRef = collection(firestore, collectionName);
-  let queryConstraints = [];
-  
+  const collectionRef = collection(firestore, collectionName);
+  const queryConstraints = [];
+
   // Add where conditions
   conditions.forEach(condition => {
     queryConstraints.push(where(condition.field, condition.operator, condition.value));
   });
-  
+
   // Add orderBy
   orderByFields.forEach(order => {
     queryConstraints.push(orderBy(order.field, order.direction || 'asc'));
   });
-  
+
   // Add limit
   if (limitCount > 0) {
     queryConstraints.push(limit(limitCount));
   }
-  
+
   const q = query(collectionRef, ...queryConstraints);
-  
-  return onSnapshot(q, (querySnapshot) => {
-    const documents = [];
-    querySnapshot.forEach(doc => {
-      documents.push({
-        id: doc.id,
-        ...doc.data()
+
+  return onSnapshot(
+    q,
+    querySnapshot => {
+      const documents = [];
+      querySnapshot.forEach(doc => {
+        documents.push({
+          id: doc.id,
+          ...doc.data(),
+        });
       });
-    });
-    
-    callback({ 
-      documents, 
-      count: documents.length,
-      error: null 
-    });
-  }, (error) => {
-    console.error(`Error subscribing to query in ${collectionName}:`, error);
-    callback({ 
-      documents: [], 
-      count: 0,
-      error: error.message 
-    });
-  });
+
+      callback({
+        documents,
+        count: documents.length,
+        error: null,
+      });
+    },
+    error => {
+      console.error(`Error subscribing to query in ${collectionName}:`, error);
+      callback({
+        documents: [],
+        count: 0,
+        error: error.message,
+      });
+    }
+  );
 };
 
 // Helper to get a timestamp

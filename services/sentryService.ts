@@ -1,7 +1,7 @@
 /**
  * Sentry Error Tracking Service
  * Centralized error monitoring and performance tracking
- * 
+ *
  * Compatible with Expo SDK 51.0.0 and Sentry v5.22.0
  */
 
@@ -52,8 +52,8 @@ class SentryService {
         enableInAppFrames: config.enableInAppFrames,
         tracesSampleRate: config.tracesSampleRate,
         debug: config.debug,
-        
-        beforeSend: (event) => {
+
+        beforeSend: event => {
           // Filter out non-production errors in development
           if (config.environment === 'development' && !config.debug) {
             return null;
@@ -63,9 +63,12 @@ class SentryService {
           if (event.contexts) {
             event.contexts.app = {
               name: 'AI Sports Edge',
-              version: Constants.expoConfig?.version || Constants.manifest2?.extra?.expoClient?.version || '1.0.0',
+              version:
+                Constants.expoConfig?.version ||
+                Constants.manifest2?.extra?.expoClient?.version ||
+                '1.0.0',
             };
-            
+
             event.contexts.device = {
               model: Constants.deviceName || 'unknown',
               simulator: Constants.isDevice === false,
@@ -80,7 +83,10 @@ class SentryService {
 
           // Add tags
           if (event.tags) {
-            event.tags.appVersion = Constants.expoConfig?.version || Constants.manifest2?.extra?.expoClient?.version || '1.0.0';
+            event.tags.appVersion =
+              Constants.expoConfig?.version ||
+              Constants.manifest2?.extra?.expoClient?.version ||
+              '1.0.0';
             event.tags.expoVersion = Constants.expoConfig?.sdkVersion || '51.0.0';
             event.tags.platform = Constants.platform?.ios ? 'ios' : 'android';
           }
@@ -99,7 +105,6 @@ class SentryService {
 
       this.isInitialized = true;
       console.log(`Sentry initialized for ${config.environment} environment`);
-
     } catch (error) {
       console.error('Failed to initialize Sentry:', error);
     }
@@ -140,7 +145,12 @@ class SentryService {
   /**
    * Add breadcrumb for tracking user actions
    */
-  addBreadcrumb(message: string, category: string, level: 'info' | 'warning' | 'error' = 'info', data?: Record<string, any>): void {
+  addBreadcrumb(
+    message: string,
+    category: string,
+    level: 'info' | 'warning' | 'error' = 'info',
+    data?: Record<string, any>
+  ): void {
     if (!this.isInitialized) return;
 
     Sentry.addBreadcrumb({
@@ -161,7 +171,7 @@ class SentryService {
       return undefined;
     }
 
-    return Sentry.withScope((scope) => {
+    return Sentry.withScope(scope => {
       if (context) {
         // Set user context
         if (context.userId || context.userEmail) {
@@ -190,13 +200,17 @@ class SentryService {
   /**
    * Capture message with context
    */
-  captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', context?: ErrorContext): string | undefined {
+  captureMessage(
+    message: string,
+    level: 'info' | 'warning' | 'error' = 'info',
+    context?: ErrorContext
+  ): string | undefined {
     if (!this.isInitialized) {
       console.log('Sentry not initialized, logging message:', message);
       return undefined;
     }
 
-    return Sentry.withScope((scope) => {
+    return Sentry.withScope(scope => {
       if (context) {
         if (context.userId || context.userEmail) {
           scope.setUser({
@@ -223,68 +237,67 @@ class SentryService {
   /**
    * Track racing data operations
    */
-  trackRacingOperation(operation: string, sport: 'nascar' | 'horse_racing', data?: Record<string, any>): void {
-    this.addBreadcrumb(
-      `Racing operation: ${operation}`,
-      'racing',
-      'info',
-      {
-        operation,
-        sport,
-        ...data,
-      }
-    );
+  trackRacingOperation(
+    operation: string,
+    sport: 'nascar' | 'horse_racing',
+    data?: Record<string, any>
+  ): void {
+    this.addBreadcrumb(`Racing operation: ${operation}`, 'racing', 'info', {
+      operation,
+      sport,
+      ...data,
+    });
   }
 
   /**
    * Track ML operations
    */
-  trackMLOperation(operation: string, modelType?: string, accuracy?: number, data?: Record<string, any>): void {
-    this.addBreadcrumb(
-      `ML operation: ${operation}`,
-      'ml',
-      'info',
-      {
-        operation,
-        modelType,
-        accuracy,
-        ...data,
-      }
-    );
+  trackMLOperation(
+    operation: string,
+    modelType?: string,
+    accuracy?: number,
+    data?: Record<string, any>
+  ): void {
+    this.addBreadcrumb(`ML operation: ${operation}`, 'ml', 'info', {
+      operation,
+      modelType,
+      accuracy,
+      ...data,
+    });
   }
 
   /**
    * Track caching operations
    */
-  trackCacheOperation(operation: string, tier: 'hot' | 'warm' | 'cold', hitRate?: number, data?: Record<string, any>): void {
-    this.addBreadcrumb(
-      `Cache operation: ${operation}`,
-      'cache',
-      'info',
-      {
-        operation,
-        tier,
-        hitRate,
-        ...data,
-      }
-    );
+  trackCacheOperation(
+    operation: string,
+    tier: 'hot' | 'warm' | 'cold',
+    hitRate?: number,
+    data?: Record<string, any>
+  ): void {
+    this.addBreadcrumb(`Cache operation: ${operation}`, 'cache', 'info', {
+      operation,
+      tier,
+      hitRate,
+      ...data,
+    });
   }
 
   /**
    * Track database operations
    */
-  trackDatabaseOperation(operation: string, collection: string, latency?: number, data?: Record<string, any>): void {
-    this.addBreadcrumb(
-      `Database operation: ${operation}`,
-      'database',
-      'info',
-      {
-        operation,
-        collection,
-        latency,
-        ...data,
-      }
-    );
+  trackDatabaseOperation(
+    operation: string,
+    collection: string,
+    latency?: number,
+    data?: Record<string, any>
+  ): void {
+    this.addBreadcrumb(`Database operation: ${operation}`, 'database', 'info', {
+      operation,
+      collection,
+      latency,
+      ...data,
+    });
   }
 
   /**
@@ -303,7 +316,12 @@ class SentryService {
   /**
    * Track API performance
    */
-  trackAPIPerformance(endpoint: string, method: string, statusCode: number, duration: number): void {
+  trackAPIPerformance(
+    endpoint: string,
+    method: string,
+    statusCode: number,
+    duration: number
+  ): void {
     this.addBreadcrumb(
       `API call: ${method} ${endpoint}`,
       'api',
@@ -320,18 +338,18 @@ class SentryService {
   /**
    * Track feature usage
    */
-  trackFeatureUsage(feature: string, action: string, userId?: string, data?: Record<string, any>): void {
-    this.addBreadcrumb(
-      `Feature usage: ${feature} - ${action}`,
-      'feature',
-      'info',
-      {
-        feature,
-        action,
-        userId,
-        ...data,
-      }
-    );
+  trackFeatureUsage(
+    feature: string,
+    action: string,
+    userId?: string,
+    data?: Record<string, any>
+  ): void {
+    this.addBreadcrumb(`Feature usage: ${feature} - ${action}`, 'feature', 'info', {
+      feature,
+      action,
+      userId,
+      ...data,
+    });
   }
 
   /**
@@ -384,12 +402,16 @@ class SentryService {
 export const sentryService = new SentryService();
 
 // Export Sentry configuration factory
-export const createSentryConfig = (environment: 'development' | 'staging' | 'production'): SentryConfig => {
+export const createSentryConfig = (
+  environment: 'development' | 'staging' | 'production'
+): SentryConfig => {
   // Get DSN from environment variables or Expo config
-  const sentryDsn = process.env.SENTRY_DSN || 
-                   Constants.expoConfig?.extra?.sentry?.dsn || 
-                   Constants.manifest2?.extra?.expoClient?.extra?.sentry?.dsn || 
-                   Constants.manifest?.extra?.sentry?.dsn || '';
+  const sentryDsn =
+    process.env.SENTRY_DSN ||
+    Constants.expoConfig?.extra?.sentry?.dsn ||
+    Constants.manifest2?.extra?.expoClient?.extra?.sentry?.dsn ||
+    Constants.manifest?.extra?.sentry?.dsn ||
+    '';
 
   const configs = {
     development: {
@@ -399,7 +421,10 @@ export const createSentryConfig = (environment: 'development' | 'staging' | 'pro
       enableNativeCrashHandling: false,
       enableInAppFrames: true,
       tracesSampleRate: 0.1,
-      debug: Constants.expoConfig?.extra?.sentry?.debug || Constants.manifest?.extra?.sentry?.debug || true,
+      debug:
+        Constants.expoConfig?.extra?.sentry?.debug ||
+        Constants.manifest?.extra?.sentry?.debug ||
+        true,
     },
     staging: {
       dsn: sentryDsn,

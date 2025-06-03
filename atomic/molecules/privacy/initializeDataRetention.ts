@@ -17,6 +17,8 @@ import {
   deleteDoc,
   addDoc,
 } from 'firebase/firestore';
+
+import { getDataCategory } from '../../atoms/privacy/dataCategories';
 import {
   retentionPeriods,
   defaultRetentionPolicies,
@@ -25,7 +27,6 @@ import {
   shouldAnonymize,
   getRetentionExceptions,
 } from '../../atoms/privacy/dataRetentionPolicies';
-import { getDataCategory } from '../../atoms/privacy/dataCategories';
 
 // Interval ID for the data retention job
 let dataRetentionIntervalId: NodeJS.Timeout | null = null;

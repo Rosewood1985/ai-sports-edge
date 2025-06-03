@@ -1,9 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Image, Platform, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { ThemedText } from './ThemedText';
 import QRCode from 'react-native-qrcode-svg';
+
+import { ThemedText } from './ThemedText';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface MobileAppDownloadProps {
   onClose?: () => void;
@@ -21,51 +22,50 @@ const MobileAppDownload: React.FC<MobileAppDownloadProps> = ({
   onClose,
   appStoreUrl,
   playStoreUrl,
-  webAppUrl
+  webAppUrl,
 }) => {
   const { colors, isDark } = useTheme();
   const [isLargeDevice, setIsLargeDevice] = useState(false);
-  
+
   // Determine if device is a tablet or desktop
   useEffect(() => {
     const { width, height } = Dimensions.get('window');
     const isTabletOrDesktop = width >= 768 || height >= 768;
     setIsLargeDevice(isTabletOrDesktop);
-    
+
     // Add event listener for dimension changes
     const dimensionsHandler = Dimensions.addEventListener('change', () => {
       const { width, height } = Dimensions.get('window');
       const isTabletOrDesktop = width >= 768 || height >= 768;
       setIsLargeDevice(isTabletOrDesktop);
     });
-    
+
     // Clean up
     return () => {
       dimensionsHandler.remove();
     };
   }, []);
-  
+
   // Determine if current platform is iOS
   const isIOS = Platform.OS === 'ios';
-  
+
   // Determine if current platform is web
   const isWeb = Platform.OS === 'web';
-  
+
   return (
-    <View style={[
-      styles.container,
-      { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.95)' }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.95)' },
+      ]}
+    >
       {/* Close button */}
       {onClose && (
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={onClose}
-        >
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
       )}
-      
+
       <View style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
@@ -76,11 +76,9 @@ const MobileAppDownload: React.FC<MobileAppDownloadProps> = ({
             style={styles.icon}
           />
           <ThemedText style={styles.title}>Get the Mobile App</ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Download our app for a better experience
-          </ThemedText>
+          <ThemedText style={styles.subtitle}>Download our app for a better experience</ThemedText>
         </View>
-        
+
         {/* QR Code for large devices */}
         {isLargeDevice && (
           <View style={styles.qrContainer}>
@@ -90,20 +88,15 @@ const MobileAppDownload: React.FC<MobileAppDownloadProps> = ({
               color={isDark ? '#FFFFFF' : '#000000'}
               backgroundColor={isDark ? '#000000' : '#FFFFFF'}
             />
-            <ThemedText style={styles.qrText}>
-              Scan this QR code with your mobile device
-            </ThemedText>
+            <ThemedText style={styles.qrText}>Scan this QR code with your mobile device</ThemedText>
           </View>
         )}
-        
+
         {/* Download buttons */}
         <View style={styles.buttonsContainer}>
           {/* iOS App Store button */}
           <TouchableOpacity
-            style={[
-              styles.downloadButton,
-              { backgroundColor: isDark ? '#333333' : '#FFFFFF' }
-            ]}
+            style={[styles.downloadButton, { backgroundColor: isDark ? '#333333' : '#FFFFFF' }]}
             onPress={() => {
               if (isWeb) {
                 // @ts-ignore
@@ -118,21 +111,14 @@ const MobileAppDownload: React.FC<MobileAppDownloadProps> = ({
               style={styles.buttonIcon}
             />
             <View style={styles.buttonTextContainer}>
-              <ThemedText style={styles.buttonSmallText}>
-                Download on the
-              </ThemedText>
-              <ThemedText style={styles.buttonLargeText}>
-                App Store
-              </ThemedText>
+              <ThemedText style={styles.buttonSmallText}>Download on the</ThemedText>
+              <ThemedText style={styles.buttonLargeText}>App Store</ThemedText>
             </View>
           </TouchableOpacity>
-          
+
           {/* Android Play Store button */}
           <TouchableOpacity
-            style={[
-              styles.downloadButton,
-              { backgroundColor: isDark ? '#333333' : '#FFFFFF' }
-            ]}
+            style={[styles.downloadButton, { backgroundColor: isDark ? '#333333' : '#FFFFFF' }]}
             onPress={() => {
               if (isWeb) {
                 // @ts-ignore
@@ -147,16 +133,12 @@ const MobileAppDownload: React.FC<MobileAppDownloadProps> = ({
               style={styles.buttonIcon}
             />
             <View style={styles.buttonTextContainer}>
-              <ThemedText style={styles.buttonSmallText}>
-                GET IT ON
-              </ThemedText>
-              <ThemedText style={styles.buttonLargeText}>
-                Google Play
-              </ThemedText>
+              <ThemedText style={styles.buttonSmallText}>GET IT ON</ThemedText>
+              <ThemedText style={styles.buttonLargeText}>Google Play</ThemedText>
             </View>
           </TouchableOpacity>
         </View>
-        
+
         {/* Additional info */}
         <ThemedText style={styles.additionalInfo}>
           Our mobile app offers exclusive features and a seamless betting experience

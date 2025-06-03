@@ -1,8 +1,9 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import AccessibleTouchableOpacity from './AccessibleTouchableOpacity';
+
 import AccessibleThemedText from './AccessibleThemedText';
+import AccessibleTouchableOpacity from './AccessibleTouchableOpacity';
 import { useI18n } from '../organisms/i18n/I18nContext';
 
 /**

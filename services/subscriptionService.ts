@@ -1,6 +1,18 @@
-import { auth } from '../config/firebase';
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+
+import { auth } from '../config/firebase';
 import { generateRandomCode } from '../utils/codeGenerator';
 
 // Initialize Firestore and Functions
@@ -14,7 +26,7 @@ export const GIFT_SUBSCRIPTION_AMOUNTS = [
   { label: '$150 (2 months Analyst)', value: 15000 },
   { label: '$190 (1 month Edge Collective)', value: 19000 },
   { label: '$300 (4 months Analyst)', value: 30000 },
-  { label: '$500 (Gift Card)', value: 50000 }
+  { label: '$500 (Gift Card)', value: 50000 },
 ];
 
 /**
@@ -27,13 +39,13 @@ export const hasActiveSubscription = async (userId: string): Promise<boolean> =>
     // Get user document
     const userDocRef = doc(firestore, 'users', userId);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (!userDoc.exists()) {
       return false;
     }
-    
+
     const userData = userDoc.data();
-    
+
     // Check if user has an active subscription
     if (userData.subscriptionStatus === 'active') {
       // If there's a subscription ID, check if it's still valid
@@ -41,10 +53,10 @@ export const hasActiveSubscription = async (userId: string): Promise<boolean> =>
         // Get the subscription document
         const subscriptionsRef = collection(firestore, 'users', userId, 'subscriptions');
         const subscriptionDoc = await getDoc(doc(subscriptionsRef, userData.subscriptionId));
-        
+
         if (subscriptionDoc.exists()) {
           const subscriptionData = subscriptionDoc.data();
-          
+
           // Check if subscription is active and not expired
           if (subscriptionData.status === 'active') {
             // If there's an end date, check if it's in the future
@@ -52,13 +64,13 @@ export const hasActiveSubscription = async (userId: string): Promise<boolean> =>
               const endDate = subscriptionData.currentPeriodEnd.toDate();
               return endDate > new Date();
             }
-            
+
             return true;
           }
         }
       }
     }
-    
+
     return false;
   } catch (error) {
     console.error('Error checking subscription status:', error);
@@ -85,7 +97,7 @@ export const createGiftSubscription = async (
   try {
     // Generate a unique gift code
     const code = generateRandomCode(8);
-    
+
     // Call the Cloud Function to create the gift subscription
     const createGiftSubscriptionFn = httpsCallable(functions, 'createGiftSubscription');
     const result = await createGiftSubscriptionFn({
@@ -93,9 +105,9 @@ export const createGiftSubscription = async (
       amount,
       code,
       recipientEmail,
-      message
+      message,
     });
-    
+
     // Return the gift subscription data
     return result.data;
   } catch (error: any) {
@@ -114,11 +126,11 @@ export const getGiftSubscriptionByCode = async (code: string): Promise<any> => {
     // Get the gift subscription document
     const giftSubscriptionRef = doc(firestore, 'giftSubscriptions', code);
     const giftSubscriptionDoc = await getDoc(giftSubscriptionRef);
-    
+
     if (!giftSubscriptionDoc.exists()) {
       return null;
     }
-    
+
     return giftSubscriptionDoc.data();
   } catch (error) {
     console.error('Error getting gift subscription:', error);
@@ -137,7 +149,7 @@ export const redeemGiftSubscription = async (userId: string, code: string): Prom
     // Call the Cloud Function to redeem the gift subscription
     const redeemGiftSubscriptionFn = httpsCallable(functions, 'redeemGiftSubscription');
     const result = await redeemGiftSubscriptionFn({ code });
-    
+
     // Return the subscription data
     return result.data;
   } catch (error: any) {
@@ -157,16 +169,16 @@ export const getPurchasedGiftSubscriptions = async (userId: string): Promise<any
     const giftSubscriptionsRef = collection(firestore, 'giftSubscriptions');
     const q = query(giftSubscriptionsRef, where('purchasedBy', '==', userId));
     const querySnapshot = await getDocs(q);
-    
+
     // Convert query snapshot to array of gift subscriptions
     const giftSubscriptions: any[] = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       giftSubscriptions.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       });
     });
-    
+
     return giftSubscriptions;
   } catch (error) {
     console.error('Error getting purchased gift subscriptions:', error);
@@ -185,16 +197,16 @@ export const getRedeemedGiftSubscriptions = async (userId: string): Promise<any[
     const giftSubscriptionsRef = collection(firestore, 'giftSubscriptions');
     const q = query(giftSubscriptionsRef, where('redeemedBy', '==', userId));
     const querySnapshot = await getDocs(q);
-    
+
     // Convert query snapshot to array of gift subscriptions
     const giftSubscriptions: any[] = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       giftSubscriptions.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       });
     });
-    
+
     return giftSubscriptions;
   } catch (error) {
     console.error('Error getting redeemed gift subscriptions:', error);

@@ -8,12 +8,6 @@ export { LineChart } from './LineChart';
 export { PieChart } from './PieChart';
 export { BettingAnalyticsChart } from './BettingAnalyticsChart';
 
-export type {
-  LineChartDataPoint,
-  LineChartProps
-} from './LineChart';
+export type { LineChartDataPoint, LineChartProps } from './LineChart';
 
-export type {
-  PieChartItem,
-  PieChartProps
-} from './PieChart';
+export type { PieChartItem, PieChartProps } from './PieChart';

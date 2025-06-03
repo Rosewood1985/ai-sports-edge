@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+
 const {
   API_KEY_PATTERNS,
   SCAN_EXCLUSIONS,

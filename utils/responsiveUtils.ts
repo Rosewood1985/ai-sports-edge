@@ -9,6 +9,9 @@ import {
   StyleSheet,
 } from 'react-native';
 
+// Import PixelRatio for font scaling
+import { PixelRatio } from 'react-native';
+
 // Device types with more granular categorization
 export enum DeviceType {
   SMALL_PHONE, // Small phones (< 360dp width)
@@ -400,6 +403,3 @@ export function createFullyResponsiveStyles<T>(
 
   return styles;
 }
-
-// Import PixelRatio for font scaling
-import { PixelRatio } from 'react-native';

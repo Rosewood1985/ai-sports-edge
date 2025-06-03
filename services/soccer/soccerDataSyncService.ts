@@ -1,6 +1,6 @@
-import * as admin from 'firebase-admin';
 import * as Sentry from '@sentry/node';
 import axios from 'axios';
+import * as admin from 'firebase-admin';
 
 interface SoccerMatch {
   matchId: string;
@@ -146,11 +146,15 @@ export class SoccerDataSyncService {
   private competitions = {
     'premier-league': { name: 'Premier League', country: 'England', espnId: 'eng.1' },
     'la-liga': { name: 'La Liga', country: 'Spain', espnId: 'esp.1' },
-    'bundesliga': { name: 'Bundesliga', country: 'Germany', espnId: 'ger.1' },
+    bundesliga: { name: 'Bundesliga', country: 'Germany', espnId: 'ger.1' },
     'serie-a': { name: 'Serie A', country: 'Italy', espnId: 'ita.1' },
     'ligue-1': { name: 'Ligue 1', country: 'France', espnId: 'fra.1' },
-    'champions-league': { name: 'UEFA Champions League', country: 'Europe', espnId: 'uefa.champions' },
-    'europa-league': { name: 'UEFA Europa League', country: 'Europe', espnId: 'uefa.europa' }
+    'champions-league': {
+      name: 'UEFA Champions League',
+      country: 'Europe',
+      espnId: 'uefa.champions',
+    },
+    'europa-league': { name: 'UEFA Europa League', country: 'Europe', espnId: 'uefa.europa' },
   };
 
   constructor() {
@@ -160,14 +164,14 @@ export class SoccerDataSyncService {
   async syncAllCompetitions(): Promise<void> {
     const transaction = Sentry.startTransaction({
       op: 'soccer_data_sync',
-      name: 'Sync All Soccer Competitions'
+      name: 'Sync All Soccer Competitions',
     });
 
     try {
       Sentry.addBreadcrumb({
         message: 'Starting comprehensive soccer data sync',
         level: 'info',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       for (const [competitionKey, competitionData] of Object.entries(this.competitions)) {
@@ -177,9 +181,8 @@ export class SoccerDataSyncService {
 
       Sentry.addBreadcrumb({
         message: 'Soccer data sync completed successfully',
-        level: 'info'
+        level: 'info',
       });
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error in soccer data sync:', error);
@@ -195,18 +198,17 @@ export class SoccerDataSyncService {
 
       // Sync matches
       await this.syncMatches(competitionKey, competitionData);
-      
+
       // Sync teams
       await this.syncTeams(competitionKey, competitionData);
-      
+
       // Sync player data
       await this.syncPlayers(competitionKey, competitionData);
-      
+
       // Sync team statistics
       await this.syncTeamStats(competitionKey, competitionData);
 
       console.log(`${competitionData.name} sync completed`);
-
     } catch (error) {
       console.error(`Error syncing ${competitionData.name}:`, error);
       Sentry.captureException(error);
@@ -223,7 +225,9 @@ export class SoccerDataSyncService {
         return;
       }
 
-      const matches = response.data.events.map((event: any) => this.transformMatchData(event, competitionKey));
+      const matches = response.data.events.map((event: any) =>
+        this.transformMatchData(event, competitionKey)
+      );
 
       // Store matches in batches
       for (let i = 0; i < matches.length; i += this.batchSize) {
@@ -234,7 +238,7 @@ export class SoccerDataSyncService {
           const docRef = this.db.collection('soccer_matches').doc(match.matchId);
           batch.set(docRef, {
             ...match,
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           });
         });
 
@@ -242,7 +246,6 @@ export class SoccerDataSyncService {
       }
 
       console.log(`Synced ${matches.length} matches for ${competitionData.name}`);
-
     } catch (error) {
       console.error(`Error syncing matches for ${competitionData.name}:`, error);
       Sentry.captureException(error);
@@ -259,7 +262,7 @@ export class SoccerDataSyncService {
         return;
       }
 
-      const teams = response.data.sports[0].leagues[0].teams.map((teamData: any) => 
+      const teams = response.data.sports[0].leagues[0].teams.map((teamData: any) =>
         this.transformTeamData(teamData.team, competitionKey, competitionData)
       );
 
@@ -272,7 +275,7 @@ export class SoccerDataSyncService {
           const docRef = this.db.collection('soccer_teams').doc(team.teamId);
           batch.set(docRef, {
             ...team,
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           });
         });
 
@@ -280,7 +283,6 @@ export class SoccerDataSyncService {
       }
 
       console.log(`Synced ${teams.length} teams for ${competitionData.name}`);
-
     } catch (error) {
       console.error(`Error syncing teams for ${competitionData.name}:`, error);
       Sentry.captureException(error);
@@ -290,7 +292,8 @@ export class SoccerDataSyncService {
   async syncPlayers(competitionKey: string, competitionData: any): Promise<void> {
     try {
       // Get teams first
-      const teamsSnapshot = await this.db.collection('soccer_teams')
+      const teamsSnapshot = await this.db
+        .collection('soccer_teams')
         .where('league', '==', competitionKey)
         .get();
 
@@ -299,7 +302,6 @@ export class SoccerDataSyncService {
         await this.syncTeamPlayers(team.teamId, competitionKey);
         await this.delay(1000); // Rate limiting
       }
-
     } catch (error) {
       console.error(`Error syncing players for ${competitionData.name}:`, error);
       Sentry.captureException(error);
@@ -321,13 +323,12 @@ export class SoccerDataSyncService {
           const docRef = this.db.collection('soccer_players').doc(player.playerId);
           batch.set(docRef, {
             ...player,
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           });
         });
 
         await batch.commit();
       }
-
     } catch (error) {
       console.error(`Error syncing players for team ${teamId}:`, error);
       Sentry.captureException(error);
@@ -345,7 +346,7 @@ export class SoccerDataSyncService {
       }
 
       const standings = response.data.children[0].standings.entries;
-      const teamStats = standings.map((entry: any) => 
+      const teamStats = standings.map((entry: any) =>
         this.transformTeamStatsData(entry, competitionKey, competitionData)
       );
 
@@ -355,10 +356,12 @@ export class SoccerDataSyncService {
         const statsBatch = teamStats.slice(i, i + this.batchSize);
 
         statsBatch.forEach((stats: TeamStats) => {
-          const docRef = this.db.collection('soccer_team_stats').doc(`${stats.teamId}_${stats.season}`);
+          const docRef = this.db
+            .collection('soccer_team_stats')
+            .doc(`${stats.teamId}_${stats.season}`);
           batch.set(docRef, {
             ...stats,
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           });
         });
 
@@ -366,7 +369,6 @@ export class SoccerDataSyncService {
       }
 
       console.log(`Synced team stats for ${competitionData.name}`);
-
     } catch (error) {
       console.error(`Error syncing team stats for ${competitionData.name}:`, error);
       Sentry.captureException(error);
@@ -376,7 +378,7 @@ export class SoccerDataSyncService {
   async syncLiveMatches(): Promise<SoccerMatch[]> {
     const transaction = Sentry.startTransaction({
       op: 'soccer_live_sync',
-      name: 'Sync Live Soccer Matches'
+      name: 'Sync Live Soccer Matches',
     });
 
     try {
@@ -400,13 +402,12 @@ export class SoccerDataSyncService {
                 homeScore: match.homeScore,
                 awayScore: match.awayScore,
                 status: match.status,
-                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
               });
             }
           }
 
           await this.delay(500);
-
         } catch (error) {
           console.error(`Error syncing live matches for ${competitionData.name}:`, error);
         }
@@ -414,7 +415,6 @@ export class SoccerDataSyncService {
 
       console.log(`Synced ${liveMatches.length} live matches`);
       return liveMatches;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error syncing live matches:', error);
@@ -429,7 +429,6 @@ export class SoccerDataSyncService {
       // Sync transfer news and market values
       // This would integrate with transfer market APIs
       console.log('Transfer market sync completed');
-
     } catch (error) {
       console.error('Error syncing transfer market:', error);
       Sentry.captureException(error);
@@ -441,7 +440,6 @@ export class SoccerDataSyncService {
       // Sync injury reports for all leagues
       // This would integrate with injury tracking APIs
       console.log('Injury reports sync completed');
-
     } catch (error) {
       console.error('Error syncing injury reports:', error);
       Sentry.captureException(error);
@@ -465,7 +463,7 @@ export class SoccerDataSyncService {
         shortName: homeTeam.team.abbreviation,
         logo: homeTeam.team.logos?.[0]?.href,
         league: competitionKey,
-        country: this.competitions[competitionKey as keyof typeof this.competitions].country
+        country: this.competitions[competitionKey as keyof typeof this.competitions].country,
       },
       awayTeam: {
         teamId: awayTeam.team.id,
@@ -473,7 +471,7 @@ export class SoccerDataSyncService {
         shortName: awayTeam.team.abbreviation,
         logo: awayTeam.team.logos?.[0]?.href,
         league: competitionKey,
-        country: this.competitions[competitionKey as keyof typeof this.competitions].country
+        country: this.competitions[competitionKey as keyof typeof this.competitions].country,
       },
       homeScore: parseInt(homeTeam.score) || 0,
       awayScore: parseInt(awayTeam.score) || 0,
@@ -484,14 +482,18 @@ export class SoccerDataSyncService {
         city: event.competitions[0].venue?.address?.city || 'Unknown',
         country: this.competitions[competitionKey as keyof typeof this.competitions].country,
         capacity: event.competitions[0].venue?.capacity || 0,
-        surface: 'grass'
+        surface: 'grass',
       },
       attendance: event.competitions[0].attendance,
-      odds: this.generateMatchOdds(homeTeam.score, awayTeam.score)
+      odds: this.generateMatchOdds(homeTeam.score, awayTeam.score),
     };
   }
 
-  private transformTeamData(teamData: any, competitionKey: string, competitionData: any): SoccerTeam {
+  private transformTeamData(
+    teamData: any,
+    competitionKey: string,
+    competitionData: any
+  ): SoccerTeam {
     return {
       teamId: teamData.id,
       name: teamData.displayName,
@@ -501,13 +503,17 @@ export class SoccerDataSyncService {
       country: competitionData.country,
       founded: teamData.founded,
       venue: teamData.venue?.fullName,
-      marketValue: Math.floor(Math.random() * 500000000) + 50000000 // 50M-550M euro
+      marketValue: Math.floor(Math.random() * 500000000) + 50000000, // 50M-550M euro
     };
   }
 
-  private transformTeamStatsData(entry: any, competitionKey: string, competitionData: any): TeamStats {
+  private transformTeamStatsData(
+    entry: any,
+    competitionKey: string,
+    competitionData: any
+  ): TeamStats {
     const stats = entry.stats;
-    
+
     return {
       teamId: entry.team.id,
       season: new Date().getFullYear().toString(),
@@ -532,22 +538,32 @@ export class SoccerDataSyncService {
       bigChances: Math.random() * 3 + 2, // 2-5 big chances per game
       cleanSheets: Math.floor(Math.random() * 15), // 0-15 clean sheets
       yellowCards: Math.floor(Math.random() * 50) + 30, // 30-80 yellow cards
-      redCards: Math.floor(Math.random() * 8) // 0-8 red cards
+      redCards: Math.floor(Math.random() * 8), // 0-8 red cards
     };
   }
 
   private generateTeamPlayers(teamId: string, competitionKey: string): SoccerPlayer[] {
     const players: SoccerPlayer[] = [];
     const positions = [
-      'Goalkeeper', 'Defender', 'Defender', 'Defender', 'Defender',
-      'Midfielder', 'Midfielder', 'Midfielder', 'Midfielder', 'Midfielder',
-      'Forward', 'Forward', 'Forward'
+      'Goalkeeper',
+      'Defender',
+      'Defender',
+      'Defender',
+      'Defender',
+      'Midfielder',
+      'Midfielder',
+      'Midfielder',
+      'Midfielder',
+      'Midfielder',
+      'Forward',
+      'Forward',
+      'Forward',
     ];
 
     // Generate 25 players per team (typical squad size)
     for (let i = 0; i < 25; i++) {
       const position = positions[Math.floor(Math.random() * positions.length)];
-      
+
       players.push({
         playerId: `${teamId}_player_${i + 1}`,
         name: `Player ${i + 1}`,
@@ -559,7 +575,7 @@ export class SoccerDataSyncService {
         teamId,
         jerseyNumber: i + 1,
         marketValue: this.generateMarketValue(position),
-        stats: this.generatePlayerStats(position)
+        stats: this.generatePlayerStats(position),
       });
     }
 
@@ -581,7 +597,7 @@ export class SoccerDataSyncService {
       passAccuracy: Math.random() * 20 + 70, // 70-90%
       dribbleSuccess: Math.random() * 30 + 50, // 50-80%
       expectedGoals: 0,
-      expectedAssists: 0
+      expectedAssists: 0,
     };
 
     // Position-specific stat adjustments
@@ -591,21 +607,21 @@ export class SoccerDataSyncService {
         baseStats.assists = Math.floor(Math.random() * 3);
         baseStats.passAccuracy = Math.random() * 15 + 60; // 60-75%
         break;
-      
+
       case 'Defender':
         baseStats.goals = Math.floor(Math.random() * 5);
         baseStats.assists = Math.floor(Math.random() * 6);
         baseStats.tacklesPerGame = Math.random() * 3 + 2; // 2-5 tackles
         baseStats.interceptionsPerGame = Math.random() * 2 + 1; // 1-3 interceptions
         break;
-      
+
       case 'Midfielder':
         baseStats.goals = Math.floor(Math.random() * 12);
         baseStats.assists = Math.floor(Math.random() * 15);
         baseStats.keyPassesPerGame = Math.random() * 3 + 1; // 1-4 key passes
         baseStats.passAccuracy = Math.random() * 15 + 80; // 80-95%
         break;
-      
+
       case 'Forward':
         baseStats.goals = Math.floor(Math.random() * 25) + 5;
         baseStats.assists = Math.floor(Math.random() * 12);
@@ -622,25 +638,28 @@ export class SoccerDataSyncService {
   private generateMatchOdds(homeScore: number, awayScore: number): MatchOdds {
     // Generate realistic odds based on score (if available) or random
     const homeFavorite = Math.random() > 0.4; // 60% chance home team is favorite
-    
+
     return {
       homeWin: homeFavorite ? Math.random() * 1.5 + 1.5 : Math.random() * 3 + 2.5,
       draw: Math.random() * 1.5 + 3.0,
       awayWin: homeFavorite ? Math.random() * 3 + 2.5 : Math.random() * 1.5 + 1.5,
       overUnder25: {
         over: Math.random() * 0.4 + 1.7,
-        under: Math.random() * 0.4 + 2.0
+        under: Math.random() * 0.4 + 2.0,
       },
       bothTeamsScore: {
         yes: Math.random() * 0.6 + 1.6,
-        no: Math.random() * 0.8 + 2.0
-      }
+        no: Math.random() * 0.8 + 2.0,
+      },
     };
   }
 
   private generateForm(): string {
     const results = ['W', 'D', 'L'];
-    return Array.from({ length: 5 }, () => results[Math.floor(Math.random() * results.length)]).join('');
+    return Array.from(
+      { length: 5 },
+      () => results[Math.floor(Math.random() * results.length)]
+    ).join('');
   }
 
   private generateRecord(): Record {
@@ -648,29 +667,46 @@ export class SoccerDataSyncService {
     const won = Math.floor(Math.random() * played);
     const drawn = Math.floor(Math.random() * (played - won));
     const lost = played - won - drawn;
-    
+
     return {
       played,
       won,
       drawn,
       lost,
       goalsFor: Math.floor(Math.random() * 20) + 5,
-      goalsAgainst: Math.floor(Math.random() * 15) + 3
+      goalsAgainst: Math.floor(Math.random() * 15) + 3,
     };
   }
 
   private getRandomNationality(): string {
     const nationalities = [
-      'England', 'Spain', 'Germany', 'Italy', 'France', 'Brazil', 'Argentina',
-      'Portugal', 'Netherlands', 'Belgium', 'Croatia', 'Poland', 'Mexico',
-      'Colombia', 'Uruguay', 'Chile', 'Denmark', 'Sweden', 'Norway', 'Austria'
+      'England',
+      'Spain',
+      'Germany',
+      'Italy',
+      'France',
+      'Brazil',
+      'Argentina',
+      'Portugal',
+      'Netherlands',
+      'Belgium',
+      'Croatia',
+      'Poland',
+      'Mexico',
+      'Colombia',
+      'Uruguay',
+      'Chile',
+      'Denmark',
+      'Sweden',
+      'Norway',
+      'Austria',
     ];
     return nationalities[Math.floor(Math.random() * nationalities.length)];
   }
 
   private generateMarketValue(position: string): number {
     let baseValue = 0;
-    
+
     switch (position) {
       case 'Goalkeeper':
         baseValue = Math.random() * 30000000 + 5000000; // 5-35M
@@ -685,7 +721,7 @@ export class SoccerDataSyncService {
         baseValue = Math.random() * 80000000 + 20000000; // 20-100M
         break;
     }
-    
+
     return Math.floor(baseValue);
   }
 

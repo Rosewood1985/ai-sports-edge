@@ -57,7 +57,7 @@ export interface OddsMovementAlert {
 class OddsHistoryService {
   private alerts: OddsMovementAlert[] = [];
   private alertThreshold: number = 5; // Default 5% change threshold
-  
+
   /**
    * Track odds for a game
    * @param sportKey Sport key
@@ -79,7 +79,7 @@ class OddsHistoryService {
       // Calculate best odds
       let bestOdds: number | null = null;
       let bestBookmaker: string | null = null;
-      
+
       if (draftKingsOdds !== null && fanDuelOdds !== null) {
         if (draftKingsOdds < fanDuelOdds) {
           bestOdds = draftKingsOdds;
@@ -95,7 +95,7 @@ class OddsHistoryService {
         bestOdds = fanDuelOdds;
         bestBookmaker = 'fanduel';
       }
-      
+
       // Create history point
       const historyPoint: OddsHistoryPoint = {
         timestamp: Date.now(),
@@ -108,21 +108,24 @@ class OddsHistoryService {
         homeTeam,
         awayTeam,
       };
-      
+
       // Get existing history
       const storageKey = `${STORAGE_KEYS.ODDS_HISTORY}${sportKey}_${gameId}`;
       const historyString = await AsyncStorage.getItem(storageKey);
       let gameHistory: GameOddsHistory;
-      
+
       if (historyString) {
         gameHistory = JSON.parse(historyString);
-        
+
         // Check for significant odds movement
         const lastPoint = gameHistory.history[gameHistory.history.length - 1];
-        
+
         // Check DraftKings odds movement
         if (draftKingsOdds !== null && lastPoint.draftKingsOdds !== null) {
-          const percentChange = this.calculatePercentageChange(lastPoint.draftKingsOdds, draftKingsOdds);
+          const percentChange = this.calculatePercentageChange(
+            lastPoint.draftKingsOdds,
+            draftKingsOdds
+          );
           if (Math.abs(percentChange) >= this.alertThreshold) {
             this.createMovementAlert(
               gameId,
@@ -136,7 +139,7 @@ class OddsHistoryService {
             );
           }
         }
-        
+
         // Check FanDuel odds movement
         if (fanDuelOdds !== null && lastPoint.fanDuelOdds !== null) {
           const percentChange = this.calculatePercentageChange(lastPoint.fanDuelOdds, fanDuelOdds);
@@ -153,15 +156,15 @@ class OddsHistoryService {
             );
           }
         }
-        
+
         // Add new history point
         gameHistory.history.push(historyPoint);
-        
+
         // Trim history if needed
         if (gameHistory.history.length > MAX_HISTORY_POINTS) {
           gameHistory.history = gameHistory.history.slice(-MAX_HISTORY_POINTS);
         }
-        
+
         // Update last updated timestamp
         gameHistory.lastUpdated = Date.now();
       } else {
@@ -176,17 +179,17 @@ class OddsHistoryService {
           lastUpdated: Date.now(),
         };
       }
-      
+
       // Save updated history
       await AsyncStorage.setItem(storageKey, JSON.stringify(gameHistory));
-      
+
       // Update last updated timestamp
       await AsyncStorage.setItem(STORAGE_KEYS.LAST_UPDATED, Date.now().toString());
     } catch (error) {
       console.error('Error tracking odds:', error);
     }
   }
-  
+
   /**
    * Get odds history for a game
    * @param sportKey Sport key
@@ -197,18 +200,18 @@ class OddsHistoryService {
     try {
       const storageKey = `${STORAGE_KEYS.ODDS_HISTORY}${sportKey}_${gameId}`;
       const historyString = await AsyncStorage.getItem(storageKey);
-      
+
       if (historyString) {
         return JSON.parse(historyString);
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error getting odds history:', error);
       return null;
     }
   }
-  
+
   /**
    * Get all tracked games for a sport
    * @param sportKey Sport key
@@ -217,26 +220,26 @@ class OddsHistoryService {
   async getTrackedGames(sportKey: string): Promise<GameOddsHistory[]> {
     try {
       const keys = await AsyncStorage.getAllKeys();
-      const historyKeys = keys.filter(key => 
+      const historyKeys = keys.filter(key =>
         key.startsWith(`${STORAGE_KEYS.ODDS_HISTORY}${sportKey}_`)
       );
-      
+
       const games: GameOddsHistory[] = [];
-      
+
       for (const key of historyKeys) {
         const historyString = await AsyncStorage.getItem(key);
         if (historyString) {
           games.push(JSON.parse(historyString));
         }
       }
-      
+
       return games;
     } catch (error) {
       console.error('Error getting tracked games:', error);
       return [];
     }
   }
-  
+
   /**
    * Calculate percentage change between two odds values
    * @param oldOdds Old odds value
@@ -246,12 +249,12 @@ class OddsHistoryService {
   private calculatePercentageChange(oldOdds: number, newOdds: number): number {
     // Handle American odds format
     if (oldOdds === 0) return 0;
-    
+
     // For positive odds (underdogs)
     if (oldOdds > 0 && newOdds > 0) {
       return ((newOdds - oldOdds) / oldOdds) * 100;
     }
-    
+
     // For negative odds (favorites)
     if (oldOdds < 0 && newOdds < 0) {
       // Convert to positive for calculation
@@ -259,12 +262,12 @@ class OddsHistoryService {
       const newPositive = Math.abs(newOdds);
       return ((oldPositive - newPositive) / oldPositive) * 100;
     }
-    
+
     // For odds that changed from positive to negative or vice versa
     // This is a significant change, so we'll return a large percentage
     return 100;
   }
-  
+
   /**
    * Create a movement alert
    * @param gameId Game ID
@@ -299,11 +302,11 @@ class OddsHistoryService {
       timestamp: Date.now(),
       read: false,
     };
-    
+
     this.alerts.push(alert);
     this.saveAlerts();
   }
-  
+
   /**
    * Save alerts to storage
    */
@@ -314,7 +317,7 @@ class OddsHistoryService {
       console.error('Error saving alerts:', error);
     }
   }
-  
+
   /**
    * Load alerts from storage
    */
@@ -328,7 +331,7 @@ class OddsHistoryService {
       console.error('Error loading alerts:', error);
     }
   }
-  
+
   /**
    * Get all movement alerts
    * @returns List of movement alerts
@@ -337,7 +340,7 @@ class OddsHistoryService {
     await this.loadAlerts();
     return [...this.alerts];
   }
-  
+
   /**
    * Get unread movement alerts
    * @returns List of unread movement alerts
@@ -346,21 +349,21 @@ class OddsHistoryService {
     await this.loadAlerts();
     return this.alerts.filter(alert => !alert.read);
   }
-  
+
   /**
    * Mark alert as read
    * @param alertId Alert ID
    */
   async markAlertAsRead(alertId: string): Promise<void> {
     await this.loadAlerts();
-    
+
     const alertIndex = this.alerts.findIndex(alert => alert.id === alertId);
     if (alertIndex !== -1) {
       this.alerts[alertIndex].read = true;
       await this.saveAlerts();
     }
   }
-  
+
   /**
    * Set alert threshold
    * @param threshold Percentage threshold for alerts
@@ -368,7 +371,7 @@ class OddsHistoryService {
   setAlertThreshold(threshold: number): void {
     this.alertThreshold = threshold;
   }
-  
+
   /**
    * Get alert threshold
    * @returns Current alert threshold
@@ -376,7 +379,7 @@ class OddsHistoryService {
   getAlertThreshold(): number {
     return this.alertThreshold;
   }
-  
+
   /**
    * Clear all history
    */
@@ -384,11 +387,11 @@ class OddsHistoryService {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const historyKeys = keys.filter(key => key.startsWith(STORAGE_KEYS.ODDS_HISTORY));
-      
+
       if (historyKeys.length > 0) {
         await AsyncStorage.multiRemove(historyKeys);
       }
-      
+
       // Clear alerts
       this.alerts = [];
       await this.saveAlerts();

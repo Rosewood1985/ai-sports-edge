@@ -1,9 +1,10 @@
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { useTranslation } from '../i18n/mock';
+
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../i18n/mock';
 
 /**
  * Props for the AIPickCard component
@@ -128,11 +129,7 @@ const AIPickCard: React.FC<AIPickCardProps> = ({
               styles.momentumValue,
               {
                 color:
-                  momentumScore > 10
-                    ? '#10B981'
-                    : momentumScore < -10
-                    ? '#EF4444'
-                    : theme.text,
+                  momentumScore > 10 ? '#10B981' : momentumScore < -10 ? '#EF4444' : theme.text,
               },
             ]}
           >

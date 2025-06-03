@@ -1,6 +1,6 @@
 /**
  * Profile Screen Example
- * 
+ *
  * This example demonstrates how to create a screen using the atomic architecture.
  */
 
@@ -8,32 +8,31 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Import atomic components
-import { MainLayout } from '../atomic/templates';
 import { useTheme } from '../atomic/molecules/themeContext';
-import { firebaseService } from '../atomic/organisms';
-import { monitoringService } from '../atomic/organisms';
+import { firebaseService, monitoringService } from '../atomic/organisms';
+import { MainLayout } from '../atomic/templates';
 
 const ProfileScreen = ({ navigation }) => {
   // Get theme from context
   const { colors } = useTheme();
-  
+
   // State
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Load user data on mount
   useEffect(() => {
     const loadUserData = async () => {
       try {
         // Get current user
         const currentUser = firebaseService.auth.getCurrentUser();
-        
+
         if (!currentUser) {
           navigation.replace('Login');
           return;
         }
-        
+
         // Get user data from Firestore
         const userData = await firebaseService.firestore.getDocument('users', currentUser.uid);
         setUser(userData || currentUser);
@@ -45,10 +44,10 @@ const ProfileScreen = ({ navigation }) => {
         setLoading(false);
       }
     };
-    
+
     loadUserData();
   }, [navigation]);
-  
+
   // Header component
   const Header = () => (
     <View style={[styles.header, { backgroundColor: colors.surface }]}>
@@ -61,7 +60,7 @@ const ProfileScreen = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
-  
+
   // Content component
   const Content = () => {
     if (loading) {
@@ -71,7 +70,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       );
     }
-    
+
     if (error) {
       return (
         <View style={styles.centerContent}>
@@ -85,7 +84,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       );
     }
-    
+
     if (!user) {
       return (
         <View style={styles.centerContent}>
@@ -93,7 +92,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       );
     }
-    
+
     return (
       <View style={styles.content}>
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -104,7 +103,7 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={[styles.name, { color: colors.text }]}>{user.displayName || 'User'}</Text>
           <Text style={[styles.email, { color: colors.textSecondary }]}>{user.email}</Text>
         </View>
-        
+
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Account Information</Text>
           <View style={styles.infoRow}>
@@ -114,17 +113,21 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.infoRow}>
             <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Created:</Text>
             <Text style={[styles.infoValue, { color: colors.text }]}>
-              {user.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'Unknown'}
+              {user.metadata?.creationTime
+                ? new Date(user.metadata.creationTime).toLocaleDateString()
+                : 'Unknown'}
             </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Last Login:</Text>
             <Text style={[styles.infoValue, { color: colors.text }]}>
-              {user.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleDateString() : 'Unknown'}
+              {user.metadata?.lastSignInTime
+                ? new Date(user.metadata.lastSignInTime).toLocaleDateString()
+                : 'Unknown'}
             </Text>
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}
           onPress={() => firebaseService.auth.signOut()}
@@ -134,13 +137,10 @@ const ProfileScreen = ({ navigation }) => {
       </View>
     );
   };
-  
+
   // Render screen using MainLayout template
   return (
-    <MainLayout
-      header={<Header />}
-      scrollable={true}
-    >
+    <MainLayout header={<Header />} scrollable>
       <Content />
     </MainLayout>
   );

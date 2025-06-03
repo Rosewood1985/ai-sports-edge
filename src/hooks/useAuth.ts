@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { auth } from '../firebase/config';
 import { User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '../firebase/config';
+import { useState, useEffect } from 'react';
+
+import { auth, firestore } from '../firebase/config';
 
 export interface AuthUser extends User {
   roles?: string[];

@@ -1,12 +1,12 @@
 /**
  * Advanced Image Optimization Service
- * 
+ *
  * Provides intelligent image optimization with adaptive quality,
  * next-gen format support, and performance-based loading strategies.
  */
 
-import { enhancedCacheService } from './enhancedCacheService';
 import { analyticsService } from './analyticsService';
+import { enhancedCacheService } from './enhancedCacheService';
 import { sentryService } from './sentryService';
 
 interface ImageMetrics {
@@ -76,7 +76,7 @@ class AdvancedImageOptimizationService {
     this.config = this.getDefaultConfig();
     this.formatSupport = this.detectFormatSupport();
     this.metrics = this.initializeMetrics();
-    
+
     this.detectNetworkQuality();
     this.initializeLazyLoading();
     this.startMetricsCollection();
@@ -138,13 +138,13 @@ class AdvancedImageOptimizationService {
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
       const effectiveType = connection?.effectiveType;
-      
+
       if (['slow-2g', '2g', '3g'].includes(effectiveType)) {
         this.networkQuality = 'slow';
       } else if (['4g'].includes(effectiveType)) {
         this.networkQuality = 'fast';
       }
-      
+
       // Listen for network changes
       connection?.addEventListener('change', () => {
         this.detectNetworkQuality();
@@ -183,8 +183,8 @@ class AdvancedImageOptimizationService {
     if (!('IntersectionObserver' in window)) return;
 
     this.intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target as HTMLImageElement;
             this.loadImage(img);
@@ -205,8 +205,8 @@ class AdvancedImageOptimizationService {
   private startMetricsCollection(): void {
     // Monitor image loading performance
     if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
+      const observer = new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
           if (entry.initiatorType === 'img') {
             this.updateLoadTimeMetrics(entry.duration);
           }
@@ -232,7 +232,7 @@ class AdvancedImageOptimizationService {
   async optimizeImage(request: ImageLoadRequest): Promise<OptimizedImageResult> {
     try {
       const cacheKey = this.generateCacheKey(request);
-      
+
       // Check cache first
       const cached = this.imageCache.get(cacheKey);
       if (cached) {
@@ -241,27 +241,32 @@ class AdvancedImageOptimizationService {
 
       // Determine optimal format
       const format = this.selectOptimalFormat(request);
-      
+
       // Determine optimal quality
       const quality = this.selectOptimalQuality(request);
-      
+
       // Generate optimized image URLs
-      const optimizedSrc = this.generateOptimizedUrl(request.src, format, quality, request.width, request.height);
+      const optimizedSrc = this.generateOptimizedUrl(
+        request.src,
+        format,
+        quality,
+        request.width,
+        request.height
+      );
       const result = await this.processImageOptimization(request, optimizedSrc, format, quality);
-      
+
       // Cache the result
       this.imageCache.set(cacheKey, result);
-      
+
       // Update metrics
       this.metrics.totalImages++;
-      this.metrics.bandwidthSaved += (result.originalSize - result.optimizedSize);
-      
-      return result;
+      this.metrics.bandwidthSaved += result.originalSize - result.optimizedSize;
 
+      return result;
     } catch (error) {
       console.error('Error optimizing image:', error);
       sentryService.captureException(error);
-      
+
       // Fallback to original image
       return {
         src: request.src,
@@ -314,21 +319,21 @@ class AdvancedImageOptimizationService {
     // Adaptive quality based on priority and network
     switch (request.priority) {
       case 'critical':
-        return this.networkQuality === 'slow' ? 
-          this.config.qualityTiers.medium : 
-          this.config.qualityTiers.high;
-      
+        return this.networkQuality === 'slow'
+          ? this.config.qualityTiers.medium
+          : this.config.qualityTiers.high;
+
       case 'high':
         return this.config.qualityTiers.medium;
-      
+
       case 'medium':
-        return this.networkQuality === 'slow' ? 
-          this.config.qualityTiers.low : 
-          this.config.qualityTiers.medium;
-      
+        return this.networkQuality === 'slow'
+          ? this.config.qualityTiers.low
+          : this.config.qualityTiers.medium;
+
       case 'low':
         return this.config.qualityTiers.low;
-      
+
       default:
         return this.config.qualityTiers.medium;
     }
@@ -338,21 +343,21 @@ class AdvancedImageOptimizationService {
    * Generate optimized image URL (would integrate with CDN or image service)
    */
   private generateOptimizedUrl(
-    originalSrc: string, 
-    format: string, 
-    quality: number, 
-    width?: number, 
+    originalSrc: string,
+    format: string,
+    quality: number,
+    width?: number,
     height?: number
   ): string {
     // In a real implementation, this would integrate with a CDN like Cloudinary, ImageKit, etc.
     // For now, we'll create a mock optimized URL
     const params = new URLSearchParams();
-    
+
     if (format !== 'original') params.set('f', format);
     params.set('q', quality.toString());
     if (width) params.set('w', width.toString());
     if (height) params.set('h', height.toString());
-    
+
     // Mock CDN URL structure
     return `https://cdn.aisportsedge.com/optimized/${encodeURIComponent(originalSrc)}?${params.toString()}`;
   }
@@ -373,7 +378,7 @@ class AdvancedImageOptimizationService {
       // For now, estimate based on quality and format
       const originalSize = this.estimateImageSize(request.src, 'original', 100);
       const optimizedSize = this.estimateImageSize(request.src, format, quality);
-      
+
       const result: OptimizedImageResult = {
         src: optimizedSrc,
         format,
@@ -390,7 +395,6 @@ class AdvancedImageOptimizationService {
       }
 
       return result;
-
     } catch (error) {
       throw new Error(`Failed to process image optimization: ${error.message}`);
     }
@@ -405,17 +409,17 @@ class AdvancedImageOptimizationService {
 
     // Adjust for format
     const formatMultipliers = {
-      avif: 0.5,   // 50% smaller than JPEG
-      webp: 0.75,  // 25% smaller than JPEG
-      jpeg: 1.0,   // Baseline
-      png: 1.5,    // 50% larger than JPEG
+      avif: 0.5, // 50% smaller than JPEG
+      webp: 0.75, // 25% smaller than JPEG
+      jpeg: 1.0, // Baseline
+      png: 1.5, // 50% larger than JPEG
       original: 1.0,
     };
 
     baseSize *= formatMultipliers[format] || 1.0;
 
     // Adjust for quality
-    baseSize *= (quality / 100);
+    baseSize *= quality / 100;
 
     return Math.round(baseSize);
   }
@@ -423,9 +427,14 @@ class AdvancedImageOptimizationService {
   /**
    * Generate responsive srcSet
    */
-  private generateResponsiveSrcSet(src: string, format: string, quality: number, baseWidth: number): string {
+  private generateResponsiveSrcSet(
+    src: string,
+    format: string,
+    quality: number,
+    baseWidth: number
+  ): string {
     const breakpoints = [0.5, 1, 1.5, 2]; // Device pixel ratios
-    
+
     return breakpoints
       .map(ratio => {
         const width = Math.round(baseWidth * ratio);
@@ -457,22 +466,21 @@ class AdvancedImageOptimizationService {
         alt: img.alt,
         width: img.width || undefined,
         height: img.height || undefined,
-        priority: img.dataset.priority as any || 'medium',
+        priority: (img.dataset.priority as any) || 'medium',
         responsive: img.dataset.responsive === 'true',
-        quality: img.dataset.quality as any || 'auto',
+        quality: (img.dataset.quality as any) || 'auto',
       };
 
       const optimized = await this.optimizeImage(request);
-      
+
       // Update image attributes
       img.src = optimized.src;
       if (optimized.srcSet) img.srcset = optimized.srcSet;
       if (optimized.sizes) img.sizes = optimized.sizes;
-      
+
       // Remove loading indicator
       img.classList.remove('loading');
       img.classList.add('loaded');
-
     } catch (error) {
       console.error('Failed to load optimized image:', error);
       // Fallback to original source
@@ -489,11 +497,11 @@ class AdvancedImageOptimizationService {
     if (!this.config.preloadCritical) return;
 
     const criticalImages = images.filter(img => img.priority === 'critical');
-    
+
     for (const image of criticalImages) {
       try {
         const optimized = await this.optimizeImage(image);
-        
+
         // Create preload link
         const link = document.createElement('link');
         link.rel = 'preload';
@@ -503,9 +511,8 @@ class AdvancedImageOptimizationService {
           link.setAttribute('imagesrcset', optimized.srcSet);
           link.setAttribute('imagesizes', optimized.sizes || '100vw');
         }
-        
-        document.head.appendChild(link);
 
+        document.head.appendChild(link);
       } catch (error) {
         console.error('Failed to preload critical image:', error);
       }
@@ -529,7 +536,7 @@ class AdvancedImageOptimizationService {
    */
   updateConfig(newConfig: Partial<ImageOptimizationConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     // Update intersection observer threshold if changed
     if (newConfig.lazyLoadThreshold && this.intersectionObserver) {
       this.intersectionObserver.disconnect();
@@ -550,7 +557,7 @@ class AdvancedImageOptimizationService {
   generateOptimizationReport(): any {
     const totalSavings = this.metrics.bandwidthSaved;
     const averageCompressionRatio = this.calculateAverageCompressionRatio();
-    
+
     return {
       timestamp: new Date().toISOString(),
       metrics: this.metrics,
@@ -575,7 +582,7 @@ class AdvancedImageOptimizationService {
    */
   private calculateAverageCompressionRatio(): number {
     if (this.imageCache.size === 0) return 1;
-    
+
     const ratios = Array.from(this.imageCache.values()).map(result => result.compressionRatio);
     return ratios.reduce((sum, ratio) => sum + ratio, 0) / ratios.length;
   }

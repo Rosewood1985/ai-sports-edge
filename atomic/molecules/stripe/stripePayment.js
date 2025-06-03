@@ -5,9 +5,9 @@
  * It combines stripe configuration atoms to provide payment-related functions.
  */
 
-const { getStripe } = require('../../atoms/stripe/stripeConfig');
-const logger = require('../../../utils/logger');
 const cache = require('../../../utils/cache');
+const logger = require('../../../utils/logger');
+const { getStripe } = require('../../atoms/stripe/stripeConfig');
 
 /**
  * Validate that the customer is in the United States

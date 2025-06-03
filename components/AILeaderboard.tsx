@@ -1,13 +1,8 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 
 interface LeaderboardEntry {
@@ -27,10 +22,7 @@ interface AILeaderboardProps {
  * @param {AILeaderboardProps} props - Component props
  * @returns {JSX.Element} - Rendered component
  */
-const AILeaderboard: React.FC<AILeaderboardProps> = ({ 
-  entries,
-  isPremium
-}) => {
+const AILeaderboard: React.FC<AILeaderboardProps> = ({ entries, isPremium }) => {
   const navigation = useNavigation();
   const { colors, isDark } = useTheme();
 
@@ -44,72 +36,45 @@ const AILeaderboard: React.FC<AILeaderboardProps> = ({
   const renderEntry = ({ item }: { item: LeaderboardEntry }) => {
     // Calculate AI edge
     const aiEdge = item.aiAccuracy - item.publicAccuracy;
-    
+
     // Determine if entry is locked (premium-only)
     const isLocked = item.isPremium && !isPremium;
 
     return (
-      <View style={[
-        styles.entryContainer,
-        isLocked && styles.lockedEntry
-      ]}>
+      <View style={[styles.entryContainer, isLocked && styles.lockedEntry]}>
         {/* Date */}
-        <Text style={[
-          styles.dateText,
-          { color: colors.text },
-          isLocked && styles.lockedText
-        ]}>
+        <Text style={[styles.dateText, { color: colors.text }, isLocked && styles.lockedText]}>
           {item.date}
         </Text>
-        
+
         {/* AI Accuracy */}
         <View style={styles.accuracyContainer}>
-          <Text style={[
-            styles.accuracyLabel,
-            { color: colors.text },
-            isLocked && styles.lockedText
-          ]}>
+          <Text
+            style={[styles.accuracyLabel, { color: colors.text }, isLocked && styles.lockedText]}
+          >
             AI
           </Text>
           {isLocked ? (
-            <View style={[
-              styles.lockedAccuracy,
-              { backgroundColor: isDark ? '#333' : '#ddd' }
-            ]} />
+            <View style={[styles.lockedAccuracy, { backgroundColor: isDark ? '#333' : '#ddd' }]} />
           ) : (
-            <Text style={[
-              styles.accuracyValue,
-              { color: '#4CAF50' }
-            ]}>
-              {item.aiAccuracy}%
-            </Text>
+            <Text style={[styles.accuracyValue, { color: '#4CAF50' }]}>{item.aiAccuracy}%</Text>
           )}
         </View>
-        
+
         {/* Public Accuracy */}
         <View style={styles.accuracyContainer}>
-          <Text style={[
-            styles.accuracyLabel,
-            { color: colors.text },
-            isLocked && styles.lockedText
-          ]}>
+          <Text
+            style={[styles.accuracyLabel, { color: colors.text }, isLocked && styles.lockedText]}
+          >
             Public
           </Text>
           {isLocked ? (
-            <View style={[
-              styles.lockedAccuracy,
-              { backgroundColor: isDark ? '#333' : '#ddd' }
-            ]} />
+            <View style={[styles.lockedAccuracy, { backgroundColor: isDark ? '#333' : '#ddd' }]} />
           ) : (
-            <Text style={[
-              styles.accuracyValue,
-              { color: '#F44336' }
-            ]}>
-              {item.publicAccuracy}%
-            </Text>
+            <Text style={[styles.accuracyValue, { color: '#F44336' }]}>{item.publicAccuracy}%</Text>
           )}
         </View>
-        
+
         {/* AI Edge */}
         <View style={styles.edgeContainer}>
           {isLocked ? (
@@ -118,15 +83,11 @@ const AILeaderboard: React.FC<AILeaderboardProps> = ({
             </View>
           ) : (
             <>
-              <Text style={[
-                styles.edgeValue,
-                { color: aiEdge >= 0 ? '#4CAF50' : '#F44336' }
-              ]}>
-                {aiEdge >= 0 ? '+' : ''}{aiEdge}%
+              <Text style={[styles.edgeValue, { color: aiEdge >= 0 ? '#4CAF50' : '#F44336' }]}>
+                {aiEdge >= 0 ? '+' : ''}
+                {aiEdge}%
               </Text>
-              <Text style={[styles.edgeLabel, { color: colors.text }]}>
-                AI Edge
-              </Text>
+              <Text style={[styles.edgeLabel, { color: colors.text }]}>AI Edge</Text>
             </>
           )}
         </View>
@@ -135,16 +96,11 @@ const AILeaderboard: React.FC<AILeaderboardProps> = ({
   };
 
   return (
-    <View style={[
-      styles.container,
-      { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }
-    ]}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#1e1e1e' : '#f9f9f9' }]}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Ionicons name="podium" size={20} color={colors.primary} />
-          <Text style={[styles.title, { color: colors.text }]}>
-            AI vs Public Leaderboard
-          </Text>
+          <Text style={[styles.title, { color: colors.text }]}>AI vs Public Leaderboard</Text>
         </View>
         <Text style={[styles.subtitle, { color: colors.text }]}>
           Track how AI picks perform vs. public consensus
@@ -152,10 +108,7 @@ const AILeaderboard: React.FC<AILeaderboardProps> = ({
       </View>
 
       {/* Header row */}
-      <View style={[
-        styles.headerRow,
-        { borderBottomColor: isDark ? '#333' : '#e0e0e0' }
-      ]}>
+      <View style={[styles.headerRow, { borderBottomColor: isDark ? '#333' : '#e0e0e0' }]}>
         <Text style={[styles.headerText, { color: colors.text }]}>Date</Text>
         <Text style={[styles.headerText, { color: colors.text }]}>AI</Text>
         <Text style={[styles.headerText, { color: colors.text }]}>Public</Text>
@@ -165,13 +118,10 @@ const AILeaderboard: React.FC<AILeaderboardProps> = ({
       <FlatList
         data={entries}
         renderItem={renderEntry}
-        keyExtractor={(item) => item.date}
+        keyExtractor={item => item.date}
         scrollEnabled={false}
         ItemSeparatorComponent={() => (
-          <View style={[
-            styles.separator,
-            { backgroundColor: isDark ? '#333' : '#e0e0e0' }
-          ]} />
+          <View style={[styles.separator, { backgroundColor: isDark ? '#333' : '#e0e0e0' }]} />
         )}
       />
 

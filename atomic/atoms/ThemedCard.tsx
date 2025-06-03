@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { View, TouchableOpacity, ViewStyle } from 'react-native';
+
 import { useUITheme } from '../../components/UIThemeProvider';
 
 interface ThemedCardProps {
@@ -96,21 +97,13 @@ export function ThemedCard({
 
   if (touchable && onPress) {
     return (
-      <TouchableOpacity
-        style={[cardStyle, style]}
-        onPress={onPress}
-        activeOpacity={0.8}
-      >
+      <TouchableOpacity style={[cardStyle, style]} onPress={onPress} activeOpacity={0.8}>
         {children}
       </TouchableOpacity>
     );
   }
 
-  return (
-    <View style={[cardStyle, style]}>
-      {children}
-    </View>
-  );
+  return <View style={[cardStyle, style]}>{children}</View>;
 }
 
 export default ThemedCard;

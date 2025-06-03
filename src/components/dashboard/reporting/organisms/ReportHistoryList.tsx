@@ -1,10 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import { ReportHistory, ReportFormat, ReportType, ReportHistoryFilters } from '../../../../types/reporting';
+
+import { useCrossPlatform } from '../../../../hooks/useCrossPlatform';
+import {
+  ReportHistory,
+  ReportFormat,
+  ReportType,
+  ReportHistoryFilters,
+} from '../../../../types/reporting';
 import { Button } from '../../../ui/Button';
+import { Card } from '../../../ui/Card';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { Card } from '../../../ui/Card';
-import { useCrossPlatform } from '../../../../hooks/useCrossPlatform';
 
 export interface ReportHistoryListProps {
   className?: string;
@@ -142,9 +148,7 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Report History
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Report History</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             View and download previously generated reports
           </p>
@@ -167,7 +171,7 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
           type="text"
           placeholder="Search reports..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
           className="w-full"
         />
       </div>
@@ -175,9 +179,7 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
       {/* Filters */}
       {showFilters && (
         <Card className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
-            Filter Reports
-          </h4>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Filter Reports</h4>
           <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-4'}`}>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -186,7 +188,7 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
               <Input
                 type="date"
                 value={filters.startDate}
-                onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                onChange={e => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
               />
             </div>
             <div>
@@ -196,7 +198,7 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
               <Input
                 type="date"
                 value={filters.endDate}
-                onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                onChange={e => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
               />
             </div>
             <div>
@@ -205,10 +207,15 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
               </label>
               <Select
                 value={filters.status || 'all'}
-                onChange={(e) => setFilters(prev => ({ 
-                  ...prev, 
-                  status: e.target.value === 'all' ? undefined : e.target.value as 'success' | 'failed'
-                }))}
+                onChange={e =>
+                  setFilters(prev => ({
+                    ...prev,
+                    status:
+                      e.target.value === 'all'
+                        ? undefined
+                        : (e.target.value as 'success' | 'failed'),
+                  }))
+                }
               >
                 <option value="all">All</option>
                 <option value="success">Success</option>
@@ -221,10 +228,13 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
               </label>
               <Select
                 value={filters.reportType || 'all'}
-                onChange={(e) => setFilters(prev => ({ 
-                  ...prev, 
-                  reportType: e.target.value === 'all' ? undefined : e.target.value as ReportType
-                }))}
+                onChange={e =>
+                  setFilters(prev => ({
+                    ...prev,
+                    reportType:
+                      e.target.value === 'all' ? undefined : (e.target.value as ReportType),
+                  }))
+                }
               >
                 <option value="all">All Types</option>
                 <option value="standard">Standard</option>
@@ -238,12 +248,14 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setFilters({
-                startDate: '',
-                endDate: '',
-                status: undefined,
-                reportType: undefined,
-              })}
+              onClick={() =>
+                setFilters({
+                  startDate: '',
+                  endDate: '',
+                  status: undefined,
+                  reportType: undefined,
+                })
+              }
             >
               Clear Filters
             </Button>
@@ -265,9 +277,11 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
           </div>
         </Card>
       ) : (
-        <div className={`grid gap-4 ${
-          isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-        }`}>
+        <div
+          className={`grid gap-4 ${
+            isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+          }`}
+        >
           {filteredHistory.map(item => (
             <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
@@ -279,7 +293,9 @@ export function ReportHistoryList({ className = '' }: ReportHistoryListProps) {
                     {item.templateName}
                   </p>
                 </div>
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${getStatusBgColor(item.status)}`}>
+                <span
+                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${getStatusBgColor(item.status)}`}
+                >
                   {item.status}
                 </span>
               </div>

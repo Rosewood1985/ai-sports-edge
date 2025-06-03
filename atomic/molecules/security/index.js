@@ -5,8 +5,8 @@
  */
 
 const apiKeyScanner = require('./apiKeyScanner');
-const inputValidator = require('./inputValidator');
 const authManager = require('./authManager');
+const inputValidator = require('./inputValidator');
 
 module.exports = {
   // API Key Scanner

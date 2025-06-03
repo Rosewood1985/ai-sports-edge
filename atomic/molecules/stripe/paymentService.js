@@ -5,10 +5,10 @@
  * It combines stripe configuration atoms to provide payment functionality.
  */
 
+const cache = require('../../../utils/cache');
+const logger = require('../../../utils/logger');
 const { getStripe } = require('../../atoms/stripe/stripeConfig');
 const { DEFAULT_TAX_BEHAVIOR, TAX_CODES } = require('../../atoms/stripe/stripeTaxConfig');
-const logger = require('../../../utils/logger');
-const cache = require('../../../utils/cache');
 
 /**
  * Validate that the customer is in the United States

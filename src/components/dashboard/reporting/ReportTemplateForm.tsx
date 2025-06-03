@@ -5,7 +5,8 @@
  * It allows users to select widgets, set filters, and configure report options.
  */
 
-import React, { useState, useEffect } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Button,
@@ -26,8 +27,8 @@ import {
   Checkbox,
   ListItemText,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import React, { useState, useEffect } from 'react';
+
 import { ReportTemplate, ReportType } from '../../../types/reporting';
 
 // Available widgets for reports
@@ -390,8 +391,8 @@ const ReportTemplateForm: React.FC<ReportTemplateFormProps> = ({
                 {isSubmitting
                   ? 'Saving...'
                   : initialTemplate
-                  ? 'Update Template'
-                  : 'Create Template'}
+                    ? 'Update Template'
+                    : 'Create Template'}
               </Button>
             </Box>
           </Grid>

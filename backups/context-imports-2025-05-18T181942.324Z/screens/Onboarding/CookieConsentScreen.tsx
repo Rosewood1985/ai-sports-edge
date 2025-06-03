@@ -1,18 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { saveVerificationData } from '../../services/userService';
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 
 type CookieConsentScreenNavigationProp = StackNavigationProp<
   OnboardingStackParamList,
@@ -24,23 +21,19 @@ const CookieConsentScreen = () => {
   const { colors } = useTheme();
   const { t } = useLanguage();
   const { user } = useAuth();
-  
+
   // Cookie consent options
   const [essentialCookies, setEssentialCookies] = useState(true); // Always required
   const [analyticsCookies, setAnalyticsCookies] = useState(false);
   const [marketingCookies, setMarketingCookies] = useState(false);
   const [preferenceCookies, setPreferenceCookies] = useState(false);
-  
+
   const handleContinue = async () => {
     if (!user) {
-      Alert.alert(
-        t('common.error'),
-        t('common.not_authenticated'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('common.not_authenticated'), [{ text: t('common.ok') }]);
       return;
     }
-    
+
     try {
       // Save cookie consent to user profile
       await saveVerificationData(user.uid, 'cookieConsent', {
@@ -48,151 +41,141 @@ const CookieConsentScreen = () => {
         analyticsCookies,
         marketingCookies,
         preferenceCookies,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // Navigate to next screen (Age Verification)
       navigation.navigate('AgeVerification');
     } catch (error) {
       console.error('Error saving cookie consent:', error);
-      Alert.alert(
-        t('common.error'),
-        t('cookie.save_error'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), t('cookie.save_error'), [{ text: t('common.ok') }]);
     }
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
-          <ThemedText style={styles.title}>
-            {t('cookie.title')}
-          </ThemedText>
-          
-          <ThemedText style={styles.description}>
-            {t('cookie.description')}
-          </ThemedText>
-          
+          <ThemedText style={styles.title}>{t('cookie.title')}</ThemedText>
+
+          <ThemedText style={styles.description}>{t('cookie.description')}</ThemedText>
+
           {/* Essential Cookies - Always required */}
           <View style={styles.cookieSection}>
             <View style={styles.cookieHeader}>
-              <ThemedText style={styles.cookieTitle}>
-                {t('cookie.essential_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: colors.primary,
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.cookieTitle}>{t('cookie.essential_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 <Ionicons name="checkmark" size={18} color="white" />
               </View>
             </View>
-            
+
             <ThemedText style={styles.cookieDescription}>
               {t('cookie.essential_description')}
             </ThemedText>
           </View>
-          
+
           {/* Analytics Cookies */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.cookieSection}
             onPress={() => setAnalyticsCookies(!analyticsCookies)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('cookie.analytics_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: analyticsCookies }}
           >
             <View style={styles.cookieHeader}>
-              <ThemedText style={styles.cookieTitle}>
-                {t('cookie.analytics_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: analyticsCookies ? colors.primary : 'transparent',
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.cookieTitle}>{t('cookie.analytics_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: analyticsCookies ? colors.primary : 'transparent',
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 {analyticsCookies && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
-            
+
             <ThemedText style={styles.cookieDescription}>
               {t('cookie.analytics_description')}
             </ThemedText>
           </TouchableOpacity>
-          
+
           {/* Marketing Cookies */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.cookieSection}
             onPress={() => setMarketingCookies(!marketingCookies)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('cookie.marketing_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: marketingCookies }}
           >
             <View style={styles.cookieHeader}>
-              <ThemedText style={styles.cookieTitle}>
-                {t('cookie.marketing_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: marketingCookies ? colors.primary : 'transparent',
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.cookieTitle}>{t('cookie.marketing_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: marketingCookies ? colors.primary : 'transparent',
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 {marketingCookies && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
-            
+
             <ThemedText style={styles.cookieDescription}>
               {t('cookie.marketing_description')}
             </ThemedText>
           </TouchableOpacity>
-          
+
           {/* Preference Cookies */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.cookieSection}
             onPress={() => setPreferenceCookies(!preferenceCookies)}
-            accessible={true}
+            accessible
             accessibilityLabel={t('cookie.preference_title')}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: preferenceCookies }}
           >
             <View style={styles.cookieHeader}>
-              <ThemedText style={styles.cookieTitle}>
-                {t('cookie.preference_title')}
-              </ThemedText>
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: preferenceCookies ? colors.primary : 'transparent',
-                  borderColor: colors.primary
-                }
-              ]}>
+              <ThemedText style={styles.cookieTitle}>{t('cookie.preference_title')}</ThemedText>
+              <View
+                style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: preferenceCookies ? colors.primary : 'transparent',
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
                 {preferenceCookies && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
             </View>
-            
+
             <ThemedText style={styles.cookieDescription}>
               {t('cookie.preference_description')}
             </ThemedText>
           </TouchableOpacity>
-          
-          <ThemedText style={styles.cookieNote}>
-            {t('cookie.note')}
-          </ThemedText>
-          
+
+          <ThemedText style={styles.cookieNote}>{t('cookie.note')}</ThemedText>
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.acceptSelectedButton, { borderColor: colors.border }]}
               onPress={handleContinue}
-              accessible={true}
+              accessible
               accessibilityLabel={t('cookie.accept_selected')}
               accessibilityRole="button"
             >
@@ -200,7 +183,7 @@ const CookieConsentScreen = () => {
                 {t('cookie.accept_selected')}
               </ThemedText>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.acceptAllButton, { backgroundColor: colors.primary }]}
               onPress={() => {
@@ -209,23 +192,21 @@ const CookieConsentScreen = () => {
                 setPreferenceCookies(true);
                 setTimeout(handleContinue, 300);
               }}
-              accessible={true}
+              accessible
               accessibilityLabel={t('cookie.accept_all')}
               accessibilityRole="button"
             >
-              <Text style={styles.acceptAllButtonText}>
-                {t('cookie.accept_all')}
-              </Text>
+              <Text style={styles.acceptAllButtonText}>{t('cookie.accept_all')}</Text>
             </TouchableOpacity>
           </View>
-          
+
           <TouchableOpacity
             style={styles.cookiePolicyLink}
             onPress={() => {
               // Navigate to cookie policy
               navigation.navigate('Legal', { type: 'privacy-policy' });
             }}
-            accessible={true}
+            accessible
             accessibilityLabel={t('cookie.view_policy')}
             accessibilityRole="link"
           >

@@ -15,13 +15,14 @@ import {
   Alert,
   Switch,
 } from 'react-native';
+
 import { Card, Button } from '../../../atomic';
-import { useThemeColor } from '../../../hooks/useThemeColor';
 import { useInsightStream, useEnhancedInsights } from '../../../hooks/useEnhancedInsights';
-import { ChartComponent } from '../charts/ChartComponent';
+import { useThemeColor } from '../../../hooks/useThemeColor';
+import { EnhancedInsight, InsightFilters } from '../../../types/enhancedInsights';
 import { LoadingState } from '../../atoms/LoadingState';
 import { ErrorBoundary } from '../../organisms/ErrorBoundary';
-import { EnhancedInsight, InsightFilters } from '../../../types/enhancedInsights';
+import { ChartComponent } from '../charts/ChartComponent';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -53,10 +54,14 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
-  
+
   // State management
   const [isStreaming, setIsStreaming] = useState(false);
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['revenue', 'users', 'engagement']);
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
+    'revenue',
+    'users',
+    'engagement',
+  ]);
   const [timeWindow, setTimeWindow] = useState<'1h' | '6h' | '24h' | '7d'>('1h');
   const [realTimeMetrics, setRealTimeMetrics] = useState<RealTimeMetric[]>([]);
   const [streamingData, setStreamingData] = useState<Record<string, StreamingData>>({});
@@ -99,29 +104,31 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
 
   // Update real-time data
   const updateRealTimeData = useCallback(() => {
-    setRealTimeMetrics(prev => prev.map(metric => {
-      const variance = (Math.random() - 0.5) * 50;
-      const newValue = Math.max(0, metric.value + variance);
-      const change = ((newValue - metric.value) / metric.value) * 100;
-      
-      return {
-        ...metric,
-        value: newValue,
-        change,
-        trend: change > 0 ? 'up' : change < 0 ? 'down' : 'stable',
-        timestamp: new Date().toISOString(),
-      };
-    }));
+    setRealTimeMetrics(prev =>
+      prev.map(metric => {
+        const variance = (Math.random() - 0.5) * 50;
+        const newValue = Math.max(0, metric.value + variance);
+        const change = ((newValue - metric.value) / metric.value) * 100;
+
+        return {
+          ...metric,
+          value: newValue,
+          change,
+          trend: change > 0 ? 'up' : change < 0 ? 'down' : 'stable',
+          timestamp: new Date().toISOString(),
+        };
+      })
+    );
 
     // Update streaming data for charts
     setStreamingData(prev => {
       const newData = { ...prev };
       const now = new Date().toISOString();
-      
+
       selectedMetrics.forEach(metricId => {
         const metricConfig = availableMetrics.find(m => m.id === metricId);
         const currentMetric = realTimeMetrics.find(m => m.id === metricId);
-        
+
         if (!newData[metricId]) {
           newData[metricId] = {
             timestamps: [],
@@ -130,25 +137,25 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
             color: metricConfig?.color || '#666666',
           };
         }
-        
+
         // Add new data point
         newData[metricId].timestamps.push(now);
         newData[metricId].values.push(currentMetric?.value || 0);
-        
+
         // Keep only recent data based on time window
         const maxPoints = {
-          '1h': 60,   // 1 point per minute
-          '6h': 360,  // 1 point per minute
+          '1h': 60, // 1 point per minute
+          '6h': 360, // 1 point per minute
           '24h': 288, // 1 point per 5 minutes
-          '7d': 336,  // 1 point per 30 minutes
+          '7d': 336, // 1 point per 30 minutes
         }[timeWindow];
-        
+
         if (newData[metricId].timestamps.length > maxPoints) {
           newData[metricId].timestamps = newData[metricId].timestamps.slice(-maxPoints);
           newData[metricId].values = newData[metricId].values.slice(-maxPoints);
         }
       });
-      
+
       return newData;
     });
   }, [realTimeMetrics, selectedMetrics, timeWindow, availableMetrics]);
@@ -157,18 +164,17 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   const startRealTimeStreaming = useCallback(async () => {
     try {
       setIsStreaming(true);
-      
+
       // Start insight stream
       const filters: InsightFilters = {
         types: ['anomaly', 'trend', 'opportunity'],
         severities: ['medium', 'high', 'critical'],
       };
-      
+
       await startStream(filters);
-      
+
       // Start data updates
       intervalRef.current = setInterval(updateRealTimeData, 5000); // Update every 5 seconds
-      
     } catch (error) {
       Alert.alert('Error', 'Failed to start real-time streaming');
       console.error('Streaming error:', error);
@@ -180,16 +186,15 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   const stopRealTimeStreaming = useCallback(async () => {
     try {
       setIsStreaming(false);
-      
+
       // Stop insight stream
       await stopStream();
-      
+
       // Clear intervals
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      
     } catch (error) {
       console.error('Error stopping stream:', error);
     }
@@ -200,7 +205,8 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
     setSelectedMetrics(prev => {
       if (prev.includes(metricId)) {
         return prev.filter(id => id !== metricId);
-      } else if (prev.length < 6) { // Limit to 6 metrics
+      } else if (prev.length < 6) {
+        // Limit to 6 metrics
         return [...prev, metricId];
       } else {
         Alert.alert('Limit Reached', 'You can monitor up to 6 metrics at once');
@@ -221,7 +227,7 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
         updateRealTimeData();
       }, 100);
     }
-    
+
     return () => {
       if (dataUpdateRef.current) {
         clearTimeout(dataUpdateRef.current);
@@ -252,38 +258,42 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   // Render metric cards
   const renderMetricCards = () => (
     <View style={styles.metricsGrid}>
-      {realTimeMetrics.map((metric) => (
+      {realTimeMetrics.map(metric => (
         <Card key={metric.id} style={styles.metricCard}>
           <View style={styles.metricHeader}>
-            <Text style={[styles.metricName, { color: textColor }]}>
-              {metric.name}
-            </Text>
-            <View style={[
-              styles.trendIndicator,
-              { backgroundColor: 
-                metric.trend === 'up' ? '#22c55e' : 
-                metric.trend === 'down' ? '#ef4444' : '#6b7280'
-              }
-            ]}>
+            <Text style={[styles.metricName, { color: textColor }]}>{metric.name}</Text>
+            <View
+              style={[
+                styles.trendIndicator,
+                {
+                  backgroundColor:
+                    metric.trend === 'up'
+                      ? '#22c55e'
+                      : metric.trend === 'down'
+                        ? '#ef4444'
+                        : '#6b7280',
+                },
+              ]}
+            >
               <Text style={styles.trendText}>
                 {metric.trend === 'up' ? '↗' : metric.trend === 'down' ? '↘' : '→'}
               </Text>
             </View>
           </View>
-          
+
           <View style={styles.metricValue}>
             <Text style={[styles.metricNumber, { color: textColor }]}>
               {metric.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               {metric.unit}
             </Text>
-            <Text style={[
-              styles.metricChange,
-              { color: metric.change >= 0 ? '#22c55e' : '#ef4444' }
-            ]}>
-              {metric.change >= 0 ? '+' : ''}{metric.change.toFixed(1)}%
+            <Text
+              style={[styles.metricChange, { color: metric.change >= 0 ? '#22c55e' : '#ef4444' }]}
+            >
+              {metric.change >= 0 ? '+' : ''}
+              {metric.change.toFixed(1)}%
             </Text>
           </View>
-          
+
           <Text style={[styles.metricTimestamp, { color: textColor }]}>
             Last updated: {new Date(metric.timestamp).toLocaleTimeString()}
           </Text>
@@ -295,29 +305,27 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   // Render streaming charts
   const renderStreamingCharts = () => (
     <View style={styles.chartsSection}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        Live Data Streams
-      </Text>
-      
+      <Text style={[styles.sectionTitle, { color: textColor }]}>Live Data Streams</Text>
+
       {Object.entries(streamingData).map(([metricId, data]) => (
         <Card key={metricId} style={styles.chartCard}>
-          <Text style={[styles.chartTitle, { color: textColor }]}>
-            {data.label} - Live Stream
-          </Text>
-          
+          <Text style={[styles.chartTitle, { color: textColor }]}>{data.label} - Live Stream</Text>
+
           <ChartComponent
             type="line"
             data={{
               labels: data.timestamps.map(t => new Date(t).toLocaleTimeString()),
-              datasets: [{
-                label: data.label,
-                data: data.values,
-                borderColor: data.color,
-                backgroundColor: `${data.color}20`,
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-              }],
+              datasets: [
+                {
+                  label: data.label,
+                  data: data.values,
+                  borderColor: data.color,
+                  backgroundColor: `${data.color}20`,
+                  borderWidth: 2,
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
             }}
             options={{
               responsive: true,
@@ -357,30 +365,31 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   // Render alerts panel
   const renderAlertsPanel = () => (
     <Card style={styles.alertsCard}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        Real-time Alerts
-      </Text>
-      
+      <Text style={[styles.sectionTitle, { color: textColor }]}>Real-time Alerts</Text>
+
       {alerts.length === 0 ? (
-        <Text style={[styles.noAlertsText, { color: textColor }]}>
-          No alerts in the last hour
-        </Text>
+        <Text style={[styles.noAlertsText, { color: textColor }]}>No alerts in the last hour</Text>
       ) : (
         <ScrollView style={styles.alertsList} showsVerticalScrollIndicator={false}>
           {alerts.map((alert, index) => (
             <View key={`${alert.id}-${index}`} style={styles.alertItem}>
-              <View style={[
-                styles.alertSeverity,
-                { backgroundColor: 
-                  alert.severity === 'critical' ? '#ef4444' :
-                  alert.severity === 'high' ? '#f59e0b' :
-                  alert.severity === 'medium' ? '#06b6d4' : '#6b7280'
-                }
-              ]} />
+              <View
+                style={[
+                  styles.alertSeverity,
+                  {
+                    backgroundColor:
+                      alert.severity === 'critical'
+                        ? '#ef4444'
+                        : alert.severity === 'high'
+                          ? '#f59e0b'
+                          : alert.severity === 'medium'
+                            ? '#06b6d4'
+                            : '#6b7280',
+                  },
+                ]}
+              />
               <View style={styles.alertContent}>
-                <Text style={[styles.alertTitle, { color: textColor }]}>
-                  {alert.title}
-                </Text>
+                <Text style={[styles.alertTitle, { color: textColor }]}>{alert.title}</Text>
                 <Text style={[styles.alertDescription, { color: textColor }]}>
                   {alert.description}
                 </Text>
@@ -398,26 +407,26 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
   // Render metric selector
   const renderMetricSelector = () => (
     <Card style={styles.selectorCard}>
-      <Text style={[styles.sectionTitle, { color: textColor }]}>
-        Select Metrics to Monitor
-      </Text>
-      
+      <Text style={[styles.sectionTitle, { color: textColor }]}>Select Metrics to Monitor</Text>
+
       <View style={styles.metricsSelector}>
-        {availableMetrics.map((metric) => (
+        {availableMetrics.map(metric => (
           <TouchableOpacity
             key={metric.id}
             style={[
               styles.metricOption,
               { borderColor: selectedMetrics.includes(metric.id) ? primaryColor : '#e5e7eb' },
-              selectedMetrics.includes(metric.id) && { backgroundColor: `${primaryColor}20` }
+              selectedMetrics.includes(metric.id) && { backgroundColor: `${primaryColor}20` },
             ]}
             onPress={() => toggleMetric(metric.id)}
           >
             <View style={[styles.metricColorIndicator, { backgroundColor: metric.color }]} />
-            <Text style={[
-              styles.metricOptionText,
-              { color: selectedMetrics.includes(metric.id) ? primaryColor : textColor }
-            ]}>
+            <Text
+              style={[
+                styles.metricOptionText,
+                { color: selectedMetrics.includes(metric.id) ? primaryColor : textColor },
+              ]}
+            >
               {metric.name}
             </Text>
           </TouchableOpacity>
@@ -446,19 +455,15 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={[styles.title, { color: textColor }]}>
-              Real-time Analytics
-            </Text>
+            <Text style={[styles.title, { color: textColor }]}>Real-time Analytics</Text>
             <Text style={[styles.subtitle, { color: textColor }]}>
               Live streaming data and AI-powered insights
             </Text>
           </View>
-          
+
           <View style={styles.headerRight}>
             <View style={styles.streamingToggle}>
-              <Text style={[styles.toggleLabel, { color: textColor }]}>
-                Live Streaming
-              </Text>
+              <Text style={[styles.toggleLabel, { color: textColor }]}>Live Streaming</Text>
               <Switch
                 value={isStreaming}
                 onValueChange={isStreaming ? stopRealTimeStreaming : startRealTimeStreaming}
@@ -466,13 +471,11 @@ export const RealTimeAnalyticsDashboard: React.FC<RealTimeAnalyticsDashboardProp
                 thumbColor={isStreaming ? '#ffffff' : '#9ca3af'}
               />
             </View>
-            
+
             {isStreaming && (
               <View style={styles.liveIndicator}>
                 <View style={styles.liveDot} />
-                <Text style={[styles.liveText, { color: '#ef4444' }]}>
-                  LIVE
-                </Text>
+                <Text style={[styles.liveText, { color: '#ef4444' }]}>LIVE</Text>
               </View>
             )}
           </View>

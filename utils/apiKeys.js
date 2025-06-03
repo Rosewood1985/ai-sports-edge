@@ -8,9 +8,10 @@
  * All sensitive values should be loaded from environment variables or secure storage.
  */
 
-const { Platform } = require('react-native');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+
+const { Platform } = require('react-native');
 
 // Storage keys for API keys
 const API_KEY_STORAGE_KEYS = {

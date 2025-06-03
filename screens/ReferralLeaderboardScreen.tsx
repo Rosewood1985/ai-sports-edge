@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,15 +9,13 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { rewardsService } from '../services/rewardsService';
+
 import ReferralLeaderboard from '../components/ReferralLeaderboard';
 import ReferralPrivacySettings from '../components/ReferralPrivacySettings';
+import { useThemeColor } from '../hooks/useThemeColor';
+import { rewardsService } from '../services/rewardsService';
 import { LeaderboardEntry, LeaderboardPrivacy } from '../types/rewards';
 
 type RootStackParamList = {
@@ -34,24 +35,24 @@ const ReferralLeaderboardScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [privacyModalVisible, setPrivacyModalVisible] = useState<boolean>(false);
   const [currentPrivacy, setCurrentPrivacy] = useState<LeaderboardPrivacy>('public');
-  
+
   const navigation = useNavigation<NavigationProp>();
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
-  
+
   useEffect(() => {
     loadLeaderboardData();
     loadPrivacySettings();
   }, [period]);
-  
+
   const loadLeaderboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Get leaderboard data for the selected period
       const leaderboardData = await rewardsService.getLeaderboardData();
-      
+
       // Set the entries based on the selected period
       switch (period) {
         case 'weekly':
@@ -72,13 +73,13 @@ const ReferralLeaderboardScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   const loadPrivacySettings = async () => {
     try {
       // In a real app, this would fetch from the user's settings
       const userId = 'current-user-id'; // In a real app, get from auth
       const userRewards = await rewardsService.getUserRewards(userId);
-      
+
       if (userRewards && userRewards.leaderboardPrivacy) {
         setCurrentPrivacy(userRewards.leaderboardPrivacy);
       }
@@ -86,24 +87,24 @@ const ReferralLeaderboardScreen: React.FC = () => {
       console.error('Error loading privacy settings:', error);
     }
   };
-  
+
   const handlePeriodChange = (newPeriod: 'weekly' | 'monthly' | 'allTime') => {
     setPeriod(newPeriod);
   };
-  
+
   const handlePrivacySettingsPress = () => {
     setPrivacyModalVisible(true);
   };
-  
+
   const handlePrivacyChange = async (privacy: LeaderboardPrivacy) => {
     try {
       // In a real app, this would update the user's settings
       const userId = 'current-user-id'; // In a real app, get from auth
       await rewardsService.updateLeaderboardPrivacy(userId, privacy);
-      
+
       setCurrentPrivacy(privacy);
       setPrivacyModalVisible(false);
-      
+
       // Reload leaderboard data to reflect privacy changes
       loadLeaderboardData();
     } catch (error) {
@@ -111,38 +112,33 @@ const ReferralLeaderboardScreen: React.FC = () => {
       Alert.alert('Error', 'Failed to update privacy settings. Please try again.');
     }
   };
-  
+
   // Handle privacy change from the settings component
   const handlePrivacySettingsChanged = (privacy: LeaderboardPrivacy) => {
     setCurrentPrivacy(privacy);
     loadLeaderboardData();
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Custom Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={textColor} />
         </TouchableOpacity>
-        
-        <Text style={[styles.headerTitle, { color: textColor }]}>
-          Referral Leaderboard
-        </Text>
-        
-        <TouchableOpacity 
+
+        <Text style={[styles.headerTitle, { color: textColor }]}>Referral Leaderboard</Text>
+
+        <TouchableOpacity
           style={styles.rewardsButton}
           onPress={() => navigation.navigate('ReferralRewards')}
         >
           <Ionicons name="gift" size={24} color={textColor} />
         </TouchableOpacity>
       </View>
-      
+
       <ReferralLeaderboard
         entries={leaderboardEntries}
         loading={loading}
@@ -150,7 +146,7 @@ const ReferralLeaderboardScreen: React.FC = () => {
         onPeriodChange={handlePeriodChange}
         onPrivacySettingsPress={handlePrivacySettingsPress}
       />
-      
+
       <ReferralPrivacySettings
         visible={privacyModalVisible}
         onClose={() => setPrivacyModalVisible(false)}

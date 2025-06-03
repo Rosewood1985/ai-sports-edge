@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -9,26 +11,14 @@ import {
   Alert,
   Platform,
   Image,
-  TextInput
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-// TODO: Install these packages with: npm install expo-image-picker expo-clipboard
-// import * as ImagePicker from 'expo-image-picker';
-// import * as Clipboard from 'expo-clipboard';
-// Mock implementations for now
-const ImagePicker = {
-  requestCameraPermissionsAsync: async () => ({ status: 'granted' }),
-  launchCameraAsync: async (options?: any) => ({ canceled: false, assets: [{ uri: 'https://example.com/image.jpg' }] }),
-  launchImageLibraryAsync: async (options?: any) => ({ canceled: false, assets: [{ uri: 'https://example.com/image.jpg' }] }),
-  MediaTypeOptions: { Images: 'images' }
-};
-const Clipboard = {
-  getStringAsync: async () => 'Mocked clipboard text'
-};
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { PremiumFeature } from '../atomic/organisms';
+import { useTheme } from '../contexts/ThemeContext';
 import { bettingSlipImportService } from '../services/bettingSlipImportService';
 import {
   Sportsbook,
@@ -39,35 +29,54 @@ import {
   SuggestionType,
   ImportedBet,
   ImportResult,
-  SubscriptionRequirements
+  SubscriptionRequirements,
 } from '../types/bettingSlipImport';
-import { useTheme } from '../contexts/ThemeContext';
-import { PremiumFeature } from '../atomic/organisms';
+
+// TODO: Install these packages with: npm install expo-image-picker expo-clipboard
+// import * as ImagePicker from 'expo-image-picker';
+// import * as Clipboard from 'expo-clipboard';
+// Mock implementations for now
+const ImagePicker = {
+  requestCameraPermissionsAsync: async () => ({ status: 'granted' }),
+  launchCameraAsync: async (options?: any) => ({
+    canceled: false,
+    assets: [{ uri: 'https://example.com/image.jpg' }],
+  }),
+  launchImageLibraryAsync: async (options?: any) => ({
+    canceled: false,
+    assets: [{ uri: 'https://example.com/image.jpg' }],
+  }),
+  MediaTypeOptions: { Images: 'images' },
+};
+const Clipboard = {
+  getStringAsync: async () => 'Mocked clipboard text',
+};
 
 /**
  * Betting Slip Import Screen
- * 
+ *
  * This screen allows users to import betting slips from various sportsbooks.
  */
 const BettingSlipImportScreen: React.FC = () => {
   const navigation = useNavigation();
   const { isDark, colors } = useTheme();
   const [loading, setLoading] = useState(false);
-  const [subscriptionRequirements, setSubscriptionRequirements] = useState<SubscriptionRequirements | null>(null);
+  const [subscriptionRequirements, setSubscriptionRequirements] =
+    useState<SubscriptionRequirements | null>(null);
   const [selectedSportsbook, setSelectedSportsbook] = useState<Sportsbook | null>(null);
   const [importMethod, setImportMethod] = useState<ImportMethod | null>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [pastedText, setPastedText] = useState<string>('');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [importedBets, setImportedBets] = useState<ImportedBet[]>([]);
-  
+
   // Colors for the screen
   const backgroundColor = colors.background;
   const cardBackgroundColor = isDark ? '#1E1E1E' : '#FFFFFF';
   const cardBorderColor = isDark ? '#333333' : '#E0E0E0';
   const textColor = colors.text;
   const primaryColor = colors.primary;
-  
+
   // Check subscription requirements
   useEffect(() => {
     const checkSubscription = async () => {
@@ -84,22 +93,25 @@ const BettingSlipImportScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     checkSubscription();
   }, []);
-  
+
   // Request camera permissions
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Permission Required', 'Camera permission is required to take photos of betting slips.');
+          Alert.alert(
+            'Permission Required',
+            'Camera permission is required to take photos of betting slips.'
+          );
         }
       }
     })();
   }, []);
-  
+
   // Handle sportsbook selection
   const handleSelectSportsbook = (sportsbook: Sportsbook) => {
     setSelectedSportsbook(sportsbook);
@@ -108,7 +120,7 @@ const BettingSlipImportScreen: React.FC = () => {
     setPastedText('');
     setImportResult(null);
   };
-  
+
   // Handle import method selection
   const handleSelectImportMethod = (method: ImportMethod) => {
     setImportMethod(method);
@@ -116,7 +128,7 @@ const BettingSlipImportScreen: React.FC = () => {
     setPastedText('');
     setImportResult(null);
   };
-  
+
   // Handle taking a photo
   const handleTakePhoto = async () => {
     try {
@@ -126,7 +138,7 @@ const BettingSlipImportScreen: React.FC = () => {
         aspect: [4, 3],
         quality: 1,
       });
-      
+
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setImageUri(result.assets[0].uri);
       }
@@ -135,7 +147,7 @@ const BettingSlipImportScreen: React.FC = () => {
       Alert.alert('Error', 'Failed to take photo. Please try again.');
     }
   };
-  
+
   // Handle picking an image
   const handlePickImage = async () => {
     try {
@@ -145,7 +157,7 @@ const BettingSlipImportScreen: React.FC = () => {
         aspect: [4, 3],
         quality: 1,
       });
-      
+
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setImageUri(result.assets[0].uri);
       }
@@ -154,7 +166,7 @@ const BettingSlipImportScreen: React.FC = () => {
       Alert.alert('Error', 'Failed to pick image. Please try again.');
     }
   };
-  
+
   // Handle pasting text
   const handlePasteText = async () => {
     try {
@@ -169,22 +181,22 @@ const BettingSlipImportScreen: React.FC = () => {
       Alert.alert('Error', 'Failed to paste text. Please try again.');
     }
   };
-  
+
   // Handle importing betting slip
   const handleImport = async () => {
     if (!selectedSportsbook || !importMethod) {
       Alert.alert('Missing Information', 'Please select a sportsbook and import method.');
       return;
     }
-    
+
     try {
       setLoading(true);
-      
+
       // TODO: Replace with actual user ID
       const userId = 'user123';
-      
+
       let result: ImportResult;
-      
+
       if (importMethod === ImportMethod.SCREENSHOT && imageUri) {
         result = await bettingSlipImportService.importFromScreenshot(
           userId,
@@ -219,13 +231,13 @@ const BettingSlipImportScreen: React.FC = () => {
                 confidence: 0.85,
                 alternativeOdds: -105,
                 alternativeSportsbook: Sportsbook.FANDUEL,
-                potentialAdditionalWinnings: 2.38
-              }
-            }
-          ]
+                potentialAdditionalWinnings: 2.38,
+              },
+            },
+          ],
         };
       }
-      
+
       setImportResult(result);
       if (result.success) {
         setImportedBets(result.bets);
@@ -237,30 +249,31 @@ const BettingSlipImportScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   // Render sportsbook selection
   const renderSportsbookSelection = () => {
     const sportsbooks = [
       { id: Sportsbook.DRAFTKINGS, name: 'DraftKings', icon: 'logo-dribbble' },
       { id: Sportsbook.FANDUEL, name: 'FanDuel', icon: 'logo-facebook' },
       { id: Sportsbook.BETMGM, name: 'BetMGM', icon: 'logo-google' },
-      { id: Sportsbook.CAESARS, name: 'Caesars', icon: 'logo-apple' }
+      { id: Sportsbook.CAESARS, name: 'Caesars', icon: 'logo-apple' },
     ];
-    
+
     return (
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Select Sportsbook</ThemedText>
         <View style={styles.sportsbookGrid}>
-          {sportsbooks.map((sportsbook) => (
+          {sportsbooks.map(sportsbook => (
             <TouchableOpacity
               key={sportsbook.id}
               style={[
                 styles.sportsbookCard,
                 {
                   backgroundColor: cardBackgroundColor,
-                  borderColor: selectedSportsbook === sportsbook.id ? primaryColor : cardBorderColor,
-                  borderWidth: selectedSportsbook === sportsbook.id ? 2 : 1
-                }
+                  borderColor:
+                    selectedSportsbook === sportsbook.id ? primaryColor : cardBorderColor,
+                  borderWidth: selectedSportsbook === sportsbook.id ? 2 : 1,
+                },
               ]}
               onPress={() => handleSelectSportsbook(sportsbook.id)}
             >
@@ -276,21 +289,21 @@ const BettingSlipImportScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render import method selection
   const renderImportMethodSelection = () => {
     if (!selectedSportsbook) return null;
-    
+
     const methods = [
       { id: ImportMethod.SCREENSHOT, name: 'Screenshot', icon: 'camera' },
-      { id: ImportMethod.COPY_PASTE, name: 'Copy & Paste', icon: 'copy' }
+      { id: ImportMethod.COPY_PASTE, name: 'Copy & Paste', icon: 'copy' },
     ];
-    
+
     return (
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Select Import Method</ThemedText>
         <View style={styles.methodGrid}>
-          {methods.map((method) => (
+          {methods.map(method => (
             <TouchableOpacity
               key={method.id}
               style={[
@@ -298,8 +311,8 @@ const BettingSlipImportScreen: React.FC = () => {
                 {
                   backgroundColor: cardBackgroundColor,
                   borderColor: importMethod === method.id ? primaryColor : cardBorderColor,
-                  borderWidth: importMethod === method.id ? 2 : 1
-                }
+                  borderWidth: importMethod === method.id ? 2 : 1,
+                },
               ]}
               onPress={() => handleSelectImportMethod(method.id)}
             >
@@ -315,11 +328,11 @@ const BettingSlipImportScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render screenshot import
   const renderScreenshotImport = () => {
     if (!selectedSportsbook || importMethod !== ImportMethod.SCREENSHOT) return null;
-    
+
     return (
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Take a Screenshot</ThemedText>
@@ -330,7 +343,7 @@ const BettingSlipImportScreen: React.FC = () => {
             <View
               style={[
                 styles.screenshotPlaceholder,
-                { backgroundColor: cardBackgroundColor, borderColor: cardBorderColor }
+                { backgroundColor: cardBackgroundColor, borderColor: cardBorderColor },
               ]}
             >
               <Ionicons name="image" size={48} color={textColor} />
@@ -339,7 +352,7 @@ const BettingSlipImportScreen: React.FC = () => {
               </ThemedText>
             </View>
           )}
-          
+
           <View style={styles.screenshotButtons}>
             <TouchableOpacity
               style={[styles.screenshotButton, { backgroundColor: primaryColor }]}
@@ -348,7 +361,7 @@ const BettingSlipImportScreen: React.FC = () => {
               <Ionicons name="camera" size={24} color="#FFFFFF" />
               <Text style={styles.screenshotButtonText}>Take Photo</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.screenshotButton, { backgroundColor: primaryColor }]}
               onPress={handlePickImage}
@@ -361,11 +374,11 @@ const BettingSlipImportScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render copy paste import
   const renderCopyPasteImport = () => {
     if (!selectedSportsbook || importMethod !== ImportMethod.COPY_PASTE) return null;
-    
+
     return (
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Paste Betting Slip Text</ThemedText>
@@ -376,8 +389,8 @@ const BettingSlipImportScreen: React.FC = () => {
               {
                 backgroundColor: cardBackgroundColor,
                 borderColor: cardBorderColor,
-                color: textColor
-              }
+                color: textColor,
+              },
             ]}
             multiline
             placeholder="Paste your betting slip text here..."
@@ -385,7 +398,7 @@ const BettingSlipImportScreen: React.FC = () => {
             value={pastedText}
             onChangeText={setPastedText}
           />
-          
+
           <TouchableOpacity
             style={[styles.pasteButton, { backgroundColor: primaryColor }]}
             onPress={handlePasteText}
@@ -397,13 +410,13 @@ const BettingSlipImportScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render import button
   const renderImportButton = () => {
     if (!selectedSportsbook || !importMethod) return null;
-    
+
     const isReady = importMethod === ImportMethod.SCREENSHOT ? !!imageUri : !!pastedText;
-    
+
     return (
       <View style={styles.importButtonContainer}>
         <TouchableOpacity
@@ -411,8 +424,8 @@ const BettingSlipImportScreen: React.FC = () => {
             styles.importButton,
             {
               backgroundColor: isReady ? primaryColor : '#CCCCCC',
-              opacity: isReady ? 1 : 0.7
-            }
+              opacity: isReady ? 1 : 0.7,
+            },
           ]}
           onPress={handleImport}
           disabled={!isReady || loading}
@@ -429,11 +442,11 @@ const BettingSlipImportScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render import result
   const renderImportResult = () => {
     if (!importResult) return null;
-    
+
     return (
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Import Result</ThemedText>
@@ -443,8 +456,8 @@ const BettingSlipImportScreen: React.FC = () => {
             {
               backgroundColor: cardBackgroundColor,
               borderColor: importResult.success ? '#4CAF50' : '#F44336',
-              borderWidth: 2
-            }
+              borderWidth: 2,
+            },
           ]}
         >
           <View style={styles.resultHeader}>
@@ -455,15 +468,15 @@ const BettingSlipImportScreen: React.FC = () => {
             />
             <ThemedText style={styles.resultMessage}>{importResult.message}</ThemedText>
           </View>
-          
+
           {importResult.success && (
             <View style={styles.importedBetsContainer}>
-              {importedBets.map((bet) => (
+              {importedBets.map(bet => (
                 <View
                   key={bet.id}
                   style={[
                     styles.importedBetCard,
-                    { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' }
+                    { backgroundColor: isDark ? '#2A2A2A' : '#F5F5F5' },
                   ]}
                 >
                   <View style={styles.importedBetHeader}>
@@ -474,11 +487,9 @@ const BettingSlipImportScreen: React.FC = () => {
                       ${bet.amount.toFixed(2)}
                     </ThemedText>
                   </View>
-                  
-                  <ThemedText style={styles.importedBetDescription}>
-                    {bet.description}
-                  </ThemedText>
-                  
+
+                  <ThemedText style={styles.importedBetDescription}>{bet.description}</ThemedText>
+
                   <View style={styles.importedBetDetails}>
                     <ThemedText style={styles.importedBetOdds}>
                       Odds: {bet.odds > 0 ? `+${bet.odds}` : bet.odds}
@@ -487,7 +498,7 @@ const BettingSlipImportScreen: React.FC = () => {
                       Potential Win: ${bet.potentialWinnings.toFixed(2)}
                     </ThemedText>
                   </View>
-                  
+
                   {bet.aiSuggestion && (
                     <View
                       style={[
@@ -497,19 +508,19 @@ const BettingSlipImportScreen: React.FC = () => {
                             bet.aiSuggestion.type === SuggestionType.BETTER_ODDS
                               ? '#E3F2FD'
                               : bet.aiSuggestion.type === SuggestionType.GOOD_VALUE
-                              ? '#E8F5E9'
-                              : bet.aiSuggestion.type === SuggestionType.AVOID
-                              ? '#FFEBEE'
-                              : '#FFF8E1',
+                                ? '#E8F5E9'
+                                : bet.aiSuggestion.type === SuggestionType.AVOID
+                                  ? '#FFEBEE'
+                                  : '#FFF8E1',
                           borderColor:
                             bet.aiSuggestion.type === SuggestionType.BETTER_ODDS
                               ? '#2196F3'
                               : bet.aiSuggestion.type === SuggestionType.GOOD_VALUE
-                              ? '#4CAF50'
-                              : bet.aiSuggestion.type === SuggestionType.AVOID
-                              ? '#F44336'
-                              : '#FFC107'
-                        }
+                                ? '#4CAF50'
+                                : bet.aiSuggestion.type === SuggestionType.AVOID
+                                  ? '#F44336'
+                                  : '#FFC107',
+                        },
                       ]}
                     >
                       <Ionicons
@@ -517,20 +528,20 @@ const BettingSlipImportScreen: React.FC = () => {
                           bet.aiSuggestion.type === SuggestionType.BETTER_ODDS
                             ? 'trending-up'
                             : bet.aiSuggestion.type === SuggestionType.GOOD_VALUE
-                            ? 'thumbs-up'
-                            : bet.aiSuggestion.type === SuggestionType.AVOID
-                            ? 'thumbs-down'
-                            : 'alert-circle'
+                              ? 'thumbs-up'
+                              : bet.aiSuggestion.type === SuggestionType.AVOID
+                                ? 'thumbs-down'
+                                : 'alert-circle'
                         }
                         size={20}
                         color={
                           bet.aiSuggestion.type === SuggestionType.BETTER_ODDS
                             ? '#2196F3'
                             : bet.aiSuggestion.type === SuggestionType.GOOD_VALUE
-                            ? '#4CAF50'
-                            : bet.aiSuggestion.type === SuggestionType.AVOID
-                            ? '#F44336'
-                            : '#FFC107'
+                              ? '#4CAF50'
+                              : bet.aiSuggestion.type === SuggestionType.AVOID
+                                ? '#F44336'
+                                : '#FFC107'
                         }
                       />
                       <Text
@@ -541,11 +552,11 @@ const BettingSlipImportScreen: React.FC = () => {
                               bet.aiSuggestion.type === SuggestionType.BETTER_ODDS
                                 ? '#0D47A1'
                                 : bet.aiSuggestion.type === SuggestionType.GOOD_VALUE
-                                ? '#1B5E20'
-                                : bet.aiSuggestion.type === SuggestionType.AVOID
-                                ? '#B71C1C'
-                                : '#F57F17'
-                          }
+                                  ? '#1B5E20'
+                                  : bet.aiSuggestion.type === SuggestionType.AVOID
+                                    ? '#B71C1C'
+                                    : '#F57F17',
+                          },
                         ]}
                       >
                         {bet.aiSuggestion.description}
@@ -556,7 +567,7 @@ const BettingSlipImportScreen: React.FC = () => {
               ))}
             </View>
           )}
-          
+
           {!importResult.success && importResult.errorDetails && (
             <ThemedText style={styles.errorDetails}>{importResult.errorDetails}</ThemedText>
           )}
@@ -564,11 +575,11 @@ const BettingSlipImportScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   // Render subscription required message
   const renderSubscriptionRequired = () => {
     if (!subscriptionRequirements || subscriptionRequirements.isEligible) return null;
-    
+
     return (
       <PremiumFeature
         message={`Upgrade to ${subscriptionRequirements.requiredTier} to import betting slips from popular sportsbooks and get AI-powered suggestions for better odds and hedging opportunities.`}
@@ -576,13 +587,14 @@ const BettingSlipImportScreen: React.FC = () => {
         <View style={styles.premiumFeatureContent}>
           <ThemedText style={styles.premiumFeatureTitle}>Betting Slip Import</ThemedText>
           <ThemedText style={styles.premiumFeatureDescription}>
-            Import your betting slips from popular sportsbooks and get AI-powered suggestions for better odds and hedging opportunities.
+            Import your betting slips from popular sportsbooks and get AI-powered suggestions for
+            better odds and hedging opportunities.
           </ThemedText>
         </View>
       </PremiumFeature>
     );
   };
-  
+
   // Render loading state
   if (loading && !subscriptionRequirements) {
     return (
@@ -594,36 +606,36 @@ const BettingSlipImportScreen: React.FC = () => {
       </SafeAreaView>
     );
   }
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
         <ThemedText style={styles.title}>Betting Slip Import</ThemedText>
         <ThemedText style={styles.subtitle}>Import your betting slips from sportsbooks</ThemedText>
       </View>
-      
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Subscription required message */}
         {renderSubscriptionRequired()}
-        
+
         {/* Main content */}
         {subscriptionRequirements && subscriptionRequirements.isEligible && (
           <>
             {/* Sportsbook selection */}
             {renderSportsbookSelection()}
-            
+
             {/* Import method selection */}
             {renderImportMethodSelection()}
-            
+
             {/* Screenshot import */}
             {renderScreenshotImport()}
-            
+
             {/* Copy paste import */}
             {renderCopyPasteImport()}
-            
+
             {/* Import button */}
             {renderImportButton()}
-            
+
             {/* Import result */}
             {renderImportResult()}
           </>

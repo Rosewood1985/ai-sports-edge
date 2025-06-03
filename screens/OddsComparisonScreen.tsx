@@ -1,3 +1,4 @@
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -7,20 +8,19 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '../contexts/ThemeContext';
+
 import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
-import { auth } from '../config/firebase';
-import { hasActiveSubscription } from '../services/subscriptionService';
-import { Header } from '../atomic/organisms';
-import { PremiumFeature } from '../atomic/organisms';
-import OddsComparisonComponent from '../components/OddsComparisonComponent';
-import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
 import {
   AccessibleThemedText,
   AccessibleThemedView,
   AccessibleTouchableOpacity,
 } from '../atomic/atoms';
+import { Header, PremiumFeature } from '../atomic/organisms';
+import OddsComparisonComponent from '../components/OddsComparisonComponent';
+import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
+import { analyticsService, AnalyticsEventType } from '../services/analyticsService';
+import { hasActiveSubscription } from '../services/subscriptionService';
 
 type OddsComparisonScreenProps = {
   navigation: StackNavigationProp<any, 'OddsComparison'>;
@@ -151,7 +151,7 @@ export default function OddsComparisonScreen({
             accessibilityHint={t('oddsComparison.accessibility.pullToRefreshHint')}
           />
         }
-        accessible={true}
+        accessible
         accessibilityLabel={t('oddsComparison.accessibility.oddsScrollView')}
         accessibilityRole="scrollbar"
       >
@@ -187,7 +187,7 @@ export default function OddsComparisonScreen({
               </AccessibleThemedText>
             </AccessibleThemedView>
           ) : hasPremium ? (
-            <OddsComparisonComponent ref={oddsComponentRef} isPremium={true} />
+            <OddsComparisonComponent ref={oddsComponentRef} isPremium />
           ) : (
             <PremiumFeature message={t('oddsComparison.purchaseOdds')} onUpgrade={handleUpgrade}>
               <OddsComparisonComponent ref={oddsComponentRef} isPremium={false} />

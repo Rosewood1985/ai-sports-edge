@@ -1,6 +1,6 @@
 /**
  * Theme Context
- * 
+ *
  * Provides theme context for the application.
  */
 

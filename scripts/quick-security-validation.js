@@ -2,7 +2,7 @@
 
 /**
  * Quick OCR Security Validation
- * 
+ *
  * Simple validation that the security fixes are working correctly
  */
 
@@ -16,7 +16,10 @@ async function quickSecurityTest() {
   total++;
   try {
     const { secureCommandService } = require('../services/secureCommandService');
-    await secureCommandService.executeSecureCommand('tesseract', ['test"; rm -rf /; echo "pwned', 'stdout']);
+    await secureCommandService.executeSecureCommand('tesseract', [
+      'test"; rm -rf /; echo "pwned',
+      'stdout',
+    ]);
     console.log('❌ Command injection test FAILED - should have been blocked');
   } catch (error) {
     if (error.message.includes('dangerous characters')) {
@@ -35,7 +38,7 @@ async function quickSecurityTest() {
       originalname: 'malicious.sh',
       mimetype: 'application/x-executable',
       size: 1024,
-      buffer: Buffer.alloc(1024)
+      buffer: Buffer.alloc(1024),
     };
     await secureFileUploadService.validateAndSecureFile(mockFile);
     console.log('❌ File validation test FAILED - should have been blocked');
@@ -78,7 +81,7 @@ async function quickSecurityTest() {
   console.log('\n📊 SECURITY VALIDATION SUMMARY');
   console.log('================================');
   console.log(`Tests Passed: ${passed}/${total}`);
-  
+
   const score = Math.round((passed / total) * 100);
   console.log(`Security Score: ${score}%`);
 
@@ -92,12 +95,14 @@ async function quickSecurityTest() {
 }
 
 if (require.main === module) {
-  quickSecurityTest().then(success => {
-    process.exit(success ? 0 : 1);
-  }).catch(error => {
-    console.error('❌ Security validation failed:', error.message);
-    process.exit(1);
-  });
+  quickSecurityTest()
+    .then(success => {
+      process.exit(success ? 0 : 1);
+    })
+    .catch(error => {
+      console.error('❌ Security validation failed:', error.message);
+      process.exit(1);
+    });
 }
 
 module.exports = quickSecurityTest;

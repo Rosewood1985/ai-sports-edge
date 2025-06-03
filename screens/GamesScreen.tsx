@@ -1,14 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
-
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 
 const GamesScreen = () => {
   const navigation = useNavigation();
@@ -25,9 +23,11 @@ const GamesScreen = () => {
       setLoading(true);
 
       // Fetch games from Firebase function
-      const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+      const response = await fetch(
+        'https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames'
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         let filteredGames = data.games;
 
@@ -39,7 +39,7 @@ const GamesScreen = () => {
         } else if (tab === 'completed') {
           filteredGames = data.games.filter(game => game.status === 'completed');
         }
-        
+
         setGames(filteredGames);
       } else {
         throw new Error('Failed to fetch games');
@@ -88,8 +88,8 @@ const GamesScreen = () => {
       item.status === 'live'
         ? 'Live game'
         : item.status === 'upcoming'
-        ? 'Upcoming game'
-        : 'Completed game';
+          ? 'Upcoming game'
+          : 'Completed game';
     const gameDescription = `${item.homeTeam.name} versus ${item.awayTeam.name} at ${item.venue}`;
 
     return (

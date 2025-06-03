@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert } from 'react-native';
-import { 
-  createDocument, 
-  getDocument, 
-  updateDocument, 
-  deleteDocument, 
+
+import {
+  createDocument,
+  getDocument,
+  updateDocument,
+  deleteDocument,
   queryDocuments,
   subscribeToQuery,
-  getServerTimestamp
+  getServerTimestamp,
 } from '../firestore';
 
 /**
@@ -19,21 +20,21 @@ const FirestoreExample = () => {
   const [noteText, setNoteText] = useState('');
   const [selectedNote, setSelectedNote] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Collection name for this example
   const COLLECTION_NAME = 'notes';
 
   // Load notes on component mount and set up real-time listener
   useEffect(() => {
     loadNotes();
-    
+
     // Set up real-time subscription
     const unsubscribe = subscribeToQuery(
       COLLECTION_NAME,
       [{ field: 'archived', operator: '==', value: false }],
       [{ field: 'createdAt', direction: 'desc' }],
       50,
-      (result) => {
+      result => {
         if (result.error) {
           console.error('Error in subscription:', result.error);
         } else {
@@ -41,7 +42,7 @@ const FirestoreExample = () => {
         }
       }
     );
-    
+
     // Clean up subscription on unmount
     return () => unsubscribe();
   }, []);
@@ -49,15 +50,15 @@ const FirestoreExample = () => {
   // Load notes from Firestore
   const loadNotes = async () => {
     setLoading(true);
-    
+
     const result = await queryDocuments(
       COLLECTION_NAME,
       [{ field: 'archived', operator: '==', value: false }],
       [{ field: 'createdAt', direction: 'desc' }]
     );
-    
+
     setLoading(false);
-    
+
     if (result.error) {
       Alert.alert('Error', `Failed to load notes: ${result.error}`);
     } else {
@@ -71,19 +72,19 @@ const FirestoreExample = () => {
       Alert.alert('Error', 'Please enter note text');
       return;
     }
-    
+
     setLoading(true);
-    
+
     const noteData = {
       text: noteText.trim(),
       archived: false,
       createdAt: getServerTimestamp(),
     };
-    
+
     const result = await createDocument(COLLECTION_NAME, noteData);
-    
+
     setLoading(false);
-    
+
     if (result.error) {
       Alert.alert('Error', `Failed to add note: ${result.error}`);
     } else {
@@ -98,16 +99,16 @@ const FirestoreExample = () => {
       Alert.alert('Error', 'Please select a note and enter text');
       return;
     }
-    
+
     setLoading(true);
-    
+
     const result = await updateDocument(COLLECTION_NAME, selectedNote.id, {
       text: noteText.trim(),
       updatedAt: getServerTimestamp(),
     });
-    
+
     setLoading(false);
-    
+
     if (result.error) {
       Alert.alert('Error', `Failed to update note: ${result.error}`);
     } else {
@@ -118,16 +119,16 @@ const FirestoreExample = () => {
   };
 
   // Delete a note (soft delete by archiving)
-  const archiveNote = async (noteId) => {
+  const archiveNote = async noteId => {
     setLoading(true);
-    
+
     const result = await updateDocument(COLLECTION_NAME, noteId, {
       archived: true,
       updatedAt: getServerTimestamp(),
     });
-    
+
     setLoading(false);
-    
+
     if (result.error) {
       Alert.alert('Error', `Failed to archive note: ${result.error}`);
     } else {
@@ -140,13 +141,13 @@ const FirestoreExample = () => {
   };
 
   // Hard delete a note (permanent)
-  const deleteNotePermantly = async (noteId) => {
+  const deleteNotePermantly = async noteId => {
     setLoading(true);
-    
+
     const result = await deleteDocument(COLLECTION_NAME, noteId);
-    
+
     setLoading(false);
-    
+
     if (result.error) {
       Alert.alert('Error', `Failed to delete note: ${result.error}`);
     } else {
@@ -159,7 +160,7 @@ const FirestoreExample = () => {
   };
 
   // Select a note for editing
-  const selectNote = (note) => {
+  const selectNote = note => {
     setSelectedNote(note);
     setNoteText(note.text);
   };
@@ -174,22 +175,11 @@ const FirestoreExample = () => {
   const renderNoteItem = ({ item }) => (
     <View style={styles.noteItem}>
       <Text style={styles.noteText}>{item.text}</Text>
-      
+
       <View style={styles.noteActions}>
-        <Button 
-          title="Edit" 
-          onPress={() => selectNote(item)} 
-        />
-        <Button 
-          title="Archive" 
-          onPress={() => archiveNote(item.id)} 
-          color="#ff9800"
-        />
-        <Button 
-          title="Delete" 
-          onPress={() => deleteNotePermantly(item.id)} 
-          color="#f44336"
-        />
+        <Button title="Edit" onPress={() => selectNote(item)} />
+        <Button title="Archive" onPress={() => archiveNote(item.id)} color="#ff9800" />
+        <Button title="Delete" onPress={() => deleteNotePermantly(item.id)} color="#f44336" />
       </View>
     </View>
   );
@@ -197,7 +187,7 @@ const FirestoreExample = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Firebase Firestore Example</Text>
-      
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -206,46 +196,30 @@ const FirestoreExample = () => {
           onChangeText={setNoteText}
           multiline
         />
-        
+
         <View style={styles.buttonContainer}>
           {selectedNote ? (
             <>
-              <Button 
-                title="Update" 
-                onPress={updateNote} 
-                disabled={loading} 
-              />
-              <Button 
-                title="Cancel" 
-                onPress={cancelEdit} 
-                disabled={loading} 
-                color="#999"
-              />
+              <Button title="Update" onPress={updateNote} disabled={loading} />
+              <Button title="Cancel" onPress={cancelEdit} disabled={loading} color="#999" />
             </>
           ) : (
-            <Button 
-              title="Add Note" 
-              onPress={addNote} 
-              disabled={loading} 
-            />
+            <Button title="Add Note" onPress={addNote} disabled={loading} />
           )}
         </View>
       </View>
-      
+
       <Text style={styles.subtitle}>
-        Notes ({notes.length})
-        {loading && ' - Loading...'}
+        Notes ({notes.length}){loading && ' - Loading...'}
       </Text>
-      
+
       <FlatList
         data={notes}
         renderItem={renderNoteItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         style={styles.notesList}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            No notes found. Add your first note!
-          </Text>
+          <Text style={styles.emptyText}>No notes found. Add your first note!</Text>
         }
       />
     </View>

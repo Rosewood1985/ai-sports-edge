@@ -1,12 +1,21 @@
-import React from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { 
-  NewsSearchResult, 
-  TeamSearchResult, 
-  PlayerSearchResult, 
+import React from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+
+import {
+  NewsSearchResult,
+  TeamSearchResult,
+  PlayerSearchResult,
   OddsSearchResult,
-  SearchFilters
+  SearchFilters,
 } from '../../services/searchService';
 
 interface SearchResultsProps {
@@ -43,33 +52,30 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   onOddsPress,
   onFilterChange,
   filters,
-  style = {}
+  style = {},
 }) => {
   // Format date for display
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
   // Render news item
   const renderNewsItem = ({ item }: { item: NewsSearchResult }) => (
-    <TouchableOpacity 
-      style={styles.newsItem} 
-      onPress={() => onNewsItemPress(item)}
-    >
+    <TouchableOpacity style={styles.newsItem} onPress={() => onNewsItemPress(item)}>
       {item.imageUrl && (
-        <Image 
-          source={{ uri: item.imageUrl }} 
-          style={styles.newsImage} 
-          resizeMode="cover" 
-        />
+        <Image source={{ uri: item.imageUrl }} style={styles.newsImage} resizeMode="cover" />
       )}
       <View style={styles.newsContent}>
-        <Text style={styles.newsTitle} numberOfLines={2}>{item.title}</Text>
-        <Text style={styles.newsSnippet} numberOfLines={2}>{item.snippet}</Text>
+        <Text style={styles.newsTitle} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <Text style={styles.newsSnippet} numberOfLines={2}>
+          {item.snippet}
+        </Text>
         <View style={styles.newsFooter}>
           <Text style={styles.newsSource}>{item.source}</Text>
           <Text style={styles.newsDate}>{formatDate(item.date)}</Text>
@@ -80,18 +86,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   // Render team item
   const renderTeamItem = ({ item }: { item: TeamSearchResult }) => (
-    <TouchableOpacity 
-      style={styles.teamItem} 
-      onPress={() => onTeamPress(item)}
-    >
-      <Image 
-        source={{ uri: item.logo }} 
-        style={styles.teamLogo} 
-        resizeMode="contain" 
-      />
+    <TouchableOpacity style={styles.teamItem} onPress={() => onTeamPress(item)}>
+      <Image source={{ uri: item.logo }} style={styles.teamLogo} resizeMode="contain" />
       <View style={styles.teamContent}>
         <Text style={styles.teamName}>{item.name}</Text>
-        <Text style={styles.teamDetails}>{item.sport} | {item.league}</Text>
+        <Text style={styles.teamDetails}>
+          {item.sport} | {item.league}
+        </Text>
         {item.record && <Text style={styles.teamRecord}>{item.record}</Text>}
       </View>
     </TouchableOpacity>
@@ -99,16 +100,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   // Render player item
   const renderPlayerItem = ({ item }: { item: PlayerSearchResult }) => (
-    <TouchableOpacity 
-      style={styles.playerItem} 
-      onPress={() => onPlayerPress(item)}
-    >
+    <TouchableOpacity style={styles.playerItem} onPress={() => onPlayerPress(item)}>
       {item.imageUrl ? (
-        <Image 
-          source={{ uri: item.imageUrl }} 
-          style={styles.playerImage} 
-          resizeMode="cover" 
-        />
+        <Image source={{ uri: item.imageUrl }} style={styles.playerImage} resizeMode="cover" />
       ) : (
         <View style={styles.playerImagePlaceholder}>
           <Ionicons name="person" size={24} color="#ccc" />
@@ -117,31 +111,37 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       <View style={styles.playerContent}>
         <Text style={styles.playerName}>{item.name}</Text>
         <Text style={styles.playerTeam}>{item.team}</Text>
-        <Text style={styles.playerDetails}>{item.position} | {item.sport} | {item.league}</Text>
+        <Text style={styles.playerDetails}>
+          {item.position} | {item.sport} | {item.league}
+        </Text>
       </View>
     </TouchableOpacity>
   );
 
   // Render odds item
   const renderOddsItem = ({ item }: { item: OddsSearchResult }) => (
-    <TouchableOpacity 
-      style={styles.oddsItem} 
-      onPress={() => onOddsPress(item)}
-    >
+    <TouchableOpacity style={styles.oddsItem} onPress={() => onOddsPress(item)}>
       <View style={styles.oddsHeader}>
-        <Text style={styles.oddsTeams}>{item.homeTeam} vs {item.awayTeam}</Text>
+        <Text style={styles.oddsTeams}>
+          {item.homeTeam} vs {item.awayTeam}
+        </Text>
         <Text style={styles.oddsDate}>{formatDate(item.date)}</Text>
       </View>
       <View style={styles.oddsContent}>
         <View style={styles.oddsDetail}>
           <Text style={styles.oddsLabel}>Moneyline</Text>
           <Text style={styles.oddsValue}>
-            {item.odds.homeMoneyline > 0 ? '+' : ''}{item.odds.homeMoneyline} / {item.odds.awayMoneyline > 0 ? '+' : ''}{item.odds.awayMoneyline}
+            {item.odds.homeMoneyline > 0 ? '+' : ''}
+            {item.odds.homeMoneyline} / {item.odds.awayMoneyline > 0 ? '+' : ''}
+            {item.odds.awayMoneyline}
           </Text>
         </View>
         <View style={styles.oddsDetail}>
           <Text style={styles.oddsLabel}>Spread</Text>
-          <Text style={styles.oddsValue}>{item.odds.spread > 0 ? '+' : ''}{item.odds.spread}</Text>
+          <Text style={styles.oddsValue}>
+            {item.odds.spread > 0 ? '+' : ''}
+            {item.odds.spread}
+          </Text>
         </View>
         <View style={styles.oddsDetail}>
           <Text style={styles.oddsLabel}>O/U</Text>
@@ -149,7 +149,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         </View>
       </View>
       <View style={styles.oddsFooter}>
-        <Text style={styles.oddsLeague}>{item.sport} | {item.league}</Text>
+        <Text style={styles.oddsLeague}>
+          {item.sport} | {item.league}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -166,7 +168,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             {query ? `No results found for "${query}"` : 'Search for sports content'}
           </Text>
           <Text style={styles.emptyStateText}>
-            {query ? 'Try different keywords or filters' : 'Enter a search term to find news, teams, players, and odds'}
+            {query
+              ? 'Try different keywords or filters'
+              : 'Enter a search term to find news, teams, players, and odds'}
           </Text>
         </>
       )}
@@ -186,96 +190,112 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     <View style={styles.filtersContainer}>
       <Text style={styles.filtersTitle}>Filters</Text>
       <View style={styles.filterOptions}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[
-            styles.filterOption, 
-            filters.contentTypes?.includes('news') && styles.filterOptionActive
+            styles.filterOption,
+            filters.contentTypes?.includes('news') && styles.filterOptionActive,
           ]}
           onPress={() => {
             const contentTypes = filters.contentTypes || [];
             const newContentTypes = contentTypes.includes('news')
               ? contentTypes.filter(type => type !== 'news')
               : [...contentTypes, 'news'];
-            
+
             onFilterChange({
               ...filters,
-              contentTypes: newContentTypes
+              contentTypes: newContentTypes,
             });
           }}
         >
-          <Text style={[
-            styles.filterOptionText,
-            filters.contentTypes?.includes('news') && styles.filterOptionTextActive
-          ]}>News</Text>
+          <Text
+            style={[
+              styles.filterOptionText,
+              filters.contentTypes?.includes('news') && styles.filterOptionTextActive,
+            ]}
+          >
+            News
+          </Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[
-            styles.filterOption, 
-            filters.contentTypes?.includes('teams') && styles.filterOptionActive
+            styles.filterOption,
+            filters.contentTypes?.includes('teams') && styles.filterOptionActive,
           ]}
           onPress={() => {
             const contentTypes = filters.contentTypes || [];
             const newContentTypes = contentTypes.includes('teams')
               ? contentTypes.filter(type => type !== 'teams')
               : [...contentTypes, 'teams'];
-            
+
             onFilterChange({
               ...filters,
-              contentTypes: newContentTypes
+              contentTypes: newContentTypes,
             });
           }}
         >
-          <Text style={[
-            styles.filterOptionText,
-            filters.contentTypes?.includes('teams') && styles.filterOptionTextActive
-          ]}>Teams</Text>
+          <Text
+            style={[
+              styles.filterOptionText,
+              filters.contentTypes?.includes('teams') && styles.filterOptionTextActive,
+            ]}
+          >
+            Teams
+          </Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[
-            styles.filterOption, 
-            filters.contentTypes?.includes('players') && styles.filterOptionActive
+            styles.filterOption,
+            filters.contentTypes?.includes('players') && styles.filterOptionActive,
           ]}
           onPress={() => {
             const contentTypes = filters.contentTypes || [];
             const newContentTypes = contentTypes.includes('players')
               ? contentTypes.filter(type => type !== 'players')
               : [...contentTypes, 'players'];
-            
+
             onFilterChange({
               ...filters,
-              contentTypes: newContentTypes
+              contentTypes: newContentTypes,
             });
           }}
         >
-          <Text style={[
-            styles.filterOptionText,
-            filters.contentTypes?.includes('players') && styles.filterOptionTextActive
-          ]}>Players</Text>
+          <Text
+            style={[
+              styles.filterOptionText,
+              filters.contentTypes?.includes('players') && styles.filterOptionTextActive,
+            ]}
+          >
+            Players
+          </Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[
-            styles.filterOption, 
-            filters.contentTypes?.includes('odds') && styles.filterOptionActive
+            styles.filterOption,
+            filters.contentTypes?.includes('odds') && styles.filterOptionActive,
           ]}
           onPress={() => {
             const contentTypes = filters.contentTypes || [];
             const newContentTypes = contentTypes.includes('odds')
               ? contentTypes.filter(type => type !== 'odds')
               : [...contentTypes, 'odds'];
-            
+
             onFilterChange({
               ...filters,
-              contentTypes: newContentTypes
+              contentTypes: newContentTypes,
             });
           }}
         >
-          <Text style={[
-            styles.filterOptionText,
-            filters.contentTypes?.includes('odds') && styles.filterOptionTextActive
-          ]}>Odds</Text>
+          <Text
+            style={[
+              styles.filterOptionText,
+              filters.contentTypes?.includes('odds') && styles.filterOptionTextActive,
+            ]}
+          >
+            Odds
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -288,9 +308,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           {totalResults} {totalResults === 1 ? 'result' : 'results'} for "{query}"
         </Text>
       )}
-      
+
       {renderFilterOptions()}
-      
+
       {totalResults === 0 ? (
         renderEmptyState()
       ) : (
@@ -305,46 +325,46 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                   <FlatList
                     data={newsResults}
                     renderItem={renderNewsItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={item => item.id}
                     horizontal={false}
                     scrollEnabled={false}
                   />
                 </View>
               )}
-              
+
               {teamsResults.length > 0 && (
                 <View style={styles.section}>
                   {renderSectionHeader('Teams', teamsResults.length)}
                   <FlatList
                     data={teamsResults}
                     renderItem={renderTeamItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={item => item.id}
                     horizontal={false}
                     scrollEnabled={false}
                   />
                 </View>
               )}
-              
+
               {playersResults.length > 0 && (
                 <View style={styles.section}>
                   {renderSectionHeader('Players', playersResults.length)}
                   <FlatList
                     data={playersResults}
                     renderItem={renderPlayerItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={item => item.id}
                     horizontal={false}
                     scrollEnabled={false}
                   />
                 </View>
               )}
-              
+
               {oddsResults.length > 0 && (
                 <View style={styles.section}>
                   {renderSectionHeader('Odds', oddsResults.length)}
                   <FlatList
                     data={oddsResults}
                     renderItem={renderOddsItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={item => item.id}
                     horizontal={false}
                     scrollEnabled={false}
                   />

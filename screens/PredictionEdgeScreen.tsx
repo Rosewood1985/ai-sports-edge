@@ -1,19 +1,13 @@
-import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Platform,
-  FlatList,
-  SafeAreaView,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '../hooks';
-import { useTheme } from '../contexts/ThemeContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, Platform, FlatList, SafeAreaView } from 'react-native';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../hooks';
 
 // Define types for the component props and state
 interface SportFilter {
@@ -77,7 +71,7 @@ interface KellyCalculation {
 
 /**
  * PredictionEdgeScreen Component
- * 
+ *
  * Displays AI-powered predictions, line movements, betting action, and Kelly calculations
  * for sports betting insights.
  */
@@ -149,7 +143,8 @@ const PredictionEdgeScreen: React.FC = () => {
       moneyDistributionHome: 35,
       moneyDistributionAway: 65,
       sharpActionDetected: true,
-      sharpActionMessage: 'Big money is on Philadelphia despite lower ticket volume. This indicates professional interest against the public.',
+      sharpActionMessage:
+        'Big money is on Philadelphia despite lower ticket volume. This indicates professional interest against the public.',
     },
   ];
 
@@ -164,16 +159,17 @@ const PredictionEdgeScreen: React.FC = () => {
       winProbability: 56,
       marketPrice: '-110',
       expectedValue: '+2.8%',
-      strategy: 'This is a moderate-sized allocation based on a modest edge. The expected value is positive but not overwhelming. Consider using this as part of a diversified approach.',
+      strategy:
+        'This is a moderate-sized allocation based on a modest edge. The expected value is positive but not overwhelming. Consider using this as part of a diversified approach.',
     },
   ];
 
   // Format date to display
   const formatDate = (date: Date): string => {
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      month: 'short', 
-      day: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
     };
     return date.toLocaleDateString('en-US', options);
   };
@@ -254,12 +250,8 @@ const PredictionEdgeScreen: React.FC = () => {
 
         {/* Game Time */}
         <View style={styles.gameTimeContainer}>
-          <AccessibleThemedText style={styles.gameTime}>
-            {item.time}
-          </AccessibleThemedText>
-          <AccessibleThemedText style={styles.leagueName}>
-            {item.league}
-          </AccessibleThemedText>
+          <AccessibleThemedText style={styles.gameTime}>{item.time}</AccessibleThemedText>
+          <AccessibleThemedText style={styles.leagueName}>{item.league}</AccessibleThemedText>
         </View>
 
         {/* Away Team */}
@@ -285,14 +277,14 @@ const PredictionEdgeScreen: React.FC = () => {
         {/* Home Win Probability */}
         <View style={styles.probabilityContainer}>
           <View style={styles.probabilityCircle}>
-            <View 
+            <View
               style={[
-                styles.probabilityFill, 
-                { 
+                styles.probabilityFill,
+                {
                   backgroundColor: colors.primary,
                   height: `${item.homeWinProbability}%`,
-                }
-              ]} 
+                },
+              ]}
             />
             <View style={styles.probabilityTextContainer}>
               <AccessibleThemedText style={styles.probabilityText}>
@@ -310,28 +302,30 @@ const PredictionEdgeScreen: React.FC = () => {
 
         {/* Recommended Bet */}
         <View style={styles.recommendationContainer}>
-          <View 
+          <View
             style={[
-              styles.edgeIndicator, 
-              { 
-                backgroundColor: item.edgeStrength === 'STRONG' 
-                  ? colors.success + '20' 
-                  : item.edgeStrength === 'MODERATE' 
-                    ? colors.warning + '20' 
-                    : colors.notification + '20'
-              }
+              styles.edgeIndicator,
+              {
+                backgroundColor:
+                  item.edgeStrength === 'STRONG'
+                    ? colors.success + '20'
+                    : item.edgeStrength === 'MODERATE'
+                      ? colors.warning + '20'
+                      : colors.notification + '20',
+              },
             ]}
           >
-            <AccessibleThemedText 
+            <AccessibleThemedText
               style={[
-                styles.edgeText, 
-                { 
-                  color: item.edgeStrength === 'STRONG' 
-                    ? colors.success 
-                    : item.edgeStrength === 'MODERATE' 
-                      ? colors.warning 
-                      : colors.notification
-                }
+                styles.edgeText,
+                {
+                  color:
+                    item.edgeStrength === 'STRONG'
+                      ? colors.success
+                      : item.edgeStrength === 'MODERATE'
+                        ? colors.warning
+                        : colors.notification,
+                },
               ]}
             >
               {t(`prediction.edge.${item.edgeStrength.toLowerCase()}`)}
@@ -351,14 +345,14 @@ const PredictionEdgeScreen: React.FC = () => {
         {/* Away Win Probability */}
         <View style={styles.probabilityContainer}>
           <View style={styles.probabilityCircle}>
-            <View 
+            <View
               style={[
-                styles.probabilityFill, 
-                { 
+                styles.probabilityFill,
+                {
                   backgroundColor: colors.secondary,
                   height: `${item.awayWinProbability}%`,
-                }
-              ]} 
+                },
+              ]}
             />
             <View style={styles.probabilityTextContainer}>
               <AccessibleThemedText style={styles.probabilityText}>
@@ -374,7 +368,7 @@ const PredictionEdgeScreen: React.FC = () => {
 
       {/* Action Buttons */}
       <AccessibleThemedView style={styles.actionButtons}>
-        <AccessibleTouchableOpacity 
+        <AccessibleTouchableOpacity
           style={[styles.actionButton, { borderRightWidth: 1, borderRightColor: colors.border }]}
           accessibilityLabel={t('accessibility.viewInsights')}
           accessibilityRole="button"
@@ -384,7 +378,7 @@ const PredictionEdgeScreen: React.FC = () => {
             {t('prediction.insights')}
           </AccessibleThemedText>
         </AccessibleTouchableOpacity>
-        <AccessibleTouchableOpacity 
+        <AccessibleTouchableOpacity
           style={styles.actionButton}
           accessibilityLabel={t('accessibility.sharePrediction')}
           accessibilityRole="button"
@@ -416,7 +410,7 @@ const PredictionEdgeScreen: React.FC = () => {
 
       {/* Line Chart */}
       <AccessibleThemedView style={styles.chartContainer}>
-        <AccessibleThemedView 
+        <AccessibleThemedView
           style={[styles.chart, { backgroundColor: colors.card }]}
           accessibilityLabel={t('accessibility.lineMovementChart')}
           accessibilityRole="image"
@@ -438,13 +432,11 @@ const PredictionEdgeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-      
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {/* Header */}
         <AccessibleThemedView style={styles.header}>
-          <AccessibleThemedText style={styles.title}>
-            {t('prediction.title')}
-          </AccessibleThemedText>
+          <AccessibleThemedText style={styles.title}>{t('prediction.title')}</AccessibleThemedText>
           <AccessibleThemedText style={styles.subtitle}>
             {t('prediction.subtitle')}
           </AccessibleThemedText>
@@ -463,9 +455,7 @@ const PredictionEdgeScreen: React.FC = () => {
         {/* Error State */}
         {error && (
           <AccessibleThemedView style={styles.errorContainer}>
-            <AccessibleThemedText style={styles.errorText}>
-              {error}
-            </AccessibleThemedText>
+            <AccessibleThemedText style={styles.errorText}>{error}</AccessibleThemedText>
             <AccessibleTouchableOpacity
               style={styles.retryButton}
               onPress={loadPredictions}
@@ -493,7 +483,7 @@ const PredictionEdgeScreen: React.FC = () => {
               <FlatList
                 data={topPredictions}
                 renderItem={renderPredictionCard}
-                keyExtractor={(item) => item.id}
+                keyExtractor={item => item.id}
                 scrollEnabled={false}
                 showsVerticalScrollIndicator={false}
               />
@@ -507,7 +497,7 @@ const PredictionEdgeScreen: React.FC = () => {
               <FlatList
                 data={lineMovementData}
                 renderItem={renderLineMovement}
-                keyExtractor={(item) => item.id}
+                keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
               />

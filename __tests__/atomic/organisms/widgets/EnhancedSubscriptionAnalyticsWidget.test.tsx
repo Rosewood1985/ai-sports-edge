@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+
 import '@testing-library/jest-dom';
 import { EnhancedSubscriptionAnalyticsWidget } from '../../../../atomic/organisms/widgets/EnhancedSubscriptionAnalyticsWidget';
 
@@ -14,7 +15,7 @@ jest.mock('../../../../atomic/molecules/charts/LineChart', () => ({
       <div data-testid="chart-title">{title}</div>
       <div data-testid="chart-data-length">{data?.length || 0}</div>
     </div>
-  )
+  ),
 }));
 
 jest.mock('../../../../atomic/molecules/charts/PieChart', () => ({
@@ -23,7 +24,7 @@ jest.mock('../../../../atomic/molecules/charts/PieChart', () => ({
       <div data-testid="chart-title">{title}</div>
       <div data-testid="chart-data-length">{data?.length || 0}</div>
     </div>
-  )
+  ),
 }));
 
 // Mock the hooks
@@ -35,7 +36,7 @@ jest.mock('../../../../atomic/organisms/reporting/useReportTemplates', () => ({
     createTemplate: jest.fn(),
     updateTemplate: jest.fn(),
     deleteTemplate: jest.fn(),
-  })
+  }),
 }));
 
 describe('EnhancedSubscriptionAnalyticsWidget', () => {
@@ -48,7 +49,7 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
         { label: 'Jan', value: 8000 },
         { label: 'Feb', value: 9000 },
         { label: 'Mar', value: 10000 },
-      ]
+      ],
     },
     subscriptions: {
       active: 500,
@@ -59,13 +60,13 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
         { label: 'Basic', value: 200 },
         { label: 'Pro', value: 250 },
         { label: 'Premium', value: 50 },
-      ]
+      ],
     },
     userMetrics: {
       totalUsers: 1000,
       activeUsers: 750,
       engagementScore: 85,
-    }
+    },
   };
 
   const defaultProps = {
@@ -86,7 +87,7 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
   });
 
   it('displays loading state correctly', () => {
-    render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} loading={true} />);
+    render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} loading />);
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
@@ -124,7 +125,7 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
       ...mockData,
       revenue: null,
     };
-    
+
     render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} data={dataWithoutRevenue} />);
     expect(screen.getByTestId('enhanced-subscription-analytics')).toBeInTheDocument();
   });
@@ -134,8 +135,10 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
       ...mockData,
       subscriptions: null,
     };
-    
-    render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} data={dataWithoutSubscriptions} />);
+
+    render(
+      <EnhancedSubscriptionAnalyticsWidget {...defaultProps} data={dataWithoutSubscriptions} />
+    );
     expect(screen.getByTestId('enhanced-subscription-analytics')).toBeInTheDocument();
   });
 
@@ -146,17 +149,17 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
         current: 0,
         previous: 0,
         trend: 'flat',
-        chartData: []
+        chartData: [],
       },
       subscriptions: {
         active: 0,
         new: 0,
         churned: 0,
         churnRate: 0,
-        distributionData: []
-      }
+        distributionData: [],
+      },
     };
-    
+
     render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} data={dataWithZeros} />);
     expect(screen.getByTestId('enhanced-subscription-analytics')).toBeInTheDocument();
   });
@@ -172,22 +175,27 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
       ...mockData,
       revenue: {
         ...mockData.revenue,
-        chartData: []
+        chartData: [],
       },
       subscriptions: {
         ...mockData.subscriptions,
-        distributionData: []
-      }
+        distributionData: [],
+      },
     };
-    
+
     render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} data={dataWithEmptyCharts} />);
     expect(screen.getByTestId('enhanced-subscription-analytics')).toBeInTheDocument();
   });
 
   it('updates time range when changed', async () => {
     const onTimeRangeChange = jest.fn();
-    render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} onTimeRangeChange={onTimeRangeChange} />);
-    
+    render(
+      <EnhancedSubscriptionAnalyticsWidget
+        {...defaultProps}
+        onTimeRangeChange={onTimeRangeChange}
+      />
+    );
+
     // This would typically involve clicking a time range selector
     // For now, we just verify the component renders with the prop
     expect(screen.getByTestId('enhanced-subscription-analytics')).toBeInTheDocument();
@@ -206,10 +214,10 @@ describe('EnhancedSubscriptionAnalyticsWidget', () => {
         ...mockData.revenue,
         current: 7000,
         previous: 8000,
-        trend: 'down'
-      }
+        trend: 'down',
+      },
     };
-    
+
     render(<EnhancedSubscriptionAnalyticsWidget {...defaultProps} data={dataWithNegativeGrowth} />);
     expect(screen.getByTestId('trend-indicator')).toHaveClass('trend-down');
   });

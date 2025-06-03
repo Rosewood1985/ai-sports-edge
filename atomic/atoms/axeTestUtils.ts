@@ -5,9 +5,9 @@
  * It provides functions for running axe tests on React Native components.
  */
 
+import { render } from '@testing-library/react-native';
 import { configureAxe, toHaveNoViolations } from 'jest-axe';
 import { ReactElement } from 'react';
-import { render } from '@testing-library/react-native';
 
 // Add jest-axe matchers to Jest
 expect.extend(toHaveNoViolations);

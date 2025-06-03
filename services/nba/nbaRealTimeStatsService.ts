@@ -1,14 +1,15 @@
 /**
  * NBA Real-Time Statistics Service
- * 
+ *
  * Replaces placeholder methods in nbaDataSyncService.ts with real-time data integration
  * Provides live player statistics, game data, and real-time updates
  */
 
-import { realTimeDataService, REALTIME_EVENTS } from '../realTimeDataService';
-import { oddsCacheService } from '../oddsCacheService';
-import apiKeys from '../../utils/apiKeys';
 import * as Sentry from '@sentry/react-native';
+
+import apiKeys from '../../utils/apiKeys';
+import { oddsCacheService } from '../oddsCacheService';
+import { realTimeDataService, REALTIME_EVENTS } from '../realTimeDataService';
 
 // NBA API configuration
 const NBA_API_CONFIG = {
@@ -118,7 +119,6 @@ export class NBARealTimeStatsService {
 
       this.isInitialized = true;
       console.log('[NBA REALTIME] NBA real-time stats service initialized');
-
     } catch (error) {
       console.error('[NBA REALTIME] Failed to initialize NBA real-time stats service:', error);
       Sentry.captureException(error);
@@ -132,7 +132,9 @@ export class NBARealTimeStatsService {
   async getPlayerStats(playerId: string): Promise<NBAPlayerStats> {
     try {
       // Check cache first
-      const cached = await oddsCacheService.getCachedData<NBAPlayerStats>(`nba_player_stats_${playerId}`);
+      const cached = await oddsCacheService.getCachedData<NBAPlayerStats>(
+        `nba_player_stats_${playerId}`
+      );
       if (cached && cached.source === 'api') {
         return cached.data;
       }
@@ -177,11 +179,10 @@ export class NBARealTimeStatsService {
       await oddsCacheService.setCachedData(`nba_player_stats_${playerId}`, stats, 300000); // 5 minutes
 
       return stats;
-
     } catch (error) {
       console.error(`[NBA REALTIME] Error getting player stats for ${playerId}:`, error);
       Sentry.captureException(error);
-      
+
       // Return empty stats instead of undefined
       return {
         playerId,
@@ -210,7 +211,9 @@ export class NBARealTimeStatsService {
   async getAdvancedPlayerStats(playerId: string): Promise<NBAAdvancedStats> {
     try {
       // Check cache first
-      const cached = await oddsCacheService.getCachedData<NBAAdvancedStats>(`nba_advanced_stats_${playerId}`);
+      const cached = await oddsCacheService.getCachedData<NBAAdvancedStats>(
+        `nba_advanced_stats_${playerId}`
+      );
       if (cached && cached.source === 'api') {
         return cached.data;
       }
@@ -251,11 +254,10 @@ export class NBARealTimeStatsService {
       await oddsCacheService.setCachedData(`nba_advanced_stats_${playerId}`, advancedStats, 300000); // 5 minutes
 
       return advancedStats;
-
     } catch (error) {
       console.error(`[NBA REALTIME] Error getting advanced stats for ${playerId}:`, error);
       Sentry.captureException(error);
-      
+
       // Return empty stats instead of undefined
       return {
         playerId,
@@ -280,7 +282,9 @@ export class NBARealTimeStatsService {
   async getCurrentSeasonRecord(teamId: string): Promise<NBATeamRecord> {
     try {
       // Check cache first
-      const cached = await oddsCacheService.getCachedData<NBATeamRecord>(`nba_team_record_${teamId}`);
+      const cached = await oddsCacheService.getCachedData<NBATeamRecord>(
+        `nba_team_record_${teamId}`
+      );
       if (cached && cached.source === 'api') {
         return cached.data;
       }
@@ -334,11 +338,10 @@ export class NBARealTimeStatsService {
       await oddsCacheService.setCachedData(`nba_team_record_${teamId}`, record, 600000); // 10 minutes
 
       return record;
-
     } catch (error) {
       console.error(`[NBA REALTIME] Error getting team record for ${teamId}:`, error);
       Sentry.captureException(error);
-      
+
       // Return empty record instead of undefined
       return {
         teamId,
@@ -367,7 +370,9 @@ export class NBARealTimeStatsService {
       }
 
       // Check cache first
-      const cached = await oddsCacheService.getCachedData<NBALiveGameData>(`nba_live_game_${gameId}`);
+      const cached = await oddsCacheService.getCachedData<NBALiveGameData>(
+        `nba_live_game_${gameId}`
+      );
       if (cached && cached.source === 'api') {
         return cached.data;
       }
@@ -424,11 +429,10 @@ export class NBARealTimeStatsService {
       await oddsCacheService.setCachedData(`nba_live_game_${gameId}`, liveData, 5000); // 5 seconds
 
       return liveData;
-
     } catch (error) {
       console.error(`[NBA REALTIME] Error getting live game data for ${gameId}:`, error);
       Sentry.captureException(error);
-      
+
       // Return empty game data instead of undefined
       return {
         gameId,
@@ -454,7 +458,9 @@ export class NBARealTimeStatsService {
   /**
    * Get player injury status (replaces placeholder method)
    */
-  async getPlayerInjuryStatus(playerId: string): Promise<{ isInjured: boolean; injuryType?: string; status?: string }> {
+  async getPlayerInjuryStatus(
+    playerId: string
+  ): Promise<{ isInjured: boolean; injuryType?: string; status?: string }> {
     try {
       // Check cache first
       const cached = await oddsCacheService.getCachedData(`nba_injury_${playerId}`);
@@ -485,11 +491,10 @@ export class NBARealTimeStatsService {
       await oddsCacheService.setCachedData(`nba_injury_${playerId}`, injuryStatus, 300000); // 5 minutes
 
       return injuryStatus;
-
     } catch (error) {
       console.error(`[NBA REALTIME] Error getting injury status for ${playerId}:`, error);
       Sentry.captureException(error);
-      
+
       // Return not injured instead of undefined
       return { isInjured: false };
     }
@@ -498,7 +503,9 @@ export class NBARealTimeStatsService {
   /**
    * Get head coach information (replaces placeholder method)
    */
-  async getHeadCoach(teamId: string): Promise<{ name: string; experience: number; winPercentage: number }> {
+  async getHeadCoach(
+    teamId: string
+  ): Promise<{ name: string; experience: number; winPercentage: number }> {
     try {
       // Check cache first
       const cached = await oddsCacheService.getCachedData(`nba_coach_${teamId}`);
@@ -533,11 +540,10 @@ export class NBARealTimeStatsService {
       await oddsCacheService.setCachedData(`nba_coach_${teamId}`, coachInfo, 3600000); // 1 hour
 
       return coachInfo;
-
     } catch (error) {
       console.error(`[NBA REALTIME] Error getting head coach for team ${teamId}:`, error);
       Sentry.captureException(error);
-      
+
       // Return default coach info instead of undefined
       return { name: 'Unknown Coach', experience: 0, winPercentage: 0 };
     }
@@ -547,21 +553,35 @@ export class NBARealTimeStatsService {
    * Setup real-time event listeners
    */
   private setupRealTimeListeners(): void {
-    realTimeDataService.on(REALTIME_EVENTS.SCORE_UPDATE, (scoreUpdate) => {
+    realTimeDataService.on(REALTIME_EVENTS.SCORE_UPDATE, scoreUpdate => {
       if (scoreUpdate.sport.toLowerCase() === 'nba') {
         // Update cached live game data
-        oddsCacheService.setCachedData(`live_score_${scoreUpdate.gameId}`, scoreUpdate, 5000, 'api');
-        console.log(`[NBA REALTIME] Live score update: ${scoreUpdate.awayTeam} ${scoreUpdate.awayScore} - ${scoreUpdate.homeScore} ${scoreUpdate.homeTeam}`);
+        oddsCacheService.setCachedData(
+          `live_score_${scoreUpdate.gameId}`,
+          scoreUpdate,
+          5000,
+          'api'
+        );
+        console.log(
+          `[NBA REALTIME] Live score update: ${scoreUpdate.awayTeam} ${scoreUpdate.awayScore} - ${scoreUpdate.homeScore} ${scoreUpdate.homeTeam}`
+        );
       }
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.PLAYER_STAT_UPDATE, (statUpdate) => {
+    realTimeDataService.on(REALTIME_EVENTS.PLAYER_STAT_UPDATE, statUpdate => {
       // Update cached player stats
-      oddsCacheService.setCachedData(`player_stat_update_${statUpdate.playerId}`, statUpdate, 10000, 'api');
-      console.log(`[NBA REALTIME] Player stat update: ${statUpdate.playerName} ${statUpdate.statType}: ${statUpdate.value}`);
+      oddsCacheService.setCachedData(
+        `player_stat_update_${statUpdate.playerId}`,
+        statUpdate,
+        10000,
+        'api'
+      );
+      console.log(
+        `[NBA REALTIME] Player stat update: ${statUpdate.playerName} ${statUpdate.statType}: ${statUpdate.value}`
+      );
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.INJURY_REPORT, (injuryReport) => {
+    realTimeDataService.on(REALTIME_EVENTS.INJURY_REPORT, injuryReport => {
       if (injuryReport.sport.toLowerCase() === 'nba') {
         // Update cached injury status
         const injuryStatus = {
@@ -569,8 +589,15 @@ export class NBARealTimeStatsService {
           injuryType: injuryReport.injuryType,
           status: injuryReport.severity,
         };
-        oddsCacheService.setCachedData(`nba_injury_${injuryReport.playerId}`, injuryStatus, 600000, 'api');
-        console.log(`[NBA REALTIME] Injury update: ${injuryReport.playerName} - ${injuryReport.injuryType} (${injuryReport.severity})`);
+        oddsCacheService.setCachedData(
+          `nba_injury_${injuryReport.playerId}`,
+          injuryStatus,
+          600000,
+          'api'
+        );
+        console.log(
+          `[NBA REALTIME] Injury update: ${injuryReport.playerName} - ${injuryReport.injuryType} (${injuryReport.severity})`
+        );
       }
     });
   }

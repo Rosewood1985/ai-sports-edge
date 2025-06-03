@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -9,26 +12,24 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert
-} from "react-native";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { auth } from "../config/firebase";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { NeonText, NeonButton, NeonCard, NeonContainer } from "../atomic/atoms";
-import { colors, spacing, borderRadius, typography } from "../styles/theme";
-import { useHoverEffect, useGlowHoverEffect, useFadeIn, useSlideIn } from "../utils/animationUtils";
-import { useI18n } from "../../atomic/organisms/i18n/I18nContext";
-import { ROUTES } from "../constants/navigation";
+  Alert,
+} from 'react-native';
+
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import { NeonText, NeonButton, NeonCard, NeonContainer } from '../atomic/atoms';
+import { auth } from '../config/firebase';
+import { ROUTES } from '../constants/navigation';
+import { colors, spacing, borderRadius, typography } from '../styles/theme';
+import { useHoverEffect, useGlowHoverEffect, useFadeIn, useSlideIn } from '../utils/animationUtils';
 
 const { width } = Dimensions.get('window');
 
 const NeonLoginScreen = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const { t, language } = useI18n();
 
   // Animation hooks
@@ -44,7 +45,12 @@ const NeonLoginScreen = () => {
     onPress?: () => void
   ) => {
     const { animatedStyle, onPressIn, onPressOut } = useHoverEffect(1.1);
-    const { glowOpacity, glowRadius, onPressIn: glowIn, onPressOut: glowOut } = useGlowHoverEffect('low', 'high');
+    const {
+      glowOpacity,
+      glowRadius,
+      onPressIn: glowIn,
+      onPressOut: glowOut,
+    } = useGlowHoverEffect('low', 'high');
 
     const handlePressIn = () => {
       onPressIn();
@@ -63,21 +69,23 @@ const NeonLoginScreen = () => {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.8}
-        accessible={true}
+        accessible
         accessibilityRole="button"
         accessibilityLabel={t(`login.features.${labelKey}`)}
         accessibilityHint={t(`login.features.${labelKey}`)}
       >
-        <Animated.View style={[
-          styles.iconInner,
-          animatedStyle,
-          {
-            shadowOpacity: glowOpacity,
-            shadowRadius: glowRadius,
-            shadowColor: colors.neon.blue,
-            shadowOffset: { width: 0, height: 0 },
-          }
-        ]}>
+        <Animated.View
+          style={[
+            styles.iconInner,
+            animatedStyle,
+            {
+              shadowOpacity: glowOpacity,
+              shadowRadius: glowRadius,
+              shadowColor: colors.neon.blue,
+              shadowOffset: { width: 0, height: 0 },
+            },
+          ]}
+        >
           {iconComponent === 'FontAwesome5' ? (
             <FontAwesome5 name={name as any} size={32} color={colors.neon.blue} />
           ) : (
@@ -96,94 +104,94 @@ const NeonLoginScreen = () => {
       setError(t('login.errors.emailRequired'));
       return false;
     }
-    
+
     if (!password.trim()) {
       setError(t('login.errors.passwordRequired'));
       return false;
     }
-    
+
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError(t('login.errors.invalidEmail'));
       return false;
     }
-    
+
     return true;
   };
 
   const handleSignIn = async () => {
-    setError("");
-    
+    setError('');
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setIsLoading(false);
-      Alert.alert(t("common.success"), t("login.alerts.loggedIn"));
+      Alert.alert(t('common.success'), t('login.alerts.loggedIn'));
       navigation.navigate(ROUTES.HOME as never);
     } catch (error: any) {
       setIsLoading(false);
-      
+
       // Sanitize error messages to avoid exposing sensitive information
-      let errorMessage = t("login.errors.loginFailed");
-      
+      let errorMessage = t('login.errors.loginFailed');
+
       // Only show specific error messages for known error codes
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = t("login.errors.invalidCredentials");
+        errorMessage = t('login.errors.invalidCredentials');
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t("login.errors.invalidEmail");
+        errorMessage = t('login.errors.invalidEmail');
       } else if (error.code === 'auth/user-disabled') {
-        errorMessage = t("login.errors.accountDisabled");
+        errorMessage = t('login.errors.accountDisabled');
       } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = t("login.errors.tooManyAttempts");
+        errorMessage = t('login.errors.tooManyAttempts');
       }
-      
+
       setError(errorMessage);
       console.error('Login error:', error);
     }
   };
-  
+
   const handleSignUp = async () => {
-    setError("");
-    
+    setError('');
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       setIsLoading(false);
-      Alert.alert(t("login.features.signUp"), t("login.alerts.accountCreated"));
+      Alert.alert(t('login.features.signUp'), t('login.alerts.accountCreated'));
       navigation.navigate(ROUTES.HOME as never);
     } catch (error: any) {
       setIsLoading(false);
-      
+
       // Sanitize error messages to avoid exposing sensitive information
-      let errorMessage = t("login.errors.signUpFailed");
-      
+      let errorMessage = t('login.errors.signUpFailed');
+
       // Only show specific error messages for known error codes
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = t("login.errors.emailInUse");
+        errorMessage = t('login.errors.emailInUse');
       } else if (error.code === 'auth/weak-password') {
-        errorMessage = t("login.errors.weakPassword");
+        errorMessage = t('login.errors.weakPassword');
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t("login.errors.invalidEmail");
+        errorMessage = t('login.errors.invalidEmail');
       }
-      
+
       setError(errorMessage);
       console.error('Sign up error:', error);
     }
   };
 
   return (
-    <NeonContainer gradient={true} gradientColors={[colors.background.primary, '#0D0D0D']}>
+    <NeonContainer gradient gradientColors={[colors.background.primary, '#0D0D0D']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -194,20 +202,10 @@ const NeonLoginScreen = () => {
         >
           {/* App Title */}
           <Animated.View style={{ opacity: titleOpacity, marginBottom: spacing.xl }}>
-            <NeonText
-              type="heading"
-              glow={true}
-              intensity="high"
-              style={styles.title}
-            >
+            <NeonText type="heading" glow intensity="high" style={styles.title}>
               {t('login.title')}
             </NeonText>
-            <NeonText
-              type="caption"
-              color={colors.neon.cyan}
-              glow={true}
-              style={styles.subtitle}
-            >
+            <NeonText type="caption" color={colors.neon.cyan} glow style={styles.subtitle}>
               {t('login.subtitle')}
             </NeonText>
           </Animated.View>
@@ -217,16 +215,21 @@ const NeonLoginScreen = () => {
             <NeonCard
               borderColor={colors.border.default}
               glowIntensity="low"
-              gradient={true}
+              gradient
               gradientColors={[colors.background.secondary, colors.background.tertiary]}
               style={styles.formCard}
             >
-              <NeonText type="subheading" glow={true} style={styles.formTitle}>
+              <NeonText type="subheading" glow style={styles.formTitle}>
                 {t('login.signIn')}
               </NeonText>
-              
+
               <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={20} color={colors.text.secondary} style={styles.inputIcon} />
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color={colors.text.secondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={styles.input}
                   placeholder={t('login.email')}
@@ -237,9 +240,14 @@ const NeonLoginScreen = () => {
                   keyboardType="email-address"
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color={colors.text.secondary} style={styles.inputIcon} />
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color={colors.text.secondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={styles.input}
                   placeholder={t('login.password')}
@@ -249,7 +257,7 @@ const NeonLoginScreen = () => {
                   secureTextEntry
                 />
               </View>
-              
+
               {error ? (
                 <View style={styles.errorContainer}>
                   <NeonText type="caption" color={colors.status.error} style={styles.errorText}>
@@ -257,7 +265,7 @@ const NeonLoginScreen = () => {
                   </NeonText>
                 </View>
               ) : null}
-              
+
               <View style={styles.buttonContainer}>
                 <NeonButton
                   title={isLoading ? '...' : t('login.signIn')}
@@ -266,7 +274,7 @@ const NeonLoginScreen = () => {
                   style={styles.signInButton}
                   disabled={isLoading}
                 />
-                
+
                 <NeonButton
                   title={isLoading ? '...' : t('login.signUp')}
                   onPress={handleSignUp}
@@ -275,7 +283,7 @@ const NeonLoginScreen = () => {
                   disabled={isLoading}
                 />
               </View>
-              
+
               <TouchableOpacity style={styles.forgotPassword}>
                 <NeonText type="caption" color={colors.text.secondary}>
                   {t('login.forgotPassword')}
@@ -286,13 +294,17 @@ const NeonLoginScreen = () => {
 
           {/* Feature Icons Row */}
           <Animated.View style={[styles.iconContainer, iconsAnimation]}>
-            {renderAnimatedIcon("robot", "FontAwesome5", "aiPicks")}
-            {renderAnimatedIcon("chart-line", "FontAwesome5", "trackBets")}
-            {renderAnimatedIcon("trophy", "FontAwesome5", "rewards", () => navigation.navigate(ROUTES.REWARDS as never))}
-            {renderAnimatedIcon("bullseye", "FontAwesome5", "proAnalysis")}
-            {renderAnimatedIcon("help-circle", "Ionicons", "helpFaq", () => navigation.navigate(ROUTES.FAQ as never))}
+            {renderAnimatedIcon('robot', 'FontAwesome5', 'aiPicks')}
+            {renderAnimatedIcon('chart-line', 'FontAwesome5', 'trackBets')}
+            {renderAnimatedIcon('trophy', 'FontAwesome5', 'rewards', () =>
+              navigation.navigate(ROUTES.REWARDS as never)
+            )}
+            {renderAnimatedIcon('bullseye', 'FontAwesome5', 'proAnalysis')}
+            {renderAnimatedIcon('help-circle', 'Ionicons', 'helpFaq', () =>
+              navigation.navigate(ROUTES.FAQ as never)
+            )}
           </Animated.View>
-          
+
           {/* Create Account Link */}
           <TouchableOpacity
             style={styles.createAccount}
@@ -301,8 +313,8 @@ const NeonLoginScreen = () => {
             accessibilityHint={t('login.signUp')}
           >
             <NeonText type="body" color={colors.text.secondary}>
-              {t('login.dontHaveAccount')}{" "}
-              <NeonText type="body" color={colors.neon.blue} glow={true}>
+              {t('login.dontHaveAccount')}{' '}
+              <NeonText type="body" color={colors.neon.blue} glow>
                 {t('login.signUp')}
               </NeonText>
             </NeonText>
@@ -322,21 +334,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingTop: spacing.xl * 2,
     paddingBottom: spacing.xl,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 32,
-    textAlign: "center",
+    textAlign: 'center',
     letterSpacing: 2,
   },
   subtitle: {
-    textAlign: "center",
+    textAlign: 'center',
     letterSpacing: 1,
     marginTop: spacing.xs,
   },
   formContainer: {
-    width: "100%",
+    width: '100%',
     maxWidth: 400,
     marginBottom: spacing.xl,
   },
@@ -344,12 +356,12 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   formTitle: {
-    textAlign: "center",
+    textAlign: 'center',
     marginBottom: spacing.md,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border.default,
@@ -381,18 +393,18 @@ const styles = StyleSheet.create({
     marginLeft: spacing.xs,
   },
   forgotPassword: {
-    alignSelf: "center",
+    alignSelf: 'center',
     marginTop: spacing.md,
   },
   iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
     marginBottom: spacing.xl,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
   },
   iconWrapper: {
-    alignItems: "center",
+    alignItems: 'center',
     marginHorizontal: spacing.sm,
     marginVertical: spacing.sm,
     width: width / 5,
@@ -403,7 +415,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   iconText: {
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: spacing.xs,
   },
   createAccount: {

@@ -7,10 +7,10 @@
  * It checks for WCAG 2.1 compliance issues and generates a report.
  */
 
-const puppeteer = require('puppeteer');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
 const fs = require('fs');
 const path = require('path');
+const puppeteer = require('puppeteer');
 
 // URLs to test
 const urls = [

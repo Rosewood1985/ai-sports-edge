@@ -1,11 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import BettingHistoryChart from '../components/BettingHistoryChart';
 import { TimePeriodFilter } from '../services/bettingAnalyticsService';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
 
 /**
  * Screen that displays betting history charts
@@ -13,202 +14,186 @@ import {  ThemedView  } from '../atomic/atoms/ThemedView';
 const BettingHistoryScreen: React.FC = () => {
   const navigation = useNavigation();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriodFilter['period']>('month');
-  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'winRate' | 'betType' | 'sport'>('profit');
-  
+  const [selectedChartType, setSelectedChartType] = useState<
+    'profit' | 'winRate' | 'betType' | 'sport'
+  >('profit');
+
   /**
    * Handle period selection
    */
   const handlePeriodChange = (period: TimePeriodFilter['period']) => {
     setSelectedPeriod(period);
   };
-  
+
   /**
    * Handle chart type selection
    */
   const handleChartTypeChange = (chartType: 'profit' | 'winRate' | 'betType' | 'sport') => {
     setSelectedChartType(chartType);
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Betting History</ThemedText>
       </View>
-      
+
       <ThemedView style={styles.content}>
         {/* Time period selector */}
         <View style={styles.periodSelector}>
           <TouchableOpacity
-            style={[
-              styles.periodButton,
-              selectedPeriod === 'week' && styles.selectedPeriodButton
-            ]}
+            style={[styles.periodButton, selectedPeriod === 'week' && styles.selectedPeriodButton]}
             onPress={() => handlePeriodChange('week')}
           >
             <ThemedText
               style={[
                 styles.periodButtonText,
-                selectedPeriod === 'week' && styles.selectedPeriodButtonText
+                selectedPeriod === 'week' && styles.selectedPeriodButtonText,
               ]}
             >
               Week
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
-            style={[
-              styles.periodButton,
-              selectedPeriod === 'month' && styles.selectedPeriodButton
-            ]}
+            style={[styles.periodButton, selectedPeriod === 'month' && styles.selectedPeriodButton]}
             onPress={() => handlePeriodChange('month')}
           >
             <ThemedText
               style={[
                 styles.periodButtonText,
-                selectedPeriod === 'month' && styles.selectedPeriodButtonText
+                selectedPeriod === 'month' && styles.selectedPeriodButtonText,
               ]}
             >
               Month
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
-            style={[
-              styles.periodButton,
-              selectedPeriod === 'year' && styles.selectedPeriodButton
-            ]}
+            style={[styles.periodButton, selectedPeriod === 'year' && styles.selectedPeriodButton]}
             onPress={() => handlePeriodChange('year')}
           >
             <ThemedText
               style={[
                 styles.periodButtonText,
-                selectedPeriod === 'year' && styles.selectedPeriodButtonText
+                selectedPeriod === 'year' && styles.selectedPeriodButtonText,
               ]}
             >
               Year
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
-            style={[
-              styles.periodButton,
-              selectedPeriod === 'all' && styles.selectedPeriodButton
-            ]}
+            style={[styles.periodButton, selectedPeriod === 'all' && styles.selectedPeriodButton]}
             onPress={() => handlePeriodChange('all')}
           >
             <ThemedText
               style={[
                 styles.periodButtonText,
-                selectedPeriod === 'all' && styles.selectedPeriodButtonText
+                selectedPeriod === 'all' && styles.selectedPeriodButtonText,
               ]}
             >
               All Time
             </ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         {/* Chart type selector */}
         <View style={styles.chartTypeSelector}>
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'profit' && styles.selectedChartTypeButton
+              selectedChartType === 'profit' && styles.selectedChartTypeButton,
             ]}
             onPress={() => handleChartTypeChange('profit')}
           >
-            <Ionicons 
-              name="trending-up" 
-              size={20} 
-              color={selectedChartType === 'profit' ? '#fff' : '#666'} 
+            <Ionicons
+              name="trending-up"
+              size={20}
+              color={selectedChartType === 'profit' ? '#fff' : '#666'}
             />
             <ThemedText
               style={[
                 styles.chartTypeButtonText,
-                selectedChartType === 'profit' && styles.selectedChartTypeButtonText
+                selectedChartType === 'profit' && styles.selectedChartTypeButtonText,
               ]}
             >
               Profit
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'winRate' && styles.selectedChartTypeButton
+              selectedChartType === 'winRate' && styles.selectedChartTypeButton,
             ]}
             onPress={() => handleChartTypeChange('winRate')}
           >
-            <Ionicons 
-              name="stats-chart" 
-              size={20} 
-              color={selectedChartType === 'winRate' ? '#fff' : '#666'} 
+            <Ionicons
+              name="stats-chart"
+              size={20}
+              color={selectedChartType === 'winRate' ? '#fff' : '#666'}
             />
             <ThemedText
               style={[
                 styles.chartTypeButtonText,
-                selectedChartType === 'winRate' && styles.selectedChartTypeButtonText
+                selectedChartType === 'winRate' && styles.selectedChartTypeButtonText,
               ]}
             >
               Win Rate
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'betType' && styles.selectedChartTypeButton
+              selectedChartType === 'betType' && styles.selectedChartTypeButton,
             ]}
             onPress={() => handleChartTypeChange('betType')}
           >
-            <Ionicons 
-              name="pie-chart" 
-              size={20} 
-              color={selectedChartType === 'betType' ? '#fff' : '#666'} 
+            <Ionicons
+              name="pie-chart"
+              size={20}
+              color={selectedChartType === 'betType' ? '#fff' : '#666'}
             />
             <ThemedText
               style={[
                 styles.chartTypeButtonText,
-                selectedChartType === 'betType' && styles.selectedChartTypeButtonText
+                selectedChartType === 'betType' && styles.selectedChartTypeButtonText,
               ]}
             >
               Bet Types
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'sport' && styles.selectedChartTypeButton
+              selectedChartType === 'sport' && styles.selectedChartTypeButton,
             ]}
             onPress={() => handleChartTypeChange('sport')}
           >
-            <Ionicons 
-              name="basketball" 
-              size={20} 
-              color={selectedChartType === 'sport' ? '#fff' : '#666'} 
+            <Ionicons
+              name="basketball"
+              size={20}
+              color={selectedChartType === 'sport' ? '#fff' : '#666'}
             />
             <ThemedText
               style={[
                 styles.chartTypeButtonText,
-                selectedChartType === 'sport' && styles.selectedChartTypeButtonText
+                selectedChartType === 'sport' && styles.selectedChartTypeButtonText,
               ]}
             >
               Sports
             </ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         <ScrollView style={styles.chartContainer}>
-          <BettingHistoryChart 
-            timePeriod={selectedPeriod}
-            chartType={selectedChartType}
-          />
+          <BettingHistoryChart timePeriod={selectedPeriod} chartType={selectedChartType} />
         </ScrollView>
       </ThemedView>
     </SafeAreaView>

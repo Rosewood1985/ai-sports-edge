@@ -1,5 +1,5 @@
-import { auth, firestore } from '../config/firebase';
 import { hasPremiumAccess } from './firebaseSubscriptionService';
+import { auth, firestore } from '../config/firebase';
 
 /**
  * Cricket match data interface
@@ -113,8 +113,8 @@ export const getUpcomingMatches = async (): Promise<CricketMatch[]> => {
         awayTeam: 'Australia',
         date: '2025-06-12',
         time: '10:00:00Z',
-        venue: 'Lord\'s Cricket Ground',
-        status: 'scheduled'
+        venue: "Lord's Cricket Ground",
+        status: 'scheduled',
       },
       {
         id: 'match-2025-2',
@@ -125,7 +125,7 @@ export const getUpcomingMatches = async (): Promise<CricketMatch[]> => {
         date: '2025-01-15',
         time: '08:00:00Z',
         venue: 'Wanderers Stadium',
-        status: 'scheduled'
+        status: 'scheduled',
       },
       {
         id: 'match-2025-3',
@@ -136,8 +136,8 @@ export const getUpcomingMatches = async (): Promise<CricketMatch[]> => {
         date: '2025-02-20',
         time: '14:00:00Z',
         venue: 'Melbourne Cricket Ground',
-        status: 'scheduled'
-      }
+        status: 'scheduled',
+      },
     ];
   } catch (error) {
     console.error('Error fetching Cricket matches:', error);
@@ -167,7 +167,7 @@ export const getTeamRankings = async (format: 'Test' | 'ODI' | 'T20I'): Promise<
           won: 22,
           lost: 5,
           drawn: 3,
-          noResult: 0
+          noResult: 0,
         },
         {
           id: 'team-2',
@@ -180,7 +180,7 @@ export const getTeamRankings = async (format: 'Test' | 'ODI' | 'T20I'): Promise<
           won: 20,
           lost: 6,
           drawn: 2,
-          noResult: 0
+          noResult: 0,
         },
         {
           id: 'team-3',
@@ -193,11 +193,11 @@ export const getTeamRankings = async (format: 'Test' | 'ODI' | 'T20I'): Promise<
           won: 18,
           lost: 10,
           drawn: 4,
-          noResult: 0
-        }
+          noResult: 0,
+        },
       ];
     }
-    
+
     // Return empty array for other formats
     return [];
   } catch (error) {
@@ -232,7 +232,7 @@ export const getPlayerStats = async (teamId: string): Promise<CricketPlayer[]> =
             strikeRate: 57.48,
             hundreds: 29,
             fifties: 28,
-            highestScore: 254
+            highestScore: 254,
           },
           bowlingStats: {
             matches: 106,
@@ -240,8 +240,8 @@ export const getPlayerStats = async (teamId: string): Promise<CricketPlayer[]> =
             wickets: 5,
             average: 32.25,
             economy: 3.52,
-            bestBowling: '1/13'
-          }
+            bestBowling: '1/13',
+          },
         },
         {
           id: 'player-2',
@@ -254,11 +254,11 @@ export const getPlayerStats = async (teamId: string): Promise<CricketPlayer[]> =
             matches: 32,
             innings: 36,
             runs: 148,
-            average: 7.40,
-            strikeRate: 37.00,
+            average: 7.4,
+            strikeRate: 37.0,
             hundreds: 0,
             fifties: 0,
-            highestScore: 24
+            highestScore: 24,
           },
           bowlingStats: {
             matches: 32,
@@ -266,12 +266,12 @@ export const getPlayerStats = async (teamId: string): Promise<CricketPlayer[]> =
             wickets: 128,
             average: 21.99,
             economy: 2.69,
-            bestBowling: '6/27'
-          }
-        }
+            bestBowling: '6/27',
+          },
+        },
       ];
     }
-    
+
     // Return empty array for other teams
     return [];
   } catch (error) {
@@ -293,23 +293,25 @@ export const getMatchPrediction = async (
   try {
     // Check if user has premium access or has purchased this prediction
     const hasPremium = await hasPremiumAccess(userId);
-    
+
     if (!hasPremium) {
       // Check if user has purchased this specific prediction
       const db = firestore;
-      const purchasesSnapshot = await db.collection('users').doc(userId)
+      const purchasesSnapshot = await db
+        .collection('users')
+        .doc(userId)
         .collection('purchases')
         .where('productId', '==', 'cricket-match-prediction')
         .where('matchId', '==', matchId)
         .where('status', '==', 'succeeded')
         .limit(1)
         .get();
-      
+
       if (purchasesSnapshot.empty) {
         return null; // User doesn't have access
       }
     }
-    
+
     // In a real implementation, this would call the Cricket API or a machine learning service
     // For now, we'll return mock data
     return {
@@ -319,13 +321,13 @@ export const getMatchPrediction = async (
       awayTeam: 'Australia',
       winProbability: {
         home: 0.45,
-        away: 0.40,
-        draw: 0.15
+        away: 0.4,
+        draw: 0.15,
       },
       predictedScores: {
         homeTeamScore: '342 & 289',
         awayTeamScore: '315 & 298',
-        confidence: 0.70
+        confidence: 0.7,
       },
       keyPlayerPredictions: [
         {
@@ -333,29 +335,29 @@ export const getMatchPrediction = async (
           team: 'England',
           role: 'Batsman',
           predictedPerformance: '85+ runs in first innings',
-          impactScore: 8.5
+          impactScore: 8.5,
         },
         {
           player: 'Pat Cummins',
           team: 'Australia',
           role: 'Bowler',
           predictedPerformance: '5+ wickets in the match',
-          impactScore: 8.2
+          impactScore: 8.2,
         },
         {
           player: 'Ben Stokes',
           team: 'England',
           role: 'All-rounder',
           predictedPerformance: '50+ runs and 3+ wickets',
-          impactScore: 7.9
-        }
+          impactScore: 7.9,
+        },
       ],
       weatherImpact: {
         condition: 'Overcast with chance of rain on day 3',
         impact: 'Will favor swing bowling',
-        favoringTeam: 'England'
+        favoringTeam: 'England',
       },
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Error fetching Cricket match prediction:', error);
@@ -376,23 +378,25 @@ export const getPlayerAnalysis = async (
   try {
     // Check if user has premium access or has purchased this analysis
     const hasPremium = await hasPremiumAccess(userId);
-    
+
     if (!hasPremium) {
       // Check if user has purchased this specific analysis
       const db = firestore;
-      const purchasesSnapshot = await db.collection('users').doc(userId)
+      const purchasesSnapshot = await db
+        .collection('users')
+        .doc(userId)
         .collection('purchases')
         .where('productId', '==', 'cricket-player-stats')
         .where('playerId', '==', playerId)
         .where('status', '==', 'succeeded')
         .limit(1)
         .get();
-      
+
       if (purchasesSnapshot.empty) {
         return null; // User doesn't have access
       }
     }
-    
+
     // In a real implementation, this would call the Cricket API or a machine learning service
     // For now, we'll return mock data for Virat Kohli
     if (playerId === 'player-1') {
@@ -402,19 +406,19 @@ export const getPlayerAnalysis = async (
         strengths: [
           'Exceptional against pace bowling',
           'Strong on the front foot',
-          'Excellent in run chases'
+          'Excellent in run chases',
         ],
         weaknesses: [
           'Vulnerable to off-spin early in innings',
-          'Tendency to chase wide deliveries when under pressure'
+          'Tendency to chase wide deliveries when under pressure',
         ],
         recentForm: {
           matches: 5,
           runs: 342,
-          average: 68.40,
+          average: 68.4,
           hundreds: 1,
           fifties: 2,
-          trend: 'Upward'
+          trend: 'Upward',
         },
         matchupAnalysis: [
           {
@@ -422,24 +426,24 @@ export const getPlayerAnalysis = async (
             dismissals: 7,
             ballsFaced: 245,
             runsScored: 112,
-            recommendation: 'High risk matchup'
+            recommendation: 'High risk matchup',
           },
           {
             bowlerName: 'Nathan Lyon',
             dismissals: 5,
             ballsFaced: 320,
             runsScored: 180,
-            recommendation: 'Medium risk matchup'
-          }
+            recommendation: 'Medium risk matchup',
+          },
         ],
         venuePerformance: [
           {
-            venue: 'Lord\'s Cricket Ground',
+            venue: "Lord's Cricket Ground",
             matches: 2,
             runs: 149,
             average: 37.25,
             hundreds: 0,
-            fifties: 1
+            fifties: 1,
           },
           {
             venue: 'Melbourne Cricket Ground',
@@ -447,14 +451,15 @@ export const getPlayerAnalysis = async (
             runs: 335,
             average: 83.75,
             hundreds: 2,
-            fifties: 0
-          }
+            fifties: 0,
+          },
         ],
-        bettingInsight: 'Strong candidate for top run-scorer in the series. Consider backing for a century in Melbourne Test.',
-        generatedAt: new Date().toISOString()
+        bettingInsight:
+          'Strong candidate for top run-scorer in the series. Consider backing for a century in Melbourne Test.',
+        generatedAt: new Date().toISOString(),
       };
     }
-    
+
     // Return null for other players
     return null;
   } catch (error) {
@@ -468,5 +473,5 @@ export default {
   getTeamRankings,
   getPlayerStats,
   getMatchPrediction,
-  getPlayerAnalysis
+  getPlayerAnalysis,
 };

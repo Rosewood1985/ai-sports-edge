@@ -3,11 +3,21 @@
  * Fetches and manages direct URLs to betting sites for specific games
  */
 
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  writeBatch,
+  Timestamp,
+} from 'firebase/firestore';
+import { Platform } from 'react-native';
+
 import { analyticsService } from './analyticsService';
 import { firestore } from '../config/firebase';
-import { collection, doc, getDoc, getDocs, query, where, writeBatch, Timestamp } from 'firebase/firestore';
 
 // Define types for game URLs
 export interface GameUrl {
@@ -62,7 +72,7 @@ class GameUrlService {
     [SportsApiType.SPORTS_RADAR]: '',
     [SportsApiType.ESPN_API]: '',
   };
-  
+
   /**
    * Initialize the service
    */
@@ -70,10 +80,10 @@ class GameUrlService {
     try {
       // Load cache from storage
       await this.loadCache();
-      
+
       // Load API keys from Firestore
       await this.loadApiKeys();
-      
+
       // Fetch latest game URLs if cache is stale
       if (this.isCacheStale()) {
         this.fetchPromise = this.fetchGameUrls();
@@ -82,7 +92,7 @@ class GameUrlService {
       console.error('Error initializing GameUrlService:', error);
     }
   }
-  
+
   /**
    * Load cache from storage
    */
@@ -92,16 +102,16 @@ class GameUrlService {
       const cacheJson = await AsyncStorage.getItem(STORAGE_KEYS.GAME_URLS_CACHE);
       if (cacheJson) {
         const parsedCache = JSON.parse(cacheJson);
-        
+
         // Convert string dates to Date objects
         Object.values(parsedCache).forEach((gameUrl: any) => {
           gameUrl.startTime = new Date(gameUrl.startTime);
           gameUrl.lastUpdated = new Date(gameUrl.lastUpdated);
         });
-        
+
         this.cache = parsedCache;
       }
-      
+
       // Load last fetch time
       const lastFetchTimeStr = await AsyncStorage.getItem(STORAGE_KEYS.LAST_FETCH_TIME);
       if (lastFetchTimeStr) {
@@ -111,14 +121,14 @@ class GameUrlService {
       console.error('Error loading game URL cache:', error);
     }
   }
-  
+
   /**
    * Save cache to storage
    */
   private async saveCache(): Promise<void> {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.GAME_URLS_CACHE, JSON.stringify(this.cache));
-      
+
       if (this.lastFetchTime) {
         await AsyncStorage.setItem(STORAGE_KEYS.LAST_FETCH_TIME, this.lastFetchTime.toISOString());
       }
@@ -126,7 +136,7 @@ class GameUrlService {
       console.error('Error saving game URL cache:', error);
     }
   }
-  
+
   /**
    * Load API keys from Firestore
    */
@@ -136,10 +146,10 @@ class GameUrlService {
         console.warn('Firestore not initialized');
         return;
       }
-      
+
       const apiKeysDocRef = doc(collection(firestore, COLLECTIONS.API_KEYS), 'sports');
       const apiKeysDoc = await getDoc(apiKeysDocRef);
-      
+
       if (apiKeysDoc.exists()) {
         const data = apiKeysDoc.data();
         if (data) {
@@ -154,7 +164,7 @@ class GameUrlService {
       console.error('Error loading API keys:', error);
     }
   }
-  
+
   /**
    * Check if cache is stale (older than 6 hours)
    */
@@ -162,13 +172,13 @@ class GameUrlService {
     if (!this.lastFetchTime) {
       return true;
     }
-    
+
     const sixHoursAgo = new Date();
     sixHoursAgo.setHours(sixHoursAgo.getHours() - 6);
-    
+
     return this.lastFetchTime < sixHoursAgo;
   }
-  
+
   /**
    * Fetch game URLs from sports APIs and store in Firestore
    */
@@ -176,28 +186,28 @@ class GameUrlService {
     try {
       // Set last fetch time
       this.lastFetchTime = new Date();
-      
+
       // Fetch from multiple APIs in parallel
       const [oddsApiUrls, sportsRadarUrls, espnApiUrls] = await Promise.all([
         this.fetchFromOddsApi(),
         this.fetchFromSportsRadar(),
         this.fetchFromEspnApi(),
       ]);
-      
+
       // Merge results
       const allUrls = [...oddsApiUrls, ...sportsRadarUrls, ...espnApiUrls];
-      
+
       // Update cache
       allUrls.forEach(gameUrl => {
         this.cache[gameUrl.gameId] = gameUrl;
       });
-      
+
       // Save to storage
       await this.saveCache();
-      
+
       // Save to Firestore
       await this.saveToFirestore(allUrls);
-      
+
       // Track success
       analyticsService.trackEvent('game_urls_fetched', {
         count: allUrls.length,
@@ -206,7 +216,7 @@ class GameUrlService {
       });
     } catch (error) {
       console.error('Error fetching game URLs:', error);
-      
+
       // Track error
       analyticsService.trackError(error as Error, {
         action: 'fetch_game_urls',
@@ -216,7 +226,7 @@ class GameUrlService {
       this.fetchPromise = null;
     }
   }
-  
+
   /**
    * Fetch game URLs from The Odds API
    */
@@ -224,27 +234,27 @@ class GameUrlService {
     if (!this.apiKeys[SportsApiType.ODDS_API]) {
       return [];
     }
-    
+
     try {
       // Example URL: https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=YOUR_API_KEY&regions=us&markets=h2h&oddsFormat=american&bookmakers=fanduel
       const apiKey = this.apiKeys[SportsApiType.ODDS_API];
       const sports = ['basketball_nba', 'basketball_ncaab', 'football_nfl', 'baseball_mlb'];
       const bookmakers = ['fanduel'];
-      
+
       const allResults: GameUrl[] = [];
-      
+
       // Fetch for each sport
       for (const sport of sports) {
         const response = await fetch(
           `https://api.the-odds-api.com/v4/sports/${sport}/odds/?apiKey=${apiKey}&regions=us&markets=h2h&oddsFormat=american&bookmakers=${bookmakers.join(',')}`
         );
-        
+
         if (!response.ok) {
           throw new Error(`The Odds API error: ${response.status} ${response.statusText}`);
         }
-        
+
         const data = await response.json();
-        
+
         // Process results
         data.forEach((game: any) => {
           // Extract FanDuel URL from bookmakers
@@ -254,7 +264,7 @@ class GameUrlService {
             // For now, we'll construct a URL based on the game ID
             const sportType = sport.split('_')[0];
             const leagueId = sport.split('_')[1];
-            
+
             const gameUrl: GameUrl = {
               gameId: game.id,
               sportType,
@@ -266,19 +276,19 @@ class GameUrlService {
               lastUpdated: new Date(),
               isActive: new Date(game.commence_time) > new Date(),
             };
-            
+
             allResults.push(gameUrl);
           }
         });
       }
-      
+
       return allResults;
     } catch (error) {
       console.error('Error fetching from The Odds API:', error);
       return [];
     }
   }
-  
+
   /**
    * Fetch game URLs from Sports Radar API
    */
@@ -287,7 +297,7 @@ class GameUrlService {
     // For now, we'll return an empty array
     return [];
   }
-  
+
   /**
    * Fetch game URLs from ESPN API
    */
@@ -296,7 +306,7 @@ class GameUrlService {
     // For now, we'll return an empty array
     return [];
   }
-  
+
   /**
    * Save game URLs to Firestore
    */
@@ -306,10 +316,10 @@ class GameUrlService {
         console.warn('Firestore not initialized');
         return;
       }
-      
+
       const firestoreInstance = firestore;
       const batch = writeBatch(firestoreInstance);
-      
+
       // Add each game URL to batch
       gameUrls.forEach(gameUrl => {
         const gameUrlsCollection = collection(firestoreInstance, COLLECTIONS.GAME_URLS);
@@ -320,32 +330,35 @@ class GameUrlService {
           lastUpdated: Timestamp.fromDate(gameUrl.lastUpdated),
         });
       });
-      
+
       // Commit batch
       await batch.commit();
     } catch (error) {
       console.error('Error saving game URLs to Firestore:', error);
     }
   }
-  
+
   /**
    * Get game URL for a specific game
    * @param gameId Game ID
    * @param bettingSite Betting site to get URL for
    * @returns Game URL or null if not found
    */
-  async getGameUrl(gameId: string, bettingSite: BettingSite = BettingSite.FANDUEL): Promise<string | null> {
+  async getGameUrl(
+    gameId: string,
+    bettingSite: BettingSite = BettingSite.FANDUEL
+  ): Promise<string | null> {
     // Wait for any pending fetch to complete
     if (this.fetchPromise) {
       await this.fetchPromise;
     }
-    
+
     // Check if we need to refresh the cache
     if (this.isCacheStale() && !this.fetchPromise) {
       this.fetchPromise = this.fetchGameUrls();
       await this.fetchPromise;
     }
-    
+
     // Check cache
     const gameUrl = this.cache[gameId];
     if (gameUrl) {
@@ -356,7 +369,7 @@ class GameUrlService {
         platform: Platform.OS,
         timestamp: Date.now(),
       });
-      
+
       // Return URL based on betting site
       switch (bettingSite) {
         case BettingSite.FANDUEL:
@@ -365,32 +378,32 @@ class GameUrlService {
           return gameUrl.fanduelUrl; // Default to FanDuel
       }
     }
-    
+
     // If not in cache, try to fetch from Firestore
     try {
       if (!firestore) {
         console.warn('Firestore not initialized');
         return null;
       }
-      
+
       const firestoreInstance = firestore;
       const gameUrlsCollection = collection(firestoreInstance, COLLECTIONS.GAME_URLS);
       const gameDocRef = doc(gameUrlsCollection, gameId);
       const gameDoc = await getDoc(gameDocRef);
-      
+
       if (gameDoc.exists()) {
         const data = gameDoc.data() as any;
-        
+
         // Convert Firestore timestamps to Date objects
         const gameUrl: GameUrl = {
           ...data,
           startTime: data.startTime.toDate(),
           lastUpdated: data.lastUpdated.toDate(),
         };
-        
+
         // Add to cache
         this.cache[gameId] = gameUrl;
-        
+
         // Track usage
         analyticsService.trackEvent('game_url_used', {
           gameId,
@@ -398,7 +411,7 @@ class GameUrlService {
           platform: Platform.OS,
           timestamp: Date.now(),
         });
-        
+
         // Return URL based on betting site
         switch (bettingSite) {
           case BettingSite.FANDUEL:
@@ -410,10 +423,10 @@ class GameUrlService {
     } catch (error) {
       console.error('Error fetching game URL from Firestore:', error);
     }
-    
+
     return null;
   }
-  
+
   /**
    * Get game URLs for a specific sport and league
    * @param sportType Sport type (e.g., 'basketball', 'football')
@@ -422,13 +435,14 @@ class GameUrlService {
    * @returns Array of game URLs
    */
   getGameUrlsForLeague(sportType: string, leagueId: string, activeOnly: boolean = true): GameUrl[] {
-    return Object.values(this.cache).filter(gameUrl => 
-      gameUrl.sportType === sportType && 
-      gameUrl.leagueId === leagueId &&
-      (!activeOnly || gameUrl.isActive)
+    return Object.values(this.cache).filter(
+      gameUrl =>
+        gameUrl.sportType === sportType &&
+        gameUrl.leagueId === leagueId &&
+        (!activeOnly || gameUrl.isActive)
     );
   }
-  
+
   /**
    * Get game URLs for a specific team
    * @param teamId Team ID
@@ -436,12 +450,13 @@ class GameUrlService {
    * @returns Array of game URLs
    */
   getGameUrlsForTeam(teamId: string, activeOnly: boolean = true): GameUrl[] {
-    return Object.values(this.cache).filter(gameUrl => 
-      (gameUrl.homeTeamId === teamId || gameUrl.awayTeamId === teamId) &&
-      (!activeOnly || gameUrl.isActive)
+    return Object.values(this.cache).filter(
+      gameUrl =>
+        (gameUrl.homeTeamId === teamId || gameUrl.awayTeamId === teamId) &&
+        (!activeOnly || gameUrl.isActive)
     );
   }
-  
+
   /**
    * Force refresh of game URLs
    */
@@ -449,7 +464,7 @@ class GameUrlService {
     if (this.fetchPromise) {
       await this.fetchPromise;
     }
-    
+
     this.fetchPromise = this.fetchGameUrls();
     await this.fetchPromise;
   }

@@ -38,7 +38,7 @@ export function RiskMatrix({ data, className = '' }: RiskMatrixProps) {
     <div className={`risk-matrix ${className}`}>
       <div className="grid grid-cols-4 gap-1">
         {/* Header row */}
-        <div className="p-2 font-medium text-center"></div>
+        <div className="p-2 font-medium text-center" />
         <div className="p-2 font-medium text-center">Low Impact</div>
         <div className="p-2 font-medium text-center">Medium Impact</div>
         <div className="p-2 font-medium text-center">High Impact</div>

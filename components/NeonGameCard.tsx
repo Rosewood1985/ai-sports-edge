@@ -1,19 +1,21 @@
-import React, { memo } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Game, ConfidenceLevel } from '../types/odds';
-import PremiumFeature from './PremiumFeature';
-import PropBetList from './PropBetList';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-// Corrected import paths for Neon components - importing directly
-import NeonText from './ui/NeonText';
-import NeonCard from './ui/NeonCard';
-import NeonButton from './ui/NeonButton';
-import theme from '../styles/theme'; // Import the full theme object
-import { Colors } from '../constants/Colors'; // Import base Colors for status
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { memo } from 'react';
+import { View, StyleSheet } from 'react-native';
+
+import PremiumFeature from './PremiumFeature';
+import PropBetList from './PropBetList';
+import { Game, ConfidenceLevel } from '../types/odds';
+
+// Corrected import paths for Neon components - importing directly
+import NeonButton from './ui/NeonButton';
+import NeonCard from './ui/NeonCard';
+import NeonText from './ui/NeonText';
 import { AccessibleTouchableOpacity } from '../atomic/atoms'; // Import AccessibleTouchableOpacity
+import { Colors } from '../constants/Colors'; // Import base Colors for status
+import theme from '../styles/theme'; // Import the full theme object
 
 // Define navigation type
 type RootStackParamList = {
@@ -101,7 +103,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
       borderColor={isGameActive() ? theme.colors.primaryAction : theme.colors.borderSubtle}
       glowIntensity={isGameActive() ? 'medium' : 'low'}
       glowColor={isGameActive() ? theme.colors.primaryAction : 'transparent'}
-      gradient={true}
+      gradient
       // Use theme background colors for gradient
       gradientColors={[theme.colors.surfaceBackground, theme.colors.primaryBackground]}
       style={styles.card} // Apply base margin from StyleSheet
@@ -118,7 +120,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
         <View style={styles.header}>
           <View style={styles.matchupContainer}>
             {/* Assuming NeonText type='subheading' maps roughly to theme.typography.h3 */}
-            <NeonText type="subheading" glow={true} color={theme.colors.primaryText}>
+            <NeonText type="subheading" glow color={theme.colors.primaryText}>
               {game.home_team} vs {game.away_team}
             </NeonText>
 
@@ -159,7 +161,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
           </NeonText>
 
           {game.live_updates && (
-            <NeonText type="caption" color={Colors.status.lowConfidence} glow={true}>
+            <NeonText type="caption" color={Colors.status.lowConfidence} glow>
               {game.live_updates.period} • {game.live_updates.time_remaining} remaining
             </NeonText>
           )}
@@ -180,7 +182,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
                       {outcome.name}
                     </NeonText>
                     {/* Use primary action color for odds */}
-                    <NeonText type="body" color={theme.colors.primaryAction} glow={true}>
+                    <NeonText type="body" color={theme.colors.primaryAction} glow>
                       {outcome.price}
                     </NeonText>
                   </View>
@@ -212,7 +214,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
               ]}
             >
               <View style={styles.predictionHeader}>
-                <NeonText type="subheading" color={theme.colors.primaryAction} glow={true}>
+                <NeonText type="subheading" color={theme.colors.primaryAction} glow>
                   AI Prediction
                 </NeonText>
                 <View style={[styles.confidenceIndicator, { backgroundColor: confidenceColor }]}>
@@ -231,7 +233,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
                   Pick:
                 </NeonText>
                 {/* Use appropriate status color for winner */}
-                <NeonText type="body" color={Colors.status.highConfidence} glow={true}>
+                <NeonText type="body" color={Colors.status.highConfidence} glow>
                   {game.ai_prediction.predicted_winner}
                 </NeonText>
               </View>
@@ -262,7 +264,7 @@ const NeonGameCard = memo(({ game, onPress, isLocalGame }: NeonGameCardProps): J
                   Historical Accuracy:
                 </NeonText>
                 {/* Use accent color for accuracy */}
-                <NeonText type="body" color={theme.colors.accent} glow={true}>
+                <NeonText type="body" color={theme.colors.accent} glow>
                   {game.ai_prediction.historical_accuracy}%
                 </NeonText>
               </View>

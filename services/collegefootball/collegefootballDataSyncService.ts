@@ -1,6 +1,6 @@
 /**
  * College Football Data Sync Service
- * 
+ *
  * Comprehensive data synchronization for college football with focus on:
  * - Conference realignment tracking
  * - Recruiting class analysis
@@ -57,14 +57,14 @@ export interface ConferenceData {
   playoffBids: number;
   averageRecruitingRank: number;
   revenueSharing: number;
-  realignmentHistory: Array<{
+  realignmentHistory: {
     year: number;
-    changes: Array<{
+    changes: {
       team: string;
       from: string;
       to: string;
-    }>;
-  }>;
+    }[];
+  }[];
 }
 
 export interface CFBGame {
@@ -101,7 +101,8 @@ export interface CFBGame {
 }
 
 export class CollegeFootballDataSyncService {
-  private readonly espnApiBase = 'https://site.api.espn.com/apis/site/v2/sports/football/college-football';
+  private readonly espnApiBase =
+    'https://site.api.espn.com/apis/site/v2/sports/football/college-football';
   private readonly cfbDataApiKey = process.env.CFB_DATA_API_KEY;
   private readonly rateLimitDelay = 1800; // 200 calls/hour = ~3.3 calls/minute
   private readonly fbsTeamCount = 130; // Division I FBS teams
@@ -118,17 +119,13 @@ export class CollegeFootballDataSyncService {
       Sentry.addBreadcrumb({
         message: 'Starting college football data sync',
         category: 'college-football.sync',
-        level: 'info'
+        level: 'info',
       });
 
       console.log('🔄 CFB Data Sync - Starting comprehensive college football data sync');
 
       // Phase 1: Core structural data
-      await Promise.all([
-        this.syncConferences(),
-        this.syncTeams(),
-        this.syncRankings()
-      ]);
+      await Promise.all([this.syncConferences(), this.syncTeams(), this.syncRankings()]);
 
       // Phase 2: Dynamic data (sequential to respect rate limits)
       await this.syncGames();
@@ -146,7 +143,6 @@ export class CollegeFootballDataSyncService {
 
       Sentry.captureMessage('College football data sync completed', 'info');
       console.log('✅ CFB Data Sync - College football data sync completed successfully');
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ CFB Data Sync - College football data sync failed', error);
@@ -162,8 +158,17 @@ export class CollegeFootballDataSyncService {
       console.log('🔄 CFB Data Sync - Syncing conference data');
 
       const conferences = [
-        'SEC', 'Big Ten', 'Big 12', 'ACC', 'Pac-12', 'American',
-        'Mountain West', 'Conference USA', 'MAC', 'Sun Belt', 'Independents'
+        'SEC',
+        'Big Ten',
+        'Big 12',
+        'ACC',
+        'Pac-12',
+        'American',
+        'Mountain West',
+        'Conference USA',
+        'MAC',
+        'Sun Belt',
+        'Independents',
       ];
 
       for (const conference of conferences) {
@@ -173,7 +178,6 @@ export class CollegeFootballDataSyncService {
 
       // Track recent realignment moves
       await this.trackConferenceRealignment();
-
     } catch (error) {
       console.error('❌ CFB Data Sync - Conference sync failed', error);
       throw error;
@@ -197,12 +201,11 @@ export class CollegeFootballDataSyncService {
         playoffBids: this.calculatePlayoffBids(conference),
         averageRecruitingRank: this.calculateAverageRecruitingRank(teams),
         revenueSharing: this.getRevenueSharing(conference),
-        realignmentHistory: await this.getConferenceRealignmentHistory(conference)
+        realignmentHistory: await this.getConferenceRealignmentHistory(conference),
       };
 
       // TODO: Store in Firebase when available
       console.log(`✅ CFB Data Sync - Conference ${conference} data synced`);
-
     } catch (error) {
       console.error(`❌ CFB Data Sync - Conference ${conference} sync failed`, error);
       throw error;
@@ -219,12 +222,11 @@ export class CollegeFootballDataSyncService {
       const [cfpRankings, apPoll, coachesPoll] = await Promise.all([
         this.fetchCFPRankings(),
         this.fetchAPPoll(),
-        this.fetchCoachesPoll()
+        this.fetchCoachesPoll(),
       ]);
 
       // TODO: Store in Firebase when available
       console.log('✅ CFB Data Sync - Rankings data synced');
-
     } catch (error) {
       console.error('❌ CFB Data Sync - Rankings sync failed', error);
       throw error;
@@ -276,10 +278,10 @@ export class CollegeFootballDataSyncService {
   private async makeESPNAPICall(url: string): Promise<any> {
     try {
       console.log(`🔄 ESPN College Football API call: ${url}`);
-      
+
       // TODO: Implement actual API call when ESPN API keys are available
       // For now, return empty array to prevent errors
-      
+
       return [];
     } catch (error) {
       console.error(`❌ ESPN API call failed: ${url}`, error);
@@ -387,10 +389,18 @@ export class CollegeFootballDataSyncService {
   }
 
   // Additional helper methods with placeholder implementations
-  private calculatePlayoffBids(conference: string): number { return 0; }
-  private calculateAverageRecruitingRank(teams: CollegeFootballTeam[]): number { return 0; }
-  private getRevenueSharing(conference: string): number { return 0; }
-  private async getConferenceRealignmentHistory(conference: string): Promise<any[]> { return []; }
+  private calculatePlayoffBids(conference: string): number {
+    return 0;
+  }
+  private calculateAverageRecruitingRank(teams: CollegeFootballTeam[]): number {
+    return 0;
+  }
+  private getRevenueSharing(conference: string): number {
+    return 0;
+  }
+  private async getConferenceRealignmentHistory(conference: string): Promise<any[]> {
+    return [];
+  }
   private async trackConferenceRealignment(): Promise<void> {}
 }
 

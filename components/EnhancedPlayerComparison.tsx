@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  ActivityIndicator,
-  Dimensions
-} from 'react-native';
-import { ThemedText } from './ThemedText';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { useColorScheme } from '../hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
-import { PlayerComparisonData } from '../services/playerStatsService';
+
 import PlayerComparisonView from './PlayerComparisonView';
+import { ThemedText } from './ThemedText';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { useThemeColor } from '../hooks/useThemeColor';
+import { PlayerComparisonData } from '../services/playerStatsService';
 
 interface EnhancedPlayerComparisonProps {
   comparisonData: PlayerComparisonData;
@@ -23,31 +24,33 @@ interface EnhancedPlayerComparisonProps {
 /**
  * Enhanced component to display side-by-side comparison of two players with additional visualizations
  */
-const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({ 
+const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
   comparisonData,
-  loading = false
+  loading = false,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'offensive' | 'defensive' | 'overall'>('offensive');
+  const [selectedCategory, setSelectedCategory] = useState<'offensive' | 'defensive' | 'overall'>(
+    'offensive'
+  );
   const [showRadarChart, setShowRadarChart] = useState(false);
-  
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const colorScheme = useColorScheme() ?? 'light';
-  
+
   // Define colors based on the color scheme
   const borderColor = colorScheme === 'light' ? '#e1e1e1' : '#38383A';
   const positiveColor = colorScheme === 'light' ? '#34C759' : '#30D158';
   const negativeColor = colorScheme === 'light' ? '#FF3B30' : '#FF453A';
   const player1Color = '#0a7ea4';
   const player2Color = '#FF9500';
-  
+
   // Chart background and grid colors
   const chartBackgroundColor = colorScheme === 'light' ? '#fff' : '#1c1c1e';
   const chartGridColor = colorScheme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
-  
+
   // Screen width for chart
   const screenWidth = Dimensions.get('window').width - 40; // Accounting for padding
-  
+
   // Chart configuration
   const chartConfig = {
     backgroundColor: chartBackgroundColor,
@@ -55,130 +58,131 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
     backgroundGradientTo: chartBackgroundColor,
     decimalPlaces: 1,
     color: (opacity = 1) => `rgba(10, 126, 164, ${opacity})`,
-    labelColor: (opacity = 1) => colorScheme === 'light' ? `rgba(0, 0, 0, ${opacity})` : `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) =>
+      colorScheme === 'light' ? `rgba(0, 0, 0, ${opacity})` : `rgba(255, 255, 255, ${opacity})`,
     style: {
       borderRadius: 16,
     },
     barPercentage: 0.7,
   };
-  
+
   // Format percentage values
   const formatPercentage = (value?: number): string => {
     if (value === undefined) return 'N/A';
     return `${(value * 100).toFixed(1)}%`;
   };
-  
+
   // Format rating values
   const formatRating = (value?: number): string => {
     if (value === undefined) return 'N/A';
     return value.toFixed(1);
   };
-  
+
   // Get metrics for the selected category
   const getCategoryMetrics = () => {
     switch (selectedCategory) {
       case 'offensive':
         return [
-          { 
-            label: 'True Shooting %', 
-            value1: comparisonData.player1.trueShootingPercentage || 0, 
+          {
+            label: 'True Shooting %',
+            value1: comparisonData.player1.trueShootingPercentage || 0,
             value2: comparisonData.player2.trueShootingPercentage || 0,
             formatter: formatPercentage,
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Effective FG%', 
-            value1: comparisonData.player1.effectiveFieldGoalPercentage || 0, 
+          {
+            label: 'Effective FG%',
+            value1: comparisonData.player1.effectiveFieldGoalPercentage || 0,
             value2: comparisonData.player2.effectiveFieldGoalPercentage || 0,
             formatter: formatPercentage,
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Offensive Rating', 
-            value1: comparisonData.player1.offensiveRating || 0, 
+          {
+            label: 'Offensive Rating',
+            value1: comparisonData.player1.offensiveRating || 0,
             value2: comparisonData.player2.offensiveRating || 0,
             formatter: formatRating,
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Usage Rate', 
-            value1: comparisonData.player1.usageRate || 0, 
+          {
+            label: 'Usage Rate',
+            value1: comparisonData.player1.usageRate || 0,
             value2: comparisonData.player2.usageRate || 0,
             formatter: (value?: number) => formatPercentage(value ? value / 100 : undefined),
-            higherIsBetter: true
-          }
+            higherIsBetter: true,
+          },
         ];
       case 'defensive':
         return [
-          { 
-            label: 'Defensive Rating', 
-            value1: comparisonData.player1.defensiveRating || 0, 
+          {
+            label: 'Defensive Rating',
+            value1: comparisonData.player1.defensiveRating || 0,
             value2: comparisonData.player2.defensiveRating || 0,
             formatter: formatRating,
-            higherIsBetter: false
+            higherIsBetter: false,
           },
-          { 
-            label: 'Steal %', 
-            value1: comparisonData.player1.stealPercentage || 0, 
+          {
+            label: 'Steal %',
+            value1: comparisonData.player1.stealPercentage || 0,
             value2: comparisonData.player2.stealPercentage || 0,
             formatter: (value?: number) => formatPercentage(value ? value / 100 : undefined),
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Block %', 
-            value1: comparisonData.player1.blockPercentage || 0, 
+          {
+            label: 'Block %',
+            value1: comparisonData.player1.blockPercentage || 0,
             value2: comparisonData.player2.blockPercentage || 0,
             formatter: (value?: number) => formatPercentage(value ? value / 100 : undefined),
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Defensive Rebound %', 
-            value1: comparisonData.player1.defensiveReboundPercentage || 0, 
+          {
+            label: 'Defensive Rebound %',
+            value1: comparisonData.player1.defensiveReboundPercentage || 0,
             value2: comparisonData.player2.defensiveReboundPercentage || 0,
             formatter: (value?: number) => formatPercentage(value ? value / 100 : undefined),
-            higherIsBetter: true
-          }
+            higherIsBetter: true,
+          },
         ];
       case 'overall':
         return [
-          { 
-            label: 'PER', 
-            value1: comparisonData.player1.playerEfficiencyRating || 0, 
+          {
+            label: 'PER',
+            value1: comparisonData.player1.playerEfficiencyRating || 0,
             value2: comparisonData.player2.playerEfficiencyRating || 0,
             formatter: formatRating,
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'VORP', 
-            value1: comparisonData.player1.valueOverReplacement || 0, 
+          {
+            label: 'VORP',
+            value1: comparisonData.player1.valueOverReplacement || 0,
             value2: comparisonData.player2.valueOverReplacement || 0,
             formatter: formatRating,
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Win Shares', 
-            value1: comparisonData.player1.winShares || 0, 
+          {
+            label: 'Win Shares',
+            value1: comparisonData.player1.winShares || 0,
             value2: comparisonData.player2.winShares || 0,
             formatter: formatRating,
-            higherIsBetter: true
+            higherIsBetter: true,
           },
-          { 
-            label: 'Box +/-', 
-            value1: comparisonData.player1.boxPlusMinus || 0, 
+          {
+            label: 'Box +/-',
+            value1: comparisonData.player1.boxPlusMinus || 0,
             value2: comparisonData.player2.boxPlusMinus || 0,
             formatter: formatRating,
-            higherIsBetter: true
-          }
+            higherIsBetter: true,
+          },
         ];
       default:
         return [];
     }
   };
-  
+
   // Prepare bar chart data
   const getBarChartData = () => {
     const metrics = getCategoryMetrics();
-    
+
     return {
       labels: metrics.map(m => m.label),
       datasets: [
@@ -189,7 +193,7 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             return max === 0 ? 0 : (m.value1 / max) * 100;
           }),
           color: (opacity = 1) => `rgba(10, 126, 164, ${opacity})`,
-          strokeWidth: 2
+          strokeWidth: 2,
         },
         {
           data: metrics.map(m => {
@@ -198,19 +202,19 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             return max === 0 ? 0 : (m.value2 / max) * 100;
           }),
           color: (opacity = 1) => `rgba(255, 149, 0, ${opacity})`,
-          strokeWidth: 2
-        }
+          strokeWidth: 2,
+        },
       ],
-      legend: [comparisonData.player1.playerName, comparisonData.player2.playerName]
+      legend: [comparisonData.player1.playerName, comparisonData.player2.playerName],
     };
   };
-  
+
   // Determine which player has the advantage in the selected category
   const getAdvantageAnalysis = () => {
     const metrics = getCategoryMetrics();
     let player1Wins = 0;
     let player2Wins = 0;
-    
+
     metrics.forEach(metric => {
       if (metric.higherIsBetter) {
         if (metric.value1 > metric.value2) player1Wins++;
@@ -220,26 +224,26 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
         else if (metric.value2 < metric.value1) player2Wins++;
       }
     });
-    
+
     if (player1Wins > player2Wins) {
       return {
         player: comparisonData.player1.playerName,
         advantage: player1Wins - player2Wins,
         total: metrics.length,
-        color: player1Color
+        color: player1Color,
       };
     } else if (player2Wins > player1Wins) {
       return {
         player: comparisonData.player2.playerName,
         advantage: player2Wins - player1Wins,
         total: metrics.length,
-        color: player2Color
+        color: player2Color,
       };
     } else {
       return null; // Even match
     }
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -251,9 +255,9 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
       </View>
     );
   }
-  
+
   const advantage = getAdvantageAnalysis();
-  
+
   return (
     <View style={[styles.container, { backgroundColor, borderColor }]}>
       {/* Original Player Comparison View */}
@@ -262,8 +266,8 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
           id: comparisonData.player1.playerId,
           name: comparisonData.player1.playerName,
           team: comparisonData.player1.team,
-          position: "Forward", // Default position since it's not in the metrics
-          jerseyNumber: "0", // Default jersey number since it's not in the metrics
+          position: 'Forward', // Default position since it's not in the metrics
+          jerseyNumber: '0', // Default jersey number since it's not in the metrics
           stats: {
             // Use recent game averages for basic stats if available
             points: comparisonData.player1.recentGamesAverages?.points?.[0] || 0,
@@ -272,7 +276,8 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             steals: comparisonData.player1.recentGamesAverages?.steals?.[0] || 0,
             blocks: comparisonData.player1.recentGamesAverages?.blocks?.[0] || 0,
             turnovers: 0, // Not available in the metrics
-            fieldGoalPercentage: (comparisonData.player1.recentGamesAverages?.fieldGoalPercentage?.[0] || 0) * 100,
+            fieldGoalPercentage:
+              (comparisonData.player1.recentGamesAverages?.fieldGoalPercentage?.[0] || 0) * 100,
             threePointPercentage: 0, // Not available in the metrics
             freeThrowPercentage: 0, // Not available in the metrics
             plusMinus: comparisonData.player1.boxPlusMinus || 0,
@@ -282,15 +287,15 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             usageRate: comparisonData.player1.usageRate,
             playerEfficiencyRating: comparisonData.player1.playerEfficiencyRating,
             offensiveRating: comparisonData.player1.offensiveRating,
-            defensiveRating: comparisonData.player1.defensiveRating
-          }
+            defensiveRating: comparisonData.player1.defensiveRating,
+          },
         }}
         player2={{
           id: comparisonData.player2.playerId,
           name: comparisonData.player2.playerName,
           team: comparisonData.player2.team,
-          position: "Forward", // Default position since it's not in the metrics
-          jerseyNumber: "0", // Default jersey number since it's not in the metrics
+          position: 'Forward', // Default position since it's not in the metrics
+          jerseyNumber: '0', // Default jersey number since it's not in the metrics
           stats: {
             // Use recent game averages for basic stats if available
             points: comparisonData.player2.recentGamesAverages?.points?.[0] || 0,
@@ -299,7 +304,8 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             steals: comparisonData.player2.recentGamesAverages?.steals?.[0] || 0,
             blocks: comparisonData.player2.recentGamesAverages?.blocks?.[0] || 0,
             turnovers: 0, // Not available in the metrics
-            fieldGoalPercentage: (comparisonData.player2.recentGamesAverages?.fieldGoalPercentage?.[0] || 0) * 100,
+            fieldGoalPercentage:
+              (comparisonData.player2.recentGamesAverages?.fieldGoalPercentage?.[0] || 0) * 100,
             threePointPercentage: 0, // Not available in the metrics
             freeThrowPercentage: 0, // Not available in the metrics
             plusMinus: comparisonData.player2.boxPlusMinus || 0,
@@ -309,71 +315,71 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             usageRate: comparisonData.player2.usageRate,
             playerEfficiencyRating: comparisonData.player2.playerEfficiencyRating,
             offensiveRating: comparisonData.player2.offensiveRating,
-            defensiveRating: comparisonData.player2.defensiveRating
-          }
+            defensiveRating: comparisonData.player2.defensiveRating,
+          },
         }}
-        gameId={comparisonData.player1.gameId || "current"}
+        gameId={comparisonData.player1.gameId || 'current'}
         userId="current"
       />
-      
+
       {/* Enhanced Visualization Section */}
       <View style={styles.enhancedSection}>
         <ThemedText style={styles.enhancedTitle}>Enhanced Comparison</ThemedText>
-        
+
         {/* Category Selection */}
         <View style={styles.categorySelection}>
           <TouchableOpacity
             style={[
               styles.categoryButton,
-              selectedCategory === 'offensive' && { backgroundColor: player1Color }
+              selectedCategory === 'offensive' && { backgroundColor: player1Color },
             ]}
             onPress={() => setSelectedCategory('offensive')}
           >
-            <ThemedText 
+            <ThemedText
               style={[
                 styles.categoryButtonText,
-                selectedCategory === 'offensive' && { color: 'white' }
+                selectedCategory === 'offensive' && { color: 'white' },
               ]}
             >
               Offensive
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.categoryButton,
-              selectedCategory === 'defensive' && { backgroundColor: player1Color }
+              selectedCategory === 'defensive' && { backgroundColor: player1Color },
             ]}
             onPress={() => setSelectedCategory('defensive')}
           >
-            <ThemedText 
+            <ThemedText
               style={[
                 styles.categoryButtonText,
-                selectedCategory === 'defensive' && { color: 'white' }
+                selectedCategory === 'defensive' && { color: 'white' },
               ]}
             >
               Defensive
             </ThemedText>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.categoryButton,
-              selectedCategory === 'overall' && { backgroundColor: player1Color }
+              selectedCategory === 'overall' && { backgroundColor: player1Color },
             ]}
             onPress={() => setSelectedCategory('overall')}
           >
-            <ThemedText 
+            <ThemedText
               style={[
                 styles.categoryButtonText,
-                selectedCategory === 'overall' && { color: 'white' }
+                selectedCategory === 'overall' && { color: 'white' },
               ]}
             >
               Overall
             </ThemedText>
           </TouchableOpacity>
         </View>
-        
+
         {/* Bar Chart Visualization */}
         <View style={styles.chartContainer}>
           <BarChart
@@ -389,18 +395,19 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             yAxisSuffix=""
           />
         </View>
-        
+
         {/* Advantage Analysis */}
         <View style={styles.advantageContainer}>
           <ThemedText style={styles.advantageTitle}>
             {selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Advantage
           </ThemedText>
-          
+
           {advantage ? (
             <View style={styles.advantageContent}>
               <Ionicons name="trophy" size={24} color={advantage.color} />
               <ThemedText style={[styles.advantageText, { color: advantage.color }]}>
-                {advantage.player} has the edge in {advantage.advantage} of {advantage.total} metrics
+                {advantage.player} has the edge in {advantage.advantage} of {advantage.total}{' '}
+                metrics
               </ThemedText>
             </View>
           ) : (
@@ -412,77 +419,101 @@ const EnhancedPlayerComparison: React.FC<EnhancedPlayerComparisonProps> = ({
             </View>
           )}
         </View>
-        
+
         {/* Detailed Metrics Comparison */}
         <View style={styles.detailedMetricsContainer}>
           <ThemedText style={styles.detailedMetricsTitle}>Detailed Comparison</ThemedText>
-          
+
           <View style={styles.metricsTable}>
             <View style={styles.tableHeader}>
               <ThemedText style={[styles.tableHeaderText, { flex: 2 }]}>Metric</ThemedText>
-              <ThemedText style={[styles.tableHeaderText, { flex: 1, textAlign: 'center', color: player1Color }]}>
+              <ThemedText
+                style={[
+                  styles.tableHeaderText,
+                  { flex: 1, textAlign: 'center', color: player1Color },
+                ]}
+              >
                 {comparisonData.player1.playerName.split(' ')[0]}
               </ThemedText>
-              <ThemedText style={[styles.tableHeaderText, { flex: 1, textAlign: 'center', color: player2Color }]}>
+              <ThemedText
+                style={[
+                  styles.tableHeaderText,
+                  { flex: 1, textAlign: 'center', color: player2Color },
+                ]}
+              >
                 {comparisonData.player2.playerName.split(' ')[0]}
               </ThemedText>
-              <ThemedText style={[styles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Diff</ThemedText>
+              <ThemedText style={[styles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>
+                Diff
+              </ThemedText>
             </View>
-            
+
             {getCategoryMetrics().map((metric, index) => {
-              const diff = metric.higherIsBetter 
-                ? metric.value1 - metric.value2 
+              const diff = metric.higherIsBetter
+                ? metric.value1 - metric.value2
                 : metric.value2 - metric.value1;
-              
-              const diffColor = diff > 0 
-                ? (metric.higherIsBetter ? positiveColor : negativeColor)
-                : (diff < 0 
-                  ? (metric.higherIsBetter ? negativeColor : positiveColor) 
-                  : textColor);
-              
-              const formattedDiff = diff === 0 
-                ? '-' 
-                : (diff > 0 ? '+' : '') + metric.formatter(Math.abs(diff));
-              
+
+              const diffColor =
+                diff > 0
+                  ? metric.higherIsBetter
+                    ? positiveColor
+                    : negativeColor
+                  : diff < 0
+                    ? metric.higherIsBetter
+                      ? negativeColor
+                      : positiveColor
+                    : textColor;
+
+              const formattedDiff =
+                diff === 0 ? '-' : (diff > 0 ? '+' : '') + metric.formatter(Math.abs(diff));
+
               return (
                 <View key={index} style={[styles.tableRow, index % 2 === 0 && styles.tableRowAlt]}>
                   <ThemedText style={[styles.tableCell, { flex: 2 }]}>{metric.label}</ThemedText>
-                  <ThemedText 
+                  <ThemedText
                     style={[
-                      styles.tableCell, 
-                      { 
-                        flex: 1, 
+                      styles.tableCell,
+                      {
+                        flex: 1,
                         textAlign: 'center',
-                        color: metric.higherIsBetter 
-                          ? (metric.value1 > metric.value2 ? positiveColor : textColor)
-                          : (metric.value1 < metric.value2 ? positiveColor : textColor)
-                      }
+                        color: metric.higherIsBetter
+                          ? metric.value1 > metric.value2
+                            ? positiveColor
+                            : textColor
+                          : metric.value1 < metric.value2
+                            ? positiveColor
+                            : textColor,
+                      },
                     ]}
                   >
                     {metric.formatter(metric.value1)}
                   </ThemedText>
-                  <ThemedText 
+                  <ThemedText
                     style={[
-                      styles.tableCell, 
-                      { 
-                        flex: 1, 
+                      styles.tableCell,
+                      {
+                        flex: 1,
                         textAlign: 'center',
-                        color: metric.higherIsBetter 
-                          ? (metric.value2 > metric.value1 ? positiveColor : textColor)
-                          : (metric.value2 < metric.value1 ? positiveColor : textColor)
-                      }
+                        color: metric.higherIsBetter
+                          ? metric.value2 > metric.value1
+                            ? positiveColor
+                            : textColor
+                          : metric.value2 < metric.value1
+                            ? positiveColor
+                            : textColor,
+                      },
                     ]}
                   >
                     {metric.formatter(metric.value2)}
                   </ThemedText>
-                  <ThemedText 
+                  <ThemedText
                     style={[
-                      styles.tableCell, 
-                      { 
-                        flex: 1, 
+                      styles.tableCell,
+                      {
+                        flex: 1,
                         textAlign: 'center',
-                        color: diffColor
-                      }
+                        color: diffColor,
+                      },
                     ]}
                   >
                     {formattedDiff}

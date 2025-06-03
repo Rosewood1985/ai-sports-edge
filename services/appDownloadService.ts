@@ -24,18 +24,18 @@ class AppDownloadService {
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         return false;
       }
-      
+
       // Check if prompt has been shown for this user
       const key = `${APP_DOWNLOAD_PROMPT_SHOWN_KEY}_${userId}`;
       const promptShown = await AsyncStorage.getItem(key);
-      
+
       return !promptShown;
     } catch (error) {
       console.error('Error checking if download prompt should be shown:', error);
       return false;
     }
   }
-  
+
   /**
    * Mark the app download prompt as shown for a user
    * @param userId User ID to mark as shown
@@ -48,7 +48,7 @@ class AppDownloadService {
       console.error('Error marking download prompt as shown:', error);
     }
   }
-  
+
   /**
    * Get app store URLs
    * @returns Object containing app store URLs
@@ -57,7 +57,7 @@ class AppDownloadService {
     return {
       appStoreUrl: APP_STORE_URL,
       playStoreUrl: PLAY_STORE_URL,
-      webAppUrl: WEB_APP_URL
+      webAppUrl: WEB_APP_URL,
     };
   }
 }

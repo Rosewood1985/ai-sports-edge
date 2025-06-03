@@ -1,13 +1,13 @@
-import { Game, AIPrediction, ConfidenceLevel, DailyInsight, GameResult } from '../types/odds';
-import { PropBetLine, PropBetPrediction, PropBetType } from '../types/playerProps';
-import { auth } from '../config/firebase';
-import { useI18n } from '../contexts/I18nContext';
 import {
   hasPremiumAccess,
   hasUsedFreeDailyPick,
-  markFreeDailyPickAsUsed
+  markFreeDailyPickAsUsed,
 } from './firebaseSubscriptionService';
 import { mlPredictionService } from './mlPredictionService';
+import { auth } from '../config/firebase';
+import { useI18n } from '../contexts/I18nContext';
+import { Game, AIPrediction, ConfidenceLevel, DailyInsight, GameResult } from '../types/odds';
+import { PropBetLine, PropBetPrediction, PropBetType } from '../types/playerProps';
 
 /**
  * Generate an AI prediction for a game
@@ -15,10 +15,7 @@ import { mlPredictionService } from './mlPredictionService';
  * @param language - The language code (en or es)
  * @returns AI prediction
  */
-export const generateAIPrediction = async (
-  game: Game,
-  language = 'en'
-): Promise<AIPrediction> => {
+export const generateAIPrediction = async (game: Game, language = 'en'): Promise<AIPrediction> => {
   try {
     // Use the ML prediction service to generate a prediction
     return await mlPredictionService.generatePrediction(game, language);
@@ -29,10 +26,11 @@ export const generateAIPrediction = async (
       predicted_winner: game.home_team,
       confidence: 'low', // Always 'low' confidence for error cases
       confidence_score: 30,
-      reasoning: language === 'es'
-        ? 'Error al generar la predicción. Usando predicción de respaldo.'
-        : 'Error generating prediction. Using fallback prediction.',
-      historical_accuracy: 60
+      reasoning:
+        language === 'es'
+          ? 'Error al generar la predicción. Usando predicción de respaldo.'
+          : 'Error generating prediction. Using fallback prediction.',
+      historical_accuracy: 60,
     };
   }
 };
@@ -47,27 +45,27 @@ export const getAIPredictions = async (games: Game[]): Promise<Game[]> => {
     // Check if user has premium access
     const userId = auth.currentUser?.uid;
     let hasPremium = false;
-    
+
     if (userId) {
       hasPremium = await hasPremiumAccess(userId);
     }
-    
+
     // If user doesn't have premium access, return games without predictions
     if (!hasPremium) {
       return games;
     }
-    
+
     // Generate predictions for each game using the ML prediction service
     const gamesWithPredictions = await Promise.all(
-      games.map(async (game) => {
+      games.map(async game => {
         const prediction = await mlPredictionService.generatePrediction(game);
         return {
           ...game,
-          ai_prediction: prediction
+          ai_prediction: prediction,
         };
       })
     );
-    
+
     return gamesWithPredictions;
   } catch (error) {
     console.error('Error generating AI predictions:', error);
@@ -84,35 +82,37 @@ export const getLiveGameUpdates = (game: Game): Game => {
   // Check if game is in progress
   const gameTime = new Date(game.commence_time);
   const now = new Date();
-  
+
   // If game hasn't started yet, return the original game
   if (gameTime > now) {
     return game;
   }
-  
+
   // Simulate game in progress
   const homeScore = Math.floor(Math.random() * 30);
   const awayScore = Math.floor(Math.random() * 30);
-  
+
   // Simulate time remaining
   const periods = ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter'];
   const period = periods[Math.floor(Math.random() * periods.length)];
-  
+
   // Simulate minutes remaining (0-15)
   const minutesRemaining = Math.floor(Math.random() * 15);
-  const timeRemaining = `${minutesRemaining}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
-  
+  const timeRemaining = `${minutesRemaining}:${Math.floor(Math.random() * 60)
+    .toString()
+    .padStart(2, '0')}`;
+
   return {
     ...game,
     live_updates: {
       score: {
         home: homeScore,
-        away: awayScore
+        away: awayScore,
       },
       time_remaining: timeRemaining,
       period,
-      last_update: new Date().toISOString()
-    }
+      last_update: new Date().toISOString(),
+    },
   };
 };
 
@@ -133,36 +133,36 @@ export const getLiveUpdates = (games: Game[]): Game[] => {
 export const getGameResult = async (gameId: string): Promise<GameResult | null> => {
   // In a real app, this would fetch actual game results from an API
   // For now, we'll simulate results
-  
+
   // Randomly determine if the game is finished
   const statuses = ['scheduled', 'in_progress', 'finished', 'cancelled'];
   const status = statuses[Math.floor(Math.random() * statuses.length)] as GameResult['status'];
-  
+
   if (status === 'finished') {
     const homeScore = Math.floor(Math.random() * 30);
     const awayScore = Math.floor(Math.random() * 30);
-    
+
     return {
       home_score: homeScore,
       away_score: awayScore,
       status,
       winner: homeScore > awayScore ? 'home' : 'away',
-      last_update: new Date().toISOString()
+      last_update: new Date().toISOString(),
     };
   } else if (status === 'in_progress') {
     const homeScore = Math.floor(Math.random() * 20);
     const awayScore = Math.floor(Math.random() * 20);
-    
+
     return {
       home_score: homeScore,
       away_score: awayScore,
       status,
-      last_update: new Date().toISOString()
+      last_update: new Date().toISOString(),
     };
   } else {
     return {
       status,
-      last_update: new Date().toISOString()
+      last_update: new Date().toISOString(),
     };
   }
 };
@@ -174,45 +174,45 @@ export const getGameResult = async (gameId: string): Promise<GameResult | null> 
 export const getDailyInsights = async (): Promise<DailyInsight> => {
   // In a real app, this would fetch insights from an AI model or API
   // For now, we'll generate random insights
-  
+
   // Generate random top picks
   const topPicks = Array.from({ length: 3 }, (_, i) => {
     const homeTeam = `Team ${String.fromCharCode(65 + i * 2)}`;
     const awayTeam = `Team ${String.fromCharCode(66 + i * 2)}`;
     const pick = Math.random() > 0.5 ? homeTeam : awayTeam;
-    
+
     const confidenceLevels: ConfidenceLevel[] = ['high', 'medium', 'low'];
     const confidence = confidenceLevels[Math.floor(Math.random() * confidenceLevels.length)];
-    
+
     const reasonings = [
       `${pick} has a strong home field advantage.`,
       `${pick} has key players returning from injury.`,
       `${pick} has a statistical edge in this matchup.`,
-      `${pick} has won the last 3 meetings against their opponent.`
+      `${pick} has won the last 3 meetings against their opponent.`,
     ];
-    
+
     return {
       game_id: `game-${i}`,
       home_team: homeTeam,
       away_team: awayTeam,
       pick,
       confidence,
-      reasoning: reasonings[Math.floor(Math.random() * reasonings.length)]
+      reasoning: reasonings[Math.floor(Math.random() * reasonings.length)],
     };
   });
-  
+
   // Generate trending bets
   const trendingBets = [
     { game_id: 'trend-1', description: 'Over 45.5 points in Lakers vs Warriors' },
     { game_id: 'trend-2', description: 'Chiefs to win by 7+ points' },
-    { game_id: 'trend-3', description: 'Yankees to score in the first inning' }
+    { game_id: 'trend-3', description: 'Yankees to score in the first inning' },
   ];
-  
+
   return {
     id: 'daily-insights',
     date: new Date().toISOString().split('T')[0],
     top_picks: topPicks,
-    trending_bets: trendingBets
+    trending_bets: trendingBets,
   };
 };
 
@@ -221,16 +221,18 @@ export const getDailyInsights = async (): Promise<DailyInsight> => {
  * @param propBet - The player prop bet to predict
  * @returns AI prediction for the player prop bet
  */
-export const generatePropBetPrediction = async (propBet: PropBetLine): Promise<PropBetPrediction> => {
+export const generatePropBetPrediction = async (
+  propBet: PropBetLine
+): Promise<PropBetPrediction> => {
   // In a real app, this would call an AI model API
   // For now, we'll simulate AI predictions with random data
-  
+
   // Randomly select over or under
   const prediction = Math.random() > 0.5 ? 'over' : 'under';
-  
+
   // Generate a confidence score (0-100)
   const confidenceScore = Math.floor(Math.random() * 100);
-  
+
   // Determine confidence level based on score
   let confidence: ConfidenceLevel;
   if (confidenceScore >= 70) {
@@ -240,42 +242,47 @@ export const generatePropBetPrediction = async (propBet: PropBetLine): Promise<P
   } else {
     confidence = 'low';
   }
-  
+
   // Generate reasoning based on prop type
   let reasoning = '';
   switch (propBet.type) {
     case 'points':
-      reasoning = prediction === 'over'
-        ? `${propBet.player} has exceeded this points line in 7 of the last 10 games.`
-        : `${propBet.player} has gone under this points line in 6 of the last 10 games.`;
+      reasoning =
+        prediction === 'over'
+          ? `${propBet.player} has exceeded this points line in 7 of the last 10 games.`
+          : `${propBet.player} has gone under this points line in 6 of the last 10 games.`;
       break;
     case 'rebounds':
-      reasoning = prediction === 'over'
-        ? `${propBet.player} has a favorable rebounding matchup against this opponent.`
-        : `${propBet.player}'s rebounding numbers tend to decrease against this opponent.`;
+      reasoning =
+        prediction === 'over'
+          ? `${propBet.player} has a favorable rebounding matchup against this opponent.`
+          : `${propBet.player}'s rebounding numbers tend to decrease against this opponent.`;
       break;
     case 'assists':
-      reasoning = prediction === 'over'
-        ? `${propBet.player} has been more involved in the offense recently.`
-        : `${propBet.player} may see reduced playmaking opportunities in this matchup.`;
+      reasoning =
+        prediction === 'over'
+          ? `${propBet.player} has been more involved in the offense recently.`
+          : `${propBet.player} may see reduced playmaking opportunities in this matchup.`;
       break;
     case 'touchdowns':
-      reasoning = prediction === 'over'
-        ? `${propBet.player} has scored in 3 consecutive games.`
-        : `${propBet.player} faces a tough red zone defense.`;
+      reasoning =
+        prediction === 'over'
+          ? `${propBet.player} has scored in 3 consecutive games.`
+          : `${propBet.player} faces a tough red zone defense.`;
       break;
     default:
-      reasoning = prediction === 'over'
-        ? `${propBet.player} has been performing above expectations recently.`
-        : `${propBet.player} may struggle to reach this line based on recent performance.`;
+      reasoning =
+        prediction === 'over'
+          ? `${propBet.player} has been performing above expectations recently.`
+          : `${propBet.player} may struggle to reach this line based on recent performance.`;
   }
-  
+
   // Simulate historical accuracy (60-95%)
   const historicalAccuracy = 60 + Math.floor(Math.random() * 35);
-  
+
   // All prop bet predictions are premium content
   const isPremium = true;
-  
+
   return {
     propBet,
     prediction,
@@ -283,7 +290,7 @@ export const generatePropBetPrediction = async (propBet: PropBetLine): Promise<P
     confidenceScore,
     reasoning,
     historicalAccuracy,
-    isPremium
+    isPremium,
   };
 };
 
@@ -292,28 +299,30 @@ export const generatePropBetPrediction = async (propBet: PropBetLine): Promise<P
  * @param propBets - List of player prop bets
  * @returns Player prop bets with AI predictions
  */
-export const getPropBetPredictions = async (propBets: PropBetLine[]): Promise<PropBetPrediction[]> => {
+export const getPropBetPredictions = async (
+  propBets: PropBetLine[]
+): Promise<PropBetPrediction[]> => {
   try {
     // Check if user has premium access
     const userId = auth.currentUser?.uid;
     let hasPremium = false;
-    
+
     if (userId) {
       hasPremium = await hasPremiumAccess(userId);
     }
-    
+
     // If user doesn't have premium access, return empty array
     if (!hasPremium) {
       return [];
     }
-    
+
     // Generate predictions for each prop bet
     const predictions = await Promise.all(
-      propBets.map(async (propBet) => {
+      propBets.map(async propBet => {
         return await generatePropBetPrediction(propBet);
       })
     );
-    
+
     return predictions;
   } catch (error) {
     console.error('Error generating prop bet predictions:', error);
@@ -329,20 +338,20 @@ export const getPropBetPredictions = async (propBets: PropBetLine[]): Promise<Pr
 export const getSamplePropBets = (game: Game): PropBetLine[] => {
   // In a real app, this would fetch actual prop bets from an API
   // For now, we'll generate sample prop bets
-  
+
   // Generate player names based on team names
   const homeTeamPlayers = [
     `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Johnson`,
     `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Smith`,
-    `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Williams`
+    `${game.home_team.split(' ')[game.home_team.split(' ').length - 1].charAt(0)}. Williams`,
   ];
-  
+
   const awayTeamPlayers = [
     `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Brown`,
     `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Davis`,
-    `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Miller`
+    `${game.away_team.split(' ')[game.away_team.split(' ').length - 1].charAt(0)}. Miller`,
   ];
-  
+
   // Determine sport type based on game title
   let propTypes: PropBetType[] = [];
   if (game.sport_title.toLowerCase().includes('basketball')) {
@@ -356,15 +365,15 @@ export const getSamplePropBets = (game: Game): PropBetLine[] => {
   } else {
     propTypes = ['points', 'assists', 'goals'];
   }
-  
+
   // Generate prop bets
   const propBets: PropBetLine[] = [];
-  
+
   // Home team props
   homeTeamPlayers.forEach(player => {
     const propType = propTypes[Math.floor(Math.random() * propTypes.length)];
     let line = 0;
-    
+
     // Set reasonable lines based on prop type
     switch (propType) {
       case 'points':
@@ -394,22 +403,22 @@ export const getSamplePropBets = (game: Game): PropBetLine[] => {
       default:
         line = 9.5 + Math.floor(Math.random() * 10);
     }
-    
+
     propBets.push({
       type: propType,
       player,
       team: game.home_team,
       line,
       overOdds: -110 + Math.floor(Math.random() * 40) - 20,
-      underOdds: -110 + Math.floor(Math.random() * 40) - 20
+      underOdds: -110 + Math.floor(Math.random() * 40) - 20,
     });
   });
-  
+
   // Away team props
   awayTeamPlayers.forEach(player => {
     const propType = propTypes[Math.floor(Math.random() * propTypes.length)];
     let line = 0;
-    
+
     // Set reasonable lines based on prop type
     switch (propType) {
       case 'points':
@@ -439,17 +448,17 @@ export const getSamplePropBets = (game: Game): PropBetLine[] => {
       default:
         line = 9.5 + Math.floor(Math.random() * 10);
     }
-    
+
     propBets.push({
       type: propType,
       player,
       team: game.away_team,
       line,
       overOdds: -110 + Math.floor(Math.random() * 40) - 20,
-      underOdds: -110 + Math.floor(Math.random() * 40) - 20
+      underOdds: -110 + Math.floor(Math.random() * 40) - 20,
     });
   });
-  
+
   return propBets;
 };
 
@@ -465,30 +474,30 @@ export const getFreeDailyPick = async (games: Game[]): Promise<Game | null> => {
     if (!userId) {
       return null;
     }
-    
+
     // Check if user has already used their free daily pick
     const hasUsedPick = await hasUsedFreeDailyPick(userId);
     if (hasUsedPick) {
       return null;
     }
-    
+
     // Select a random game for the free pick
     if (games.length === 0) {
       return null;
     }
-    
+
     const randomIndex = Math.floor(Math.random() * games.length);
     const selectedGame = games[randomIndex];
-    
+
     // Generate prediction for the selected game
     const prediction = await mlPredictionService.generatePrediction(selectedGame);
-    
+
     // Mark the free daily pick as used
     await markFreeDailyPickAsUsed(userId, selectedGame.id);
-    
+
     return {
       ...selectedGame,
-      ai_prediction: prediction
+      ai_prediction: prediction,
     };
   } catch (error) {
     console.error('Error generating free daily pick:', error);
@@ -505,24 +514,24 @@ export const getBlurredPredictions = async (games: Game[]): Promise<Game[]> => {
   try {
     // Generate predictions for each game but blur the confidence scores
     const gamesWithBlurredPredictions = await Promise.all(
-      games.map(async (game) => {
+      games.map(async game => {
         const prediction = await mlPredictionService.generatePrediction(game);
-        
+
         // Create a blurred version of the prediction
         const blurredPrediction = {
           ...prediction,
           confidence_score: -1, // Hide the actual score
           reasoning: 'Upgrade to premium to see detailed reasoning',
-          historical_accuracy: -1 // Hide the actual accuracy
+          historical_accuracy: -1, // Hide the actual accuracy
         };
-        
+
         return {
           ...game,
-          ai_prediction: blurredPrediction
+          ai_prediction: blurredPrediction,
         };
       })
     );
-    
+
     return gamesWithBlurredPredictions;
   } catch (error) {
     console.error('Error generating blurred predictions:', error);
@@ -534,7 +543,9 @@ export const getBlurredPredictions = async (games: Game[]): Promise<Game[]> => {
  * Get trending bets data (available to free users)
  * @returns Trending bets data
  */
-export const getTrendingBets = async (): Promise<{game_id: string, description: string, percentage: number}[]> => {
+export const getTrendingBets = async (): Promise<
+  { game_id: string; description: string; percentage: number }[]
+> => {
   // In a real app, this would fetch actual trending bets from an API
   // For now, we'll generate sample trending bets
   return [
@@ -542,7 +553,7 @@ export const getTrendingBets = async (): Promise<{game_id: string, description: 
     { game_id: 'trend-2', description: 'Chiefs to win by 7+ points', percentage: 65 },
     { game_id: 'trend-3', description: 'Yankees to score in the first inning', percentage: 52 },
     { game_id: 'trend-4', description: 'Celtics vs Bucks under 220.5', percentage: 61 },
-    { game_id: 'trend-5', description: 'Cowboys -3.5 vs Eagles', percentage: 57 }
+    { game_id: 'trend-5', description: 'Cowboys -3.5 vs Eagles', percentage: 57 },
   ];
 };
 
@@ -550,13 +561,15 @@ export const getTrendingBets = async (): Promise<{game_id: string, description: 
  * Get community poll data
  * @returns Community poll data
  */
-export const getCommunityPolls = async (): Promise<{
-  id: string;
-  question: string;
-  options: {id: string, text: string, votes: number}[];
-  totalVotes: number;
-  aiPrediction?: string;
-}[]> => {
+export const getCommunityPolls = async (): Promise<
+  {
+    id: string;
+    question: string;
+    options: { id: string; text: string; votes: number }[];
+    totalVotes: number;
+    aiPrediction?: string;
+  }[]
+> => {
   // In a real app, this would fetch actual community polls from an API
   // For now, we'll generate sample polls
   return [
@@ -565,31 +578,31 @@ export const getCommunityPolls = async (): Promise<{
       question: 'Who will win tonight: Lakers or Warriors?',
       options: [
         { id: 'option-1', text: 'Lakers', votes: 342 },
-        { id: 'option-2', text: 'Warriors', votes: 289 }
+        { id: 'option-2', text: 'Warriors', votes: 289 },
       ],
       totalVotes: 631,
-      aiPrediction: 'Lakers'
+      aiPrediction: 'Lakers',
     },
     {
       id: 'poll-2',
       question: 'Will the Chiefs cover the -7.5 spread vs Raiders?',
       options: [
         { id: 'option-1', text: 'Yes', votes: 187 },
-        { id: 'option-2', text: 'No', votes: 213 }
+        { id: 'option-2', text: 'No', votes: 213 },
       ],
       totalVotes: 400,
-      aiPrediction: 'No'
+      aiPrediction: 'No',
     },
     {
       id: 'poll-3',
       question: 'Over/Under 220.5 points in Celtics vs Bucks?',
       options: [
         { id: 'option-1', text: 'Over', votes: 156 },
-        { id: 'option-2', text: 'Under', votes: 178 }
+        { id: 'option-2', text: 'Under', votes: 178 },
       ],
       totalVotes: 334,
-      aiPrediction: 'Under'
-    }
+      aiPrediction: 'Under',
+    },
   ];
 };
 
@@ -597,43 +610,44 @@ export const getCommunityPolls = async (): Promise<{
  * Get AI vs public betting leaderboard data
  * @returns Leaderboard data
  */
-export const getAILeaderboard = async (): Promise<{
-  date: string;
-  aiAccuracy: number;
-  publicAccuracy: number;
-  isPremium: boolean;
-}[]> => {
+export const getAILeaderboard = async (): Promise<
+  {
+    date: string;
+    aiAccuracy: number;
+    publicAccuracy: number;
+    isPremium: boolean;
+  }[]
+> => {
   // In a real app, this would fetch actual leaderboard data from an API
   // For now, we'll generate sample data
   const today = new Date();
   const entries = [];
-  
+
   // Generate entries for the past 7 days
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    
+
     // Format date as MM/DD
     const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
-    
+
     // Generate random accuracy percentages
     const aiAccuracy = 55 + Math.floor(Math.random() * 25); // 55-80%
     const publicAccuracy = 45 + Math.floor(Math.random() * 15); // 45-60%
-    
+
     // Make recent days premium-only
     const isPremium = i < 3;
-    
+
     entries.push({
       date: formattedDate,
       aiAccuracy,
       publicAccuracy,
-      isPremium
+      isPremium,
     });
   }
-  
+
   return entries;
 };
-
 
 /**
  * Record prediction feedback
@@ -669,5 +683,5 @@ export default {
   getCommunityPolls,
   getAILeaderboard,
   recordPredictionFeedback,
-  generateAIPrediction
+  generateAIPrediction,
 };

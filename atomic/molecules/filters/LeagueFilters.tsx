@@ -3,11 +3,12 @@
  * Complex filtering component for leagues using UI theme system
  * Location: /atomic/molecules/filters/LeagueFilters.tsx
  */
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal } from 'react-native';
+
 import { useUITheme } from '../../../components/UIThemeProvider';
 import { LeagueFilter } from '../../../types/sports';
-import { Ionicons } from '@expo/vector-icons';
 
 interface LeagueFiltersProps {
   filters: LeagueFilter;
@@ -47,21 +48,21 @@ export const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterC
   const { theme } = useUITheme();
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showSportModal, setShowSportModal] = useState(false);
-  
+
   // Get display name for selected country
   const getSelectedCountryLabel = (): string => {
     if (!filters.country) return 'All Countries';
     const country = COUNTRIES.find(c => c.value === filters.country);
     return country ? country.label : 'All Countries';
   };
-  
+
   // Get display name for selected sport
   const getSelectedSportLabel = (): string => {
     if (!filters.sport) return 'All Sports';
     const sport = SPORTS.find(s => s.value === filters.sport);
     return sport ? sport.label : 'All Sports';
   };
-  
+
   // Create dynamic styles using theme
   const styles = StyleSheet.create({
     container: {
@@ -165,7 +166,7 @@ export const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterC
       color: theme.colors.text,
     },
   });
-  
+
   // Render selector modal
   const renderSelectorModal = (
     options: FilterOption[],
@@ -174,39 +175,32 @@ export const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterC
     onSelect: (value: string) => void,
     selectedValue: string | undefined
   ) => (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>
-              Select Option
-            </Text>
+            <Text style={styles.modalTitle}>Select Option</Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close-outline" size={24} color={theme.colors.text} />
             </TouchableOpacity>
           </View>
-          
+
           <ScrollView style={styles.optionsList}>
-            {options.map((option) => (
+            {options.map(option => (
               <TouchableOpacity
                 key={option.value}
                 style={[
                   styles.optionItem,
-                  selectedValue === option.value && { backgroundColor: theme.colors.primary + '20' }
+                  selectedValue === option.value && {
+                    backgroundColor: theme.colors.primary + '20',
+                  },
                 ]}
                 onPress={() => {
                   onSelect(option.value);
                   onClose();
                 }}
               >
-                <Text style={styles.optionText}>
-                  {option.label}
-                </Text>
+                <Text style={styles.optionText}>{option.label}</Text>
                 {selectedValue === option.value && (
                   <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
@@ -217,65 +211,53 @@ export const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterC
       </View>
     </Modal>
   );
-  
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Filter Leagues
-      </Text>
-      
+      <Text style={styles.title}>Filter Leagues</Text>
+
       {/* Country Filter */}
       <View style={styles.filterRow}>
         <Text style={styles.filterLabel}>Country:</Text>
-        <TouchableOpacity
-          style={styles.selectorButton}
-          onPress={() => setShowCountryModal(true)}
-        >
-          <Text style={styles.selectorText}>
-            {getSelectedCountryLabel()}
-          </Text>
+        <TouchableOpacity style={styles.selectorButton} onPress={() => setShowCountryModal(true)}>
+          <Text style={styles.selectorText}>{getSelectedCountryLabel()}</Text>
           <Ionicons name="chevron-down-outline" size={16} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
-      
+
       {/* Sport Filter */}
       <View style={styles.filterRow}>
         <Text style={styles.filterLabel}>Sport:</Text>
-        <TouchableOpacity
-          style={styles.selectorButton}
-          onPress={() => setShowSportModal(true)}
-        >
-          <Text style={styles.selectorText}>
-            {getSelectedSportLabel()}
-          </Text>
+        <TouchableOpacity style={styles.selectorButton} onPress={() => setShowSportModal(true)}>
+          <Text style={styles.selectorText}>{getSelectedSportLabel()}</Text>
           <Ionicons name="chevron-down-outline" size={16} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
-      
+
       {/* College Filter */}
       <View style={styles.filterRow}>
-        <Text style={styles.filterLabel}>
-          College Leagues Only:
-        </Text>
+        <Text style={styles.filterLabel}>College Leagues Only:</Text>
         <Switch
           value={filters.isCollege === true}
-          onValueChange={(value: boolean) => onFilterChange({ isCollege: value ? true : undefined })}
+          onValueChange={(value: boolean) =>
+            onFilterChange({ isCollege: value ? true : undefined })
+          }
           trackColor={{ false: '#767577', true: theme.colors.primary }}
           thumbColor={filters.isCollege ? '#f4f3f4' : '#f4f3f4'}
         />
       </View>
-      
+
       {/* Reset Filters Button */}
       <TouchableOpacity
         style={styles.resetButton}
-        onPress={() => onFilterChange({ country: undefined, sport: undefined, isCollege: undefined })}
+        onPress={() =>
+          onFilterChange({ country: undefined, sport: undefined, isCollege: undefined })
+        }
       >
         <Ionicons name="refresh-outline" size={16} color={theme.colors.primary} />
-        <Text style={styles.resetButtonText}>
-          Reset Filters
-        </Text>
+        <Text style={styles.resetButtonText}>Reset Filters</Text>
       </TouchableOpacity>
-      
+
       {/* Country Selector Modal */}
       {renderSelectorModal(
         COUNTRIES,
@@ -284,7 +266,7 @@ export const LeagueFilters: React.FC<LeagueFiltersProps> = ({ filters, onFilterC
         (value: string) => onFilterChange({ country: value || undefined }),
         filters.country
       )}
-      
+
       {/* Sport Selector Modal */}
       {renderSelectorModal(
         SPORTS,

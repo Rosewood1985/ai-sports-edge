@@ -96,40 +96,44 @@ class UfcOddsService {
   async getBestOdds() {
     try {
       const fights = await this.getMoneylineOdds();
-      
+
       return fights.map(fight => {
         // Find best odds for fighter 1
-        const fighter1Odds = fight.bookmakers.map(bookmaker => {
-          const market = bookmaker.markets.find(m => m.key === 'h2h');
-          if (!market) return null;
-          
-          const outcome = market.outcomes.find(o => o.name === fight.homeTeam);
-          if (!outcome) return null;
-          
-          return {
-            bookmaker: bookmaker.name,
-            price: outcome.price,
-          };
-        }).filter(Boolean);
-        
+        const fighter1Odds = fight.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === fight.homeTeam);
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
         // Find best odds for fighter 2
-        const fighter2Odds = fight.bookmakers.map(bookmaker => {
-          const market = bookmaker.markets.find(m => m.key === 'h2h');
-          if (!market) return null;
-          
-          const outcome = market.outcomes.find(o => o.name === fight.awayTeam);
-          if (!outcome) return null;
-          
-          return {
-            bookmaker: bookmaker.name,
-            price: outcome.price,
-          };
-        }).filter(Boolean);
-        
+        const fighter2Odds = fight.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === fight.awayTeam);
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
         // Sort by best price
         const bestFighter1Odds = fighter1Odds.sort((a, b) => b.price - a.price)[0] || null;
         const bestFighter2Odds = fighter2Odds.sort((a, b) => b.price - a.price)[0] || null;
-        
+
         return {
           id: fight.id,
           sport: fight.sport,
@@ -154,11 +158,11 @@ class UfcOddsService {
   async getPropBets(fightId = null) {
     try {
       const odds = await oddsService.getOdds('UFC', 'props');
-      
+
       if (fightId) {
         return odds.filter(fight => fight.id === fightId);
       }
-      
+
       return odds;
     } catch (error) {
       console.error('Error fetching UFC prop bets:', error);

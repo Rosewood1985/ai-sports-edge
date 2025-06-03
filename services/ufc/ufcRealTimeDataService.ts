@@ -1,14 +1,15 @@
 /**
  * UFC Real-Time Data Integration Service
- * 
+ *
  * Replaces mock data in ufcDataSyncService.ts with real UFC API integration
  * Provides live fight results, round-by-round scoring, and real-time updates
  */
 
-import { realTimeDataService, REALTIME_EVENTS } from '../realTimeDataService';
-import { oddsCacheService } from '../oddsCacheService';
-import apiKeys from '../../utils/apiKeys';
 import * as Sentry from '@sentry/react-native';
+
+import apiKeys from '../../utils/apiKeys';
+import { oddsCacheService } from '../oddsCacheService';
+import { realTimeDataService, REALTIME_EVENTS } from '../realTimeDataService';
 
 // UFC API configuration
 const UFC_API_CONFIG = {
@@ -94,12 +95,12 @@ interface UFCLiveStats {
 interface UFCRankings {
   division: string;
   date: string;
-  rankings: Array<{
+  rankings: {
     rank: number;
     fighterId: string;
     name: string;
     record: string;
-  }>;
+  }[];
   lastUpdated: string;
 }
 
@@ -133,7 +134,6 @@ export class UFCRealTimeDataService {
 
       this.isInitialized = true;
       console.log('[UFC REALTIME] UFC real-time data service initialized');
-
     } catch (error) {
       console.error('[UFC REALTIME] Failed to initialize UFC real-time data service:', error);
       Sentry.captureException(error);
@@ -163,7 +163,7 @@ export class UFCRealTimeDataService {
       }
 
       const apiData = await response.json();
-      
+
       const fighters: UFCFighter[] = apiData.map((fighter: any) => ({
         id: fighter.FighterID?.toString() || fighter.GlobalTeamID?.toString(),
         name: `${fighter.FirstName} ${fighter.LastName}`,
@@ -193,11 +193,10 @@ export class UFCRealTimeDataService {
 
       console.log(`[UFC REALTIME] Fetched ${fighters.length} UFC fighters`);
       return fighters;
-
     } catch (error) {
       console.error('[UFC REALTIME] Error fetching UFC fighters:', error);
       Sentry.captureException(error);
-      
+
       // Return empty array instead of crashing
       return [];
     }
@@ -225,16 +224,14 @@ export class UFCRealTimeDataService {
       }
 
       const apiData = await response.json();
-      
+
       // Filter for upcoming events
-      const upcomingEvents = apiData.filter((event: any) => 
-        new Date(event.DateTime) > new Date()
-      );
+      const upcomingEvents = apiData.filter((event: any) => new Date(event.DateTime) > new Date());
 
       const events: UFCEvent[] = await Promise.all(
         upcomingEvents.map(async (event: any) => {
           const fights = await this.getEventFights(event.GameID?.toString());
-          
+
           return {
             id: event.GameID?.toString() || event.GlobalGameID?.toString(),
             name: event.Title || `UFC Event ${event.GameID}`,
@@ -253,7 +250,6 @@ export class UFCRealTimeDataService {
 
       console.log(`[UFC REALTIME] Fetched ${events.length} upcoming UFC events`);
       return events;
-
     } catch (error) {
       console.error('[UFC REALTIME] Error fetching upcoming events:', error);
       Sentry.captureException(error);
@@ -267,7 +263,9 @@ export class UFCRealTimeDataService {
   async getEventFights(eventId: string): Promise<UFCFight[]> {
     try {
       // Check cache first
-      const cached = await oddsCacheService.getCachedData<UFCFight[]>(`ufc_event_fights_${eventId}`);
+      const cached = await oddsCacheService.getCachedData<UFCFight[]>(
+        `ufc_event_fights_${eventId}`
+      );
       if (cached && cached.source === 'api') {
         return cached.data;
       }
@@ -283,7 +281,7 @@ export class UFCRealTimeDataService {
       }
 
       const apiData = await response.json();
-      
+
       const fights: UFCFight[] = apiData.map((fight: any) => ({
         id: fight.FightID?.toString() || fight.GlobalFightID?.toString(),
         eventId,
@@ -301,7 +299,6 @@ export class UFCRealTimeDataService {
       await oddsCacheService.setCachedData(`ufc_event_fights_${eventId}`, fights, 600000);
 
       return fights;
-
     } catch (error) {
       console.error(`[UFC REALTIME] Error fetching fights for event ${eventId}:`, error);
       Sentry.captureException(error);
@@ -322,10 +319,10 @@ export class UFCRealTimeDataService {
 
       // Fetch fighters with rankings
       const fighters = await this.getAllFighters();
-      
+
       // Group by weight class and create rankings
       const rankingsByDivision = new Map<string, UFCRankings>();
-      
+
       fighters
         .filter(fighter => fighter.rank && fighter.isActive)
         .forEach(fighter => {
@@ -337,7 +334,7 @@ export class UFCRealTimeDataService {
               lastUpdated: new Date().toISOString(),
             });
           }
-          
+
           const division = rankingsByDivision.get(fighter.weightClass)!;
           division.rankings.push({
             rank: fighter.rank!,
@@ -358,7 +355,6 @@ export class UFCRealTimeDataService {
 
       console.log(`[UFC REALTIME] Fetched rankings for ${rankings.length} divisions`);
       return rankings;
-
     } catch (error) {
       console.error('[UFC REALTIME] Error fetching UFC rankings:', error);
       Sentry.captureException(error);
@@ -385,7 +381,6 @@ export class UFCRealTimeDataService {
       this.subscribedFights.add(fightId);
 
       console.log(`[UFC REALTIME] Subscribed to live updates for fight ${fightId}`);
-
     } catch (error) {
       console.error(`[UFC REALTIME] Failed to subscribe to fight ${fightId}:`, error);
       Sentry.captureException(error);
@@ -414,14 +409,14 @@ export class UFCRealTimeDataService {
       }
 
       const completedEvents = await response.json();
-      
+
       // Get the most recent events (last 5)
       const recentEvents = completedEvents
         .sort((a: any, b: any) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime())
         .slice(0, 5);
 
       const allRecentFights: UFCFight[] = [];
-      
+
       for (const event of recentEvents) {
         const fights = await this.getEventFights(event.GameID?.toString());
         allRecentFights.push(...fights.filter(fight => fight.result));
@@ -437,7 +432,6 @@ export class UFCRealTimeDataService {
 
       console.log(`[UFC REALTIME] Fetched ${recentResults.length} recent fight results`);
       return recentResults;
-
     } catch (error) {
       console.error('[UFC REALTIME] Error fetching recent results:', error);
       Sentry.captureException(error);
@@ -483,12 +477,12 @@ export class UFCRealTimeDataService {
   private determineEventStatus(event: any): 'upcoming' | 'live' | 'completed' | 'cancelled' {
     const eventDate = new Date(event.DateTime);
     const now = new Date();
-    
+
     if (event.Status === 'Cancelled') return 'cancelled';
     if (eventDate > now) return 'upcoming';
     if (event.Status === 'Final') return 'completed';
     if (eventDate <= now && event.Status !== 'Final') return 'live';
-    
+
     return 'upcoming';
   }
 
@@ -543,17 +537,26 @@ export class UFCRealTimeDataService {
    * Setup real-time event listeners
    */
   private setupRealTimeListeners(): void {
-    realTimeDataService.on(REALTIME_EVENTS.SCORE_UPDATE, (scoreUpdate) => {
+    realTimeDataService.on(REALTIME_EVENTS.SCORE_UPDATE, scoreUpdate => {
       if (scoreUpdate.sport.toLowerCase() === 'ufc') {
         // Update cached fight data
-        oddsCacheService.setCachedData(`ufc_live_fight_${scoreUpdate.gameId}`, scoreUpdate, 5000, 'api');
-        console.log(`[UFC REALTIME] Live fight update: ${scoreUpdate.awayTeam} vs ${scoreUpdate.homeTeam} - Round ${scoreUpdate.quarter}`);
+        oddsCacheService.setCachedData(
+          `ufc_live_fight_${scoreUpdate.gameId}`,
+          scoreUpdate,
+          5000,
+          'api'
+        );
+        console.log(
+          `[UFC REALTIME] Live fight update: ${scoreUpdate.awayTeam} vs ${scoreUpdate.homeTeam} - Round ${scoreUpdate.quarter}`
+        );
       }
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.INJURY_REPORT, (injuryReport) => {
+    realTimeDataService.on(REALTIME_EVENTS.INJURY_REPORT, injuryReport => {
       if (injuryReport.sport.toLowerCase() === 'ufc') {
-        console.log(`[UFC REALTIME] Fighter injury update: ${injuryReport.playerName} - ${injuryReport.injuryType}`);
+        console.log(
+          `[UFC REALTIME] Fighter injury update: ${injuryReport.playerName} - ${injuryReport.injuryType}`
+        );
       }
     });
   }

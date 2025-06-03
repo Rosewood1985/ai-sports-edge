@@ -1,6 +1,6 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 
 /**
  * ThemedView component that automatically uses the theme's background color

@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,17 +10,19 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
-  Platform
+  Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { SUBSCRIPTION_PLANS, getUserSubscription, ONE_TIME_PURCHASES } from '../services/firebaseSubscriptionService';
-import { auth } from '../config/firebase';
-import ReferralProgramCard from '../components/ReferralProgramCard';
-import { analyticsService } from '../services';
+
 import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import ReferralProgramCard from '../components/ReferralProgramCard';
+import { auth } from '../config/firebase';
+import { analyticsService } from '../services';
 import { AnalyticsEventType } from '../services/analyticsService';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  SUBSCRIPTION_PLANS,
+  getUserSubscription,
+  ONE_TIME_PURCHASES,
+} from '../services/firebaseSubscriptionService';
 
 const { width } = Dimensions.get('window');
 
@@ -65,17 +70,17 @@ const SubscriptionScreen = (): JSX.Element => {
 
   const handleSelectPlan = (planId: string) => {
     setSelectedPlan(planId);
-    
+
     // Track subscription started event
     const allPlans = [...SUBSCRIPTION_PLANS, ...ONE_TIME_PURCHASES];
     const plan = allPlans.find(p => p.id === planId);
-    
+
     analyticsService.trackEvent(AnalyticsEventType.SUBSCRIPTION_STARTED, {
       plan_id: planId,
       plan_name: plan?.name || 'Unknown',
-      plan_type: activeTab
+      plan_type: activeTab,
     });
-    
+
     navigation.navigate('Payment', { planId });
   };
 
@@ -110,7 +115,8 @@ const SubscriptionScreen = (): JSX.Element => {
   const renderPlanCard = (plan: any, isRecommended = false) => {
     const isYearly = plan.interval === 'year';
     const monthlyPlan = SUBSCRIPTION_PLANS.find(p => p.id === 'premium-monthly');
-    const savings = isYearly && monthlyPlan ? calculateSavings(plan.price, monthlyPlan.price) : null;
+    const savings =
+      isYearly && monthlyPlan ? calculateSavings(plan.price, monthlyPlan.price) : null;
 
     return (
       <TouchableOpacity
@@ -118,17 +124,19 @@ const SubscriptionScreen = (): JSX.Element => {
         style={[
           styles.planCard,
           isRecommended && styles.recommendedCard,
-          selectedPlan === plan.id && styles.selectedCard
+          selectedPlan === plan.id && styles.selectedCard,
         ]}
         onPress={() => handleSelectPlan(plan.id)}
       >
         {isRecommended && (
           <View style={styles.recommendedBadge}>
             <Ionicons name="star" size={16} color="#fff" />
-            <Text style={styles.recommendedText}>{t('subscription.recommended') || 'Most Popular'}</Text>
+            <Text style={styles.recommendedText}>
+              {t('subscription.recommended') || 'Most Popular'}
+            </Text>
           </View>
         )}
-        
+
         {savings && (
           <View style={styles.savingsBadge}>
             <Text style={styles.savingsText}>
@@ -140,22 +148,14 @@ const SubscriptionScreen = (): JSX.Element => {
         <View style={styles.planHeader}>
           <Text style={styles.planName}>{plan.name}</Text>
           <View style={styles.priceContainer}>
-            <Text style={styles.planPrice}>
-              ${plan.price}
-            </Text>
-            <Text style={styles.planInterval}>
-              /{plan.interval === 'month' ? 'month' : 'year'}
-            </Text>
-            {savings && (
-              <Text style={styles.savingsAmount}>
-                Save ${savings.amount.toFixed(2)}
-              </Text>
-            )}
+            <Text style={styles.planPrice}>${plan.price}</Text>
+            <Text style={styles.planInterval}>/{plan.interval === 'month' ? 'month' : 'year'}</Text>
+            {savings && <Text style={styles.savingsAmount}>Save ${savings.amount.toFixed(2)}</Text>}
           </View>
         </View>
-        
+
         <Text style={styles.planDescription}>{plan.description}</Text>
-        
+
         <View style={styles.featuresContainer}>
           <Text style={styles.featuresTitle}>{t('subscription.features') || 'Features'}:</Text>
           {plan.features.slice(0, 3).map((feature: string, index: number) => (
@@ -170,18 +170,12 @@ const SubscriptionScreen = (): JSX.Element => {
             </Text>
           )}
         </View>
-        
+
         <TouchableOpacity
-          style={[
-            styles.selectButton,
-            isRecommended && styles.recommendedButton
-          ]}
+          style={[styles.selectButton, isRecommended && styles.recommendedButton]}
           onPress={() => handleSelectPlan(plan.id)}
         >
-          <Text style={[
-            styles.selectButtonText,
-            isRecommended && styles.recommendedButtonText
-          ]}>
+          <Text style={[styles.selectButtonText, isRecommended && styles.recommendedButtonText]}>
             {t('subscription.selectPlan') || 'Select Plan'}
           </Text>
         </TouchableOpacity>
@@ -231,22 +225,18 @@ const SubscriptionScreen = (): JSX.Element => {
 
       <View style={styles.plansContainer}>
         {activeTab === 'subscription' ? (
-          <>
-            {SUBSCRIPTION_PLANS.map((plan) => renderPlanCard(plan, plan.popular))}
-          </>
+          <>{SUBSCRIPTION_PLANS.map(plan => renderPlanCard(plan, plan.popular))}</>
         ) : (
-          <>
-            {ONE_TIME_PURCHASES.map((purchase) => renderPlanCard(purchase, false))}
-          </>
+          <>{ONE_TIME_PURCHASES.map(purchase => renderPlanCard(purchase, false))}</>
         )}
       </View>
 
-      {!hasSubscription && (
-        <ReferralProgramCard />
-      )}
+      {!hasSubscription && <ReferralProgramCard />}
 
       <View style={styles.groupSubscriptionCard}>
-        <Text style={styles.groupTitle}>{t('subscription.group.title') || 'Group Subscription'}</Text>
+        <Text style={styles.groupTitle}>
+          {t('subscription.group.title') || 'Group Subscription'}
+        </Text>
         <Text style={styles.groupDescription}>
           {t('subscription.group.description') || 'Share premium features with friends and family'}
         </Text>
@@ -271,7 +261,7 @@ const SubscriptionScreen = (): JSX.Element => {
               {t('subscription.gift.giveButton') || 'Give Gift'}
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.giftButton}
             onPress={() => navigation.navigate('GiftRedemption')}

@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from 'react';
 
 /**
  * Lazy Load Utility
- * 
+ *
  * This utility provides a wrapper for React.lazy and Suspense to implement code splitting.
  * It allows components to be loaded only when they are needed, reducing the initial bundle size.
  */
@@ -15,7 +15,7 @@ import React, { lazy, Suspense } from 'react';
  */
 export const lazyLoad = (importFunc, fallback = null) => {
   const LazyComponent = lazy(importFunc);
-  
+
   return props => (
     <Suspense fallback={fallback || <DefaultLoadingFallback />}>
       <LazyComponent {...props} />
@@ -29,7 +29,7 @@ export const lazyLoad = (importFunc, fallback = null) => {
  */
 const DefaultLoadingFallback = () => (
   <div style={styles.loadingContainer}>
-    <div style={styles.loadingSpinner}></div>
+    <div style={styles.loadingSpinner} />
   </div>
 );
 
@@ -70,7 +70,7 @@ if (typeof document !== 'undefined') {
  * @param {Function} importFunc - Dynamic import function for the route component
  * @returns {Object} Route object with lazy-loaded component
  */
-export const lazyLoadRoute = (importFunc) => ({
+export const lazyLoadRoute = importFunc => ({
   component: lazyLoad(importFunc),
 });
 
@@ -79,12 +79,12 @@ export const lazyLoadRoute = (importFunc) => ({
  * @param {Object} routes - Object with route paths as keys and import functions as values
  * @returns {Object} Object with route paths as keys and lazy-loaded route objects as values
  */
-export const lazyLoadRoutes = (routes) => {
+export const lazyLoadRoutes = routes => {
   const lazyRoutes = {};
-  
+
   Object.keys(routes).forEach(path => {
     lazyRoutes[path] = lazyLoadRoute(routes[path]);
   });
-  
+
   return lazyRoutes;
 };

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+
+import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
 import { useExportFormats, useExportHistory, useExportData } from '../../../hooks/useReporting';
 import { ExportConfig } from '../../../types/export';
-import { EnhancedWidget } from '../widgets/EnhancedWidget';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
 import { Button } from '../../ui/Button';
-import { Select } from '../../ui/Select';
 import { Card } from '../../ui/Card';
-import { Input } from '../../ui/Input';
 import { Checkbox } from '../../ui/Checkbox';
-import { useCrossPlatform } from '../../../hooks/useCrossPlatform';
+import { Input } from '../../ui/Input';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { Select } from '../../ui/Select';
+import { EnhancedWidget } from '../widgets/EnhancedWidget';
 
 export interface ExportManagerProps {
   className?: string;
@@ -39,7 +40,12 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
   const availableWidgets = [
     { id: 'bet-slip-performance', name: 'Bet Slip Performance', category: 'Analytics', icon: '🎯' },
     { id: 'conversion-funnel', name: 'Conversion Funnel', category: 'Business', icon: '📈' },
-    { id: 'subscription-analytics', name: 'Subscription Analytics', category: 'Business', icon: '📊' },
+    {
+      id: 'subscription-analytics',
+      name: 'Subscription Analytics',
+      category: 'Business',
+      icon: '📊',
+    },
     { id: 'system-health', name: 'System Health', category: 'Technical', icon: '⚙️' },
     { id: 'user-engagement', name: 'User Engagement', category: 'Analytics', icon: '👥' },
     { id: 'revenue-breakdown', name: 'Revenue Breakdown', category: 'Business', icon: '💰' },
@@ -48,13 +54,16 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
   ];
 
   // Group widgets by category
-  const widgetsByCategory = availableWidgets.reduce((acc, widget) => {
-    if (!acc[widget.category]) {
-      acc[widget.category] = [];
-    }
-    acc[widget.category].push(widget);
-    return acc;
-  }, {} as Record<string, typeof availableWidgets>);
+  const widgetsByCategory = availableWidgets.reduce(
+    (acc, widget) => {
+      if (!acc[widget.category]) {
+        acc[widget.category] = [];
+      }
+      acc[widget.category].push(widget);
+      return acc;
+    },
+    {} as Record<string, typeof availableWidgets>
+  );
 
   const handleExport = async () => {
     if (!selectedFormat) {
@@ -149,7 +158,7 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
                 <Input
                   type="date"
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={e => setStartDate(e.target.value)}
                   disabled={isExporting}
                 />
               </div>
@@ -160,7 +169,7 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
                 <Input
                   type="date"
                   value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  onChange={e => setEndDate(e.target.value)}
                   disabled={isExporting}
                 />
               </div>
@@ -183,22 +192,33 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
                       type="button"
                       onClick={() => {
                         const categoryWidgetIds = widgets.map(w => w.id);
-                        const allSelected = categoryWidgetIds.every(id => selectedWidgets.includes(id));
+                        const allSelected = categoryWidgetIds.every(id =>
+                          selectedWidgets.includes(id)
+                        );
                         if (allSelected) {
-                          setSelectedWidgets(selectedWidgets.filter(id => !categoryWidgetIds.includes(id)));
+                          setSelectedWidgets(
+                            selectedWidgets.filter(id => !categoryWidgetIds.includes(id))
+                          );
                         } else {
-                          setSelectedWidgets([...new Set([...selectedWidgets, ...categoryWidgetIds])]);
+                          setSelectedWidgets([
+                            ...new Set([...selectedWidgets, ...categoryWidgetIds]),
+                          ]);
                         }
                       }}
                       disabled={isExporting}
                       className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      {widgets.every(w => selectedWidgets.includes(w.id)) ? 'Deselect All' : 'Select All'}
+                      {widgets.every(w => selectedWidgets.includes(w.id))
+                        ? 'Deselect All'
+                        : 'Select All'}
                     </button>
                   </h4>
                   <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     {widgets.map(widget => (
-                      <div key={widget.id} className="flex items-center p-2 border border-gray-200 dark:border-gray-700 rounded">
+                      <div
+                        key={widget.id}
+                        className="flex items-center p-2 border border-gray-200 dark:border-gray-700 rounded"
+                      >
                         <Checkbox
                           id={`widget-${widget.id}`}
                           checked={selectedWidgets.includes(widget.id)}
@@ -279,7 +299,9 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
               <div className="flex justify-between mb-1">
                 <span>Format:</span>
                 <span className="font-medium">
-                  {selectedFormat ? formats.find(f => f.id === selectedFormat)?.name : 'None selected'}
+                  {selectedFormat
+                    ? formats.find(f => f.id === selectedFormat)?.name
+                    : 'None selected'}
                 </span>
               </div>
               <div className="flex justify-between mb-1">
@@ -362,17 +384,24 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
 
               const getFormatIcon = (format: string) => {
                 switch (format.toLowerCase()) {
-                  case 'pdf': return '📄';
-                  case 'excel': return '📊';
-                  case 'csv': return '📋';
-                  case 'json': return '📁';
-                  default: return '📄';
+                  case 'pdf':
+                    return '📄';
+                  case 'excel':
+                    return '📊';
+                  case 'csv':
+                    return '📋';
+                  case 'json':
+                    return '📁';
+                  default:
+                    return '📄';
                 }
               };
 
               return (
                 <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
-                  <div className={`flex ${isMobile ? 'flex-col space-y-3' : 'justify-between items-center'}`}>
+                  <div
+                    className={`flex ${isMobile ? 'flex-col space-y-3' : 'justify-between items-center'}`}
+                  >
                     <div className="flex-1">
                       <div className="flex items-center mb-2">
                         <span className="text-lg mr-2">{getFormatIcon(item.format)}</span>
@@ -395,7 +424,9 @@ export function ExportManager({ className = '' }: ExportManagerProps) {
                         </div>
                       </div>
                     </div>
-                    <div className={`flex ${isMobile ? 'w-full' : 'space-x-2'} ${isMobile ? 'space-x-2' : ''}`}>
+                    <div
+                      className={`flex ${isMobile ? 'w-full' : 'space-x-2'} ${isMobile ? 'space-x-2' : ''}`}
+                    >
                       <Button
                         variant="primary"
                         size="sm"

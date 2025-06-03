@@ -21,7 +21,7 @@ export default class Team {
     this.logo = logo;
     this.metadata = metadata;
   }
-  
+
   /**
    * Create a Team instance from API data
    * @param {Object} apiTeam - Team data from API
@@ -37,7 +37,7 @@ export default class Team {
       apiTeam.metadata || {}
     );
   }
-  
+
   /**
    * Get the team's display name
    * @returns {string} Display name (e.g., "Los Angeles Lakers (NBA)")
@@ -45,7 +45,7 @@ export default class Team {
   getDisplayName() {
     return `${this.name} (${this.league})`;
   }
-  
+
   /**
    * Get the team's short name
    * @returns {string} Short name (e.g., "Lakers")
@@ -58,7 +58,7 @@ export default class Team {
     }
     return this.name;
   }
-  
+
   /**
    * Get the team's city
    * @returns {string} City name (e.g., "Los Angeles")
@@ -71,7 +71,7 @@ export default class Team {
     }
     return '';
   }
-  
+
   /**
    * Convert to JSON object
    * @returns {Object} JSON representation of the team
@@ -83,23 +83,16 @@ export default class Team {
       league: this.league,
       abbreviation: this.abbreviation,
       logo: this.logo,
-      metadata: this.metadata
+      metadata: this.metadata,
     };
   }
-  
+
   /**
    * Create a Team instance from JSON
    * @param {Object} json - JSON representation of a team
    * @returns {Team} New Team instance
    */
   static fromJSON(json) {
-    return new Team(
-      json.id,
-      json.name,
-      json.league,
-      json.abbreviation,
-      json.logo,
-      json.metadata
-    );
+    return new Team(json.id, json.name, json.league, json.abbreviation, json.logo, json.metadata);
   }
 }

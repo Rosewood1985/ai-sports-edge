@@ -1,16 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRoute, useNavigation, RouteProp, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
 
-
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
 import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Define route params type
 type LegalScreenParams = {
@@ -28,21 +23,19 @@ const LegalScreen = () => {
   const { t } = useLanguage();
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  
+
   // Get the type of legal document to display from route params
   const { type = 'privacy-policy' } = route.params || {};
-  
+
   // Set the title based on the type
-  const title = type === 'privacy-policy' 
-    ? t('legal.privacy_policy') 
-    : t('legal.terms_of_service');
-  
+  const title = type === 'privacy-policy' ? t('legal.privacy_policy') : t('legal.terms_of_service');
+
   // Load the content
   useEffect(() => {
     const loadContent = async () => {
       try {
         setLoading(true);
-        
+
         // In a real app, this would load the content from a markdown file or API
         // For now, we'll just simulate loading with a timeout
         setTimeout(() => {
@@ -106,7 +99,7 @@ You are responsible for safeguarding the password that you use to access the App
 [Full Terms of Service available at https://aisportsedge.com/terms-of-service]
             `);
           }
-          
+
           setLoading(false);
         }, 500);
       } catch (error) {
@@ -114,23 +107,20 @@ You are responsible for safeguarding the password that you use to access the App
         setLoading(false);
       }
     };
-    
+
     loadContent();
   }, [type]);
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>{title}</ThemedText>
         <View style={styles.headerRight} />
       </View>
-      
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -186,7 +176,7 @@ const styles = StyleSheet.create({
   markdownContent: {
     fontSize: 16,
     lineHeight: 24,
-  }
+  },
 });
 
 export default LegalScreen;

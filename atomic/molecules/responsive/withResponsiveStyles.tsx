@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from 'react-native';
+
 import { useResponsiveDimensions, DeviceType, Orientation } from '../../../utils/responsiveUtils';
 
 // Type for style objects

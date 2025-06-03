@@ -20,7 +20,7 @@ export const RSS_ANALYTICS_EVENTS = {
   PREFERENCES_OPENED: 'rss_preferences_opened',
   PREFERENCES_CLOSED: 'rss_preferences_closed',
   SOURCE_TOGGLED: 'rss_source_toggled',
-  ANALYTICS_PREFERENCE_CHANGED: 'rss_analytics_preference_changed'
+  ANALYTICS_PREFERENCE_CHANGED: 'rss_analytics_preference_changed',
 };
 
 /**
@@ -34,7 +34,7 @@ export function trackFeedViewed(source, itemCount, metadata = {}) {
     source,
     item_count: itemCount,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -53,7 +53,7 @@ export function trackItemClicked(item, source, position, metadata = {}) {
     position,
     has_analytics: !!item.hasAnalytics,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -69,7 +69,7 @@ export function trackItemShared(item, platform, metadata = {}) {
     item_title: item.teams || item.title,
     platform,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -83,7 +83,7 @@ export function trackItemBookmarked(item, metadata = {}) {
     item_id: item.id,
     item_title: item.teams || item.title,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -101,7 +101,7 @@ export function trackAnalyticsButtonClicked(item, analysisType, metadata = {}) {
     stats: item.stats ? JSON.stringify(item.stats) : null,
     sport: item.sport,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -118,7 +118,7 @@ export function trackFilterApplied(filterType, filterValue, isAdded, metadata = 
     filter_value: filterValue,
     action: isAdded ? 'added' : 'removed',
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -133,7 +133,7 @@ export function trackPreferencesUpdated(preferenceType, newValue, metadata = {})
     preference_type: preferenceType,
     new_value: typeof newValue === 'object' ? JSON.stringify(newValue) : newValue,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -148,7 +148,7 @@ export function trackFeedImpression(sources, totalItems, metadata = {}) {
     sources: sources.join(','),
     total_items: totalItems,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -163,7 +163,7 @@ export function trackFeedScroll(scrollDepth, timeSpent, metadata = {}) {
     scroll_depth: scrollDepth,
     time_spent: timeSpent,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -180,7 +180,7 @@ export function trackFeedHover(item, hoverDuration, metadata = {}) {
     hover_duration: hoverDuration,
     has_analytics: !!item.hasAnalytics,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -191,7 +191,7 @@ export function trackFeedHover(item, hoverDuration, metadata = {}) {
 export function trackPreferencesOpened(metadata = {}) {
   trackEvent(RSS_ANALYTICS_EVENTS.PREFERENCES_OPENED, {
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -204,7 +204,7 @@ export function trackPreferencesClosed(timeSpent, metadata = {}) {
   trackEvent(RSS_ANALYTICS_EVENTS.PREFERENCES_CLOSED, {
     time_spent: timeSpent,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -219,7 +219,7 @@ export function trackSourceToggled(source, enabled, metadata = {}) {
     source,
     action: enabled ? 'enabled' : 'disabled',
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -234,7 +234,7 @@ export function trackAnalyticsPreferenceChanged(preference, value, metadata = {}
     preference,
     value: typeof value === 'object' ? JSON.stringify(value) : value,
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   });
 }
 
@@ -247,11 +247,11 @@ export function trackAnalyticsPreferenceChanged(preference, value, metadata = {}
 export async function getFeedAnalytics(source, timeframe = 'week') {
   try {
     const response = await fetch(`/api/analytics/rss/${source}?timeframe=${timeframe}`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch analytics: ${response.status} ${response.statusText}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error(`Error fetching analytics for ${source}:`, error);
@@ -267,12 +267,14 @@ export async function getFeedAnalytics(source, timeframe = 'week') {
  */
 export async function getPopularNewsItems(timeframe = 'day', limit = 10) {
   try {
-    const response = await fetch(`/api/analytics/rss/popular?timeframe=${timeframe}&limit=${limit}`);
-    
+    const response = await fetch(
+      `/api/analytics/rss/popular?timeframe=${timeframe}&limit=${limit}`
+    );
+
     if (!response.ok) {
       throw new Error(`Failed to fetch popular items: ${response.status} ${response.statusText}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Error fetching popular news items:', error);
@@ -288,11 +290,11 @@ export async function getPopularNewsItems(timeframe = 'day', limit = 10) {
 export async function getUserEngagementMetrics(userId) {
   try {
     const response = await fetch(`/api/analytics/rss/user/${userId}`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch user metrics: ${response.status} ${response.statusText}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error(`Error fetching user metrics for ${userId}:`, error);
@@ -308,12 +310,14 @@ export async function getUserEngagementMetrics(userId) {
  */
 export async function getTrendingTopics(timeframe = 'day', limit = 10) {
   try {
-    const response = await fetch(`/api/analytics/rss/trending?timeframe=${timeframe}&limit=${limit}`);
-    
+    const response = await fetch(
+      `/api/analytics/rss/trending?timeframe=${timeframe}&limit=${limit}`
+    );
+
     if (!response.ok) {
       throw new Error(`Failed to fetch trending topics: ${response.status} ${response.statusText}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Error fetching trending topics:', error);
@@ -329,11 +333,13 @@ export async function getTrendingTopics(timeframe = 'day', limit = 10) {
 export async function getAnalyticsConversionMetrics(timeframe = 'week') {
   try {
     const response = await fetch(`/api/analytics/rss/analytics?timeframe=${timeframe}`);
-    
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch analytics metrics: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch analytics metrics: ${response.status} ${response.statusText}`
+      );
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Error fetching analytics conversion metrics:', error);

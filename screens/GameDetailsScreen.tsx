@@ -1,17 +1,16 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRoute, useNavigation, RouteProp, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import { useLanguage } from '../atomic/organisms/i18n/LanguageContext';
 
 // Define route params type
 type GameDetailsParams = {
   gameId: string;
 };
-
 
 const GameDetailsScreen = () => {
   const route = useRoute<RouteProp<Record<string, GameDetailsParams>, string>>();
@@ -36,9 +35,11 @@ const GameDetailsScreen = () => {
         }
 
         // Fetch specific game from Firebase function
-        const response = await fetch('https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames');
+        const response = await fetch(
+          'https://us-central1-ai-sports-edge.cloudfunctions.net/featuredGames'
+        );
         const data = await response.json();
-        
+
         if (data.success) {
           // Find the specific game by ID
           const foundGame = data.games.find(g => g.id === gameId);

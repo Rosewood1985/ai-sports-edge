@@ -1,14 +1,15 @@
 // Firebase Authentication Module
-import { 
+import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup
-} from "firebase/auth";
-import { auth } from "./config";
+  signInWithPopup,
+} from 'firebase/auth';
+
+import { auth } from './config';
 
 // Create a user with email and password
 export const createUser = async (email, password) => {
@@ -16,11 +17,14 @@ export const createUser = async (email, password) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return { user: userCredential.user, error: null };
   } catch (error) {
-    console.error("Error creating user:", error.code, error.message);
-    return { user: null, error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error creating user:', error.code, error.message);
+    return {
+      user: null,
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -30,11 +34,14 @@ export const signIn = async (email, password) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return { user: userCredential.user, error: null };
   } catch (error) {
-    console.error("Error signing in:", error.code, error.message);
-    return { user: null, error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error signing in:', error.code, error.message);
+    return {
+      user: null,
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -45,11 +52,14 @@ export const signInWithGoogle = async () => {
     const userCredential = await signInWithPopup(auth, provider);
     return { user: userCredential.user, error: null };
   } catch (error) {
-    console.error("Error signing in with Google:", error.code, error.message);
-    return { user: null, error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error signing in with Google:', error.code, error.message);
+    return {
+      user: null,
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -59,25 +69,29 @@ export const logOut = async () => {
     await signOut(auth);
     return { error: null };
   } catch (error) {
-    console.error("Error signing out:", error.code, error.message);
-    return { error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error signing out:', error.code, error.message);
+    return {
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
 // Send password reset email
-export const resetPassword = async (email) => {
+export const resetPassword = async email => {
   try {
     await sendPasswordResetEmail(auth, email);
     return { error: null };
   } catch (error) {
-    console.error("Error sending password reset email:", error.code, error.message);
-    return { error: {
-      code: error.code,
-      message: getErrorMessage(error.code)
-    }};
+    console.error('Error sending password reset email:', error.code, error.message);
+    return {
+      error: {
+        code: error.code,
+        message: getErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -87,12 +101,12 @@ export const getCurrentUser = () => {
 };
 
 // Listen for auth state changes
-export const onAuthChange = (callback) => {
+export const onAuthChange = callback => {
   return onAuthStateChanged(auth, callback);
 };
 
 // Get user-friendly error message
-const getErrorMessage = (errorCode) => {
+const getErrorMessage = errorCode => {
   switch (errorCode) {
     case 'auth/email-already-in-use':
       return 'This email is already in use. Please try another email or sign in.';

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ReportTemplate, ReportType } from '../../../types/reporting';
-import { EnhancedWidget } from '../widgets/EnhancedWidget';
-import { Button } from '../../ui/Button';
+
 import { ReportTemplateCard } from './ReportTemplateCard';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
 import { AdminDashboardService } from '../../../services/adminDashboardService';
+import { ReportTemplate, ReportType } from '../../../types/reporting';
+import { Button } from '../../ui/Button';
+import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { EnhancedWidget } from '../widgets/EnhancedWidget';
 
 export interface ReportTemplateListProps {
   className?: string;

@@ -1,16 +1,21 @@
+import { StackNavigationProp } from '@react-navigation/stack';
+import {
+  getAuth,
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { getAuth, Auth } from 'firebase/auth';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { StackNavigationProp } from '@react-navigation/stack';
-import MobileAppDownload from '../components/MobileAppDownload';
-import LegalAcceptanceCheckbox from '../components/LegalAcceptanceCheckbox';
-import { appDownloadService } from '../services/appDownloadService';
-import { useI18n } from '../contexts/I18nContext';
-import ThemeToggle from '../atomic/molecules/theme/ThemeToggle';
-import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
+import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import ThemeToggle from '../atomic/molecules/theme/ThemeToggle';
+import LegalAcceptanceCheckbox from '../components/LegalAcceptanceCheckbox';
+import MobileAppDownload from '../components/MobileAppDownload';
+import { useI18n } from '../contexts/I18nContext';
+import { appDownloadService } from '../services/appDownloadService';
 
 // Define the navigation prop type
 type RootStackParamList = {
@@ -226,7 +231,7 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
         <LegalAcceptanceCheckbox
           isAccepted={legalAccepted}
           onAcceptanceChange={setLegalAccepted}
-          showNavigationLinks={true}
+          showNavigationLinks
         />
       )}
 
@@ -245,7 +250,9 @@ export default function LoginScreen({ navigation }: Props): JSX.Element {
 
       {/* Mode toggle button */}
       <AccessibleTouchableOpacity
-        accessibilityLabel={isSignupMode ? t('auth.already_have_account') : t('auth.dont_have_account')}
+        accessibilityLabel={
+          isSignupMode ? t('auth.already_have_account') : t('auth.dont_have_account')
+        }
         accessibilityRole="button"
         onPress={() => {
           setIsSignupMode(!isSignupMode);

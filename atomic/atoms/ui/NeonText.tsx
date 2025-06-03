@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { Text, StyleSheet, TextProps, StyleProp, TextStyle } from 'react-native';
+
 import { useUITheme } from '../../../components/UIThemeProvider';
 import { scaleFontSize, getOptimizedGlowIntensity } from '../../../utils/deviceOptimization';
 
@@ -31,7 +32,7 @@ export const NeonText: React.FC<NeonTextProps> = ({
   ...rest
 }) => {
   const { theme } = useUITheme();
-  
+
   // Use theme color if no color provided
   const textColor = color || theme.colors.primary;
 
@@ -68,13 +69,24 @@ export const NeonText: React.FC<NeonTextProps> = ({
       default:
         baseSize = theme.typography.fontSize.bodyStd;
     }
-    
+
     // Scale font size based on device
     return scaleFontSize(baseSize);
   };
 
   // Determine font weight based on type
-  const getFontWeight = (): "normal" | "bold" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900" => {
+  const getFontWeight = ():
+    | 'normal'
+    | 'bold'
+    | '100'
+    | '200'
+    | '300'
+    | '400'
+    | '500'
+    | '600'
+    | '700'
+    | '800'
+    | '900' => {
     switch (type) {
       case 'heading':
         return theme.typography.fontWeight.bold as '700';
@@ -91,10 +103,10 @@ export const NeonText: React.FC<NeonTextProps> = ({
   // Create text shadow style for glow effect with device optimization
   const getTextShadow = () => {
     if (!glow) return {};
-    
+
     // Optimize glow intensity based on device performance
     const optimizedIntensity = getOptimizedGlowIntensity(intensity);
-    
+
     return {
       textShadowColor: textColor,
       textShadowOffset: { width: 0, height: 0 },

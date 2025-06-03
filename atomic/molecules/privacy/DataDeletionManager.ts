@@ -6,6 +6,7 @@
  * providing status updates on deletion progress.
  */
 
+import { getAuth, deleteUser } from 'firebase/auth';
 import {
   getFirestore,
   collection,
@@ -19,10 +20,10 @@ import {
   deleteDoc,
   Timestamp,
 } from 'firebase/firestore';
-import { getAuth, deleteUser } from 'firebase/auth';
+
 import { getDataCategory } from '../../atoms/privacy/dataCategories';
-import { DataDeletionRequest } from '../../atoms/privacy/privacyTypes';
 import { PrivacyRequestStatus, PrivacyRequestType } from '../../atoms/privacy/gdprConfig';
+import { DataDeletionRequest } from '../../atoms/privacy/privacyTypes';
 
 /**
  * Class for managing data deletion requests

@@ -5,13 +5,13 @@
  * data access requests, and data deletion requests.
  */
 
+import { DataAccessManager } from '../../molecules/privacy/DataAccessManager';
+import { DataDeletionManager } from '../../molecules/privacy/DataDeletionManager';
+import { PrivacyManager } from '../../molecules/privacy/PrivacyManager';
 import {
   initializeDataRetentionOnStartup,
   stopDataRetention,
 } from '../../molecules/privacy/initializeDataRetention';
-import { PrivacyManager } from '../../molecules/privacy/PrivacyManager';
-import { DataAccessManager } from '../../molecules/privacy/DataAccessManager';
-import { DataDeletionManager } from '../../molecules/privacy/DataDeletionManager';
 
 /**
  * Privacy Service class

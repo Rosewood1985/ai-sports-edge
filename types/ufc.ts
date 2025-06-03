@@ -8,7 +8,7 @@ export enum FightOutcome {
   DECISION = 'Decision',
   DQ = 'Disqualification',
   DRAW = 'Draw',
-  NO_CONTEST = 'No Contest'
+  NO_CONTEST = 'No Contest',
 }
 
 /**
@@ -19,7 +19,7 @@ export enum FightStatus {
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
-  POSTPONED = 'postponed'
+  POSTPONED = 'postponed',
 }
 
 /**
@@ -72,7 +72,7 @@ export interface UFCFight {
   weightClass: string;
   isTitleFight: boolean;
   rounds: number;
-  
+
   // New properties for round betting
   roundBettingOptions?: RoundBettingOption[];
   startTime?: string;

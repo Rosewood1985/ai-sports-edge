@@ -7,59 +7,57 @@
 // External imports
 
 // Internal imports
-import { 
-  LogCategory, 
-  LogLevel, 
-  createLogger, 
-  enableConsoleLogging, 
-  enableRemoteLogging, 
-  enableSentryLogging, 
-  setGlobalMinLogLevel, 
-  setMinLogLevel, 
-  manualFlushLogs, 
-  debug, 
-  info, 
-  warn, 
-  error, 
-  fatal, 
-  trace, 
-  log 
-} from '../molecules/logging';
-
-import { 
-  captureException, 
-  captureMessage, 
-  setUser, 
-  setTag, 
-  setTags, 
-  setExtra, 
-  setExtras, 
-  addBreadcrumb, 
-  closeSentry, 
-  flushSentry, 
-  createError, 
-  formatError, 
-  getUserFriendlyMessage, 
-  parseError, 
-  getErrorCode, 
-  isAuthError, 
-  isNetworkError, 
-  isPermissionError, 
-  safeErrorCapture 
+import {
+  captureException,
+  captureMessage,
+  setUser,
+  setTag,
+  setTags,
+  setExtra,
+  setExtras,
+  addBreadcrumb,
+  closeSentry,
+  flushSentry,
+  createError,
+  formatError,
+  getUserFriendlyMessage,
+  parseError,
+  getErrorCode,
+  isAuthError,
+  isNetworkError,
+  isPermissionError,
+  safeErrorCapture,
 } from '../molecules/errorTracking';
-
-import { 
-  TransactionType, 
-  createPerformanceTimer, 
-  getPerformanceMetrics, 
-  updatePerformanceMetrics, 
-  startTransaction, 
-  trackApiRequest, 
-  trackAppStartup, 
-  trackDataOperation, 
-  trackNavigation, 
-  trackUiRender, 
-  trackUserInteraction 
+import {
+  LogCategory,
+  LogLevel,
+  createLogger,
+  enableConsoleLogging,
+  enableRemoteLogging,
+  enableSentryLogging,
+  setGlobalMinLogLevel,
+  setMinLogLevel,
+  manualFlushLogs,
+  debug,
+  info,
+  warn,
+  error,
+  fatal,
+  trace,
+  log,
+} from '../molecules/logging';
+import {
+  TransactionType,
+  createPerformanceTimer,
+  getPerformanceMetrics,
+  updatePerformanceMetrics,
+  startTransaction,
+  trackApiRequest,
+  trackAppStartup,
+  trackDataOperation,
+  trackNavigation,
+  trackUiRender,
+  trackUserInteraction,
 } from '../molecules/performance';
 
 // Core monitoring functions
@@ -68,15 +66,15 @@ const initLogging = (options = {}) => {
     if (options.enableConsole) {
       enableConsoleLogging();
     }
-    
+
     if (options.enableRemote) {
       enableRemoteLogging(options.flushInterval);
     }
-    
+
     if (options.enableSentry) {
       enableSentryLogging();
     }
-    
+
     info(LogCategory.APP, 'Logging service initialized');
     return true;
   } catch (err) {
@@ -109,7 +107,7 @@ const initPerformanceMonitoring = (options = {}) => {
 
 export const initMonitoring = (options = {}) => {
   console.log('Initializing monitoring services...');
-  
+
   const result = {
     success: false,
     logging: false,
@@ -117,18 +115,18 @@ export const initMonitoring = (options = {}) => {
     performance: false,
     errors: [],
   };
-  
+
   try {
     // Initialize logging first
     result.logging = initLogging(options.logging);
-    
+
     if (result.logging) {
       result.errorTracking = initErrorTracking(options.errorTracking);
       result.performance = initPerformanceMonitoring(options.performance);
-      
+
       // Set overall success status
       result.success = result.logging && result.errorTracking && result.performance;
-      
+
       if (result.success) {
         info(LogCategory.APP, 'All monitoring services initialized successfully');
       } else {
@@ -137,7 +135,7 @@ export const initMonitoring = (options = {}) => {
     } else {
       result.errors.push('Failed to initialize logging service');
     }
-    
+
     return result;
   } catch (error) {
     console.error('Unexpected error during monitoring initialization:', error);
@@ -150,13 +148,13 @@ export const initMonitoring = (options = {}) => {
 export const shutdownMonitoring = async () => {
   try {
     info(LogCategory.APP, 'Shutting down monitoring services');
-    
+
     // Flush logs
     await manualFlushLogs();
-    
+
     // Close Sentry
     await closeSentry();
-    
+
     info(LogCategory.APP, 'Monitoring services shut down successfully');
     return true;
   } catch (error) {
@@ -185,7 +183,7 @@ export const loggingService = {
       fatal: (message, error, data) => logger.fatal(message, error, data, tags),
       trace: (message, data) => logger.trace(message, data, tags),
     };
-  }
+  },
 };
 
 export const errorService = {
@@ -210,19 +208,19 @@ export const errorService = {
     const category = options.category || LogCategory.APP;
     const context = options.context || 'General error';
     const silent = options.silent || false;
-    
+
     if (!silent) {
       this.error(category, `${context}: ${error.message}`, error);
     }
-    
+
     // Capture in Sentry
     captureException(error, { tags: { category, context } });
-    
+
     return getUserFriendlyMessage(error);
   },
   throwError: (message, code, details) => {
     throw createError(message, code, details);
-  }
+  },
 };
 
 export const performanceService = {
@@ -239,7 +237,7 @@ export const performanceService = {
     const timer = createPerformanceTimer(name, type, data);
     try {
       const result = fn();
-      
+
       // Handle promises
       if (result instanceof Promise) {
         return result
@@ -264,7 +262,7 @@ export const performanceService = {
     return (...args) => {
       return performanceService.measure(() => fn(...args), name, type, data);
     };
-  }
+  },
 };
 
 export const monitoring = {

@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Switch, ScrollView, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import offlineService, { OfflineMode } from '../services/offlineService';
-import { analyticsService } from '../services/analyticsService';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import Header from '../components/Header';
+import { analyticsService } from '../services/analyticsService';
+import offlineService, { OfflineMode } from '../services/offlineService';
 
 /**
  * Offline Settings Screen
- * 
+ *
  * This screen allows users to configure offline mode settings.
  */
 const OfflineSettingsScreen: React.FC = () => {
@@ -26,7 +36,7 @@ const OfflineSettingsScreen: React.FC = () => {
     syncEnabled: true,
     maxCacheSize: 50,
     maxSyncQueueSize: 100,
-    cacheTTL: 24 * 60 * 60 * 1000 // 24 hours
+    cacheTTL: 24 * 60 * 60 * 1000, // 24 hours
   });
 
   // Load offline settings
@@ -34,26 +44,26 @@ const OfflineSettingsScreen: React.FC = () => {
     const loadSettings = async () => {
       try {
         setLoading(true);
-        
+
         // Get offline mode settings
         const offlineMode = offlineService.getOfflineMode();
         setSettings(offlineMode);
-        
+
         // Get cache size
         const size = await offlineService.getCacheSize();
         setCacheSize(size);
-        
+
         // Get network status
         setIsOnline(offlineService.isNetworkAvailable());
-        
+
         // Add network status listener
-        const unsubscribe = offlineService.addListener((online) => {
+        const unsubscribe = offlineService.addListener(online => {
           setIsOnline(online);
         });
-        
+
         // Track screen view
         analyticsService.trackScreenView('offline_settings');
-        
+
         return () => {
           unsubscribe();
         };
@@ -64,7 +74,7 @@ const OfflineSettingsScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadSettings();
   }, []);
 
@@ -72,9 +82,9 @@ const OfflineSettingsScreen: React.FC = () => {
   const saveSettings = async () => {
     try {
       setSaving(true);
-      
+
       await offlineService.saveOfflineMode(settings);
-      
+
       // Track event
       analyticsService.trackEvent('offline_settings_updated', {
         enabled: settings.enabled,
@@ -82,9 +92,9 @@ const OfflineSettingsScreen: React.FC = () => {
         syncEnabled: settings.syncEnabled,
         maxCacheSize: settings.maxCacheSize,
         maxSyncQueueSize: settings.maxSyncQueueSize,
-        cacheTTL: settings.cacheTTL
+        cacheTTL: settings.cacheTTL,
       });
-      
+
       Alert.alert('Success', 'Offline settings saved successfully.');
     } catch (error) {
       console.error('Error saving offline settings:', error);
@@ -105,14 +115,14 @@ const OfflineSettingsScreen: React.FC = () => {
           enabled: newEnabled,
           // If disabling, disable cache and sync as well
           cacheEnabled: newEnabled ? prev.cacheEnabled : false,
-          syncEnabled: newEnabled ? prev.syncEnabled : false
+          syncEnabled: newEnabled ? prev.syncEnabled : false,
         };
       }
-      
+
       // Otherwise, just toggle the specific setting
       return {
         ...prev,
-        [key]: value !== undefined ? value : !prev[key]
+        [key]: value !== undefined ? value : !prev[key],
       };
     });
   };
@@ -121,13 +131,13 @@ const OfflineSettingsScreen: React.FC = () => {
   const handleClearCache = async () => {
     try {
       setLoading(true);
-      
+
       await offlineService.clearCache();
-      
+
       // Update cache size
       const size = await offlineService.getCacheSize();
       setCacheSize(size);
-      
+
       Alert.alert('Success', 'Cache cleared successfully.');
     } catch (error) {
       console.error('Error clearing cache:', error);
@@ -141,14 +151,17 @@ const OfflineSettingsScreen: React.FC = () => {
   const handleSyncNow = async () => {
     try {
       if (!isOnline) {
-        Alert.alert('Error', 'Cannot sync while offline. Please connect to the internet and try again.');
+        Alert.alert(
+          'Error',
+          'Cannot sync while offline. Please connect to the internet and try again.'
+        );
         return;
       }
-      
+
       setLoading(true);
-      
+
       await offlineService.syncPendingOperations();
-      
+
       Alert.alert('Success', 'Sync completed successfully.');
     } catch (error) {
       console.error('Error syncing:', error);
@@ -161,11 +174,11 @@ const OfflineSettingsScreen: React.FC = () => {
   // Format bytes to human-readable size
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
@@ -180,24 +193,20 @@ const OfflineSettingsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="Offline Settings" 
-        onRefresh={() => {}} 
-        isLoading={loading} 
-      />
-      
+      <Header title="Offline Settings" onRefresh={() => {}} isLoading={loading} />
+
       <ScrollView style={styles.scrollView}>
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Network Status</ThemedText>
-          
+
           <View style={styles.statusContainer}>
             <View style={styles.statusIndicator}>
-              <View style={[styles.statusDot, { backgroundColor: isOnline ? '#4CAF50' : '#F44336' }]} />
-              <ThemedText style={styles.statusText}>
-                {isOnline ? 'Online' : 'Offline'}
-              </ThemedText>
+              <View
+                style={[styles.statusDot, { backgroundColor: isOnline ? '#4CAF50' : '#F44336' }]}
+              />
+              <ThemedText style={styles.statusText}>{isOnline ? 'Online' : 'Offline'}</ThemedText>
             </View>
-            
+
             {!isOnline && (
               <ThemedText style={styles.offlineMessage}>
                 You are currently offline. Some features may be limited.
@@ -205,10 +214,10 @@ const OfflineSettingsScreen: React.FC = () => {
             )}
           </View>
         </ThemedView>
-        
+
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Offline Mode</ThemedText>
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={styles.settingLabel}>Enable Offline Mode</ThemedText>
             <Switch
@@ -217,16 +226,16 @@ const OfflineSettingsScreen: React.FC = () => {
               disabled={saving}
             />
           </View>
-          
+
           <View style={styles.settingDescription}>
             <ThemedText style={styles.descriptionText}>
-              Offline mode allows you to use the app without an internet connection.
-              Data will be cached locally and synced when you're back online.
+              Offline mode allows you to use the app without an internet connection. Data will be
+              cached locally and synced when you're back online.
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !settings.enabled && styles.disabled]} />
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={[styles.settingLabel, !settings.enabled && styles.disabledText]}>
               Enable Caching
@@ -237,16 +246,16 @@ const OfflineSettingsScreen: React.FC = () => {
               disabled={!settings.enabled || saving}
             />
           </View>
-          
+
           <View style={styles.settingDescription}>
             <ThemedText style={[styles.descriptionText, !settings.enabled && styles.disabledText]}>
-              Caching stores data locally for offline access. This improves performance
-              and allows you to view content when offline.
+              Caching stores data locally for offline access. This improves performance and allows
+              you to view content when offline.
             </ThemedText>
           </View>
-          
+
           <View style={[styles.divider, !settings.enabled && styles.disabled]} />
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={[styles.settingLabel, !settings.enabled && styles.disabledText]}>
               Enable Sync
@@ -257,23 +266,23 @@ const OfflineSettingsScreen: React.FC = () => {
               disabled={!settings.enabled || saving}
             />
           </View>
-          
+
           <View style={styles.settingDescription}>
             <ThemedText style={[styles.descriptionText, !settings.enabled && styles.disabledText]}>
-              Sync allows you to make changes while offline and have them automatically
-              synchronized when you're back online.
+              Sync allows you to make changes while offline and have them automatically synchronized
+              when you're back online.
             </ThemedText>
           </View>
         </ThemedView>
-        
+
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Cache Settings</ThemedText>
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={styles.settingLabel}>Current Cache Size</ThemedText>
             <ThemedText style={styles.settingValue}>{formatBytes(cacheSize)}</ThemedText>
           </View>
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={styles.settingLabel}>Maximum Cache Size</ThemedText>
             <View style={styles.sliderContainer}>
@@ -281,15 +290,17 @@ const OfflineSettingsScreen: React.FC = () => {
               {/* Slider would go here in a real implementation */}
             </View>
           </View>
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={styles.settingLabel}>Cache Duration</ThemedText>
             <View style={styles.sliderContainer}>
-              <ThemedText style={styles.sliderValue}>{settings.cacheTTL / (60 * 60 * 1000)} hours</ThemedText>
+              <ThemedText style={styles.sliderValue}>
+                {settings.cacheTTL / (60 * 60 * 1000)} hours
+              </ThemedText>
               {/* Slider would go here in a real implementation */}
             </View>
           </View>
-          
+
           <TouchableOpacity
             style={styles.actionButton}
             onPress={handleClearCache}
@@ -300,10 +311,10 @@ const OfflineSettingsScreen: React.FC = () => {
             </ThemedText>
           </TouchableOpacity>
         </ThemedView>
-        
+
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Sync Settings</ThemedText>
-          
+
           <View style={styles.settingItem}>
             <ThemedText style={styles.settingLabel}>Maximum Sync Queue Size</ThemedText>
             <View style={styles.sliderContainer}>
@@ -311,40 +322,43 @@ const OfflineSettingsScreen: React.FC = () => {
               {/* Slider would go here in a real implementation */}
             </View>
           </View>
-          
+
           <TouchableOpacity
             style={styles.actionButton}
             onPress={handleSyncNow}
             disabled={saving || !isOnline || !settings.syncEnabled}
           >
-            <ThemedText style={[
-              styles.actionButtonText,
-              (!isOnline || !settings.syncEnabled) && styles.disabledText
-            ]}>
+            <ThemedText
+              style={[
+                styles.actionButtonText,
+                (!isOnline || !settings.syncEnabled) && styles.disabledText,
+              ]}
+            >
               Sync Now
             </ThemedText>
           </TouchableOpacity>
         </ThemedView>
-        
+
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>About Offline Mode</ThemedText>
-          
+
           <ThemedText style={styles.aboutText}>
-            Offline mode allows you to use AI Sports Edge even when you don't have an internet connection.
-            Data is cached locally on your device and changes are synchronized when you're back online.
+            Offline mode allows you to use AI Sports Edge even when you don't have an internet
+            connection. Data is cached locally on your device and changes are synchronized when
+            you're back online.
           </ThemedText>
-          
+
           <ThemedText style={styles.aboutText}>
-            Enabling caching will store data on your device, which may use storage space.
-            You can adjust the maximum cache size and duration to control how much space is used.
+            Enabling caching will store data on your device, which may use storage space. You can
+            adjust the maximum cache size and duration to control how much space is used.
           </ThemedText>
-          
+
           <ThemedText style={styles.aboutText}>
-            Enabling sync allows you to make changes while offline, which will be synchronized
-            when you're back online. This includes updating preferences, saving favorites, and more.
+            Enabling sync allows you to make changes while offline, which will be synchronized when
+            you're back online. This includes updating preferences, saving favorites, and more.
           </ThemedText>
         </ThemedView>
-        
+
         <ThemedView style={styles.saveButtonContainer}>
           <TouchableOpacity
             style={[styles.saveButton, saving && styles.disabledButton]}

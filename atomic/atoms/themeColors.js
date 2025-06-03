@@ -16,7 +16,7 @@ export const palette = {
   white: '#ffffff',
   black: '#000000',
   transparent: 'transparent',
-  
+
   blue: {
     50: '#e6f0ff',
     100: '#b3d1ff',
@@ -29,7 +29,7 @@ export const palette = {
     800: '#002966',
     900: '#001433',
   },
-  
+
   red: {
     50: '#ffe6e6',
     100: '#ffb3b3',
@@ -42,7 +42,7 @@ export const palette = {
     800: '#660000',
     900: '#330000',
   },
-  
+
   green: {
     50: '#e6f7e6',
     100: '#c3eac3',
@@ -55,7 +55,7 @@ export const palette = {
     800: '#156c15',
     900: '#0a540a',
   },
-  
+
   yellow: {
     50: '#fffbe6',
     100: '#fff3b3',
@@ -68,7 +68,7 @@ export const palette = {
     800: '#665600',
     900: '#332b00',
   },
-  
+
   gray: {
     50: '#f8f9fa',
     100: '#f1f3f5',
@@ -81,15 +81,15 @@ export const palette = {
     800: '#343a40',
     900: '#212529',
   },
-  
+
   purple: {
     500: '#5856d6', // Secondary accent
   },
-  
+
   teal: {
     500: '#5ac8fa', // Tertiary accent
   },
-  
+
   orange: {
     500: '#ff9500', // Highlight
   },
@@ -104,40 +104,40 @@ export const light = {
   primaryVariant: palette.blue[700],
   secondary: palette.purple[500],
   accent: palette.teal[500],
-  
+
   // UI colors
   background: palette.white,
   surface: palette.gray[50],
   surfaceVariant: palette.gray[100],
   card: palette.white,
   dialog: palette.white,
-  
+
   // Text colors
   text: palette.gray[900],
   textSecondary: palette.gray[700],
   textTertiary: palette.gray[600],
   textDisabled: palette.gray[500],
-  
+
   // Border colors
   border: palette.gray[300],
   borderLight: palette.gray[200],
   borderFocus: palette.blue[400],
   divider: palette.gray[200],
-  
+
   // Interactive colors
   tint: palette.blue[500],
   primaryAction: palette.blue[500],
-  
+
   // Component colors
   icon: palette.gray[700],
   iconPrimary: palette.gray[700],
-  
+
   // Status colors
   error: palette.red[500],
   success: palette.green[500],
   warning: palette.yellow[500],
   info: palette.blue[400],
-  
+
   // Betting-specific colors
   win: palette.green[500],
   loss: palette.red[500],
@@ -155,7 +155,7 @@ export const dark = {
   primaryVariant: palette.blue[300],
   secondary: palette.purple[500],
   accent: palette.teal[500],
-  
+
   // UI colors
   background: palette.gray[900],
   surface: palette.gray[800],
@@ -164,40 +164,40 @@ export const dark = {
   dialog: palette.gray[800],
   primaryBackground: palette.gray[900],
   primaryText: palette.gray[50],
-  
+
   // Text colors
   text: palette.gray[50],
   textSecondary: palette.gray[300],
   textTertiary: palette.gray[400],
   textDisabled: palette.gray[500],
-  
+
   // Border colors
   border: palette.gray[600],
   borderLight: palette.gray[700],
   borderSubtle: palette.gray[700],
   borderFocus: palette.blue[300],
   divider: palette.gray[700],
-  
+
   // Interactive colors
   tint: palette.blue[400],
-  
+
   // Component colors
   icon: palette.gray[300],
   iconPrimary: palette.gray[300],
-  
+
   // Status colors
   error: palette.red[400],
   success: palette.green[400],
   warning: palette.yellow[400],
   info: palette.blue[300],
-  
+
   // Betting-specific colors
   win: palette.green[400],
   loss: palette.red[400],
   draw: palette.gray[400],
   odds: palette.blue[300],
   boost: palette.orange[500],
-  
+
   // Additional dark theme specific colors
 };
 

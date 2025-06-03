@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+
 import { fetchOdds } from '../config/oddsApi';
-import { OddsApiResponse, Game, DailyInsight } from '../types/odds';
-import { getAIPredictions, getLiveUpdates, getDailyInsights } from '../services/aiPredictionService';
+import {
+  getAIPredictions,
+  getLiveUpdates,
+  getDailyInsights,
+} from '../services/aiPredictionService';
 import { userPreferencesService } from '../services/userPreferencesService';
+import { OddsApiResponse, Game, DailyInsight } from '../types/odds';
 
 interface UseOddsDataResult {
   data: Game[];
@@ -18,29 +23,29 @@ interface UseOddsDataResult {
 // This is a simplified mapping - in a real app, this would be more comprehensive
 const leagueToSportKeyMap: Record<string, string> = {
   // Soccer leagues
-  '4328': 'soccer_epl',           // English Premier League
+  '4328': 'soccer_epl', // English Premier League
   '4331': 'soccer_spain_la_liga', // Spanish La Liga
   '4332': 'soccer_germany_bundesliga', // German Bundesliga
   '4334': 'soccer_italy_serie_a', // Italian Serie A
   '4335': 'soccer_france_ligue_one', // French Ligue 1
   '4346': 'soccer_uefa_champs_league', // UEFA Champions League
-  
+
   // Basketball leagues
-  '4387': 'basketball_nba',       // NBA
-  '4388': 'basketball_ncaab',     // NCAA Basketball
+  '4387': 'basketball_nba', // NBA
+  '4388': 'basketball_ncaab', // NCAA Basketball
   '4408': 'basketball_euroleague', // Euroleague
-  
+
   // American Football leagues
   '4391': 'americanfootball_nfl', // NFL
   '4392': 'americanfootball_ncaaf', // NCAA Football
-  
+
   // Baseball leagues
-  '4424': 'baseball_mlb',         // MLB
-  '4429': 'baseball_ncaa',        // NCAA Baseball
-  
+  '4424': 'baseball_mlb', // MLB
+  '4429': 'baseball_ncaa', // NCAA Baseball
+
   // Ice Hockey leagues
-  '4380': 'icehockey_nhl',        // NHL
-  '4381': 'icehockey_nhl',        // NCAA Hockey
+  '4380': 'icehockey_nhl', // NHL
+  '4381': 'icehockey_nhl', // NCAA Hockey
 };
 
 /**
@@ -54,8 +59,8 @@ const leagueToSportKeyMap: Record<string, string> = {
  * @returns {UseOddsDataResult} - Object containing data, loading state, error state, and refresh function
  */
 export const useOddsData = (
-  sport = "americanfootball_nfl",
-  markets = ["h2h", "spreads"],
+  sport = 'americanfootball_nfl',
+  markets = ['h2h', 'spreads'],
   maxRetries = 3,
   enableLiveUpdates = true,
   enableAIPredictions = true,
@@ -78,7 +83,7 @@ export const useOddsData = (
           setSelectedLeagueIds(leagueIds);
           setFilteredByLeagues(leagueIds.length > 0);
         } catch (err) {
-          console.error("Error loading selected leagues:", err);
+          console.error('Error loading selected leagues:', err);
         }
       }
     };
@@ -93,7 +98,7 @@ export const useOddsData = (
         const insights = await getDailyInsights();
         setDailyInsights(insights);
       } catch (err) {
-        console.error("Error loading daily insights:", err);
+        console.error('Error loading daily insights:', err);
       }
     };
 
@@ -125,9 +130,7 @@ export const useOddsData = (
     }
 
     // Get sport keys from selected league IDs
-    const selectedSportKeys = leagueIds
-      .map(id => leagueToSportKeyMap[id])
-      .filter(key => key); // Filter out undefined values
+    const selectedSportKeys = leagueIds.map(id => leagueToSportKeyMap[id]).filter(key => key); // Filter out undefined values
 
     if (selectedSportKeys.length === 0) {
       return games; // No mappable leagues selected, return all games
@@ -137,85 +140,99 @@ export const useOddsData = (
     return games.filter(game => selectedSportKeys.includes(game.sport_key));
   };
 
-  const loadData = useCallback(async (retry = false) => {
-    if (retry) {
-      setRetryCount(prev => prev + 1);
-    } else {
-      setRetryCount(0);
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Fetch odds data with cache enabled
-      const response = await fetchOdds(sport, markets, "us", true);
-      
-      if (response && response.success) {
-        let processedData = response.data;
-        
-        // Add AI predictions if enabled
-        if (enableAIPredictions) {
-          processedData = await getAIPredictions(processedData);
-        }
-        
-        // Add live updates if enabled
-        if (enableLiveUpdates) {
-          processedData = getLiveUpdates(processedData);
-        }
-        
-        // Filter by user's selected leagues if enabled
-        if (filterByUserLeagues && selectedLeagueIds.length > 0) {
-          // Use internal function instead of the memoized one to break dependency cycle
-          processedData = filterGamesByLeaguesInternal(processedData, selectedLeagueIds);
-        }
-        
-        setData(processedData);
+  const loadData = useCallback(
+    async (retry = false) => {
+      if (retry) {
+        setRetryCount(prev => prev + 1);
+      } else {
         setRetryCount(0);
-        
-        // If data came from cache, show a message but don't treat as error
-        if (response.fromCache) {
-          setError("Using cached data. Live updates may be limited due to API rate limits.");
-        } else {
-          setError(null);
-        }
-      } else {
-        // If we got no data and hit rate limits, show a specific message
-        if (response.fromCache === false) {
-          throw new Error("API rate limit reached. Please try again later.");
-        } else {
-          throw new Error("No data received");
-        }
       }
-    } catch (err: any) {
-      console.error("Error fetching odds:", err);
-      
-      if (retryCount < maxRetries) {
-        // Retry with exponential backoff
-        const delay = Math.pow(2, retryCount) * 1000;
-        setTimeout(() => loadData(true), delay);
-        setError(`Loading failed. Retrying (${retryCount + 1}/${maxRetries})...`);
-      } else {
-        if (err.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          if (err.response.status === 429) {
-            setError("API rate limit reached. Please try again later.");
-          } else {
-            setError(`API Error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Fetch odds data with cache enabled
+        const response = await fetchOdds(sport, markets, 'us', true);
+
+        if (response && response.success) {
+          let processedData = response.data;
+
+          // Add AI predictions if enabled
+          if (enableAIPredictions) {
+            processedData = await getAIPredictions(processedData);
           }
-        } else if (err.request) {
-          // The request was made but no response was received
-          setError("Network error. Please check your connection.");
+
+          // Add live updates if enabled
+          if (enableLiveUpdates) {
+            processedData = getLiveUpdates(processedData);
+          }
+
+          // Filter by user's selected leagues if enabled
+          if (filterByUserLeagues && selectedLeagueIds.length > 0) {
+            // Use internal function instead of the memoized one to break dependency cycle
+            processedData = filterGamesByLeaguesInternal(processedData, selectedLeagueIds);
+          }
+
+          setData(processedData);
+          setRetryCount(0);
+
+          // If data came from cache, show a message but don't treat as error
+          if (response.fromCache) {
+            setError('Using cached data. Live updates may be limited due to API rate limits.');
+          } else {
+            setError(null);
+          }
         } else {
-          // Something happened in setting up the request
-          setError(`Error: ${err.message}`);
+          // If we got no data and hit rate limits, show a specific message
+          if (response.fromCache === false) {
+            throw new Error('API rate limit reached. Please try again later.');
+          } else {
+            throw new Error('No data received');
+          }
         }
+      } catch (err: any) {
+        console.error('Error fetching odds:', err);
+
+        if (retryCount < maxRetries) {
+          // Retry with exponential backoff
+          const delay = Math.pow(2, retryCount) * 1000;
+          setTimeout(() => loadData(true), delay);
+          setError(`Loading failed. Retrying (${retryCount + 1}/${maxRetries})...`);
+        } else {
+          if (err.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            if (err.response.status === 429) {
+              setError('API rate limit reached. Please try again later.');
+            } else {
+              setError(
+                `API Error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`
+              );
+            }
+          } else if (err.request) {
+            // The request was made but no response was received
+            setError('Network error. Please check your connection.');
+          } else {
+            // Something happened in setting up the request
+            setError(`Error: ${err.message}`);
+          }
+        }
+      } finally {
+        if (retryCount >= maxRetries) setLoading(false);
       }
-    } finally {
-      if (retryCount >= maxRetries) setLoading(false);
-    }
-  }, [sport, markets, retryCount, maxRetries, enableLiveUpdates, enableAIPredictions, filterByUserLeagues, selectedLeagueIds]);
+    },
+    [
+      sport,
+      markets,
+      retryCount,
+      maxRetries,
+      enableLiveUpdates,
+      enableAIPredictions,
+      filterByUserLeagues,
+      selectedLeagueIds,
+    ]
+  );
   // Removed filterGamesByLeagues from dependencies
 
   // Refresh live data without reloading from API
@@ -237,7 +254,7 @@ export const useOddsData = (
     refresh: () => loadData(false),
     dailyInsights,
     refreshLiveData,
-    filteredByLeagues
+    filteredByLeagues,
   };
 };
 

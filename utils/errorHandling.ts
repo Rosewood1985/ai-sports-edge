@@ -1,12 +1,12 @@
-import { FirestoreError } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
+import { FirestoreError } from 'firebase/firestore';
 
 /**
  * Custom error class for subscription-related errors
  */
 export class SubscriptionError extends Error {
   code: string;
-  
+
   constructor(message: string, code: string = 'unknown') {
     super(message);
     this.name = 'SubscriptionError';
@@ -19,7 +19,7 @@ export class SubscriptionError extends Error {
  */
 export class ApiError extends Error {
   code: string;
-  
+
   constructor(message: string, code: string = 'api_error') {
     super(message);
     this.name = 'ApiError';
@@ -34,23 +34,17 @@ export class ApiError extends Error {
  */
 export function handleFirebaseError(error: unknown): SubscriptionError {
   if (error instanceof FirestoreError) {
-    return new SubscriptionError(
-      `Firestore error: ${error.message}`,
-      error.code
-    );
+    return new SubscriptionError(`Firestore error: ${error.message}`, error.code);
   }
-  
+
   if (error instanceof FirebaseError) {
-    return new SubscriptionError(
-      `Firebase error: ${error.message}`,
-      error.code
-    );
+    return new SubscriptionError(`Firebase error: ${error.message}`, error.code);
   }
-  
+
   if (error instanceof Error) {
     return new SubscriptionError(error.message);
   }
-  
+
   return new SubscriptionError('An unknown error occurred');
 }
 
@@ -67,24 +61,24 @@ export async function retry<T>(
   baseDelay: number = 300
 ): Promise<T> {
   let lastError: Error | undefined;
-  
+
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       // If this is the last attempt, don't wait
       if (attempt === maxRetries - 1) break;
-      
+
       // Calculate delay with exponential backoff and jitter
       const delay = baseDelay * Math.pow(2, attempt) * (0.5 + Math.random() * 0.5);
-      
+
       // Wait before next attempt
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError || new Error('Retry failed');
 }
 
@@ -96,14 +90,14 @@ export async function retry<T>(
  */
 export function handleApiError<T>(message: string, error: unknown): T[] {
   console.error(`${message}:`, error);
-  
+
   if (error instanceof ApiError) {
     throw error;
   }
-  
+
   if (error instanceof Error) {
     throw new ApiError(`${message}: ${error.message}`);
   }
-  
+
   throw new ApiError(`${message}: ${String(error)}`);
 }

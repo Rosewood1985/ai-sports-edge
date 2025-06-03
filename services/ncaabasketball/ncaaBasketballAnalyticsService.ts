@@ -3,17 +3,33 @@
 // Comprehensive College Basketball Analytics with March Madness Focus
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
-import { NCAATeam, NCAAPlayer, NCAAGame, MarchMadnessBracket } from './ncaaBasketballDataSyncService';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+
+import {
+  NCAATeam,
+  NCAAPlayer,
+  NCAAGame,
+  MarchMadnessBracket,
+} from './ncaaBasketballDataSyncService';
+import { firestore as db } from '../../config/firebase';
 
 // NCAA Basketball-specific analytics interfaces
 export interface NCAATeamAnalytics {
   teamId: string;
   season: number;
   lastUpdated: Date;
-  
+
   // College Basketball Specific Metrics
   collegeBasketballMetrics: {
     kenpomRating: number;
@@ -344,7 +360,7 @@ export class NCAABasketballAnalyticsService {
 
       // Get team games for the season
       const teamGames = await this.getTeamGames(teamId, season);
-      
+
       // Generate comprehensive analytics
       const analytics: NCAATeamAnalytics = {
         teamId,
@@ -366,7 +382,6 @@ export class NCAABasketballAnalyticsService {
 
       console.log(`Generated analytics for NCAA team ${teamId}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to generate team analytics for ${teamId}: ${error.message}`);
@@ -392,7 +407,7 @@ export class NCAABasketballAnalyticsService {
 
       // Get player games for the season
       const playerGames = await this.getPlayerGames(playerId, season);
-      
+
       // Generate comprehensive analytics
       const analytics: NCAAPlayerAnalytics = {
         playerId,
@@ -411,7 +426,6 @@ export class NCAABasketballAnalyticsService {
 
       console.log(`Generated analytics for NCAA player ${playerId}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to generate player analytics for ${playerId}: ${error.message}`);
@@ -437,7 +451,7 @@ export class NCAABasketballAnalyticsService {
 
       // Get tournament teams
       const tournamentTeams = await this.getTournamentTeams(year);
-      
+
       // Generate comprehensive tournament analytics
       const analytics: MarchMadnessAnalytics = {
         year,
@@ -454,7 +468,6 @@ export class NCAABasketballAnalyticsService {
 
       console.log(`Generated March Madness analytics for ${year}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to generate March Madness analytics for ${year}: ${error.message}`);
@@ -464,14 +477,17 @@ export class NCAABasketballAnalyticsService {
   /**
    * Calculate college basketball specific metrics
    */
-  private async calculateCollegeBasketballMetrics(games: NCAAGame[], team: NCAATeam): Promise<NCAATeamAnalytics['collegeBasketballMetrics']> {
+  private async calculateCollegeBasketballMetrics(
+    games: NCAAGame[],
+    team: NCAATeam
+  ): Promise<NCAATeamAnalytics['collegeBasketballMetrics']> {
     try {
       // Calculate KenPom-style metrics
       const kenpomRating = await this.calculateKenPomRating(games);
       const netRating = await this.calculateNETRating(games, team);
       const rpi = await this.calculateRPI(games, team);
       const quadrantRecord = await this.calculateQuadrantRecord(games);
-      
+
       return {
         kenpomRating,
         netRating,
@@ -492,7 +508,11 @@ export class NCAABasketballAnalyticsService {
   /**
    * Calculate March Madness specific metrics
    */
-  private async calculateMarchMadnessMetrics(teamId: string, games: NCAAGame[], season: number): Promise<NCAATeamAnalytics['marchMadnessMetrics']> {
+  private async calculateMarchMadnessMetrics(
+    teamId: string,
+    games: NCAAGame[],
+    season: number
+  ): Promise<NCAATeamAnalytics['marchMadnessMetrics']> {
     try {
       const team = await this.getTeamData(teamId);
       if (!team) throw new Error('Team not found');
@@ -517,7 +537,10 @@ export class NCAABasketballAnalyticsService {
   /**
    * Calculate tournament readiness factors
    */
-  private async calculateTournamentReadiness(teamId: string, games: NCAAGame[]): Promise<NCAATeamAnalytics['tournamentReadiness']> {
+  private async calculateTournamentReadiness(
+    teamId: string,
+    games: NCAAGame[]
+  ): Promise<NCAATeamAnalytics['tournamentReadiness']> {
     try {
       const team = await this.getTeamData(teamId);
       if (!team) throw new Error('Team not found');
@@ -533,7 +556,9 @@ export class NCAABasketballAnalyticsService {
       const intangibles = await this.calculateIntangiblesGrade(team);
 
       // Calculate overall grade
-      const averageScore = (offense + defense + coaching + experience + health + momentum + schedule + intangibles) / 8;
+      const averageScore =
+        (offense + defense + coaching + experience + health + momentum + schedule + intangibles) /
+        8;
       const overallGrade = this.convertScoreToGrade(averageScore);
 
       // Identify concerns, strengths, and X-factors
@@ -590,39 +615,46 @@ export class NCAABasketballAnalyticsService {
     // NET (NCAA Evaluation Tool) calculation
     // Combines game results, strength of schedule, game location, scoring margin, and quality of wins/losses
     let netScore = 0;
-    
+
     // Base score from wins/losses
     netScore += team.currentSeason.wins * 2;
     netScore -= team.currentSeason.losses * 1;
-    
+
     // Adjust for quality wins and bad losses
     netScore += team.currentSeason.qualityWins * 3;
     netScore -= team.currentSeason.badLosses * 3;
-    
+
     // Adjust for strength of schedule
     netScore += team.currentSeason.strengthOfSchedule * 0.1;
-    
+
     return netScore;
   }
 
   private async calculateRPI(games: NCAAGame[], team: NCAATeam): Promise<number> {
     // RPI = (WP * 0.25) + (OWP * 0.50) + (OOWP * 0.25)
     // Where WP = Winning Percentage, OWP = Opponents' Winning Percentage, OOWP = Opponents' Opponents' Winning Percentage
-    
+
     const totalGames = team.currentSeason.wins + team.currentSeason.losses;
     if (totalGames === 0) return 0;
-    
+
     const wp = team.currentSeason.wins / totalGames;
     const owp = 0.5; // Placeholder - would calculate actual opponents' winning percentage
     const oowp = 0.5; // Placeholder - would calculate opponents' opponents' winning percentage
-    
-    return (wp * 0.25) + (owp * 0.50) + (oowp * 0.25);
+
+    return wp * 0.25 + owp * 0.5 + oowp * 0.25;
   }
 
-  private async calculateQuadrantRecord(games: NCAAGame[]): Promise<NCAATeamAnalytics['collegeBasketballMetrics']['quadrantRecord']> {
+  private async calculateQuadrantRecord(
+    games: NCAAGame[]
+  ): Promise<NCAATeamAnalytics['collegeBasketballMetrics']['quadrantRecord']> {
     // Quadrant system based on opponent ranking and game location
-    const quadrants = { q1: { wins: 0, losses: 0 }, q2: { wins: 0, losses: 0 }, q3: { wins: 0, losses: 0 }, q4: { wins: 0, losses: 0 } };
-    
+    const quadrants = {
+      q1: { wins: 0, losses: 0 },
+      q2: { wins: 0, losses: 0 },
+      q3: { wins: 0, losses: 0 },
+      q4: { wins: 0, losses: 0 },
+    };
+
     for (const game of games.filter(g => g.status === 'completed')) {
       // This would require opponent rankings to properly classify
       // For now, placeholder implementation
@@ -631,38 +663,45 @@ export class NCAABasketballAnalyticsService {
         quadrants.q2[won ? 'wins' : 'losses']++;
       }
     }
-    
+
     return quadrants;
   }
 
   private async calculateTournamentProbability(team: NCAATeam, games: NCAAGame[]): Promise<number> {
     // Calculate tournament probability based on various factors
     let probability = 0.5; // Base 50%
-    
+
     // Adjust for wins/losses
     const totalGames = team.currentSeason.wins + team.currentSeason.losses;
     if (totalGames > 0) {
       const winPercentage = team.currentSeason.wins / totalGames;
       probability = winPercentage;
     }
-    
+
     // Adjust for quality wins
     probability += team.currentSeason.qualityWins * 0.05;
-    
+
     // Adjust for bad losses
     probability -= team.currentSeason.badLosses * 0.1;
-    
+
     // Adjust for conference strength (simplified)
-    if (team.conference.includes('Big') || team.conference.includes('SEC') || team.conference.includes('ACC')) {
+    if (
+      team.conference.includes('Big') ||
+      team.conference.includes('SEC') ||
+      team.conference.includes('ACC')
+    ) {
       probability += 0.1;
     }
-    
+
     return Math.max(0, Math.min(1, probability));
   }
 
-  private async calculateSeedProjection(team: NCAATeam, games: NCAAGame[]): Promise<NCAATeamAnalytics['marchMadnessMetrics']['seedProjection']> {
+  private async calculateSeedProjection(
+    team: NCAATeam,
+    games: NCAAGame[]
+  ): Promise<NCAATeamAnalytics['marchMadnessMetrics']['seedProjection']> {
     const tournamentProb = await this.calculateTournamentProbability(team, games);
-    
+
     if (tournamentProb < 0.3) {
       return {
         mostLikely: 16,
@@ -671,14 +710,14 @@ export class NCAABasketballAnalyticsService {
         firstFourOut: true,
       };
     }
-    
+
     // Simplified seed projection based on record and metrics
     const totalGames = team.currentSeason.wins + team.currentSeason.losses;
     const winPercentage = totalGames > 0 ? team.currentSeason.wins / totalGames : 0;
-    
-    let projectedSeed = Math.round(16 - (winPercentage * 15));
+
+    let projectedSeed = Math.round(16 - winPercentage * 15);
     projectedSeed = Math.max(1, Math.min(16, projectedSeed));
-    
+
     return {
       mostLikely: projectedSeed,
       range: { min: Math.max(1, projectedSeed - 2), max: Math.min(16, projectedSeed + 2) },
@@ -761,7 +800,9 @@ export class NCAABasketballAnalyticsService {
     };
   }
 
-  private convertScoreToGrade(score: number): NCAATeamAnalytics['tournamentReadiness']['overallGrade'] {
+  private convertScoreToGrade(
+    score: number
+  ): NCAATeamAnalytics['tournamentReadiness']['overallGrade'] {
     if (score >= 95) return 'A+';
     if (score >= 90) return 'A';
     if (score >= 85) return 'A-';
@@ -782,7 +823,7 @@ export class NCAABasketballAnalyticsService {
   private async getTeamData(teamId: string): Promise<NCAATeam | null> {
     try {
       const teamDoc = await getDoc(doc(db, 'ncaa_teams', teamId));
-      return teamDoc.exists() ? teamDoc.data() as NCAATeam : null;
+      return teamDoc.exists() ? (teamDoc.data() as NCAATeam) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -792,7 +833,7 @@ export class NCAABasketballAnalyticsService {
   private async getPlayerData(playerId: string): Promise<NCAAPlayer | null> {
     try {
       const playerDoc = await getDoc(doc(db, 'ncaa_players', playerId));
-      return playerDoc.exists() ? playerDoc.data() as NCAAPlayer : null;
+      return playerDoc.exists() ? (playerDoc.data() as NCAAPlayer) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -801,11 +842,8 @@ export class NCAABasketballAnalyticsService {
 
   private async getTeamGames(teamId: string, season: number): Promise<NCAAGame[]> {
     try {
-      const gamesQuery = query(
-        collection(db, 'ncaa_games'),
-        where('season', '==', season)
-      );
-      
+      const gamesQuery = query(collection(db, 'ncaa_games'), where('season', '==', season));
+
       const gamesSnapshot = await getDocs(gamesQuery);
       return gamesSnapshot.docs
         .map(doc => doc.data() as NCAAGame)
@@ -819,7 +857,7 @@ export class NCAABasketballAnalyticsService {
   private async getCurrentBracket(year: number): Promise<MarchMadnessBracket | null> {
     try {
       const bracketDoc = await getDoc(doc(db, 'march_madness_brackets', year.toString()));
-      return bracketDoc.exists() ? bracketDoc.data() as MarchMadnessBracket : null;
+      return bracketDoc.exists() ? (bracketDoc.data() as MarchMadnessBracket) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -827,49 +865,119 @@ export class NCAABasketballAnalyticsService {
   }
 
   // Placeholder implementations for complex calculations
-  private async calculateOffensiveMetrics(games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculateDefensiveMetrics(games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculateAdvancedTeamMetrics(games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculateSituationalMetrics(games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculatePlayerImpactMetrics(teamId: string, games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculateBasicPlayerMetrics(games: any[]): Promise<any> { return {}; }
-  private async calculateAdvancedPlayerMetrics(games: any[]): Promise<any> { return {}; }
-  private async calculateCollegeSpecificMetrics(player: NCAAPlayer, games: any[]): Promise<any> { return {}; }
-  private async calculateNBAProjection(player: NCAAPlayer, games: any[]): Promise<any> { return {}; }
-  private async calculateTournamentMetrics(playerId: string, games: any[]): Promise<any> { return {}; }
-  private async calculateBracketAnalytics(bracket: MarchMadnessBracket, teams: any[]): Promise<any> { return {}; }
-  private async calculateRegionalAnalysis(bracket: MarchMadnessBracket, teams: any[]): Promise<any> { return {}; }
-  private async calculateHistoricalContext(year: number): Promise<any> { return {}; }
-  private async calculateTrendAnalysis(teams: any[]): Promise<any> { return {}; }
+  private async calculateOffensiveMetrics(games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculateDefensiveMetrics(games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculateAdvancedTeamMetrics(games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculateSituationalMetrics(games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculatePlayerImpactMetrics(teamId: string, games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculateBasicPlayerMetrics(games: any[]): Promise<any> {
+    return {};
+  }
+  private async calculateAdvancedPlayerMetrics(games: any[]): Promise<any> {
+    return {};
+  }
+  private async calculateCollegeSpecificMetrics(player: NCAAPlayer, games: any[]): Promise<any> {
+    return {};
+  }
+  private async calculateNBAProjection(player: NCAAPlayer, games: any[]): Promise<any> {
+    return {};
+  }
+  private async calculateTournamentMetrics(playerId: string, games: any[]): Promise<any> {
+    return {};
+  }
+  private async calculateBracketAnalytics(
+    bracket: MarchMadnessBracket,
+    teams: any[]
+  ): Promise<any> {
+    return {};
+  }
+  private async calculateRegionalAnalysis(
+    bracket: MarchMadnessBracket,
+    teams: any[]
+  ): Promise<any> {
+    return {};
+  }
+  private async calculateHistoricalContext(year: number): Promise<any> {
+    return {};
+  }
+  private async calculateTrendAnalysis(teams: any[]): Promise<any> {
+    return {};
+  }
 
   // Additional placeholder methods
-  private async getPlayerGames(playerId: string, season: number): Promise<any[]> { return []; }
-  private async getTournamentTeams(year: number): Promise<any[]> { return []; }
-  private async calculateStrengthOfSchedule(games: NCAAGame[]): Promise<number> { return 0; }
-  private async calculateResumeScore(quadrants: any, team: NCAATeam): Promise<number> { return 0; }
-  private async calculateBracketologyMetrics(team: NCAATeam, games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculateHistoricalComparison(team: NCAATeam, games: NCAAGame[]): Promise<any> { return {}; }
-  private async calculateOffenseGrade(games: NCAAGame[]): Promise<number> { return 75; }
-  private async calculateDefenseGrade(games: NCAAGame[]): Promise<number> { return 75; }
-  private async calculateCoachingGrade(team: NCAATeam): Promise<number> { return 75; }
-  private async calculateExperienceGrade(teamId: string): Promise<number> { return 75; }
-  private async calculateHealthGrade(teamId: string): Promise<number> { return 75; }
-  private async calculateMomentumGrade(games: NCAAGame[]): Promise<number> { return 75; }
-  private async calculateScheduleGrade(games: NCAAGame[]): Promise<number> { return 75; }
-  private async calculateIntangiblesGrade(team: NCAATeam): Promise<number> { return 75; }
-  private async identifyConcerns(team: NCAATeam, games: NCAAGame[]): Promise<string[]> { return []; }
-  private async identifyStrengths(team: NCAATeam, games: NCAAGame[]): Promise<string[]> { return []; }
-  private async identifyXFactors(team: NCAATeam): Promise<string[]> { return []; }
-  private async findComparableTeams(teamId: string): Promise<string[]> { return []; }
+  private async getPlayerGames(playerId: string, season: number): Promise<any[]> {
+    return [];
+  }
+  private async getTournamentTeams(year: number): Promise<any[]> {
+    return [];
+  }
+  private async calculateStrengthOfSchedule(games: NCAAGame[]): Promise<number> {
+    return 0;
+  }
+  private async calculateResumeScore(quadrants: any, team: NCAATeam): Promise<number> {
+    return 0;
+  }
+  private async calculateBracketologyMetrics(team: NCAATeam, games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculateHistoricalComparison(team: NCAATeam, games: NCAAGame[]): Promise<any> {
+    return {};
+  }
+  private async calculateOffenseGrade(games: NCAAGame[]): Promise<number> {
+    return 75;
+  }
+  private async calculateDefenseGrade(games: NCAAGame[]): Promise<number> {
+    return 75;
+  }
+  private async calculateCoachingGrade(team: NCAATeam): Promise<number> {
+    return 75;
+  }
+  private async calculateExperienceGrade(teamId: string): Promise<number> {
+    return 75;
+  }
+  private async calculateHealthGrade(teamId: string): Promise<number> {
+    return 75;
+  }
+  private async calculateMomentumGrade(games: NCAAGame[]): Promise<number> {
+    return 75;
+  }
+  private async calculateScheduleGrade(games: NCAAGame[]): Promise<number> {
+    return 75;
+  }
+  private async calculateIntangiblesGrade(team: NCAATeam): Promise<number> {
+    return 75;
+  }
+  private async identifyConcerns(team: NCAATeam, games: NCAAGame[]): Promise<string[]> {
+    return [];
+  }
+  private async identifyStrengths(team: NCAATeam, games: NCAAGame[]): Promise<string[]> {
+    return [];
+  }
+  private async identifyXFactors(team: NCAATeam): Promise<string[]> {
+    return [];
+  }
+  private async findComparableTeams(teamId: string): Promise<string[]> {
+    return [];
+  }
 
   /**
    * Public utility methods
    */
-  
+
   async getTeamAnalytics(teamId: string, season: number): Promise<NCAATeamAnalytics | null> {
     try {
       const analyticsDoc = await getDoc(doc(db, 'ncaa_team_analytics', `${teamId}_${season}`));
-      return analyticsDoc.exists() ? analyticsDoc.data() as NCAATeamAnalytics : null;
+      return analyticsDoc.exists() ? (analyticsDoc.data() as NCAATeamAnalytics) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -879,7 +987,7 @@ export class NCAABasketballAnalyticsService {
   async getPlayerAnalytics(playerId: string, season: number): Promise<NCAAPlayerAnalytics | null> {
     try {
       const analyticsDoc = await getDoc(doc(db, 'ncaa_player_analytics', `${playerId}_${season}`));
-      return analyticsDoc.exists() ? analyticsDoc.data() as NCAAPlayerAnalytics : null;
+      return analyticsDoc.exists() ? (analyticsDoc.data() as NCAAPlayerAnalytics) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -889,7 +997,7 @@ export class NCAABasketballAnalyticsService {
   async getMarchMadnessAnalytics(year: number): Promise<MarchMadnessAnalytics | null> {
     try {
       const analyticsDoc = await getDoc(doc(db, 'march_madness_analytics', year.toString()));
-      return analyticsDoc.exists() ? analyticsDoc.data() as MarchMadnessAnalytics : null;
+      return analyticsDoc.exists() ? (analyticsDoc.data() as MarchMadnessAnalytics) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;

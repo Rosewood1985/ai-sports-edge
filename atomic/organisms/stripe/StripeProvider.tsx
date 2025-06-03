@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
+
 import * as stripeService from './stripeService';
 import { getStripe } from '../../atoms/stripe/stripeConfig';
 

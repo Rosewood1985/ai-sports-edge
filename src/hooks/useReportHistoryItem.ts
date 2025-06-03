@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ReportHistory } from '../types/reporting';
+
 import { ReportingService } from '../services/reportingService';
+import { ReportHistory } from '../types/reporting';
 
 interface UseReportHistoryItemResult {
   historyItem: ReportHistory | null;

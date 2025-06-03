@@ -1,8 +1,9 @@
 import React from 'react';
+
 import { ReportTemplate } from '../../../types/reporting';
 import { formatDateTime } from '../../../utils/dateUtils';
-import { Card } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
+import { Card } from '../../ui/Card';
 import { IconButton } from '../../ui/IconButton';
 
 export interface ReportTemplateCardProps {

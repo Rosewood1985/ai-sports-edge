@@ -1,11 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
-import NearbyVenues from '../components/NearbyVenues';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import NearbyVenues from '../components/NearbyVenues';
 
 /**
  * Screen that displays nearby sports venues based on user's location
@@ -16,10 +17,7 @@ const NearbyVenuesScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Nearby Venues</ThemedText>
@@ -29,9 +27,8 @@ const NearbyVenuesScreen: React.FC = () => {
         <ThemedView style={styles.infoCard}>
           <ThemedText style={styles.infoTitle}>Find Sports Venues Near You</ThemedText>
           <ThemedText style={styles.infoText}>
-            Discover stadiums, arenas, and other sports venues in your area.
-            Get information about capacity, home teams, and more.
-            Tap on the map icon to open directions to the venue.
+            Discover stadiums, arenas, and other sports venues in your area. Get information about
+            capacity, home teams, and more. Tap on the map icon to open directions to the venue.
           </ThemedText>
         </ThemedView>
 

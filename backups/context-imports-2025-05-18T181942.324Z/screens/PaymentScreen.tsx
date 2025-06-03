@@ -1,3 +1,6 @@
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,14 +9,12 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
-import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
+
 import { auth } from '../config/firebase';
 import { useI18n } from '../contexts/I18nContext';
+import { SUBSCRIPTION_PLANS, createSubscription } from '../services/firebaseSubscriptionService';
 
 type RootStackParamList = {
   Payment: { planId: string };
@@ -31,13 +32,13 @@ type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Paym
 const PaymentScreen = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [cardComplete, setCardComplete] = useState<boolean>(false);
-  const [selectedPlan, setSelectedPlan] = useState<typeof SUBSCRIPTION_PLANS[0] | null>(null);
-  
+  const [selectedPlan, setSelectedPlan] = useState<(typeof SUBSCRIPTION_PLANS)[0] | null>(null);
+
   const navigation = useNavigation<PaymentScreenNavigationProp>();
   const route = useRoute<PaymentScreenRouteProp>();
   const { createPaymentMethod } = useStripe();
   const { t } = useI18n();
-  
+
   const { planId } = route.params;
 
   useEffect(() => {
@@ -82,16 +83,12 @@ const PaymentScreen = (): JSX.Element => {
       await createSubscription(userId, paymentMethod.id, planId);
 
       // Show success message
-      Alert.alert(
-        t('payment.success.title'),
-        t('payment.success.message'),
-        [
-          {
-            text: t('common.ok'),
-            onPress: () => navigation.navigate('Main'),
-          },
-        ]
-      );
+      Alert.alert(t('payment.success.title'), t('payment.success.message'), [
+        {
+          text: t('common.ok'),
+          onPress: () => navigation.navigate('Main'),
+        },
+      ]);
     } catch (error: any) {
       Alert.alert(t('common.error'), error.message || t('payment.errors.generic'));
     } finally {
@@ -110,9 +107,7 @@ const PaymentScreen = (): JSX.Element => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>{t('payment.title')}</Text>
-      <Text style={styles.subtitle}>
-        {t('payment.subtitle', { planName: selectedPlan.name })}
-      </Text>
+      <Text style={styles.subtitle}>{t('payment.subtitle', { planName: selectedPlan.name })}</Text>
 
       <View style={styles.planSummary}>
         <Text style={styles.planSummaryTitle}>{t('payment.planSummary.title')}</Text>
@@ -123,8 +118,8 @@ const PaymentScreen = (): JSX.Element => {
         <View style={styles.planSummaryRow}>
           <Text style={styles.planSummaryLabel}>{t('payment.planSummary.price')}:</Text>
           <Text style={styles.planSummaryValue}>
-            ${(selectedPlan.amount || selectedPlan.price * 100) / 100}
-            /{t(`payment.interval.${selectedPlan.interval}`)}
+            ${(selectedPlan.amount || selectedPlan.price * 100) / 100}/
+            {t(`payment.interval.${selectedPlan.interval}`)}
           </Text>
         </View>
       </View>
@@ -132,22 +127,19 @@ const PaymentScreen = (): JSX.Element => {
       <View style={styles.cardContainer}>
         <Text style={styles.cardLabel}>{t('payment.cardInformation')}</Text>
         <CardField
-          postalCodeEnabled={true}
+          postalCodeEnabled
           placeholders={{
             number: '4242 4242 4242 4242',
           }}
           style={styles.cardField}
-          onCardChange={(cardDetails) => {
+          onCardChange={cardDetails => {
             setCardComplete(cardDetails.complete);
           }}
         />
       </View>
 
       <TouchableOpacity
-        style={[
-          styles.payButton,
-          (!cardComplete || loading) && styles.payButtonDisabled,
-        ]}
+        style={[styles.payButton, (!cardComplete || loading) && styles.payButtonDisabled]}
         onPress={handlePayment}
         disabled={!cardComplete || loading}
       >
@@ -158,9 +150,7 @@ const PaymentScreen = (): JSX.Element => {
         )}
       </TouchableOpacity>
 
-      <Text style={styles.secureText}>
-        🔒 {t('payment.secureInfo')}
-      </Text>
+      <Text style={styles.secureText}>🔒 {t('payment.secureInfo')}</Text>
 
       <TouchableOpacity
         style={styles.cancelButton}

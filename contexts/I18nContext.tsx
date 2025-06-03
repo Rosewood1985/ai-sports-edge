@@ -1,13 +1,13 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import en from 'atomic/atoms/translations/en.json';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { I18nManager, Platform, NativeModules } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Import translations
+import es from '../translations/es.json';
 
 // Storage key for language preference
 const LANGUAGE_STORAGE_KEY = 'app_language';
-
-// Import translations
-import en from 'atomic/atoms/translations/en.json';
-import es from '../translations/es.json';
 
 // Define supported languages
 export type Language = 'en' | 'es';
@@ -31,17 +31,17 @@ const getDeviceLanguage = (): string => {
       'en'
     );
   }
-  
+
   // Android
   if (Platform.OS === 'android') {
     return NativeModules.I18nManager.localeIdentifier || 'en';
   }
-  
+
   // Web
   if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
     return navigator.language || 'en';
   }
-  
+
   return 'en';
 };
 
@@ -52,13 +52,17 @@ const getDeviceLanguage = (): string => {
  */
 const getLanguageFromLocale = (locale: string): Language => {
   const langCode = locale.split('-')[0].toLowerCase();
-  
+
   // Fix: Add better language detection for Spanish variants
-  if (langCode === 'es' || locale.startsWith('es-') ||
-      locale === 'spa' || locale.includes('spanish')) {
+  if (
+    langCode === 'es' ||
+    locale.startsWith('es-') ||
+    locale === 'spa' ||
+    locale.includes('spanish')
+  ) {
     return 'es';
   }
-  
+
   // Default to English for all other languages
   return 'en';
 };
@@ -81,16 +85,16 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType>({
   language: DEFAULT_LANGUAGE,
   setLanguage: () => {},
-  t: (key) => key,
-  formatNumber: (value) => String(value),
-  formatCurrency: (value) => String(value),
-  formatDate: (date) => date.toISOString(),
+  t: key => key,
+  formatNumber: value => String(value),
+  formatCurrency: value => String(value),
+  formatDate: date => date.toISOString(),
   isRTL: false,
 });
 
 /**
  * I18nProvider component
- * 
+ *
  * This component provides internationalization functionality to the app.
  * It manages the current language and provides translation and formatting functions.
  */
@@ -101,17 +105,17 @@ export const I18nProvider: React.FC<{
   // State for current language
   const [language, setLanguageState] = useState<Language>(initialLanguage || DEFAULT_LANGUAGE);
   const [isRTL, setIsRTL] = useState<boolean>(I18nManager.isRTL);
-  
+
   // Load saved language on startup
   useEffect(() => {
     const loadSavedLanguage = async () => {
       try {
         // Try to load saved language
         const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-        
+
         if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
           setLanguageState(savedLanguage as Language);
-          
+
           // Update RTL status
           const isRTLLanguage = ['ar', 'he', 'ur'].includes(savedLanguage);
           setIsRTL(isRTLLanguage);
@@ -119,9 +123,9 @@ export const I18nProvider: React.FC<{
           // If no saved language and no initial language provided, try to detect device language
           const deviceLocale = getDeviceLanguage();
           const detectedLanguage = getLanguageFromLocale(deviceLocale);
-          
+
           setLanguageState(detectedLanguage);
-          
+
           // Save detected language
           await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, detectedLanguage);
         }
@@ -129,22 +133,22 @@ export const I18nProvider: React.FC<{
         console.error('Error loading saved language:', error);
       }
     };
-    
+
     loadSavedLanguage();
   }, [initialLanguage]);
-  
+
   // Set language and update RTL status
   const setLanguage = async (lang: Language) => {
     if (Object.keys(translations).includes(lang)) {
       setLanguageState(lang);
-      
+
       // Save language preference
       try {
         await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
       } catch (error) {
         console.error('Error saving language preference:', error);
       }
-      
+
       // Update RTL status (not needed for English/Spanish, but included for future languages)
       const isRTLLanguage = ['ar', 'he', 'ur'].includes(lang);
       setIsRTL(isRTLLanguage);
@@ -154,7 +158,7 @@ export const I18nProvider: React.FC<{
       setIsRTL(false);
     }
   };
-  
+
   /**
    * Translate a key with optional parameter interpolation
    */
@@ -162,7 +166,7 @@ export const I18nProvider: React.FC<{
     const keys = key.split('.');
     let translation: any = translations[language];
     let foundTranslation = true;
-    
+
     // Navigate through the nested keys
     for (const k of keys) {
       if (!translation || !translation[k]) {
@@ -171,15 +175,15 @@ export const I18nProvider: React.FC<{
       }
       translation = translation[k];
     }
-    
+
     // If translation not found in current language, try fallback
     if (!foundTranslation) {
       console.warn(`Translation missing for key: ${key} in language: ${language}`);
-      
+
       // Try English as fallback
       let fallbackTranslation: any = translations[DEFAULT_LANGUAGE];
       let foundInFallback = true;
-      
+
       // Navigate through the nested keys in fallback
       for (const fallbackKey of keys) {
         if (!fallbackTranslation || !fallbackTranslation[fallbackKey]) {
@@ -188,7 +192,7 @@ export const I18nProvider: React.FC<{
         }
         fallbackTranslation = fallbackTranslation[fallbackKey];
       }
-      
+
       // Use fallback if found
       if (foundInFallback) {
         translation = fallbackTranslation;
@@ -197,10 +201,10 @@ export const I18nProvider: React.FC<{
         return key;
       }
     }
-    
+
     // Return the key if translation not found
     if (!translation) return key;
-    
+
     // Replace parameters if provided
     if (params) {
       return Object.entries(params).reduce(
@@ -209,10 +213,10 @@ export const I18nProvider: React.FC<{
         translation
       );
     }
-    
+
     return translation;
   };
-  
+
   /**
    * Format a number according to the current locale
    */
@@ -220,17 +224,17 @@ export const I18nProvider: React.FC<{
     const locale = language === 'en' ? 'en-US' : 'es-ES';
     return new Intl.NumberFormat(locale, options).format(value);
   };
-  
+
   /**
    * Format a currency according to the current locale
    */
   const formatCurrency = (value: number, currencyCode = 'USD'): string => {
     return formatNumber(value, {
       style: 'currency',
-      currency: currencyCode
+      currency: currencyCode,
     });
   };
-  
+
   /**
    * Format a date according to the current locale
    */
@@ -238,7 +242,7 @@ export const I18nProvider: React.FC<{
     const locale = language === 'en' ? 'en-US' : 'es-ES';
     return new Intl.DateTimeFormat(locale, options).format(date);
   };
-  
+
   return (
     <I18nContext.Provider
       value={{

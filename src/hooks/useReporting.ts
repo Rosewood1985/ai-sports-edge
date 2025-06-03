@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
+
+import { AdminDashboardService } from '../services/adminDashboardService';
 import { ExportConfig, ExportFormat, ExportHistory, ExportResult } from '../types/export';
 import { ReportTemplate } from '../types/reporting';
-import { AdminDashboardService } from '../services/adminDashboardService';
 
 /**
  * Hook for accessing export formats
@@ -164,9 +165,7 @@ export function useReportTemplates() {
     setError(null);
     try {
       const updatedTemplate = await AdminDashboardService.updateReportTemplate(template);
-      setTemplates(prev => prev.map(t => 
-        t.id === template.id ? updatedTemplate : t
-      ));
+      setTemplates(prev => prev.map(t => (t.id === template.id ? updatedTemplate : t)));
       return updatedTemplate;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to update report template'));

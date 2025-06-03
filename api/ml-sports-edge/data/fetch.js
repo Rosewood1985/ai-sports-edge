@@ -20,8 +20,8 @@ const API_CONFIG = {
       NHL: 'icehockey_nhl',
       NCAA_MENS: 'basketball_ncaa',
       NCAA_WOMENS: 'basketball_ncaaw',
-      FORMULA1: 'motorsport_f1'
-    }
+      FORMULA1: 'motorsport_f1',
+    },
   },
   ESPN_API: {
     BASE_URL: 'https://site.api.espn.com/apis/site/v2/sports',
@@ -32,8 +32,8 @@ const API_CONFIG = {
       NHL: 'hockey/nhl/scoreboard',
       NCAA_MENS: 'basketball/mens-college-basketball/scoreboard',
       NCAA_WOMENS: 'basketball/womens-college-basketball/scoreboard',
-      FORMULA1: 'racing/f1/scoreboard'
-    }
+      FORMULA1: 'racing/f1/scoreboard',
+    },
   },
   NHL_API: {
     BASE_URL: 'https://api-web.nhl.com',
@@ -43,9 +43,9 @@ const API_CONFIG = {
       TEAMS: '/api/v1/teams',
       STANDINGS: '/api/v1/standings',
       PLAYER_STATS: '/api/v1/people',
-      GAME_STATS: '/api/v1/game'
-    }
-  }
+      GAME_STATS: '/api/v1/game',
+    },
+  },
 };
 
 // Data directory
@@ -74,23 +74,20 @@ async function fetchOddsData(sport) {
       apiKey: API_CONFIG.ODDS_API.API_KEY,
       regions: 'us',
       markets: 'h2h,spreads,totals',
-      oddsFormat: 'american'
+      oddsFormat: 'american',
     };
 
     console.log(`Fetching odds data for ${sport}...`);
     const response = await axios.get(url, { params });
-    
+
     if (response.status !== 200) {
       throw new Error(`Odds API returned ${response.status}: ${response.statusText}`);
     }
-    
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_odds_${new Date().toISOString().split('T')[0]}.json`;
-    fs.writeFileSync(
-      path.join(DATA_DIR, filename),
-      JSON.stringify(response.data, null, 2)
-    );
-    
+    fs.writeFileSync(path.join(DATA_DIR, filename), JSON.stringify(response.data, null, 2));
+
     console.log(`Saved odds data for ${sport} to ${filename}`);
     return response.data;
   } catch (error) {
@@ -113,21 +110,18 @@ async function fetchESPNData(sport) {
     }
 
     const url = `${API_CONFIG.ESPN_API.BASE_URL}/${endpoint}`;
-    
+
     console.log(`Fetching ESPN data for ${sport}...`);
     const response = await axios.get(url);
-    
+
     if (response.status !== 200) {
       throw new Error(`ESPN API returned ${response.status}: ${response.statusText}`);
     }
-    
+
     // Save data to file
     const filename = `${sport.toLowerCase()}_espn_${new Date().toISOString().split('T')[0]}.json`;
-    fs.writeFileSync(
-      path.join(DATA_DIR, filename),
-      JSON.stringify(response.data, null, 2)
-    );
-    
+    fs.writeFileSync(path.join(DATA_DIR, filename), JSON.stringify(response.data, null, 2));
+
     console.log(`Saved ESPN data for ${sport} to ${filename}`);
     return response.data;
   } catch (error) {
@@ -144,21 +138,18 @@ async function fetchESPNData(sport) {
 async function fetchNHLStats(date = new Date().toISOString().split('T')[0]) {
   try {
     const url = `${API_CONFIG.NHL_API.BASE_URL}${API_CONFIG.NHL_API.ENDPOINTS.SCHEDULE}?date=${date}&expand=schedule.linescore`;
-    
+
     console.log(`Fetching NHL schedule for ${date}...`);
     const response = await axios.get(url);
-    
+
     if (response.status !== 200) {
       throw new Error(`NHL API returned ${response.status}: ${response.statusText}`);
     }
-    
+
     // Save data to file
     const filename = `nhl_stats_${date}.json`;
-    fs.writeFileSync(
-      path.join(DATA_DIR, filename),
-      JSON.stringify(response.data, null, 2)
-    );
-    
+    fs.writeFileSync(path.join(DATA_DIR, filename), JSON.stringify(response.data, null, 2));
+
     console.log(`Saved NHL stats to ${filename}`);
     return response.data;
   } catch (error) {
@@ -178,9 +169,9 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
   // This is a placeholder function
   // In a real implementation, this would fetch historical results
   // from a sports data provider API
-  
+
   console.log(`Fetching historical results for ${sport} from ${startDate} to ${endDate}...`);
-  
+
   // Mock data for demonstration
   const mockData = {
     sport,
@@ -197,8 +188,8 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
           spread: -3.5,
           overUnder: 224.5,
           homeMoneyline: -150,
-          awayMoneyline: +130
-        }
+          awayMoneyline: +130,
+        },
       },
       {
         date: '2025-03-16',
@@ -210,19 +201,16 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
           spread: -2.5,
           overUnder: 235.5,
           homeMoneyline: -130,
-          awayMoneyline: +110
-        }
-      }
-    ]
+          awayMoneyline: +110,
+        },
+      },
+    ],
   };
-  
+
   // Save mock data to file
   const filename = `${sport.toLowerCase()}_historical_${startDate}_to_${endDate}.json`;
-  fs.writeFileSync(
-    path.join(DATA_DIR, filename),
-    JSON.stringify(mockData, null, 2)
-  );
-  
+  fs.writeFileSync(path.join(DATA_DIR, filename), JSON.stringify(mockData, null, 2));
+
   console.log(`Saved historical results to ${filename}`);
   return mockData;
 }
@@ -233,32 +221,28 @@ async function fetchHistoricalResults(sport, startDate, endDate) {
  */
 async function fetchAllDataForSport(sport) {
   console.log(`Fetching all data for ${sport}...`);
-  
+
   // Fetch current odds
   const oddsData = await fetchOddsData(sport);
-  
+
   // Fetch ESPN data
   const espnData = await fetchESPNData(sport);
-  
+
   // Fetch NHL-specific data if applicable
   if (sport === 'NHL') {
     const nhlData = await fetchNHLStats();
   }
-  
+
   // Fetch historical data (last 30 days)
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(today.getDate() - 30);
-  
+
   const startDate = thirtyDaysAgo.toISOString().split('T')[0];
   const endDate = today.toISOString().split('T')[0];
-  
-  const historicalData = await fetchHistoricalResults(
-    sport,
-    startDate,
-    endDate
-  );
-  
+
+  const historicalData = await fetchHistoricalResults(sport, startDate, endDate);
+
   console.log(`Completed data fetch for ${sport}`);
 }
 
@@ -267,15 +251,15 @@ async function fetchAllDataForSport(sport) {
  */
 async function fetchAllSportsData() {
   console.log('Starting data fetch process...');
-  
+
   // List of sports to fetch data for
   const sports = ['NBA', 'WNBA', 'MLB', 'NHL', 'NCAA_MENS', 'NCAA_WOMENS', 'FORMULA1'];
-  
+
   // Fetch data for each sport
   for (const sport of sports) {
     await fetchAllDataForSport(sport);
   }
-  
+
   console.log('Data fetch process completed');
 }
 
@@ -297,5 +281,5 @@ module.exports = {
   fetchNHLStats,
   fetchHistoricalResults,
   fetchAllDataForSport,
-  fetchAllSportsData
+  fetchAllSportsData,
 };

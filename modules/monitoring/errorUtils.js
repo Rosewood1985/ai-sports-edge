@@ -1,6 +1,6 @@
 /**
  * Error Utilities
- * 
+ *
  * Provides utility functions for error handling and tracking.
  */
 
@@ -24,7 +24,7 @@ export const safeErrorCapture = (error, context) => {
     if (process.env.NODE_ENV === 'development' || __DEV__) {
       console.error('Error captured:', error, context);
     }
-    
+
     // In a production app, this would send the error to a tracking service
     // This is implemented in errorTracking.js
   } catch (captureError) {
@@ -38,9 +38,9 @@ export const safeErrorCapture = (error, context) => {
  * @param {Error} error - Error to format
  * @returns {Object} Formatted error
  */
-export const formatError = (error) => {
+export const formatError = error => {
   if (!error) return null;
-  
+
   return {
     name: error.name,
     message: error.message,

@@ -36,7 +36,8 @@ export function LineChart({
   const countRange = maxCount - minCount;
 
   // Handle case where all values are the same or range is 0
-  const paddedMin = countRange > 0 ? Math.max(0, minCount - countRange * 0.1) : Math.max(0, minCount - 1);
+  const paddedMin =
+    countRange > 0 ? Math.max(0, minCount - countRange * 0.1) : Math.max(0, minCount - 1);
   const paddedMax = countRange > 0 ? maxCount + countRange * 0.1 : maxCount + 1;
   const paddedRange = paddedMax - paddedMin;
 

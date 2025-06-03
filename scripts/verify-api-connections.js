@@ -17,11 +17,12 @@
  *   --help                Show help
  */
 
+const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
-const dotenv = require('dotenv');
-const { apiKeys } = require('../utils/apiKeys');
+
 const { securityManager } = require('../atomic/organisms/security');
+const { apiKeys } = require('../utils/apiKeys');
 
 // Parse command line arguments
 const args = process.argv.slice(2);

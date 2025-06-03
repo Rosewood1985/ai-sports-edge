@@ -1,5 +1,6 @@
 import React from 'react';
 import { Platform, View } from 'react-native';
+
 import { useI18n } from '../atomic/organisms/i18n/I18nContext';
 import { seoConfig, Language } from '../config/seo';
 import {

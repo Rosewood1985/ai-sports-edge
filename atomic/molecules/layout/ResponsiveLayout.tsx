@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ViewStyle, Dimensions } from 'react-native';
+
 import { useUITheme } from '../../providers/UIThemeProvider';
 
 interface ResponsiveBreakpoints {
@@ -33,7 +34,7 @@ export const Container: React.FC<ContainerProps> = ({
 }) => {
   const { theme } = useUITheme();
   const { width } = Dimensions.get('window');
-  
+
   const getMaxWidth = () => {
     if (fluid) return '100%';
     if (typeof maxWidth === 'number') return maxWidth;
@@ -55,7 +56,13 @@ interface RowProps {
   children: React.ReactNode;
   style?: ViewStyle;
   wrap?: boolean;
-  justify?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
+  justify?:
+    | 'flex-start'
+    | 'center'
+    | 'flex-end'
+    | 'space-between'
+    | 'space-around'
+    | 'space-evenly';
   align?: 'flex-start' | 'center' | 'flex-end' | 'stretch';
 }
 
@@ -67,7 +74,7 @@ export const Row: React.FC<RowProps> = ({
   align = 'stretch',
 }) => {
   const { theme } = useUITheme();
-  
+
   const rowStyle: ViewStyle = {
     flexDirection: 'row',
     flexWrap: wrap ? 'wrap' : 'nowrap',
@@ -90,26 +97,18 @@ interface ColumnProps {
   style?: ViewStyle;
 }
 
-export const Column: React.FC<ColumnProps> = ({
-  children,
-  xs = 12,
-  sm,
-  md,
-  lg,
-  xl,
-  style,
-}) => {
+export const Column: React.FC<ColumnProps> = ({ children, xs = 12, sm, md, lg, xl, style }) => {
   const { theme } = useUITheme();
   const { width } = Dimensions.get('window');
-  
+
   const getColumnWidth = () => {
     let cols = xs;
-    
+
     if (xl && width >= DEFAULT_BREAKPOINTS.xl) cols = xl;
     else if (lg && width >= DEFAULT_BREAKPOINTS.lg) cols = lg;
     else if (md && width >= DEFAULT_BREAKPOINTS.md) cols = md;
     else if (sm && width >= DEFAULT_BREAKPOINTS.sm) cols = sm;
-    
+
     return `${(cols / 12) * 100}%`;
   };
 
@@ -129,14 +128,9 @@ interface GridProps {
   style?: ViewStyle;
 }
 
-export const Grid: React.FC<GridProps> = ({
-  children,
-  spacing = 'sm',
-  columns = 2,
-  style,
-}) => {
+export const Grid: React.FC<GridProps> = ({ children, spacing = 'sm', columns = 2, style }) => {
   const { theme } = useUITheme();
-  
+
   const gridStyle: ViewStyle = {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -175,7 +169,7 @@ export const Section: React.FC<SectionProps> = ({
   style,
 }) => {
   const { theme } = useUITheme();
-  
+
   const getBackgroundColor = () => {
     switch (background) {
       case 'primary':
@@ -202,7 +196,7 @@ export const Section: React.FC<SectionProps> = ({
 // Export responsive hooks for custom components
 export const useResponsive = () => {
   const { width } = Dimensions.get('window');
-  
+
   return {
     isXs: width < DEFAULT_BREAKPOINTS.sm,
     isSm: width >= DEFAULT_BREAKPOINTS.sm && width < DEFAULT_BREAKPOINTS.md,

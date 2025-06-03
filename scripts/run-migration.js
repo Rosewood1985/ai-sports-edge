@@ -2,17 +2,17 @@
 
 /**
  * Database Migration Runner
- * 
+ *
  * This script runs SQL migration files against the database.
- * 
+ *
  * Usage:
  *   node run-migration.js path/to/migration.sql
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
-const { execSync } = require('child_process');
 
 // Load database configuration
 const configPath = path.join(process.cwd(), 'config', 'database.json');
@@ -59,19 +59,19 @@ const pool = new Pool({
 // Run migration
 async function runMigration() {
   const client = await pool.connect();
-  
+
   try {
     console.log(`Running migration: ${migrationPath}`);
-    
+
     // Start transaction
     await client.query('BEGIN');
-    
+
     // Run migration
     await client.query(migration);
-    
+
     // Commit transaction
     await client.query('COMMIT');
-    
+
     console.log('Migration completed successfully');
   } catch (error) {
     // Rollback transaction on error
@@ -81,7 +81,7 @@ async function runMigration() {
   } finally {
     // Release client
     client.release();
-    
+
     // Close pool
     await pool.end();
   }
@@ -91,13 +91,13 @@ async function runMigration() {
 function runMigrationWithPsql() {
   try {
     console.log(`Running migration with psql: ${migrationPath}`);
-    
+
     // Build psql command
     const command = `PGPASSWORD=${dbConfig.password} psql -h ${dbConfig.host} -p ${dbConfig.port} -d ${dbConfig.database} -U ${dbConfig.user} -f ${migrationPath}`;
-    
+
     // Execute command
     execSync(command, { stdio: 'inherit' });
-    
+
     console.log('Migration completed successfully');
   } catch (error) {
     console.error('Migration failed:', error.message);

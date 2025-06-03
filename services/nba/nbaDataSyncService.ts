@@ -3,9 +3,19 @@
 // Comprehensive NBA Data Integration with Real-Time Updates
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc, writeBatch, query, where, getDocs } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  writeBatch,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
+
+import { firestore as db } from '../../config/firebase';
 import { getWeatherApiKey, getApiKey } from '../../utils/apiKeys';
 
 // NBA-specific interfaces
@@ -222,7 +232,7 @@ export class NBADataSyncService {
 
       // Validate API access
       await this.validateApiAccess();
-      
+
       console.log('NBA Data Sync Service initialized successfully');
     } catch (error) {
       Sentry.captureException(error);
@@ -266,16 +276,16 @@ export class NBADataSyncService {
       // Phase 1: Core data sync
       await this.syncTeams();
       await this.syncPlayers();
-      
-      // Phase 2: Game data sync  
+
+      // Phase 2: Game data sync
       await this.syncCurrentSeasonGames();
       await this.syncRecentGames();
-      
+
       // Phase 3: Enhanced data sync
       await this.syncInjuryReports();
       await this.syncCoachingStaff();
       await this.syncArenaInformation();
-      
+
       // Phase 4: Analytics data
       await this.syncAdvancedStats();
       await this.syncTeamRankings();
@@ -305,7 +315,7 @@ export class NBADataSyncService {
       });
 
       const teamsData = await this.makeApiCall(`${this.espnBaseUrl}/teams`);
-      
+
       if (!teamsData || !teamsData.sports || !teamsData.sports[0].leagues) {
         throw new Error('Invalid teams data structure from ESPN API');
       }
@@ -317,11 +327,11 @@ export class NBADataSyncService {
       for (const teamData of teams) {
         try {
           const team = teamData.team;
-          
+
           // Get detailed team information
           const detailedTeamData = await this.makeApiCall(`${this.espnBaseUrl}/teams/${team.id}`);
           const roster = await this.makeApiCall(`${this.espnBaseUrl}/teams/${team.id}/roster`);
-          
+
           const nbaTeam: NBATeam = {
             id: team.id,
             name: team.displayName,
@@ -356,7 +366,6 @@ export class NBADataSyncService {
 
           // Rate limiting
           await this.enforceRateLimit();
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing team ${teamData.team?.displayName}:`, error.message);
@@ -366,7 +375,6 @@ export class NBADataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NBA teams`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NBA teams: ${error.message}`);
@@ -392,19 +400,19 @@ export class NBADataSyncService {
       for (const teamDoc of teamsSnapshot.docs) {
         try {
           const teamId = teamDoc.id;
-          
+
           // Get roster data
           const rosterData = await this.makeApiCall(`${this.espnBaseUrl}/teams/${teamId}/roster`);
-          
+
           if (rosterData?.athletes) {
             for (const athleteData of rosterData.athletes) {
               try {
                 const player = athleteData.athlete;
-                
+
                 // Get detailed player stats
                 const playerStats = await this.getPlayerStats(player.id);
                 const advancedStats = await this.getAdvancedPlayerStats(player.id);
-                
+
                 const nbaPlayer: NBAPlayer = {
                   id: player.id,
                   name: player.displayName,
@@ -430,15 +438,16 @@ export class NBADataSyncService {
 
                 // Rate limiting
                 await this.enforceRateLimit();
-
               } catch (error) {
                 Sentry.captureException(error);
-                console.error(`Error syncing player ${athleteData.athlete?.displayName}:`, error.message);
+                console.error(
+                  `Error syncing player ${athleteData.athlete?.displayName}:`,
+                  error.message
+                );
                 continue;
               }
             }
           }
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing roster for team ${teamId}:`, error.message);
@@ -448,7 +457,6 @@ export class NBADataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NBA players`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NBA players: ${error.message}`);
@@ -468,7 +476,7 @@ export class NBADataSyncService {
 
       const currentSeason = new Date().getFullYear();
       const scoreboardData = await this.makeApiCall(`${this.espnBaseUrl}/scoreboard`);
-      
+
       if (!scoreboardData?.events) {
         throw new Error('Invalid scoreboard data from ESPN API');
       }
@@ -481,8 +489,10 @@ export class NBADataSyncService {
           const game: NBAGame = {
             id: event.id,
             date: new Date(event.date),
-            homeTeam: event.competitions[0].competitors.find(c => c.homeAway === 'home')?.team?.id || '',
-            awayTeam: event.competitions[0].competitors.find(c => c.homeAway === 'away')?.team?.id || '',
+            homeTeam:
+              event.competitions[0].competitors.find(c => c.homeAway === 'home')?.team?.id || '',
+            awayTeam:
+              event.competitions[0].competitors.find(c => c.homeAway === 'away')?.team?.id || '',
             season: currentSeason,
             seasonType: this.determineSeasonType(event.date),
             gameNumber: event.week || 1,
@@ -490,13 +500,25 @@ export class NBADataSyncService {
             arena: event.competitions[0].venue?.fullName || 'Unknown Arena',
             attendance: event.competitions[0].attendance,
             officials: event.competitions[0].officials?.map(o => o.displayName) || [],
-            scores: event.competitions[0].competitors[0].score ? {
-              home: parseInt(event.competitions[0].competitors.find(c => c.homeAway === 'home')?.score || '0'),
-              away: parseInt(event.competitions[0].competitors.find(c => c.homeAway === 'away')?.score || '0'),
-              quarters: await this.getQuarterScores(event.id),
-            } : undefined,
-            boxScore: event.status.type.name === 'STATUS_FINAL' ? await this.getBoxScore(event.id) : undefined,
-            gameFlow: event.status.type.name === 'STATUS_FINAL' ? await this.getGameFlow(event.id) : undefined,
+            scores: event.competitions[0].competitors[0].score
+              ? {
+                  home: parseInt(
+                    event.competitions[0].competitors.find(c => c.homeAway === 'home')?.score || '0'
+                  ),
+                  away: parseInt(
+                    event.competitions[0].competitors.find(c => c.homeAway === 'away')?.score || '0'
+                  ),
+                  quarters: await this.getQuarterScores(event.id),
+                }
+              : undefined,
+            boxScore:
+              event.status.type.name === 'STATUS_FINAL'
+                ? await this.getBoxScore(event.id)
+                : undefined,
+            gameFlow:
+              event.status.type.name === 'STATUS_FINAL'
+                ? await this.getGameFlow(event.id)
+                : undefined,
             weather: await this.getGameWeather(event.competitions[0].venue),
             broadcast: {
               tv: event.competitions[0].broadcasts?.map(b => b.names?.join(', ')) || [],
@@ -511,7 +533,6 @@ export class NBADataSyncService {
 
           // Rate limiting
           await this.enforceRateLimit();
-
         } catch (error) {
           Sentry.captureException(error);
           console.error(`Error syncing game ${event.id}:`, error.message);
@@ -521,7 +542,6 @@ export class NBADataSyncService {
 
       await batch.commit();
       console.log(`Successfully synced ${syncedCount} NBA games`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync NBA games: ${error.message}`);
@@ -535,17 +555,16 @@ export class NBADataSyncService {
     try {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      
+
       // Get recent completed games for analysis
       const gamesQuery = query(
         collection(db, 'nba_games'),
         where('date', '>=', oneWeekAgo),
         where('status', '==', 'completed')
       );
-      
+
       const gamesSnapshot = await getDocs(gamesQuery);
       console.log(`Found ${gamesSnapshot.size} recent NBA games for analysis`);
-      
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to sync recent NBA games: ${error.message}`);
@@ -555,23 +574,41 @@ export class NBADataSyncService {
   /**
    * Helper methods for data processing
    */
-  
+
   private determineConference(teamId: string): 'Eastern' | 'Western' {
     // Eastern Conference team IDs (ESPN IDs)
-    const easternTeams = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+    const easternTeams = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+      '11',
+      '12',
+      '13',
+      '14',
+      '15',
+    ];
     return easternTeams.includes(teamId) ? 'Eastern' : 'Western';
   }
 
-  private determineDivision(teamId: string): 'Atlantic' | 'Central' | 'Southeast' | 'Northwest' | 'Pacific' | 'Southwest' {
+  private determineDivision(
+    teamId: string
+  ): 'Atlantic' | 'Central' | 'Southeast' | 'Northwest' | 'Pacific' | 'Southwest' {
     const divisions = {
-      'Atlantic': ['1', '2', '3', '4', '5'], // Celtics, Nets, Knicks, 76ers, Raptors
-      'Central': ['6', '7', '8', '9', '10'], // Bulls, Cavaliers, Pistons, Pacers, Bucks
-      'Southeast': ['11', '12', '13', '14', '15'], // Hawks, Hornets, Heat, Magic, Wizards
-      'Northwest': ['16', '17', '18', '19', '20'], // Nuggets, Timberwolves, Thunder, Blazers, Jazz
-      'Pacific': ['21', '22', '23', '24', '25'], // Warriors, Clippers, Lakers, Suns, Kings
-      'Southwest': ['26', '27', '28', '29', '30'], // Mavericks, Rockets, Grizzlies, Pelicans, Spurs
+      Atlantic: ['1', '2', '3', '4', '5'], // Celtics, Nets, Knicks, 76ers, Raptors
+      Central: ['6', '7', '8', '9', '10'], // Bulls, Cavaliers, Pistons, Pacers, Bucks
+      Southeast: ['11', '12', '13', '14', '15'], // Hawks, Hornets, Heat, Magic, Wizards
+      Northwest: ['16', '17', '18', '19', '20'], // Nuggets, Timberwolves, Thunder, Blazers, Jazz
+      Pacific: ['21', '22', '23', '24', '25'], // Warriors, Clippers, Lakers, Suns, Kings
+      Southwest: ['26', '27', '28', '29', '30'], // Mavericks, Rockets, Grizzlies, Pelicans, Spurs
     };
-    
+
     for (const [division, teams] of Object.entries(divisions)) {
       if (teams.includes(teamId)) {
         return division as any;
@@ -583,7 +620,7 @@ export class NBADataSyncService {
   private determineSeasonType(dateString: string): 'Pre-Season' | 'Regular Season' | 'Playoffs' {
     const date = new Date(dateString);
     const month = date.getMonth() + 1; // 1-12
-    
+
     if (month >= 10 || month <= 4) {
       return 'Regular Season';
     } else if (month >= 5 && month <= 6) {
@@ -593,7 +630,9 @@ export class NBADataSyncService {
     }
   }
 
-  private mapGameStatus(status: string): 'scheduled' | 'in-progress' | 'completed' | 'postponed' | 'cancelled' {
+  private mapGameStatus(
+    status: string
+  ): 'scheduled' | 'in-progress' | 'completed' | 'postponed' | 'cancelled' {
     switch (status) {
       case 'STATUS_SCHEDULED':
         return 'scheduled';
@@ -616,11 +655,11 @@ export class NBADataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay - timeSinceLastRequest));
     }
-    
+
     this.lastRequestTime = Date.now();
     this.requestCount++;
   }
@@ -628,11 +667,11 @@ export class NBADataSyncService {
   private async makeApiCall(url: string, retryCount = 0): Promise<any> {
     try {
       await this.enforceRateLimit();
-      
+
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
@@ -647,7 +686,7 @@ export class NBADataSyncService {
         await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
         return this.makeApiCall(url, retryCount + 1);
       }
-      
+
       Sentry.captureException(error);
       throw error;
     }
@@ -664,7 +703,9 @@ export class NBADataSyncService {
 
   private async getCurrentSeasonRecord(teamId: string): Promise<any> {
     return {
-      wins: 0, losses: 0, winPercentage: 0,
+      wins: 0,
+      losses: 0,
+      winPercentage: 0,
       streak: { type: 'W' as const, count: 0 },
       homeRecord: { wins: 0, losses: 0 },
       awayRecord: { wins: 0, losses: 0 },
@@ -675,17 +716,33 @@ export class NBADataSyncService {
 
   private async getPlayerStats(playerId: string): Promise<any> {
     return {
-      games: 0, minutes: 0, points: 0, rebounds: 0, assists: 0,
-      steals: 0, blocks: 0, turnovers: 0, fieldGoalPercentage: 0,
-      threePointPercentage: 0, freeThrowPercentage: 0, playerEfficiencyRating: 0,
+      games: 0,
+      minutes: 0,
+      points: 0,
+      rebounds: 0,
+      assists: 0,
+      steals: 0,
+      blocks: 0,
+      turnovers: 0,
+      fieldGoalPercentage: 0,
+      threePointPercentage: 0,
+      freeThrowPercentage: 0,
+      playerEfficiencyRating: 0,
     };
   }
 
   private async getAdvancedPlayerStats(playerId: string): Promise<any> {
     return {
-      usageRate: 0, trueShootingPercentage: 0, reboundRate: 0, assistRate: 0,
-      blockRate: 0, stealRate: 0, turnoverRate: 0, winShares: 0,
-      boxPlusMinus: 0, valueOverReplacementPlayer: 0,
+      usageRate: 0,
+      trueShootingPercentage: 0,
+      reboundRate: 0,
+      assistRate: 0,
+      blockRate: 0,
+      stealRate: 0,
+      turnoverRate: 0,
+      winShares: 0,
+      boxPlusMinus: 0,
+      valueOverReplacementPlayer: 0,
     };
   }
 
@@ -737,7 +794,7 @@ export class NBADataSyncService {
   /**
    * Public utility methods
    */
-  
+
   async getAllActiveTeams(): Promise<NBATeam[]> {
     try {
       const teamsSnapshot = await getDocs(collection(db, 'nba_teams'));
@@ -751,7 +808,7 @@ export class NBADataSyncService {
   async getTeamById(teamId: string): Promise<NBATeam | null> {
     try {
       const teamDoc = await getDoc(doc(db, 'nba_teams', teamId));
-      return teamDoc.exists() ? teamDoc.data() as NBATeam : null;
+      return teamDoc.exists() ? (teamDoc.data() as NBATeam) : null;
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get NBA team ${teamId}: ${error.message}`);
@@ -803,11 +860,8 @@ export class NBADataSyncService {
   async getTeamUpcomingGames(teamId: string, count: number = 5): Promise<NBAGame[]> {
     try {
       const now = new Date();
-      
-      const gamesQuery = query(
-        collection(db, 'nba_games'),
-        where('date', '>=', now)
-      );
+
+      const gamesQuery = query(collection(db, 'nba_games'), where('date', '>=', now));
 
       const gamesSnapshot = await getDocs(gamesQuery);
       const teamGames = gamesSnapshot.docs

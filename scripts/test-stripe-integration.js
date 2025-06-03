@@ -6,8 +6,8 @@
 // Price IDs from Stripe configuration
 const PRICE_IDS = {
   INSIGHT: 'price_1RTpnOBpGzv2zgRcutbfCICB',
-  ANALYST: 'price_1RTpnpBpGzv2zgRccFtbSsgl', 
-  EDGE_COLLECTIVE: 'price_1RTpomBpGzv2zgRc72MCfG7F'
+  ANALYST: 'price_1RTpnpBpGzv2zgRccFtbSsgl',
+  EDGE_COLLECTIVE: 'price_1RTpomBpGzv2zgRc72MCfG7F',
 };
 
 async function testStripeIntegration() {
@@ -21,14 +21,15 @@ async function testStripeIntegration() {
 
   // Test 2: Webhook Endpoint
   console.log('🔗 Testing Webhook Endpoint:');
-  const webhookUrl = 'https://us-central1-ai-sports-edge.cloudfunctions.net/ext-firestore-stripe-payments-handleWebhookEvents';
-  
+  const webhookUrl =
+    'https://us-central1-ai-sports-edge.cloudfunctions.net/ext-firestore-stripe-payments-handleWebhookEvents';
+
   try {
     const response = await fetch(webhookUrl, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-    
+
     if (response.status === 405) {
       console.log('✓ Webhook endpoint is active (405 Method Not Allowed is expected for GET)');
     } else {
@@ -43,7 +44,7 @@ async function testStripeIntegration() {
   console.log('✅ Webhook secret added');
   console.log('✅ Functions ready for deployment');
   console.log('✅ Extension configuration complete');
-  
+
   console.log('\n🚀 Ready for production deployment!');
   console.log('\nRun deployment with:');
   console.log('  ./scripts/deploy-stripe-system.sh');

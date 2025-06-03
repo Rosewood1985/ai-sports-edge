@@ -97,16 +97,18 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
 }));
 
 // Setup global variables for testing
-global.fetch = jest.fn(() => Promise.resolve({
-  json: () => Promise.resolve({}),
-  text: () => Promise.resolve(''),
-  ok: true,
-  status: 200,
-  headers: {
-    get: jest.fn(),
-    forEach: jest.fn(),
-  },
-}));
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+    ok: true,
+    status: 200,
+    headers: {
+      get: jest.fn(),
+      forEach: jest.fn(),
+    },
+  })
+);
 
 // Mock console methods to avoid cluttering test output
 global.console = {

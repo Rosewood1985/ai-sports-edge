@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Spinner, Badge, Tabs, Tab } from 'react-bootstrap';
-import { 
-  fetchF1RaceWinnerOdds, 
-  fetchF1DriverChampionshipOdds, 
+
+import {
+  fetchF1RaceWinnerOdds,
+  fetchF1DriverChampionshipOdds,
   fetchF1ConstructorChampionshipOdds,
-  generateFanDuelDeepLink 
+  generateFanDuelDeepLink,
 } from '../../public/sports-api-v5';
 
 /**
@@ -16,11 +17,11 @@ import {
  * @param {Function} props.onBetClick - Callback for bet button click
  * @returns {JSX.Element} Formula1OddsCard component
  */
-const Formula1OddsCard = ({ 
-  raceId, 
-  oddsType = 'race-winner', 
-  showBetButton = true, 
-  onBetClick 
+const Formula1OddsCard = ({
+  raceId,
+  oddsType = 'race-winner',
+  showBetButton = true,
+  onBetClick,
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,7 +34,7 @@ const Formula1OddsCard = ({
     const fetchOddsData = async () => {
       try {
         setLoading(true);
-        
+
         let oddsData;
         switch (activeOddsType) {
           case 'driver-championship':
@@ -57,16 +58,16 @@ const Formula1OddsCard = ({
             }
             break;
         }
-        
+
         setOdds(oddsData);
-        
+
         // If there's only one race, select it
         if (oddsData.length === 1) {
           setSelectedRace(oddsData[0]);
         } else {
           setSelectedRace(null);
         }
-        
+
         setError(null);
       } catch (err) {
         console.error(`Error fetching Formula 1 ${activeOddsType} odds:`, err);
@@ -75,17 +76,17 @@ const Formula1OddsCard = ({
         setLoading(false);
       }
     };
-    
+
     fetchOddsData();
   }, [raceId, activeOddsType]);
 
   // Handle odds type change
-  const handleOddsTypeChange = (type) => {
+  const handleOddsTypeChange = type => {
     setActiveOddsType(type);
   };
 
   // Handle race selection
-  const handleRaceSelect = (race) => {
+  const handleRaceSelect = race => {
     setSelectedRace(race);
   };
 
@@ -101,7 +102,7 @@ const Formula1OddsCard = ({
         betType: activeOddsType,
         team: driver,
       });
-      
+
       // Open FanDuel in a new tab
       window.open(deepLink, '_blank', 'noopener,noreferrer');
     }
@@ -127,11 +128,7 @@ const Formula1OddsCard = ({
         <Card.Header>
           <h5>{getTitle()}</h5>
           {!raceId && (
-            <Tabs
-              activeKey={activeOddsType}
-              onSelect={handleOddsTypeChange}
-              className="mb-3"
-            >
+            <Tabs activeKey={activeOddsType} onSelect={handleOddsTypeChange} className="mb-3">
               <Tab eventKey="race-winner" title="Race Winner" />
               <Tab eventKey="driver-championship" title="Driver Championship" />
               <Tab eventKey="constructor-championship" title="Constructor Championship" />
@@ -155,11 +152,7 @@ const Formula1OddsCard = ({
         <Card.Header>
           <h5>{getTitle()}</h5>
           {!raceId && (
-            <Tabs
-              activeKey={activeOddsType}
-              onSelect={handleOddsTypeChange}
-              className="mb-3"
-            >
+            <Tabs activeKey={activeOddsType} onSelect={handleOddsTypeChange} className="mb-3">
               <Tab eventKey="race-winner" title="Race Winner" />
               <Tab eventKey="driver-championship" title="Driver Championship" />
               <Tab eventKey="constructor-championship" title="Constructor Championship" />
@@ -168,13 +161,10 @@ const Formula1OddsCard = ({
         </Card.Header>
         <Card.Body className="text-center py-5">
           <div className="text-danger mb-3">
-            <i className="fas fa-exclamation-circle fa-3x"></i>
+            <i className="fas fa-exclamation-circle fa-3x" />
           </div>
           <p>{error}</p>
-          <Button 
-            variant="outline-primary" 
-            onClick={() => window.location.reload()}
-          >
+          <Button variant="outline-primary" onClick={() => window.location.reload()}>
             Retry
           </Button>
         </Card.Body>
@@ -189,11 +179,7 @@ const Formula1OddsCard = ({
         <Card.Header>
           <h5>{getTitle()}</h5>
           {!raceId && (
-            <Tabs
-              activeKey={activeOddsType}
-              onSelect={handleOddsTypeChange}
-              className="mb-3"
-            >
+            <Tabs activeKey={activeOddsType} onSelect={handleOddsTypeChange} className="mb-3">
               <Tab eventKey="race-winner" title="Race Winner" />
               <Tab eventKey="driver-championship" title="Driver Championship" />
               <Tab eventKey="constructor-championship" title="Constructor Championship" />
@@ -213,11 +199,7 @@ const Formula1OddsCard = ({
       <Card className="odds-card f1-odds-card">
         <Card.Header>
           <h5>{getTitle()}</h5>
-          <Tabs
-            activeKey={activeOddsType}
-            onSelect={handleOddsTypeChange}
-            className="mb-3"
-          >
+          <Tabs activeKey={activeOddsType} onSelect={handleOddsTypeChange} className="mb-3">
             <Tab eventKey="race-winner" title="Race Winner" />
             <Tab eventKey="driver-championship" title="Driver Championship" />
             <Tab eventKey="constructor-championship" title="Constructor Championship" />
@@ -225,23 +207,23 @@ const Formula1OddsCard = ({
         </Card.Header>
         <Card.Body>
           <div className="championship-odds">
-            {odds.map((item) => {
+            {odds.map(item => {
               // For championship odds, we display all bookmakers and their odds
               return (
                 <div key={item.id} className="championship-item">
                   <div className="bookmakers">
-                    {item.bookmakers.map((bookmaker) => {
+                    {item.bookmakers.map(bookmaker => {
                       const marketData = bookmaker.markets.find(m => m.key === 'outrights');
-                      
+
                       if (!marketData) return null;
-                      
+
                       return (
                         <div key={bookmaker.name} className="bookmaker">
                           <div className="bookmaker-name">{bookmaker.name}</div>
                           <div className="outcomes">
                             {marketData.outcomes
                               .sort((a, b) => a.price - b.price) // Sort by odds (lowest first)
-                              .map((outcome) => (
+                              .map(outcome => (
                                 <div key={outcome.name} className="outcome">
                                   <div className="outcome-name">{outcome.name}</div>
                                   <div className="outcome-price">
@@ -278,11 +260,7 @@ const Formula1OddsCard = ({
       <Card.Header>
         <h5>{getTitle()}</h5>
         {!raceId && (
-          <Tabs
-            activeKey={activeOddsType}
-            onSelect={handleOddsTypeChange}
-            className="mb-3"
-          >
+          <Tabs activeKey={activeOddsType} onSelect={handleOddsTypeChange} className="mb-3">
             <Tab eventKey="race-winner" title="Race Winner" />
             <Tab eventKey="driver-championship" title="Driver Championship" />
             <Tab eventKey="constructor-championship" title="Constructor Championship" />
@@ -293,16 +271,10 @@ const Formula1OddsCard = ({
         {!selectedRace ? (
           // Race selection view
           <div className="race-list">
-            {odds.map((race) => (
-              <div 
-                key={race.id} 
-                className="race-item"
-                onClick={() => handleRaceSelect(race)}
-              >
+            {odds.map(race => (
+              <div key={race.id} className="race-item" onClick={() => handleRaceSelect(race)}>
                 <div className="race-name">{race.homeTeam}</div>
-                <div className="race-time">
-                  {new Date(race.startTime).toLocaleString()}
-                </div>
+                <div className="race-time">{new Date(race.startTime).toLocaleString()}</div>
               </div>
             ))}
           </div>
@@ -311,33 +283,27 @@ const Formula1OddsCard = ({
           <div className="race-odds">
             <div className="race-header">
               <h6>{selectedRace.homeTeam}</h6>
-              <div className="race-time">
-                {new Date(selectedRace.startTime).toLocaleString()}
-              </div>
+              <div className="race-time">{new Date(selectedRace.startTime).toLocaleString()}</div>
               {odds.length > 1 && (
-                <Button 
-                  variant="link" 
-                  size="sm"
-                  onClick={() => setSelectedRace(null)}
-                >
+                <Button variant="link" size="sm" onClick={() => setSelectedRace(null)}>
                   Back to all races
                 </Button>
               )}
             </div>
-            
+
             <div className="bookmakers">
-              {selectedRace.bookmakers.map((bookmaker) => {
+              {selectedRace.bookmakers.map(bookmaker => {
                 const marketData = bookmaker.markets.find(m => m.key === 'h2h');
-                
+
                 if (!marketData) return null;
-                
+
                 return (
                   <div key={bookmaker.name} className="bookmaker">
                     <div className="bookmaker-name">{bookmaker.name}</div>
                     <div className="outcomes">
                       {marketData.outcomes
                         .sort((a, b) => a.price - b.price) // Sort by odds (lowest first)
-                        .map((outcome) => (
+                        .map(outcome => (
                           <div key={outcome.name} className="outcome">
                             <div className="outcome-name">{outcome.name}</div>
                             <div className="outcome-price">

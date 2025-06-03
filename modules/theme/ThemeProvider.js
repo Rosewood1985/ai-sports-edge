@@ -1,12 +1,13 @@
 /**
  * Theme Provider
- * 
+ *
  * Provides theme state and functionality to the application.
  */
 
-import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+
 import { ThemeContext } from './ThemeContext';
 
 // Storage key for theme preference
@@ -21,7 +22,7 @@ const THEME_STORAGE_KEY = '@theme_preference';
 export const ThemeProvider = ({ children }) => {
   // Get device color scheme
   const deviceTheme = useColorScheme();
-  
+
   // Initialize theme state
   const [theme, setThemeState] = useState(deviceTheme || 'light');
   const [isLoading, setIsLoading] = useState(true);
@@ -63,7 +64,7 @@ export const ThemeProvider = ({ children }) => {
    * Set theme
    * @param {string} newTheme - New theme ('light' or 'dark')
    */
-  const setTheme = (newTheme) => {
+  const setTheme = newTheme => {
     setThemeState(newTheme);
   };
 

@@ -5,10 +5,10 @@
  * in a React component.
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ThemeToggle } from 'atomic/molecules/theme';
 import { useTheme } from 'atomic/molecules/themeContext';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 // Define theme colors type for TypeScript
 interface ThemeColors {

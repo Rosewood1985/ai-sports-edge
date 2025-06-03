@@ -1,6 +1,6 @@
 /**
  * Firebase Module
- * 
+ *
  * Central module for Firebase configuration and services.
  * Exports all Firebase-related functionality.
  */

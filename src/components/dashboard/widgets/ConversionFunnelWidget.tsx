@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
+
 import { EnhancedWidget } from './EnhancedWidget';
-import { MetricCard } from '../metrics/MetricCard';
-import { LineChart } from '../charts/LineChart';
-import { useConversionFunnelData } from '../../../hooks/useConversionFunnelData';
-import { DataStatusIndicator } from '../atoms/DataStatusIndicator';
 import { Tooltip } from '../../../components/ui/Tooltip';
+import { useConversionFunnelData } from '../../../hooks/useConversionFunnelData';
 import {
   FunnelStage,
   Cohort,
   ConversionTrigger,
   EngagementMetric,
 } from '../../../types/conversionFunnel';
+import { DataStatusIndicator } from '../atoms/DataStatusIndicator';
+import { LineChart } from '../charts/LineChart';
+import { MetricCard } from '../metrics/MetricCard';
 
 // Advanced funnel comparison component
 const FunnelComparison: React.FC<{ stages: FunnelStage[] }> = ({ stages }) => {
@@ -20,9 +21,9 @@ const FunnelComparison: React.FC<{ stages: FunnelStage[] }> = ({ stages }) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h5 className="text-md font-medium">Funnel Performance</h5>
-        <select 
-          value={timeRange} 
-          onChange={(e) => setTimeRange(e.target.value)}
+        <select
+          value={timeRange}
+          onChange={e => setTimeRange(e.target.value)}
           className="text-xs border rounded px-2 py-1"
         >
           <option value="7d">Last 7 days</option>
@@ -38,11 +39,15 @@ const FunnelComparison: React.FC<{ stages: FunnelStage[] }> = ({ stages }) => {
               <span className="text-gray-600">{stage.count.toLocaleString()} users</span>
             </div>
             <div className="relative h-12 bg-gray-100 rounded-lg overflow-hidden">
-              <div 
+              <div
                 className={`absolute top-0 left-0 h-full transition-all duration-500 ${
-                  index === 0 ? 'bg-blue-500' :
-                  index === 1 ? 'bg-green-500' :
-                  index === 2 ? 'bg-yellow-500' : 'bg-purple-500'
+                  index === 0
+                    ? 'bg-blue-500'
+                    : index === 1
+                      ? 'bg-green-500'
+                      : index === 2
+                        ? 'bg-yellow-500'
+                        : 'bg-purple-500'
                 }`}
                 style={{ width: `${(stage.count / stages[0].count) * 100}%` }}
               />
@@ -79,7 +84,7 @@ export function ConversionFunnelWidget() {
           <a href="/admin/conversion-analytics" className="text-blue-500 hover:underline text-sm">
             View detailed conversion analytics
           </a>
-          <DataStatusIndicator 
+          <DataStatusIndicator
             isRealTime={isRealTime || false}
             lastUpdated={new Date().toISOString()}
             connectionStatus={!error}
@@ -100,9 +105,15 @@ export function ConversionFunnelWidget() {
                 <Tooltip content="Overall conversion from trial view to purchase">
                   <MetricCard
                     title="Total Conversion"
-                    value={`${data?.funnelStages ? 
-                      ((data.funnelStages[data.funnelStages.length - 1].count / data.funnelStages[0].count) * 100).toFixed(1) 
-                      : 0}%`}
+                    value={`${
+                      data?.funnelStages
+                        ? (
+                            (data.funnelStages[data.funnelStages.length - 1].count /
+                              data.funnelStages[0].count) *
+                            100
+                          ).toFixed(1)
+                        : 0
+                    }%`}
                     status="neutral"
                   />
                 </Tooltip>
@@ -124,13 +135,13 @@ export function ConversionFunnelWidget() {
           <div className="flex justify-between items-center mb-3">
             <h4 className="text-lg font-medium">Cohort Analysis</h4>
             <div className="flex gap-2">
-              <select 
-                value={selectedCohort || ''} 
-                onChange={(e) => setSelectedCohort(e.target.value || null)}
+              <select
+                value={selectedCohort || ''}
+                onChange={e => setSelectedCohort(e.target.value || null)}
                 className="text-xs border rounded px-2 py-1"
               >
                 <option value="">All Cohorts</option>
-                {data?.cohorts.map((cohort) => (
+                {data?.cohorts.map(cohort => (
                   <option key={cohort.startDate} value={cohort.startDate}>
                     {new Date(cohort.startDate).toLocaleDateString()}
                   </option>
@@ -138,7 +149,7 @@ export function ConversionFunnelWidget() {
               </select>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -167,38 +178,49 @@ export function ConversionFunnelWidget() {
                   {data?.cohorts
                     .filter(cohort => !selectedCohort || cohort.startDate === selectedCohort)
                     .map((cohort: Cohort) => (
-                    <tr key={cohort.startDate} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {new Date(cohort.startDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {cohort.size.toLocaleString()}
-                      </td>
-                      {cohort.retentionRates.map((retention: { day: number; rate: number }) => (
-                        <td
-                          key={retention.day}
-                          className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300"
-                        >
-                          <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            retention.rate >= 70 ? 'bg-green-100 text-green-800' :
-                            retention.rate >= 50 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {retention.rate}%
+                      <tr
+                        key={cohort.startDate}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(cohort.startDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                          {cohort.size.toLocaleString()}
+                        </td>
+                        {cohort.retentionRates.map((retention: { day: number; rate: number }) => (
+                          <td
+                            key={retention.day}
+                            className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300"
+                          >
+                            <div
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                retention.rate >= 70
+                                  ? 'bg-green-100 text-green-800'
+                                  : retention.rate >= 50
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {retention.rate}%
+                            </div>
+                          </td>
+                        ))}
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                          <div
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              cohort.conversionRate >= 25
+                                ? 'bg-green-100 text-green-800'
+                                : cohort.conversionRate >= 20
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                            }`}
+                          >
+                            {cohort.conversionRate}%
                           </div>
                         </td>
-                      ))}
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          cohort.conversionRate >= 25 ? 'bg-green-100 text-green-800' :
-                          cohort.conversionRate >= 20 ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {cohort.conversionRate}%
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -207,32 +229,49 @@ export function ConversionFunnelWidget() {
               <h5 className="text-md font-medium mb-3">Retention Insights</h5>
               <div className="space-y-3">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                  <h6 className="text-sm font-semibold text-blue-800 dark:text-blue-200">Best Performing Cohort</h6>
+                  <h6 className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                    Best Performing Cohort
+                  </h6>
                   <p className="text-sm text-blue-600 dark:text-blue-300">
-                    {data?.cohorts.reduce((best, current) => 
-                      current.conversionRate > best.conversionRate ? current : best, 
+                    {data?.cohorts.reduce(
+                      (best, current) =>
+                        current.conversionRate > best.conversionRate ? current : best,
                       data.cohorts[0]
-                    )?.startDate ? new Date(
-                      data.cohorts.reduce((best, current) => 
-                        current.conversionRate > best.conversionRate ? current : best, 
-                        data.cohorts[0]
-                      ).startDate
-                    ).toLocaleDateString() : 'N/A'} - {
-                      data?.cohorts.reduce((best, current) => 
-                        current.conversionRate > best.conversionRate ? current : best, 
+                    )?.startDate
+                      ? new Date(
+                          data.cohorts.reduce(
+                            (best, current) =>
+                              current.conversionRate > best.conversionRate ? current : best,
+                            data.cohorts[0]
+                          ).startDate
+                        ).toLocaleDateString()
+                      : 'N/A'}{' '}
+                    -{' '}
+                    {
+                      data?.cohorts.reduce(
+                        (best, current) =>
+                          current.conversionRate > best.conversionRate ? current : best,
                         data.cohorts[0]
                       ).conversionRate
-                    }% conversion
+                    }
+                    % conversion
                   </p>
                 </div>
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
-                  <h6 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200">Day 7 Drop-off</h6>
+                  <h6 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200">
+                    Day 7 Drop-off
+                  </h6>
                   <p className="text-sm text-yellow-600 dark:text-yellow-300">
-                    Average: {data?.cohorts ? 
-                      (data.cohorts.reduce((sum, cohort) => {
-                        const day7 = cohort.retentionRates.find(r => r.day === 7);
-                        return sum + (day7?.rate || 0);
-                      }, 0) / data.cohorts.length).toFixed(1) : 0}% retention at day 7
+                    Average:{' '}
+                    {data?.cohorts
+                      ? (
+                          data.cohorts.reduce((sum, cohort) => {
+                            const day7 = cohort.retentionRates.find(r => r.day === 7);
+                            return sum + (day7?.rate || 0);
+                          }, 0) / data.cohorts.length
+                        ).toFixed(1)
+                      : 0}
+                    % retention at day 7
                   </p>
                 </div>
               </div>
@@ -265,7 +304,7 @@ export function ConversionFunnelWidget() {
                         <div
                           style={{ width: `${trigger.conversionImpact * 100}%` }}
                           className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
-                        ></div>
+                        />
                       </div>
                     </div>
                   ))}
@@ -322,8 +361,8 @@ export function ConversionFunnelWidget() {
                   data?.engagementScore.overallScore >= data?.engagementScore.thresholds.high
                     ? 'success'
                     : data?.engagementScore.overallScore >= data?.engagementScore.thresholds.medium
-                    ? 'warning'
-                    : 'error'
+                      ? 'warning'
+                      : 'error'
                 }
               />
             </div>
@@ -347,8 +386,8 @@ export function ConversionFunnelWidget() {
                             metric.trend.direction === 'up'
                               ? 'text-green-500'
                               : metric.trend.direction === 'down'
-                              ? 'text-red-500'
-                              : 'text-gray-500'
+                                ? 'text-red-500'
+                                : 'text-gray-500'
                           }`}
                         >
                           {metric.trend.value}

@@ -1,10 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+
 import { ThemedText } from './ThemedText';
-import { Ionicons } from '@expo/vector-icons';
+import UpgradePrompt from './UpgradePrompt';
 import { hasPlayerComparisonAccess } from '../services/subscriptionService';
 import { incrementViewCounter, shouldShowUpgradePrompt } from '../services/viewCounterService';
-import UpgradePrompt from './UpgradePrompt';
 
 interface PlayerStats {
   points: number;
@@ -46,9 +47,11 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
   player1,
   player2,
   gameId,
-  userId
+  userId,
 }) => {
-  const [activeCategory, setActiveCategory] = useState<'offensive' | 'defensive' | 'overall'>('overall');
+  const [activeCategory, setActiveCategory] = useState<'offensive' | 'defensive' | 'overall'>(
+    'overall'
+  );
   const [hasAccess, setHasAccess] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
@@ -57,17 +60,17 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
       // Check if user has access to player comparison
       const hasComparisonAccess = await hasPlayerComparisonAccess(userId, gameId);
       setHasAccess(hasComparisonAccess);
-      
+
       // Increment view counter
       await incrementViewCounter();
-      
+
       // Check if we should show upgrade prompt
       const shouldShowPrompt = await shouldShowUpgradePrompt();
       if (shouldShowPrompt && !hasComparisonAccess) {
         setShowUpgradePrompt(true);
       }
     };
-    
+
     checkAccess();
   }, [userId, gameId]);
 
@@ -76,7 +79,7 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
       setShowUpgradePrompt(true);
       return;
     }
-    
+
     setActiveCategory(category);
   };
 
@@ -84,45 +87,64 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
     <View style={styles.comparisonHeader}>
       <View style={styles.playerColumn}>
         <ThemedText style={styles.playerName}>{player1.name}</ThemedText>
-        <ThemedText style={styles.playerInfo}>{player1.team} | {player1.position}</ThemedText>
+        <ThemedText style={styles.playerInfo}>
+          {player1.team} | {player1.position}
+        </ThemedText>
       </View>
-      
+
       <View style={styles.vsColumn}>
         <ThemedText style={styles.vsText}>VS</ThemedText>
       </View>
-      
+
       <View style={styles.playerColumn}>
         <ThemedText style={styles.playerName}>{player2.name}</ThemedText>
-        <ThemedText style={styles.playerInfo}>{player2.team} | {player2.position}</ThemedText>
+        <ThemedText style={styles.playerInfo}>
+          {player2.team} | {player2.position}
+        </ThemedText>
       </View>
     </View>
   );
 
   const renderCategoryTabs = () => (
     <View style={styles.categoryTabs}>
-      <TouchableOpacity 
-        style={[styles.categoryTab, activeCategory === 'overall' && styles.activeCategoryTab]} 
+      <TouchableOpacity
+        style={[styles.categoryTab, activeCategory === 'overall' && styles.activeCategoryTab]}
         onPress={() => handleCategoryPress('overall')}
       >
-        <ThemedText style={[styles.categoryTabText, activeCategory === 'overall' && styles.activeCategoryTabText]}>
+        <ThemedText
+          style={[
+            styles.categoryTabText,
+            activeCategory === 'overall' && styles.activeCategoryTabText,
+          ]}
+        >
           Overall
         </ThemedText>
       </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.categoryTab, activeCategory === 'offensive' && styles.activeCategoryTab]} 
+
+      <TouchableOpacity
+        style={[styles.categoryTab, activeCategory === 'offensive' && styles.activeCategoryTab]}
         onPress={() => handleCategoryPress('offensive')}
       >
-        <ThemedText style={[styles.categoryTabText, activeCategory === 'offensive' && styles.activeCategoryTabText]}>
+        <ThemedText
+          style={[
+            styles.categoryTabText,
+            activeCategory === 'offensive' && styles.activeCategoryTabText,
+          ]}
+        >
           Offensive
         </ThemedText>
       </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.categoryTab, activeCategory === 'defensive' && styles.activeCategoryTab]} 
+
+      <TouchableOpacity
+        style={[styles.categoryTab, activeCategory === 'defensive' && styles.activeCategoryTab]}
         onPress={() => handleCategoryPress('defensive')}
       >
-        <ThemedText style={[styles.categoryTabText, activeCategory === 'defensive' && styles.activeCategoryTabText]}>
+        <ThemedText
+          style={[
+            styles.categoryTabText,
+            activeCategory === 'defensive' && styles.activeCategoryTabText,
+          ]}
+        >
           Defensive
         </ThemedText>
       </TouchableOpacity>
@@ -135,25 +157,22 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
       <ThemedText style={styles.lockedText}>
         Player comparison is available with Premium subscription
       </ThemedText>
-      <TouchableOpacity 
-        style={styles.unlockButton}
-        onPress={() => setShowUpgradePrompt(true)}
-      >
+      <TouchableOpacity style={styles.unlockButton} onPress={() => setShowUpgradePrompt(true)}>
         <ThemedText style={styles.unlockButtonText}>Unlock Player Comparison</ThemedText>
       </TouchableOpacity>
     </View>
   );
 
   const renderStatComparison = (
-    label: string, 
-    value1: number | string, 
+    label: string,
+    value1: number | string,
     value2: number | string,
     higherIsBetter: boolean = true
   ) => {
     // Determine which value is better
     let player1Better = false;
     let player2Better = false;
-    
+
     if (typeof value1 === 'number' && typeof value2 === 'number') {
       if (higherIsBetter) {
         player1Better = value1 > value2;
@@ -163,28 +182,22 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
         player2Better = value2 < value1;
       }
     }
-    
+
     return (
       <View style={styles.statComparisonRow}>
         <View style={styles.statComparisonCell}>
-          <ThemedText style={[
-            styles.statComparisonValue,
-            player1Better && styles.betterValue
-          ]}>
+          <ThemedText style={[styles.statComparisonValue, player1Better && styles.betterValue]}>
             {typeof value1 === 'number' ? value1.toFixed(1) : value1}
             {player1Better && <Ionicons name="caret-up" size={12} color="#34C759" />}
           </ThemedText>
         </View>
-        
+
         <View style={styles.statComparisonLabelCell}>
           <ThemedText style={styles.statComparisonLabel}>{label}</ThemedText>
         </View>
-        
+
         <View style={styles.statComparisonCell}>
-          <ThemedText style={[
-            styles.statComparisonValue,
-            player2Better && styles.betterValue
-          ]}>
+          <ThemedText style={[styles.statComparisonValue, player2Better && styles.betterValue]}>
             {typeof value2 === 'number' ? value2.toFixed(1) : value2}
             {player2Better && <Ionicons name="caret-up" size={12} color="#34C759" />}
           </ThemedText>
@@ -198,21 +211,33 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
       <View style={styles.advantageContainer}>
         <ThemedText style={styles.advantageTitle}>Overall Advantage</ThemedText>
         <ThemedText style={styles.advantageText}>
-          {player1.stats.playerEfficiencyRating! > player2.stats.playerEfficiencyRating! ? 
-            `${player1.name} has a slight edge in overall performance metrics.` : 
-            `${player2.name} has a slight edge in overall performance metrics.`}
+          {player1.stats.playerEfficiencyRating! > player2.stats.playerEfficiencyRating!
+            ? `${player1.name} has a slight edge in overall performance metrics.`
+            : `${player2.name} has a slight edge in overall performance metrics.`}
         </ThemedText>
       </View>
-      
+
       {renderStatComparison('PTS', player1.stats.points, player2.stats.points)}
       {renderStatComparison('REB', player1.stats.rebounds, player2.stats.rebounds)}
       {renderStatComparison('AST', player1.stats.assists, player2.stats.assists)}
       {renderStatComparison('STL', player1.stats.steals, player2.stats.steals)}
       {renderStatComparison('BLK', player1.stats.blocks, player2.stats.blocks)}
       {renderStatComparison('TO', player1.stats.turnovers, player2.stats.turnovers, false)}
-      {renderStatComparison('FG%', player1.stats.fieldGoalPercentage, player2.stats.fieldGoalPercentage)}
-      {renderStatComparison('3P%', player1.stats.threePointPercentage, player2.stats.threePointPercentage)}
-      {renderStatComparison('FT%', player1.stats.freeThrowPercentage, player2.stats.freeThrowPercentage)}
+      {renderStatComparison(
+        'FG%',
+        player1.stats.fieldGoalPercentage,
+        player2.stats.fieldGoalPercentage
+      )}
+      {renderStatComparison(
+        '3P%',
+        player1.stats.threePointPercentage,
+        player2.stats.threePointPercentage
+      )}
+      {renderStatComparison(
+        'FT%',
+        player1.stats.freeThrowPercentage,
+        player2.stats.freeThrowPercentage
+      )}
       {renderStatComparison('+/-', player1.stats.plusMinus, player2.stats.plusMinus)}
     </View>
   );
@@ -222,21 +247,49 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
       <View style={styles.advantageContainer}>
         <ThemedText style={styles.advantageTitle}>Offensive Advantage</ThemedText>
         <ThemedText style={styles.advantageText}>
-          {player1.stats.offensiveRating! > player2.stats.offensiveRating! ? 
-            `${player1.name} has a higher offensive rating and is more efficient.` : 
-            `${player2.name} has a higher offensive rating and is more efficient.`}
+          {player1.stats.offensiveRating! > player2.stats.offensiveRating!
+            ? `${player1.name} has a higher offensive rating and is more efficient.`
+            : `${player2.name} has a higher offensive rating and is more efficient.`}
         </ThemedText>
       </View>
-      
+
       {renderStatComparison('PTS', player1.stats.points, player2.stats.points)}
       {renderStatComparison('AST', player1.stats.assists, player2.stats.assists)}
-      {renderStatComparison('FG%', player1.stats.fieldGoalPercentage, player2.stats.fieldGoalPercentage)}
-      {renderStatComparison('3P%', player1.stats.threePointPercentage, player2.stats.threePointPercentage)}
-      {renderStatComparison('FT%', player1.stats.freeThrowPercentage, player2.stats.freeThrowPercentage)}
-      {renderStatComparison('TS%', player1.stats.trueShootingPercentage || 58.5, player2.stats.trueShootingPercentage || 52.3)}
-      {renderStatComparison('eFG%', player1.stats.effectiveFieldGoalPercentage || 52.3, player2.stats.effectiveFieldGoalPercentage || 48.7)}
-      {renderStatComparison('USG%', player1.stats.usageRate || 25.3, player2.stats.usageRate || 28.7)}
-      {renderStatComparison('Off Rtg', player1.stats.offensiveRating || 112.4, player2.stats.offensiveRating || 108.3)}
+      {renderStatComparison(
+        'FG%',
+        player1.stats.fieldGoalPercentage,
+        player2.stats.fieldGoalPercentage
+      )}
+      {renderStatComparison(
+        '3P%',
+        player1.stats.threePointPercentage,
+        player2.stats.threePointPercentage
+      )}
+      {renderStatComparison(
+        'FT%',
+        player1.stats.freeThrowPercentage,
+        player2.stats.freeThrowPercentage
+      )}
+      {renderStatComparison(
+        'TS%',
+        player1.stats.trueShootingPercentage || 58.5,
+        player2.stats.trueShootingPercentage || 52.3
+      )}
+      {renderStatComparison(
+        'eFG%',
+        player1.stats.effectiveFieldGoalPercentage || 52.3,
+        player2.stats.effectiveFieldGoalPercentage || 48.7
+      )}
+      {renderStatComparison(
+        'USG%',
+        player1.stats.usageRate || 25.3,
+        player2.stats.usageRate || 28.7
+      )}
+      {renderStatComparison(
+        'Off Rtg',
+        player1.stats.offensiveRating || 112.4,
+        player2.stats.offensiveRating || 108.3
+      )}
     </View>
   );
 
@@ -245,17 +298,22 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
       <View style={styles.advantageContainer}>
         <ThemedText style={styles.advantageTitle}>Defensive Advantage</ThemedText>
         <ThemedText style={styles.advantageText}>
-          {player1.stats.defensiveRating! < player2.stats.defensiveRating! ? 
-            `${player1.name} has a better defensive rating and creates more stops.` : 
-            `${player2.name} has a better defensive rating and creates more stops.`}
+          {player1.stats.defensiveRating! < player2.stats.defensiveRating!
+            ? `${player1.name} has a better defensive rating and creates more stops.`
+            : `${player2.name} has a better defensive rating and creates more stops.`}
         </ThemedText>
       </View>
-      
+
       {renderStatComparison('STL', player1.stats.steals, player2.stats.steals)}
       {renderStatComparison('BLK', player1.stats.blocks, player2.stats.blocks)}
       {renderStatComparison('REB', player1.stats.rebounds, player2.stats.rebounds)}
       {renderStatComparison('TO', player1.stats.turnovers, player2.stats.turnovers, false)}
-      {renderStatComparison('Def Rtg', player1.stats.defensiveRating || 108.3, player2.stats.defensiveRating || 112.4, false)}
+      {renderStatComparison(
+        'Def Rtg',
+        player1.stats.defensiveRating || 108.3,
+        player2.stats.defensiveRating || 112.4,
+        false
+      )}
       {renderStatComparison('+/-', player1.stats.plusMinus, player2.stats.plusMinus)}
     </View>
   );
@@ -264,7 +322,7 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
     if (!hasAccess) {
       return renderLockedContent();
     }
-    
+
     switch (activeCategory) {
       case 'offensive':
         return renderOffensiveComparison();
@@ -280,14 +338,12 @@ const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
     <View style={styles.container}>
       {renderComparisonHeader()}
       {renderCategoryTabs()}
-      
-      <ScrollView style={styles.scrollContainer}>
-        {renderComparisonContent()}
-      </ScrollView>
-      
+
+      <ScrollView style={styles.scrollContainer}>{renderComparisonContent()}</ScrollView>
+
       {showUpgradePrompt && (
-        <UpgradePrompt 
-          onClose={() => setShowUpgradePrompt(false)} 
+        <UpgradePrompt
+          onClose={() => setShowUpgradePrompt(false)}
           gameId={gameId}
           featureType="player-comparison"
         />

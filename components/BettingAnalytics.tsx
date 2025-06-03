@@ -1,10 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { bettingAnalyticsService, AnalyticsSummary, TimePeriodFilter, BetResult, BetType } from '../services/bettingAnalyticsService';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Share,
+} from 'react-native';
+
+import BettingAnalyticsChart from './BettingAnalyticsChart';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import BettingAnalyticsChart from './BettingAnalyticsChart';
+import {
+  bettingAnalyticsService,
+  AnalyticsSummary,
+  TimePeriodFilter,
+  BetResult,
+  BetType,
+} from '../services/bettingAnalyticsService';
 
 interface WageringAnalyticsProps {
   onRefresh?: () => void;
@@ -18,13 +33,15 @@ const WageringAnalytics: React.FC<WageringAnalyticsProps> = ({ onRefresh }) => {
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriodFilter['period']>('month');
-  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'betTypes' | 'winRate'>('profit');
+  const [selectedChartType, setSelectedChartType] = useState<'profit' | 'betTypes' | 'winRate'>(
+    'profit'
+  );
   const [showCharts, setShowCharts] = useState<boolean>(false);
-  
+
   useEffect(() => {
     loadAnalytics();
   }, [selectedPeriod]);
-  
+
   /**
    * Load analytics data
    */
@@ -32,10 +49,10 @@ const WageringAnalytics: React.FC<WageringAnalyticsProps> = ({ onRefresh }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const timePeriod: TimePeriodFilter = { period: selectedPeriod };
       const analyticsData = await bettingAnalyticsService.getAnalyticsSummary(timePeriod);
-      
+
       setAnalytics(analyticsData);
       setLoading(false);
     } catch (error) {
@@ -44,7 +61,7 @@ const WageringAnalytics: React.FC<WageringAnalyticsProps> = ({ onRefresh }) => {
       setLoading(false);
     }
   };
-  
+
   /**
    * Handle refresh button press
    */
@@ -54,34 +71,34 @@ const WageringAnalytics: React.FC<WageringAnalyticsProps> = ({ onRefresh }) => {
       onRefresh();
     }
   };
-  
+
   /**
    * Handle period selection
    */
   const handlePeriodChange = (period: TimePeriodFilter['period']) => {
     setSelectedPeriod(period);
   };
-  
+
   /**
    * Handle chart type selection
    */
   const handleChartTypeChange = (type: 'profit' | 'betTypes' | 'winRate') => {
     setSelectedChartType(type);
   };
-  
+
   /**
    * Toggle charts visibility
    */
   const toggleCharts = () => {
     setShowCharts(!showCharts);
   };
-  
+
   /**
    * Share analytics summary
    */
   const shareAnalytics = async () => {
     if (!analytics) return;
-    
+
     try {
       const message = `
 My Betting Analytics Summary:
@@ -99,7 +116,7 @@ Longest Loss Streak: ${analytics.streaks.longestLossStreak}
 
 Shared from AI Sports Edge
       `;
-      
+
       await Share.share({
         message,
         title: 'My Betting Analytics',
@@ -108,7 +125,7 @@ Shared from AI Sports Edge
       console.error('Error sharing analytics:', error);
     }
   };
-  
+
   /**
    * Render loading state
    */
@@ -120,7 +137,7 @@ Shared from AI Sports Edge
       </ThemedView>
     );
   }
-  
+
   /**
    * Render error state
    */
@@ -135,7 +152,7 @@ Shared from AI Sports Edge
       </ThemedView>
     );
   }
-  
+
   /**
    * Render empty state
    */
@@ -150,7 +167,7 @@ Shared from AI Sports Edge
       </ThemedView>
     );
   }
-  
+
   /**
    * Format currency
    */
@@ -159,24 +176,24 @@ Shared from AI Sports Edge
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
   };
-  
+
   /**
    * Format percentage
    */
   const formatPercentage = (value: number): string => {
     return `${value.toFixed(1)}%`;
   };
-  
+
   /**
    * Get color based on value (positive/negative)
    */
   const getValueColor = (value: number): string => {
     return value >= 0 ? '#4caf50' : '#f44336';
   };
-  
+
   /**
    * Get icon for bet result
    */
@@ -194,14 +211,18 @@ Shared from AI Sports Edge
         return null;
     }
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <ThemedText style={styles.headerTitle}>Betting Analytics</ThemedText>
         <View style={styles.headerButtons}>
           <TouchableOpacity style={styles.headerButton} onPress={toggleCharts}>
-            <Ionicons name={showCharts ? "stats-chart" : "stats-chart-outline"} size={24} color="#4080ff" />
+            <Ionicons
+              name={showCharts ? 'stats-chart' : 'stats-chart-outline'}
+              size={24}
+              color="#4080ff"
+            />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton} onPress={shareAnalytics}>
             <Ionicons name="share-outline" size={24} color="#4080ff" />
@@ -211,78 +232,66 @@ Shared from AI Sports Edge
           </TouchableOpacity>
         </View>
       </View>
-      
+
       {/* Time period selector */}
       <View style={styles.periodSelector}>
         <TouchableOpacity
-          style={[
-            styles.periodButton,
-            selectedPeriod === 'week' && styles.selectedPeriodButton
-          ]}
+          style={[styles.periodButton, selectedPeriod === 'week' && styles.selectedPeriodButton]}
           onPress={() => handlePeriodChange('week')}
         >
           <ThemedText
             style={[
               styles.periodButtonText,
-              selectedPeriod === 'week' && styles.selectedPeriodButtonText
+              selectedPeriod === 'week' && styles.selectedPeriodButtonText,
             ]}
           >
             Week
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.periodButton,
-            selectedPeriod === 'month' && styles.selectedPeriodButton
-          ]}
+          style={[styles.periodButton, selectedPeriod === 'month' && styles.selectedPeriodButton]}
           onPress={() => handlePeriodChange('month')}
         >
           <ThemedText
             style={[
               styles.periodButtonText,
-              selectedPeriod === 'month' && styles.selectedPeriodButtonText
+              selectedPeriod === 'month' && styles.selectedPeriodButtonText,
             ]}
           >
             Month
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.periodButton,
-            selectedPeriod === 'year' && styles.selectedPeriodButton
-          ]}
+          style={[styles.periodButton, selectedPeriod === 'year' && styles.selectedPeriodButton]}
           onPress={() => handlePeriodChange('year')}
         >
           <ThemedText
             style={[
               styles.periodButtonText,
-              selectedPeriod === 'year' && styles.selectedPeriodButtonText
+              selectedPeriod === 'year' && styles.selectedPeriodButtonText,
             ]}
           >
             Year
           </ThemedText>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.periodButton,
-            selectedPeriod === 'all' && styles.selectedPeriodButton
-          ]}
+          style={[styles.periodButton, selectedPeriod === 'all' && styles.selectedPeriodButton]}
           onPress={() => handlePeriodChange('all')}
         >
           <ThemedText
             style={[
               styles.periodButtonText,
-              selectedPeriod === 'all' && styles.selectedPeriodButtonText
+              selectedPeriod === 'all' && styles.selectedPeriodButtonText,
             ]}
           >
             All Time
           </ThemedText>
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView style={styles.scrollView}>
         {/* Charts Section */}
         {showCharts && (
@@ -291,119 +300,112 @@ Shared from AI Sports Edge
               <TouchableOpacity
                 style={[
                   styles.chartTypeButton,
-                  selectedChartType === 'profit' && styles.selectedChartTypeButton
+                  selectedChartType === 'profit' && styles.selectedChartTypeButton,
                 ]}
                 onPress={() => handleChartTypeChange('profit')}
               >
                 <ThemedText
                   style={[
                     styles.chartTypeButtonText,
-                    selectedChartType === 'profit' && styles.selectedChartTypeButtonText
+                    selectedChartType === 'profit' && styles.selectedChartTypeButtonText,
                   ]}
                 >
                   Profit
                 </ThemedText>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[
                   styles.chartTypeButton,
-                  selectedChartType === 'betTypes' && styles.selectedChartTypeButton
+                  selectedChartType === 'betTypes' && styles.selectedChartTypeButton,
                 ]}
                 onPress={() => handleChartTypeChange('betTypes')}
               >
                 <ThemedText
                   style={[
                     styles.chartTypeButtonText,
-                    selectedChartType === 'betTypes' && styles.selectedChartTypeButtonText
+                    selectedChartType === 'betTypes' && styles.selectedChartTypeButtonText,
                   ]}
                 >
                   Bet Types
                 </ThemedText>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[
                   styles.chartTypeButton,
-                  selectedChartType === 'winRate' && styles.selectedChartTypeButton
+                  selectedChartType === 'winRate' && styles.selectedChartTypeButton,
                 ]}
                 onPress={() => handleChartTypeChange('winRate')}
               >
                 <ThemedText
                   style={[
                     styles.chartTypeButtonText,
-                    selectedChartType === 'winRate' && styles.selectedChartTypeButtonText
+                    selectedChartType === 'winRate' && styles.selectedChartTypeButtonText,
                   ]}
                 >
                   Win Rate
                 </ThemedText>
               </TouchableOpacity>
             </View>
-            
-            <BettingAnalyticsChart
-              data={analytics}
-              chartType={selectedChartType}
-            />
+
+            <BettingAnalyticsChart data={analytics} chartType={selectedChartType} />
           </View>
         )}
-        
+
         {/* Summary Card */}
         <ThemedView style={styles.card}>
           <ThemedText style={styles.cardTitle}>Summary</ThemedText>
-          
+
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
               <ThemedText style={styles.summaryLabel}>Total Bets</ThemedText>
               <ThemedText style={styles.summaryValue}>{analytics.totalBets}</ThemedText>
             </View>
-            
+
             <View style={styles.summaryItem}>
               <ThemedText style={styles.summaryLabel}>Win Rate</ThemedText>
-              <ThemedText style={styles.summaryValue}>{formatPercentage(analytics.winRate)}</ThemedText>
+              <ThemedText style={styles.summaryValue}>
+                {formatPercentage(analytics.winRate)}
+              </ThemedText>
             </View>
           </View>
-          
+
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
               <ThemedText style={styles.summaryLabel}>Total Wagered</ThemedText>
-              <ThemedText style={styles.summaryValue}>{formatCurrency(analytics.totalWagered)}</ThemedText>
+              <ThemedText style={styles.summaryValue}>
+                {formatCurrency(analytics.totalWagered)}
+              </ThemedText>
             </View>
-            
+
             <View style={styles.summaryItem}>
               <ThemedText style={styles.summaryLabel}>Total Winnings</ThemedText>
-              <ThemedText style={styles.summaryValue}>{formatCurrency(analytics.totalWinnings)}</ThemedText>
+              <ThemedText style={styles.summaryValue}>
+                {formatCurrency(analytics.totalWinnings)}
+              </ThemedText>
             </View>
           </View>
-          
+
           <View style={styles.profitContainer}>
             <ThemedText style={styles.profitLabel}>Net Profit</ThemedText>
-            <ThemedText
-              style={[
-                styles.profitValue,
-                { color: getValueColor(analytics.netProfit) }
-              ]}
-            >
+            <ThemedText style={[styles.profitValue, { color: getValueColor(analytics.netProfit) }]}>
               {formatCurrency(analytics.netProfit)}
             </ThemedText>
           </View>
-          
+
           <View style={styles.roiContainer}>
             <ThemedText style={styles.roiLabel}>ROI</ThemedText>
-            <ThemedText
-              style={[
-                styles.roiValue,
-                { color: getValueColor(analytics.roi) }
-              ]}
-            >
+            <ThemedText style={[styles.roiValue, { color: getValueColor(analytics.roi) }]}>
               {formatPercentage(analytics.roi)}
             </ThemedText>
           </View>
         </ThemedView>
-        
+
         {/* Recent Form Card */}
         <ThemedView style={styles.card}>
           <ThemedText style={styles.cardTitle}>Recent Form</ThemedText>
-          
+
           <View style={styles.recentFormContainer}>
             {analytics.recentForm.length > 0 ? (
               <View style={styles.recentFormRow}>
@@ -415,13 +417,17 @@ Shared from AI Sports Edge
                       result === BetResult.WIN && styles.winBadge,
                       result === BetResult.LOSS && styles.lossBadge,
                       result === BetResult.PUSH && styles.pushBadge,
-                      result === BetResult.VOID && styles.voidBadge
+                      result === BetResult.VOID && styles.voidBadge,
                     ]}
                   >
                     <ThemedText style={styles.resultText}>
-                      {result === BetResult.WIN ? 'W' :
-                       result === BetResult.LOSS ? 'L' :
-                       result === BetResult.PUSH ? 'P' : 'V'}
+                      {result === BetResult.WIN
+                        ? 'W'
+                        : result === BetResult.LOSS
+                          ? 'L'
+                          : result === BetResult.PUSH
+                            ? 'P'
+                            : 'V'}
                     </ThemedText>
                   </View>
                 ))}
@@ -430,7 +436,7 @@ Shared from AI Sports Edge
               <ThemedText style={styles.noDataText}>No recent bets</ThemedText>
             )}
           </View>
-          
+
           <View style={styles.streakContainer}>
             <ThemedText style={styles.streakLabel}>Current Streak:</ThemedText>
             <View style={styles.streakValue}>
@@ -441,24 +447,28 @@ Shared from AI Sports Edge
               </ThemedText>
             </View>
           </View>
-          
+
           <View style={styles.streakRow}>
             <View style={styles.streakItem}>
               <ThemedText style={styles.streakItemLabel}>Longest Win Streak:</ThemedText>
-              <ThemedText style={styles.streakItemValue}>{analytics.streaks.longestWinStreak}</ThemedText>
+              <ThemedText style={styles.streakItemValue}>
+                {analytics.streaks.longestWinStreak}
+              </ThemedText>
             </View>
-            
+
             <View style={styles.streakItem}>
               <ThemedText style={styles.streakItemLabel}>Longest Loss Streak:</ThemedText>
-              <ThemedText style={styles.streakItemValue}>{analytics.streaks.longestLossStreak}</ThemedText>
+              <ThemedText style={styles.streakItemValue}>
+                {analytics.streaks.longestLossStreak}
+              </ThemedText>
             </View>
           </View>
         </ThemedView>
-        
+
         {/* Bet Type Breakdown Card */}
         <ThemedView style={styles.card}>
           <ThemedText style={styles.cardTitle}>Bet Type Breakdown</ThemedText>
-          
+
           {Object.entries(analytics.betTypeBreakdown).length > 0 ? (
             Object.entries(analytics.betTypeBreakdown).map(([betType, data]) => (
               <View key={betType} style={styles.betTypeRow}>
@@ -470,17 +480,12 @@ Shared from AI Sports Edge
                     {data.count} bet{data.count !== 1 ? 's' : ''}
                   </ThemedText>
                 </View>
-                
+
                 <View style={styles.betTypeStats}>
                   <ThemedText style={styles.betTypeWinRate}>
                     {formatPercentage(data.winRate)}
                   </ThemedText>
-                  <ThemedText
-                    style={[
-                      styles.betTypeProfit,
-                      { color: getValueColor(data.profit) }
-                    ]}
-                  >
+                  <ThemedText style={[styles.betTypeProfit, { color: getValueColor(data.profit) }]}>
                     {formatCurrency(data.profit)}
                   </ThemedText>
                 </View>
@@ -490,31 +495,36 @@ Shared from AI Sports Edge
             <ThemedText style={styles.noDataText}>No bet type data available</ThemedText>
           )}
         </ThemedView>
-        
+
         {/* Most Bet Card */}
         <ThemedView style={styles.card}>
           <ThemedText style={styles.cardTitle}>Most Bet</ThemedText>
-          
+
           <View style={styles.mostBetRow}>
             <View style={styles.mostBetItem}>
               <ThemedText style={styles.mostBetLabel}>Sport</ThemedText>
               {analytics.mostBetSport ? (
                 <>
-                  <ThemedText style={styles.mostBetValue}>{analytics.mostBetSport.sport}</ThemedText>
+                  <ThemedText style={styles.mostBetValue}>
+                    {analytics.mostBetSport.sport}
+                  </ThemedText>
                   <ThemedText style={styles.mostBetCount}>
-                    {analytics.mostBetSport.count} bet{analytics.mostBetSport.count !== 1 ? 's' : ''}
+                    {analytics.mostBetSport.count} bet
+                    {analytics.mostBetSport.count !== 1 ? 's' : ''}
                   </ThemedText>
                 </>
               ) : (
                 <ThemedText style={styles.noDataText}>No data</ThemedText>
               )}
             </View>
-            
+
             <View style={styles.mostBetItem}>
               <ThemedText style={styles.mostBetLabel}>Team</ThemedText>
               {analytics.mostBetTeam ? (
                 <>
-                  <ThemedText style={styles.mostBetValue}>{analytics.mostBetTeam.teamName}</ThemedText>
+                  <ThemedText style={styles.mostBetValue}>
+                    {analytics.mostBetTeam.teamName}
+                  </ThemedText>
                   <ThemedText style={styles.mostBetCount}>
                     {analytics.mostBetTeam.count} bet{analytics.mostBetTeam.count !== 1 ? 's' : ''}
                   </ThemedText>
@@ -525,11 +535,11 @@ Shared from AI Sports Edge
             </View>
           </View>
         </ThemedView>
-        
+
         {/* Best and Worst Bets Card */}
         <ThemedView style={styles.card}>
           <ThemedText style={styles.cardTitle}>Best & Worst Bets</ThemedText>
-          
+
           <View style={styles.bestWorstRow}>
             <View style={styles.bestWorstItem}>
               <ThemedText style={styles.bestWorstLabel}>Best Bet</ThemedText>
@@ -540,19 +550,24 @@ Shared from AI Sports Edge
                     {formatCurrency(analytics.bestBet.amount)}
                   </ThemedText>
                   <ThemedText style={[styles.bestWorstProfit, { color: '#4caf50' }]}>
-                    +{formatCurrency((analytics.bestBet.potentialWinnings || 0) - analytics.bestBet.amount)}
+                    +
+                    {formatCurrency(
+                      (analytics.bestBet.potentialWinnings || 0) - analytics.bestBet.amount
+                    )}
                   </ThemedText>
                 </>
               ) : (
                 <ThemedText style={styles.noDataText}>No data</ThemedText>
               )}
             </View>
-            
+
             <View style={styles.bestWorstItem}>
               <ThemedText style={styles.bestWorstLabel}>Worst Bet</ThemedText>
               {analytics.worstBet ? (
                 <>
-                  <ThemedText style={styles.bestWorstTeam}>{analytics.worstBet.teamName}</ThemedText>
+                  <ThemedText style={styles.bestWorstTeam}>
+                    {analytics.worstBet.teamName}
+                  </ThemedText>
                   <ThemedText style={styles.bestWorstAmount}>
                     {formatCurrency(analytics.worstBet.amount)}
                   </ThemedText>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import AccessibleTouchable from '../AccessibleTouchable';
-import AccessibleText from '../AccessibleText';
+
 import accessibilityService from '../../services/accessibilityService';
+import AccessibleText from '../AccessibleText';
+import AccessibleTouchable from '../AccessibleTouchable';
 
 /**
  * Example component demonstrating keyboard navigation
@@ -50,7 +51,7 @@ const KeyboardNavigationExample: React.FC = () => {
           keyboardNavigationId="button1"
           nextElementId="button2"
           prevElementId="button4"
-          autoFocus={true}
+          autoFocus
           onPress={() => handleButtonPress('button1')}
           onFocus={() => handleButtonFocus('button1')}
           onBlur={handleButtonBlur}

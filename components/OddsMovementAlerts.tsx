@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { useTheme } from '../contexts/ThemeContext';
 import { oddsHistoryService, OddsMovementAlert } from '../services/oddsHistoryService';
 
@@ -21,10 +22,10 @@ const OddsMovementAlerts: React.FC<OddsMovementAlertsProps> = ({ onClose }) => {
       try {
         setLoading(true);
         const movementAlerts = await oddsHistoryService.getMovementAlerts();
-        
+
         // Sort alerts by timestamp (newest first)
         movementAlerts.sort((a, b) => b.timestamp - a.timestamp);
-        
+
         setAlerts(movementAlerts);
       } catch (error) {
         console.error('Error loading movement alerts:', error);
@@ -38,12 +39,10 @@ const OddsMovementAlerts: React.FC<OddsMovementAlertsProps> = ({ onClose }) => {
 
   const handleMarkAsRead = async (alertId: string) => {
     await oddsHistoryService.markAlertAsRead(alertId);
-    
+
     // Update local state
-    setAlerts(prevAlerts => 
-      prevAlerts.map(alert => 
-        alert.id === alertId ? { ...alert, read: true } : alert
-      )
+    setAlerts(prevAlerts =>
+      prevAlerts.map(alert => (alert.id === alertId ? { ...alert, read: true } : alert))
     );
   };
 
@@ -59,29 +58,27 @@ const OddsMovementAlerts: React.FC<OddsMovementAlertsProps> = ({ onClose }) => {
   const renderAlertItem = ({ item }: { item: OddsMovementAlert }) => {
     const isPositiveChange = item.currentOdds > item.previousOdds;
     const changeColor = isPositiveChange ? '#4CAF50' : '#F44336';
-    
+
     return (
       <TouchableOpacity
         style={[
           styles.alertItem,
           { backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5' },
-          !item.read && styles.unreadAlert
+          !item.read && styles.unreadAlert,
         ]}
         onPress={() => handleMarkAsRead(item.id)}
       >
         <View style={styles.alertHeader}>
-          <Text style={[styles.bookmakerName, { color: colors.text }]}>
-            {item.bookmaker}
-          </Text>
+          <Text style={[styles.bookmakerName, { color: colors.text }]}>{item.bookmaker}</Text>
           <Text style={[styles.timestamp, { color: colors.text }]}>
             {formatTimestamp(item.timestamp)}
           </Text>
         </View>
-        
+
         <Text style={[styles.gameTitle, { color: colors.text }]}>
           {item.homeTeam} vs {item.awayTeam}
         </Text>
-        
+
         <View style={styles.oddsChangeContainer}>
           <Text style={[styles.previousOdds, { color: colors.text }]}>
             {formatOdds(item.previousOdds)}
@@ -96,13 +93,12 @@ const OddsMovementAlerts: React.FC<OddsMovementAlertsProps> = ({ onClose }) => {
             {formatOdds(item.currentOdds)}
           </Text>
           <Text style={[styles.percentageChange, { color: changeColor }]}>
-            ({isPositiveChange ? '+' : ''}{item.percentageChange.toFixed(1)}%)
+            ({isPositiveChange ? '+' : ''}
+            {item.percentageChange.toFixed(1)}%)
           </Text>
         </View>
-        
-        {!item.read && (
-          <View style={styles.unreadIndicator} />
-        )}
+
+        {!item.read && <View style={styles.unreadIndicator} />}
       </TouchableOpacity>
     );
   };
@@ -115,7 +111,7 @@ const OddsMovementAlerts: React.FC<OddsMovementAlertsProps> = ({ onClose }) => {
           <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
-      
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: colors.text }]}>Loading alerts...</Text>

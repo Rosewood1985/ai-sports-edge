@@ -2,7 +2,7 @@
 
 /**
  * Migration Script: Replace Vulnerable OCR Services
- * 
+ *
  * This script safely migrates from vulnerable OCR services to secure implementations.
  * It backs up existing files and updates imports throughout the codebase.
  */
@@ -18,37 +18,39 @@ const MIGRATION_CONFIG = {
       file: 'services/enhancedOCRService.js',
       backup: 'enhancedOCRService.js.vulnerable',
       replacement: 'services/secureEnhancedOCRService.js',
-      newName: 'services/enhancedOCRService.js'
+      newName: 'services/enhancedOCRService.js',
     },
     {
       file: 'services/multiProviderOCRService.js',
       backup: 'multiProviderOCRService.js.vulnerable',
       replacement: 'services/secureMultiProviderOCRService.js',
-      newName: 'services/multiProviderOCRService.js'
+      newName: 'services/multiProviderOCRService.js',
     },
     {
       file: 'services/imagePreprocessingService.js',
       backup: 'imagePreprocessingService.js.vulnerable',
       replacement: 'services/secureImagePreprocessingService.js',
-      newName: 'services/imagePreprocessingService.js'
-    }
+      newName: 'services/imagePreprocessingService.js',
+    },
   ],
-  
+
   // Files that import the vulnerable services (need import updates)
   importUpdates: [
     {
       pattern: /const.*=.*require\(['"]\.\/enhancedOCRService['"]\)/g,
-      replacement: "const { secureEnhancedOCRService } = require('./secureEnhancedOCRService')"
+      replacement: "const { secureEnhancedOCRService } = require('./secureEnhancedOCRService')",
     },
     {
       pattern: /const.*=.*require\(['"]\.\/multiProviderOCRService['"]\)/g,
-      replacement: "const { secureMultiProviderOCRService } = require('./secureMultiProviderOCRService')"
+      replacement:
+        "const { secureMultiProviderOCRService } = require('./secureMultiProviderOCRService')",
     },
     {
       pattern: /const.*=.*require\(['"]\.\/imagePreprocessingService['"]\)/g,
-      replacement: "const { secureImagePreprocessingService } = require('./secureImagePreprocessingService')"
-    }
-  ]
+      replacement:
+        "const { secureImagePreprocessingService } = require('./secureImagePreprocessingService')",
+    },
+  ],
 };
 
 /**
@@ -56,27 +58,26 @@ const MIGRATION_CONFIG = {
  */
 async function migrateToSecureOCR() {
   console.log('🔒 Starting migration to secure OCR services...');
-  
+
   try {
     // Step 1: Create backup directory
     await createBackupDirectory();
-    
+
     // Step 2: Backup vulnerable services
     await backupVulnerableServices();
-    
+
     // Step 3: Replace with secure services
     await replaceWithSecureServices();
-    
+
     // Step 4: Update imports throughout codebase
     await updateImports();
-    
+
     // Step 5: Create migration summary
     await createMigrationSummary();
-    
+
     console.log('✅ Migration completed successfully!');
     console.log(`📁 Backups stored in: ${MIGRATION_CONFIG.backupDir}`);
     console.log('🔧 Please restart your application to use secure OCR services.');
-    
   } catch (error) {
     console.error('❌ Migration failed:', error.message);
     console.log('🔄 Attempting rollback...');
@@ -98,11 +99,11 @@ async function createBackupDirectory() {
  */
 async function backupVulnerableServices() {
   console.log('💾 Backing up vulnerable services...');
-  
+
   for (const service of MIGRATION_CONFIG.vulnerableServices) {
     const sourcePath = path.join(__dirname, '..', service.file);
     const backupPath = path.join(MIGRATION_CONFIG.backupDir, service.backup);
-    
+
     try {
       await fs.access(sourcePath);
       await fs.copyFile(sourcePath, backupPath);
@@ -122,19 +123,18 @@ async function backupVulnerableServices() {
  */
 async function replaceWithSecureServices() {
   console.log('🔄 Replacing with secure services...');
-  
+
   for (const service of MIGRATION_CONFIG.vulnerableServices) {
     const sourcePath = path.join(__dirname, '..', service.replacement);
     const targetPath = path.join(__dirname, '..', service.newName);
-    
+
     try {
       // Check if secure service exists
       await fs.access(sourcePath);
-      
+
       // Copy secure service to replace vulnerable one
       await fs.copyFile(sourcePath, targetPath);
       console.log(`✓ Replaced: ${service.file} → ${service.replacement}`);
-      
     } catch (error) {
       throw new Error(`Failed to replace ${service.file}: ${error.message}`);
     }
@@ -146,15 +146,15 @@ async function replaceWithSecureServices() {
  */
 async function updateImports() {
   console.log('🔗 Updating imports throughout codebase...');
-  
+
   const jsFiles = await findJavaScriptFiles();
   let updatedFiles = 0;
-  
+
   for (const filePath of jsFiles) {
     try {
       let content = await fs.readFile(filePath, 'utf-8');
       let modified = false;
-      
+
       // Apply import updates
       for (const update of MIGRATION_CONFIG.importUpdates) {
         if (update.pattern.test(content)) {
@@ -162,19 +162,18 @@ async function updateImports() {
           modified = true;
         }
       }
-      
+
       // Write updated content if modified
       if (modified) {
         await fs.writeFile(filePath, content, 'utf-8');
         updatedFiles++;
         console.log(`✓ Updated imports in: ${path.relative(process.cwd(), filePath)}`);
       }
-      
     } catch (error) {
       console.warn(`⚠️  Could not update imports in ${filePath}: ${error.message}`);
     }
   }
-  
+
   console.log(`📝 Updated imports in ${updatedFiles} files`);
 }
 
@@ -184,14 +183,14 @@ async function updateImports() {
 async function findJavaScriptFiles() {
   const files = [];
   const excludeDirs = ['node_modules', '.git', 'backups', 'build', 'dist'];
-  
+
   async function scanDirectory(dir) {
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
+
         if (entry.isDirectory() && !excludeDirs.includes(entry.name)) {
           await scanDirectory(fullPath);
         } else if (entry.isFile() && (entry.name.endsWith('.js') || entry.name.endsWith('.jsx'))) {
@@ -202,7 +201,7 @@ async function findJavaScriptFiles() {
       // Skip directories we can't read
     }
   }
-  
+
   await scanDirectory(path.join(__dirname, '..'));
   return files;
 }
@@ -212,14 +211,14 @@ async function findJavaScriptFiles() {
  */
 async function createMigrationSummary() {
   console.log('📋 Creating migration summary...');
-  
+
   const summary = {
     migrationDate: new Date().toISOString(),
     backupLocation: MIGRATION_CONFIG.backupDir,
     migratedServices: MIGRATION_CONFIG.vulnerableServices.map(s => ({
       original: s.file,
       backup: s.backup,
-      replacement: s.replacement
+      replacement: s.replacement,
     })),
     securityImprovements: [
       'Command injection prevention through parameterized execution',
@@ -227,19 +226,19 @@ async function createMigrationSummary() {
       'Comprehensive input validation',
       'Secure file handling with proper cleanup',
       'Timeout controls for all operations',
-      'Error handling and security incident logging'
+      'Error handling and security incident logging',
     ],
     nextSteps: [
       'Restart the application',
       'Test OCR functionality with secure services',
       'Monitor logs for security incidents',
-      'Remove backup files after verification (optional)'
-    ]
+      'Remove backup files after verification (optional)',
+    ],
   };
-  
+
   const summaryPath = path.join(MIGRATION_CONFIG.backupDir, 'migration-summary.json');
   await fs.writeFile(summaryPath, JSON.stringify(summary, null, 2));
-  
+
   console.log(`📄 Migration summary saved to: ${summaryPath}`);
 }
 
@@ -248,12 +247,12 @@ async function createMigrationSummary() {
  */
 async function rollbackMigration() {
   console.log('🔄 Rolling back migration...');
-  
+
   try {
     for (const service of MIGRATION_CONFIG.vulnerableServices) {
       const backupPath = path.join(MIGRATION_CONFIG.backupDir, service.backup);
       const targetPath = path.join(__dirname, '..', service.file);
-      
+
       try {
         await fs.access(backupPath);
         await fs.copyFile(backupPath, targetPath);
@@ -262,7 +261,7 @@ async function rollbackMigration() {
         console.warn(`⚠️  Could not restore ${service.file}: ${error.message}`);
       }
     }
-    
+
     console.log('✅ Rollback completed');
   } catch (error) {
     console.error('❌ Rollback failed:', error.message);
@@ -274,7 +273,7 @@ async function rollbackMigration() {
  */
 async function validateEnvironment() {
   console.log('🔍 Validating environment...');
-  
+
   // Check if we're in the right directory
   const packageJsonPath = path.join(__dirname, '..', 'package.json');
   try {
@@ -282,7 +281,7 @@ async function validateEnvironment() {
   } catch (error) {
     throw new Error('Not in project root directory (package.json not found)');
   }
-  
+
   // Check if secure services exist
   for (const service of MIGRATION_CONFIG.vulnerableServices) {
     const securePath = path.join(__dirname, '..', service.replacement);
@@ -292,7 +291,7 @@ async function validateEnvironment() {
       throw new Error(`Secure service not found: ${service.replacement}`);
     }
   }
-  
+
   console.log('✓ Environment validation passed');
 }
 
@@ -324,7 +323,7 @@ if (require.main === module) {
   (async () => {
     try {
       showMigrationPlan();
-      
+
       // Simple confirmation (in a real scenario, you might use a proper prompt library)
       if (process.argv.includes('--confirm')) {
         await validateEnvironment();
@@ -342,5 +341,5 @@ if (require.main === module) {
 
 module.exports = {
   migrateToSecureOCR,
-  MIGRATION_CONFIG
+  MIGRATION_CONFIG,
 };

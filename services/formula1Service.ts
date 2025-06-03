@@ -1,6 +1,6 @@
-import { auth, firestore } from '../config/firebase';
 import { hasPremiumAccess } from './firebaseSubscriptionService';
 import { shouldUseMockData, logMockDataUsage } from './mockDataService';
+import { auth, firestore } from '../config/firebase';
 
 /**
  * Formula 1 race data interface
@@ -80,7 +80,7 @@ export const getUpcomingRaces = async (): Promise<Formula1Race[]> => {
     if (shouldUseMockData(firestore)) {
       logMockDataUsage('getUpcomingRaces');
     }
-    
+
     // In a real implementation, this would call the Formula 1 API
     // For now, we'll return mock data
     return [
@@ -92,7 +92,7 @@ export const getUpcomingRaces = async (): Promise<Formula1Race[]> => {
         time: '05:00:00Z',
         country: 'Australia',
         round: 1,
-        season: 2025
+        season: 2025,
       },
       {
         id: 'race-2025-2',
@@ -102,7 +102,7 @@ export const getUpcomingRaces = async (): Promise<Formula1Race[]> => {
         time: '15:00:00Z',
         country: 'Bahrain',
         round: 2,
-        season: 2025
+        season: 2025,
       },
       {
         id: 'race-2025-3',
@@ -112,8 +112,8 @@ export const getUpcomingRaces = async (): Promise<Formula1Race[]> => {
         time: '07:00:00Z',
         country: 'China',
         round: 3,
-        season: 2025
-      }
+        season: 2025,
+      },
     ];
   } catch (error) {
     console.error('Error fetching Formula 1 races:', error);
@@ -129,14 +129,14 @@ export const getDriverStandings = async (): Promise<Formula1Driver[]> => {
   try {
     // Production Formula 1 API integration
     const response = await fetch('https://ergast.com/api/f1/current/driverStandings.json');
-    
+
     if (!response.ok) {
       throw new Error(`Formula 1 API error: ${response.status}`);
     }
-    
+
     const data = await response.json();
     const standings = data.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];
-    
+
     return standings.map((standing: any, index: number) => ({
       id: `driver-${standing.Driver.driverId}`,
       name: `${standing.Driver.givenName} ${standing.Driver.familyName}`,
@@ -147,7 +147,7 @@ export const getDriverStandings = async (): Promise<Formula1Driver[]> => {
       points: parseInt(standing.points) || 0,
       position: parseInt(standing.position) || index + 1,
       wins: parseInt(standing.wins) || 0,
-      podiums: 0 // Note: Ergast API doesn't provide podiums in standings, would need separate call
+      podiums: 0, // Note: Ergast API doesn't provide podiums in standings, would need separate call
     }));
   } catch (error) {
     console.error('Error fetching Formula 1 driver standings:', error);
@@ -165,24 +165,24 @@ export const getTeamStandings = async (): Promise<Formula1Team[]> => {
     if (shouldUseMockData(firestore)) {
       logMockDataUsage('getTeamStandings');
     }
-    
+
     // Production Formula 1 API integration for constructor standings
     const response = await fetch('https://ergast.com/api/f1/current/constructorStandings.json');
-    
+
     if (!response.ok) {
       throw new Error(`Formula 1 API error: ${response.status}`);
     }
-    
+
     const data = await response.json();
     const standings = data.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
-    
+
     return standings.map((standing: any) => ({
       id: `team-${standing.Constructor.constructorId}`,
       name: standing.Constructor.name,
       nationality: standing.Constructor.nationality || 'Unknown',
       points: parseInt(standing.points) || 0,
       position: parseInt(standing.position) || 0,
-      championships: 0 // Note: Ergast API doesn't provide championship count in standings
+      championships: 0, // Note: Ergast API doesn't provide championship count in standings
     }));
   } catch (error) {
     console.error('Error fetching Formula 1 team standings:', error);
@@ -204,7 +204,7 @@ export const getRacePrediction = async (
     // In development mode or if Firebase is not initialized, return mock data
     if (shouldUseMockData(firestore)) {
       logMockDataUsage('getRacePrediction');
-      
+
       // Return mock prediction data
       return {
         raceId,
@@ -215,58 +215,60 @@ export const getRacePrediction = async (
             driverId: 'driver-1',
             driverName: 'Max Verstappen',
             team: 'Red Bull Racing',
-            confidence: 0.85
+            confidence: 0.85,
           },
           {
             position: 2,
             driverId: 'driver-2',
             driverName: 'Lewis Hamilton',
             team: 'Mercedes',
-            confidence: 0.75
+            confidence: 0.75,
           },
           {
             position: 3,
             driverId: 'driver-3',
             driverName: 'Charles Leclerc',
             team: 'Ferrari',
-            confidence: 0.65
-          }
+            confidence: 0.65,
+          },
         ],
         podiumPrediction: {
           first: 'Max Verstappen',
           second: 'Lewis Hamilton',
           third: 'Charles Leclerc',
-          confidence: 0.70
+          confidence: 0.7,
         },
         fastestLapPrediction: {
           driver: 'Max Verstappen',
-          confidence: 0.65
+          confidence: 0.65,
         },
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       };
     }
-    
+
     // Check if user has premium access or has purchased this prediction
     const hasPremium = await hasPremiumAccess(userId);
-    
+
     if (!hasPremium) {
       // Check if user has purchased this specific prediction
       const db = firestore;
       if (!db) return null;
-      
-      const purchasesSnapshot = await db.collection('users').doc(userId)
+
+      const purchasesSnapshot = await db
+        .collection('users')
+        .doc(userId)
         .collection('purchases')
         .where('productId', '==', 'formula1-race-prediction')
         .where('raceId', '==', raceId)
         .where('status', '==', 'succeeded')
         .limit(1)
         .get();
-      
+
       if (purchasesSnapshot.empty) {
         return null; // User doesn't have access
       }
     }
-    
+
     // In a real implementation, this would call the Formula 1 API or a machine learning service
     // For now, we'll return mock data
     return {
@@ -278,34 +280,34 @@ export const getRacePrediction = async (
           driverId: 'driver-1',
           driverName: 'Max Verstappen',
           team: 'Red Bull Racing',
-          confidence: 0.85
+          confidence: 0.85,
         },
         {
           position: 2,
           driverId: 'driver-2',
           driverName: 'Lewis Hamilton',
           team: 'Mercedes',
-          confidence: 0.75
+          confidence: 0.75,
         },
         {
           position: 3,
           driverId: 'driver-3',
           driverName: 'Charles Leclerc',
           team: 'Ferrari',
-          confidence: 0.65
-        }
+          confidence: 0.65,
+        },
       ],
       podiumPrediction: {
         first: 'Max Verstappen',
         second: 'Lewis Hamilton',
         third: 'Charles Leclerc',
-        confidence: 0.70
+        confidence: 0.7,
       },
       fastestLapPrediction: {
         driver: 'Max Verstappen',
-        confidence: 0.65
+        confidence: 0.65,
       },
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Error fetching Formula 1 race prediction:', error);
@@ -317,5 +319,5 @@ export default {
   getUpcomingRaces,
   getDriverStandings,
   getTeamStandings,
-  getRacePrediction
+  getRacePrediction,
 };

@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  ActivityIndicator, 
-  RefreshControl,
-  Alert
-} from 'react-native';
-import { getPendingQuestions, FAQQuestion } from '../services/faqService';
-import PendingQuestionItem from '../components/PendingQuestionItem';
-import EmptyState from '../components/EmptyState';
-import { auth } from '../config/firebase';
 import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+  Alert,
+} from 'react-native';
+
+import EmptyState from '../components/EmptyState';
+import PendingQuestionItem from '../components/PendingQuestionItem';
+import { auth } from '../config/firebase';
+import { getPendingQuestions, FAQQuestion } from '../services/faqService';
 
 /**
  * Admin screen for moderating FAQ questions
@@ -28,18 +29,16 @@ const FAQModerationScreen = (): JSX.Element => {
   const checkAdminAccess = () => {
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert(
-        'Access Denied',
-        'You must be logged in to access the moderation dashboard.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
+      Alert.alert('Access Denied', 'You must be logged in to access the moderation dashboard.', [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
       return false;
     }
-    
+
     // In a real app, you would check admin status in Firestore or Firebase Auth claims
     // For this example, we'll just check if the email contains "admin"
     const isAdmin = user.email?.includes('admin') || false;
-    
+
     if (!isAdmin) {
       Alert.alert(
         'Access Denied',
@@ -48,13 +47,13 @@ const FAQModerationScreen = (): JSX.Element => {
       );
       return false;
     }
-    
+
     return true;
   };
 
   const loadPendingQuestions = async () => {
     if (!checkAdminAccess()) return;
-    
+
     try {
       const questions = await getPendingQuestions();
       setPendingQuestions(questions);
@@ -93,35 +92,21 @@ const FAQModerationScreen = (): JSX.Element => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>FAQ Moderation Dashboard</Text>
-      <Text style={styles.subtitle}>
-        Review and manage submitted questions
-      </Text>
-      
+      <Text style={styles.subtitle}>Review and manage submitted questions</Text>
+
       <FlatList
         data={pendingQuestions}
-        keyExtractor={(item) => item.id || Math.random().toString()}
+        keyExtractor={item => item.id || Math.random().toString()}
         renderItem={({ item }) => (
-          <PendingQuestionItem 
-            question={item} 
-            onQuestionUpdated={handleQuestionUpdated} 
-          />
+          <PendingQuestionItem question={item} onQuestionUpdated={handleQuestionUpdated} />
         )}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={['#3498db']}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#3498db']} />
         }
         ListEmptyComponent={
-          <EmptyState 
-            message="No pending questions to review" 
-            style={styles.emptyState}
-          />
+          <EmptyState message="No pending questions to review" style={styles.emptyState} />
         }
-        contentContainerStyle={
-          pendingQuestions.length === 0 ? { flex: 1 } : { paddingBottom: 20 }
-        }
+        contentContainerStyle={pendingQuestions.length === 0 ? { flex: 1 } : { paddingBottom: 20 }}
       />
     </View>
   );
@@ -158,7 +143,7 @@ const styles = StyleSheet.create({
   emptyState: {
     flex: 1,
     justifyContent: 'center',
-  }
+  },
 });
 
 export default FAQModerationScreen;

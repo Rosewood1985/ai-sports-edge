@@ -3,14 +3,14 @@
  * This service provides mock data when Firebase is not available
  */
 
+import {
+  SubscriptionPlan,
+  Subscription,
+  PaymentMethod,
+  SUBSCRIPTION_PLANS,
+} from './firebaseSubscriptionService';
 import { isDevMode } from '../config/firebase';
 import { isFirebaseInitialized } from '../utils/environmentUtils';
-import { 
-  SubscriptionPlan, 
-  Subscription, 
-  PaymentMethod,
-  SUBSCRIPTION_PLANS
-} from './firebaseSubscriptionService';
 
 /**
  * Check if we should use mock data
@@ -35,7 +35,7 @@ export const getMockSubscription = (): Subscription => {
     trialEnd: null,
     defaultPaymentMethod: 'mock-payment-method',
     plan: SUBSCRIPTION_PLANS.find(p => p.id === 'premium-yearly'),
-    createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000 // 60 days ago
+    createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000, // 60 days ago
   };
 };
 
@@ -51,7 +51,7 @@ export const getMockPaymentMethods = (): PaymentMethod[] => {
       last4: '4242',
       expiryMonth: 12,
       expiryYear: 2030,
-      isDefault: true
+      isDefault: true,
     },
     {
       id: 'pm_mock_mastercard',
@@ -59,8 +59,8 @@ export const getMockPaymentMethods = (): PaymentMethod[] => {
       last4: '8888',
       expiryMonth: 10,
       expiryYear: 2028,
-      isDefault: false
-    }
+      isDefault: false,
+    },
   ];
 };
 
@@ -70,7 +70,7 @@ export const getMockPaymentMethods = (): PaymentMethod[] => {
  */
 export const mockSuccess = async (): Promise<boolean> => {
   // Add a small delay to simulate network request
-  await new Promise<void>((resolve) => setTimeout(() => resolve(), 300));
+  await new Promise<void>(resolve => setTimeout(() => resolve(), 300));
   return true;
 };
 
@@ -87,5 +87,5 @@ export default {
   getMockSubscription,
   getMockPaymentMethods,
   mockSuccess,
-  logMockDataUsage
+  logMockDataUsage,
 };

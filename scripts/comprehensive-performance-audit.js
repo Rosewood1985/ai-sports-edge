@@ -1,13 +1,13 @@
 /**
  * Comprehensive Performance Audit Script
- * 
+ *
  * Runs a complete performance analysis of the AI Sports Edge platform,
  * including bundle analysis, image optimization, and advanced performance metrics.
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 class ComprehensivePerformanceAudit {
   constructor() {
@@ -66,7 +66,6 @@ class ComprehensivePerformanceAudit {
 
       console.log('\n✅ Comprehensive Performance Audit Complete!');
       console.log(`📊 Overall Performance Score: ${this.auditResults.scores.overall}/100`);
-
     } catch (error) {
       console.error('❌ Audit failed:', error.message);
       process.exit(1);
@@ -80,7 +79,7 @@ class ComprehensivePerformanceAudit {
     try {
       // Check if webpack stats exist
       const statsPath = path.join(process.cwd(), 'dist', 'bundle-stats.json');
-      
+
       if (!fs.existsSync(statsPath)) {
         console.log('   Building bundle with analysis...');
         execSync('ANALYZE_BUNDLE=true npm run build:prod', { stdio: 'pipe' });
@@ -88,7 +87,7 @@ class ComprehensivePerformanceAudit {
 
       if (fs.existsSync(statsPath)) {
         const stats = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
-        
+
         this.auditResults.bundleAnalysis = {
           totalSize: this.calculateTotalBundleSize(stats),
           chunks: this.analyzeBundleChunks(stats),
@@ -96,12 +95,13 @@ class ComprehensivePerformanceAudit {
           duplicates: this.findDuplicateModules(stats),
         };
 
-        console.log(`   ✅ Bundle Size: ${this.formatBytes(this.auditResults.bundleAnalysis.totalSize)}`);
+        console.log(
+          `   ✅ Bundle Size: ${this.formatBytes(this.auditResults.bundleAnalysis.totalSize)}`
+        );
       } else {
         console.log('   ⚠️  Bundle stats not available');
         this.auditResults.bundleAnalysis = { error: 'Stats not available' };
       }
-
     } catch (error) {
       console.log(`   ❌ Bundle analysis failed: ${error.message}`);
       this.auditResults.bundleAnalysis = { error: error.message };
@@ -123,14 +123,16 @@ class ComprehensivePerformanceAudit {
    */
   analyzeBundleChunks(stats) {
     if (!stats.chunks) return [];
-    
-    return stats.chunks.map(chunk => ({
-      id: chunk.id,
-      names: chunk.names,
-      size: chunk.size,
-      modules: chunk.modules ? chunk.modules.length : 0,
-      files: chunk.files,
-    })).sort((a, b) => b.size - a.size);
+
+    return stats.chunks
+      .map(chunk => ({
+        id: chunk.id,
+        names: chunk.names,
+        size: chunk.size,
+        modules: chunk.modules ? chunk.modules.length : 0,
+        files: chunk.files,
+      }))
+      .sort((a, b) => b.size - a.size);
   }
 
   /**
@@ -140,7 +142,7 @@ class ComprehensivePerformanceAudit {
     if (!stats.modules) return [];
 
     const dependencies = {};
-    
+
     stats.modules.forEach(module => {
       if (module.name && module.name.includes('node_modules')) {
         const match = module.name.match(/node_modules\/([^\/]+)/);
@@ -208,10 +210,9 @@ class ComprehensivePerformanceAudit {
       };
 
       this.auditResults.performanceMetrics = metrics;
-      
+
       console.log(`   ✅ Build Time: ${metrics.buildTime}ms`);
       console.log(`   ✅ Dependencies: ${metrics.dependencies.total} packages`);
-
     } catch (error) {
       console.log(`   ❌ Performance metrics collection failed: ${error.message}`);
       this.auditResults.performanceMetrics = { error: error.message };
@@ -223,7 +224,7 @@ class ComprehensivePerformanceAudit {
    */
   async measureBuildTime() {
     const startTime = Date.now();
-    
+
     try {
       // Run a quick build to measure time
       execSync('npm run build:prod', { stdio: 'pipe' });
@@ -240,10 +241,10 @@ class ComprehensivePerformanceAudit {
     try {
       const packageJsonPath = path.join(process.cwd(), 'package.json');
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      
+
       const dependencies = packageJson.dependencies || {};
       const devDependencies = packageJson.devDependencies || {};
-      
+
       return {
         total: Object.keys(dependencies).length + Object.keys(devDependencies).length,
         production: Object.keys(dependencies).length,
@@ -282,7 +283,7 @@ class ComprehensivePerformanceAudit {
       // Count files and lines
       const srcPath = path.join(process.cwd(), 'src');
       const stats = this.analyzeDirectoryStats(srcPath);
-      
+
       return {
         totalFiles: stats.files,
         totalLines: stats.lines,
@@ -298,16 +299,16 @@ class ComprehensivePerformanceAudit {
    * Analyze directory statistics
    */
   analyzeDirectoryStats(dirPath) {
-    let stats = { files: 0, lines: 0 };
-    
+    const stats = { files: 0, lines: 0 };
+
     if (!fs.existsSync(dirPath)) return stats;
-    
+
     const items = fs.readdirSync(dirPath);
-    
+
     items.forEach(item => {
       const itemPath = path.join(dirPath, item);
       const stat = fs.statSync(itemPath);
-      
+
       if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
         const subStats = this.analyzeDirectoryStats(itemPath);
         stats.files += subStats.files;
@@ -322,7 +323,7 @@ class ComprehensivePerformanceAudit {
         }
       }
     });
-    
+
     return stats;
   }
 
@@ -332,7 +333,7 @@ class ComprehensivePerformanceAudit {
   calculateComplexityScore(stats) {
     // Simple complexity calculation based on lines per file
     const avgLines = stats.lines / stats.files;
-    
+
     if (avgLines < 50) return 'Low';
     if (avgLines < 100) return 'Medium';
     if (avgLines < 200) return 'High';
@@ -346,7 +347,7 @@ class ComprehensivePerformanceAudit {
     try {
       const assetsPath = path.join(process.cwd(), 'assets');
       const publicPath = path.join(process.cwd(), 'public');
-      
+
       const imageStats = {
         totalImages: 0,
         totalSize: 0,
@@ -365,10 +366,9 @@ class ComprehensivePerformanceAudit {
       }
 
       this.auditResults.imageOptimization = imageStats;
-      
+
       console.log(`   ✅ Images Found: ${imageStats.totalImages}`);
       console.log(`   ✅ Total Size: ${this.formatBytes(imageStats.totalSize)}`);
-
     } catch (error) {
       console.log(`   ❌ Image optimization analysis failed: ${error.message}`);
       this.auditResults.imageOptimization = { error: error.message };
@@ -380,20 +380,20 @@ class ComprehensivePerformanceAudit {
    */
   analyzeImagesInDirectory(dirPath, stats) {
     if (!fs.existsSync(dirPath)) return;
-    
+
     const items = fs.readdirSync(dirPath);
-    
+
     items.forEach(item => {
       const itemPath = path.join(dirPath, item);
       const stat = fs.statSync(itemPath);
-      
+
       if (stat.isDirectory() && !item.startsWith('.')) {
         this.analyzeImagesInDirectory(itemPath, stats);
       } else if (stat.isFile() && /\.(jpg|jpeg|png|gif|svg|webp|avif)$/i.test(item)) {
         const ext = path.extname(item).toLowerCase();
         stats.totalImages += 1;
         stats.totalSize += stat.size;
-        
+
         if (!stats.formats[ext]) {
           stats.formats[ext] = { count: 0, size: 0 };
         }
@@ -401,10 +401,12 @@ class ComprehensivePerformanceAudit {
         stats.formats[ext].size += stat.size;
 
         // Generate recommendations
-        if (ext === '.png' && stat.size > 100000) { // > 100KB PNG
+        if (ext === '.png' && stat.size > 100000) {
+          // > 100KB PNG
           stats.recommendations.push(`Convert ${item} to WebP for better compression`);
         }
-        if (ext === '.jpg' && stat.size > 500000) { // > 500KB JPEG
+        if (ext === '.jpg' && stat.size > 500000) {
+          // > 500KB JPEG
           stats.recommendations.push(`Optimize ${item} - consider reducing quality or size`);
         }
       }
@@ -418,15 +420,15 @@ class ComprehensivePerformanceAudit {
     try {
       const packageJsonPath = path.join(process.cwd(), 'package.json');
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      
+
       const dependencies = packageJson.dependencies || {};
       const heavyDependencies = [];
       const optimizationOpportunities = [];
 
       // Check for known heavy dependencies
       const heavyPackages = {
-        'moment': { size: '67KB', alternative: 'date-fns', savings: '50KB' },
-        'lodash': { size: '71KB', alternative: 'lodash-es', savings: '30KB' },
+        moment: { size: '67KB', alternative: 'date-fns', savings: '50KB' },
+        lodash: { size: '71KB', alternative: 'lodash-es', savings: '30KB' },
         '@mui/material': { size: '1.2MB', alternative: 'selective imports', savings: '800KB' },
         'react-router-dom': { size: '45KB', alternative: 'reach-router', savings: '20KB' },
       };
@@ -437,7 +439,7 @@ class ComprehensivePerformanceAudit {
             name: dep,
             ...heavyPackages[dep],
           });
-          
+
           optimizationOpportunities.push({
             type: 'dependency',
             package: dep,
@@ -454,7 +456,6 @@ class ComprehensivePerformanceAudit {
 
       console.log(`   ✅ Heavy Dependencies: ${heavyDependencies.length}`);
       console.log(`   ✅ Optimization Opportunities: ${optimizationOpportunities.length}`);
-
     } catch (error) {
       console.log(`   ❌ Dependency analysis failed: ${error.message}`);
     }
@@ -476,7 +477,7 @@ class ComprehensivePerformanceAudit {
       try {
         execSync('npx eslint . --format json --output-file eslint-results.json', { stdio: 'pipe' });
         const eslintResults = JSON.parse(fs.readFileSync('eslint-results.json', 'utf8'));
-        
+
         eslintResults.forEach(file => {
           file.messages.forEach(message => {
             if (message.severity === 2) results.eslintErrors++;
@@ -499,11 +500,10 @@ class ComprehensivePerformanceAudit {
       }
 
       this.auditResults.codeQuality = results;
-      
+
       console.log(`   ✅ ESLint Errors: ${results.eslintErrors}`);
       console.log(`   ✅ ESLint Warnings: ${results.eslintWarnings}`);
       console.log(`   ✅ TypeScript: ${results.typescript}`);
-
     } catch (error) {
       console.log(`   ❌ Code quality analysis failed: ${error.message}`);
     }
@@ -524,7 +524,7 @@ class ComprehensivePerformanceAudit {
       try {
         const auditOutput = execSync('npm audit --json', { stdio: 'pipe', encoding: 'utf8' });
         const audit = JSON.parse(auditOutput);
-        
+
         if (audit.metadata) {
           results.vulnerabilities = audit.metadata.vulnerabilities?.total || 0;
         }
@@ -541,9 +541,8 @@ class ComprehensivePerformanceAudit {
       }
 
       this.auditResults.security = results;
-      
-      console.log(`   ✅ Vulnerabilities: ${results.vulnerabilities}`);
 
+      console.log(`   ✅ Vulnerabilities: ${results.vulnerabilities}`);
     } catch (error) {
       console.log(`   ❌ Security analysis failed: ${error.message}`);
     }
@@ -556,7 +555,8 @@ class ComprehensivePerformanceAudit {
     const recommendations = [];
 
     // Bundle size recommendations
-    if (this.auditResults.bundleAnalysis?.totalSize > 500000) { // > 500KB
+    if (this.auditResults.bundleAnalysis?.totalSize > 500000) {
+      // > 500KB
       recommendations.push({
         category: 'Bundle Size',
         priority: 'High',
@@ -627,18 +627,20 @@ class ComprehensivePerformanceAudit {
 
     // Bundle size score
     const bundleSize = this.auditResults.bundleAnalysis?.totalSize || 0;
-    if (bundleSize > 1000000) scores.bundleSize = 50; // > 1MB
-    else if (bundleSize > 500000) scores.bundleSize = 75; // > 500KB
+    if (bundleSize > 1000000)
+      scores.bundleSize = 50; // > 1MB
+    else if (bundleSize > 500000)
+      scores.bundleSize = 75; // > 500KB
     else if (bundleSize > 250000) scores.bundleSize = 90; // > 250KB
 
     // Code quality score
     const eslintErrors = this.auditResults.codeQuality?.eslintErrors || 0;
     const eslintWarnings = this.auditResults.codeQuality?.eslintWarnings || 0;
-    scores.codeQuality = Math.max(0, 100 - (eslintErrors * 5) - (eslintWarnings * 1));
+    scores.codeQuality = Math.max(0, 100 - eslintErrors * 5 - eslintWarnings * 1);
 
     // Security score
     const vulnerabilities = this.auditResults.security?.vulnerabilities || 0;
-    scores.security = Math.max(0, 100 - (vulnerabilities * 10));
+    scores.security = Math.max(0, 100 - vulnerabilities * 10);
 
     // Performance score (average of other scores)
     scores.performance = Math.round((scores.bundleSize + scores.codeQuality) / 2);
@@ -740,13 +742,17 @@ class ComprehensivePerformanceAudit {
             <!-- Recommendations -->
             <div class="section">
                 <h2>Recommendations (${this.auditResults.recommendations.length} items)</h2>
-                ${this.auditResults.recommendations.map(rec => `
+                ${this.auditResults.recommendations
+                  .map(
+                    rec => `
                     <div class="recommendation priority-${rec.priority.toLowerCase()}">
                         <strong>${rec.category}</strong> - ${rec.priority} Priority<br>
                         ${rec.description}<br>
                         <small>Impact: ${rec.impact}</small>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
 
             <!-- Bundle Analysis -->

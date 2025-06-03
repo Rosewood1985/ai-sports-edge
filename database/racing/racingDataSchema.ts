@@ -1,26 +1,22 @@
 /**
  * Racing Data Database Schema
  * Optimized for ML query patterns and racing predictions
- * 
+ *
  * Phase 3: Storage and Caching Layer
  * Part of Racing Data Integration System
  */
 
-import { 
-  StandardizedNascarRace, 
-  StandardizedNascarDriver, 
-  NascarMLFeatures 
-} from '../../types/racing/nascarTypes';
-import { 
-  StandardizedHorseRace, 
-  StandardizedHorseRunner, 
-  HorseRacingMLFeatures 
+import { MLFeatureVector, RacingSport, CacheMetadata } from '../../types/racing/commonTypes';
+import {
+  StandardizedHorseRace,
+  StandardizedHorseRunner,
+  HorseRacingMLFeatures,
 } from '../../types/racing/horseRacingTypes';
-import { 
-  MLFeatureVector, 
-  RacingSport, 
-  CacheMetadata 
-} from '../../types/racing/commonTypes';
+import {
+  StandardizedNascarRace,
+  StandardizedNascarDriver,
+  NascarMLFeatures,
+} from '../../types/racing/nascarTypes';
 
 // Database Collection Interfaces
 export interface RacingDataCollection {
@@ -45,7 +41,7 @@ export interface NascarRaceDocument extends RacingDataCollection {
     predictions: any[];
     generatedAt: Date;
   }[];
-  
+
   // Indexing fields for ML queries
   season: number;
   raceWeek: number;
@@ -53,7 +49,7 @@ export interface NascarRaceDocument extends RacingDataCollection {
   trackType: string;
   weather: string;
   seriesType: string;
-  
+
   // Cache optimization fields
   cacheKey: string;
   cacheTier: 'hot' | 'warm' | 'cold';
@@ -65,7 +61,7 @@ export interface NascarRaceDocument extends RacingDataCollection {
 export interface NascarDriverDocument extends RacingDataCollection {
   sport: 'nascar';
   driverData: StandardizedNascarDriver;
-  
+
   // Performance tracking
   currentSeason: {
     wins: number;
@@ -75,7 +71,7 @@ export interface NascarDriverDocument extends RacingDataCollection {
     points: number;
     rank: number;
   };
-  
+
   careerStats: {
     totalRaces: number;
     wins: number;
@@ -83,7 +79,7 @@ export interface NascarDriverDocument extends RacingDataCollection {
     avgFinish: number;
     championships: number;
   };
-  
+
   // Track-specific performance
   trackPerformance: {
     [trackId: string]: {
@@ -95,7 +91,7 @@ export interface NascarDriverDocument extends RacingDataCollection {
       lastRaceResult?: number;
     };
   };
-  
+
   // ML optimization
   mlReadiness: boolean;
   featureVersion: string;
@@ -114,7 +110,7 @@ export interface HorseRaceDocument extends RacingDataCollection {
     predictions: any[];
     generatedAt: Date;
   }[];
-  
+
   // Indexing fields for ML queries
   raceDate: Date;
   trackId: string;
@@ -124,12 +120,12 @@ export interface HorseRaceDocument extends RacingDataCollection {
   grade: string;
   purse: number;
   weather: string;
-  
+
   // Market data
   totalPool: number;
   favoriteOdds: number;
   fieldSize: number;
-  
+
   // Cache optimization
   cacheKey: string;
   cacheTier: 'hot' | 'warm' | 'cold';
@@ -156,7 +152,7 @@ export interface HorseDocument extends RacingDataCollection {
       pedigreeRating: number;
     };
   };
-  
+
   // Performance tracking
   careerStats: {
     starts: number;
@@ -168,7 +164,7 @@ export interface HorseDocument extends RacingDataCollection {
     placeRate: number;
     avgFinish: number;
   };
-  
+
   // Current form
   recentForm: {
     lastSixRaces: number[];
@@ -177,7 +173,7 @@ export interface HorseDocument extends RacingDataCollection {
     classMovement: string;
     speedFigures: number[];
   };
-  
+
   // Surface/distance preferences
   preferences: {
     [surface: string]: {
@@ -187,7 +183,7 @@ export interface HorseDocument extends RacingDataCollection {
       avgSpeedFigure: number;
     };
   };
-  
+
   distancePerformance: {
     [distanceRange: string]: {
       starts: number;
@@ -196,7 +192,7 @@ export interface HorseDocument extends RacingDataCollection {
       avgFinish: number;
     };
   };
-  
+
   // ML optimization
   mlReadiness: boolean;
   featureVersion: string;
@@ -209,14 +205,14 @@ export interface MLFeatureDocument extends RacingDataCollection {
   modelType: string;
   extractedAt: Date;
   validUntil: Date;
-  
+
   // Feature metadata
   featureCount: number;
   completeness: number;
   accuracy: number;
   consistency: number;
   timeliness: number;
-  
+
   // Cache and performance
   cacheKey: string;
   compressionRatio: number;
@@ -230,11 +226,11 @@ export interface PredictionDocument extends RacingDataCollection {
   modelId: string;
   modelVersion: string;
   sport: RacingSport;
-  
+
   // Input data
   raceId: string;
   features: MLFeatureVector[];
-  
+
   // Prediction results
   predictions: {
     participantId: string;
@@ -243,12 +239,12 @@ export interface PredictionDocument extends RacingDataCollection {
     rank: number;
     probability: number;
   }[];
-  
+
   // Model performance
   accuracy?: number;
   calibration?: number;
   reliability?: number;
-  
+
   // Timing
   predictedAt: Date;
   raceTime: Date;
@@ -257,7 +253,7 @@ export interface PredictionDocument extends RacingDataCollection {
     actualRank: number;
     actualResult: any;
   }[];
-  
+
   // Cache optimization
   cacheKey: string;
   accessCount: number;
@@ -273,16 +269,16 @@ export const DATABASE_INDEXES = {
     { fields: ['cacheTier', 'priority'], unique: false },
     { fields: ['mlCompatible', 'dataQuality'], unique: false },
     { fields: ['cacheKey'], unique: true },
-    { fields: ['lastAccessed'], unique: false }
+    { fields: ['lastAccessed'], unique: false },
   ],
-  
+
   nascarDrivers: [
     { fields: ['driverData.id'], unique: true },
     { fields: ['currentSeason.rank'], unique: false },
     { fields: ['mlReadiness', 'featureVersion'], unique: false },
-    { fields: ['careerStats.winRate'], unique: false }
+    { fields: ['careerStats.winRate'], unique: false },
   ],
-  
+
   horseRaces: [
     { fields: ['raceDate', 'trackId'], unique: false },
     { fields: ['trackId', 'raceType'], unique: false },
@@ -290,32 +286,32 @@ export const DATABASE_INDEXES = {
     { fields: ['grade', 'purse'], unique: false },
     { fields: ['cacheTier', 'priority'], unique: false },
     { fields: ['cacheKey'], unique: true },
-    { fields: ['lastAccessed'], unique: false }
+    { fields: ['lastAccessed'], unique: false },
   ],
-  
+
   horses: [
     { fields: ['horseData.id'], unique: true },
     { fields: ['horseData.trainer'], unique: false },
     { fields: ['careerStats.winRate'], unique: false },
     { fields: ['recentForm.formRating'], unique: false },
-    { fields: ['mlReadiness', 'featureVersion'], unique: false }
+    { fields: ['mlReadiness', 'featureVersion'], unique: false },
   ],
-  
+
   mlFeatures: [
     { fields: ['featureVector.id'], unique: true },
     { fields: ['sport', 'modelType'], unique: false },
     { fields: ['extractedAt', 'validUntil'], unique: false },
     { fields: ['accessPattern', 'priority'], unique: false },
-    { fields: ['cacheKey'], unique: true }
+    { fields: ['cacheKey'], unique: true },
   ],
-  
+
   predictions: [
     { fields: ['predictionId'], unique: true },
     { fields: ['modelId', 'modelVersion'], unique: false },
     { fields: ['sport', 'raceId'], unique: false },
     { fields: ['predictedAt', 'raceTime'], unique: false },
-    { fields: ['served', 'accessCount'], unique: false }
-  ]
+    { fields: ['served', 'accessCount'], unique: false },
+  ],
 };
 
 // Query Optimization Patterns
@@ -325,52 +321,52 @@ export const QUERY_PATTERNS = {
     collection: 'mlFeatures',
     filter: { validUntil: { $gte: new Date() }, accessPattern: 'prediction' },
     sort: { priority: -1, extractedAt: -1 },
-    limit: 100
+    limit: 100,
   },
-  
+
   getTrainingData: {
     collection: 'mlFeatures',
     filter: { accessPattern: 'training', completeness: { $gte: 0.95 } },
     sort: { extractedAt: -1 },
-    limit: 10000
+    limit: 10000,
   },
-  
+
   getDriverTrackPerformance: {
     collection: 'nascarDrivers',
     filter: { 'trackPerformance.{trackId}.races': { $gte: 5 } },
-    projection: { 'trackPerformance.{trackId}': 1, 'careerStats': 1 }
+    projection: { 'trackPerformance.{trackId}': 1, careerStats: 1 },
   },
-  
+
   getHorseFormData: {
     collection: 'horses',
     filter: { 'recentForm.lastSixRaces': { $exists: true, $ne: [] } },
-    projection: { 'recentForm': 1, 'careerStats': 1, 'preferences': 1 }
-  }
+    projection: { recentForm: 1, careerStats: 1, preferences: 1 },
+  },
 };
 
 // Cache Configuration
 export interface CacheConfiguration {
   tiers: {
     hot: {
-      maxSize: number;        // 100MB
-      ttl: number;           // 15 minutes
-      compression: boolean;   // false
+      maxSize: number; // 100MB
+      ttl: number; // 15 minutes
+      compression: boolean; // false
       priority: 'high';
     };
     warm: {
-      maxSize: number;        // 500MB
-      ttl: number;           // 2 hours
-      compression: boolean;   // true
+      maxSize: number; // 500MB
+      ttl: number; // 2 hours
+      compression: boolean; // true
       priority: 'medium';
     };
     cold: {
-      maxSize: number;        // 2GB
-      ttl: number;           // 24 hours
-      compression: boolean;   // true
+      maxSize: number; // 2GB
+      ttl: number; // 24 hours
+      compression: boolean; // true
       priority: 'low';
     };
   };
-  
+
   evictionPolicy: 'lru' | 'lfu' | 'priority';
   compressionThreshold: number;
   prefetchPatterns: string[];
@@ -389,8 +385,8 @@ export default {
     horseRaces: HorseRaceDocument,
     horses: HorseDocument,
     mlFeatures: MLFeatureDocument,
-    predictions: PredictionDocument
+    predictions: PredictionDocument,
   },
   indexes: DATABASE_INDEXES,
-  queryPatterns: QUERY_PATTERNS
+  queryPatterns: QUERY_PATTERNS,
 };

@@ -1,5 +1,5 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -14,7 +14,7 @@ const messaging = admin.messaging();
  * and sends push notifications when significant changes occur
  */
 exports.monitorPlayerPlusMinus = functions.firestore
-  .document('playerPlusMinus/{docId}')
+  .document("playerPlusMinus/{docId}")
   .onUpdate(async (change, context) => {
     try {
       // Get the previous and current document data
@@ -37,7 +37,7 @@ exports.monitorPlayerPlusMinus = functions.firestore
       const { playerId, playerName, team, gameId } = currentData;
       
       // Get game information
-      const gameDoc = await db.collection('games').doc(gameId).get();
+      const gameDoc = await db.collection("games").doc(gameId).get();
       if (!gameDoc.exists) {
         console.log(`Game document ${gameId} not found.`);
         return null;
@@ -47,24 +47,24 @@ exports.monitorPlayerPlusMinus = functions.firestore
       const gameTitle = `${gameData.home_team} vs ${gameData.away_team}`;
       
       // Determine notification message based on direction of change
-      const direction = plusMinusChange > 0 ? 'increased' : 'decreased';
-      const emoji = plusMinusChange > 0 ? '📈' : '📉';
+      const direction = plusMinusChange > 0 ? "increased" : "decreased";
+      const emoji = plusMinusChange > 0 ? "📈" : "📉";
       const changeAbs = Math.abs(plusMinusChange);
       
       const title = `${emoji} Player Impact Alert`;
       const body = `${playerName} (${team}) has ${direction} their plus-minus by ${changeAbs} points in ${gameTitle}!`;
       
       // Find users who have access to this feature and have subscribed to notifications
-      const premiumUsers = await db.collection('users')
-        .where('notificationsEnabled', '==', true)
-        .where('subscriptionStatus.active', '==', true)
-        .where('subscriptionStatus.planId', 'in', ['premium-monthly', 'premium-yearly'])
+      const premiumUsers = await db.collection("users")
+        .where("notificationsEnabled", "==", true)
+        .where("subscriptionStatus.active", "==", true)
+        .where("subscriptionStatus.planId", "in", ["premium-monthly", "premium-yearly"])
         .get();
       
       // Find users with one-time purchases for this game
-      const oneTimePurchaseUsers = await db.collection('users')
-        .where('notificationsEnabled', '==', true)
-        .where(`gameAccess.${gameId}`, '==', true)
+      const oneTimePurchaseUsers = await db.collection("users")
+        .where("notificationsEnabled", "==", true)
+        .where(`gameAccess.${gameId}`, "==", true)
         .get();
       
       // Combine user lists (avoiding duplicates)
@@ -88,7 +88,7 @@ exports.monitorPlayerPlusMinus = functions.firestore
       
       // If no users to notify, exit early
       if (userTokens.size === 0) {
-        console.log('No users to notify.');
+        console.log("No users to notify.");
         return null;
       }
       
@@ -105,7 +105,7 @@ exports.monitorPlayerPlusMinus = functions.firestore
           team,
           plusMinus: currentPlusMinus.toString(),
           plusMinusChange: plusMinusChange.toString(),
-          type: 'player_plus_minus_alert',
+          type: "player_plus_minus_alert",
           timestamp: Date.now().toString(),
         },
         tokens: Array.from(userTokens),
@@ -123,12 +123,12 @@ exports.monitorPlayerPlusMinus = functions.firestore
             failedTokens.push(Array.from(userTokens)[idx]);
           }
         });
-        console.log('Notification failed for tokens:', failedTokens);
+        console.log("Notification failed for tokens:", failedTokens);
       }
       
       return null;
     } catch (error) {
-      console.error('Error sending player plus-minus notifications:', error);
+      console.error("Error sending player plus-minus notifications:", error);
       return null;
     }
   });
@@ -140,46 +140,46 @@ exports.sendTestPlusMinusNotification = functions.https.onCall(async (data, cont
   // Ensure user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'You must be logged in to send test notifications.'
+      "unauthenticated",
+      "You must be logged in to send test notifications."
     );
   }
   
   const { userId } = data;
   if (!userId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'The function must be called with a userId.'
+      "invalid-argument",
+      "The function must be called with a userId."
     );
   }
   
   try {
     // Get user document
-    const userDoc = await db.collection('users').doc(userId).get();
+    const userDoc = await db.collection("users").doc(userId).get();
     if (!userDoc.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'User not found.'
+        "not-found",
+        "User not found."
       );
     }
     
     const userData = userDoc.data();
     if (!userData.fcmToken) {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'User does not have a registered FCM token.'
+        "failed-precondition",
+        "User does not have a registered FCM token."
       );
     }
     
     // Send test notification
     const message = {
       notification: {
-        title: '📊 Test Player Impact Alert',
-        body: 'This is a test notification for player plus-minus alerts.',
+        title: "📊 Test Player Impact Alert",
+        body: "This is a test notification for player plus-minus alerts.",
       },
       data: {
-        type: 'player_plus_minus_alert',
-        test: 'true',
+        type: "player_plus_minus_alert",
+        test: "true",
         timestamp: Date.now().toString(),
       },
       token: userData.fcmToken,
@@ -187,12 +187,12 @@ exports.sendTestPlusMinusNotification = functions.https.onCall(async (data, cont
     
     await messaging.send(message);
     
-    return { success: true, message: 'Test notification sent successfully.' };
+    return { success: true, message: "Test notification sent successfully." };
   } catch (error) {
-    console.error('Error sending test notification:', error);
+    console.error("Error sending test notification:", error);
     throw new functions.https.HttpsError(
-      'internal',
-      'Error sending test notification.',
+      "internal",
+      "Error sending test notification.",
       error
     );
   }

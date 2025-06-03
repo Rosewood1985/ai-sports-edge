@@ -1,19 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, ScrollView, RefreshControl, ActivityIndicator, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { getTrendingParlays, ParlayPackage } from '../services/parlayService';
-import useOddsData from '../hooks/useOddsData';
-import ParlayCard from '../components/ParlayCard';
-import { Header } from '../atomic/organisms';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, ScrollView, RefreshControl, ActivityIndicator, Alert } from 'react-native';
+
 import { EmptyState } from '../atomic/atoms';
-import { trackEvent } from '../services/analyticsService';
-import { hasActiveSubscription } from '../services/subscriptionService';
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import { Header } from '../atomic/organisms';
+import ParlayCard from '../components/ParlayCard';
+import { useTheme } from '../contexts/ThemeContext';
+import useOddsData from '../hooks/useOddsData';
+import { trackEvent } from '../services/analyticsService';
+import { getTrendingParlays, ParlayPackage } from '../services/parlayService';
+import { hasActiveSubscription } from '../services/subscriptionService';
 
 type ParlayScreenProps = {
   navigation: StackNavigationProp<any, 'Parlays'>;
@@ -162,7 +163,7 @@ const ParlayScreen: React.FC<ParlayScreenProps> = ({ navigation }) => {
             accessibilityLabel="Refresh parlay suggestions"
           />
         }
-        accessible={true}
+        accessible
         accessibilityLabel="Parlay suggestions list"
       >
         {/* Premium User Banner */}

@@ -4,9 +4,10 @@
 // =============================================================================
 
 import * as Sentry from '@sentry/react-native';
+
 import { BetAnalytics, Bet, BetCategoryStats } from './betTrackingService';
-import { ParlayCard } from './parlayBuilderService';
 import { optimizedQuery } from './firebaseOptimizationService';
+import { ParlayCard } from './parlayBuilderService';
 
 // =============================================================================
 // INTERFACES
@@ -29,18 +30,18 @@ export interface PerformanceMetrics {
   pushRate: number;
   averageOdds: number;
   unitsSold: number; // Profit in betting units
-  
+
   // Performance by time period
   daily: TimeBasedMetrics[];
   weekly: TimeBasedMetrics[];
   monthly: TimeBasedMetrics[];
-  
+
   // Performance efficiency
   sharpeRatio: number;
   informationRatio: number;
   maxDrawdown: number;
   calmarRatio: number;
-  
+
   // Betting patterns
   averageBetSize: number;
   medianBetSize: number;
@@ -53,19 +54,19 @@ export interface ProfitabilityMetrics {
   totalProfit: number;
   netROI: number;
   grossROI: number;
-  
+
   // Profit analysis
   profitByMonth: MonthlyProfitData[];
   profitBySport: SportProfitData[];
   profitByBetType: BetTypeProfitData[];
   profitByStakeSize: StakeSizeProfitData[];
-  
+
   // Efficiency metrics
   profitPerBet: number;
   profitPerUnit: number;
   closingLineValue: number; // How often you beat closing line
   expectedVsActual: number; // Expected profit vs actual
-  
+
   // Tax implications
   taxableIncome: number;
   deductibleLosses: number;
@@ -80,21 +81,21 @@ export interface RiskManagementMetrics {
     bankrollGrowth: number;
     drawdownFromPeak: number;
   };
-  
+
   kellyAnalysis: {
     optimalKellyBets: number;
     overBetCount: number;
     underBetCount: number;
     averageKellyUtilization: number;
   };
-  
+
   riskMetrics: {
     valueAtRisk95: number; // 95% VaR
     conditionalVaR: number; // Expected shortfall
     maximumRisk: number;
     riskAdjustedReturn: number;
   };
-  
+
   positionSizing: {
     averagePositionSize: number;
     maxPositionSize: number;
@@ -109,19 +110,19 @@ export interface StreakAnalysis {
     losses: number;
     type: 'winning' | 'losing' | 'mixed';
   };
-  
+
   historicalStreaks: {
     longestWinStreak: number;
     longestLossStreak: number;
     averageWinStreak: number;
     averageLossStreak: number;
   };
-  
+
   streakBreaking: {
     winStreakBreakerAnalysis: string[];
     lossRecoveryPatterns: string[];
   };
-  
+
   momentum: {
     momentumScore: number; // -100 to 100
     trendDirection: 'up' | 'down' | 'sideways';
@@ -134,7 +135,7 @@ export interface SeasonalAnalysis {
   weekdayPerformance: WeekdayPerformanceData[];
   timeOfDayPerformance: TimeOfDayPerformanceData[];
   seasonalTrends: SeasonalTrendData[];
-  
+
   insights: {
     bestMonth: string;
     worstMonth: string;
@@ -152,14 +153,14 @@ export interface PredictionAccuracyMetrics {
     accuracyByBetType: { [type: string]: number };
     accuracyByConfidence: { [range: string]: number };
   };
-  
+
   calibration: {
     calibrationScore: number;
     overconfidenceRate: number;
     underconfidenceRate: number;
     reliabilityDiagram: CalibrationPoint[];
   };
-  
+
   valueAdd: {
     beatsClosingLine: number; // Percentage
     expectedValueAccuracy: number;
@@ -174,20 +175,20 @@ export interface MarketAnalysisMetrics {
     marketEdgeIdentification: number;
     arbitrageOpportunities: number;
   };
-  
+
   lineMovement: {
     favorableMovements: number;
     unfavorableMovements: number;
     averageLineMovement: number;
     optimalTimingScore: number;
   };
-  
+
   bookmakerAnalysis: {
     profitByBookmaker: { [bookmaker: string]: BookmakerMetrics };
     bestBookmakerOverall: string;
     limitingFactors: string[];
   };
-  
+
   sportSpecific: {
     edgeBySport: { [sport: string]: number };
     volumeBySport: { [sport: string]: number };
@@ -200,7 +201,7 @@ export interface RecommendationEngine {
   strategic: StrategicRecommendation[];
   warnings: WarningRecommendation[];
   opportunities: OpportunityRecommendation[];
-  
+
   priorityScore: number; // 0-100, how urgent recommendations are
   confidenceLevel: number; // How confident we are in recommendations
 }
@@ -413,13 +414,16 @@ export class AdvancedBettingAnalyticsService {
   /**
    * Get comprehensive betting analytics
    */
-  async getAdvancedAnalytics(userId: string, timeframe: 'week' | 'month' | 'quarter' | 'year' | 'all' = 'month'): Promise<AdvancedBettingMetrics> {
+  async getAdvancedAnalytics(
+    userId: string,
+    timeframe: 'week' | 'month' | 'quarter' | 'year' | 'all' = 'month'
+  ): Promise<AdvancedBettingMetrics> {
     const startTime = Date.now();
-    
+
     try {
       const cacheKey = `analytics_${userId}_${timeframe}`;
       const cached = this.analyticsCache.get(cacheKey);
-      
+
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
         return cached.data;
       }
@@ -427,7 +431,7 @@ export class AdvancedBettingAnalyticsService {
       // Get user bets for analysis
       const bets = await this.getUserBetsForAnalysis(userId, timeframe);
       const parlays = await this.getUserParlaysForAnalysis(userId, timeframe);
-      
+
       // Calculate all metrics
       const analytics: AdvancedBettingMetrics = {
         performance: await this.calculatePerformanceMetrics(bets),
@@ -450,7 +454,6 @@ export class AdvancedBettingAnalyticsService {
       console.log(`Analytics calculation took ${Date.now() - startTime}ms`);
 
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get advanced analytics: ${error}`);
@@ -463,7 +466,7 @@ export class AdvancedBettingAnalyticsService {
   async getBettingInsights(userId: string): Promise<BettingInsights> {
     try {
       const analytics = await this.getAdvancedAnalytics(userId);
-      
+
       const insights: BettingInsights = {
         keyPerformanceIndicators: this.calculateKPIs(analytics),
         strengthsAndWeaknesses: this.analyzeStrengthsWeaknesses(analytics),
@@ -473,7 +476,6 @@ export class AdvancedBettingAnalyticsService {
       };
 
       return insights;
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get betting insights: ${error}`);
@@ -492,7 +494,7 @@ export class AdvancedBettingAnalyticsService {
     try {
       const analytics = await this.getAdvancedAnalytics(userId, 'week');
       const insights = await this.getBettingInsights(userId);
-      
+
       return {
         liveMetrics: {
           currentROI: analytics.profitability.netROI,
@@ -512,7 +514,6 @@ export class AdvancedBettingAnalyticsService {
           bestSport: this.getBestPerformingSport(analytics),
         },
       };
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to get performance dashboard: ${error}`);
@@ -528,7 +529,7 @@ export class AdvancedBettingAnalyticsService {
    */
   private async calculatePerformanceMetrics(bets: Bet[]): Promise<PerformanceMetrics> {
     const settledBets = bets.filter(bet => ['won', 'lost', 'push'].includes(bet.status));
-    
+
     if (settledBets.length === 0) {
       return this.getEmptyPerformanceMetrics();
     }
@@ -543,19 +544,21 @@ export class AdvancedBettingAnalyticsService {
     const totalProfit = totalReturns - totalStaked;
     const unitsSold = totalProfit / (totalStaked / settledBets.length); // Profit in betting units
 
-    const averageOdds = settledBets.reduce((sum, bet) => sum + bet.totalOdds, 0) / settledBets.length;
+    const averageOdds =
+      settledBets.reduce((sum, bet) => sum + bet.totalOdds, 0) / settledBets.length;
     const averageBetSize = totalStaked / settledBets.length;
 
     // Calculate risk-adjusted metrics
     const returns = settledBets.map(bet => ((bet.actualPayout || 0) - bet.stake) / bet.stake);
     const avgReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-    const returnVariance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length;
+    const returnVariance =
+      returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length;
     const returnStdDev = Math.sqrt(returnVariance);
     const sharpeRatio = returnStdDev > 0 ? avgReturn / returnStdDev : 0;
 
     // Calculate drawdown
     const maxDrawdown = this.calculateMaxDrawdown(settledBets);
-    const calmarRatio = maxDrawdown > 0 ? (totalProfit / totalStaked) / maxDrawdown : 0;
+    const calmarRatio = maxDrawdown > 0 ? totalProfit / totalStaked / maxDrawdown : 0;
 
     // Bet size statistics
     const betSizes = settledBets.map(bet => bet.stake);
@@ -593,12 +596,12 @@ export class AdvancedBettingAnalyticsService {
    */
   private async calculateProfitabilityMetrics(bets: Bet[]): Promise<ProfitabilityMetrics> {
     const settledBets = bets.filter(bet => ['won', 'lost', 'push'].includes(bet.status));
-    
+
     const totalStaked = settledBets.reduce((sum, bet) => sum + bet.stake, 0);
     const totalReturns = settledBets.reduce((sum, bet) => sum + (bet.actualPayout || 0), 0);
     const totalProfit = totalReturns - totalStaked;
     const netROI = totalStaked > 0 ? (totalProfit / totalStaked) * 100 : 0;
-    const grossROI = totalStaked > 0 ? ((totalReturns / totalStaked) - 1) * 100 : 0;
+    const grossROI = totalStaked > 0 ? (totalReturns / totalStaked - 1) * 100 : 0;
 
     return {
       totalProfit,
@@ -623,31 +626,36 @@ export class AdvancedBettingAnalyticsService {
    */
   private async calculateRiskMetrics(bets: Bet[], userId: string): Promise<RiskManagementMetrics> {
     const settledBets = bets.filter(bet => ['won', 'lost', 'push'].includes(bet.status));
-    
+
     // Bankroll analysis (simplified - in production would track actual bankroll)
     const startingBankroll = 10000; // Would come from user settings
-    const totalProfit = settledBets.reduce((sum, bet) => sum + ((bet.actualPayout || 0) - bet.stake), 0);
+    const totalProfit = settledBets.reduce(
+      (sum, bet) => sum + ((bet.actualPayout || 0) - bet.stake),
+      0
+    );
     const currentBankroll = startingBankroll + totalProfit;
     const peakBankroll = this.calculatePeakBankroll(settledBets, startingBankroll);
     const bankrollGrowth = ((currentBankroll - startingBankroll) / startingBankroll) * 100;
     const drawdownFromPeak = ((peakBankroll - currentBankroll) / peakBankroll) * 100;
 
     // Kelly analysis
-    const kellyOptimalBets = settledBets.filter(bet => 
-      bet.bankrollPercentage <= this.calculateOptimalKelly(bet)
+    const kellyOptimalBets = settledBets.filter(
+      bet => bet.bankrollPercentage <= this.calculateOptimalKelly(bet)
     ).length;
-    
-    const averageKellyUtilization = settledBets.reduce((sum, bet) => {
-      const optimal = this.calculateOptimalKelly(bet);
-      return sum + (bet.bankrollPercentage / optimal);
-    }, 0) / settledBets.length;
+
+    const averageKellyUtilization =
+      settledBets.reduce((sum, bet) => {
+        const optimal = this.calculateOptimalKelly(bet);
+        return sum + bet.bankrollPercentage / optimal;
+      }, 0) / settledBets.length;
 
     // Risk metrics
     const returns = settledBets.map(bet => ((bet.actualPayout || 0) - bet.stake) / bet.stake);
     returns.sort((a, b) => a - b);
     const valueAtRisk95 = returns[Math.floor(returns.length * 0.05)] || 0;
-    const conditionalVaR = returns.slice(0, Math.floor(returns.length * 0.05))
-      .reduce((sum, r) => sum + r, 0) / Math.floor(returns.length * 0.05) || 0;
+    const conditionalVaR =
+      returns.slice(0, Math.floor(returns.length * 0.05)).reduce((sum, r) => sum + r, 0) /
+        Math.floor(returns.length * 0.05) || 0;
 
     // Position sizing
     const stakes = settledBets.map(bet => bet.stake);
@@ -712,12 +720,15 @@ export class AdvancedBettingAnalyticsService {
 
     // Historical streaks
     const streaks = this.calculateHistoricalStreaks(settledBets);
-    
+
     // Momentum calculation
     const recentBets = settledBets.slice(-10);
     const recentWins = recentBets.filter(bet => bet.status === 'won').length;
-    const recentProfit = recentBets.reduce((sum, bet) => sum + ((bet.actualPayout || 0) - bet.stake), 0);
-    const momentumScore = ((recentWins / recentBets.length) - 0.5) * 200; // -100 to 100
+    const recentProfit = recentBets.reduce(
+      (sum, bet) => sum + ((bet.actualPayout || 0) - bet.stake),
+      0
+    );
+    const momentumScore = (recentWins / recentBets.length - 0.5) * 200; // -100 to 100
 
     return {
       currentStreaks: {
@@ -748,7 +759,7 @@ export class AdvancedBettingAnalyticsService {
    */
   private calculateSeasonalAnalysis(bets: Bet[]): SeasonalAnalysis {
     const settledBets = bets.filter(bet => ['won', 'lost', 'push'].includes(bet.status));
-    
+
     return {
       monthlyPerformance: this.calculateMonthlyPerformance(settledBets),
       weekdayPerformance: this.calculateWeekdayPerformance(settledBets),
@@ -763,15 +774,16 @@ export class AdvancedBettingAnalyticsService {
    */
   private async calculatePredictionAccuracy(bets: Bet[]): Promise<PredictionAccuracyMetrics> {
     const settledBets = bets.filter(bet => ['won', 'lost'].includes(bet.status));
-    
+
     // Overall accuracy
     const correctPredictions = settledBets.filter(bet => bet.status === 'won').length;
-    const overallAccuracy = settledBets.length > 0 ? (correctPredictions / settledBets.length) * 100 : 0;
+    const overallAccuracy =
+      settledBets.length > 0 ? (correctPredictions / settledBets.length) * 100 : 0;
 
     // Accuracy by sport
     const accuracyBySport: { [sport: string]: number } = {};
     const sportGroups = this.groupBy(settledBets, 'sport');
-    
+
     Object.entries(sportGroups).forEach(([sport, sportBets]) => {
       const wins = sportBets.filter(bet => bet.status === 'won').length;
       accuracyBySport[sport] = (wins / sportBets.length) * 100;
@@ -780,7 +792,7 @@ export class AdvancedBettingAnalyticsService {
     // Accuracy by bet type
     const accuracyByBetType: { [type: string]: number } = {};
     const betTypeGroups = this.groupBy(settledBets, 'betType');
-    
+
     Object.entries(betTypeGroups).forEach(([type, typeBets]) => {
       const wins = typeBets.filter(bet => bet.status === 'won').length;
       accuracyByBetType[type] = (wins / typeBets.length) * 100;
@@ -824,7 +836,7 @@ export class AdvancedBettingAnalyticsService {
    */
   private async calculateMarketAnalysis(bets: Bet[]): Promise<MarketAnalysisMetrics> {
     const settledBets = bets.filter(bet => ['won', 'lost', 'push'].includes(bet.status));
-    
+
     return {
       marketBeating: {
         closingLineBeatRate: await this.calculateClosingLineValue(settledBets),
@@ -853,9 +865,12 @@ export class AdvancedBettingAnalyticsService {
   /**
    * Generate recommendations
    */
-  private async generateRecommendations(bets: Bet[], userId: string): Promise<RecommendationEngine> {
+  private async generateRecommendations(
+    bets: Bet[],
+    userId: string
+  ): Promise<RecommendationEngine> {
     const analytics = await this.getAdvancedAnalytics(userId);
-    
+
     const immediate = this.generateImmediateRecommendations(analytics);
     const strategic = this.generateStrategicRecommendations(analytics);
     const warnings = this.generateWarnings(analytics);
@@ -884,7 +899,10 @@ export class AdvancedBettingAnalyticsService {
     return this.generateMockBets(userId, 100);
   }
 
-  private async getUserParlaysForAnalysis(userId: string, timeframe: string): Promise<ParlayCard[]> {
+  private async getUserParlaysForAnalysis(
+    userId: string,
+    timeframe: string
+  ): Promise<ParlayCard[]> {
     // In production, would query actual parlay data
     return [];
   }
@@ -919,9 +937,12 @@ export class AdvancedBettingAnalyticsService {
     return maxDrawdown * 100;
   }
 
-  private calculateTimeBasedMetrics(bets: Bet[], period: 'day' | 'week' | 'month'): TimeBasedMetrics[] {
+  private calculateTimeBasedMetrics(
+    bets: Bet[],
+    period: 'day' | 'week' | 'month'
+  ): TimeBasedMetrics[] {
     const grouped = this.groupBetsByTime(bets, period);
-    
+
     return Object.entries(grouped).map(([date, dateBets]) => {
       const wins = dateBets.filter(bet => bet.status === 'won').length;
       const totalStaked = dateBets.reduce((sum, bet) => sum + bet.stake, 0);
@@ -944,11 +965,11 @@ export class AdvancedBettingAnalyticsService {
 
   private groupBetsByTime(bets: Bet[], period: 'day' | 'week' | 'month'): { [key: string]: Bet[] } {
     const grouped: { [key: string]: Bet[] } = {};
-    
+
     bets.forEach(bet => {
       let key: string;
       const date = bet.placedAt;
-      
+
       switch (period) {
         case 'day':
           key = date.toISOString().split('T')[0];
@@ -962,40 +983,43 @@ export class AdvancedBettingAnalyticsService {
           key = date.toISOString().slice(0, 7);
           break;
       }
-      
+
       if (!grouped[key]) {
         grouped[key] = [];
       }
       grouped[key].push(bet);
     });
-    
+
     return grouped;
   }
 
   private groupBy<T>(array: T[], key: keyof T): { [key: string]: T[] } {
-    return array.reduce((groups, item) => {
-      const groupKey = String(item[key]);
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      groups[groupKey].push(item);
-      return groups;
-    }, {} as { [key: string]: T[] });
+    return array.reduce(
+      (groups, item) => {
+        const groupKey = String(item[key]);
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(item);
+        return groups;
+      },
+      {} as { [key: string]: T[] }
+    );
   }
 
   // Mock data generation for demo
   private generateMockBets(userId: string, count: number): Bet[] {
     const mockBets: Bet[] = [];
     const now = new Date();
-    
+
     for (let i = 0; i < count; i++) {
       const daysAgo = Math.floor(Math.random() * 90);
       const betDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-      
+
       const stake = 25 + Math.random() * 200;
       const odds = 1.5 + Math.random() * 3;
       const won = Math.random() > 0.45; // 55% win rate
-      
+
       const bet: Bet = {
         id: `mock_bet_${i}`,
         userId,
@@ -1021,10 +1045,10 @@ export class AdvancedBettingAnalyticsService {
         createdAt: betDate,
         updatedAt: betDate,
       };
-      
+
       mockBets.push(bet);
     }
-    
+
     return mockBets;
   }
 
@@ -1054,53 +1078,133 @@ export class AdvancedBettingAnalyticsService {
   private getEmptyStreakAnalysis(): StreakAnalysis {
     return {
       currentStreaks: { wins: 0, losses: 0, type: 'mixed' },
-      historicalStreaks: { longestWinStreak: 0, longestLossStreak: 0, averageWinStreak: 0, averageLossStreak: 0 },
+      historicalStreaks: {
+        longestWinStreak: 0,
+        longestLossStreak: 0,
+        averageWinStreak: 0,
+        averageLossStreak: 0,
+      },
       streakBreaking: { winStreakBreakerAnalysis: [], lossRecoveryPatterns: [] },
       momentum: { momentumScore: 0, trendDirection: 'sideways', confidenceLevel: 0 },
     };
   }
 
   // Additional calculation methods would be implemented here...
-  private calculateMonthlyProfit(bets: Bet[]): MonthlyProfitData[] { return []; }
-  private calculateSportProfit(bets: Bet[]): SportProfitData[] { return []; }
-  private calculateBetTypeProfit(bets: Bet[]): BetTypeProfitData[] { return []; }
-  private calculateStakeSizeProfit(bets: Bet[]): StakeSizeProfitData[] { return []; }
-  private async calculateClosingLineValue(bets: Bet[]): Promise<number> { return 65; }
-  private calculateExpectedVsActual(bets: Bet[]): number { return 0.05; }
-  private calculateOptimalKelly(bet: Bet): number { return 2; }
-  private calculatePeakBankroll(bets: Bet[], starting: number): number { return starting * 1.2; }
-  private calculatePositionSizeConsistency(stakes: number[]): number { return 0.8; }
-  private calculateHistoricalStreaks(bets: Bet[]): any { return { longestWin: 5, longestLoss: 3, averageWin: 2.5, averageLoss: 2.1 }; }
-  private analyzeStreakBreakers(bets: Bet[], type: string): string[] { return ['Low confidence bets', 'Emotional decisions']; }
-  private calculateMonthlyPerformance(bets: Bet[]): MonthlyPerformanceData[] { return []; }
-  private calculateWeekdayPerformance(bets: Bet[]): WeekdayPerformanceData[] { return []; }
-  private calculateTimeOfDayPerformance(bets: Bet[]): TimeOfDayPerformanceData[] { return []; }
-  private calculateSeasonalTrends(bets: Bet[]): SeasonalTrendData[] { return []; }
-  private calculateSeasonalInsights(bets: Bet[]): SeasonalAnalysis['insights'] { 
-    return { bestMonth: 'March', worstMonth: 'August', bestDayOfWeek: 'Sunday', worstDayOfWeek: 'Friday', bestTimeOfDay: 'Evening', seasonalityScore: 0.7 };
+  private calculateMonthlyProfit(bets: Bet[]): MonthlyProfitData[] {
+    return [];
   }
-  private calculateAccuracyByConfidence(bets: Bet[]): { [range: string]: number } { return { 'High (80%+)': 78.5, 'Medium (60-79%)': 65.2, 'Low (40-59%)': 52.1 }; }
-  private calculateCalibrationScore(bets: Bet[]): number { return 0.85; }
-  private calculateReliabilityDiagram(bets: Bet[]): CalibrationPoint[] { return []; }
-  private calculateOverconfidenceRate(bets: Bet[]): number { return 15.2; }
-  private calculateUnderconfidenceRate(bets: Bet[]): number { return 8.7; }
-  private calculateAIPickProfit(bets: Bet[]): number { return 0.12; }
-  private calculateAIRecommendationSuccess(bets: Bet[]): number { return 72.5; }
-  private calculateExpectedValueAccuracy(bets: Bet[]): number { return 0.08; }
-  private calculateMarketEdgeIdentification(bets: Bet[]): number { return 0.15; }
-  private calculateFavorableMovements(bets: Bet[]): number { return 42; }
-  private calculateUnfavorableMovements(bets: Bet[]): number { return 28; }
-  private calculateAverageLineMovement(bets: Bet[]): number { return 0.02; }
-  private calculateOptimalTimingScore(bets: Bet[]): number { return 68; }
-  private calculateBookmakerProfits(bets: Bet[]): { [bookmaker: string]: BookmakerMetrics } { return {}; }
-  private getBestBookmaker(bets: Bet[]): string { return 'DraftKings'; }
-  private calculateEdgeBySport(bets: Bet[]): { [sport: string]: number } { return { nba: 0.08, nfl: 0.12 }; }
-  private calculateVolumeBySport(bets: Bet[]): { [sport: string]: number } { return { nba: 45, nfl: 35 }; }
-  private calculateProfitabilitySport(bets: Bet[]): { [sport: string]: number } { return { nba: 0.15, nfl: 0.22 }; }
+  private calculateSportProfit(bets: Bet[]): SportProfitData[] {
+    return [];
+  }
+  private calculateBetTypeProfit(bets: Bet[]): BetTypeProfitData[] {
+    return [];
+  }
+  private calculateStakeSizeProfit(bets: Bet[]): StakeSizeProfitData[] {
+    return [];
+  }
+  private async calculateClosingLineValue(bets: Bet[]): Promise<number> {
+    return 65;
+  }
+  private calculateExpectedVsActual(bets: Bet[]): number {
+    return 0.05;
+  }
+  private calculateOptimalKelly(bet: Bet): number {
+    return 2;
+  }
+  private calculatePeakBankroll(bets: Bet[], starting: number): number {
+    return starting * 1.2;
+  }
+  private calculatePositionSizeConsistency(stakes: number[]): number {
+    return 0.8;
+  }
+  private calculateHistoricalStreaks(bets: Bet[]): any {
+    return { longestWin: 5, longestLoss: 3, averageWin: 2.5, averageLoss: 2.1 };
+  }
+  private analyzeStreakBreakers(bets: Bet[], type: string): string[] {
+    return ['Low confidence bets', 'Emotional decisions'];
+  }
+  private calculateMonthlyPerformance(bets: Bet[]): MonthlyPerformanceData[] {
+    return [];
+  }
+  private calculateWeekdayPerformance(bets: Bet[]): WeekdayPerformanceData[] {
+    return [];
+  }
+  private calculateTimeOfDayPerformance(bets: Bet[]): TimeOfDayPerformanceData[] {
+    return [];
+  }
+  private calculateSeasonalTrends(bets: Bet[]): SeasonalTrendData[] {
+    return [];
+  }
+  private calculateSeasonalInsights(bets: Bet[]): SeasonalAnalysis['insights'] {
+    return {
+      bestMonth: 'March',
+      worstMonth: 'August',
+      bestDayOfWeek: 'Sunday',
+      worstDayOfWeek: 'Friday',
+      bestTimeOfDay: 'Evening',
+      seasonalityScore: 0.7,
+    };
+  }
+  private calculateAccuracyByConfidence(bets: Bet[]): { [range: string]: number } {
+    return { 'High (80%+)': 78.5, 'Medium (60-79%)': 65.2, 'Low (40-59%)': 52.1 };
+  }
+  private calculateCalibrationScore(bets: Bet[]): number {
+    return 0.85;
+  }
+  private calculateReliabilityDiagram(bets: Bet[]): CalibrationPoint[] {
+    return [];
+  }
+  private calculateOverconfidenceRate(bets: Bet[]): number {
+    return 15.2;
+  }
+  private calculateUnderconfidenceRate(bets: Bet[]): number {
+    return 8.7;
+  }
+  private calculateAIPickProfit(bets: Bet[]): number {
+    return 0.12;
+  }
+  private calculateAIRecommendationSuccess(bets: Bet[]): number {
+    return 72.5;
+  }
+  private calculateExpectedValueAccuracy(bets: Bet[]): number {
+    return 0.08;
+  }
+  private calculateMarketEdgeIdentification(bets: Bet[]): number {
+    return 0.15;
+  }
+  private calculateFavorableMovements(bets: Bet[]): number {
+    return 42;
+  }
+  private calculateUnfavorableMovements(bets: Bet[]): number {
+    return 28;
+  }
+  private calculateAverageLineMovement(bets: Bet[]): number {
+    return 0.02;
+  }
+  private calculateOptimalTimingScore(bets: Bet[]): number {
+    return 68;
+  }
+  private calculateBookmakerProfits(bets: Bet[]): { [bookmaker: string]: BookmakerMetrics } {
+    return {};
+  }
+  private getBestBookmaker(bets: Bet[]): string {
+    return 'DraftKings';
+  }
+  private calculateEdgeBySport(bets: Bet[]): { [sport: string]: number } {
+    return { nba: 0.08, nfl: 0.12 };
+  }
+  private calculateVolumeBySport(bets: Bet[]): { [sport: string]: number } {
+    return { nba: 45, nfl: 35 };
+  }
+  private calculateProfitabilitySport(bets: Bet[]): { [sport: string]: number } {
+    return { nba: 0.15, nfl: 0.22 };
+  }
 
-  private generateImmediateRecommendations(analytics: AdvancedBettingMetrics): ImmediateRecommendation[] {
+  private generateImmediateRecommendations(
+    analytics: AdvancedBettingMetrics
+  ): ImmediateRecommendation[] {
     const recommendations: ImmediateRecommendation[] = [];
-    
+
     if (analytics.riskManagement.bankrollManagement.drawdownFromPeak > 20) {
       recommendations.push({
         type: 'stop_loss',
@@ -1110,23 +1214,50 @@ export class AdvancedBettingAnalyticsService {
         expectedImpact: 'Reduced risk of further losses',
       });
     }
-    
+
     return recommendations;
   }
 
-  private generateStrategicRecommendations(analytics: AdvancedBettingMetrics): StrategicRecommendation[] { return []; }
-  private generateWarnings(analytics: AdvancedBettingMetrics): WarningRecommendation[] { return []; }
-  private generateOpportunities(analytics: AdvancedBettingMetrics): OpportunityRecommendation[] { return []; }
-  private calculatePriorityScore(immediate: ImmediateRecommendation[], warnings: WarningRecommendation[]): number { return 65; }
-  private calculateRecommendationConfidence(bets: Bet[]): number { return 78; }
-  private calculateKPIs(analytics: AdvancedBettingMetrics): KPI[] { return []; }
-  private analyzeStrengthsWeaknesses(analytics: AdvancedBettingMetrics): StrengthWeaknessAnalysis { 
+  private generateStrategicRecommendations(
+    analytics: AdvancedBettingMetrics
+  ): StrategicRecommendation[] {
+    return [];
+  }
+  private generateWarnings(analytics: AdvancedBettingMetrics): WarningRecommendation[] {
+    return [];
+  }
+  private generateOpportunities(analytics: AdvancedBettingMetrics): OpportunityRecommendation[] {
+    return [];
+  }
+  private calculatePriorityScore(
+    immediate: ImmediateRecommendation[],
+    warnings: WarningRecommendation[]
+  ): number {
+    return 65;
+  }
+  private calculateRecommendationConfidence(bets: Bet[]): number {
+    return 78;
+  }
+  private calculateKPIs(analytics: AdvancedBettingMetrics): KPI[] {
+    return [];
+  }
+  private analyzeStrengthsWeaknesses(analytics: AdvancedBettingMetrics): StrengthWeaknessAnalysis {
     return { strengths: [], weaknesses: [], recommendations: [], focus_areas: [] };
   }
-  private identifyImprovementAreas(analytics: AdvancedBettingMetrics): ImprovementArea[] { return []; }
-  private async identifyMarketOpportunities(analytics: AdvancedBettingMetrics): Promise<MarketOpportunity[]> { return []; }
-  private generateRiskAlerts(analytics: AdvancedBettingMetrics): RiskAlert[] { return []; }
-  private getBestPerformingSport(analytics: AdvancedBettingMetrics): string { return 'NBA'; }
+  private identifyImprovementAreas(analytics: AdvancedBettingMetrics): ImprovementArea[] {
+    return [];
+  }
+  private async identifyMarketOpportunities(
+    analytics: AdvancedBettingMetrics
+  ): Promise<MarketOpportunity[]> {
+    return [];
+  }
+  private generateRiskAlerts(analytics: AdvancedBettingMetrics): RiskAlert[] {
+    return [];
+  }
+  private getBestPerformingSport(analytics: AdvancedBettingMetrics): string {
+    return 'NBA';
+  }
 
   /**
    * Clear analytics cache

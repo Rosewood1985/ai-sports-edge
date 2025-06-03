@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,21 +9,20 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
+
 import { useLanguage } from '../../atomic/organisms/i18n/LanguageContext';
-import { ufcService } from '../services/ufcService';
-import { UFCFight, RoundBettingOption, FightStatus } from '../types/ufc';
+import { ThemedText } from '../atomic/atoms/ThemedText';
 import { Container } from '../atomic/molecules/layout/ResponsiveLayout';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import RoundBettingCard from '../components/RoundBettingCard';
-import LoadingIndicator from '../components/LoadingIndicator';
 import ErrorMessage from '../components/ErrorMessage';
+import LoadingIndicator from '../components/LoadingIndicator';
+import RoundBettingCard from '../components/RoundBettingCard';
 // import PremiumFeature from '../components/PremiumFeature';
 import { auth } from '../config/firebase';
-import subscriptionService from '../services/subscriptionService';
+import { useTheme } from '../contexts/ThemeContext';
 import { trackScreenView } from '../services/analyticsService';
+import subscriptionService from '../services/subscriptionService';
+import { ufcService } from '../services/ufcService';
+import { UFCFight, RoundBettingOption, FightStatus } from '../types/ufc';
 
 type RootStackParamList = {
   FightDetail: { fightId: string };
@@ -231,12 +232,12 @@ const FightDetailScreen: React.FC<FightDetailScreenProps> = ({ route, navigation
                     ? 'rgba(46, 204, 113, 0.2)'
                     : 'rgba(46, 204, 113, 0.1)'
                   : fight.status === FightStatus.COMPLETED
-                  ? isDark
-                    ? 'rgba(52, 152, 219, 0.2)'
-                    : 'rgba(52, 152, 219, 0.1)'
-                  : isDark
-                  ? 'rgba(241, 196, 15, 0.2)'
-                  : 'rgba(241, 196, 15, 0.1)',
+                    ? isDark
+                      ? 'rgba(52, 152, 219, 0.2)'
+                      : 'rgba(52, 152, 219, 0.1)'
+                    : isDark
+                      ? 'rgba(241, 196, 15, 0.2)'
+                      : 'rgba(241, 196, 15, 0.1)',
             },
           ]}
         >

@@ -1,9 +1,21 @@
-import { firestore, functions } from '../config/firebase';
-import { doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, runTransaction, setDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
-import environmentUtils from '../utils/environmentUtils';
+
 import { analyticsService } from './analyticsService';
 import { hasPremiumAccess } from './firebaseSubscriptionService';
+import { firestore, functions } from '../config/firebase';
+import environmentUtils from '../utils/environmentUtils';
 
 const isDevMode = environmentUtils.isDevelopmentMode();
 
@@ -213,13 +225,13 @@ export const purchaseAdvancedPlayerMetrics = async (
       userId,
       productId: ADVANCED_METRICS_PRODUCT_ID,
       gameId,
-      amount: ADVANCED_METRICS_PRICE
+      amount: ADVANCED_METRICS_PRICE,
     });
 
     // Track the purchase event
     await analyticsService.trackEvent('purchase_advanced_metrics', {
       gameId,
-      amount: ADVANCED_METRICS_PRICE / 100 // Convert to dollars for analytics
+      amount: ADVANCED_METRICS_PRICE / 100, // Convert to dollars for analytics
     });
 
     return (result.data as any).status === 'succeeded';
@@ -258,13 +270,13 @@ export const purchasePlayerComparison = async (
       userId,
       productId: PLAYER_COMPARISON_PRODUCT_ID,
       gameId,
-      amount: PLAYER_COMPARISON_PRICE
+      amount: PLAYER_COMPARISON_PRICE,
     });
 
     // Track the purchase event
     await analyticsService.trackEvent('purchase_player_comparison', {
       gameId,
-      amount: PLAYER_COMPARISON_PRICE / 100 // Convert to dollars for analytics
+      amount: PLAYER_COMPARISON_PRICE / 100, // Convert to dollars for analytics
     });
 
     return (result.data as any).status === 'succeeded';
@@ -303,13 +315,13 @@ export const purchaseHistoricalTrends = async (
       userId,
       productId: HISTORICAL_TRENDS_PRODUCT_ID,
       gameId,
-      amount: HISTORICAL_TRENDS_PRICE
+      amount: HISTORICAL_TRENDS_PRICE,
     });
 
     // Track the purchase event
     await analyticsService.trackEvent('purchase_historical_trends', {
       gameId,
-      amount: HISTORICAL_TRENDS_PRICE / 100 // Convert to dollars for analytics
+      amount: HISTORICAL_TRENDS_PRICE / 100, // Convert to dollars for analytics
     });
 
     return (result.data as any).status === 'succeeded';
@@ -325,10 +337,7 @@ export const purchaseHistoricalTrends = async (
  * @param gameId Game ID
  * @returns Whether the purchase was successful
  */
-export const purchasePremiumBundle = async (
-  userId: string,
-  gameId: string
-): Promise<boolean> => {
+export const purchasePremiumBundle = async (userId: string, gameId: string): Promise<boolean> => {
   try {
     // In development mode, always return true
     if (isDevMode) {
@@ -348,13 +357,13 @@ export const purchasePremiumBundle = async (
       userId,
       productId: PREMIUM_BUNDLE_PRODUCT_ID,
       gameId,
-      amount: PREMIUM_BUNDLE_PRICE
+      amount: PREMIUM_BUNDLE_PRICE,
     });
 
     // Track the purchase event
     await analyticsService.trackEvent('purchase_premium_bundle', {
       gameId,
-      amount: PREMIUM_BUNDLE_PRICE / 100 // Convert to dollars for analytics
+      amount: PREMIUM_BUNDLE_PRICE / 100, // Convert to dollars for analytics
     });
 
     return (result.data as any).status === 'succeeded';
@@ -370,10 +379,7 @@ export const purchasePremiumBundle = async (
  * @param gameId Game ID
  * @returns Array of purchases
  */
-export const getGamePurchaseHistory = async (
-  userId: string,
-  gameId: string
-): Promise<any[]> => {
+export const getGamePurchaseHistory = async (userId: string, gameId: string): Promise<any[]> => {
   try {
     const db = firestore;
     if (!db) return [];
@@ -392,7 +398,7 @@ export const getGamePurchaseHistory = async (
 
     return purchasesSnapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error('Error getting game purchase history:', error);
@@ -420,12 +426,12 @@ export const trackFeatureUsage = async (
       userId,
       gameId,
       featureType,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
     });
 
     // Track the event
     await analyticsService.trackEvent(`used_${featureType}`, {
-      gameId
+      gameId,
     });
   } catch (error) {
     console.error('Error tracking feature usage:', error);
@@ -484,20 +490,20 @@ export const incrementFreeViewCount = async (userId: string): Promise<number> =>
 
     // Update the view count in Firestore
     const viewCountRef = doc(db, 'users', userId, 'stats', 'viewCount');
-    
+
     // Use the correct Firebase v9 transaction syntax
-    await runTransaction(db, async (transaction) => {
+    await runTransaction(db, async transaction => {
       const viewCountDoc = await transaction.get(viewCountRef);
-      
+
       if (!viewCountDoc.exists()) {
         transaction.set(viewCountRef, {
           count: 1,
-          lastUpdated: serverTimestamp()
+          lastUpdated: serverTimestamp(),
         });
       } else {
         transaction.update(viewCountRef, {
           count: newCount,
-          lastUpdated: serverTimestamp()
+          lastUpdated: serverTimestamp(),
         });
       }
     });
@@ -505,7 +511,7 @@ export const incrementFreeViewCount = async (userId: string): Promise<number> =>
     // Track the event
     await analyticsService.trackEvent('free_view_used', {
       currentCount: newCount,
-      remainingViews: FREE_TIER_VIEW_LIMIT - newCount
+      remainingViews: FREE_TIER_VIEW_LIMIT - newCount,
     });
 
     return newCount;
@@ -520,7 +526,9 @@ export const incrementFreeViewCount = async (userId: string): Promise<number> =>
  * @param userId User ID
  * @returns Object with hasReachedLimit and viewsRemaining
  */
-export const checkFreeViewLimit = async (userId: string): Promise<{
+export const checkFreeViewLimit = async (
+  userId: string
+): Promise<{
   hasReachedLimit: boolean;
   viewsRemaining: number;
   showWarning: boolean;
@@ -533,7 +541,7 @@ export const checkFreeViewLimit = async (userId: string): Promise<{
       return {
         hasReachedLimit: false,
         viewsRemaining: Infinity,
-        showWarning: false
+        showWarning: false,
       };
     }
 
@@ -546,14 +554,14 @@ export const checkFreeViewLimit = async (userId: string): Promise<{
     return {
       hasReachedLimit,
       viewsRemaining,
-      showWarning
+      showWarning,
     };
   } catch (error) {
     console.error('Error checking free view limit:', error);
     return {
       hasReachedLimit: false,
       viewsRemaining: FREE_TIER_VIEW_LIMIT,
-      showWarning: false
+      showWarning: false,
     };
   }
 };
@@ -570,16 +578,16 @@ export const resetFreeViewCount = async (userId: string): Promise<boolean> => {
 
     // Reset the view count in Firestore
     const viewCountRef = doc(db, 'users', userId, 'stats', 'viewCount');
-    
+
     // Simply set the document directly instead of using a transaction
     await setDoc(viewCountRef, {
       count: 0,
-      lastUpdated: serverTimestamp()
+      lastUpdated: serverTimestamp(),
     });
 
     // Track the event
     await analyticsService.trackEvent('free_view_count_reset', {
-      userId
+      userId,
     });
 
     return true;
@@ -612,5 +620,5 @@ export default {
   HISTORICAL_TRENDS_PRICE,
   PREMIUM_BUNDLE_PRICE,
   FREE_TIER_VIEW_LIMIT,
-  FREE_TIER_WARNING_THRESHOLD
+  FREE_TIER_WARNING_THRESHOLD,
 };

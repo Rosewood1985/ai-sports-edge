@@ -14,18 +14,19 @@ const metadataCache = new Map();
  * @param {number} ttlMs - Time to live in milliseconds
  * @returns {boolean} Success status
  */
-export function setCacheItem(key, value, ttlMs = 30 * 60 * 1000) { // Default 30 minutes
+export function setCacheItem(key, value, ttlMs = 30 * 60 * 1000) {
+  // Default 30 minutes
   try {
     // Store the value
     cache.set(key, value);
-    
+
     // Store metadata
     metadataCache.set(key, {
       timestamp: Date.now(),
       ttl: ttlMs,
-      expiresAt: Date.now() + ttlMs
+      expiresAt: Date.now() + ttlMs,
     });
-    
+
     // Set up expiration
     setTimeout(() => {
       if (cache.has(key)) {
@@ -34,7 +35,7 @@ export function setCacheItem(key, value, ttlMs = 30 * 60 * 1000) { // Default 30
         console.log(`Cache item expired: ${key}`);
       }
     }, ttlMs);
-    
+
     return true;
   } catch (error) {
     console.error('Error setting cache item:', error);
@@ -52,7 +53,7 @@ export function getCacheItem(key) {
   if (cache.has(key) && metadataCache.has(key)) {
     const metadata = metadataCache.get(key);
     const now = Date.now();
-    
+
     // Check if expired
     if (now > metadata.expiresAt) {
       // Clean up expired item
@@ -60,14 +61,14 @@ export function getCacheItem(key) {
       metadataCache.delete(key);
       return undefined;
     }
-    
+
     // Update access timestamp
     metadata.lastAccessed = now;
     metadataCache.set(key, metadata);
-    
+
     return cache.get(key);
   }
-  
+
   return undefined;
 }
 
@@ -81,7 +82,7 @@ export function hasCacheItem(key) {
     const metadata = metadataCache.get(key);
     return Date.now() <= metadata.expiresAt;
   }
-  
+
   return false;
 }
 
@@ -128,45 +129,45 @@ export function getCacheStats() {
     averageTtl: 0,
     oldestItem: null,
     newestItem: null,
-    keys: []
+    keys: [],
   };
-  
+
   if (cache.size === 0) {
     return stats;
   }
-  
+
   let totalTtl = 0;
   let oldestTimestamp = Infinity;
   let newestTimestamp = 0;
-  
+
   // Calculate statistics
   for (const [key, metadata] of metadataCache.entries()) {
     // Count expired items
     if (now > metadata.expiresAt) {
       stats.expiredItems++;
     }
-    
+
     // Track oldest and newest items
     if (metadata.timestamp < oldestTimestamp) {
       oldestTimestamp = metadata.timestamp;
       stats.oldestItem = key;
     }
-    
+
     if (metadata.timestamp > newestTimestamp) {
       newestTimestamp = metadata.timestamp;
       stats.newestItem = key;
     }
-    
+
     // Sum TTLs for average
     totalTtl += metadata.ttl;
-    
+
     // Add to keys list
     stats.keys.push(key);
   }
-  
+
   // Calculate average TTL
   stats.averageTtl = totalTtl / cache.size;
-  
+
   return stats;
 }
 
@@ -179,15 +180,15 @@ export function getCacheItemMetadata(key) {
   if (metadataCache.has(key)) {
     const metadata = metadataCache.get(key);
     const now = Date.now();
-    
+
     return {
       ...metadata,
       age: now - metadata.timestamp,
       remainingTtl: Math.max(0, metadata.expiresAt - now),
-      isExpired: now > metadata.expiresAt
+      isExpired: now > metadata.expiresAt,
     };
   }
-  
+
   return undefined;
 }
 
@@ -201,14 +202,14 @@ export function updateCacheTtl(key, newTtlMs) {
   if (cache.has(key) && metadataCache.has(key)) {
     const metadata = metadataCache.get(key);
     const now = Date.now();
-    
+
     // Update TTL and expiration
     metadata.ttl = newTtlMs;
     metadata.expiresAt = now + newTtlMs;
-    
+
     metadataCache.set(key, metadata);
     return true;
   }
-  
+
   return false;
 }

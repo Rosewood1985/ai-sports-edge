@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,11 +10,13 @@ import {
   ActivityIndicator,
   Image,
   RefreshControl,
-  Switch
+  Switch,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { fetchSportsNews, NewsItem } from '../services/sportsNewsService';
-import { generateAISummary } from '../services/aiSummaryService';
+
+import Header from '../components/Header';
+import PremiumFeature from '../components/PremiumFeature';
+import { NeonContainer, NeonText } from '../components/ui';
+import { auth } from '../config/firebase';
 import {
   analyzeSentiment,
   predictOddsImpact,
@@ -21,16 +25,13 @@ import {
   SentimentAnalysis,
   OddsImpactPrediction,
   HistoricalCorrelation,
-  PersonalizedNewsSummary
+  PersonalizedNewsSummary,
 } from '../services/aiNewsAnalysisService';
-import { getUserSportsPreferences } from '../services/userSportsPreferencesService';
-import { NeonContainer, NeonText } from '../components/ui';
-import Header from '../components/Header';
-import PremiumFeature from '../components/PremiumFeature';
-import { useNavigation } from '@react-navigation/native';
+import { generateAISummary } from '../services/aiSummaryService';
 import { trackEvent } from '../services/analyticsService';
 import { hasPremiumAccess } from '../services/firebaseSubscriptionService';
-import { auth } from '../config/firebase';
+import { fetchSportsNews, NewsItem } from '../services/sportsNewsService';
+import { getUserSportsPreferences } from '../services/userSportsPreferencesService';
 
 /**
  * SportsNewsScreen component displays AI-summarized sports news
@@ -39,7 +40,9 @@ const SportsNewsScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'injury' | 'lineup' | 'trade' | 'general'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<
+    'all' | 'injury' | 'lineup' | 'trade' | 'general'
+  >('all');
   const [focusOn, setFocusOn] = useState<'betting' | 'fantasy' | 'general'>('betting');
   const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
   const [personalizedMode, setPersonalizedMode] = useState<boolean>(false);
@@ -52,17 +55,17 @@ const SportsNewsScreen: React.FC = () => {
       oddsImpact?: OddsImpactPrediction;
       historicalCorrelation?: HistoricalCorrelation;
       personalizedSummary?: PersonalizedNewsSummary;
-    }
+    };
   }>({});
-  
+
   const navigation = useNavigation();
-  
+
   useEffect(() => {
     loadNewsData();
     checkPremiumStatus();
     loadUserPreferences();
   }, []);
-  
+
   // Check if user has premium access
   const checkPremiumStatus = async () => {
     try {
@@ -75,7 +78,7 @@ const SportsNewsScreen: React.FC = () => {
       console.error('Error checking premium status:', error);
     }
   };
-  
+
   // Load user preferences
   const loadUserPreferences = async () => {
     try {
@@ -85,7 +88,7 @@ const SportsNewsScreen: React.FC = () => {
       console.error('Error loading user preferences:', error);
     }
   };
-  
+
   const loadNewsData = async (refresh = false) => {
     try {
       if (refresh) {
@@ -93,71 +96,71 @@ const SportsNewsScreen: React.FC = () => {
       } else {
         setLoading(true);
       }
-      
+
       // Reset expanded news
       setExpandedNewsId(null);
-      
+
       // Fetch news from API
       let news = await fetchSportsNews();
-      
+
       // Filter by favorite teams if enabled
       if (favoriteTeamsOnly && favoriteTeams.length > 0) {
-        news = news.filter(item =>
-          item.teams.some(team => favoriteTeams.includes(team))
-        );
+        news = news.filter(item => item.teams.some(team => favoriteTeams.includes(team)));
       }
-      
+
       // Generate AI summaries for each news item
       const newsWithSummaries = await Promise.all(
-        news.map(async (item) => {
+        news.map(async item => {
           const summary = await generateAISummary(item.content, 150, focusOn);
           return {
             ...item,
-            aiSummary: summary
+            aiSummary: summary,
           };
         })
       );
-      
+
       setNewsItems(newsWithSummaries);
-      
+
       // For premium users, pre-load some advanced analytics
       if (isPremiumUser && newsWithSummaries.length > 0) {
         // Only analyze the first few items to avoid too many API calls
         const itemsToAnalyze = newsWithSummaries.slice(0, 3);
-        
+
         // Create a new analytics object
         const newAnalytics = { ...newsAnalytics };
-        
+
         // Generate analytics for each item
         await Promise.all(
-          itemsToAnalyze.map(async (item) => {
+          itemsToAnalyze.map(async item => {
             // Initialize analytics for this item if not exists
             if (!newAnalytics[item.id]) {
               newAnalytics[item.id] = {};
             }
-            
+
             // Generate sentiment analysis
             const sentiment = await analyzeSentiment(item);
             newAnalytics[item.id].sentiment = sentiment;
-            
+
             // Generate odds impact prediction
             const oddsImpact = await predictOddsImpact(item);
             newAnalytics[item.id].oddsImpact = oddsImpact;
-            
+
             // Generate historical correlation analysis
             const historicalCorrelation = await analyzeHistoricalCorrelations(item);
             newAnalytics[item.id].historicalCorrelation = historicalCorrelation;
-            
+
             // Send notification for high-impact news
             if (oddsImpact.impactLevel === 'high' || oddsImpact.impactLevel === 'medium') {
-              const { scheduleHighImpactNewsNotification } = await import('../services/notificationService');
+              const { scheduleHighImpactNewsNotification } = await import(
+                '../services/notificationService'
+              );
               await scheduleHighImpactNewsNotification(
                 item.title,
                 oddsImpact.impactLevel,
                 item.teams
               );
             }
-            
+
             // If personalized mode is enabled, generate personalized summary
             if (personalizedMode) {
               const personalizedSummary = await generatePersonalizedSummary(item);
@@ -165,17 +168,17 @@ const SportsNewsScreen: React.FC = () => {
             }
           })
         );
-        
+
         // Update the analytics state
         setNewsAnalytics(newAnalytics);
       }
-      
+
       // Track the event
       await trackEvent('sports_news_viewed', {
         item_count: newsWithSummaries.length,
         focus: focusOn,
         personalized: personalizedMode,
-        favorite_teams_only: favoriteTeamsOnly
+        favorite_teams_only: favoriteTeamsOnly,
       });
     } catch (error) {
       console.error('Error loading news data:', error);
@@ -184,47 +187,48 @@ const SportsNewsScreen: React.FC = () => {
       setRefreshing(false);
     }
   };
-  
+
   const onRefresh = () => {
     loadNewsData(true);
   };
-  
+
   const handleCategoryChange = (category: 'all' | 'injury' | 'lineup' | 'trade' | 'general') => {
     setSelectedCategory(category);
   };
-  
+
   const handleFocusChange = async (focus: 'betting' | 'fantasy' | 'general') => {
     setFocusOn(focus);
-    
+
     // Regenerate summaries with new focus
     setLoading(true);
-    
+
     const newsWithSummaries = await Promise.all(
-      newsItems.map(async (item) => {
+      newsItems.map(async item => {
         const summary = await generateAISummary(item.content, 150, focus);
         return {
           ...item,
-          aiSummary: summary
+          aiSummary: summary,
         };
       })
     );
-    
+
     setNewsItems(newsWithSummaries);
     setLoading(false);
-    
+
     // Track the event
     await trackEvent('sports_news_focus_changed', {
-      focus
+      focus,
     });
   };
-  
-  const filteredNews = selectedCategory === 'all' 
-    ? newsItems 
-    : newsItems.filter(item => item.category === selectedCategory);
-  
+
+  const filteredNews =
+    selectedCategory === 'all'
+      ? newsItems
+      : newsItems.filter(item => item.category === selectedCategory);
+
   const renderCategoryTabs = () => (
-    <ScrollView 
-      horizontal 
+    <ScrollView
+      horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.categoryTabsContainer}
     >
@@ -232,49 +236,74 @@ const SportsNewsScreen: React.FC = () => {
         style={[styles.categoryTab, selectedCategory === 'all' && styles.categoryTabActive]}
         onPress={() => handleCategoryChange('all')}
       >
-        <Text style={[styles.categoryTabText, selectedCategory === 'all' && styles.categoryTabTextActive]}>
+        <Text
+          style={[
+            styles.categoryTabText,
+            selectedCategory === 'all' && styles.categoryTabTextActive,
+          ]}
+        >
           All
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.categoryTab, selectedCategory === 'injury' && styles.categoryTabActive]}
         onPress={() => handleCategoryChange('injury')}
       >
-        <Text style={[styles.categoryTabText, selectedCategory === 'injury' && styles.categoryTabTextActive]}>
+        <Text
+          style={[
+            styles.categoryTabText,
+            selectedCategory === 'injury' && styles.categoryTabTextActive,
+          ]}
+        >
           Injuries
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.categoryTab, selectedCategory === 'lineup' && styles.categoryTabActive]}
         onPress={() => handleCategoryChange('lineup')}
       >
-        <Text style={[styles.categoryTabText, selectedCategory === 'lineup' && styles.categoryTabTextActive]}>
+        <Text
+          style={[
+            styles.categoryTabText,
+            selectedCategory === 'lineup' && styles.categoryTabTextActive,
+          ]}
+        >
           Lineups
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.categoryTab, selectedCategory === 'trade' && styles.categoryTabActive]}
         onPress={() => handleCategoryChange('trade')}
       >
-        <Text style={[styles.categoryTabText, selectedCategory === 'trade' && styles.categoryTabTextActive]}>
+        <Text
+          style={[
+            styles.categoryTabText,
+            selectedCategory === 'trade' && styles.categoryTabTextActive,
+          ]}
+        >
           Trades
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.categoryTab, selectedCategory === 'general' && styles.categoryTabActive]}
         onPress={() => handleCategoryChange('general')}
       >
-        <Text style={[styles.categoryTabText, selectedCategory === 'general' && styles.categoryTabTextActive]}>
+        <Text
+          style={[
+            styles.categoryTabText,
+            selectedCategory === 'general' && styles.categoryTabTextActive,
+          ]}
+        >
           General
         </Text>
       </TouchableOpacity>
     </ScrollView>
   );
-  
+
   const renderFocusTabs = () => (
     <View style={styles.focusTabsContainer}>
       <TouchableOpacity
@@ -285,7 +314,7 @@ const SportsNewsScreen: React.FC = () => {
           Betting Focus
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.focusTab, focusOn === 'fantasy' && styles.focusTabActive]}
         onPress={() => handleFocusChange('fantasy')}
@@ -294,7 +323,7 @@ const SportsNewsScreen: React.FC = () => {
           Fantasy Focus
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.focusTab, focusOn === 'general' && styles.focusTabActive]}
         onPress={() => handleFocusChange('general')}
@@ -305,11 +334,11 @@ const SportsNewsScreen: React.FC = () => {
       </TouchableOpacity>
     </View>
   );
-  
+
   const renderNewsItem = (item: NewsItem) => {
     const analytics = newsAnalytics[item.id];
     const isExpanded = expandedNewsId === item.id;
-    
+
     return (
       <View key={item.id} style={styles.newsCard}>
         <View style={styles.newsHeader}>
@@ -319,27 +348,27 @@ const SportsNewsScreen: React.FC = () => {
             </Text>
           </View>
           <Text style={styles.timestamp}>
-            {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(item.timestamp).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </Text>
         </View>
-        
+
         <Text style={styles.newsTitle}>{item.title}</Text>
-        
+
         <View style={styles.teamsContainer}>
-          {item.teams.map((team) => (
+          {item.teams.map(team => (
             <View key={team} style={styles.teamBadge}>
               <Text style={styles.teamText}>{team}</Text>
             </View>
           ))}
         </View>
-        
-        <Text
-          style={styles.newsContent}
-          numberOfLines={isExpanded ? undefined : 3}
-        >
+
+        <Text style={styles.newsContent} numberOfLines={isExpanded ? undefined : 3}>
           {item.content}
         </Text>
-        
+
         {/* Standard AI Summary for all users */}
         <PremiumFeature>
           <View style={styles.aiSummaryContainer}>
@@ -347,12 +376,10 @@ const SportsNewsScreen: React.FC = () => {
               <Ionicons name="flash" size={16} color="#f39c12" />
               <Text style={styles.aiSummaryTitle}>AI Sports Edge</Text>
             </View>
-            <Text style={styles.aiSummaryText}>
-              {item.aiSummary || 'AI summary not available'}
-            </Text>
+            <Text style={styles.aiSummaryText}>{item.aiSummary || 'AI summary not available'}</Text>
           </View>
         </PremiumFeature>
-        
+
         {/* Advanced Analytics for Premium Users */}
         {isPremiumUser && analytics && (
           <View style={styles.advancedAnalyticsContainer}>
@@ -360,14 +387,8 @@ const SportsNewsScreen: React.FC = () => {
             {analytics.sentiment && (
               <View style={styles.analyticsSection}>
                 <View style={styles.analyticsSectionHeader}>
-                  <Ionicons
-                    name="analytics-outline"
-                    size={16}
-                    color="#3498db"
-                  />
-                  <Text style={styles.analyticsSectionTitle}>
-                    Sentiment Analysis
-                  </Text>
+                  <Ionicons name="analytics-outline" size={16} color="#3498db" />
+                  <Text style={styles.analyticsSectionTitle}>Sentiment Analysis</Text>
                 </View>
                 <View style={styles.sentimentIndicator}>
                   <View
@@ -375,89 +396,94 @@ const SportsNewsScreen: React.FC = () => {
                       styles.sentimentBar,
                       {
                         backgroundColor:
-                          analytics.sentiment.sentiment === 'positive' ? '#2ecc71' :
-                          analytics.sentiment.sentiment === 'negative' ? '#e74c3c' :
-                          '#f39c12',
-                        width: `${Math.abs(analytics.sentiment.score * 100)}%`
-                      }
+                          analytics.sentiment.sentiment === 'positive'
+                            ? '#2ecc71'
+                            : analytics.sentiment.sentiment === 'negative'
+                              ? '#e74c3c'
+                              : '#f39c12',
+                        width: `${Math.abs(analytics.sentiment.score * 100)}%`,
+                      },
                     ]}
                   />
                   <Text style={styles.sentimentText}>
                     {analytics.sentiment.sentiment.charAt(0).toUpperCase() +
-                     analytics.sentiment.sentiment.slice(1)}
+                      analytics.sentiment.sentiment.slice(1)}
                     ({Math.round(analytics.sentiment.score * 100)}%)
                   </Text>
                 </View>
               </View>
             )}
-            
+
             {/* Odds Impact */}
             {analytics.oddsImpact && (
               <View style={styles.analyticsSection}>
                 <View style={styles.analyticsSectionHeader}>
-                  <Ionicons
-                    name="trending-up-outline"
-                    size={16}
-                    color="#3498db"
-                  />
-                  <Text style={styles.analyticsSectionTitle}>
-                    Odds Impact
-                  </Text>
+                  <Ionicons name="trending-up-outline" size={16} color="#3498db" />
+                  <Text style={styles.analyticsSectionTitle}>Odds Impact</Text>
                 </View>
                 <Text style={styles.oddsImpactText}>
                   <Text style={styles.highlightText}>
                     {analytics.oddsImpact.impactLevel.toUpperCase()}
-                  </Text> impact expected ({analytics.oddsImpact.predictedChange.toFixed(1)}% change)
+                  </Text>{' '}
+                  impact expected ({analytics.oddsImpact.predictedChange.toFixed(1)}% change)
                 </Text>
-                <Text style={styles.oddsImpactReasoning}>
-                  {analytics.oddsImpact.reasoning}
-                </Text>
+                <Text style={styles.oddsImpactReasoning}>{analytics.oddsImpact.reasoning}</Text>
               </View>
             )}
-            
+
             {/* Historical Correlation Analysis */}
             {analytics.historicalCorrelation && (
               <View style={[styles.analyticsSection, styles.historicalSection]}>
                 <View style={styles.analyticsSectionHeader}>
-                  <Ionicons
-                    name="time-outline"
-                    size={16}
-                    color="#16a085"
-                  />
+                  <Ionicons name="time-outline" size={16} color="#16a085" />
                   <Text style={[styles.analyticsSectionTitle, { color: '#16a085' }]}>
                     Historical Analysis
                   </Text>
-                  <View style={[
-                    styles.correlationBadge,
-                    {
-                      backgroundColor:
-                        analytics.historicalCorrelation.correlationStrength === 'strong' ? 'rgba(46, 204, 113, 0.2)' :
-                        analytics.historicalCorrelation.correlationStrength === 'moderate' ? 'rgba(243, 156, 18, 0.2)' :
-                        analytics.historicalCorrelation.correlationStrength === 'weak' ? 'rgba(189, 195, 199, 0.2)' :
-                        'rgba(189, 195, 199, 0.2)'
-                    }
-                  ]}>
-                    <Text style={[
-                      styles.correlationText,
+                  <View
+                    style={[
+                      styles.correlationBadge,
                       {
-                        color:
-                          analytics.historicalCorrelation.correlationStrength === 'strong' ? '#27ae60' :
-                          analytics.historicalCorrelation.correlationStrength === 'moderate' ? '#d35400' :
-                          analytics.historicalCorrelation.correlationStrength === 'weak' ? '#7f8c8d' :
-                          '#7f8c8d'
-                      }
-                    ]}>
-                      {analytics.historicalCorrelation.correlationStrength.toUpperCase()} CORRELATION
+                        backgroundColor:
+                          analytics.historicalCorrelation.correlationStrength === 'strong'
+                            ? 'rgba(46, 204, 113, 0.2)'
+                            : analytics.historicalCorrelation.correlationStrength === 'moderate'
+                              ? 'rgba(243, 156, 18, 0.2)'
+                              : analytics.historicalCorrelation.correlationStrength === 'weak'
+                                ? 'rgba(189, 195, 199, 0.2)'
+                                : 'rgba(189, 195, 199, 0.2)',
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.correlationText,
+                        {
+                          color:
+                            analytics.historicalCorrelation.correlationStrength === 'strong'
+                              ? '#27ae60'
+                              : analytics.historicalCorrelation.correlationStrength === 'moderate'
+                                ? '#d35400'
+                                : analytics.historicalCorrelation.correlationStrength === 'weak'
+                                  ? '#7f8c8d'
+                                  : '#7f8c8d',
+                        },
+                      ]}
+                    >
+                      {analytics.historicalCorrelation.correlationStrength.toUpperCase()}{' '}
+                      CORRELATION
                     </Text>
                   </View>
                 </View>
-                
+
                 <Text style={styles.predictedOutcomeText}>
                   <Text style={styles.predictedOutcomeLabel}>Predicted Outcome: </Text>
                   {analytics.historicalCorrelation.predictedOutcome}
-                  <Text style={styles.confidenceText}> ({Math.round(analytics.historicalCorrelation.confidence * 100)}% confidence)</Text>
+                  <Text style={styles.confidenceText}>
+                    {' '}
+                    ({Math.round(analytics.historicalCorrelation.confidence * 100)}% confidence)
+                  </Text>
                 </Text>
-                
+
                 <Text style={styles.similarEventsTitle}>Similar Historical Events:</Text>
                 {analytics.historicalCorrelation.similarEvents.map((event, index) => (
                   <View key={index} style={styles.similarEventItem}>
@@ -465,54 +491,55 @@ const SportsNewsScreen: React.FC = () => {
                     <View style={styles.similarEventDetails}>
                       <Text style={styles.similarEventDate}>{event.date}</Text>
                       <Text style={styles.similarEventOutcome}>{event.outcome}</Text>
-                      <Text style={[
-                        styles.similarEventImpact,
-                        { color: event.oddsImpact >= 0 ? '#27ae60' : '#e74c3c' }
-                      ]}>
-                        {event.oddsImpact >= 0 ? '+' : ''}{event.oddsImpact.toFixed(1)}% odds change
+                      <Text
+                        style={[
+                          styles.similarEventImpact,
+                          { color: event.oddsImpact >= 0 ? '#27ae60' : '#e74c3c' },
+                        ]}
+                      >
+                        {event.oddsImpact >= 0 ? '+' : ''}
+                        {event.oddsImpact.toFixed(1)}% odds change
                       </Text>
                     </View>
                   </View>
                 ))}
               </View>
             )}
-            
+
             {/* Personalized Summary */}
             {personalizedMode && analytics.personalizedSummary && (
-              <View style={[
-                styles.analyticsSection,
-                styles.personalizedSection
-              ]}>
+              <View style={[styles.analyticsSection, styles.personalizedSection]}>
                 <View style={styles.analyticsSectionHeader}>
-                  <Ionicons
-                    name="person-outline"
-                    size={16}
-                    color="#9b59b6"
-                  />
-                  <Text style={[
-                    styles.analyticsSectionTitle,
-                    { color: '#9b59b6' }
-                  ]}>
+                  <Ionicons name="person-outline" size={16} color="#9b59b6" />
+                  <Text style={[styles.analyticsSectionTitle, { color: '#9b59b6' }]}>
                     Personalized Insights
                   </Text>
-                  <View style={[
-                    styles.relevanceBadge,
-                    {
-                      backgroundColor:
-                        analytics.personalizedSummary.relevanceToUser === 'high' ? 'rgba(46, 204, 113, 0.2)' :
-                        analytics.personalizedSummary.relevanceToUser === 'medium' ? 'rgba(243, 156, 18, 0.2)' :
-                        'rgba(189, 195, 199, 0.2)'
-                    }
-                  ]}>
-                    <Text style={[
-                      styles.relevanceText,
+                  <View
+                    style={[
+                      styles.relevanceBadge,
                       {
-                        color:
-                          analytics.personalizedSummary.relevanceToUser === 'high' ? '#27ae60' :
-                          analytics.personalizedSummary.relevanceToUser === 'medium' ? '#d35400' :
-                          '#7f8c8d'
-                      }
-                    ]}>
+                        backgroundColor:
+                          analytics.personalizedSummary.relevanceToUser === 'high'
+                            ? 'rgba(46, 204, 113, 0.2)'
+                            : analytics.personalizedSummary.relevanceToUser === 'medium'
+                              ? 'rgba(243, 156, 18, 0.2)'
+                              : 'rgba(189, 195, 199, 0.2)',
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.relevanceText,
+                        {
+                          color:
+                            analytics.personalizedSummary.relevanceToUser === 'high'
+                              ? '#27ae60'
+                              : analytics.personalizedSummary.relevanceToUser === 'medium'
+                                ? '#d35400'
+                                : '#7f8c8d',
+                        },
+                      ]}
+                    >
                       {analytics.personalizedSummary.relevanceToUser.toUpperCase()} RELEVANCE
                     </Text>
                   </View>
@@ -528,18 +555,16 @@ const SportsNewsScreen: React.FC = () => {
             )}
           </View>
         )}
-        
+
         <View style={styles.newsFooter}>
           <Text style={styles.sourceText}>Source: {item.source}</Text>
           <TouchableOpacity
             style={styles.readMoreButton}
             onPress={() => setExpandedNewsId(isExpanded ? null : item.id)}
           >
-            <Text style={styles.readMoreText}>
-              {isExpanded ? 'Show Less' : 'Read More'}
-            </Text>
+            <Text style={styles.readMoreText}>{isExpanded ? 'Show Less' : 'Read More'}</Text>
             <Ionicons
-              name={isExpanded ? "chevron-up" : "chevron-forward"}
+              name={isExpanded ? 'chevron-up' : 'chevron-forward'}
               size={16}
               color="#3498db"
             />
@@ -548,7 +573,7 @@ const SportsNewsScreen: React.FC = () => {
       </View>
     );
   };
-  
+
   if (loading) {
     return (
       <NeonContainer>
@@ -559,29 +584,21 @@ const SportsNewsScreen: React.FC = () => {
       </NeonContainer>
     );
   }
-  
+
   return (
     <NeonContainer>
-      <Header
-        title="AI Sports News"
-        onRefresh={onRefresh}
-        isLoading={refreshing}
-      />
-      
-      <ScrollView 
+      <Header title="AI Sports News" onRefresh={onRefresh} isLoading={refreshing} />
+
+      <ScrollView
         style={styles.container}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#3498db']}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#3498db']} />
         }
       >
-        <NeonText type="heading" glow={true} style={styles.title}>
+        <NeonText type="heading" glow style={styles.title}>
           AI Sports News
         </NeonText>
-        
+
         {/* Premium user controls */}
         {isPremiumUser && (
           <View style={styles.premiumControlsContainer}>
@@ -589,7 +606,7 @@ const SportsNewsScreen: React.FC = () => {
               <Text style={styles.premiumControlLabel}>Personalized Mode</Text>
               <Switch
                 value={personalizedMode}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   setPersonalizedMode(value);
                   loadNewsData(true);
                 }}
@@ -597,12 +614,12 @@ const SportsNewsScreen: React.FC = () => {
                 thumbColor={personalizedMode ? '#fff' : '#f4f3f4'}
               />
             </View>
-            
+
             <View style={styles.premiumControlRow}>
               <Text style={styles.premiumControlLabel}>Favorite Teams Only</Text>
               <Switch
                 value={favoriteTeamsOnly}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   setFavoriteTeamsOnly(value);
                   loadNewsData(true);
                 }}
@@ -610,7 +627,7 @@ const SportsNewsScreen: React.FC = () => {
                 thumbColor={favoriteTeamsOnly ? '#fff' : '#f4f3f4'}
               />
             </View>
-            
+
             {favoriteTeams.length === 0 && favoriteTeamsOnly && (
               <Text style={styles.warningText}>
                 No favorite teams set. Go to Settings to add favorite teams.
@@ -618,10 +635,10 @@ const SportsNewsScreen: React.FC = () => {
             )}
           </View>
         )}
-        
+
         {renderCategoryTabs()}
         {renderFocusTabs()}
-        
+
         {filteredNews.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="newspaper-outline" size={64} color="#666" />

@@ -1,6 +1,6 @@
 /**
  * Merge Translations Script
- * 
+ *
  * This script merges the error updates into the main Spanish translation file.
  * It ensures that all error messages are properly translated in both English and Spanish.
  */
@@ -17,7 +17,7 @@ const colors = {
   blink: '\x1b[5m',
   reverse: '\x1b[7m',
   hidden: '\x1b[8m',
-  
+
   black: '\x1b[30m',
   red: '\x1b[31m',
   green: '\x1b[32m',
@@ -43,33 +43,33 @@ console.log();
 try {
   // Read the files
   console.log(`${colors.yellow}Reading translation files...${colors.reset}`);
-  
+
   // Check if files exist
   if (!fs.existsSync(spanishFilePath)) {
     throw new Error(`Spanish translation file not found: ${spanishFilePath}`);
   }
-  
+
   if (!fs.existsSync(updatesFilePath)) {
     throw new Error(`Updates file not found: ${updatesFilePath}`);
   }
-  
+
   // Read and parse the files
   const spanishContent = fs.readFileSync(spanishFilePath, 'utf8');
   const updatesContent = fs.readFileSync(updatesFilePath, 'utf8');
-  
+
   const spanishTranslations = JSON.parse(spanishContent);
   const updatesTranslations = JSON.parse(updatesContent);
-  
+
   console.log(`${colors.green}Files read successfully.${colors.reset}`);
-  
+
   // Create a backup of the original file
   console.log(`${colors.yellow}Creating backup of Spanish translation file...${colors.reset}`);
   fs.writeFileSync(backupFilePath, spanishContent);
   console.log(`${colors.green}Backup created: ${backupFilePath}${colors.reset}`);
-  
+
   // Merge the translations
   console.log(`${colors.yellow}Merging translations...${colors.reset}`);
-  
+
   // Helper function to deep merge objects
   const deepMerge = (target, source) => {
     for (const key in source) {
@@ -83,29 +83,28 @@ try {
     }
     return target;
   };
-  
+
   // Perform the merge
   const mergedTranslations = deepMerge(spanishTranslations, updatesTranslations);
-  
+
   // Write the merged translations back to the Spanish file
   console.log(`${colors.yellow}Writing merged translations to file...${colors.reset}`);
   fs.writeFileSync(spanishFilePath, JSON.stringify(mergedTranslations, null, 2));
-  
+
   console.log(`${colors.green}Translations merged successfully!${colors.reset}`);
   console.log();
-  
+
   // Log summary
   console.log(`${colors.bright}Summary:${colors.reset}`);
   console.log(`- Original Spanish translations backed up to: ${backupFilePath}`);
   console.log(`- Error updates merged into: ${spanishFilePath}`);
   console.log();
-  
+
   // Log sections updated
   console.log(`${colors.bright}Sections updated:${colors.reset}`);
   Object.keys(updatesTranslations).forEach(section => {
     console.log(`- ${section}: ${Object.keys(updatesTranslations[section]).length} entries`);
   });
-  
 } catch (error) {
   console.error(`${colors.red}Error merging translations:${colors.reset}`, error.message);
   console.error(error.stack);

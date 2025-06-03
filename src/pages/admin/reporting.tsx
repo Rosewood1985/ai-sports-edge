@@ -1,7 +1,8 @@
-import React from 'react';
 import { NextPage } from 'next';
-import { AdminLayout } from '../../components/layouts/AdminLayout';
+import React from 'react';
+
 import { ReportingCenter } from '../../components/dashboard/reporting/ReportingCenter';
+import { AdminLayout } from '../../components/layouts/AdminLayout';
 import { withAuth } from '../../hocs/withAuth';
 
 /**

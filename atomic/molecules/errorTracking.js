@@ -21,7 +21,7 @@ const getCurrentUser = () => {
 
 /**
  * Initialize error tracking service
- * 
+ *
  * @param {Object} [options] - Initialization options
  * @param {string} [options.dsn] - Sentry DSN
  * @param {string} [options.environment] - Environment
@@ -35,15 +35,15 @@ export const initErrorTracking = (options = {}) => {
   try {
     console.log('initErrorTracking: Starting initialization');
     console.log('initErrorTracking: Checking if Sentry is defined');
-    
+
     // Check if Sentry is defined
     if (typeof Sentry === 'undefined') {
       console.error('initErrorTracking: Sentry is undefined');
       return false;
     }
-    
+
     console.log('initErrorTracking: About to call Sentry.init');
-    
+
     // Get configuration
     const config = {
       dsn: options.dsn || sentryConfig.dsn,
@@ -52,15 +52,15 @@ export const initErrorTracking = (options = {}) => {
       tracesSampleRate: options.tracesSampleRate || sentryConfig.tracesSampleRate,
       debug: options.debug || false,
     };
-    
+
     console.log(
       `initErrorTracking: Using DSN: ${config.dsn.substring(0, 15)}... and environment: ${config.environment}`
     );
-    
+
     // Initialize Sentry with detailed error handling
     try {
       console.log('initErrorTracking: Calling Sentry.init with options');
-      
+
       const initOptions = {
         dsn: config.dsn,
         environment: config.environment,
@@ -71,17 +71,17 @@ export const initErrorTracking = (options = {}) => {
         beforeSend: event => {
           try {
             console.log('initErrorTracking: beforeSend called for event');
-            
+
             if (event && event.user) {
               console.log('initErrorTracking: Removing IP address from user data');
               delete event.user.ip_address;
             }
-            
+
             if (isDevelopment) {
               console.log('initErrorTracking: In development, not sending event to Sentry');
               return null;
             }
-            
+
             return event;
           } catch (beforeSendError) {
             console.error('initErrorTracking: Error in beforeSend:', beforeSendError);
@@ -89,15 +89,15 @@ export const initErrorTracking = (options = {}) => {
           }
         },
       };
-      
+
       Sentry.init(initOptions);
       console.log('initErrorTracking: Sentry.init completed successfully');
-      
+
       // Set user information if available
       try {
         console.log('initErrorTracking: Setting user information');
         const user = getCurrentUser();
-        
+
         if (user) {
           console.log(`initErrorTracking: Setting user with ID: ${user.id}`);
           Sentry.setUser({
@@ -111,7 +111,7 @@ export const initErrorTracking = (options = {}) => {
         // Continue even if setting user fails
         console.error('initErrorTracking: Error setting user information:', userError);
       }
-      
+
       console.log('initErrorTracking: Initialization completed successfully');
       return true;
     } catch (initError) {
@@ -126,7 +126,7 @@ export const initErrorTracking = (options = {}) => {
 
 /**
  * Capture an exception
- * 
+ *
  * @param {Error} error - Error to capture
  * @param {CaptureContext} [context] - Additional context
  */
@@ -135,10 +135,10 @@ export const captureException = (error, context) => {
     if (isDevelopment) {
       console.error('Error captured:', error, context);
     }
-    
+
     // Parse error if it's not an Error instance
     const parsedError = parseError(error);
-    
+
     // Capture in Sentry
     Sentry.captureException(parsedError, context);
   } catch (sentryError) {
@@ -149,7 +149,7 @@ export const captureException = (error, context) => {
 
 /**
  * Capture a message
- * 
+ *
  * @param {string} message - Message to capture
  * @param {Object} [options] - Capture options
  * @param {string} [options.level] - Message level
@@ -159,7 +159,7 @@ export const captureMessage = (message, options = {}) => {
     if (isDevelopment) {
       console.log(`Message captured (${options.level || 'info'})`, message);
     }
-    
+
     Sentry.captureMessage(message, options.level);
   } catch (sentryError) {
     console.error('Sentry captureMessage failed:', sentryError);
@@ -168,7 +168,7 @@ export const captureMessage = (message, options = {}) => {
 
 /**
  * Add breadcrumb
- * 
+ *
  * @param {import('../atoms/errorUtils').BreadcrumbData} breadcrumb - Breadcrumb to add
  */
 export const addBreadcrumb = breadcrumb => {
@@ -181,7 +181,7 @@ export const addBreadcrumb = breadcrumb => {
 
 /**
  * Set user information
- * 
+ *
  * @param {Object|null} user - User information
  * @param {string} [user.id] - User ID
  * @param {string} [user.email] - User email
@@ -197,7 +197,7 @@ export const setUser = user => {
 
 /**
  * Set a tag
- * 
+ *
  * @param {string} key - Tag key
  * @param {string} value - Tag value
  */
@@ -211,7 +211,7 @@ export const setTag = (key, value) => {
 
 /**
  * Set tags
- * 
+ *
  * @param {Object} tags - Tags to set
  */
 export const setTags = tags => {
@@ -224,7 +224,7 @@ export const setTags = tags => {
 
 /**
  * Set extra context
- * 
+ *
  * @param {string} key - Context key
  * @param {any} value - Context value
  */
@@ -238,7 +238,7 @@ export const setExtra = (key, value) => {
 
 /**
  * Set extras
- * 
+ *
  * @param {Object} extras - Extras to set
  */
 export const setExtras = extras => {
@@ -251,7 +251,7 @@ export const setExtras = extras => {
 
 /**
  * Start a transaction
- * 
+ *
  * @param {string} name - Transaction name
  * @param {string} op - Transaction operation
  * @returns {Object} Transaction
@@ -271,7 +271,7 @@ export const startTransaction = (name, op) => {
 
 /**
  * Flush events
- * 
+ *
  * @param {number} [timeout] - Timeout in ms
  * @returns {Promise} Promise that resolves when events are flushed
  */
@@ -285,7 +285,7 @@ export const flush = timeout => {
 
 /**
  * Close Sentry
- * 
+ *
  * @returns {Promise} Promise that resolves when Sentry is closed
  */
 export const close = () => {

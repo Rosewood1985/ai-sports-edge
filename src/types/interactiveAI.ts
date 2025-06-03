@@ -713,7 +713,7 @@ export type {
   ModelSimulation,
   ScenarioComparison,
   InteractiveVisualization,
-  
+
   // Supporting types
   ScenarioParameters,
   PredictedOutcome,

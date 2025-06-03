@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { I18nManager, Platform, NativeModules } from 'react-native';
 
 // Import translations directly
@@ -26,7 +26,7 @@ const i18n = {
   locale: 'en',
   fallbacks: true,
   defaultLocale: 'en',
-  t: function (key: string, options?: Record<string, any>): string {
+  t(key: string, options?: Record<string, any>): string {
     try {
       const keys = key.split('.');
       const translationObj = this.locale === 'en' ? this.translations.en : this.translations.es;

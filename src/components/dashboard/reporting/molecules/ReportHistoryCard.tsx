@@ -1,4 +1,5 @@
-import React from 'react';
+import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Card,
   CardContent,
@@ -10,8 +11,8 @@ import {
   Divider,
   Stack,
 } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import React from 'react';
+
 import { ReportHistory } from '../../../../types/reporting';
 import { HistoryStatusBadge, FormatBadge, RecipientChip } from '../atoms';
 

@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity
-} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { referralNotificationService, ReferralNotification as NotificationType } from '../services/referralNotificationService';
-import ReferralNotificationList from '../components/ReferralNotificationList';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+
 import ReferralNotificationModal from '../components/ReferralNotification';
+import ReferralNotificationList from '../components/ReferralNotificationList';
+import { useThemeColor } from '../hooks/useThemeColor';
+import {
+  referralNotificationService,
+  ReferralNotification as NotificationType,
+} from '../services/referralNotificationService';
 
 type RootStackParamList = {
   ReferralLeaderboard: undefined;
@@ -30,10 +27,10 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 const ReferralNotificationsScreen: React.FC = () => {
   const [selectedNotification, setSelectedNotification] = useState<NotificationType | null>(null);
   const [notificationVisible, setNotificationVisible] = useState<boolean>(false);
-  
+
   const navigation = useNavigation<NavigationProp>();
   const backgroundColor = useThemeColor({}, 'background');
-  
+
   useEffect(() => {
     // Mark notifications as read when screen is focused
     const unsubscribe = navigation.addListener('focus', () => {
@@ -44,49 +41,46 @@ const ReferralNotificationsScreen: React.FC = () => {
         }
       });
     });
-    
+
     return unsubscribe;
   }, [navigation]);
-  
+
   const handleNotificationPress = (notification: NotificationType) => {
     setSelectedNotification(notification);
     setNotificationVisible(true);
   };
-  
+
   const handleCloseNotification = () => {
     setNotificationVisible(false);
   };
-  
+
   const handleMarkAllAsRead = () => {
     // Update badge count in tab navigator
     // This would be implemented in a real app
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Custom Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={useThemeColor({}, 'text')} />
         </TouchableOpacity>
-        
+
         <Text style={[styles.headerTitle, { color: useThemeColor({}, 'text') }]}>
           Notifications
         </Text>
-        
+
         <View style={styles.headerRight} />
       </View>
-      
+
       <ReferralNotificationList
         onNotificationPress={handleNotificationPress}
         onMarkAllAsRead={handleMarkAllAsRead}
       />
-      
+
       {selectedNotification && (
         <ReferralNotificationModal
           visible={notificationVisible}

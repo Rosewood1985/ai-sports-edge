@@ -3,12 +3,12 @@
  * All functions with comprehensive Sentry monitoring using new names to avoid Gen1->Gen2 issues
  */
 
-const { onRequest } = require('firebase-functions/v2/https');
-const { onSchedule } = require('firebase-functions/v2/scheduler');
-const { onDocumentWritten } = require('firebase-functions/v2/firestore');
-const { wrapHttpFunction, wrapEventFunction, captureCloudFunctionError } = require('./sentryConfig');
-const { wrapScheduledFunction } = require('./sentryCronConfig');
-const admin = require('firebase-admin');
+const { onRequest } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onDocumentWritten } = require("firebase-functions/v2/firestore");
+const { wrapHttpFunction, wrapEventFunction, captureCloudFunctionError } = require("./sentryConfig");
+const { wrapScheduledFunction } = require("./sentryCronConfig");
+const admin = require("firebase-admin");
 
 // Core Sentry Test Functions
 
@@ -16,31 +16,31 @@ const admin = require('firebase-admin');
  * Simple Sentry test function for verification
  */
 exports.sentryVerifyV2 = wrapHttpFunction(onRequest(async (req, res) => {
-  console.log('Sentry verification function called successfully!');
+  console.log("Sentry verification function called successfully!");
   
   try {
     // Test different scenarios based on query parameter
-    if (req.query.test === 'error') {
-      throw new Error('Test error for Sentry monitoring verification');
+    if (req.query.test === "error") {
+      throw new Error("Test error for Sentry monitoring verification");
     }
     
-    if (req.query.test === 'warning') {
-      console.warn('Test warning for Sentry monitoring verification');
+    if (req.query.test === "warning") {
+      console.warn("Test warning for Sentry monitoring verification");
     }
     
     // Success response with Sentry info
     res.json({
       success: true,
-      message: 'Sentry integration verified!',
+      message: "Sentry integration verified!",
       timestamp: new Date().toISOString(),
-      function: 'sentryVerifyV2',
-      sentry: 'active',
-      monitoring: 'enabled'
+      function: "sentryVerifyV2",
+      sentry: "active",
+      monitoring: "enabled"
     });
     
   } catch (error) {
-    console.error('Sentry verification error:', error);
-    captureCloudFunctionError(error, 'sentryVerifyV2', {
+    console.error("Sentry verification error:", error);
+    captureCloudFunctionError(error, "sentryVerifyV2", {
       query: req.query,
       timestamp: new Date().toISOString()
     });
@@ -49,7 +49,7 @@ exports.sentryVerifyV2 = wrapHttpFunction(onRequest(async (req, res) => {
       success: false,
       error: error.message,
       timestamp: new Date().toISOString(),
-      function: 'sentryVerifyV2'
+      function: "sentryVerifyV2"
     });
   }
 }));
@@ -60,15 +60,15 @@ exports.sentryVerifyV2 = wrapHttpFunction(onRequest(async (req, res) => {
 exports.stripeWebhookV2 = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
   try {
-    console.log('Stripe webhook V2 received');
+    console.log("Stripe webhook V2 received");
     
     // Simulate webhook processing
-    if (req.method !== 'POST') {
-      throw new Error('Only POST method allowed for webhook');
+    if (req.method !== "POST") {
+      throw new Error("Only POST method allowed for webhook");
     }
     
     // Basic webhook validation
-    const eventType = req.body?.type || 'unknown';
+    const eventType = req.body?.type || "unknown";
     
     console.log(`Processing Stripe event: ${eventType}`);
     
@@ -81,14 +81,14 @@ exports.stripeWebhookV2 = wrapHttpFunction(onRequest({ cors: true }, async (req,
     });
     
   } catch (error) {
-    console.error('Stripe webhook V2 error:', error);
-    captureCloudFunctionError(error, 'stripeWebhookV2', {
+    console.error("Stripe webhook V2 error:", error);
+    captureCloudFunctionError(error, "stripeWebhookV2", {
       method: req.method,
       url: req.url,
       processingTime: Date.now() - startTime
     });
     res.status(500).json({ 
-      error: 'Webhook processing failed',
+      error: "Webhook processing failed",
       timestamp: new Date().toISOString()
     });
   }
@@ -98,25 +98,25 @@ exports.stripeWebhookV2 = wrapHttpFunction(onRequest({ cors: true }, async (req,
  * Enhanced notification processing with Sentry monitoring
  */
 exports.processNotificationsV2 = wrapScheduledFunction(
-  'processNotificationsV2',
-  'every 1 minutes',
-  onSchedule('every 1 minutes', async (event) => {
-    console.log('Processing notifications V2 started');
+  "processNotificationsV2",
+  "every 1 minutes",
+  onSchedule("every 1 minutes", async (event) => {
+    console.log("Processing notifications V2 started");
     
     try {
       const db = admin.firestore();
       
       // Get pending notifications
       const notificationsSnapshot = await db
-        .collection('notifications')
-        .where('status', '==', 'pending')
-        .where('scheduledFor', '<=', new Date())
+        .collection("notifications")
+        .where("status", "==", "pending")
+        .where("scheduledFor", "<=", new Date())
         .limit(50)
         .get();
       
       if (notificationsSnapshot.empty) {
-        console.log('No pending notifications to process');
-        return { processed: 0, status: 'success' };
+        console.log("No pending notifications to process");
+        return { processed: 0, status: "success" };
       }
       
       console.log(`Processing ${notificationsSnapshot.size} notifications`);
@@ -130,7 +130,7 @@ exports.processNotificationsV2 = wrapScheduledFunction(
         try {
           // Mark as processing
           batch.update(doc.ref, {
-            status: 'processing',
+            status: "processing",
             processedAt: new Date(),
             processingAttempts: (notification.processingAttempts || 0) + 1
           });
@@ -140,7 +140,7 @@ exports.processNotificationsV2 = wrapScheduledFunction(
           console.error(`Error processing notification ${doc.id}:`, error);
           // Mark as failed
           batch.update(doc.ref, {
-            status: 'failed',
+            status: "failed",
             failedAt: new Date(),
             error: error.message
           });
@@ -150,10 +150,10 @@ exports.processNotificationsV2 = wrapScheduledFunction(
       await batch.commit();
       
       console.log(`Notification processing V2 completed: ${processedCount} processed`);
-      return { processed: processedCount, status: 'success' };
+      return { processed: processedCount, status: "success" };
       
     } catch (error) {
-      console.error('Notification processing V2 error:', error);
+      console.error("Notification processing V2 error:", error);
       throw error; // Let Sentry wrapper handle it
     }
   })
@@ -163,23 +163,23 @@ exports.processNotificationsV2 = wrapScheduledFunction(
  * Referral leaderboard update with Sentry monitoring
  */
 exports.updateLeaderboardV2 = wrapScheduledFunction(
-  'updateLeaderboardV2',
-  'every 30 minutes',
-  onSchedule('every 30 minutes', async (event) => {
-    console.log('Updating referral leaderboard V2');
+  "updateLeaderboardV2",
+  "every 30 minutes",
+  onSchedule("every 30 minutes", async (event) => {
+    console.log("Updating referral leaderboard V2");
     
     try {
       const db = admin.firestore();
       
       // Get all users with referral data
       const usersSnapshot = await db
-        .collection('users')
-        .where('referralCode', '!=', null)
+        .collection("users")
+        .where("referralCode", "!=", null)
         .get();
       
       if (usersSnapshot.empty) {
-        console.log('No users with referral codes found');
-        return { updated: 0, status: 'success' };
+        console.log("No users with referral codes found");
+        return { updated: 0, status: "success" };
       }
       
       const leaderboardData = [];
@@ -190,9 +190,9 @@ exports.updateLeaderboardV2 = wrapScheduledFunction(
         
         // Get referral stats
         const referralsSnapshot = await db
-          .collection('referrals')
-          .where('referrerId', '==', userId)
-          .where('status', '==', 'completed')
+          .collection("referrals")
+          .where("referrerId", "==", userId)
+          .where("status", "==", "completed")
           .get();
         
         if (!referralsSnapshot.empty) {
@@ -207,7 +207,7 @@ exports.updateLeaderboardV2 = wrapScheduledFunction(
       
       // Update leaderboard collection
       const batch = db.batch();
-      const leaderboardRef = db.collection('leaderboard').doc('referrals');
+      const leaderboardRef = db.collection("leaderboard").doc("referrals");
       
       batch.set(leaderboardRef, {
         data: leaderboardData.sort((a, b) => b.totalReferrals - a.totalReferrals),
@@ -218,10 +218,10 @@ exports.updateLeaderboardV2 = wrapScheduledFunction(
       await batch.commit();
       
       console.log(`Leaderboard V2 updated with ${leaderboardData.length} entries`);
-      return { updated: leaderboardData.length, status: 'success' };
+      return { updated: leaderboardData.length, status: "success" };
       
     } catch (error) {
-      console.error('Leaderboard update V2 error:', error);
+      console.error("Leaderboard update V2 error:", error);
       throw error; // Let Sentry wrapper handle it
     }
   })
@@ -231,10 +231,10 @@ exports.updateLeaderboardV2 = wrapScheduledFunction(
  * Daily cleanup with Sentry monitoring
  */
 exports.dailyCleanupV2 = wrapScheduledFunction(
-  'dailyCleanupV2',
-  '0 2 * * *', // 2 AM daily
-  onSchedule('0 2 * * *', async (event) => {
-    console.log('Daily cleanup V2 started');
+  "dailyCleanupV2",
+  "0 2 * * *", // 2 AM daily
+  onSchedule("0 2 * * *", async (event) => {
+    console.log("Daily cleanup V2 started");
     
     try {
       const db = admin.firestore();
@@ -243,9 +243,9 @@ exports.dailyCleanupV2 = wrapScheduledFunction(
       
       // Clean up old notifications
       const oldNotificationsSnapshot = await db
-        .collection('notifications')
-        .where('createdAt', '<', thirtyDaysAgo)
-        .where('status', 'in', ['sent', 'failed'])
+        .collection("notifications")
+        .where("createdAt", "<", thirtyDaysAgo)
+        .where("status", "in", ["sent", "failed"])
         .limit(100)
         .get();
       
@@ -260,8 +260,8 @@ exports.dailyCleanupV2 = wrapScheduledFunction(
       
       // Clean up old logs
       const oldLogsSnapshot = await db
-        .collection('logs')
-        .where('timestamp', '<', thirtyDaysAgo)
+        .collection("logs")
+        .where("timestamp", "<", thirtyDaysAgo)
         .limit(100)
         .get();
       
@@ -274,15 +274,15 @@ exports.dailyCleanupV2 = wrapScheduledFunction(
         console.log(`Deleted ${oldLogsSnapshot.size} old logs`);
       }
       
-      console.log('Daily cleanup V2 completed successfully');
+      console.log("Daily cleanup V2 completed successfully");
       return { 
         notificationsDeleted: oldNotificationsSnapshot.size,
         logsDeleted: oldLogsSnapshot.size,
-        status: 'success'
+        status: "success"
       };
       
     } catch (error) {
-      console.error('Daily cleanup V2 error:', error);
+      console.error("Daily cleanup V2 error:", error);
       throw error; // Let Sentry wrapper handle it
     }
   })
@@ -292,43 +292,43 @@ exports.dailyCleanupV2 = wrapScheduledFunction(
  * User data backup with Sentry monitoring
  */
 exports.backupUserDataV2 = wrapScheduledFunction(
-  'backupUserDataV2',
-  '0 3 * * *', // 3 AM daily
-  onSchedule('0 3 * * *', async (event) => {
-    console.log('User data backup V2 started');
+  "backupUserDataV2",
+  "0 3 * * *", // 3 AM daily
+  onSchedule("0 3 * * *", async (event) => {
+    console.log("User data backup V2 started");
     
     try {
       const db = admin.firestore();
-      const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const timestamp = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
       
       // Get all users
-      const usersSnapshot = await db.collection('users').get();
+      const usersSnapshot = await db.collection("users").get();
       
       if (usersSnapshot.empty) {
-        console.log('No users found for backup');
-        return { backedUp: 0, status: 'success' };
+        console.log("No users found for backup");
+        return { backedUp: 0, status: "success" };
       }
       
       // Create backup document
       const backupData = {
         timestamp: new Date(),
         userCount: usersSnapshot.size,
-        backupType: 'daily',
-        status: 'completed'
+        backupType: "daily",
+        status: "completed"
       };
       
       // Store backup metadata
-      await db.collection('backups').doc(`users_${timestamp}`).set(backupData);
+      await db.collection("backups").doc(`users_${timestamp}`).set(backupData);
       
       console.log(`User data backup V2 completed: ${usersSnapshot.size} users`);
       return { 
         backedUp: usersSnapshot.size,
         timestamp,
-        status: 'success'
+        status: "success"
       };
       
     } catch (error) {
-      console.error('User data backup V2 error:', error);
+      console.error("User data backup V2 error:", error);
       throw error; // Let Sentry wrapper handle it
     }
   })
@@ -338,15 +338,15 @@ exports.backupUserDataV2 = wrapScheduledFunction(
  * Firestore document change monitor with Sentry
  */
 exports.documentChangeMonitorV2 = wrapEventFunction(
-  onDocumentWritten('users/{userId}', async (event) => {
-    console.log('Document change monitor V2 triggered');
+  onDocumentWritten("users/{userId}", async (event) => {
+    console.log("Document change monitor V2 triggered");
     
     try {
       const change = event.data;
       const userId = event.params.userId;
       
       if (!change) {
-        console.log('No change data available');
+        console.log("No change data available");
         return;
       }
       
@@ -356,20 +356,20 @@ exports.documentChangeMonitorV2 = wrapEventFunction(
       // Log the change
       const logData = {
         userId,
-        changeType: !before ? 'created' : !after ? 'deleted' : 'updated',
+        changeType: !before ? "created" : !after ? "deleted" : "updated",
         timestamp: new Date(),
         hasData: !!after
       };
       
-      await admin.firestore().collection('userChangeLogs').add(logData);
+      await admin.firestore().collection("userChangeLogs").add(logData);
       
       console.log(`Document change logged for user ${userId}: ${logData.changeType}`);
       
     } catch (error) {
-      console.error('Document change monitor V2 error:', error);
+      console.error("Document change monitor V2 error:", error);
       throw error; // Let Sentry wrapper handle it
     }
   })
 );
 
-console.log('Sentry monitored functions V2 loaded successfully');
+console.log("Sentry monitored functions V2 loaded successfully");

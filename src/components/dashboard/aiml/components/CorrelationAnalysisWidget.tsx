@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { LineChart, ScatterChart } from 'react-native-chart-kit';
+
 import { useCorrelationAnalysis } from '../../../../hooks/useEnhancedInsights';
 import { CorrelationInsight, CorrelationType } from '../../../../types/enhancedInsights';
-import LoadingIndicator from '../../../LoadingIndicator';
 import ErrorMessage from '../../../ErrorMessage';
+import LoadingIndicator from '../../../LoadingIndicator';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -15,25 +16,25 @@ interface CorrelationAnalysisWidgetProps {
 
 export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps> = ({
   dateRange,
-  variables
+  variables,
 }) => {
   const [selectedCorrelation, setSelectedCorrelation] = useState<CorrelationInsight | null>(null);
   const [correlationType, setCorrelationType] = useState<CorrelationType>('pearson');
   const [minStrength, setMinStrength] = useState<number>(0.3);
 
-  const { 
-    correlations, 
-    isLoading, 
-    error, 
+  const {
+    correlations,
+    isLoading,
+    error,
     analyzeCorrelations,
     getCorrelationMatrix,
-    predictCorrelation 
+    predictCorrelation,
   } = useCorrelationAnalysis({
     startDate: dateRange[0],
     endDate: dateRange[1],
     variables,
     type: correlationType,
-    minStrength
+    minStrength,
   });
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
             {/* Header row */}
             <View style={styles.matrixRow}>
               <View style={styles.matrixHeaderCell}>
-                <Text style={styles.matrixHeaderText}></Text>
+                <Text style={styles.matrixHeaderText} />
               </View>
               {matrix[0]?.variables.map((variable, index) => (
                 <View key={index} style={styles.matrixHeaderCell}>
@@ -83,7 +84,7 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
                 </View>
               ))}
             </View>
-            
+
             {/* Data rows */}
             {matrix.map((row, rowIndex) => (
               <View key={rowIndex} style={styles.matrixRow}>
@@ -97,13 +98,12 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
                     key={colIndex}
                     style={[
                       styles.matrixCell,
-                      { backgroundColor: getCorrelationColor(correlation) + '20' }
+                      { backgroundColor: getCorrelationColor(correlation) + '20' },
                     ]}
                   >
-                    <Text style={[
-                      styles.matrixCellText,
-                      { color: getCorrelationColor(correlation) }
-                    ]}>
+                    <Text
+                      style={[styles.matrixCellText, { color: getCorrelationColor(correlation) }]}
+                    >
                       {correlation.toFixed(2)}
                     </Text>
                   </View>
@@ -120,13 +120,15 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
     if (!correlation.scatterData) return null;
 
     const data = {
-      datasets: [{
-        data: correlation.scatterData.map(point => ({
-          x: point.x,
-          y: point.y
-        })),
-        color: () => getCorrelationColor(correlation.strength),
-      }]
+      datasets: [
+        {
+          data: correlation.scatterData.map(point => ({
+            x: point.x,
+            y: point.y,
+          })),
+          color: () => getCorrelationColor(correlation.strength),
+        },
+      ],
     };
 
     return (
@@ -157,16 +159,16 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
     if (!correlation.timeSeriesData) return null;
 
     const data = {
-      labels: correlation.timeSeriesData.map(point => 
-        new Date(point.timestamp).toLocaleDateString().split('/')[1]
+      labels: correlation.timeSeriesData.map(
+        point => new Date(point.timestamp).toLocaleDateString().split('/')[1]
       ),
       datasets: [
         {
           data: correlation.timeSeriesData.map(point => point.correlation),
           color: (opacity = 1) => `rgba(46, 204, 113, ${opacity})`,
           strokeWidth: 2,
-        }
-      ]
+        },
+      ],
     };
 
     return (
@@ -187,8 +189,8 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
             propsForDots: {
               r: '4',
               strokeWidth: '2',
-              stroke: '#2ECC71'
-            }
+              stroke: '#2ECC71',
+            },
           }}
           bezier
           style={styles.chart}
@@ -202,7 +204,7 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
       key={correlation.id}
       style={[
         styles.correlationCard,
-        selectedCorrelation?.id === correlation.id && styles.selectedCard
+        selectedCorrelation?.id === correlation.id && styles.selectedCard,
       ]}
       onPress={() => setSelectedCorrelation(correlation)}
     >
@@ -212,12 +214,15 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
           <Text style={styles.correlationSymbol}>⟷</Text>
           <Text style={styles.variableText}>{correlation.variableY}</Text>
         </View>
-        <View style={[
-          styles.strengthBadge,
-          { backgroundColor: getCorrelationColor(correlation.strength) }
-        ]}>
+        <View
+          style={[
+            styles.strengthBadge,
+            { backgroundColor: getCorrelationColor(correlation.strength) },
+          ]}
+        >
           <Text style={styles.strengthText}>
-            {correlation.strength > 0 ? '+' : ''}{correlation.strength.toFixed(3)}
+            {correlation.strength > 0 ? '+' : ''}
+            {correlation.strength.toFixed(3)}
           </Text>
         </View>
       </View>
@@ -246,13 +251,19 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
       </View>
 
       {correlation.significance && (
-        <View style={[
-          styles.significanceTag,
-          { 
-            backgroundColor: correlation.significance === 'significant' ? '#2ECC71' : 
-                           correlation.significance === 'marginally_significant' ? '#F39C12' : '#95A5A6'
-          }
-        ]}>
+        <View
+          style={[
+            styles.significanceTag,
+            {
+              backgroundColor:
+                correlation.significance === 'significant'
+                  ? '#2ECC71'
+                  : correlation.significance === 'marginally_significant'
+                    ? '#F39C12'
+                    : '#95A5A6',
+            },
+          ]}
+        >
           <Text style={styles.significanceText}>
             {correlation.significance.replace('_', ' ').toUpperCase()}
           </Text>
@@ -265,9 +276,7 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
     if (!selectedCorrelation) {
       return (
         <View style={styles.noSelectionContainer}>
-          <Text style={styles.noSelectionText}>
-            Select a correlation to view detailed analysis
-          </Text>
+          <Text style={styles.noSelectionText}>Select a correlation to view detailed analysis</Text>
         </View>
       );
     }
@@ -281,16 +290,16 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
         <View style={styles.detailsSection}>
           <Text style={styles.sectionTitle}>Correlation Analysis</Text>
           <Text style={styles.analysisText}>
-            This {getCorrelationStrengthLabel(selectedCorrelation.strength).toLowerCase()} {' '}
-            {selectedCorrelation.strength > 0 ? 'positive' : 'negative'} correlation indicates that 
-            as {selectedCorrelation.variableX} {selectedCorrelation.strength > 0 ? 'increases' : 'decreases'}, {' '}
-            {selectedCorrelation.variableY} tends to {selectedCorrelation.strength > 0 ? 'increase' : 'decrease'} as well.
+            This {getCorrelationStrengthLabel(selectedCorrelation.strength).toLowerCase()}{' '}
+            {selectedCorrelation.strength > 0 ? 'positive' : 'negative'} correlation indicates that
+            as {selectedCorrelation.variableX}{' '}
+            {selectedCorrelation.strength > 0 ? 'increases' : 'decreases'},{' '}
+            {selectedCorrelation.variableY} tends to{' '}
+            {selectedCorrelation.strength > 0 ? 'increase' : 'decrease'} as well.
           </Text>
-          
+
           {selectedCorrelation.interpretation && (
-            <Text style={styles.interpretationText}>
-              📊 {selectedCorrelation.interpretation}
-            </Text>
+            <Text style={styles.interpretationText}>📊 {selectedCorrelation.interpretation}</Text>
           )}
         </View>
 
@@ -302,18 +311,18 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Correlation Coefficient</Text>
-              <Text style={[
-                styles.statValue,
-                { color: getCorrelationColor(selectedCorrelation.strength) }
-              ]}>
+              <Text
+                style={[
+                  styles.statValue,
+                  { color: getCorrelationColor(selectedCorrelation.strength) },
+                ]}
+              >
                 {selectedCorrelation.strength.toFixed(4)}
               </Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>R-Squared</Text>
-              <Text style={styles.statValue}>
-                {(selectedCorrelation.strength ** 2).toFixed(4)}
-              </Text>
+              <Text style={styles.statValue}>{(selectedCorrelation.strength ** 2).toFixed(4)}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Method</Text>
@@ -321,9 +330,7 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Significance</Text>
-              <Text style={styles.statValue}>
-                {selectedCorrelation.significance || 'Unknown'}
-              </Text>
+              <Text style={styles.statValue}>{selectedCorrelation.significance || 'Unknown'}</Text>
             </View>
           </View>
         </View>
@@ -346,9 +353,7 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Correlation Analysis</Text>
-        <Text style={styles.subtitle}>
-          {correlations.length} correlations found
-        </Text>
+        <Text style={styles.subtitle}>{correlations.length} correlations found</Text>
       </View>
 
       {/* Controls */}
@@ -359,16 +364,12 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
             {(['pearson', 'spearman', 'kendall'] as CorrelationType[]).map(method => (
               <TouchableOpacity
                 key={method}
-                style={[
-                  styles.methodButton,
-                  correlationType === method && styles.activeMethod
-                ]}
+                style={[styles.methodButton, correlationType === method && styles.activeMethod]}
                 onPress={() => setCorrelationType(method)}
               >
-                <Text style={[
-                  styles.methodText,
-                  correlationType === method && styles.activeMethodText
-                ]}>
+                <Text
+                  style={[styles.methodText, correlationType === method && styles.activeMethodText]}
+                >
                   {method.charAt(0).toUpperCase() + method.slice(1)}
                 </Text>
               </TouchableOpacity>
@@ -382,16 +383,15 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
             {[0.1, 0.3, 0.5, 0.7].map(strength => (
               <TouchableOpacity
                 key={strength}
-                style={[
-                  styles.strengthButton,
-                  minStrength === strength && styles.activeStrength
-                ]}
+                style={[styles.strengthButton, minStrength === strength && styles.activeStrength]}
                 onPress={() => setMinStrength(strength)}
               >
-                <Text style={[
-                  styles.strengthButtonText,
-                  minStrength === strength && styles.activeStrengthText
-                ]}>
+                <Text
+                  style={[
+                    styles.strengthButtonText,
+                    minStrength === strength && styles.activeStrengthText,
+                  ]}
+                >
                   {strength}
                 </Text>
               </TouchableOpacity>
@@ -406,16 +406,12 @@ export const CorrelationAnalysisWidget: React.FC<CorrelationAnalysisWidgetProps>
         {/* Correlations List */}
         <View style={styles.listContainer}>
           <ScrollView style={styles.correlationsList} showsVerticalScrollIndicator={false}>
-            {correlations.map((correlation, index) => 
-              renderCorrelationCard(correlation, index)
-            )}
+            {correlations.map((correlation, index) => renderCorrelationCard(correlation, index))}
           </ScrollView>
         </View>
 
         {/* Correlation Details */}
-        <View style={styles.detailsPane}>
-          {renderCorrelationDetails()}
-        </View>
+        <View style={styles.detailsPane}>{renderCorrelationDetails()}</View>
       </View>
     </View>
   );

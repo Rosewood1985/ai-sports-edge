@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+
 import OddsButton from '../components/OddsButton';
 import '../styles/odds.css';
 
@@ -24,7 +25,7 @@ const OddsPage = () => {
             startTime: new Date(Date.now() + 86400000), // Tomorrow
             sport: 'NFL',
             odds: { home: -3.5, away: 3.5, over: 49.5, under: 49.5 },
-            fanduelEventId: 'nfl_chiefs_49ers_2025'
+            fanduelEventId: 'nfl_chiefs_49ers_2025',
           },
           {
             id: 'game2',
@@ -35,7 +36,7 @@ const OddsPage = () => {
             startTime: new Date(Date.now() + 172800000), // Day after tomorrow
             sport: 'NBA',
             odds: { home: -2.5, away: 2.5, over: 220.5, under: 220.5 },
-            fanduelEventId: 'nba_lakers_celtics_2025'
+            fanduelEventId: 'nba_lakers_celtics_2025',
           },
           {
             id: 'game3',
@@ -46,10 +47,10 @@ const OddsPage = () => {
             startTime: new Date(Date.now() + 259200000), // 3 days from now
             sport: 'MLB',
             odds: { home: -1.5, away: 1.5, over: 8.5, under: 8.5 },
-            fanduelEventId: 'mlb_yankees_redsox_2025'
-          }
+            fanduelEventId: 'mlb_yankees_redsox_2025',
+          },
         ];
-        
+
         setGames(mockGames);
         setLoading(false);
       } catch (error) {
@@ -57,12 +58,12 @@ const OddsPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchGames();
   }, []);
 
   // Handle successful purchase
-  const handlePurchaseSuccess = (gameId) => {
+  const handlePurchaseSuccess = gameId => {
     console.log(`Successfully purchased odds for game ${gameId}`);
     // In a real app, you might update the UI or show a notification
   };
@@ -71,20 +72,29 @@ const OddsPage = () => {
     <>
       <Helmet>
         <title>Live Odds - AI Sports Edge</title>
-        <meta name="description" content="Get the latest odds and predictions for upcoming games. Purchase AI-powered insights to improve your betting strategy." />
-        <meta name="keywords" content="sports odds, betting predictions, AI predictions, sports betting" />
+        <meta
+          name="description"
+          content="Get the latest odds and predictions for upcoming games. Purchase AI-powered insights to improve your betting strategy."
+        />
+        <meta
+          name="keywords"
+          content="sports odds, betting predictions, AI predictions, sports betting"
+        />
         <link rel="canonical" href="https://aisportsedge.app/odds" />
       </Helmet>
-      
+
       <section className="odds-hero">
         <div className="container">
           <div className="odds-hero-content">
             <h1>Live Odds & Predictions</h1>
-            <p>Get AI-powered insights for upcoming games. Purchase odds to see our detailed predictions and analysis.</p>
+            <p>
+              Get AI-powered insights for upcoming games. Purchase odds to see our detailed
+              predictions and analysis.
+            </p>
           </div>
         </div>
       </section>
-      
+
       <section className="odds-main">
         <div className="container">
           {loading ? (
@@ -97,7 +107,7 @@ const OddsPage = () => {
                     <span className="game-sport">{game.sport}</span>
                     <span className="game-time">{game.startTime.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="game-teams">
                     <div className="team home">
                       <span className="team-name">{game.homeTeam}</span>
@@ -109,18 +119,20 @@ const OddsPage = () => {
                       <span className="team-score">{game.awayScore}</span>
                     </div>
                   </div>
-                  
+
                   <div className="game-odds">
                     <div className="odds-item">
                       <span className="odds-label">Spread:</span>
-                      <span className="odds-value">{game.homeTeam} {game.odds.home}</span>
+                      <span className="odds-value">
+                        {game.homeTeam} {game.odds.home}
+                      </span>
                     </div>
                     <div className="odds-item">
                       <span className="odds-label">Total:</span>
                       <span className="odds-value">O/U {game.odds.over}</span>
                     </div>
                   </div>
-                  
+
                   <div className="game-actions">
                     <OddsButton
                       game={game}
@@ -136,12 +148,14 @@ const OddsPage = () => {
           )}
         </div>
       </section>
-      
+
       <section className="odds-cta">
         <div className="container">
           <h2>Want More Predictions?</h2>
           <p>Download our mobile app for comprehensive coverage and advanced features.</p>
-          <a href="/download" className="button primary-button">Download App</a>
+          <a href="/download" className="button primary-button">
+            Download App
+          </a>
         </div>
       </section>
     </>

@@ -1,15 +1,15 @@
 /**
  * Optimization Orchestrator Service
- * 
+ *
  * Coordinates all optimization services and provides a unified interface
  * for managing performance optimizations across the AI Sports Edge platform.
  */
 
-import { advancedPerformanceOptimizationService } from './advancedPerformanceOptimizationService';
-import { bundleOptimizationService } from './bundleOptimizationService';
 import { advancedImageOptimizationService } from './advancedImageOptimizationService';
-import { enhancedCacheService } from './enhancedCacheService';
+import { advancedPerformanceOptimizationService } from './advancedPerformanceOptimizationService';
 import { analyticsService } from './analyticsService';
+import { bundleOptimizationService } from './bundleOptimizationService';
+import { enhancedCacheService } from './enhancedCacheService';
 import { sentryService } from './sentryService';
 
 interface OptimizationStatus {
@@ -101,7 +101,6 @@ class OptimizationOrchestrator {
         services: this.status.services,
         timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
       console.error('❌ Failed to initialize Optimization Orchestrator:', error);
       sentryService.captureException(error);
@@ -178,13 +177,12 @@ class OptimizationOrchestrator {
       if (optimizationsTriggered > 0) {
         this.status.lastOptimization = new Date();
         console.log(`⚡ Triggered ${optimizationsTriggered} automatic optimizations`);
-        
+
         analyticsService.trackEvent('automatic_optimization_triggered', {
           optimizationsCount: optimizationsTriggered,
           metrics: performanceMetrics,
         });
       }
-
     } catch (error) {
       console.error('Error in automatic optimizations:', error);
     }
@@ -268,10 +266,12 @@ class OptimizationOrchestrator {
 
       // Generate bundle recommendations
       const bundleRecommendations = await bundleOptimizationService.analyzeBundleOptimization();
-      report.recommendations.push(...bundleRecommendations.map(rec => ({
-        ...rec,
-        category: 'Bundle',
-      })));
+      report.recommendations.push(
+        ...bundleRecommendations.map(rec => ({
+          ...rec,
+          category: 'Bundle',
+        }))
+      );
 
       // Calculate scores
       report.scores = this.calculateOptimizationScores(report);
@@ -286,7 +286,6 @@ class OptimizationOrchestrator {
       });
 
       return report;
-
     } catch (error) {
       console.error('❌ Error in comprehensive analysis:', error);
       sentryService.captureException(error);
@@ -314,7 +313,8 @@ class OptimizationOrchestrator {
 
     // Bundle score
     const bundleSize = report.bundle.estimatedSavings || 0;
-    if (bundleSize > 100000) scores.bundle -= 30; // > 100KB savings available
+    if (bundleSize > 100000)
+      scores.bundle -= 30; // > 100KB savings available
     else if (bundleSize > 50000) scores.bundle -= 15; // > 50KB savings available
 
     // Image score
@@ -459,7 +459,6 @@ class OptimizationOrchestrator {
         timestamp: new Date().toISOString(),
         trigger: 'manual',
       });
-
     } catch (error) {
       console.error('❌ Failed to activate emergency optimization:', error);
       sentryService.captureException(error);
@@ -489,7 +488,6 @@ class OptimizationOrchestrator {
       await enhancedCacheService.clearExpiredEntries();
 
       console.log('✅ Optimizations reset to defaults');
-
     } catch (error) {
       console.error('❌ Failed to reset optimizations:', error);
       sentryService.captureException(error);

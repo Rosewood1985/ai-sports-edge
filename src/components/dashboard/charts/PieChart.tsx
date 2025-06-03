@@ -89,7 +89,7 @@ export function PieChart({
                 <div
                   className="legend-color w-4 h-4 rounded-sm mr-2"
                   style={{ backgroundColor: segment.color }}
-                ></div>
+                />
                 <div className="legend-text">
                   <span className="text-sm font-medium">{segment.name}</span>
                   <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">

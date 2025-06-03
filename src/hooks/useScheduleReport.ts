@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { ScheduledReport, ScheduleReportConfig } from '../types/reporting';
+
 import { ReportingService } from '../services/reportingService';
+import { ScheduledReport, ScheduleReportConfig } from '../types/reporting';
 
 interface UseScheduleReportResult {
   scheduleReport: (config: ScheduleReportConfig) => Promise<ScheduledReport>;

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ContentItem } from '../../../types/contentManagement';
-import { useContentManagement } from '../../../hooks/useContentManagement';
-import { ContentList } from './ContentList';
-import { ContentForm } from './ContentForm';
+
 import { ContentDetails } from './ContentDetails';
+import { ContentForm } from './ContentForm';
+import { ContentList } from './ContentList';
+import { useContentManagement } from '../../../hooks/useContentManagement';
+import { ContentItem } from '../../../types/contentManagement';
 
 type ContentView = 'list' | 'create' | 'edit' | 'details';
 

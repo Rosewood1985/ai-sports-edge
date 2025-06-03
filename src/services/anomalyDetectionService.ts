@@ -3,8 +3,8 @@
  * AI-powered service for detecting unusual patterns in system metrics and user behavior
  */
 
-import { Anomaly } from '../components/dashboard/advanced/AnomalyDetectionEngine';
 import { sentryService } from '../../services/sentryService';
+import { Anomaly } from '../components/dashboard/advanced/AnomalyDetectionEngine';
 
 export interface MetricData {
   timestamp: string;
@@ -43,8 +43,8 @@ class AnomalyDetectionService {
         'user_engagement',
         'bet_volume',
         'active_users',
-        'revenue_per_hour'
-      ]
+        'revenue_per_hour',
+      ],
     };
 
     this.patterns = [
@@ -52,26 +52,26 @@ class AnomalyDetectionService {
         type: 'spike',
         threshold: 2.5, // Standard deviations
         windowSize: 60, // minutes
-        description: 'Sudden increase beyond normal range'
+        description: 'Sudden increase beyond normal range',
       },
       {
         type: 'drop',
         threshold: -2.0,
         windowSize: 30,
-        description: 'Sudden decrease below normal range'
+        description: 'Sudden decrease below normal range',
       },
       {
         type: 'outlier',
         threshold: 3.0,
         windowSize: 15,
-        description: 'Individual data point significantly outside normal range'
+        description: 'Individual data point significantly outside normal range',
       },
       {
         type: 'pattern_break',
         threshold: 1.5,
         windowSize: 120,
-        description: 'Break in expected pattern or trend'
-      }
+        description: 'Break in expected pattern or trend',
+      },
     ];
   }
 
@@ -92,16 +92,14 @@ class AnomalyDetectionService {
       // 2. Apply ML models for anomaly detection
       // 3. Calculate statistical deviations
       // 4. Generate contextual insights
-      
+
       const mockAnomalies = await this.generateMockAnomalies();
-      return mockAnomalies.filter(anomaly => 
-        anomaly.confidence >= this.config.minimumConfidence
-      );
+      return mockAnomalies.filter(anomaly => anomaly.confidence >= this.config.minimumConfidence);
     } catch (error) {
       console.error('Error detecting anomalies:', error);
       sentryService.captureException(error, {
         context: 'anomaly-detection',
-        extra: { timeRange, config: this.config }
+        extra: { timeRange, config: this.config },
       });
       throw new Error('Failed to detect anomalies');
     }
@@ -118,18 +116,22 @@ class AnomalyDetectionService {
       anomalies.push(...detected);
     }
 
-    return anomalies.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    return anomalies.sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
   }
 
   /**
    * Apply anomaly detection pattern to metric data
    */
-  private async applyPattern(pattern: AnomalyPattern, metric: string, data: MetricData[]): Promise<Anomaly[]> {
+  private async applyPattern(
+    pattern: AnomalyPattern,
+    metric: string,
+    data: MetricData[]
+  ): Promise<Anomaly[]> {
     // Simplified pattern detection logic
     // In production, this would use advanced ML algorithms
-    
+
     const anomalies: Anomaly[] = [];
     const values = data.map(d => d.value);
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
@@ -139,13 +141,13 @@ class AnomalyDetectionService {
       const current = data[i];
       const windowData = data.slice(i - pattern.windowSize, i);
       const windowMean = windowData.reduce((a, b) => a + b.value, 0) / windowData.length;
-      
+
       const deviation = (current.value - windowMean) / stdDev;
-      
+
       if (Math.abs(deviation) >= Math.abs(pattern.threshold)) {
         const severity = this.calculateSeverity(deviation, pattern.threshold);
         const confidence = this.calculateConfidence(deviation, pattern.threshold);
-        
+
         if (confidence >= this.config.minimumConfidence) {
           anomalies.push({
             id: `anom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -158,7 +160,7 @@ class AnomalyDetectionService {
             suggestedActions: this.generateSuggestedActions(pattern.type, metric),
             rootCause: this.analyzeRootCause(pattern.type, metric, deviation),
             affectedUsers: this.estimateAffectedUsers(metric, deviation),
-            impactScore: this.calculateImpactScore(severity, confidence, metric)
+            impactScore: this.calculateImpactScore(severity, confidence, metric),
           });
         }
       }
@@ -182,28 +184,28 @@ class AnomalyDetectionService {
         type: 'spike' as const,
         severity: 'high' as const,
         minutesAgo: 15,
-        deviation: 3.2
+        deviation: 3.2,
       },
       {
-        metric: 'Payment Success Rate', 
+        metric: 'Payment Success Rate',
         type: 'drop' as const,
         severity: 'critical' as const,
         minutesAgo: 30,
-        deviation: -2.8
+        deviation: -2.8,
       },
       {
         metric: 'API Response Time',
         type: 'outlier' as const,
         severity: 'medium' as const,
         minutesAgo: 45,
-        deviation: 2.1
-      }
+        deviation: 2.1,
+      },
     ];
 
     for (const mock of mockData) {
-      const timestamp = new Date(now.getTime() - (mock.minutesAgo * 60 * 1000)).toISOString();
+      const timestamp = new Date(now.getTime() - mock.minutesAgo * 60 * 1000).toISOString();
       const confidence = Math.max(0.6, Math.min(0.98, 0.7 + (Math.abs(mock.deviation) - 2) * 0.1));
-      
+
       anomalies.push({
         id: `anom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp,
@@ -215,7 +217,7 @@ class AnomalyDetectionService {
         suggestedActions: this.generateSuggestedActions(mock.type, mock.metric),
         rootCause: this.analyzeRootCause(mock.type, mock.metric, mock.deviation),
         affectedUsers: this.estimateAffectedUsers(mock.metric, mock.deviation),
-        impactScore: this.calculateImpactScore(mock.severity, confidence, mock.metric)
+        impactScore: this.calculateImpactScore(mock.severity, confidence, mock.metric),
       });
     }
 
@@ -225,9 +227,12 @@ class AnomalyDetectionService {
   /**
    * Calculate anomaly severity based on deviation
    */
-  private calculateSeverity(deviation: number, threshold: number): 'low' | 'medium' | 'high' | 'critical' {
+  private calculateSeverity(
+    deviation: number,
+    threshold: number
+  ): 'low' | 'medium' | 'high' | 'critical' {
     const ratio = Math.abs(deviation) / Math.abs(threshold);
-    
+
     if (ratio >= 3.0) return 'critical';
     if (ratio >= 2.0) return 'high';
     if (ratio >= 1.5) return 'medium';
@@ -248,7 +253,7 @@ class AnomalyDetectionService {
   private generateDescription(type: string, metric: string, deviation: number): string {
     const absDeviation = Math.abs(deviation);
     const percentage = Math.round((absDeviation - 1) * 100);
-    
+
     switch (type) {
       case 'spike':
         return `Unusual ${percentage}% increase in ${metric.toLowerCase()} detected`;
@@ -272,34 +277,36 @@ class AnomalyDetectionService {
         'Investigate referral traffic sources',
         'Check for viral social media mentions',
         'Monitor server capacity',
-        'Review marketing campaign performance'
+        'Review marketing campaign performance',
       ],
       'Payment Success Rate': [
         'Check payment processor status',
         'Review API error logs',
         'Contact payment provider support',
-        'Monitor fraud detection systems'
+        'Monitor fraud detection systems',
       ],
       'API Response Time': [
         'Check database query performance',
         'Review caching efficiency',
         'Monitor third-party API status',
-        'Analyze server resource usage'
+        'Analyze server resource usage',
       ],
       'User Engagement': [
         'Review content quality and relevance',
         'Check for technical issues',
         'Analyze competitor activity',
-        'Review promotional campaigns'
-      ]
+        'Review promotional campaigns',
+      ],
     };
 
-    return metricActions[metric] || [
-      'Monitor the situation closely',
-      'Review related system metrics',
-      'Check for external factors',
-      'Consider escalating to relevant team'
-    ];
+    return (
+      metricActions[metric] || [
+        'Monitor the situation closely',
+        'Review related system metrics',
+        'Check for external factors',
+        'Consider escalating to relevant team',
+      ]
+    );
   }
 
   /**
@@ -318,7 +325,7 @@ class AnomalyDetectionService {
     if (metric.includes('Engagement') && type === 'pattern_break') {
       return 'Changes in user behavior, content quality, or competitive landscape';
     }
-    
+
     return 'Multiple factors may be contributing to this anomaly';
   }
 
@@ -328,12 +335,12 @@ class AnomalyDetectionService {
   private estimateAffectedUsers(metric: string, deviation: number): number {
     const baseUsers = 1000;
     const multiplier = Math.abs(deviation) * 0.3;
-    
+
     if (metric.includes('Payment')) return Math.round(baseUsers * 0.1 * multiplier);
     if (metric.includes('Signup')) return Math.round(baseUsers * 1.5 * multiplier);
     if (metric.includes('API')) return Math.round(baseUsers * 0.4 * multiplier);
     if (metric.includes('Engagement')) return Math.round(baseUsers * 2.0 * multiplier);
-    
+
     return Math.round(baseUsers * multiplier);
   }
 
@@ -341,21 +348,26 @@ class AnomalyDetectionService {
    * Calculate overall impact score (1-10)
    */
   private calculateImpactScore(severity: string, confidence: number, metric: string): number {
-    let baseScore = 5;
-    
+    const baseScore = 5;
+
     // Severity multiplier
-    const severityMultiplier = {
-      'low': 0.6,
-      'medium': 1.0,
-      'high': 1.4,
-      'critical': 1.8
-    }[severity] || 1.0;
-    
+    const severityMultiplier =
+      {
+        low: 0.6,
+        medium: 1.0,
+        high: 1.4,
+        critical: 1.8,
+      }[severity] || 1.0;
+
     // Metric importance multiplier
-    const metricMultiplier = metric.includes('Payment') ? 1.5 :
-                           metric.includes('Signup') ? 1.2 :
-                           metric.includes('API') ? 1.1 : 1.0;
-    
+    const metricMultiplier = metric.includes('Payment')
+      ? 1.5
+      : metric.includes('Signup')
+        ? 1.2
+        : metric.includes('API')
+          ? 1.1
+          : 1.0;
+
     const score = baseScore * severityMultiplier * metricMultiplier * confidence;
     return Math.min(10, Math.max(1, Math.round(score * 10) / 10));
   }

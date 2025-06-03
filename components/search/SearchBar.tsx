@@ -1,15 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Platform, 
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
   Keyboard,
   FlatList,
-  Text
+  Text,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -29,7 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   initialValue = '',
   showHistory = false,
   autoFocus = true,
-  style = {}
+  style = {},
 }) => {
   const [query, setQuery] = useState(initialValue);
   const [isFocused, setIsFocused] = useState(false);
@@ -40,13 +40,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   useEffect(() => {
     if (showHistory) {
       // In a real app, this would load from storage or API
-      setRecentSearches([
-        'NBA',
-        'NFL',
-        'Golden State Warriors',
-        'LeBron James',
-        'Super Bowl'
-      ]);
+      setRecentSearches(['NBA', 'NFL', 'Golden State Warriors', 'LeBron James', 'Super Bowl']);
     }
   }, [showHistory]);
 
@@ -54,12 +48,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSubmit = () => {
     if (query.trim()) {
       onSearch(query.trim());
-      
+
       // Add to recent searches if not already present
       if (showHistory && !recentSearches.includes(query.trim())) {
         setRecentSearches(prev => [query.trim(), ...prev.slice(0, 9)]);
       }
-      
+
       Keyboard.dismiss();
       setIsFocused(false);
     }
@@ -83,8 +77,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Render recent search item
   const renderRecentSearchItem = ({ item }: { item: string }) => (
-    <TouchableOpacity 
-      style={styles.recentSearchItem} 
+    <TouchableOpacity
+      style={styles.recentSearchItem}
       onPress={() => handleSelectRecentSearch(item)}
     >
       <Ionicons name="time-outline" size={16} color="#666" />
@@ -96,7 +90,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.searchInputContainer}>
         <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-        
+
         <TextInput
           ref={inputRef}
           style={styles.input}
@@ -112,18 +106,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
           autoCorrect={false}
           autoFocus={autoFocus}
         />
-        
+
         {query.length > 0 && Platform.OS === 'android' && (
           <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
             <Ionicons name="close-circle" size={18} color="#999" />
           </TouchableOpacity>
         )}
-        
+
         <TouchableOpacity onPress={handleSubmit} style={styles.searchButton}>
           <Text style={styles.searchButtonText}>Search</Text>
         </TouchableOpacity>
       </View>
-      
+
       {isFocused && showHistory && recentSearches.length > 0 && (
         <View style={styles.recentSearchesContainer}>
           <View style={styles.recentSearchesHeader}>
@@ -132,11 +126,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <Text style={styles.clearAllText}>Clear All</Text>
             </TouchableOpacity>
           </View>
-          
+
           <FlatList
             data={recentSearches}
             renderItem={renderRecentSearchItem}
-            keyExtractor={(item) => item}
+            keyExtractor={item => item}
             style={styles.recentSearchesList}
           />
         </View>

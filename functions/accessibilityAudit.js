@@ -3,9 +3,9 @@
  * AI Sports Edge - Comprehensive accessibility compliance checking
  */
 
-const { onRequest } = require('firebase-functions/v2/https');
-const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require('./sentryConfig');
-const admin = require('firebase-admin');
+const { onRequest } = require("firebase-functions/v2/https");
+const { wrapHttpFunction, captureCloudFunctionError, trackFunctionPerformance } = require("./sentryConfig");
+const admin = require("firebase-admin");
 
 // Initialize Firestore
 const db = admin.firestore();
@@ -15,38 +15,38 @@ const ACCESSIBILITY_CRITERIA = {
   // WCAG 2.1 AA Standards
   wcag: {
     perceivable: {
-      textAlternatives: 'All images must have alt text',
-      captions: 'Audio/video content must have captions',
-      colorContrast: 'Text must meet 4.5:1 contrast ratio',
-      textSpacing: 'Text must be resizable up to 200%'
+      textAlternatives: "All images must have alt text",
+      captions: "Audio/video content must have captions",
+      colorContrast: "Text must meet 4.5:1 contrast ratio",
+      textSpacing: "Text must be resizable up to 200%"
     },
     operable: {
-      keyboardAccessible: 'All functionality available via keyboard',
-      seizures: 'No content flashes more than 3 times per second',
-      navigable: 'Multiple ways to locate pages',
-      inputAssistance: 'Help users avoid and correct mistakes'
+      keyboardAccessible: "All functionality available via keyboard",
+      seizures: "No content flashes more than 3 times per second",
+      navigable: "Multiple ways to locate pages",
+      inputAssistance: "Help users avoid and correct mistakes"
     },
     understandable: {
-      readable: 'Text is readable and understandable',
-      predictable: 'Web pages appear and operate predictably',
-      inputAssistance: 'Users are helped to avoid and correct mistakes'
+      readable: "Text is readable and understandable",
+      predictable: "Web pages appear and operate predictably",
+      inputAssistance: "Users are helped to avoid and correct mistakes"
     },
     robust: {
-      compatible: 'Content can be interpreted by assistive technologies'
+      compatible: "Content can be interpreted by assistive technologies"
     }
   },
   // Language-specific criteria
   language: {
     english: {
-      readabilityLevel: 'Grade 8 reading level or below',
-      culturallyAppropriate: 'Content appropriate for US/UK audiences',
-      idioms: 'Avoid complex idioms and colloquialisms'
+      readabilityLevel: "Grade 8 reading level or below",
+      culturallyAppropriate: "Content appropriate for US/UK audiences",
+      idioms: "Avoid complex idioms and colloquialisms"
     },
     spanish: {
-      readabilityLevel: 'Nivel de lectura grado 8 o inferior',
-      culturallyAppropriate: 'Content appropriate for Spanish-speaking audiences',
-      dialectNeutral: 'Use neutral Spanish, not region-specific terms',
-      rtlSupport: 'Prepare for potential RTL language expansion'
+      readabilityLevel: "Nivel de lectura grado 8 o inferior",
+      culturallyAppropriate: "Content appropriate for Spanish-speaking audiences",
+      dialectNeutral: "Use neutral Spanish, not region-specific terms",
+      rtlSupport: "Prepare for potential RTL language expansion"
     }
   }
 };
@@ -57,20 +57,20 @@ const ACCESSIBILITY_CRITERIA = {
 exports.accessibilityAudit = wrapHttpFunction(onRequest({ cors: true }, async (req, res) => {
   const startTime = Date.now();
   try {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
       return;
     }
 
     const auditResults = {
       timestamp: new Date().toISOString(),
       languages: {
-        english: await auditLanguageAccessibility('en'),
-        spanish: await auditLanguageAccessibility('es')
+        english: await auditLanguageAccessibility("en"),
+        spanish: await auditLanguageAccessibility("es")
       },
       crossLanguageIssues: await identifyCrossLanguageIssues(),
       recommendations: generateAccessibilityRecommendations(),
@@ -87,27 +87,27 @@ exports.accessibilityAudit = wrapHttpFunction(onRequest({ cors: true }, async (r
     auditResults.complianceScore.overall = (auditResults.complianceScore.english + auditResults.complianceScore.spanish) / 2;
 
     // Store audit results
-    await db.collection('accessibility_audits').add({
+    await db.collection("accessibility_audits").add({
       ...auditResults,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    trackFunctionPerformance('accessibilityAudit', Date.now() - startTime, true);
+    trackFunctionPerformance("accessibilityAudit", Date.now() - startTime, true);
 
     res.status(200).json({
       status: 200,
-      message: 'Accessibility audit completed',
+      message: "Accessibility audit completed",
       data: auditResults
     });
 
   } catch (error) {
-    console.error('Accessibility audit error:', error);
-    captureCloudFunctionError(error, 'accessibilityAudit');
-    trackFunctionPerformance('accessibilityAudit', Date.now() - startTime, false);
+    console.error("Accessibility audit error:", error);
+    captureCloudFunctionError(error, "accessibilityAudit");
+    trackFunctionPerformance("accessibilityAudit", Date.now() - startTime, false);
     
     res.status(500).json({
       status: 500,
-      message: 'Audit failed',
+      message: "Audit failed",
       error: error.message
     });
   }
@@ -140,7 +140,7 @@ async function auditLanguageAccessibility(language) {
     if (!result.passed) {
       audit.issues.push({
         type: checkName,
-        severity: result.severity || 'medium',
+        severity: result.severity || "medium",
         description: result.description,
         affectedElements: result.affectedElements || [],
         fixRecommendation: result.fixRecommendation
@@ -158,7 +158,7 @@ async function checkSemanticHTML(language) {
   // This would analyze the app's component structure
   return {
     passed: true,
-    description: 'Semantic HTML elements are properly used',
+    description: "Semantic HTML elements are properly used",
     details: {
       hasMainElement: true,
       hasNavElement: true,
@@ -179,11 +179,11 @@ async function checkAriaLabels(language) {
   const ariaIssues = [];
   
   // Check translation completeness for ARIA labels
-  if (language === 'es') {
+  if (language === "es") {
     const missingSpanishLabels = await checkMissingSpanishAriaLabels();
     if (missingSpanishLabels.length > 0) {
       ariaIssues.push({
-        issue: 'Missing Spanish ARIA labels',
+        issue: "Missing Spanish ARIA labels",
         elements: missingSpanishLabels
       });
     }
@@ -191,10 +191,10 @@ async function checkAriaLabels(language) {
 
   return {
     passed: ariaIssues.length === 0,
-    description: ariaIssues.length === 0 ? 'ARIA labels properly implemented' : 'ARIA label issues found',
+    description: ariaIssues.length === 0 ? "ARIA labels properly implemented" : "ARIA label issues found",
     issues: ariaIssues,
-    severity: 'high',
-    fixRecommendation: 'Ensure all interactive elements have proper ARIA labels in both languages'
+    severity: "high",
+    fixRecommendation: "Ensure all interactive elements have proper ARIA labels in both languages"
   };
 }
 
@@ -204,9 +204,9 @@ async function checkAriaLabels(language) {
 async function checkKeyboardNavigation(language) {
   return {
     passed: true,
-    description: 'Keyboard navigation is fully functional',
+    description: "Keyboard navigation is fully functional",
     details: {
-      tabOrder: 'logical',
+      tabOrder: "logical",
       focusVisible: true,
       skipLinks: true,
       trapsFocus: true
@@ -225,8 +225,8 @@ async function checkColorContrast(language) {
   
   return {
     passed: contrastIssues.length === 0,
-    description: 'Color contrast meets WCAG AA standards',
-    minRatio: '4.5:1',
+    description: "Color contrast meets WCAG AA standards",
+    minRatio: "4.5:1",
     issues: contrastIssues
   };
 }
@@ -242,9 +242,9 @@ async function checkTextAlternatives(language) {
   
   return {
     passed: missingAltText.length === 0,
-    description: 'All images have appropriate alt text',
+    description: "All images have appropriate alt text",
     issues: missingAltText,
-    severity: 'high'
+    severity: "high"
   };
 }
 
@@ -258,7 +258,7 @@ async function checkLanguageDeclaration(language) {
     details: {
       htmlLang: language,
       langChanges: true,
-      directionSupport: language.startsWith('ar') || language.startsWith('he') ? 'rtl' : 'ltr'
+      directionSupport: language.startsWith("ar") || language.startsWith("he") ? "rtl" : "ltr"
     }
   };
 }
@@ -269,7 +269,7 @@ async function checkLanguageDeclaration(language) {
 async function checkHeadingStructure(language) {
   return {
     passed: true,
-    description: 'Heading structure is logical and hierarchical',
+    description: "Heading structure is logical and hierarchical",
     details: {
       hasH1: true,
       logicalOrder: true,
@@ -285,11 +285,11 @@ async function checkFormLabels(language) {
   const formIssues = [];
   
   // Check if form labels are properly translated
-  if (language === 'es') {
+  if (language === "es") {
     const missingSpanishLabels = await checkMissingSpanishFormLabels();
     if (missingSpanishLabels.length > 0) {
       formIssues.push({
-        issue: 'Form labels not translated to Spanish',
+        issue: "Form labels not translated to Spanish",
         forms: missingSpanishLabels
       });
     }
@@ -297,9 +297,9 @@ async function checkFormLabels(language) {
 
   return {
     passed: formIssues.length === 0,
-    description: 'All form elements have proper labels',
+    description: "All form elements have proper labels",
     issues: formIssues,
-    severity: 'high'
+    severity: "high"
   };
 }
 
@@ -309,7 +309,7 @@ async function checkFormLabels(language) {
 async function checkFocusManagement(language) {
   return {
     passed: true,
-    description: 'Focus is properly managed throughout the application',
+    description: "Focus is properly managed throughout the application",
     details: {
       visibleFocus: true,
       logicalOrder: true,
@@ -326,15 +326,15 @@ async function checkScreenReaderCompatibility(language) {
   const compatibilityIssues = [];
   
   // Check for screen reader-specific issues in Spanish
-  if (language === 'es') {
+  if (language === "es") {
     const spanishScreenReaderIssues = await checkSpanishScreenReaderIssues();
     compatibilityIssues.push(...spanishScreenReaderIssues);
   }
 
   return {
     passed: compatibilityIssues.length === 0,
-    description: 'Compatible with major screen readers',
-    supportedReaders: ['NVDA', 'JAWS', 'VoiceOver', 'TalkBack'],
+    description: "Compatible with major screen readers",
+    supportedReaders: ["NVDA", "JAWS", "VoiceOver", "TalkBack"],
     issues: compatibilityIssues
   };
 }
@@ -363,19 +363,19 @@ async function checkSpanishScreenReaderIssues() {
 async function identifyCrossLanguageIssues() {
   return {
     layoutShifts: {
-      description: 'Text expansion in Spanish may cause layout issues',
-      severity: 'medium',
+      description: "Text expansion in Spanish may cause layout issues",
+      severity: "medium",
       affectedComponents: []
     },
     fontSupport: {
-      description: 'Fonts support Spanish characters properly',
-      severity: 'low',
-      status: 'compliant'
+      description: "Fonts support Spanish characters properly",
+      severity: "low",
+      status: "compliant"
     },
     rightToLeft: {
-      description: 'RTL support prepared for future languages',
-      severity: 'low',
-      status: 'prepared'
+      description: "RTL support prepared for future languages",
+      severity: "low",
+      status: "prepared"
     }
   };
 }
@@ -386,19 +386,19 @@ async function identifyCrossLanguageIssues() {
 function generateAccessibilityRecommendations() {
   return {
     immediate: [
-      'Ensure all Spanish ARIA labels are complete and accurate',
-      'Test Spanish content with native Spanish screen reader users',
-      'Verify Spanish text doesn\'t break responsive layouts'
+      "Ensure all Spanish ARIA labels are complete and accurate",
+      "Test Spanish content with native Spanish screen reader users",
+      "Verify Spanish text doesn't break responsive layouts"
     ],
     shortTerm: [
-      'Implement automated accessibility testing in CI/CD',
-      'Create Spanish-specific accessibility guidelines',
-      'Train content team on accessible Spanish writing practices'
+      "Implement automated accessibility testing in CI/CD",
+      "Create Spanish-specific accessibility guidelines",
+      "Train content team on accessible Spanish writing practices"
     ],
     longTerm: [
-      'Prepare for RTL language support (Arabic, Hebrew)',
-      'Consider voice navigation in Spanish',
-      'Implement advanced Spanish-specific accessibility features'
+      "Prepare for RTL language support (Arabic, Hebrew)",
+      "Consider voice navigation in Spanish",
+      "Implement advanced Spanish-specific accessibility features"
     ]
   };
 }
@@ -413,4 +413,4 @@ function calculateComplianceScore(languageAudit) {
   return Math.round((passedChecks / totalChecks) * 100);
 }
 
-console.log('Accessibility Audit module loaded successfully');
+console.log("Accessibility Audit module loaded successfully");

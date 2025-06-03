@@ -9,11 +9,11 @@ export interface NavigationState {
   key: string;
   index: number;
   routeNames: string[];
-  routes: Array<{
+  routes: {
     key: string;
     name: string;
     params?: object;
-  }>;
+  }[];
 }
 
 export interface NavigationAction {
@@ -43,7 +43,7 @@ class SentryNavigationInstrumentation {
     if (!state || !sentryService.isActive()) return;
 
     const currentRouteName = this.getCurrentRouteName(state);
-    
+
     if (currentRouteName && currentRouteName !== this.currentScreen) {
       this.trackScreenTransition(currentRouteName);
     }
@@ -56,32 +56,22 @@ class SentryNavigationInstrumentation {
     if (!sentryService.isActive()) return;
 
     const currentScreen = this.getCurrentRouteName(state);
-    
-    sentryService.addBreadcrumb(
-      `Navigation action: ${action.type}`,
-      'navigation',
-      'info',
-      {
-        action: action.type,
-        currentScreen,
-        payload: action.payload,
-        source: action.source,
-        target: action.target,
-      }
-    );
+
+    sentryService.addBreadcrumb(`Navigation action: ${action.type}`, 'navigation', 'info', {
+      action: action.type,
+      currentScreen,
+      payload: action.payload,
+      source: action.source,
+      target: action.target,
+    });
 
     // Track specific navigation events
     if (action.type === 'NAVIGATE') {
-      sentryService.trackFeatureUsage(
-        'navigation',
-        'navigate',
-        undefined,
-        {
-          from: this.currentScreen,
-          to: action.payload?.name,
-          params: action.payload?.params,
-        }
-      );
+      sentryService.trackFeatureUsage('navigation', 'navigate', undefined, {
+        from: this.currentScreen,
+        to: action.payload?.name,
+        params: action.payload?.params,
+      });
     }
   }
 
@@ -91,15 +81,10 @@ class SentryNavigationInstrumentation {
   onRouteFocus(routeName: string, params?: object): void {
     if (!sentryService.isActive()) return;
 
-    sentryService.addBreadcrumb(
-      `Screen focused: ${routeName}`,
-      'navigation',
-      'info',
-      {
-        screen: routeName,
-        params,
-      }
-    );
+    sentryService.addBreadcrumb(`Screen focused: ${routeName}`, 'navigation', 'info', {
+      screen: routeName,
+      params,
+    });
 
     sentryService.setContext('current_screen', {
       name: routeName,
@@ -116,27 +101,17 @@ class SentryNavigationInstrumentation {
 
     const timeSpent = this.screenStartTime ? Date.now() - this.screenStartTime : null;
 
-    sentryService.addBreadcrumb(
-      `Screen blurred: ${routeName}`,
-      'navigation',
-      'info',
-      {
-        screen: routeName,
-        timeSpent,
-      }
-    );
+    sentryService.addBreadcrumb(`Screen blurred: ${routeName}`, 'navigation', 'info', {
+      screen: routeName,
+      timeSpent,
+    });
 
     // Track screen time performance
     if (timeSpent && timeSpent > 0) {
-      sentryService.trackFeatureUsage(
-        'screen_time',
-        'blur',
-        undefined,
-        {
-          screen: routeName,
-          duration: timeSpent,
-        }
-      );
+      sentryService.trackFeatureUsage('screen_time', 'blur', undefined, {
+        screen: routeName,
+        duration: timeSpent,
+      });
     }
   }
 
@@ -146,25 +121,15 @@ class SentryNavigationInstrumentation {
   onDeepLink(url: string, routeName?: string): void {
     if (!sentryService.isActive()) return;
 
-    sentryService.addBreadcrumb(
-      `Deep link opened: ${url}`,
-      'deep_link',
-      'info',
-      {
-        url,
-        targetRoute: routeName,
-      }
-    );
+    sentryService.addBreadcrumb(`Deep link opened: ${url}`, 'deep_link', 'info', {
+      url,
+      targetRoute: routeName,
+    });
 
-    sentryService.trackFeatureUsage(
-      'deep_link',
-      'open',
-      undefined,
-      {
-        url,
-        targetRoute: routeName,
-      }
-    );
+    sentryService.trackFeatureUsage('deep_link', 'open', undefined, {
+      url,
+      targetRoute: routeName,
+    });
   }
 
   /**
@@ -173,15 +138,10 @@ class SentryNavigationInstrumentation {
   onTabPress(tabName: string, wasAlreadyFocused: boolean): void {
     if (!sentryService.isActive()) return;
 
-    sentryService.addBreadcrumb(
-      `Tab pressed: ${tabName}`,
-      'tab_navigation',
-      'info',
-      {
-        tab: tabName,
-        wasAlreadyFocused,
-      }
-    );
+    sentryService.addBreadcrumb(`Tab pressed: ${tabName}`, 'tab_navigation', 'info', {
+      tab: tabName,
+      wasAlreadyFocused,
+    });
 
     sentryService.trackFeatureUsage(
       'tab_navigation',
@@ -219,26 +179,16 @@ class SentryNavigationInstrumentation {
   onBettingNavigation(action: string, betType?: string, data?: object): void {
     if (!sentryService.isActive()) return;
 
-    sentryService.addBreadcrumb(
-      `Betting navigation: ${action}`,
-      'betting_navigation',
-      'info',
-      {
-        action,
-        betType,
-        ...data,
-      }
-    );
-
-    sentryService.trackFeatureUsage(
-      'betting',
+    sentryService.addBreadcrumb(`Betting navigation: ${action}`, 'betting_navigation', 'info', {
       action,
-      undefined,
-      {
-        betType,
-        ...data,
-      }
-    );
+      betType,
+      ...data,
+    });
+
+    sentryService.trackFeatureUsage('betting', action, undefined, {
+      betType,
+      ...data,
+    });
   }
 
   /**
@@ -258,20 +208,15 @@ class SentryNavigationInstrumentation {
    */
   private trackScreenTransition(newScreen: string): void {
     const now = Date.now();
-    
+
     // End previous screen tracking
     if (this.currentScreen && this.screenStartTime) {
       const timeSpent = now - this.screenStartTime;
-      
-      sentryService.trackFeatureUsage(
-        'screen_time',
-        'spent',
-        undefined,
-        {
-          screen: this.currentScreen,
-          duration: timeSpent,
-        }
-      );
+
+      sentryService.trackFeatureUsage('screen_time', 'spent', undefined, {
+        screen: this.currentScreen,
+        duration: timeSpent,
+      });
     }
 
     // End previous navigation transaction
@@ -299,15 +244,10 @@ class SentryNavigationInstrumentation {
     });
 
     // Add breadcrumb for screen change
-    sentryService.addBreadcrumb(
-      `Screen changed to ${newScreen}`,
-      'navigation',
-      'info',
-      {
-        previousScreen: this.previousScreen,
-        currentScreen: newScreen,
-      }
-    );
+    sentryService.addBreadcrumb(`Screen changed to ${newScreen}`, 'navigation', 'info', {
+      previousScreen: this.previousScreen,
+      currentScreen: newScreen,
+    });
   }
 
   /**

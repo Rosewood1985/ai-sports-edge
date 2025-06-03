@@ -1,12 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, Switch, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
+import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 import { useThemeColor } from '../hooks/useThemeColor';
 import accessibilityService, { AccessibilityPreferences } from '../services/accessibilityService';
 import { trackEvent } from '../services/analyticsService';
-import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
 
 /**
  * Screen for accessibility settings

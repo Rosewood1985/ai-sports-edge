@@ -1,11 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import WageringAnalytics from '../components/BettingAnalytics';
+
 import { AccessibleThemedText } from '../atomic/atoms/AccessibleThemedText';
 import { AccessibleThemedView } from '../atomic/atoms/AccessibleThemedView';
 import AccessibleTouchableOpacity from '../atomic/atoms/AccessibleTouchableOpacity';
+import WageringAnalytics from '../components/BettingAnalytics';
 
 /**
  * Screen that displays wagering analytics for the user

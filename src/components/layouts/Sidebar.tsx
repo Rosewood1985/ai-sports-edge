@@ -15,7 +15,7 @@ interface SidebarProps {
  */
 export function Sidebar({ onNavigate }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
+
   // Simple current path detection for highlighting active nav items
   const getCurrentPath = () => {
     if (typeof window !== 'undefined') {
@@ -23,7 +23,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     }
     return '/admin/dashboard';
   };
-  
+
   const currentPath = getCurrentPath();
 
   const navigation: NavItem[] = [
@@ -180,14 +180,14 @@ export function Sidebar({ onNavigate }: SidebarProps) {
       <nav className="mt-5 px-2 space-y-1">
         {navigation.map(item => {
           const isActive = currentPath === item.href;
-          
+
           const handleClick = (e: React.MouseEvent) => {
             if (onNavigate) {
               e.preventDefault();
               onNavigate(item.href);
             }
           };
-          
+
           return (
             <a
               key={item.name}

@@ -1,14 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
+
 import { useHaptics, useOfflineStorage } from '../../../hooks/useMobile';
 import MobileButton from '../../atoms/mobile/MobileButton';
-import MobileInput from '../../atoms/mobile/MobileInput';
 import MobileCard from '../../atoms/mobile/MobileCard';
+import MobileInput from '../../atoms/mobile/MobileInput';
 
 interface MobileQuickBetProps {
   onSubmit: (betData: any) => void;
   onCancel: () => void;
-  availableSports: Array<{ id: string; name: string }>;
+  availableSports: { id: string; name: string }[];
   userBalance: number;
   theme?: 'dark' | 'light';
 }

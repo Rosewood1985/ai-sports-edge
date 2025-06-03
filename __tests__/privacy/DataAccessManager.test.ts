@@ -1,5 +1,5 @@
-import { DataAccessManager } from '../../atomic/molecules/privacy/DataAccessManager';
 import { PrivacyRequestStatus } from '../../atomic/atoms/privacy/gdprConfig';
+import { DataAccessManager } from '../../atomic/molecules/privacy/DataAccessManager';
 
 // Mock Firebase Firestore
 jest.mock('firebase/firestore', () => ({

@@ -1,12 +1,6 @@
 import React, { useRef, useCallback } from 'react';
-import {
-  TouchableOpacity,
-  Animated,
-  Text,
-  View,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { TouchableOpacity, Animated, Text, View, ViewStyle, TextStyle } from 'react-native';
+
 import { useHaptics } from '../../../hooks/useMobile';
 
 interface MobileButtonProps {

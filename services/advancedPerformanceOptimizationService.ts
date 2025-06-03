@@ -1,14 +1,14 @@
 /**
  * Advanced Performance Optimization Service
- * 
+ *
  * Builds on existing performance infrastructure to provide enterprise-grade
  * optimization with real-time monitoring, predictive caching, and automated tuning.
  */
 
-import { performanceOptimizationService } from './performanceOptimizationService';
-import { enhancedCacheService } from './enhancedCacheService';
-import { sentryService } from './sentryService';
 import { analyticsService } from './analyticsService';
+import { enhancedCacheService } from './enhancedCacheService';
+import { performanceOptimizationService } from './performanceOptimizationService';
+import { sentryService } from './sentryService';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -48,7 +48,7 @@ class AdvancedPerformanceOptimizationService {
   private deviceCapabilities: DeviceCapabilities | null = null;
   private optimizationRules: OptimizationRule[] = [];
   private isMonitoring = false;
-  private performanceQueue: Array<() => Promise<void>> = [];
+  private performanceQueue: (() => Promise<void>)[] = [];
   private adaptiveSettings = {
     imageQuality: 80,
     prefetchDistance: 3,
@@ -71,24 +71,23 @@ class AdvancedPerformanceOptimizationService {
 
       // Start existing performance monitoring
       await performanceOptimizationService.initializeOptimization();
-      
+
       // Begin advanced monitoring
       this.startAdvancedMonitoring();
-      
+
       // Apply device-specific optimizations
       await this.applyDeviceOptimizations();
-      
+
       // Set up predictive caching
       await this.initializePredictiveCaching();
-      
+
       console.log('✅ Advanced Performance Optimization Service initialized');
-      
+
       // Track initialization
       analyticsService.trackEvent('performance_optimization_init', {
         deviceTier: this.deviceCapabilities?.tier,
         memoryGB: this.deviceCapabilities?.memoryGB,
       });
-      
     } catch (error) {
       console.error('❌ Failed to initialize advanced performance optimization:', error);
       sentryService.captureException(error);
@@ -102,37 +101,39 @@ class AdvancedPerformanceOptimizationService {
     try {
       const navigator = globalThis.navigator as any;
       const deviceMemory = navigator.deviceMemory || 4; // Default to 4GB
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      
+      const connection =
+        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
       const memoryGB = deviceMemory;
       const isLowEndDevice = memoryGB < 3;
-      
+
       // Determine network speed
       let networkSpeed: 'slow' | 'fast' | 'unknown' = 'unknown';
       if (connection) {
         const effectiveType = connection.effectiveType;
         networkSpeed = ['slow-2g', '2g', '3g'].includes(effectiveType) ? 'slow' : 'fast';
       }
-      
+
       // Classify device tier
       let tier: 'low' | 'medium' | 'high' | 'premium' = 'medium';
       if (memoryGB >= 8) tier = 'premium';
       else if (memoryGB >= 6) tier = 'high';
       else if (memoryGB >= 4) tier = 'medium';
       else tier = 'low';
-      
+
       // Detect supported formats
       const supportedFormats = [];
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
+
       if (ctx) {
         // Check WebP support
-        canvas.toDataURL('image/webp').startsWith('data:image/webp') && supportedFormats.push('webp');
+        canvas.toDataURL('image/webp').startsWith('data:image/webp') &&
+          supportedFormats.push('webp');
         // Check AVIF support (more complex detection needed)
         supportedFormats.push('jpeg', 'png');
       }
-      
+
       this.deviceCapabilities = {
         tier,
         memoryGB,
@@ -140,9 +141,8 @@ class AdvancedPerformanceOptimizationService {
         networkSpeed,
         supportedFormats,
       };
-      
+
       console.log('📱 Device capabilities detected:', this.deviceCapabilities);
-      
     } catch (error) {
       console.error('Error detecting device capabilities:', error);
       // Fallback to conservative settings
@@ -161,9 +161,9 @@ class AdvancedPerformanceOptimizationService {
    */
   private async applyDeviceOptimizations(): Promise<void> {
     if (!this.deviceCapabilities) return;
-    
+
     const { tier, isLowEndDevice, networkSpeed } = this.deviceCapabilities;
-    
+
     try {
       // Adjust settings based on device tier
       switch (tier) {
@@ -176,7 +176,7 @@ class AdvancedPerformanceOptimizationService {
             lazyLoadThreshold: 0.3,
           };
           break;
-          
+
         case 'medium':
           this.adaptiveSettings = {
             imageQuality: 75,
@@ -186,7 +186,7 @@ class AdvancedPerformanceOptimizationService {
             lazyLoadThreshold: 0.2,
           };
           break;
-          
+
         case 'high':
           this.adaptiveSettings = {
             imageQuality: 85,
@@ -196,7 +196,7 @@ class AdvancedPerformanceOptimizationService {
             lazyLoadThreshold: 0.1,
           };
           break;
-          
+
         case 'premium':
           this.adaptiveSettings = {
             imageQuality: 95,
@@ -207,21 +207,20 @@ class AdvancedPerformanceOptimizationService {
           };
           break;
       }
-      
+
       // Apply network-specific optimizations
       if (networkSpeed === 'slow') {
         this.adaptiveSettings.imageQuality = Math.min(this.adaptiveSettings.imageQuality, 70);
         this.adaptiveSettings.prefetchDistance = 1;
       }
-      
+
       // Configure enhanced cache service
       await enhancedCacheService.updateConfiguration({
         maxSize: this.adaptiveSettings.maxCacheSize,
         enablePrefetching: this.adaptiveSettings.prefetchDistance > 1,
       });
-      
+
       console.log('⚡ Device optimizations applied:', this.adaptiveSettings);
-      
     } catch (error) {
       console.error('Error applying device optimizations:', error);
       sentryService.captureException(error);
@@ -235,24 +234,23 @@ class AdvancedPerformanceOptimizationService {
     try {
       // Get user's preferred sports and teams from analytics
       const userPreferences = await analyticsService.getUserPreferences();
-      
+
       if (userPreferences) {
         // Prefetch data for user's favorite sports
         const favoriteLeagues = userPreferences.favoriteLeagues || [];
         const favoriteTeams = userPreferences.favoriteTeams || [];
-        
+
         // Queue prefetch operations
         for (const league of favoriteLeagues.slice(0, this.adaptiveSettings.prefetchDistance)) {
           this.queuePrefetchOperation(`league_${league}`);
         }
-        
+
         for (const team of favoriteTeams.slice(0, this.adaptiveSettings.prefetchDistance)) {
           this.queuePrefetchOperation(`team_${team}`);
         }
       }
-      
+
       console.log('🔮 Predictive caching initialized');
-      
     } catch (error) {
       console.error('Error initializing predictive caching:', error);
     }
@@ -270,7 +268,7 @@ class AdvancedPerformanceOptimizationService {
         console.error(`Failed to prefetch ${key}:`, error);
       }
     };
-    
+
     this.performanceQueue.push(operation);
   }
 
@@ -279,7 +277,7 @@ class AdvancedPerformanceOptimizationService {
    */
   private async processPerformanceQueue(): Promise<void> {
     if (this.performanceQueue.length === 0) return;
-    
+
     // Check if system is idle (low CPU usage)
     if (this.metrics.renderTime < 16 && this.metrics.memoryUsage < 0.8) {
       const operation = this.performanceQueue.shift();
@@ -298,16 +296,16 @@ class AdvancedPerformanceOptimizationService {
    */
   private startAdvancedMonitoring(): void {
     if (this.isMonitoring) return;
-    
+
     this.isMonitoring = true;
-    
+
     // Monitor performance metrics every 5 seconds
     setInterval(() => {
       this.collectAdvancedMetrics();
       this.evaluateOptimizationRules();
       this.processPerformanceQueue();
     }, 5000);
-    
+
     console.log('📊 Advanced monitoring started');
   }
 
@@ -318,11 +316,11 @@ class AdvancedPerformanceOptimizationService {
     try {
       // Get existing metrics from performance service
       const existingMetrics = performanceOptimizationService.getMetrics();
-      
+
       // Enhance with additional metrics
       const performance = globalThis.performance;
       const navigation = performance.getEntriesByType('navigation')[0] as any;
-      
+
       this.metrics = {
         renderTime: existingMetrics.componentRenderTime || 0,
         memoryUsage: existingMetrics.memoryUsage || 0,
@@ -331,7 +329,6 @@ class AdvancedPerformanceOptimizationService {
         bundleLoadTime: navigation?.loadEventEnd - navigation?.navigationStart || 0,
         componentMountTime: existingMetrics.componentMountTime || 0,
       };
-      
     } catch (error) {
       console.error('Error collecting advanced metrics:', error);
     }
@@ -344,7 +341,7 @@ class AdvancedPerformanceOptimizationService {
     this.optimizationRules = [
       {
         id: 'high_memory_usage',
-        condition: (metrics) => metrics.memoryUsage > 0.85,
+        condition: metrics => metrics.memoryUsage > 0.85,
         action: async () => {
           await this.optimizeMemoryUsage();
         },
@@ -353,7 +350,7 @@ class AdvancedPerformanceOptimizationService {
       },
       {
         id: 'slow_render_time',
-        condition: (metrics) => metrics.renderTime > 16.67, // 60fps threshold
+        condition: metrics => metrics.renderTime > 16.67, // 60fps threshold
         action: async () => {
           await this.optimizeRenderPerformance();
         },
@@ -362,7 +359,7 @@ class AdvancedPerformanceOptimizationService {
       },
       {
         id: 'low_cache_hit_rate',
-        condition: (metrics) => metrics.cacheHitRate < 0.7,
+        condition: metrics => metrics.cacheHitRate < 0.7,
         action: async () => {
           await this.optimizeCacheStrategy();
         },
@@ -371,7 +368,7 @@ class AdvancedPerformanceOptimizationService {
       },
       {
         id: 'high_network_latency',
-        condition: (metrics) => metrics.networkLatency > 500,
+        condition: metrics => metrics.networkLatency > 500,
         action: async () => {
           await this.optimizeNetworkStrategy();
         },
@@ -388,13 +385,13 @@ class AdvancedPerformanceOptimizationService {
     for (const rule of this.optimizationRules) {
       if (rule.condition(this.metrics)) {
         console.log(`🔧 Triggering optimization: ${rule.description}`);
-        
+
         // Execute optimization asynchronously
-        rule.action().catch((error) => {
+        rule.action().catch(error => {
           console.error(`Failed to execute optimization ${rule.id}:`, error);
           sentryService.captureException(error);
         });
-        
+
         // Track optimization trigger
         analyticsService.trackEvent('optimization_triggered', {
           ruleId: rule.id,
@@ -412,16 +409,18 @@ class AdvancedPerformanceOptimizationService {
     try {
       // Clear old cache entries
       await enhancedCacheService.cleanup();
-      
+
       // Trigger garbage collection in performance service
       await performanceOptimizationService.optimizeMemory();
-      
+
       // Reduce adaptive settings temporarily
       this.adaptiveSettings.maxCacheSize = Math.max(20, this.adaptiveSettings.maxCacheSize * 0.8);
-      this.adaptiveSettings.prefetchDistance = Math.max(1, Math.floor(this.adaptiveSettings.prefetchDistance * 0.5));
-      
+      this.adaptiveSettings.prefetchDistance = Math.max(
+        1,
+        Math.floor(this.adaptiveSettings.prefetchDistance * 0.5)
+      );
+
       console.log('🧹 Memory optimization applied');
-      
     } catch (error) {
       console.error('Error optimizing memory:', error);
     }
@@ -434,15 +433,17 @@ class AdvancedPerformanceOptimizationService {
     try {
       // Reduce animation complexity
       this.adaptiveSettings.enableAnimations = false;
-      
+
       // Increase lazy loading threshold
-      this.adaptiveSettings.lazyLoadThreshold = Math.min(0.5, this.adaptiveSettings.lazyLoadThreshold * 1.5);
-      
+      this.adaptiveSettings.lazyLoadThreshold = Math.min(
+        0.5,
+        this.adaptiveSettings.lazyLoadThreshold * 1.5
+      );
+
       // Reduce image quality temporarily
       this.adaptiveSettings.imageQuality = Math.max(50, this.adaptiveSettings.imageQuality * 0.9);
-      
+
       console.log('⚡ Render performance optimization applied');
-      
     } catch (error) {
       console.error('Error optimizing render performance:', error);
     }
@@ -459,9 +460,8 @@ class AdvancedPerformanceOptimizationService {
         enablePrefetching: true,
         maxAge: 300000, // 5 minutes
       });
-      
+
       console.log('💾 Cache strategy optimization applied');
-      
     } catch (error) {
       console.error('Error optimizing cache strategy:', error);
     }
@@ -477,12 +477,11 @@ class AdvancedPerformanceOptimizationService {
         maxConcurrentRequests: 3,
         enableRequestDeduplication: true,
       });
-      
+
       // Prefer cached data
       this.adaptiveSettings.prefetchDistance = 1;
-      
+
       console.log('🌐 Network strategy optimization applied');
-      
     } catch (error) {
       console.error('Error optimizing network strategy:', error);
     }
@@ -514,10 +513,10 @@ class AdvancedPerformanceOptimizationService {
    */
   async triggerOptimization(): Promise<void> {
     console.log('🚀 Manual optimization triggered');
-    
+
     this.collectAdvancedMetrics();
     this.evaluateOptimizationRules();
-    
+
     // Process all queued operations
     while (this.performanceQueue.length > 0) {
       await this.processPerformanceQueue();

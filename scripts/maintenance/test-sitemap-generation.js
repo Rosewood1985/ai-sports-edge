@@ -6,9 +6,9 @@
  * directory features work as expected.
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 // Test configurations
 const testConfigs = [

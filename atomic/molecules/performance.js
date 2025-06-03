@@ -7,10 +7,10 @@
 // External imports
 
 // Internal imports
+import { startTransaction } from './errorTracking';
 import { info, error as logError, LogCategory } from './logging';
 import { isDevelopment } from '../atoms/envConfig';
 import { safeErrorCapture } from '../atoms/errorUtils';
-import { startTransaction } from './errorTracking';
 
 /**
  * Transaction types
@@ -33,7 +33,7 @@ let performanceMetrics = {};
 
 /**
  * Get the path from a URL
- * 
+ *
  * @param {string} url - URL
  * @returns {string} URL path
  */
@@ -49,7 +49,7 @@ const getUrlPath = url => {
 
 /**
  * Start a performance transaction
- * 
+ *
  * @param {string} name - Transaction name
  * @param {string} type - Transaction type
  * @param {Object} [data] - Additional data
@@ -59,7 +59,7 @@ export const startPerformanceTransaction = (name, type, data) => {
   try {
     // Create a transaction using Sentry
     const transaction = startTransaction(name, type);
-    
+
     // Add data as tags
     if (data && transaction) {
       Object.entries(data).forEach(([key, value]) => {
@@ -68,7 +68,7 @@ export const startPerformanceTransaction = (name, type, data) => {
         }
       });
     }
-    
+
     // Return transaction with additional methods
     return {
       ...transaction,
@@ -85,12 +85,12 @@ export const startPerformanceTransaction = (name, type, data) => {
         if (transaction) {
           transaction.markPoint(pointName);
         }
-      }
+      },
     };
   } catch (error) {
     logError(LogCategory.PERFORMANCE, 'Failed to start transaction', error);
     safeErrorCapture(error);
-    
+
     // Return a dummy transaction
     return {
       addData: () => {},
@@ -104,7 +104,7 @@ export const startPerformanceTransaction = (name, type, data) => {
 
 /**
  * Create a performance timer
- * 
+ *
  * @param {string} name - Timer name
  * @param {string} type - Transaction type
  * @param {Object} [data] - Additional data
@@ -113,70 +113,70 @@ export const startPerformanceTransaction = (name, type, data) => {
 export const createPerformanceTimer = (name, type, data) => {
   const startTime = Date.now();
   let transaction = null;
-  
+
   // Start transaction if type is provided
   if (type) {
     transaction = startPerformanceTransaction(name, type, data);
   }
-  
+
   return {
     /**
      * Mark a point in the timer
-     * 
+     *
      * @param {string} pointName - Point name
      */
     mark: pointName => {
       transaction?.markPoint(pointName);
     },
-    
+
     /**
      * Stop the timer and record the duration
-     * 
+     *
      * @param {Object} [additionalData] - Additional data to include
      * @returns {number} Duration in ms
      */
     stop: additionalData => {
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // Add duration to transaction
       if (transaction) {
         transaction.addData('duration', duration);
-        
+
         // Add additional data
         if (additionalData) {
           Object.entries(additionalData).forEach(([key, value]) => {
             transaction.addData(key, value);
           });
         }
-        
+
         // Finish transaction
         transaction.finish();
       }
-      
+
       return duration;
-    }
+    },
   };
 };
 
 /**
  * Track app startup
- * 
+ *
  * @param {number} duration - Startup duration in ms
  * @param {Object} [data] - Additional data
  */
 export const trackAppStartup = (duration, data = {}) => {
   try {
     info(LogCategory.PERFORMANCE, `App startup completed in ${duration}ms`, { duration, ...data });
-    
+
     const transaction = startPerformanceTransaction('App Startup', TransactionType.STARTUP, {
       timeToInteractive: duration,
-      ...data
+      ...data,
     });
-    
+
     // Finish transaction immediately
     transaction?.finish();
-    
+
     // Update performance metrics
     updatePerformanceMetrics({
       timeToInteractive: duration,
@@ -189,20 +189,20 @@ export const trackAppStartup = (duration, data = {}) => {
 
 /**
  * Track a navigation event
- * 
+ *
  * @param {string} routeName - Route name
  * @param {string} [previousRoute] - Previous route
  */
 export const trackNavigation = (routeName, previousRoute) => {
   try {
     info(LogCategory.NAVIGATION, `Navigated to ${routeName}`, { previousRoute });
-    
+
     const transaction = startPerformanceTransaction(
       `Navigation: ${routeName}`,
       TransactionType.NAVIGATION,
       { previousRoute }
     );
-    
+
     // Finish transaction after a delay to capture render time
     setTimeout(() => {
       transaction?.finish();
@@ -215,7 +215,7 @@ export const trackNavigation = (routeName, previousRoute) => {
 
 /**
  * Track a UI render
- * 
+ *
  * @param {string} componentName - Component name
  * @param {number} duration - Render duration in ms
  */
@@ -224,16 +224,17 @@ export const trackUiRender = (componentName, duration) => {
     // Log UI render if it's slow
     if (duration > 100) {
       info(LogCategory.PERFORMANCE, `Slow render: ${componentName} (${duration}ms)`, {
-        componentName, duration
+        componentName,
+        duration,
       });
     }
-    
+
     const transaction = startPerformanceTransaction(
       `Render: ${componentName}`,
       TransactionType.UI_RENDER,
       { componentName, duration }
     );
-    
+
     // Finish transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -244,7 +245,7 @@ export const trackUiRender = (componentName, duration) => {
 
 /**
  * Track an API request
- * 
+ *
  * @param {string} url - Request URL
  * @param {string} method - HTTP method
  * @param {number} status - HTTP status code
@@ -254,9 +255,12 @@ export const trackApiRequest = (url, method, status, duration) => {
   try {
     // Log API request
     info(LogCategory.API, `API request: ${method} ${getUrlPath(url)} (${status})`, {
-      url, method, status, duration
+      url,
+      method,
+      status,
+      duration,
     });
-    
+
     // Log error if status is 4xx or 5xx
     if (status >= 400) {
       logError(
@@ -266,13 +270,13 @@ export const trackApiRequest = (url, method, status, duration) => {
         { url, method, status, duration }
       );
     }
-    
+
     const transaction = startPerformanceTransaction(
       `API: ${method} ${getUrlPath(url)}`,
       TransactionType.API_REQUEST,
       { url, method, status, duration }
     );
-    
+
     // Finish transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -283,7 +287,7 @@ export const trackApiRequest = (url, method, status, duration) => {
 
 /**
  * Track a data operation
- * 
+ *
  * @param {string} operationName - Operation name
  * @param {number} duration - Operation duration in ms
  * @param {Object} [data] - Additional data
@@ -293,16 +297,18 @@ export const trackDataOperation = (operationName, duration, data = {}) => {
     // Log data operation if it's slow
     if (duration > 300) {
       info(LogCategory.PERFORMANCE, `Slow data operation: ${operationName} (${duration}ms)`, {
-        operationName, duration, ...data
+        operationName,
+        duration,
+        ...data,
       });
     }
-    
+
     const transaction = startPerformanceTransaction(
       `Data: ${operationName}`,
       TransactionType.DATA_OPERATION,
       { operationName, duration, ...data }
     );
-    
+
     // Finish transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -313,7 +319,7 @@ export const trackDataOperation = (operationName, duration, data = {}) => {
 
 /**
  * Track a user interaction
- * 
+ *
  * @param {string} interactionName - Interaction name
  * @param {number} duration - Interaction duration in ms
  * @param {Object} [data] - Additional data
@@ -323,16 +329,18 @@ export const trackUserInteraction = (interactionName, duration, data = {}) => {
     // Log user interaction if it's slow
     if (duration > 500) {
       info(LogCategory.PERFORMANCE, `Slow user interaction: ${interactionName} (${duration}ms)`, {
-        interactionName, duration, ...data
+        interactionName,
+        duration,
+        ...data,
       });
     }
-    
+
     const transaction = startPerformanceTransaction(
       `Interaction: ${interactionName}`,
       TransactionType.USER_INTERACTION,
       { interactionName, duration, ...data }
     );
-    
+
     // Finish transaction immediately
     transaction?.finish();
   } catch (error) {
@@ -343,7 +351,7 @@ export const trackUserInteraction = (interactionName, duration, data = {}) => {
 
 /**
  * Update performance metrics
- * 
+ *
  * @param {PerformanceMetrics} metrics - Metrics to update
  */
 export const updatePerformanceMetrics = metrics => {
@@ -360,7 +368,7 @@ export const updatePerformanceMetrics = metrics => {
 
 /**
  * Get performance metrics
- * 
+ *
  * @returns {PerformanceMetrics} Current performance metrics
  */
 export const getPerformanceMetrics = () => {
@@ -369,7 +377,7 @@ export const getPerformanceMetrics = () => {
 
 /**
  * Initialize performance monitoring
- * 
+ *
  * @param {Object} [options] - Initialization options
  * @param {boolean} [options.trackAppStart] - Whether to track app start time
  * @param {boolean} [options.trackDeviceInfo] - Whether to track device information
@@ -383,13 +391,13 @@ export const initPerformanceMonitoring = (
 ) => {
   try {
     console.log('initPerformanceMonitoring: Starting initialization');
-    
+
     // Track app start time
     if (options.trackAppStart) {
       console.log('initPerformanceMonitoring: Setting app start time');
       performanceMetrics.appStartTime = Date.now();
     }
-    
+
     // Set device information
     if (options.trackDeviceInfo) {
       console.log('initPerformanceMonitoring: Setting device information');
@@ -397,16 +405,16 @@ export const initPerformanceMonitoring = (
       performanceMetrics.deviceModel = 'Web Browser';
       performanceMetrics.osVersion = navigator.userAgent;
     }
-    
+
     info(LogCategory.PERFORMANCE, 'Performance monitoring initialized successfully');
     console.log('initPerformanceMonitoring: Initialization completed successfully');
-    
+
     return true;
   } catch (initError) {
     logError(LogCategory.PERFORMANCE, 'Failed to initialize performance monitoring', initError);
     console.error('initPerformanceMonitoring: Failed to initialize:', initError);
     safeErrorCapture(initError);
-    
+
     return false;
   }
 };

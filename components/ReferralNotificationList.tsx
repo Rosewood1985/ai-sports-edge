@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList,
-  ActivityIndicator
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeColor } from '../hooks/useThemeColor';
-import { referralNotificationService, ReferralNotification } from '../services/referralNotificationService';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
+
 import ReferralBadge from './ReferralBadge';
+import { useThemeColor } from '../hooks/useThemeColor';
+import {
+  referralNotificationService,
+  ReferralNotification,
+} from '../services/referralNotificationService';
 
 interface ReferralNotificationListProps {
   onNotificationPress?: (notification: ReferralNotification) => void;
@@ -24,19 +28,19 @@ interface ReferralNotificationListProps {
  */
 const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
   onNotificationPress,
-  onMarkAllAsRead
+  onMarkAllAsRead,
 }) => {
   const [notifications, setNotifications] = useState<ReferralNotification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'background');
-  
+
   useEffect(() => {
     loadNotifications();
   }, []);
-  
+
   const loadNotifications = async () => {
     try {
       setLoading(true);
@@ -48,15 +52,17 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
       setLoading(false);
     }
   };
-  
+
   const handleMarkAllAsRead = async () => {
     try {
       await referralNotificationService.markAllAsRead();
-      setNotifications(prev => prev.map(notification => ({
-        ...notification,
-        read: true
-      })));
-      
+      setNotifications(prev =>
+        prev.map(notification => ({
+          ...notification,
+          read: true,
+        }))
+      );
+
       if (onMarkAllAsRead) {
         onMarkAllAsRead();
       }
@@ -64,16 +70,16 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
       console.error('Error marking all as read:', error);
     }
   };
-  
+
   const handleNotificationPress = async (notification: ReferralNotification) => {
     try {
       if (!notification.read) {
         await referralNotificationService.markAsRead(notification.id);
-        setNotifications(prev => prev.map(n => 
-          n.id === notification.id ? { ...n, read: true } : n
-        ));
+        setNotifications(prev =>
+          prev.map(n => (n.id === notification.id ? { ...n, read: true } : n))
+        );
       }
-      
+
       if (onNotificationPress) {
         onNotificationPress(notification);
       }
@@ -81,7 +87,7 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
       console.error('Error handling notification press:', error);
     }
   };
-  
+
   // Get icon based on notification type
   const getIcon = (type: ReferralNotification['type']) => {
     switch (type) {
@@ -97,7 +103,7 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
         return 'gift';
     }
   };
-  
+
   // Format date to relative time
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -107,7 +113,7 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
     const diffMin = Math.floor(diffSec / 60);
     const diffHour = Math.floor(diffMin / 60);
     const diffDay = Math.floor(diffHour / 24);
-    
+
     if (diffDay > 0) {
       return diffDay === 1 ? 'Yesterday' : `${diffDay} days ago`;
     } else if (diffHour > 0) {
@@ -118,13 +124,13 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
       return 'Just now';
     }
   };
-  
+
   // Render notification item
   const renderNotificationItem = ({ item }: { item: ReferralNotification }) => (
     <TouchableOpacity
       style={[
         styles.notificationItem,
-        { backgroundColor: item.read ? 'transparent' : 'rgba(52, 152, 219, 0.1)' }
+        { backgroundColor: item.read ? 'transparent' : 'rgba(52, 152, 219, 0.1)' },
       ]}
       onPress={() => handleNotificationPress(item)}
     >
@@ -137,57 +143,50 @@ const ReferralNotificationList: React.FC<ReferralNotificationListProps> = ({
           </View>
         )}
       </View>
-      
+
       <View style={styles.notificationContent}>
-        <Text style={[styles.notificationTitle, { color: textColor }]}>
-          {item.title}
-        </Text>
-        
-        <Text style={[styles.notificationMessage, { color: textColor }]}>
-          {item.message}
-        </Text>
-        
+        <Text style={[styles.notificationTitle, { color: textColor }]}>{item.title}</Text>
+
+        <Text style={[styles.notificationMessage, { color: textColor }]}>{item.message}</Text>
+
         <Text style={[styles.notificationTime, { color: textColor }]}>
           {formatDate(item.createdAt)}
         </Text>
       </View>
-      
-      {!item.read && (
-        <View style={[styles.unreadIndicator, { backgroundColor: primaryColor }]} />
-      )}
+
+      {!item.read && <View style={[styles.unreadIndicator, { backgroundColor: primaryColor }]} />}
     </TouchableOpacity>
   );
-  
+
   // Render empty state
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="notifications-off-outline" size={64} color={textColor} style={{ opacity: 0.5 }} />
-      <Text style={[styles.emptyText, { color: textColor }]}>
-        No notifications yet
-      </Text>
+      <Ionicons
+        name="notifications-off-outline"
+        size={64}
+        color={textColor}
+        style={{ opacity: 0.5 }}
+      />
+      <Text style={[styles.emptyText, { color: textColor }]}>No notifications yet</Text>
       <Text style={[styles.emptySubtext, { color: textColor }]}>
         Refer friends to start earning rewards
       </Text>
     </View>
   );
-  
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: textColor }]}>
-          Notifications
-        </Text>
-        
+        <Text style={[styles.headerTitle, { color: textColor }]}>Notifications</Text>
+
         {notifications.some(n => !n.read) && (
           <TouchableOpacity onPress={handleMarkAllAsRead} style={styles.markAllButton}>
-            <Text style={[styles.markAllText, { color: primaryColor }]}>
-              Mark all as read
-            </Text>
+            <Text style={[styles.markAllText, { color: primaryColor }]}>Mark all as read</Text>
           </TouchableOpacity>
         )}
       </View>
-      
+
       {/* Notification List */}
       {loading ? (
         <View style={styles.loadingContainer}>

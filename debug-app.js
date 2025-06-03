@@ -10,7 +10,10 @@ const config = {
 };
 
 // Initialize log file
-fs.writeFileSync(config.logFile, `AI Sports Edge Debug and Deploy Log - ${new Date().toISOString()}\n\n`);
+fs.writeFileSync(
+  config.logFile,
+  `AI Sports Edge Debug and Deploy Log - ${new Date().toISOString()}\n\n`
+);
 
 // Helper function to log messages
 function log(message) {
@@ -44,37 +47,37 @@ async function main() {
 
     // 2. Update deployment scripts to use production environment
     log('Updating deployment scripts to use production environment');
-    
+
     // Update deploy.sh
     const deployShPath = path.join(config.rootDir, 'deploy.sh');
     if (fs.existsSync(deployShPath)) {
       let deployShContent = fs.readFileSync(deployShPath, 'utf8');
       deployShContent = deployShContent.replace(
-        /npm run build/g, 
+        /npm run build/g,
         'NODE_ENV=production npm run build:prod'
       );
       fs.writeFileSync(deployShPath, deployShContent);
       log('Updated deploy.sh to use production environment');
     }
-    
+
     // Update deploy-api-key-security.sh
     const deployApiKeyPath = path.join(config.rootDir, 'deploy-api-key-security.sh');
     if (fs.existsSync(deployApiKeyPath)) {
       let deployApiKeyContent = fs.readFileSync(deployApiKeyPath, 'utf8');
       deployApiKeyContent = deployApiKeyContent.replace(
-        /npm run build/g, 
+        /npm run build/g,
         'NODE_ENV=production npm run build:prod'
       );
       fs.writeFileSync(deployApiKeyPath, deployApiKeyContent);
       log('Updated deploy-api-key-security.sh to use production environment');
     }
-    
+
     // Update deploy-ai-features.sh
     const deployAiFeaturesPath = path.join(config.rootDir, 'deploy-ai-features.sh');
     if (fs.existsSync(deployAiFeaturesPath)) {
       let deployAiFeaturesContent = fs.readFileSync(deployAiFeaturesPath, 'utf8');
       deployAiFeaturesContent = deployAiFeaturesContent.replace(
-        /npm run build/g, 
+        /npm run build/g,
         'NODE_ENV=production npm run build:prod'
       );
       fs.writeFileSync(deployAiFeaturesPath, deployAiFeaturesContent);
@@ -86,7 +89,7 @@ async function main() {
     const loginHtmlPath = path.join(config.rootDir, 'dist', 'login.html');
     if (fs.existsSync(loginHtmlPath)) {
       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf8');
-      
+
       // Check if measurementId is already added
       if (!loginHtmlContent.includes('measurementId')) {
         loginHtmlContent = loginHtmlContent.replace(

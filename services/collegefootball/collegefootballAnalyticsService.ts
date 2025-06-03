@@ -1,6 +1,6 @@
 /**
  * College Football Analytics Service
- * 
+ *
  * Advanced analytics for college football with focus on:
  * - Recruiting impact analysis
  * - Coaching effectiveness metrics
@@ -10,6 +10,7 @@
  */
 
 import * as Sentry from '@sentry/node';
+
 import { CollegeFootballTeam, CFBGame, ConferenceData } from './collegefootballDataSyncService';
 
 export interface CFBAnalytics {
@@ -17,7 +18,7 @@ export interface CFBAnalytics {
   teamName: string;
   season: number;
   week: number;
-  
+
   // Core Performance Metrics
   offensiveMetrics: {
     pointsPerGame: number;
@@ -28,7 +29,7 @@ export interface CFBAnalytics {
     redZoneEfficiency: number;
     turnoversLost: number;
   };
-  
+
   defensiveMetrics: {
     pointsAllowedPerGame: number;
     yardsAllowedPerGame: number;
@@ -39,7 +40,7 @@ export interface CFBAnalytics {
     takeaways: number;
     sacks: number;
   };
-  
+
   // College Football Specific Analytics
   recruitingMetrics: {
     currentClassRanking: number;
@@ -50,7 +51,7 @@ export interface CFBAnalytics {
     transferPortalGains: number;
     transferPortalLosses: number;
   };
-  
+
   coachingMetrics: {
     headCoachExperience: number;
     coachingStability: number; // Years with current staff
@@ -58,21 +59,21 @@ export interface CFBAnalytics {
     gameManagement: number; // Clock management, decisions
     adjustmentRating: number; // Halftime adjustments
   };
-  
+
   academicMetrics: {
     apr: number; // Academic Progress Rate
     graduationRate: number;
     academicAllAmericans: number;
     eligibilityIssues: number;
   };
-  
+
   facilityMetrics: {
     stadiumAdvantage: number; // Home field advantage
     recruitingFacilities: number;
     trainingFacilities: number;
     fanSupport: number;
   };
-  
+
   // Advanced Analytics
   situationalMetrics: {
     performanceVsRanked: number;
@@ -81,14 +82,14 @@ export interface CFBAnalytics {
     weatherPerformance: number;
     travelPerformance: number; // Away games
   };
-  
+
   strengthOfSchedule: {
     current: number;
     remaining: number;
     conferenceStrength: number;
     nonConferenceStrength: number;
   };
-  
+
   playoff: {
     currentRanking?: number;
     playoffProbability: number;
@@ -102,21 +103,21 @@ export interface ConferenceAnalytics {
   conferenceId: string;
   conferenceName: string;
   season: number;
-  
+
   strength: {
     overallRating: number;
     topToBottom: number;
     nationalRanking: number;
     bowlPerformance: number;
   };
-  
+
   recruiting: {
     averageClassRanking: number;
     totalBlueChips: number;
     nationalFootprint: number;
     retentionRate: number;
   };
-  
+
   competitive: {
     parityIndex: number;
     championshipContenders: number;
@@ -129,7 +130,7 @@ export interface GamePrediction {
   gameId: string;
   homeTeam: string;
   awayTeam: string;
-  
+
   prediction: {
     winner: string;
     confidence: number;
@@ -140,7 +141,7 @@ export interface GamePrediction {
       away: number;
     };
   };
-  
+
   factors: {
     talentGap: number;
     coachingAdvantage: number;
@@ -149,12 +150,12 @@ export interface GamePrediction {
     healthAndAvailability: number;
     weatherImpact: number;
   };
-  
-  keyMatchups: Array<{
+
+  keyMatchups: {
     description: string;
     advantage: string; // 'home' | 'away' | 'even'
     impact: number; // 1-10 scale
-  }>;
+  }[];
 }
 
 export class CollegeFootballAnalyticsService {
@@ -173,7 +174,7 @@ export class CollegeFootballAnalyticsService {
       Sentry.addBreadcrumb({
         message: `Generating CFB analytics for team ${teamId}`,
         category: 'cfb.analytics',
-        level: 'info'
+        level: 'info',
       });
 
       console.log(`📊 Generating CFB analytics for team: ${teamId}, season: ${season}`);
@@ -187,13 +188,13 @@ export class CollegeFootballAnalyticsService {
       // Calculate core metrics
       const offensiveMetrics = this.calculateOffensiveMetrics(games);
       const defensiveMetrics = this.calculateDefensiveMetrics(games);
-      
+
       // Calculate CFB-specific metrics
       const recruitingMetrics = this.calculateRecruitingMetrics(recruitingData);
       const coachingMetrics = this.calculateCoachingMetrics(coachingData, games);
       const academicMetrics = this.calculateAcademicMetrics(team);
       const facilityMetrics = this.calculateFacilityMetrics(team);
-      
+
       // Calculate advanced analytics
       const situationalMetrics = this.calculateSituationalMetrics(games);
       const strengthOfSchedule = this.calculateStrengthOfSchedule(games);
@@ -212,12 +213,11 @@ export class CollegeFootballAnalyticsService {
         facilityMetrics,
         situationalMetrics,
         strengthOfSchedule,
-        playoff
+        playoff,
       };
 
       console.log(`✅ Generated CFB analytics for ${team.name}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error generating CFB team analytics:', error);
@@ -228,7 +228,10 @@ export class CollegeFootballAnalyticsService {
   /**
    * Generates conference-wide analytics
    */
-  async generateConferenceAnalytics(conferenceId: string, season: number): Promise<ConferenceAnalytics> {
+  async generateConferenceAnalytics(
+    conferenceId: string,
+    season: number
+  ): Promise<ConferenceAnalytics> {
     try {
       console.log(`📊 Generating conference analytics for: ${conferenceId}, season: ${season}`);
 
@@ -246,12 +249,11 @@ export class CollegeFootballAnalyticsService {
         season,
         strength,
         recruiting,
-        competitive
+        competitive,
       };
 
       console.log(`✅ Generated conference analytics for ${conference.name}`);
       return analytics;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error generating conference analytics:', error);
@@ -285,7 +287,7 @@ export class CollegeFootballAnalyticsService {
         homeFieldAdvantage,
         motivationalFactors,
         healthAndAvailability,
-        weatherImpact
+        weatherImpact,
       });
 
       const prediction: GamePrediction = {
@@ -297,7 +299,7 @@ export class CollegeFootballAnalyticsService {
           confidence: Math.abs(winProbability.home - winProbability.away),
           spread: this.calculatePredictedSpread(winProbability),
           total: this.calculatePredictedTotal(homeTeam, awayTeam),
-          winProbability
+          winProbability,
         },
         factors: {
           talentGap,
@@ -305,14 +307,13 @@ export class CollegeFootballAnalyticsService {
           homeFieldAdvantage,
           motivationalFactors,
           healthAndAvailability,
-          weatherImpact
+          weatherImpact,
         },
-        keyMatchups: this.identifyKeyMatchups(homeTeam, awayTeam)
+        keyMatchups: this.identifyKeyMatchups(homeTeam, awayTeam),
       };
 
       console.log(`✅ Generated prediction for ${homeTeam.name} vs ${awayTeam.name}`);
       return prediction;
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error predicting CFB game:', error);
@@ -334,9 +335,8 @@ export class CollegeFootballAnalyticsService {
         correlation: this.calculateRecruitingPerformanceCorrelation(recruitingClasses, performance),
         developmentIndex: this.calculatePlayerDevelopment(teamId, years),
         retentionRate: this.calculateRecruitRetention(teamId, years),
-        impactAnalysis: this.analyzeRecruitImpactTimeline(recruitingClasses, performance)
+        impactAnalysis: this.analyzeRecruitImpactTimeline(recruitingClasses, performance),
       };
-
     } catch (error) {
       Sentry.captureException(error);
       console.error('❌ Error analyzing recruiting impact:', error);
@@ -357,7 +357,7 @@ export class CollegeFootballAnalyticsService {
       rushingYardsPerGame: 150.0,
       thirdDownConversion: 0.42,
       redZoneEfficiency: 0.85,
-      turnoversLost: 1.2
+      turnoversLost: 1.2,
     };
   }
 
@@ -371,7 +371,7 @@ export class CollegeFootballAnalyticsService {
       thirdDownDefense: 0.38,
       redZoneDefense: 0.78,
       takeaways: 1.8,
-      sacks: 2.5
+      sacks: 2.5,
     };
   }
 
@@ -384,18 +384,21 @@ export class CollegeFootballAnalyticsService {
       inStateRetention: 0.65,
       nationalRecruits: 8,
       transferPortalGains: 5,
-      transferPortalLosses: 3
+      transferPortalLosses: 3,
     };
   }
 
-  private calculateCoachingMetrics(coachingData: any, games: CFBGame[]): CFBAnalytics['coachingMetrics'] {
+  private calculateCoachingMetrics(
+    coachingData: any,
+    games: CFBGame[]
+  ): CFBAnalytics['coachingMetrics'] {
     // TODO: Implement coaching metrics calculation
     return {
       headCoachExperience: 8,
       coachingStability: 3.5,
       developmentIndex: 7.2,
       gameManagement: 6.8,
-      adjustmentRating: 7.5
+      adjustmentRating: 7.5,
     };
   }
 
@@ -405,7 +408,7 @@ export class CollegeFootballAnalyticsService {
       apr: 965,
       graduationRate: 0.82,
       academicAllAmericans: 2,
-      eligibilityIssues: 0
+      eligibilityIssues: 0,
     };
   }
 
@@ -415,7 +418,7 @@ export class CollegeFootballAnalyticsService {
       stadiumAdvantage: 7.5,
       recruitingFacilities: 8.2,
       trainingFacilities: 8.0,
-      fanSupport: 7.8
+      fanSupport: 7.8,
     };
   }
 
@@ -423,10 +426,10 @@ export class CollegeFootballAnalyticsService {
     // TODO: Implement situational metrics calculation
     return {
       performanceVsRanked: 0.45,
-      performanceInBigGames: 0.60,
+      performanceInBigGames: 0.6,
       clutchPerformance: 0.55,
-      weatherPerformance: 0.70,
-      travelPerformance: 0.48
+      weatherPerformance: 0.7,
+      travelPerformance: 0.48,
     };
   }
 
@@ -436,48 +439,59 @@ export class CollegeFootballAnalyticsService {
       current: 0.65,
       remaining: 0.58,
       conferenceStrength: 0.72,
-      nonConferenceStrength: 0.45
+      nonConferenceStrength: 0.45,
     };
   }
 
-  private calculatePlayoffMetrics(team: CollegeFootballTeam, games: CFBGame[]): CFBAnalytics['playoff'] {
+  private calculatePlayoffMetrics(
+    team: CollegeFootballTeam,
+    games: CFBGame[]
+  ): CFBAnalytics['playoff'] {
     // TODO: Implement playoff metrics calculation
     return {
       currentRanking: team.rankings.cfp,
       playoffProbability: 0.15,
       strengthOfRecord: 0.82,
       qualityWins: 2,
-      badLosses: 0
+      badLosses: 0,
     };
   }
 
-  private calculateConferenceStrength(teams: CollegeFootballTeam[], games: CFBGame[]): ConferenceAnalytics['strength'] {
+  private calculateConferenceStrength(
+    teams: CollegeFootballTeam[],
+    games: CFBGame[]
+  ): ConferenceAnalytics['strength'] {
     // TODO: Implement conference strength calculation
     return {
       overallRating: 8.2,
       topToBottom: 7.5,
       nationalRanking: 3,
-      bowlPerformance: 0.68
+      bowlPerformance: 0.68,
     };
   }
 
-  private calculateConferenceRecruiting(teams: CollegeFootballTeam[]): ConferenceAnalytics['recruiting'] {
+  private calculateConferenceRecruiting(
+    teams: CollegeFootballTeam[]
+  ): ConferenceAnalytics['recruiting'] {
     // TODO: Implement conference recruiting calculation
     return {
       averageClassRanking: 45.5,
       totalBlueChips: 125,
       nationalFootprint: 0.75,
-      retentionRate: 0.68
+      retentionRate: 0.68,
     };
   }
 
-  private calculateConferenceCompetitive(teams: CollegeFootballTeam[], games: CFBGame[]): ConferenceAnalytics['competitive'] {
+  private calculateConferenceCompetitive(
+    teams: CollegeFootballTeam[],
+    games: CFBGame[]
+  ): ConferenceAnalytics['competitive'] {
     // TODO: Implement conference competitive calculation
     return {
       parityIndex: 6.8,
       championshipContenders: 3,
       bowlEligibleTeams: 8,
-      winningPercentage: 0.58
+      winningPercentage: 0.58,
     };
   }
 
@@ -490,7 +504,10 @@ export class CollegeFootballAnalyticsService {
     return 0.15; // Home team advantage
   }
 
-  private calculateCoachingAdvantage(homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): number {
+  private calculateCoachingAdvantage(
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): number {
     // TODO: Implement coaching advantage calculation
     return 0.08; // Home team advantage
   }
@@ -500,12 +517,19 @@ export class CollegeFootballAnalyticsService {
     return 0.12; // Standard home field advantage
   }
 
-  private calculateMotivationalFactors(game: CFBGame, homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): number {
+  private calculateMotivationalFactors(
+    game: CFBGame,
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): number {
     // TODO: Implement motivational factors (rivalry, revenge, etc.)
     return game.isRivalryGame ? 0.05 : 0.0;
   }
 
-  private calculateHealthFactors(homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): number {
+  private calculateHealthFactors(
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): number {
     // TODO: Implement health and availability factors
     return 0.02; // Home team advantage
   }
@@ -517,12 +541,15 @@ export class CollegeFootballAnalyticsService {
 
   private calculateWinProbability(factors: any): { home: number; away: number } {
     // TODO: Implement win probability calculation
-    const totalAdvantage = Object.values(factors).reduce((sum: number, factor: number) => sum + factor, 0);
+    const totalAdvantage = Object.values(factors).reduce(
+      (sum: number, factor: number) => sum + factor,
+      0
+    );
     const homeProb = 0.5 + totalAdvantage;
-    
+
     return {
       home: Math.max(0.1, Math.min(0.9, homeProb)),
-      away: Math.max(0.1, Math.min(0.9, 1 - homeProb))
+      away: Math.max(0.1, Math.min(0.9, 1 - homeProb)),
     };
   }
 
@@ -532,24 +559,30 @@ export class CollegeFootballAnalyticsService {
     return probDiff * 14; // Rough conversion to points
   }
 
-  private calculatePredictedTotal(homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): number {
+  private calculatePredictedTotal(
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): number {
     // TODO: Implement total points calculation
     return 52.5; // Default total
   }
 
-  private identifyKeyMatchups(homeTeam: CollegeFootballTeam, awayTeam: CollegeFootballTeam): GamePrediction['keyMatchups'] {
+  private identifyKeyMatchups(
+    homeTeam: CollegeFootballTeam,
+    awayTeam: CollegeFootballTeam
+  ): GamePrediction['keyMatchups'] {
     // TODO: Implement key matchup identification
     return [
       {
-        description: "Home passing offense vs Away pass defense",
-        advantage: "home",
-        impact: 8
+        description: 'Home passing offense vs Away pass defense',
+        advantage: 'home',
+        impact: 8,
       },
       {
-        description: "Away rushing attack vs Home run defense",
-        advantage: "away",
-        impact: 7
-      }
+        description: 'Away rushing attack vs Home run defense',
+        advantage: 'away',
+        impact: 7,
+      },
     ];
   }
 
@@ -562,7 +595,10 @@ export class CollegeFootballAnalyticsService {
     return 1;
   }
 
-  private calculateRecruitingPerformanceCorrelation(recruitingClasses: any[], performance: any[]): number {
+  private calculateRecruitingPerformanceCorrelation(
+    recruitingClasses: any[],
+    performance: any[]
+  ): number {
     // TODO: Implement correlation calculation
     return 0.72;
   }
@@ -582,7 +618,7 @@ export class CollegeFootballAnalyticsService {
     return {
       immediateImpact: 0.25,
       twoYearImpact: 0.65,
-      fourYearImpact: 0.85
+      fourYearImpact: 0.85,
     };
   }
 
@@ -602,7 +638,7 @@ export class CollegeFootballAnalyticsService {
       rankings: { ap: 15, coaches: 14, cfp: 16 },
       recruitingClass: { year: 2024, ranking: 25, averageRating: 3.2, totalCommits: 22 },
       coaching: { headCoach: 'Coach Sample', experience: 8, winPercentage: 0.68 },
-      facilities: { stadiumCapacity: 80000, trainingFacilityRating: 8.5 }
+      facilities: { stadiumCapacity: 80000, trainingFacilityRating: 8.5 },
     };
   }
 
@@ -631,7 +667,7 @@ export class CollegeFootballAnalyticsService {
       playoffBids: 2,
       averageRecruitingRank: 45,
       revenueSharing: 50000000,
-      realignmentHistory: []
+      realignmentHistory: [],
     };
   }
 
@@ -658,7 +694,7 @@ export class CollegeFootballAnalyticsService {
       isConferenceGame: true,
       isRivalryGame: false,
       betting: { spread: -3.5, total: 52.5, moneyline: { home: -150, away: 130 } },
-      gameContext: { playoffImplications: false, revengeGame: false, lookAheadSpot: false }
+      gameContext: { playoffImplications: false, revengeGame: false, lookAheadSpot: false },
     };
   }
 

@@ -1,33 +1,34 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 import { View, Text, ActivityIndicator, Button } from 'react-native';
-import { useNavigationState } from '../contexts/NavigationStateContext';
+
+import BettingNavigator from './BettingNavigator';
+import OnboardingNavigator from './OnboardingNavigator';
 import ThemeToggle from '../atomic/molecules/theme/ThemeToggle';
+import { useNavigationState } from '../contexts/NavigationStateContext';
 
 // Import screens
-import HomeScreen from '../screens/HomeScreen';
-import GamesScreen from '../screens/GamesScreen';
-import GameDetailsScreen from '../screens/GameDetailsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import SubscriptionScreen from '../screens/SubscriptionScreen';
-import PurchaseHistoryScreen from '../screens/PurchaseHistoryScreen';
-import LanguageSettingsScreen from '../screens/LanguageSettingsScreen';
 import AuthScreen from '../screens/AuthScreen';
-import LegalScreen from '../screens/LegalScreen';
+import GameDetailsScreen from '../screens/GameDetailsScreen';
+import GamesScreen from '../screens/GamesScreen';
+import HomeScreen from '../screens/HomeScreen';
 import KnowledgeEdgeScreen from '../screens/KnowledgeEdgeScreen';
-import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
+import LanguageSettingsScreen from '../screens/LanguageSettingsScreen';
+import LegalScreen from '../screens/LegalScreen';
 import LocalTeamOddsScreen from '../screens/LocalTeamOddsScreen';
-import ReferralRewardsScreen from '../screens/ReferralRewardsScreen';
+import NearbyVenuesScreen from '../screens/NearbyVenuesScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import PurchaseHistoryScreen from '../screens/PurchaseHistoryScreen';
 import ReferralLeaderboardScreen from '../screens/ReferralLeaderboardScreen';
 import ReferralNotificationsScreen from '../screens/ReferralNotificationsScreen';
+import ReferralRewardsScreen from '../screens/ReferralRewardsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import SubscriptionScreen from '../screens/SubscriptionScreen';
 
 // Import navigators
-import OnboardingNavigator from './OnboardingNavigator';
-import BettingNavigator from './BettingNavigator';
 
 // Define navigation types
 export type RootStackParamList = {

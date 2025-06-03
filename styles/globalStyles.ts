@@ -1,4 +1,5 @@
 import { StyleSheet, Platform, Dimensions } from 'react-native';
+
 import { colors, spacing, borderRadius, typography } from './theme';
 import { getResponsiveSpacing, scaleFontSize } from '../utils/deviceOptimization';
 
@@ -6,7 +7,7 @@ const { width, height } = Dimensions.get('window');
 
 /**
  * Global styles for the app
- * 
+ *
  * This file contains reusable styles that can be applied across the app
  */
 const globalStyles = StyleSheet.create({
@@ -24,7 +25,7 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.primary,
   },
-  
+
   // Text styles
   neonHeading: {
     color: colors.neon.blue,
@@ -58,7 +59,7 @@ const globalStyles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: scaleFontSize(typography.fontSize.sm),
   },
-  
+
   // Form styles
   input: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -78,7 +79,7 @@ const globalStyles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
   },
-  
+
   // Button styles
   button: {
     backgroundColor: colors.button.primary,
@@ -109,7 +110,7 @@ const globalStyles = StyleSheet.create({
     shadowOpacity: 0,
     elevation: 0,
   },
-  
+
   // Card styles
   card: {
     backgroundColor: colors.background.secondary,
@@ -126,7 +127,7 @@ const globalStyles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  
+
   // Icon styles
   iconContainer: {
     flexDirection: 'row',
@@ -145,7 +146,7 @@ const globalStyles = StyleSheet.create({
     marginTop: getResponsiveSpacing(spacing.xs),
     textAlign: 'center',
   },
-  
+
   // Layout styles
   row: {
     flexDirection: 'row',
@@ -158,14 +159,14 @@ const globalStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   // Separator
   separator: {
     height: 1,
     backgroundColor: colors.border.default,
     marginVertical: getResponsiveSpacing(spacing.md),
   },
-  
+
   // Status indicators
   statusSuccess: {
     color: colors.status.success,
@@ -179,7 +180,7 @@ const globalStyles = StyleSheet.create({
   statusInfo: {
     color: colors.status.info,
   },
-  
+
   // Badge
   badge: {
     position: 'absolute',
@@ -197,13 +198,15 @@ const globalStyles = StyleSheet.create({
     fontSize: scaleFontSize(typography.fontSize.xs),
     fontWeight: '700',
   },
-  
+
   // Responsive styles for different screen sizes
   smallScreenText: {
-    fontSize: width < 360 ? scaleFontSize(typography.fontSize.sm) : scaleFontSize(typography.fontSize.md),
+    fontSize:
+      width < 360 ? scaleFontSize(typography.fontSize.sm) : scaleFontSize(typography.fontSize.md),
   },
   tabletContainer: {
-    paddingHorizontal: width > 600 ? getResponsiveSpacing(spacing.xl) : getResponsiveSpacing(spacing.md),
+    paddingHorizontal:
+      width > 600 ? getResponsiveSpacing(spacing.xl) : getResponsiveSpacing(spacing.md),
   },
 });
 

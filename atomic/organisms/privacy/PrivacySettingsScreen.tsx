@@ -5,16 +5,16 @@
  * including consent preferences, data access, and data deletion requests.
  */
 
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 import { privacyService } from './index';
+import { PrivacyRequestType, PrivacyRequestStatus } from '../../../atomic/atoms/privacy/gdprConfig';
 import {
   PrivacyPreferences,
   PrivacyRequestUnion,
 } from '../../../atomic/atoms/privacy/privacyTypes';
-import { PrivacyRequestType, PrivacyRequestStatus } from '../../../atomic/atoms/privacy/gdprConfig';
 import { useAuth } from '../../../hooks/useAuth';
 import { useThemeColor } from '../../../hooks/useThemeColor';
 import { useI18n } from '../i18n/I18nContext';

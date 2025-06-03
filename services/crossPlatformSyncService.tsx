@@ -4,9 +4,10 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-import { analyticsService } from './analyticsService';
 import axios from 'axios';
+import { Platform } from 'react-native';
+
+import { analyticsService } from './analyticsService';
 import { API_CONFIG } from '../config/affiliateConfig';
 
 // Storage keys
@@ -50,7 +51,7 @@ class CrossPlatformSyncService {
       size: 'medium',
       animation: 'pulse',
       position: 'inline',
-      style: 'default'
+      style: 'default',
     },
     affiliateEnabled: true,
     affiliateCode: '',
@@ -65,25 +66,23 @@ class CrossPlatformSyncService {
     }
 
     this.userId = userId;
-    
+
     try {
       // Load local data first
       await this.loadLocalData();
-      
+
       // Then sync with cloud
       await this.syncWithCloud();
-      
+
       // Set up periodic sync
       if (this.syncInterval) {
         clearInterval(this.syncInterval);
       }
-      
+
       this.syncInterval = setInterval(() => {
-        this.syncWithCloud().catch(err => 
-          console.error('Background sync failed:', err)
-        );
+        this.syncWithCloud().catch(err => console.error('Background sync failed:', err));
       }, 60000); // Sync every minute
-      
+
       this.isInitialized = true;
       console.log('Cross-platform sync service initialized');
     } catch (error) {
@@ -101,7 +100,7 @@ class CrossPlatformSyncService {
       if (purchasedOddsJson) {
         this.purchasedOdds = JSON.parse(purchasedOddsJson);
       }
-      
+
       // Load user preferences
       const userPreferencesJson = await AsyncStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
       if (userPreferencesJson) {
@@ -110,7 +109,7 @@ class CrossPlatformSyncService {
           ...JSON.parse(userPreferencesJson),
         };
       }
-      
+
       // Load individual preferences if not loaded from combined object
       if (!userPreferencesJson) {
         // Load favorite teams
@@ -118,25 +117,25 @@ class CrossPlatformSyncService {
         if (favoriteTeamsJson) {
           this.userPreferences.favoriteTeams = JSON.parse(favoriteTeamsJson);
         }
-        
+
         // Load primary team
         const primaryTeam = await AsyncStorage.getItem(STORAGE_KEYS.PRIMARY_TEAM);
         if (primaryTeam) {
           this.userPreferences.primaryTeam = primaryTeam;
         }
-        
+
         // Load button settings
         const buttonSettingsJson = await AsyncStorage.getItem(STORAGE_KEYS.BUTTON_SETTINGS);
         if (buttonSettingsJson) {
           this.userPreferences.buttonSettings = JSON.parse(buttonSettingsJson);
         }
-        
+
         // Load affiliate enabled
         const affiliateEnabled = await AsyncStorage.getItem(STORAGE_KEYS.AFFILIATE_ENABLED);
         if (affiliateEnabled !== null) {
           this.userPreferences.affiliateEnabled = affiliateEnabled === 'true';
         }
-        
+
         // Load affiliate code
         const affiliateCode = await AsyncStorage.getItem(STORAGE_KEYS.AFFILIATE_CODE);
         if (affiliateCode) {
@@ -156,89 +155,88 @@ class CrossPlatformSyncService {
       console.warn('Cannot sync with cloud: No user ID');
       return;
     }
-    
+
     try {
       // Get last sync timestamp
       const lastSyncJson = await AsyncStorage.getItem(STORAGE_KEYS.LAST_SYNC_TIMESTAMP);
       const lastSync = lastSyncJson ? parseInt(lastSyncJson, 10) : 0;
       const currentTime = Date.now();
-      
+
       // Fetch cloud data
       const response = await axios.get(`${API_CONFIG.BASE_URL}/api/user-data`, {
         params: {
           userId: this.userId,
-          lastSync
-        }
+          lastSync,
+        },
       });
-      
+
       if (response.status === 200 && response.data) {
         const cloudData = response.data;
-        
+
         // Merge purchased odds
         if (cloudData.purchasedOdds && cloudData.purchasedOdds.length > 0) {
           // Create a map of existing purchases by gameId
           const existingPurchases = new Map(
             this.purchasedOdds.map(purchase => [purchase.gameId, purchase])
           );
-          
+
           // Add new purchases from cloud
           cloudData.purchasedOdds.forEach((cloudPurchase: PurchasedOdds) => {
             const existingPurchase = existingPurchases.get(cloudPurchase.gameId);
-            
+
             // If we don't have this purchase or cloud version is newer, use cloud version
             if (!existingPurchase || cloudPurchase.timestamp > existingPurchase.timestamp) {
               existingPurchases.set(cloudPurchase.gameId, cloudPurchase);
             }
           });
-          
+
           // Convert map back to array
           this.purchasedOdds = Array.from(existingPurchases.values());
-          
+
           // Save to local storage
           await AsyncStorage.setItem(
-            STORAGE_KEYS.PURCHASED_ODDS, 
+            STORAGE_KEYS.PURCHASED_ODDS,
             JSON.stringify(this.purchasedOdds)
           );
         }
-        
+
         // Merge user preferences
         if (cloudData.userPreferences) {
           // Only update if cloud data is newer
-          if (!this.userPreferences.lastUpdated || 
-              (cloudData.userPreferences.lastUpdated && 
-               cloudData.userPreferences.lastUpdated > (this.userPreferences.lastUpdated || 0))) {
+          if (
+            !this.userPreferences.lastUpdated ||
+            (cloudData.userPreferences.lastUpdated &&
+              cloudData.userPreferences.lastUpdated > (this.userPreferences.lastUpdated || 0))
+          ) {
             this.userPreferences = {
               ...this.userPreferences,
               ...cloudData.userPreferences,
             };
-            
+
             // Save to local storage
             await AsyncStorage.setItem(
               STORAGE_KEYS.USER_PREFERENCES,
               JSON.stringify(this.userPreferences)
             );
-            
+
             // Also save individual preferences for backward compatibility
             await AsyncStorage.setItem(
               STORAGE_KEYS.FAVORITE_TEAMS,
               JSON.stringify(this.userPreferences.favoriteTeams)
             );
-            
-            await AsyncStorage.setItem(
-              STORAGE_KEYS.PRIMARY_TEAM,
-              this.userPreferences.primaryTeam
-            );
-            
+
+            await AsyncStorage.setItem(STORAGE_KEYS.PRIMARY_TEAM, this.userPreferences.primaryTeam);
+
             await AsyncStorage.setItem(
               STORAGE_KEYS.BUTTON_SETTINGS,
               JSON.stringify(this.userPreferences.buttonSettings)
             );
-            
+
             await AsyncStorage.setItem(
               STORAGE_KEYS.AFFILIATE_ENABLED,
               String(this.userPreferences.affiliateEnabled)
             );
-            
+
             await AsyncStorage.setItem(
               STORAGE_KEYS.AFFILIATE_CODE,
               this.userPreferences.affiliateCode
@@ -246,25 +244,25 @@ class CrossPlatformSyncService {
           }
         }
       }
-      
+
       // Push local changes to cloud
       await this.pushLocalChangesToCloud();
-      
+
       // Update last sync timestamp
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.LAST_SYNC_TIMESTAMP,
-        currentTime.toString()
-      );
-      
+      await AsyncStorage.setItem(STORAGE_KEYS.LAST_SYNC_TIMESTAMP, currentTime.toString());
+
       console.log('Synced with cloud successfully');
     } catch (error) {
       console.error('Error syncing with cloud:', error);
-      
+
       // Track sync error
-      analyticsService.trackError(error instanceof Error ? error : new Error('Unknown sync error'), {
-        userId: this.userId,
-        context: 'cross_platform_sync',
-      });
+      analyticsService.trackError(
+        error instanceof Error ? error : new Error('Unknown sync error'),
+        {
+          userId: this.userId,
+          context: 'cross_platform_sync',
+        }
+      );
     }
   }
 
@@ -275,7 +273,7 @@ class CrossPlatformSyncService {
     if (!this.userId) {
       return;
     }
-    
+
     try {
       // Add current platform info to user preferences
       const updatedPreferences = {
@@ -283,7 +281,7 @@ class CrossPlatformSyncService {
         lastUpdated: Date.now(),
         lastPlatform: Platform.OS,
       };
-      
+
       // Push to server
       await axios.post(`${API_CONFIG.BASE_URL}/api/update-user-data`, {
         userId: this.userId,
@@ -313,21 +311,16 @@ class CrossPlatformSyncService {
         timestamp: Date.now(),
         platform: Platform.OS,
       };
-      
+
       // Add to local array
       this.purchasedOdds.push(purchase);
-      
+
       // Save to local storage
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.PURCHASED_ODDS,
-        JSON.stringify(this.purchasedOdds)
-      );
-      
+      await AsyncStorage.setItem(STORAGE_KEYS.PURCHASED_ODDS, JSON.stringify(this.purchasedOdds));
+
       // Sync with cloud immediately
-      this.syncWithCloud().catch(err => 
-        console.error('Error syncing purchase with cloud:', err)
-      );
-      
+      this.syncWithCloud().catch(err => console.error('Error syncing purchase with cloud:', err));
+
       console.log('Recorded odds purchase for game:', gameId);
     } catch (error) {
       console.error('Error recording odds purchase:', error);
@@ -344,13 +337,13 @@ class CrossPlatformSyncService {
         ...this.userPreferences,
         ...preferences,
       };
-      
+
       // Save to local storage
       await AsyncStorage.setItem(
         STORAGE_KEYS.USER_PREFERENCES,
         JSON.stringify(this.userPreferences)
       );
-      
+
       // Also save individual preferences for backward compatibility
       if (preferences.favoriteTeams) {
         await AsyncStorage.setItem(
@@ -358,37 +351,31 @@ class CrossPlatformSyncService {
           JSON.stringify(preferences.favoriteTeams)
         );
       }
-      
+
       if (preferences.primaryTeam) {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.PRIMARY_TEAM,
-          preferences.primaryTeam
-        );
+        await AsyncStorage.setItem(STORAGE_KEYS.PRIMARY_TEAM, preferences.primaryTeam);
       }
-      
+
       if (preferences.buttonSettings) {
         await AsyncStorage.setItem(
           STORAGE_KEYS.BUTTON_SETTINGS,
           JSON.stringify(preferences.buttonSettings)
         );
       }
-      
+
       if (preferences.affiliateEnabled !== undefined) {
         await AsyncStorage.setItem(
           STORAGE_KEYS.AFFILIATE_ENABLED,
           String(preferences.affiliateEnabled)
         );
       }
-      
+
       if (preferences.affiliateCode) {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.AFFILIATE_CODE,
-          preferences.affiliateCode
-        );
+        await AsyncStorage.setItem(STORAGE_KEYS.AFFILIATE_CODE, preferences.affiliateCode);
       }
-      
+
       // Sync with cloud
-      this.syncWithCloud().catch(err => 
+      this.syncWithCloud().catch(err =>
         console.error('Error syncing preferences with cloud:', err)
       );
     } catch (error) {

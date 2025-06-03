@@ -7,8 +7,9 @@
 
 import React from 'react';
 import { Text, StyleSheet, View, Switch } from 'react-native';
-import { useTheme } from '../../molecules/themeContext';
+
 import AccessibleTouchableOpacity from '../../atoms/AccessibleTouchableOpacity';
+import { useTheme } from '../../molecules/themeContext';
 
 /**
  * ThemeToggle Props

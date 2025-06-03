@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -12,7 +12,7 @@ if (!admin.apps.length) {
  * This function is triggered by a Firestore document update in the subscriptions collection
  */
 exports.handleAutoResubscribe = functions.firestore
-  .document('users/{userId}/subscriptions/{subscriptionId}')
+  .document("users/{userId}/subscriptions/{subscriptionId}")
   .onUpdate(async (change, context) => {
     const { userId, subscriptionId } = context.params;
     const beforeData = change.before.data();
@@ -21,13 +21,13 @@ exports.handleAutoResubscribe = functions.firestore
     // Only proceed if the subscription status changed from active to canceled
     // and cancelAtPeriodEnd is true (indicating it was canceled to expire at the end of the period)
     if (
-      beforeData.status === 'active' &&
-      afterData.status === 'canceled' &&
+      beforeData.status === "active" &&
+      afterData.status === "canceled" &&
       afterData.cancelAtPeriodEnd === true
     ) {
       try {
         const db = admin.firestore();
-        const userRef = db.collection('users').doc(userId);
+        const userRef = db.collection("users").doc(userId);
         const userDoc = await userRef.get();
         
         if (!userDoc.exists) {
@@ -54,10 +54,10 @@ exports.handleAutoResubscribe = functions.firestore
             console.error(`No payment method found for user ${userId}`);
             
             // Create a notification for the user
-            await userRef.collection('notifications').add({
-              type: 'auto_resubscribe_failed',
-              title: 'Auto-Resubscribe Failed',
-              message: 'We could not automatically renew your subscription because no payment method was found. Please update your payment method.',
+            await userRef.collection("notifications").add({
+              type: "auto_resubscribe_failed",
+              title: "Auto-Resubscribe Failed",
+              message: "We could not automatically renew your subscription because no payment method was found. Please update your payment method.",
               read: false,
               createdAt: admin.firestore.FieldValue.serverTimestamp()
             });
@@ -72,7 +72,7 @@ exports.handleAutoResubscribe = functions.firestore
             default_payment_method: paymentMethodId,
             metadata: {
               firebaseUserId: userId,
-              autoResubscribed: 'true',
+              autoResubscribed: "true",
               originalSubscriptionId: subscriptionId
             }
           });
@@ -80,8 +80,8 @@ exports.handleAutoResubscribe = functions.firestore
           console.log(`Created new subscription ${newSubscription.id} for user ${userId}`);
           
           // Update analytics for auto-resubscribe
-          await db.collection('analytics').doc('subscriptions').collection('events').add({
-            type: 'auto_resubscribe',
+          await db.collection("analytics").doc("subscriptions").collection("events").add({
+            type: "auto_resubscribe",
             userId: userId,
             originalSubscriptionId: subscriptionId,
             newSubscriptionId: newSubscription.id,
@@ -90,10 +90,10 @@ exports.handleAutoResubscribe = functions.firestore
           });
           
           // Create a notification for the user
-          await userRef.collection('notifications').add({
-            type: 'auto_resubscribe_success',
-            title: 'Subscription Renewed',
-            message: 'Your subscription has been automatically renewed. Thank you for your continued support!',
+          await userRef.collection("notifications").add({
+            type: "auto_resubscribe_success",
+            title: "Subscription Renewed",
+            message: "Your subscription has been automatically renewed. Thank you for your continued support!",
             read: false,
             createdAt: admin.firestore.FieldValue.serverTimestamp()
           });
@@ -104,7 +104,7 @@ exports.handleAutoResubscribe = functions.firestore
           return null;
         }
       } catch (error) {
-        console.error('Error in auto-resubscribe function:', error);
+        console.error("Error in auto-resubscribe function:", error);
         return null;
       }
     }
@@ -123,30 +123,30 @@ exports.toggleAutoResubscribe = functions.https.onCall(async (data, context) => 
   // Verify authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.'
+      "unauthenticated",
+      "The function must be called while authenticated."
     );
   }
 
   // Verify the user is updating their own setting
   if (data.userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'Users can only update their own settings.'
+      "permission-denied",
+      "Users can only update their own settings."
     );
   }
 
   // Validate required fields
   if (data.enabled === undefined) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'The "enabled" parameter is required.'
+      "invalid-argument",
+      "The \"enabled\" parameter is required."
     );
   }
 
   try {
     const db = admin.firestore();
-    const userRef = db.collection('users').doc(data.userId);
+    const userRef = db.collection("users").doc(data.userId);
     
     await userRef.update({
       autoResubscribe: data.enabled,
@@ -154,8 +154,8 @@ exports.toggleAutoResubscribe = functions.https.onCall(async (data, context) => 
     });
     
     // Track the setting change in analytics
-    await db.collection('analytics').doc('subscriptions').collection('events').add({
-      type: 'auto_resubscribe_setting_changed',
+    await db.collection("analytics").doc("subscriptions").collection("events").add({
+      type: "auto_resubscribe_setting_changed",
       userId: data.userId,
       enabled: data.enabled,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
@@ -166,8 +166,8 @@ exports.toggleAutoResubscribe = functions.https.onCall(async (data, context) => 
       autoResubscribe: data.enabled
     };
   } catch (error) {
-    console.error('Error toggling auto-resubscribe:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("Error toggling auto-resubscribe:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 

@@ -1,15 +1,16 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
+
 import { ThemedText } from './ThemedText';
-import { Ionicons } from '@expo/vector-icons';
+import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   getGameWeather,
   getWeatherPerformanceInsights,
   WeatherData,
-  WeatherPerformanceCorrelation
+  WeatherPerformanceCorrelation,
 } from '../services/weatherService';
-import { useTheme } from '../contexts/ThemeContext';
-import { useI18n } from '../../atomic/organisms/i18n/I18nContext';
 
 interface WeatherInsightsProps {
   gameId: string;
@@ -20,11 +21,7 @@ interface WeatherInsightsProps {
 /**
  * Component to display weather insights for a player's performance
  */
-const WeatherInsights: React.FC<WeatherInsightsProps> = ({
-  gameId,
-  playerId,
-  playerName
-}) => {
+const WeatherInsights: React.FC<WeatherInsightsProps> = ({ gameId, playerId, playerName }) => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [correlations, setCorrelations] = useState<WeatherPerformanceCorrelation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,17 +29,17 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
   const [expanded, setExpanded] = useState<boolean>(false);
   const { colors, isDark } = useTheme();
   const { t } = useI18n();
-  
+
   useEffect(() => {
     const loadWeatherData = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Get weather data for the game
         const weather = await getGameWeather(gameId);
         setWeatherData(weather);
-        
+
         // Get weather performance correlations
         const insights = await getWeatherPerformanceInsights(playerId, weather.condition);
         setCorrelations(insights);
@@ -53,10 +50,10 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
         setLoading(false);
       }
     };
-    
+
     loadWeatherData();
   }, [gameId, playerId]);
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -68,7 +65,7 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
       </View>
     );
   }
-  
+
   // Render error state
   if (error || !weatherData) {
     return (
@@ -82,16 +79,16 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
       </View>
     );
   }
-  
+
   // Get impact color based on correlation value
   const getImpactColor = (correlation: number) => {
     if (correlation <= -0.2) return '#FF3B30'; // Strong negative (red)
-    if (correlation < 0) return '#FF9500';     // Mild negative (orange)
-    if (correlation === 0) return '#8E8E93';   // Neutral (gray)
-    if (correlation < 0.2) return '#34C759';   // Mild positive (green)
-    return '#30D158';                          // Strong positive (bright green)
+    if (correlation < 0) return '#FF9500'; // Mild negative (orange)
+    if (correlation === 0) return '#8E8E93'; // Neutral (gray)
+    if (correlation < 0.2) return '#34C759'; // Mild positive (green)
+    return '#30D158'; // Strong positive (bright green)
   };
-  
+
   // Get impact text based on correlation value
   const getImpactText = (correlation: number) => {
     if (correlation <= -0.2) return t('weather.impact.strongNegative');
@@ -100,7 +97,7 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
     if (correlation < 0.2) return t('weather.impact.slightPositive');
     return t('weather.impact.strongPositive');
   };
-  
+
   // Get impact icon based on correlation value
   const getImpactIcon = (correlation: number) => {
     if (correlation <= -0.2) return 'arrow-down';
@@ -109,15 +106,17 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
     if (correlation < 0.2) return 'arrow-up-outline';
     return 'arrow-up';
   };
-  
+
   return (
-    <View style={[
-      styles.container, 
-      { 
-        borderColor: colors.border,
-        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
-      }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          borderColor: colors.border,
+          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+        },
+      ]}
+    >
       <TouchableOpacity
         style={styles.header}
         onPress={() => setExpanded(!expanded)}
@@ -125,32 +124,21 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
         accessibilityRole="button"
       >
         <View style={styles.weatherSummary}>
-          <Image 
-            source={{ uri: weatherData.conditionIcon }} 
-            style={styles.weatherIcon} 
-          />
+          <Image source={{ uri: weatherData.conditionIcon }} style={styles.weatherIcon} />
           <View style={styles.weatherInfo}>
-            <ThemedText style={styles.weatherCondition}>
-              {weatherData.condition}
-            </ThemedText>
-            <ThemedText style={styles.weatherLocation}>
-              {weatherData.location}
-            </ThemedText>
+            <ThemedText style={styles.weatherCondition}>{weatherData.condition}</ThemedText>
+            <ThemedText style={styles.weatherLocation}>{weatherData.location}</ThemedText>
           </View>
         </View>
-        
+
         <View style={styles.temperatureContainer}>
           <ThemedText style={styles.temperature}>
             {Math.round(weatherData.temperature)}°F
           </ThemedText>
-          <Ionicons 
-            name={expanded ? 'chevron-up' : 'chevron-down'} 
-            size={16} 
-            color={colors.text} 
-          />
+          <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color={colors.text} />
         </View>
       </TouchableOpacity>
-      
+
       {expanded && (
         <View style={styles.detailsContainer}>
           <View style={styles.weatherDetails}>
@@ -160,14 +148,12 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
                 {Math.round(weatherData.feelsLike)}°F
               </ThemedText>
             </View>
-            
+
             <View style={styles.weatherDetailItem}>
               <ThemedText style={styles.detailLabel}>{t('weather.humidity')}</ThemedText>
-              <ThemedText style={styles.detailValue}>
-                {weatherData.humidity}%
-              </ThemedText>
+              <ThemedText style={styles.detailValue}>{weatherData.humidity}%</ThemedText>
             </View>
-            
+
             <View style={styles.weatherDetailItem}>
               <ThemedText style={styles.detailLabel}>{t('weather.wind')}</ThemedText>
               <ThemedText style={styles.detailValue}>
@@ -175,52 +161,50 @@ const WeatherInsights: React.FC<WeatherInsightsProps> = ({
               </ThemedText>
             </View>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.insightsContainer}>
             <ThemedText style={styles.insightsTitle}>
               {t('weather.impact', { playerName })}
             </ThemedText>
-            
+
             {correlations.length === 0 ? (
-              <ThemedText style={styles.noInsightsText}>
-                {t('weather.noData')}
-              </ThemedText>
+              <ThemedText style={styles.noInsightsText}>{t('weather.noData')}</ThemedText>
             ) : (
               correlations.map((correlation, index) => (
                 <View key={index} style={styles.insightItem}>
                   <View style={styles.insightMetric}>
                     <ThemedText style={styles.metricName}>{correlation.metric}</ThemedText>
-                    <View style={[
-                      styles.impactBadge, 
-                      { backgroundColor: getImpactColor(correlation.correlation) }
-                    ]}>
-                      <Ionicons 
-                        name={getImpactIcon(correlation.correlation)} 
-                        size={12} 
-                        color="#fff" 
+                    <View
+                      style={[
+                        styles.impactBadge,
+                        { backgroundColor: getImpactColor(correlation.correlation) },
+                      ]}
+                    >
+                      <Ionicons
+                        name={getImpactIcon(correlation.correlation)}
+                        size={12}
+                        color="#fff"
                       />
                       <ThemedText style={styles.impactText}>
                         {getImpactText(correlation.correlation)}
                       </ThemedText>
                     </View>
                   </View>
-                  
-                  <ThemedText style={styles.insightText}>
-                    {correlation.insight}
-                  </ThemedText>
-                  
+
+                  <ThemedText style={styles.insightText}>{correlation.insight}</ThemedText>
+
                   <View style={styles.confidenceContainer}>
                     <ThemedText style={styles.confidenceLabel}>
                       {t('weather.confidence')}
                     </ThemedText>
                     <View style={styles.confidenceMeter}>
-                      <View 
+                      <View
                         style={[
                           styles.confidenceFill,
-                          { width: `${correlation.confidence * 100}%` }
-                        ]} 
+                          { width: `${correlation.confidence * 100}%` },
+                        ]}
                       />
                     </View>
                     <ThemedText style={styles.confidenceValue}>

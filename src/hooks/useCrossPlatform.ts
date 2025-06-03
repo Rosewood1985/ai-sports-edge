@@ -30,9 +30,17 @@ export interface ShareContent {
 export function usePlatformCapabilities(): PlatformCapabilities {
   const [capabilities, setCapabilities] = useState<PlatformCapabilities>(() => {
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    const screenSize = typeof window !== 'undefined' ? 
-      (window.innerWidth < 768 ? 'small' : window.innerWidth < 1024 ? 'medium' : 'large') : 'large';
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      userAgent
+    );
+    const screenSize =
+      typeof window !== 'undefined'
+        ? window.innerWidth < 768
+          ? 'small'
+          : window.innerWidth < 1024
+            ? 'medium'
+            : 'large'
+        : 'large';
 
     return {
       platform: isMobile ? 'mobile' : 'web',
@@ -49,9 +57,17 @@ export function usePlatformCapabilities(): PlatformCapabilities {
   useEffect(() => {
     const updateCapabilities = () => {
       const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-      const screenSize = typeof window !== 'undefined' ? 
-        (window.innerWidth < 768 ? 'small' : window.innerWidth < 1024 ? 'medium' : 'large') : 'large';
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        userAgent
+      );
+      const screenSize =
+        typeof window !== 'undefined'
+          ? window.innerWidth < 768
+            ? 'small'
+            : window.innerWidth < 1024
+              ? 'medium'
+              : 'large'
+          : 'large';
 
       setCapabilities({
         platform: isMobile ? 'mobile' : 'web',
@@ -78,11 +94,6 @@ export function usePlatformCapabilities(): PlatformCapabilities {
 
   return capabilities;
 }
-
-
-
-
-
 
 /**
  * Simple hook for responsive design breakpoints
@@ -114,8 +125,6 @@ export function useCrossPlatform() {
     windowSize,
   };
 }
-
-
 
 export default {
   usePlatformCapabilities,

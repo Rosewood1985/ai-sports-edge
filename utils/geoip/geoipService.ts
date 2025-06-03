@@ -1,7 +1,7 @@
+import { Request } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import requestIp from 'request-ip';
-import { Request } from 'express';
 
 // Import the Reader class from @maxmind/geoip2-node
 const geoip2 = require('@maxmind/geoip2-node');
@@ -52,11 +52,11 @@ class GeoIPService {
 
       // Read the database file
       const dbBuffer = fs.readFileSync(this.dbPath);
-      
+
       // Create the reader
       this.reader = geoip2.Reader.openBuffer(dbBuffer);
       this.initialized = true;
-      
+
       console.log('GeoIP service initialized successfully');
       return true;
     } catch (error) {
@@ -89,7 +89,7 @@ class GeoIPService {
 
       // Look up the IP address
       const response = this.reader.city(ipAddress);
-      
+
       // Extract the location data
       const locationData: GeoIPLocationData = {
         city: response.city?.names?.en || 'Unknown',
@@ -99,10 +99,10 @@ class GeoIPService {
         longitude: response.location?.longitude || 0,
         timezone: response.location?.timeZone || 'Unknown',
         postalCode: response.postal?.code || 'Unknown',
-        ipAddress: ipAddress,
-        accuracy: response.location?.accuracyRadius || 0
+        ipAddress,
+        accuracy: response.location?.accuracyRadius || 0,
       };
-      
+
       return locationData;
     } catch (error) {
       console.error('Error getting location from IP:', error);
@@ -132,12 +132,12 @@ class GeoIPService {
   async getLocationFromRequest(req: Request): Promise<GeoIPLocationData | null> {
     try {
       const clientIp = this.getClientIP(req);
-      
+
       if (!clientIp) {
         console.error('Could not determine client IP address');
         return null;
       }
-      
+
       return this.getLocationFromIP(clientIp);
     } catch (error) {
       console.error('Error getting location from request:', error);

@@ -1,7 +1,7 @@
-import { Game, Market, Outcome } from '../types/odds';
-import fetchOdds from '../config/oddsApi';
-import { auth } from '../config/firebase';
 import { hasPremiumAccess, purchaseMicrotransaction } from './firebaseSubscriptionService';
+import { auth } from '../config/firebase';
+import fetchOdds from '../config/oddsApi';
+import { Game, Market, Outcome } from '../types/odds';
 
 // Define parlay types
 export type ParlayType = '2-team' | '3-team' | '4-team';
@@ -28,7 +28,7 @@ export const PARLAY_PRICING = {
     price: 24.99,
     name: 'Monthly Parlay Odds Access',
     description: '30-day access to live parlay odds',
-  }
+  },
 };
 
 // Define parlay access record type
@@ -104,28 +104,22 @@ const findOutcomeForSelection = (
   // For moneyline (h2h) bets
   if (market.key === 'h2h') {
     // Find the outcome where the name matches the selection
-    return market.outcomes.find(outcome => 
-      outcome.name.toLowerCase() === selection.toLowerCase()
-    );
+    return market.outcomes.find(outcome => outcome.name.toLowerCase() === selection.toLowerCase());
   }
-  
+
   // For spread bets
   if (market.key === 'spreads') {
     // Find the outcome where the name matches the selection
-    return market.outcomes.find(outcome => 
-      outcome.name.toLowerCase() === selection.toLowerCase()
-    );
+    return market.outcomes.find(outcome => outcome.name.toLowerCase() === selection.toLowerCase());
   }
-  
+
   // For totals (over/under) bets
   if (market.key === 'totals') {
     // Selection should be "over" or "under"
     const overUnder = selection.toLowerCase().startsWith('over') ? 'Over' : 'Under';
-    return market.outcomes.find(outcome => 
-      outcome.name === overUnder
-    );
+    return market.outcomes.find(outcome => outcome.name === overUnder);
   }
-  
+
   return undefined;
 };
 
@@ -136,9 +130,9 @@ const findOutcomeForSelection = (
  */
 export const americanToDecimal = (americanOdds: number): number => {
   if (americanOdds > 0) {
-    return (americanOdds / 100) + 1;
+    return americanOdds / 100 + 1;
   } else {
-    return (100 / Math.abs(americanOdds)) + 1;
+    return 100 / Math.abs(americanOdds) + 1;
   }
 };
 
@@ -173,21 +167,16 @@ export const calculatePotentialPayout = (odds: number, betAmount: number): numbe
  * @returns Array of games
  */
 export const fetchGamesForParlay = async (
-  sport = "americanfootball_nfl",
+  sport = 'americanfootball_nfl',
   useCache = true
 ): Promise<Game[]> => {
   try {
-    const result = await fetchOdds(
-      sport,
-      ["h2h", "spreads", "totals"],
-      "us",
-      useCache
-    );
-    
+    const result = await fetchOdds(sport, ['h2h', 'spreads', 'totals'], 'us', useCache);
+
     if (result.success && result.data) {
       return result.data;
     }
-    
+
     return [];
   } catch (error) {
     console.error('Error fetching games for parlay:', error);
@@ -207,11 +196,11 @@ export const hasParlayAccess = async (userId: string): Promise<boolean> => {
     if (hasPremium) {
       return true;
     }
-    
+
     // TODO: Check for specific parlay access in Firestore
     // This would check if the user has purchased parlay access
     // and if it's still valid
-    
+
     // For now, return false
     return false;
   } catch (error) {
@@ -235,22 +224,18 @@ export const purchaseParlayAccess = async (
     if (!userId) {
       throw new Error('User not authenticated');
     }
-    
+
     const pricing = PARLAY_PRICING[accessType];
-    
+
     // Purchase the microtransaction
-    const success = await purchaseMicrotransaction(
-      userId,
-      pricing.id,
-      paymentMethodId
-    );
-    
+    const success = await purchaseMicrotransaction(userId, pricing.id, paymentMethodId);
+
     if (success) {
       // TODO: Store the access record in Firestore
       // This would include the user ID, access type, purchase date,
       // and expiration date
     }
-    
+
     return success;
   } catch (error) {
     console.error('Error purchasing parlay access:', error);
@@ -264,16 +249,13 @@ export const purchaseParlayAccess = async (
  * @param bookmakerOdds Bookmaker's parlay odds
  * @returns Value indicator (-1 to 1, where positive is good value)
  */
-export const getParlayValueIndicator = (
-  calculatedOdds: number,
-  bookmakerOdds: number
-): number => {
+export const getParlayValueIndicator = (calculatedOdds: number, bookmakerOdds: number): number => {
   const calculatedDecimal = americanToDecimal(calculatedOdds);
   const bookmakerDecimal = americanToDecimal(bookmakerOdds);
-  
+
   // Calculate the percentage difference
   const difference = (calculatedDecimal - bookmakerDecimal) / bookmakerDecimal;
-  
+
   // Clamp to range -1 to 1
   return Math.max(-1, Math.min(1, difference));
 };
@@ -316,7 +298,7 @@ const parlayOddsService: ParlayOddsService = {
   purchaseParlayAccess,
   getParlayValueIndicator,
   formatOdds,
-  PARLAY_PRICING
+  PARLAY_PRICING,
 };
 
 // Export the service as default

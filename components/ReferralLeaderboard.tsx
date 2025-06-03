@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,14 +8,13 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+
+import LeaderboardPositionChange from './LeaderboardPositionChange';
+import ReferralBadge from './ReferralBadge';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { LeaderboardEntry } from '../types/rewards';
-import ReferralBadge from './ReferralBadge';
-import LeaderboardPositionChange from './LeaderboardPositionChange';
 import NeonText from './ui/NeonText';
 
 interface ReferralLeaderboardProps {
@@ -34,17 +35,17 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
   loading,
   period,
   onPeriodChange,
-  onPrivacySettingsPress
+  onPrivacySettingsPress,
 }) => {
   // State to track previous entries for position change animations
   const [previousEntries, setPreviousEntries] = useState<LeaderboardEntry[]>([]);
   const [showPositionChanges, setShowPositionChanges] = useState<boolean>(false);
-  
+
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'background');
   const { width } = Dimensions.get('window');
-  
+
   // Update previous entries when entries change
   useEffect(() => {
     if (!loading && entries.length > 0) {
@@ -52,27 +53,27 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
       setTimeout(() => {
         setShowPositionChanges(true);
       }, 500);
-      
+
       // Store current entries as previous for next update
       setPreviousEntries([...entries]);
     }
   }, [entries, period]);
-  
+
   // Reset position change animation when period changes
   useEffect(() => {
     setShowPositionChanges(false);
   }, [period]);
-  
+
   // Find previous rank for a user
   const getPreviousRank = (userId: string): number => {
     const previousEntry = previousEntries.find(entry => entry.userId === userId);
     return previousEntry?.rank || 0;
   };
-  
+
   // Render top 3 podium
   const renderPodium = () => {
     const top3 = entries.slice(0, 3);
-    
+
     // If we don't have 3 entries, pad with empty ones
     while (top3.length < 3) {
       top3.push({
@@ -81,67 +82,57 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
         referralCount: 0,
         rank: top3.length + 1,
         badgeType: 'rookie',
-        isCurrentUser: false
+        isCurrentUser: false,
       });
     }
-    
+
     // Sort by rank (2nd place, 1st place, 3rd place) for display
     const displayOrder = [top3[1], top3[0], top3[2]];
-    
+
     return (
       <View style={styles.podiumContainer}>
         {displayOrder.map((entry, index) => {
           const position = index === 0 ? 2 : index === 1 ? 1 : 3;
           const isEmpty = entry.userId.startsWith('empty-');
-          
+
           // Determine podium height based on position
           const podiumHeight = position === 1 ? 120 : position === 2 ? 100 : 80;
-          
+
           // Determine medal color based on position
-          const medalColor = position === 1 
-            ? ['#f1c40f', '#e67e22'] as const // Gold
-            : position === 2 
-              ? ['#bdc3c7', '#95a5a6'] as const // Silver
-              : ['#cd7f32', '#a04000'] as const; // Bronze
-          
+          const medalColor =
+            position === 1
+              ? (['#f1c40f', '#e67e22'] as const) // Gold
+              : position === 2
+                ? (['#bdc3c7', '#95a5a6'] as const) // Silver
+                : (['#cd7f32', '#a04000'] as const); // Bronze
+
           return (
-            <View key={entry.userId} style={[
-              styles.podiumItem,
-              { width: width / 3.5 }
-            ]}>
+            <View key={entry.userId} style={[styles.podiumItem, { width: width / 3.5 }]}>
               {!isEmpty && (
                 <View style={styles.podiumUser}>
-                  <ReferralBadge 
-                    type={entry.badgeType} 
-                    size="small" 
-                  />
-                  
-                  <Text 
+                  <ReferralBadge type={entry.badgeType} size="small" />
+
+                  <Text
                     style={[styles.podiumName, { color: textColor }]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
                     {entry.isCurrentUser ? 'You' : entry.displayName}
                   </Text>
-                  
+
                   <Text style={[styles.podiumCount, { color: primaryColor }]}>
                     {entry.referralCount}
                   </Text>
                 </View>
               )}
-              
+
               <LinearGradient
                 colors={medalColor}
-                style={[
-                  styles.podiumPlatform,
-                  { height: podiumHeight }
-                ]}
+                style={[styles.podiumPlatform, { height: podiumHeight }]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.podiumPosition}>
-                  {position}
-                </Text>
+                <Text style={styles.podiumPosition}>{position}</Text>
               </LinearGradient>
             </View>
           );
@@ -149,25 +140,25 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
       </View>
     );
   };
-  
+
   // Render leaderboard entry
-  const renderLeaderboardItem = ({ item, index }: { item: LeaderboardEntry, index: number }) => {
+  const renderLeaderboardItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => {
     // Skip top 3 as they're shown in the podium
     if (index < 3) return null;
-    
+
     // Get previous rank for position change animation
     const previousRank = getPreviousRank(item.userId);
-    
+
     return (
-      <View style={[
-        styles.leaderboardItem,
-        item.isCurrentUser && { backgroundColor: 'rgba(52, 152, 219, 0.1)' }
-      ]}>
+      <View
+        style={[
+          styles.leaderboardItem,
+          item.isCurrentUser && { backgroundColor: 'rgba(52, 152, 219, 0.1)' },
+        ]}
+      >
         <View style={styles.rankContainer}>
-          <Text style={[styles.rank, { color: textColor }]}>
-            {item.rank}
-          </Text>
-          
+          <Text style={[styles.rank, { color: textColor }]}>{item.rank}</Text>
+
           {showPositionChanges && previousRank > 0 && (
             <LeaderboardPositionChange
               previousRank={previousRank}
@@ -176,123 +167,107 @@ const ReferralLeaderboard: React.FC<ReferralLeaderboardProps> = ({
             />
           )}
         </View>
-        
-        <ReferralBadge
-          type={item.badgeType}
-          size="small"
-        />
-        
+
+        <ReferralBadge type={item.badgeType} size="small" />
+
         <Text
           style={[
             styles.displayName,
             { color: textColor },
-            item.isCurrentUser && { fontWeight: 'bold' }
+            item.isCurrentUser && { fontWeight: 'bold' },
           ]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
           {item.isCurrentUser ? 'You' : item.displayName}
         </Text>
-        
-        <Text style={[styles.referralCount, { color: primaryColor }]}>
-          {item.referralCount}
-        </Text>
+
+        <Text style={[styles.referralCount, { color: primaryColor }]}>{item.referralCount}</Text>
       </View>
     );
   };
-  
+
   // Render empty state
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Ionicons name="trophy-outline" size={64} color={textColor} style={{ opacity: 0.5 }} />
-      <Text style={[styles.emptyText, { color: textColor }]}>
-        No leaderboard data yet
-      </Text>
+      <Text style={[styles.emptyText, { color: textColor }]}>No leaderboard data yet</Text>
       <Text style={[styles.emptySubtext, { color: textColor }]}>
         Start referring friends to appear on the leaderboard
       </Text>
     </View>
   );
-  
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       {/* Period Tabs */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
-          style={[
-            styles.tab,
-            period === 'weekly' && { borderBottomColor: primaryColor }
-          ]}
+          style={[styles.tab, period === 'weekly' && { borderBottomColor: primaryColor }]}
           onPress={() => onPeriodChange('weekly')}
         >
-          <Text style={[
-            styles.tabText,
-            { color: textColor },
-            period === 'weekly' && { color: primaryColor }
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              { color: textColor },
+              period === 'weekly' && { color: primaryColor },
+            ]}
+          >
             Weekly
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tab,
-            period === 'monthly' && { borderBottomColor: primaryColor }
-          ]}
+          style={[styles.tab, period === 'monthly' && { borderBottomColor: primaryColor }]}
           onPress={() => onPeriodChange('monthly')}
         >
-          <Text style={[
-            styles.tabText,
-            { color: textColor },
-            period === 'monthly' && { color: primaryColor }
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              { color: textColor },
+              period === 'monthly' && { color: primaryColor },
+            ]}
+          >
             Monthly
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tab,
-            period === 'allTime' && { borderBottomColor: primaryColor }
-          ]}
+          style={[styles.tab, period === 'allTime' && { borderBottomColor: primaryColor }]}
           onPress={() => onPeriodChange('allTime')}
         >
-          <Text style={[
-            styles.tabText,
-            { color: textColor },
-            period === 'allTime' && { color: primaryColor }
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              { color: textColor },
+              period === 'allTime' && { color: primaryColor },
+            ]}
+          >
             All Time
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Privacy Settings Button */}
       {onPrivacySettingsPress && (
-        <TouchableOpacity 
-          style={styles.privacyButton}
-          onPress={onPrivacySettingsPress}
-        >
+        <TouchableOpacity style={styles.privacyButton} onPress={onPrivacySettingsPress}>
           <Ionicons name="settings-outline" size={16} color={textColor} />
-          <Text style={[styles.privacyButtonText, { color: textColor }]}>
-            Privacy Settings
-          </Text>
+          <Text style={[styles.privacyButtonText, { color: textColor }]}>Privacy Settings</Text>
         </TouchableOpacity>
       )}
-      
+
       {/* Leaderboard Title */}
-      <NeonText type="subheading" glow={true} style={styles.title}>
-        {period === 'weekly' 
-          ? 'Weekly Leaderboard' 
-          : period === 'monthly' 
-            ? 'Monthly Leaderboard' 
-            : 'All-Time Leaderboard'
-        }
+      <NeonText type="subheading" glow style={styles.title}>
+        {period === 'weekly'
+          ? 'Weekly Leaderboard'
+          : period === 'monthly'
+            ? 'Monthly Leaderboard'
+            : 'All-Time Leaderboard'}
       </NeonText>
-      
+
       {/* Podium for Top 3 */}
       {!loading && entries.length > 0 && renderPodium()}
-      
+
       {/* Leaderboard List */}
       {loading ? (
         <View style={styles.loadingContainer}>

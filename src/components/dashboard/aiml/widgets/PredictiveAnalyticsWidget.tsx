@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+
 import { useForecasting } from '../../../../hooks/useAIML';
 import { LineChart } from '../../charts/LineChart';
 
@@ -97,7 +98,7 @@ export function PredictiveAnalyticsWidget({ className = '' }: PredictiveAnalytic
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {metrics.map((metric) => (
+            {metrics.map(metric => (
               <button
                 key={metric.value}
                 onClick={() => setSelectedMetric(metric.value)}
@@ -194,7 +195,8 @@ export function PredictiveAnalyticsWidget({ className = '' }: PredictiveAnalytic
                 <div className="text-sm text-gray-600 dark:text-gray-400">Trend</div>
                 <div className="flex items-center">
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {selectedForecast.forecastData[29]?.predicted > selectedForecast.forecastData[0]?.predicted
+                    {selectedForecast.forecastData[29]?.predicted >
+                    selectedForecast.forecastData[0]?.predicted
                       ? '📈 Increasing'
                       : '📉 Decreasing'}
                   </span>

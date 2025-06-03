@@ -9,6 +9,7 @@ import {
   AccessibilityInfo,
   Platform,
 } from 'react-native';
+
 import { useThemeColor } from '../hooks/useThemeColor';
 import accessibilityService from '../services/accessibilityService';
 
@@ -226,7 +227,7 @@ const AccessibleTouchable: React.FC<AccessibleTouchableProps> = ({
   const keyboardProps =
     Platform.OS === 'web'
       ? {
-          tabIndex: tabIndex,
+          tabIndex,
           onKeyDown: handleKeyPress,
         }
       : {};

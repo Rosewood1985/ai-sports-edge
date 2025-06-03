@@ -1,9 +1,10 @@
-import React from 'react';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { useTranslation } from '../i18n/mock';
+import React from 'react';
+
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from '../i18n/mock';
 
 // Import screens
 import AIPickOfDayScreen from '../screens/AIPickOfDayScreen';
@@ -18,7 +19,7 @@ const Stack = createStackNavigator();
  */
 const AIPickOfDayStack = () => {
   const { theme } = useTheme();
-  
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -45,7 +46,7 @@ const AIPickOfDayStack = () => {
  */
 const LeaderboardStack = () => {
   const { theme } = useTheme();
-  
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -73,7 +74,7 @@ const LeaderboardStack = () => {
 const AIPicksNavigator = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -90,7 +91,7 @@ const AIPicksNavigator = () => {
         name="AIPickOfDayTab"
         component={AIPickOfDayStack}
         options={{
-          tabBarLabel: t('Today\'s Pick'),
+          tabBarLabel: t("Today's Pick"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="sports" size={size} color={color} />
           ),
@@ -101,9 +102,7 @@ const AIPicksNavigator = () => {
         component={LeaderboardStack}
         options={{
           tabBarLabel: t('Leaderboard'),
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="trophy" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <FontAwesome name="trophy" size={size} color={color} />,
         }}
       />
     </Tab.Navigator>

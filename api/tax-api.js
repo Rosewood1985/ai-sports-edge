@@ -7,33 +7,36 @@ const monitoringService = require('../services/monitoringService');
 // Calculate tax for a transaction
 async function calculateTax(req, res) {
   const startTime = Date.now();
-  
+
   // Log the request for monitoring
   logger.info('Tax calculation request', {
     userId: req.user?.id,
     apiClient: req.apiClient?.id,
     currency: req.body.currency,
     customerId: req.body.customerId,
-    lineItemCount: req.body.lineItems?.length
+    lineItemCount: req.body.lineItems?.length,
   });
-  
+
   try {
     const { currency, customerId, customerDetails, lineItems } = req.body;
-    
+
     // Validate inputs
     if (!currency || !customerId || !customerDetails || !lineItems) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    
+
     // Calculate tax
     const tax = await stripeTaxService.calculateTax({
-      currency, customerId, customerDetails, lineItems
+      currency,
+      customerId,
+      customerDetails,
+      lineItems,
     });
-    
+
     // Calculate total amount
     const subtotal = lineItems.reduce((sum, item) => sum + (item.amount || 0), 0);
     const taxAmount = tax.tax_amount_exclusive ? tax.tax_amount_exclusive / 100 : 0; // Convert from cents
-    
+
     // Record monitoring data
     monitoringService.recordTaxCalculation({
       userId: req.user?.id,
@@ -42,9 +45,9 @@ async function calculateTax(req, res) {
       amount: subtotal,
       taxAmount,
       responseTime: Date.now() - startTime,
-      success: true
+      success: true,
     });
-    
+
     // Record API usage
     monitoringService.recordApiUsage({
       endpoint: '/api/tax/calculate',
@@ -52,9 +55,9 @@ async function calculateTax(req, res) {
       userId: req.user?.id,
       apiClientId: req.apiClient?.id,
       responseTime: Date.now() - startTime,
-      statusCode: 200
+      statusCode: 200,
     });
-    
+
     res.json({ success: true, data: tax });
   } catch (error) {
     // Record error in monitoring
@@ -66,9 +69,9 @@ async function calculateTax(req, res) {
       taxAmount: 0,
       responseTime: Date.now() - startTime,
       success: false,
-      error: error.message
+      error: error.message,
     });
-    
+
     // Record API usage
     monitoringService.recordApiUsage({
       endpoint: '/api/tax/calculate',
@@ -76,9 +79,9 @@ async function calculateTax(req, res) {
       userId: req.user?.id,
       apiClientId: req.apiClient?.id,
       responseTime: Date.now() - startTime,
-      statusCode: 500
+      statusCode: 500,
     });
-    
+
     res.status(500).json({ error: error.message });
   }
 }
@@ -86,10 +89,10 @@ async function calculateTax(req, res) {
 // Get tax rates for a location
 async function getTaxRates(req, res) {
   const startTime = Date.now();
-  
+
   try {
     const { countryCode, stateCode, postalCode, city } = req.query;
-    
+
     // Log the request for monitoring
     logger.info('Tax rates request', {
       userId: req.user?.id,
@@ -97,21 +100,21 @@ async function getTaxRates(req, res) {
       countryCode,
       stateCode,
       postalCode,
-      city
+      city,
     });
-    
+
     if (!countryCode) {
       return res.status(400).json({ error: 'Country code is required' });
     }
-    
+
     const location = { countryCode, stateCode, postalCode, city };
-    
+
     // Try to get rates from cache first
     const cachedRates = taxRateCache.getTaxRates(location);
-    
+
     if (cachedRates) {
       logger.debug('Tax rates cache hit', { countryCode, stateCode });
-      
+
       // Record tax rate lookup with cache hit
       monitoringService.recordTaxRateLookup({
         userId: req.user?.id,
@@ -121,9 +124,9 @@ async function getTaxRates(req, res) {
         city,
         cacheHit: true,
         responseTime: Date.now() - startTime,
-        success: true
+        success: true,
       });
-      
+
       // Record API usage
       monitoringService.recordApiUsage({
         endpoint: '/api/tax/rates',
@@ -131,19 +134,19 @@ async function getTaxRates(req, res) {
         userId: req.user?.id,
         apiClientId: req.apiClient?.id,
         responseTime: Date.now() - startTime,
-        statusCode: 200
+        statusCode: 200,
       });
-      
+
       return res.json({ success: true, data: cachedRates, source: 'cache' });
     }
-    
+
     // If not in cache, get from Stripe Tax service
     logger.debug('Tax rates cache miss', { countryCode, stateCode });
     const rates = await stripeTaxService.getTaxRatesForLocation(location);
-    
+
     // Store in cache for future requests
     taxRateCache.setTaxRates(location, rates);
-    
+
     // Record tax rate lookup with cache miss
     monitoringService.recordTaxRateLookup({
       userId: req.user?.id,
@@ -153,9 +156,9 @@ async function getTaxRates(req, res) {
       city,
       cacheHit: false,
       responseTime: Date.now() - startTime,
-      success: true
+      success: true,
     });
-    
+
     // Record API usage
     monitoringService.recordApiUsage({
       endpoint: '/api/tax/rates',
@@ -163,17 +166,17 @@ async function getTaxRates(req, res) {
       userId: req.user?.id,
       apiClientId: req.apiClient?.id,
       responseTime: Date.now() - startTime,
-      statusCode: 200
+      statusCode: 200,
     });
-    
+
     res.json({ success: true, data: rates, source: 'api' });
   } catch (error) {
     logger.error('Failed to get tax rates', {
       error: error.message,
       countryCode: req.query.countryCode,
-      stateCode: req.query.stateCode
+      stateCode: req.query.stateCode,
     });
-    
+
     // Record tax rate lookup error
     monitoringService.recordTaxRateLookup({
       userId: req.user?.id,
@@ -184,9 +187,9 @@ async function getTaxRates(req, res) {
       cacheHit: false,
       responseTime: Date.now() - startTime,
       success: false,
-      error: error.message
+      error: error.message,
     });
-    
+
     // Record API usage
     monitoringService.recordApiUsage({
       endpoint: '/api/tax/rates',
@@ -194,9 +197,9 @@ async function getTaxRates(req, res) {
       userId: req.user?.id,
       apiClientId: req.apiClient?.id,
       responseTime: Date.now() - startTime,
-      statusCode: 500
+      statusCode: 500,
     });
-    
+
     res.status(500).json({ error: error.message });
   }
 }

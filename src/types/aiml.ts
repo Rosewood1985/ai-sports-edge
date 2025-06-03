@@ -53,10 +53,10 @@ export interface Prediction {
 export interface PredictionOutput {
   value: any;
   probability?: number;
-  alternativeOutcomes?: Array<{
+  alternativeOutcomes?: {
     value: any;
     probability: number;
-  }>;
+  }[];
 }
 
 // Time Series Forecasting
@@ -64,7 +64,7 @@ export interface TimeSeriesForecast {
   id: string;
   metric: string;
   period: 'daily' | 'weekly' | 'monthly' | 'quarterly';
-  forecastData: Array<{
+  forecastData: {
     date: string;
     predicted: number;
     confidenceInterval: {
@@ -72,7 +72,7 @@ export interface TimeSeriesForecast {
       upper: number;
     };
     actual?: number;
-  }>;
+  }[];
   accuracy: number;
   generatedAt: string;
 }
@@ -192,7 +192,7 @@ export interface ForecastRequest {
 
 export interface BatchPredictionRequest {
   modelId: string;
-  inputs: Array<Record<string, any>>;
+  inputs: Record<string, any>[];
   batchId?: string;
 }
 
@@ -209,35 +209,35 @@ export interface BatchPredictionResponse {
 export interface MLModelPerformanceWidget {
   modelId: string;
   metrics: ModelMetrics;
-  performanceTrend: Array<{
+  performanceTrend: {
     date: string;
     accuracy: number;
     predictions: number;
-  }>;
+  }[];
 }
 
 export interface PredictionVolumeWidget {
   totalPredictions: number;
-  predictionsTrend: Array<{
+  predictionsTrend: {
     date: string;
     count: number;
     accuracy: number;
-  }>;
-  byModel: Array<{
+  }[];
+  byModel: {
     modelId: string;
     modelName: string;
     count: number;
     percentage: number;
-  }>;
+  }[];
 }
 
 export interface AnomalyDetectionWidget {
   activeAnomalies: number;
   resolvedAnomalies: number;
-  anomaliesByType: Array<{
+  anomaliesByType: {
     type: string;
     count: number;
-  }>;
+  }[];
   recentAnomalies: Anomaly[];
 }
 

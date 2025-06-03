@@ -1,7 +1,7 @@
-const path = require('path');
-const webpack = require('webpack');
-const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -58,7 +58,7 @@ module.exports = {
             // Get the name. E.g. node_modules/packageName/not/this/part.js
             // or node_modules/packageName
             const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-            
+
             // Create separate chunks for large packages
             // This helps with caching and parallel loading
             return `vendor.${packageName.replace('@', '')}`;
@@ -109,20 +109,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader',
-        ],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.(scss|sass)$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader',
-          'sass-loader',
-        ],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
       },
       {
         test: /\.(png|jpg|jpeg|gif|svg|webp)$/i,
@@ -160,16 +151,22 @@ module.exports = {
     // Then define them for the application
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
-      'process.env.REACT_APP_API_URL': JSON.stringify(process.env.REACT_APP_API_URL || 'https://api.aisportsedge.com'),
+      'process.env.REACT_APP_API_URL': JSON.stringify(
+        process.env.REACT_APP_API_URL || 'https://api.aisportsedge.com'
+      ),
       'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
       'process.env.FIREBASE_AUTH_DOMAIN': JSON.stringify(process.env.FIREBASE_AUTH_DOMAIN),
       'process.env.FIREBASE_DATABASE_URL': JSON.stringify(process.env.FIREBASE_DATABASE_URL),
       'process.env.FIREBASE_PROJECT_ID': JSON.stringify(process.env.FIREBASE_PROJECT_ID),
       'process.env.FIREBASE_STORAGE_BUCKET': JSON.stringify(process.env.FIREBASE_STORAGE_BUCKET),
-      'process.env.FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(process.env.FIREBASE_MESSAGING_SENDER_ID),
+      'process.env.FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(
+        process.env.FIREBASE_MESSAGING_SENDER_ID
+      ),
       'process.env.FIREBASE_APP_ID': JSON.stringify(process.env.FIREBASE_APP_ID),
       'process.env.FIREBASE_MEASUREMENT_ID': JSON.stringify(process.env.FIREBASE_MEASUREMENT_ID),
-      'process.env.FIREBASE_RECAPTCHA_SITE_KEY': JSON.stringify(process.env.FIREBASE_RECAPTCHA_SITE_KEY),
+      'process.env.FIREBASE_RECAPTCHA_SITE_KEY': JSON.stringify(
+        process.env.FIREBASE_RECAPTCHA_SITE_KEY
+      ),
     }),
     new CompressionPlugin({
       algorithm: 'gzip',

@@ -19,14 +19,14 @@ export interface StandardizedHorse extends BaseRacingParticipant {
   sex: 'colt' | 'filly' | 'mare' | 'stallion' | 'gelding';
   breed: string;
   color?: string;
-  
+
   // Physical attributes
   physical: {
     weight: number; // in pounds
     height?: number; // in hands
     condition: number; // 1-10 fitness rating
   };
-  
+
   // Performance statistics
   stats: {
     careerStarts: number;
@@ -34,14 +34,14 @@ export interface StandardizedHorse extends BaseRacingParticipant {
     careerPlaces: number; // 2nd place finishes
     careerShows: number; // 3rd place finishes
     careerEarnings: number;
-    
+
     // Current season
     seasonStarts: number;
     seasonWins: number;
     seasonPlaces: number;
     seasonShows: number;
     seasonEarnings: number;
-    
+
     // Calculated rates
     winRate: number;
     placeRate: number;
@@ -49,7 +49,7 @@ export interface StandardizedHorse extends BaseRacingParticipant {
     earningsPerStart: number;
     strikeRate: number; // (wins + places + shows) / starts
   };
-  
+
   // Recent form and trends
   form: {
     lastRaceDate: string;
@@ -58,7 +58,7 @@ export interface StandardizedHorse extends BaseRacingParticipant {
     formRating: number; // Calculated form score
     trend: 'improving' | 'declining' | 'stable';
   };
-  
+
   // Breeding information
   pedigree: {
     sire: string;
@@ -67,7 +67,7 @@ export interface StandardizedHorse extends BaseRacingParticipant {
     damProgenyWinRate?: number;
     inbreeding?: number; // Coefficient of inbreeding
   };
-  
+
   // Racing preferences and characteristics
   preferences: {
     preferredDistance: {
@@ -87,7 +87,7 @@ export interface StandardizedJockey extends BaseRacingParticipant {
   firstName: string;
   lastName: string;
   claimingAllowance: number; // Weight allowance for apprentice jockeys
-  
+
   // Performance statistics
   stats: {
     careerRides: number;
@@ -97,7 +97,7 @@ export interface StandardizedJockey extends BaseRacingParticipant {
     careerWinRate: number;
     careerPlaceRate: number;
     careerShowRate: number;
-    
+
     // Current season
     seasonRides: number;
     seasonWins: number;
@@ -106,13 +106,13 @@ export interface StandardizedJockey extends BaseRacingParticipant {
     seasonWinRate: number;
     seasonPlaceRate: number;
     seasonShowRate: number;
-    
+
     // Recent form
     last14DaysWins: number;
     last14DaysRides: number;
     last14DaysWinRate: number;
   };
-  
+
   // Track and distance specialties
   specialties: {
     trackSpecialty?: {
@@ -131,7 +131,7 @@ export interface StandardizedJockey extends BaseRacingParticipant {
       rides: number;
     }[];
   };
-  
+
   // Partnership performance
   partnerships: {
     trainerCombos: {
@@ -156,7 +156,7 @@ export interface StandardizedTrainer extends BaseRacingParticipant {
   lastName: string;
   stable: string;
   license: string;
-  
+
   // Performance statistics
   stats: {
     careerRunners: number;
@@ -164,20 +164,20 @@ export interface StandardizedTrainer extends BaseRacingParticipant {
     careerWinRate: number;
     careerROI: number; // Return on investment
     careerStrikeRate: number;
-    
+
     // Current season
     seasonRunners: number;
     seasonWins: number;
     seasonWinRate: number;
     seasonROI: number;
     seasonStrikeRate: number;
-    
+
     // Recent form
     last30DaysWins: number;
     last30DaysRunners: number;
     last30DaysWinRate: number;
   };
-  
+
   // Specialties and strengths
   specialties: {
     ageGroupSpecialty?: {
@@ -196,7 +196,7 @@ export interface StandardizedTrainer extends BaseRacingParticipant {
       runners: number;
     }[];
   };
-  
+
   // Stable management
   stableInfo: {
     averageStableSize: number;
@@ -208,7 +208,7 @@ export interface StandardizedTrainer extends BaseRacingParticipant {
 // Standardized race interface
 export interface StandardizedHorseRace {
   id: string;
-  
+
   // Basic race information
   meeting: {
     date: string;
@@ -217,7 +217,7 @@ export interface StandardizedHorseRace {
     country: string;
     timezone: string;
   };
-  
+
   // Race details
   raceInfo: {
     raceNumber: number;
@@ -227,19 +227,19 @@ export interface StandardizedHorseRace {
     surface: 'turf' | 'dirt' | 'synthetic';
     distance: number; // in furlongs
     going: string; // Track condition
-    
+
     // Classification
     class: string;
     grade?: 'Group 1' | 'Group 2' | 'Group 3' | 'Listed' | 'Handicap' | 'Maiden' | 'Claiming';
     purse: number;
     currency: string;
-    
+
     // Restrictions
     ageRestrictions?: string;
     sexRestrictions?: string;
     weightForAge: boolean;
   };
-  
+
   // Field information
   field: {
     numberOfRunners: number;
@@ -247,14 +247,14 @@ export interface StandardizedHorseRace {
     maximumRunners: number;
     runners: StandardizedHorseRunner[];
   };
-  
+
   // Track conditions
   conditions: {
     going: string;
     goingDescription: string;
     railPosition?: string;
     trackBias?: string;
-    
+
     // Weather
     weather?: {
       condition: string;
@@ -264,7 +264,7 @@ export interface StandardizedHorseRace {
       precipitation: boolean;
     };
   };
-  
+
   // Betting information
   betting: {
     pools: string[]; // Available bet types
@@ -273,20 +273,20 @@ export interface StandardizedHorseRace {
       horseId: string;
       odds: number;
     };
-    
+
     // Market analysis
     marketStrength: number; // 1-10 rating
     competitiveRace: boolean;
-    
+
     // Odds data
     morningLineOdds?: { [horseId: string]: number };
     currentOdds?: { [horseId: string]: number };
     finalOdds?: { [horseId: string]: number };
   };
-  
+
   // Results (if race completed)
   results?: StandardizedHorseRaceResult[];
-  
+
   // Prediction metadata
   predictionMetadata?: {
     confidence: number;
@@ -304,24 +304,24 @@ export interface StandardizedHorseRunner {
   postPosition: number;
   isScratched: boolean;
   scratchedReason?: string;
-  
+
   // Participants
   horse: StandardizedHorse;
   jockey: StandardizedJockey;
   trainer: StandardizedTrainer;
-  
+
   // Race-specific information
   raceInfo: {
     weight: number; // Assigned weight
     claimingPrice?: number;
     medication?: string[];
     equipment?: string[]; // Blinkers, tongue tie, etc.
-    
+
     // Breeding eligibility
     allowances?: string[];
     penalties?: string[];
   };
-  
+
   // Form and preparation
   preparation: {
     lastRaceDate: string;
@@ -338,7 +338,7 @@ export interface StandardizedHorseRunner {
       time: string;
     }[];
   };
-  
+
   // Market information
   market: {
     morningLineOdds: number;
@@ -353,7 +353,7 @@ export interface StandardizedHorseRunner {
 export interface StandardizedHorseRaceResult {
   horseId: string;
   finishPosition: number;
-  
+
   // Performance details
   performance: {
     winningMargin?: number; // If winner
@@ -361,14 +361,14 @@ export interface StandardizedHorseRaceResult {
     finishTime?: string;
     sectionalTimes?: number[]; // Split times
     speedFigures?: number[];
-    
+
     // Running style
     earlyPosition?: number;
     midRacePosition?: number;
     straightPosition?: number;
     finishingPosition: number;
   };
-  
+
   // Financial results
   payouts?: {
     win?: number;
@@ -378,7 +378,7 @@ export interface StandardizedHorseRaceResult {
     trifecta?: number;
     superfecta?: number;
   };
-  
+
   // Race comments
   comments?: {
     runningComment: string;
@@ -391,7 +391,7 @@ export interface StandardizedHorseRaceResult {
 export interface HorseRacingMLFeatures {
   raceId: string;
   horseId: string;
-  
+
   // Horse features
   horseFeatures: {
     // Basic attributes
@@ -399,32 +399,32 @@ export interface HorseRacingMLFeatures {
     sex: number; // Encoded
     weight: number;
     condition: number;
-    
+
     // Performance statistics
     careerWinRate: number;
     careerPlaceRate: number;
     careerShowRate: number;
     careerEarningsPerStart: number;
     careerStrikeRate: number;
-    
+
     // Current season performance
     seasonWinRate: number;
     seasonPlaceRate: number;
     seasonEarningsPerStart: number;
     seasonStarts: number;
-    
+
     // Recent form
     formRating: number;
     formTrend: number; // -1 to 1
     daysSinceLastRace: number;
     last5AveragePosition: number;
-    
+
     // Class and experience
     classRating: number;
     experienceScore: number;
     consistencyScore: number;
   };
-  
+
   // Jockey features
   jockeyFeatures: {
     careerWinRate: number;
@@ -432,35 +432,35 @@ export interface HorseRacingMLFeatures {
     seasonWinRate: number;
     recentFormWinRate: number; // Last 14 days
     claimingAllowance: number;
-    
+
     // Partnerships
     winRateWithTrainer: number;
     winRateWithHorse: number;
     ridesWithHorse: number;
-    
+
     // Track specialization
     trackWinRate: number;
     distanceWinRate: number;
     goingWinRate: number;
   };
-  
+
   // Trainer features
   trainerFeatures: {
     careerWinRate: number;
     careerROI: number;
     seasonWinRate: number;
     recentFormWinRate: number; // Last 30 days
-    
+
     // Specializations
     ageGroupWinRate: number;
     distanceWinRate: number;
     raceTypeWinRate: number;
-    
+
     // Stable management
     stableSize: number;
     stableQuality: number;
   };
-  
+
   // Race context features
   raceFeatures: {
     // Basic race information
@@ -470,18 +470,18 @@ export interface HorseRacingMLFeatures {
     purse: number;
     surface: number; // Encoded
     raceType: number; // Encoded
-    
+
     // Conditions
     going: number; // Encoded
     weatherImpact: number;
     trackBias: number;
-    
+
     // Competition
     fieldStrength: number;
     competitionLevel: number;
     classDroppedRaised: number; // -1 to 1
   };
-  
+
   // Market features
   marketFeatures: {
     morningLineOdds: number;
@@ -491,90 +491,90 @@ export interface HorseRacingMLFeatures {
     marketRank: number;
     publicSupport: number;
     marketEfficiency: number;
-    
+
     // Value indicators
     valueScore: number; // Calculated value based on model vs market
     overlayUnderlay: number; // Model odds vs market odds
   };
-  
+
   // Track and distance features
   trackDistanceFeatures: {
     // Track-specific performance
     horseTrackWinRate: number;
     horseTrackPlaceRate: number;
     horseTrackStarts: number;
-    
+
     // Distance suitability
     horseDistanceWinRate: number;
     horseDistanceStarts: number;
     optimalDistance: number;
     distanceVariance: number;
-    
+
     // Going preference
     horseGoingWinRate: number;
     horseGoingStarts: number;
     goingPreference: number;
-    
+
     // Surface preference
     horseSurfaceWinRate: number;
     horseSurfaceStarts: number;
   };
-  
+
   // Breeding and pedigree features
   breedingFeatures: {
     sireWinRate: number;
     damProgenyWinRate: number;
     inbreedingCoefficient: number;
-    
+
     // Distance and surface aptitude from pedigree
     pedigreeDistanceAptitude: number;
     pedigreeSurfaceAptitude: number;
     pedigreeClassAptitude: number;
-    
+
     // Genetic factors
     earlySpeedIndex: number;
     staminaIndex: number;
     versatiityIndex: number;
   };
-  
+
   // Workout and preparation features
   preparationFeatures: {
     workoutRecency: number; // Days since last workout
     workoutQuality: number; // Speed and time assessment
     workoutFrequency: number; // Number of workouts in last 30 days
-    
+
     // Fitness indicators
     peakFormIndicator: number;
     fitnessScore: number;
     readinessScore: number;
-    
+
     // Layoff effects
     layoffDays: number;
     layoffType: number; // Encoded: freshening, injury, etc.
     firstTimeStarter: boolean;
   };
-  
+
   // Situational features
   situationalFeatures: {
     // Post position effects
     postPosition: number;
     postPositionAdvantage: number;
-    
+
     // Pace scenario
     earlyPaceSetup: number;
     paceAdvantage: number;
     runningStyle: number; // Encoded
-    
+
     // Equipment and medication
     equipmentChanges: number;
     medicationChanges: number;
-    
+
     // Human factors
     jockeyChange: boolean;
     trainerChange: boolean;
     ownershipChange: boolean;
   };
-  
+
   // Target variables (for training)
   targets?: {
     finishPosition: number;
@@ -585,7 +585,7 @@ export interface HorseRacingMLFeatures {
     finishTime?: number;
     speedFigure?: number;
   };
-  
+
   // Feature metadata
   metadata: {
     featureVersion: string;
@@ -603,20 +603,20 @@ export interface HorseRacingPrediction {
   trackName: string;
   raceTime: string;
   generatedAt: string;
-  
+
   // Model metadata
   model: {
     version: string;
     confidence: number;
     dataQuality: number;
   };
-  
+
   // Horse predictions
   horsePredictions: {
     horseId: string;
     horseName: string;
     saddleNumber: number;
-    
+
     // Position predictions
     predictedFinish: number;
     finishProbabilities: {
@@ -625,42 +625,42 @@ export interface HorseRacingPrediction {
       show: number;
       top3: number;
     };
-    
+
     // Model assessment
     modelOdds: number;
     valueRating: number; // Compared to market odds
     confidence: number;
-    
+
     // Key factors
     strengths: string[];
     weaknesses: string[];
     keyFactors: string[];
   }[];
-  
+
   // Race analysis
   raceAnalysis: {
     // Pace scenario
     expectedPace: 'fast' | 'moderate' | 'slow';
     paceSetters: string[]; // Horse IDs
     closers: string[]; // Horse IDs
-    
+
     // Key insights
     mainContenders: string[]; // Top 3-4 chances
     valuePickes: string[]; // Overlays in the betting
     darkHorses: string[]; // Long shots with chances
-    
+
     // Race dynamics
     keyBattles: {
       description: string;
       horses: string[];
     }[];
-    
+
     // Track and weather impact
     trackBias?: string;
     weatherImpact?: string;
     goingAdvantage?: string[];
   };
-  
+
   // Betting recommendations
   bettingRecommendations: {
     topWinBet?: {
@@ -668,14 +668,14 @@ export interface HorseRacingPrediction {
       horseName: string;
       reasoning: string;
     };
-    
+
     valueWinBets: {
       horseId: string;
       horseName: string;
       valueRating: number;
       reasoning: string;
     }[];
-    
+
     exoticSuggestions: {
       betType: string;
       horses: string[];
@@ -694,24 +694,24 @@ export interface HorseRacingModelPerformance {
     racesEvaluated: number;
     horsesEvaluated: number;
   };
-  
+
   // Prediction accuracy
   accuracy: {
     winnerAccuracy: number; // Percentage of winners in top prediction
     top3Accuracy: number; // Percentage of actual top 3 in predicted top 3
     exactaAccuracy: number;
     trifectaAccuracy: number;
-    
+
     // Position-based accuracy
     favoritesAccuracy: number;
     secondChoiceAccuracy: number;
     longShotAccuracy: number;
-    
+
     // Average position error
     meanAbsoluteError: number;
     rootMeanSquareError: number;
   };
-  
+
   // Financial performance
   financialMetrics: {
     // Return on investment
@@ -719,40 +719,48 @@ export interface HorseRacingModelPerformance {
     placeBettingROI: number;
     showBettingROI: number;
     exoticBettingROI: number;
-    
+
     // Strike rates
     winStrikeRate: number;
     placeStrikeRate: number;
     showStrikeRate: number;
-    
+
     // Value identification
     overlayIdentificationRate: number; // Found overlays that won
     underlayAvoidanceRate: number; // Avoided poor value that lost
   };
-  
+
   // Feature analysis
   featureImportance: {
     topFeatures: {
       featureName: string;
       importance: number;
-      category: 'horse' | 'jockey' | 'trainer' | 'race' | 'market' | 'breeding' | 'preparation' | 'situational';
+      category:
+        | 'horse'
+        | 'jockey'
+        | 'trainer'
+        | 'race'
+        | 'market'
+        | 'breeding'
+        | 'preparation'
+        | 'situational';
     }[];
-    
+
     // Category importance
     categoryImportance: {
       [category: string]: number;
     };
   };
-  
+
   // Model confidence analysis
   confidenceAnalysis: {
     highConfidenceAccuracy: number; // >80% confidence
     mediumConfidenceAccuracy: number; // 60-80% confidence
     lowConfidenceAccuracy: number; // <60% confidence
-    
+
     calibrationScore: number; // How well confidence matches actual accuracy
   };
-  
+
   // Business impact
   businessMetrics: {
     userEngagement: number;

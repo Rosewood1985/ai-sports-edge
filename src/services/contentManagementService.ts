@@ -192,7 +192,10 @@ export class ContentManagementService {
   /**
    * Upload media asset
    */
-  static async uploadMediaAsset(file: File, metadata: Partial<ContentMediaAsset>): Promise<ContentMediaAsset> {
+  static async uploadMediaAsset(
+    file: File,
+    metadata: Partial<ContentMediaAsset>
+  ): Promise<ContentMediaAsset> {
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -289,16 +292,28 @@ export class ContentManagementService {
     const mockItems: ContentItem[] = [
       {
         id: 'content-001',
-        title: 'How to Bet on Sports: A Beginner\'s Guide',
+        title: "How to Bet on Sports: A Beginner's Guide",
         slug: 'how-to-bet-on-sports-beginners-guide',
-        content: '<p>This comprehensive guide covers everything you need to know about sports betting...</p>',
-        excerpt: 'Learn the fundamentals of sports betting with our comprehensive beginner\'s guide.',
+        content:
+          '<p>This comprehensive guide covers everything you need to know about sports betting...</p>',
+        excerpt:
+          "Learn the fundamentals of sports betting with our comprehensive beginner's guide.",
         type: ContentType.ARTICLE,
         status: ContentStatus.PUBLISHED,
         category: ContentCategory.BETTING_GUIDE,
         tags: [
-          { id: 'tag-001', name: 'Beginner', color: '#10B981', description: 'Content for beginners' },
-          { id: 'tag-002', name: 'Sports Betting', color: '#3B82F6', description: 'Sports betting content' },
+          {
+            id: 'tag-001',
+            name: 'Beginner',
+            color: '#10B981',
+            description: 'Content for beginners',
+          },
+          {
+            id: 'tag-002',
+            name: 'Sports Betting',
+            color: '#3B82F6',
+            description: 'Sports betting content',
+          },
         ],
         author: {
           id: 'author-001',
@@ -308,8 +323,9 @@ export class ContentManagementService {
           role: 'Content Editor',
         },
         metadata: {
-          title: 'How to Bet on Sports: A Beginner\'s Guide | AI Sports Edge',
-          description: 'Learn the fundamentals of sports betting with our comprehensive beginner\'s guide.',
+          title: "How to Bet on Sports: A Beginner's Guide | AI Sports Edge",
+          description:
+            "Learn the fundamentals of sports betting with our comprehensive beginner's guide.",
           keywords: ['sports betting', 'beginner guide', 'betting tips'],
         },
         featuredImage: '/images/sports-betting-guide.jpg',
@@ -342,8 +358,18 @@ export class ContentManagementService {
         status: ContentStatus.PUBLISHED,
         category: ContentCategory.SPORTS_ANALYSIS,
         tags: [
-          { id: 'tag-002', name: 'Sports Betting', color: '#3B82F6', description: 'Sports betting content' },
-          { id: 'tag-003', name: 'Football', color: '#F59E0B', description: 'Football related content' },
+          {
+            id: 'tag-002',
+            name: 'Sports Betting',
+            color: '#3B82F6',
+            description: 'Sports betting content',
+          },
+          {
+            id: 'tag-003',
+            name: 'Football',
+            color: '#F59E0B',
+            description: 'Football related content',
+          },
         ],
         author: {
           id: 'author-002',
@@ -387,8 +413,18 @@ export class ContentManagementService {
         status: ContentStatus.DRAFT,
         category: ContentCategory.ADVANCED_FEATURES,
         tags: [
-          { id: 'tag-004', name: 'AI', color: '#8B5CF6', description: 'Artificial Intelligence content' },
-          { id: 'tag-005', name: 'Analytics', color: '#06B6D4', description: 'Analytics and data content' },
+          {
+            id: 'tag-004',
+            name: 'AI',
+            color: '#8B5CF6',
+            description: 'Artificial Intelligence content',
+          },
+          {
+            id: 'tag-005',
+            name: 'Analytics',
+            color: '#06B6D4',
+            description: 'Analytics and data content',
+          },
         ],
         author: {
           id: 'author-003',
@@ -399,7 +435,8 @@ export class ContentManagementService {
         },
         metadata: {
           title: 'Advanced Analytics: Using AI for Sports Predictions | AI Sports Edge',
-          description: 'Learn how AI and machine learning are changing the game of sports prediction.',
+          description:
+            'Learn how AI and machine learning are changing the game of sports prediction.',
           keywords: ['AI sports prediction', 'machine learning', 'sports analytics'],
         },
         featuredImage: '/images/ai-analytics.jpg',
@@ -424,12 +461,13 @@ export class ContentManagementService {
 
     // Apply filters (simplified for demo)
     let filteredItems = mockItems;
-    
+
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      filteredItems = filteredItems.filter(item => 
-        item.title.toLowerCase().includes(searchLower) ||
-        item.content.toLowerCase().includes(searchLower)
+      filteredItems = filteredItems.filter(
+        item =>
+          item.title.toLowerCase().includes(searchLower) ||
+          item.content.toLowerCase().includes(searchLower)
       );
     }
 
@@ -461,7 +499,7 @@ export class ContentManagementService {
   private static getMockContentById(id: string): ContentItem {
     const mockList = this.getMockContentList(1, 100, {});
     const item = mockList.items.find(item => item.id === id);
-    
+
     if (!item) {
       throw new Error(`Content with ID ${id} not found`);
     }
@@ -555,7 +593,14 @@ export class ContentManagementService {
 ## Next Steps
 {{next_steps}}
         `,
-        placeholders: ['title', 'learning_objectives', 'prerequisites', 'tutorial_steps', 'exercises', 'next_steps'],
+        placeholders: [
+          'title',
+          'learning_objectives',
+          'prerequisites',
+          'tutorial_steps',
+          'exercises',
+          'next_steps',
+        ],
         createdAt: '2025-05-15T10:00:00Z',
         updatedAt: '2025-05-15T10:00:00Z',
       },
@@ -565,12 +610,42 @@ export class ContentManagementService {
   private static getMockContentTags(): ContentTag[] {
     return [
       { id: 'tag-001', name: 'Beginner', color: '#10B981', description: 'Content for beginners' },
-      { id: 'tag-002', name: 'Sports Betting', color: '#3B82F6', description: 'Sports betting content' },
-      { id: 'tag-003', name: 'Football', color: '#F59E0B', description: 'Football related content' },
-      { id: 'tag-004', name: 'AI', color: '#8B5CF6', description: 'Artificial Intelligence content' },
-      { id: 'tag-005', name: 'Analytics', color: '#06B6D4', description: 'Analytics and data content' },
-      { id: 'tag-006', name: 'Basketball', color: '#EF4444', description: 'Basketball related content' },
-      { id: 'tag-007', name: 'Baseball', color: '#84CC16', description: 'Baseball related content' },
+      {
+        id: 'tag-002',
+        name: 'Sports Betting',
+        color: '#3B82F6',
+        description: 'Sports betting content',
+      },
+      {
+        id: 'tag-003',
+        name: 'Football',
+        color: '#F59E0B',
+        description: 'Football related content',
+      },
+      {
+        id: 'tag-004',
+        name: 'AI',
+        color: '#8B5CF6',
+        description: 'Artificial Intelligence content',
+      },
+      {
+        id: 'tag-005',
+        name: 'Analytics',
+        color: '#06B6D4',
+        description: 'Analytics and data content',
+      },
+      {
+        id: 'tag-006',
+        name: 'Basketball',
+        color: '#EF4444',
+        description: 'Basketball related content',
+      },
+      {
+        id: 'tag-007',
+        name: 'Baseball',
+        color: '#84CC16',
+        description: 'Baseball related content',
+      },
       { id: 'tag-008', name: 'Advanced', color: '#F97316', description: 'Advanced level content' },
       { id: 'tag-009', name: 'Tutorial', color: '#EC4899', description: 'Tutorial content' },
       { id: 'tag-010', name: 'Guide', color: '#14B8A6', description: 'Guide content' },

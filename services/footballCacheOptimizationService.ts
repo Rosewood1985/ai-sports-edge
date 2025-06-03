@@ -4,6 +4,7 @@
 // =============================================================================
 
 import * as admin from 'firebase-admin';
+
 import { initSentry } from './sentryConfig';
 
 // Initialize Sentry for monitoring
@@ -52,11 +53,11 @@ export class FootballCacheOptimizationService {
   private db: admin.firestore.Firestore;
   private readonly CACHE_COLLECTION = 'football_cache_optimized';
   private readonly METRICS_COLLECTION = 'football_cache_metrics';
-  
+
   // Base cache configurations optimized for football data
   private readonly CACHE_CONFIGS: Record<string, CacheConfig> = {
     // Critical real-time data
-    'live_scores': {
+    live_scores: {
       strategy: 'adaptive',
       ttl: 15000, // 15 seconds
       priority: 'critical',
@@ -65,7 +66,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: true,
       costWeight: 8,
     },
-    'injury_reports': {
+    injury_reports: {
       strategy: 'network-first',
       ttl: 300000, // 5 minutes
       priority: 'critical',
@@ -74,7 +75,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: true,
       costWeight: 6,
     },
-    'line_movements': {
+    line_movements: {
       strategy: 'adaptive',
       ttl: 30000, // 30 seconds during games, longer otherwise
       priority: 'high',
@@ -85,7 +86,7 @@ export class FootballCacheOptimizationService {
     },
 
     // Frequently accessed data
-    'team_stats': {
+    team_stats: {
       strategy: 'cache-first',
       ttl: 3600000, // 1 hour
       priority: 'high',
@@ -94,7 +95,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: false,
       costWeight: 4,
     },
-    'player_stats': {
+    player_stats: {
       strategy: 'cache-first',
       ttl: 7200000, // 2 hours
       priority: 'medium',
@@ -103,7 +104,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: false,
       costWeight: 5,
     },
-    'weather_data': {
+    weather_data: {
       strategy: 'cache-first',
       ttl: 900000, // 15 minutes
       priority: 'medium',
@@ -114,7 +115,7 @@ export class FootballCacheOptimizationService {
     },
 
     // College football specific
-    'transfer_portal': {
+    transfer_portal: {
       strategy: 'network-first',
       ttl: 1800000, // 30 minutes
       priority: 'medium',
@@ -123,7 +124,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: true,
       costWeight: 4,
     },
-    'recruiting_data': {
+    recruiting_data: {
       strategy: 'cache-first',
       ttl: 21600000, // 6 hours
       priority: 'medium',
@@ -132,7 +133,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: false,
       costWeight: 3,
     },
-    'coaching_changes': {
+    coaching_changes: {
       strategy: 'network-first',
       ttl: 3600000, // 1 hour
       priority: 'medium',
@@ -143,7 +144,7 @@ export class FootballCacheOptimizationService {
     },
 
     // Infrequently changing data
-    'team_rosters': {
+    team_rosters: {
       strategy: 'cache-first',
       ttl: 86400000, // 24 hours
       priority: 'low',
@@ -152,7 +153,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: false,
       costWeight: 2,
     },
-    'historical_data': {
+    historical_data: {
       strategy: 'cache-only',
       ttl: 604800000, // 7 days
       priority: 'low',
@@ -161,7 +162,7 @@ export class FootballCacheOptimizationService {
       refreshOnExpiry: false,
       costWeight: 1,
     },
-    'venue_info': {
+    venue_info: {
       strategy: 'cache-only',
       ttl: 2592000000, // 30 days
       priority: 'low',
@@ -198,7 +199,8 @@ export class FootballCacheOptimizationService {
 
     // Peak load optimizations
     {
-      condition: (key, data, context) => context.regionLoad === 'high' && context.timeOfDay === 'peak',
+      condition: (key, data, context) =>
+        context.regionLoad === 'high' && context.timeOfDay === 'peak',
       action: 'change_strategy',
       value: 'cache-first',
       reason: 'Reduce load during peak times',
@@ -215,9 +217,11 @@ export class FootballCacheOptimizationService {
     // Cost optimization for large datasets
     {
       condition: (key, data, context) => {
-        return typeof data === 'object' && 
-               JSON.stringify(data).length > 100000 && // > 100KB
-               context.timeOfDay === 'night';
+        return (
+          typeof data === 'object' &&
+          JSON.stringify(data).length > 100000 && // > 100KB
+          context.timeOfDay === 'night'
+        );
       },
       action: 'compress',
       reason: 'Compress large datasets during low traffic',
@@ -232,23 +236,23 @@ export class FootballCacheOptimizationService {
    * Get data with optimized caching strategy
    */
   async get<T>(
-    key: string, 
+    key: string,
     fetchFunction: () => Promise<T>,
     context: CacheContext,
     customConfig?: Partial<CacheConfig>
   ): Promise<T> {
     const startTime = Date.now();
-    
+
     try {
       // Get cache configuration
       const config = this.getCacheConfig(key, customConfig);
-      
+
       // Apply dynamic optimizations
       const optimizedConfig = this.applyOptimizationRules(key, config, context);
-      
+
       // Check cache based on strategy
       const cachedResult = await this.checkCache(key, optimizedConfig, context);
-      
+
       if (cachedResult.hit) {
         await this.recordMetric(key, 'hit', Date.now() - startTime);
         return cachedResult.data;
@@ -256,12 +260,12 @@ export class FootballCacheOptimizationService {
 
       // Fetch fresh data
       const freshData = await fetchFunction();
-      
+
       // Store in cache with optimizations
       await this.storeInCache(key, freshData, optimizedConfig, context);
-      
+
       await this.recordMetric(key, 'miss', Date.now() - startTime);
-      
+
       return freshData;
     } catch (error) {
       Sentry.captureException(error);
@@ -274,14 +278,11 @@ export class FootballCacheOptimizationService {
    * Check cache with strategy-specific logic
    */
   private async checkCache(
-    key: string, 
-    config: CacheConfig, 
+    key: string,
+    config: CacheConfig,
     context: CacheContext
   ): Promise<{ hit: boolean; data?: any }> {
-    const cacheDoc = await this.db
-      .collection(this.CACHE_COLLECTION)
-      .doc(key)
-      .get();
+    const cacheDoc = await this.db.collection(this.CACHE_COLLECTION).doc(key).get();
 
     if (!cacheDoc.exists) {
       return { hit: false };
@@ -321,13 +322,13 @@ export class FootballCacheOptimizationService {
    * Adaptive caching strategy based on context
    */
   private adaptiveStrategy(
-    cachedData: any, 
-    config: CacheConfig, 
-    context: CacheContext, 
+    cachedData: any,
+    config: CacheConfig,
+    context: CacheContext,
     age: number
   ): { hit: boolean; data?: any } {
     const dynamicTTL = this.calculateDynamicTTL(config.ttl, context);
-    
+
     if (age < dynamicTTL) {
       return { hit: true, data: this.decompressData(cachedData.data, config) };
     }
@@ -394,15 +395,16 @@ export class FootballCacheOptimizationService {
    * Store data in cache with optimizations
    */
   private async storeInCache(
-    key: string, 
-    data: any, 
-    config: CacheConfig, 
+    key: string,
+    data: any,
+    config: CacheConfig,
     context: CacheContext
   ): Promise<void> {
     try {
       const compressedData = this.compressData(data, config);
-      const encryptedData = config.encryptionEnabled ? 
-        this.encryptData(compressedData) : compressedData;
+      const encryptedData = config.encryptionEnabled
+        ? this.encryptData(compressedData)
+        : compressedData;
 
       const cacheEntry = {
         data: encryptedData,
@@ -420,10 +422,7 @@ export class FootballCacheOptimizationService {
         size: JSON.stringify(data).length,
       };
 
-      await this.db
-        .collection(this.CACHE_COLLECTION)
-        .doc(key)
-        .set(cacheEntry);
+      await this.db.collection(this.CACHE_COLLECTION).doc(key).set(cacheEntry);
 
       // Check cache size limits
       if (config.maxSize) {
@@ -439,13 +438,13 @@ export class FootballCacheOptimizationService {
    */
   private getCacheConfig(key: string, customConfig?: Partial<CacheConfig>): CacheConfig {
     // Find the best matching config
-    const matchingConfigKey = Object.keys(this.CACHE_CONFIGS).find(configKey =>
-      key.includes(configKey) || configKey.includes(key.split('_')[0])
+    const matchingConfigKey = Object.keys(this.CACHE_CONFIGS).find(
+      configKey => key.includes(configKey) || configKey.includes(key.split('_')[0])
     );
 
-    const baseConfig = matchingConfigKey ? 
-      this.CACHE_CONFIGS[matchingConfigKey] : 
-      this.CACHE_CONFIGS['team_stats']; // Default config
+    const baseConfig = matchingConfigKey
+      ? this.CACHE_CONFIGS[matchingConfigKey]
+      : this.CACHE_CONFIGS['team_stats']; // Default config
 
     return { ...baseConfig, ...customConfig };
   }
@@ -454,11 +453,11 @@ export class FootballCacheOptimizationService {
    * Apply optimization rules to configuration
    */
   private applyOptimizationRules(
-    key: string, 
-    config: CacheConfig, 
+    key: string,
+    config: CacheConfig,
     context: CacheContext
   ): CacheConfig {
-    let optimizedConfig = { ...config };
+    const optimizedConfig = { ...config };
 
     for (const rule of this.OPTIMIZATION_RULES) {
       if (rule.condition(key, null, context)) {
@@ -468,8 +467,7 @@ export class FootballCacheOptimizationService {
             break;
           case 'reduce_ttl':
             if (typeof rule.value === 'number') {
-              optimizedConfig.ttl = rule.value < 1 ? 
-                optimizedConfig.ttl * rule.value : rule.value;
+              optimizedConfig.ttl = rule.value < 1 ? optimizedConfig.ttl * rule.value : rule.value;
             }
             break;
           case 'change_strategy':
@@ -499,24 +497,25 @@ export class FootballCacheOptimizationService {
    * Record cache metrics for analysis
    */
   private async recordMetric(
-    key: string, 
-    type: 'hit' | 'miss' | 'error', 
+    key: string,
+    type: 'hit' | 'miss' | 'error',
     responseTime: number
   ): Promise<void> {
     try {
       const today = new Date().toISOString().split('T')[0];
-      const metricDoc = this.db
-        .collection(this.METRICS_COLLECTION)
-        .doc(`${today}_${key}`);
+      const metricDoc = this.db.collection(this.METRICS_COLLECTION).doc(`${today}_${key}`);
 
-      await metricDoc.set({
-        key,
-        date: today,
-        [`${type}s`]: admin.firestore.FieldValue.increment(1),
-        totalRequests: admin.firestore.FieldValue.increment(1),
-        totalResponseTime: admin.firestore.FieldValue.increment(responseTime),
-        lastUpdate: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
+      await metricDoc.set(
+        {
+          key,
+          date: today,
+          [`${type}s`]: admin.firestore.FieldValue.increment(1),
+          totalRequests: admin.firestore.FieldValue.increment(1),
+          totalResponseTime: admin.firestore.FieldValue.increment(responseTime),
+          lastUpdate: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
     } catch (error) {
       // Don't throw on metric recording failures
       Sentry.captureException(error);
@@ -529,8 +528,8 @@ export class FootballCacheOptimizationService {
   async getCacheMetrics(days: number = 7): Promise<CacheMetrics> {
     try {
       const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
-      
+      const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+
       const metricsQuery = await this.db
         .collection(this.METRICS_COLLECTION)
         .where('date', '>=', startDate.toISOString().split('T')[0])
@@ -552,9 +551,7 @@ export class FootballCacheOptimizationService {
       }
 
       // Get cache size
-      const cacheQuery = await this.db
-        .collection(this.CACHE_COLLECTION)
-        .get();
+      const cacheQuery = await this.db.collection(this.CACHE_COLLECTION).get();
 
       cacheSize = cacheQuery.docs.reduce((sum, doc) => {
         return sum + (doc.data().size || 0);
@@ -562,7 +559,7 @@ export class FootballCacheOptimizationService {
 
       const hitRate = totalRequests > 0 ? (totalHits / totalRequests) * 100 : 0;
       const averageResponseTime = totalRequests > 0 ? totalResponseTime / totalRequests : 0;
-      
+
       // Estimate cost savings (assuming $0.001 per API call)
       const apiCallsSaved = totalHits;
       const estimatedCostSavings = apiCallsSaved * 0.001;
@@ -590,13 +587,11 @@ export class FootballCacheOptimizationService {
   async cleanupExpiredCache(): Promise<{ deletedEntries: number; freedSpace: number }> {
     try {
       const now = Date.now();
-      const expiredQuery = await this.db
-        .collection(this.CACHE_COLLECTION)
-        .get();
+      const expiredQuery = await this.db.collection(this.CACHE_COLLECTION).get();
 
       const expiredDocs = expiredQuery.docs.filter(doc => {
         const data = doc.data();
-        return (now - data.timestamp) > data.ttl;
+        return now - data.timestamp > data.ttl;
       });
 
       let freedSpace = 0;
@@ -611,7 +606,9 @@ export class FootballCacheOptimizationService {
         await batch.commit();
       }
 
-      console.log(`Cleaned up ${expiredDocs.length} expired cache entries, freed ${freedSpace} bytes`);
+      console.log(
+        `Cleaned up ${expiredDocs.length} expired cache entries, freed ${freedSpace} bytes`
+      );
 
       return {
         deletedEntries: expiredDocs.length,
@@ -643,21 +640,24 @@ export class FootballCacheOptimizationService {
     }
 
     // High memory usage optimization
-    if (metrics.cacheSize > 100) { // > 100MB
+    if (metrics.cacheSize > 100) {
+      // > 100MB
       await this.cleanupExpiredCache();
       optimizationsApplied++;
       recommendations.push('Enable compression for large datasets');
     }
 
     // Performance optimization
-    if (metrics.averageResponseTime > 1000) { // > 1 second
+    if (metrics.averageResponseTime > 1000) {
+      // > 1 second
       recommendations.push('Consider cache-first strategy for slow endpoints');
       recommendations.push('Implement request batching for related data');
     }
 
     // Cost optimization
     const potentialSavings = metrics.misses * 0.001; // Potential API cost savings
-    if (potentialSavings > 10) { // > $10 potential savings
+    if (potentialSavings > 10) {
+      // > $10 potential savings
       recommendations.push('Implement smarter prefetching strategies');
       estimatedSavings = potentialSavings * 0.7; // 70% of potential savings
     }
@@ -674,24 +674,25 @@ export class FootballCacheOptimizationService {
    */
   private compressData(data: any, config: CacheConfig): any {
     if (!config.compressionEnabled) return data;
-    
+
     // Simple JSON compression - in production, use proper compression library
     try {
       const jsonString = JSON.stringify(data);
-      if (jsonString.length > 10000) { // Only compress large objects
+      if (jsonString.length > 10000) {
+        // Only compress large objects
         // Placeholder for actual compression
         return { compressed: true, data: jsonString };
       }
     } catch (error) {
       Sentry.captureException(error);
     }
-    
+
     return data;
   }
 
   private decompressData(data: any, config: CacheConfig): any {
     if (!config.compressionEnabled) return data;
-    
+
     try {
       if (data && data.compressed) {
         return JSON.parse(data.data);
@@ -699,7 +700,7 @@ export class FootballCacheOptimizationService {
     } catch (error) {
       Sentry.captureException(error);
     }
-    
+
     return data;
   }
 
@@ -720,7 +721,7 @@ export class FootballCacheOptimizationService {
   async prefetchCommonData(context: CacheContext): Promise<void> {
     try {
       const prefetchKeys = this.getPrefetchKeys(context);
-      
+
       // TODO: Implement actual prefetching logic based on usage patterns
       console.log(`Prefetching ${prefetchKeys.length} common data keys`);
     } catch (error) {

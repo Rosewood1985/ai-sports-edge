@@ -3,8 +3,9 @@
  * Service for fetching and managing sports odds data
  */
 
-import apiKeys from '../utils/apiKeys';
 import { apiService } from 'atomic/organisms';
+
+import apiKeys from '../utils/apiKeys';
 
 // API configuration
 const API_CONFIG = {
@@ -444,7 +445,7 @@ class OddsService {
             team: teamName,
             game: `${teamName} vs. ${opponentName}`,
             odds: decimalOdds,
-            suggestion: suggestion,
+            suggestion,
             timestamp: new Date().toISOString(),
             startTime: game.startTime,
           };

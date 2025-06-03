@@ -9,7 +9,7 @@ export type {
   NascarRaceData,
   NascarDriverResult,
   NascarDriverStats,
-  NascarSeasonData
+  NascarSeasonData,
 } from '../../../../services/racing/nascarDataService';
 
 // Re-export Horse Racing types from data service
@@ -18,7 +18,7 @@ export type {
   RpscrapeRace,
   RpscrapeRunner,
   RpscrapeResult,
-  HorseRacingMLFeatures
+  HorseRacingMLFeatures,
 } from '../../../../services/racing/horseRacingDataService';
 
 // Re-export base horse racing types
@@ -35,7 +35,7 @@ export type {
   RaceStatus,
   RaceType,
   RaceGrade,
-  BetType
+  BetType,
 } from '../../../../types/horseRacing';
 
 // Common racing prediction types
@@ -71,7 +71,7 @@ export interface RacingAnalytics {
 }
 
 // Racing cache key types
-export type RacingCacheKey = 
+export type RacingCacheKey =
   | `nascar_data_${string}`
   | `horse_racing_data_${string}`
   | `racing_prediction_${string}`

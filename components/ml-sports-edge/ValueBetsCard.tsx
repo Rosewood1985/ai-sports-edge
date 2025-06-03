@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Card, Divider } from 'react-native-paper';
-import MLSportsEdgeService from '../../services/ml-sports-edge/MLSportsEdgeService';
+
 import { useTheme } from '../../contexts/ThemeContext';
+import MLSportsEdgeService from '../../services/ml-sports-edge/MLSportsEdgeService';
 
 interface ValueBet {
   home_team_name: string;
@@ -48,7 +49,9 @@ const ValueBetsCard: React.FC<ValueBetsCardProps> = ({ sport, league }) => {
   const renderValueBet = (bet: ValueBet, index: number) => {
     const teamToBet = bet.home_value_bet ? bet.home_team_name : bet.away_team_name;
     const odds = bet.home_value_bet ? bet.home_odds : bet.away_odds;
-    const probability = bet.home_value_bet ? bet.ensemble_probability : (1 - bet.ensemble_probability);
+    const probability = bet.home_value_bet
+      ? bet.ensemble_probability
+      : 1 - bet.ensemble_probability;
     const value = bet.home_value_bet ? bet.home_value : bet.away_value;
 
     return (
@@ -60,9 +63,7 @@ const ValueBetsCard: React.FC<ValueBetsCardProps> = ({ sport, league }) => {
           <Text style={[styles.teamToBet, { color: theme.colors.primary }]}>
             Bet on: {teamToBet}
           </Text>
-          <Text style={[styles.odds, { color: theme.colors.text }]}>
-            Odds: {odds.toFixed(2)}
-          </Text>
+          <Text style={[styles.odds, { color: theme.colors.text }]}>Odds: {odds.toFixed(2)}</Text>
         </View>
         <View style={styles.valueDetails}>
           <Text style={[styles.probability, { color: theme.colors.text }]}>
@@ -79,7 +80,10 @@ const ValueBetsCard: React.FC<ValueBetsCardProps> = ({ sport, league }) => {
 
   return (
     <Card style={[styles.card, { backgroundColor: theme.colors.background }]}>
-      <Card.Title title="AI Value Bets" subtitle={`${sport.toUpperCase()} - ${league.toUpperCase()}`} />
+      <Card.Title
+        title="AI Value Bets"
+        subtitle={`${sport.toUpperCase()} - ${league.toUpperCase()}`}
+      />
       <Card.Content>
         {loading ? (
           <ActivityIndicator size="large" color={theme.colors.primary} />

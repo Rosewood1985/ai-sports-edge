@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -7,23 +9,21 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { Container } from '../atomic/molecules/layout/ResponsiveLayout';
+
+import { LoadingIndicator, ErrorMessage, EmptyState } from '../atomic/atoms';
 import { ThemedText } from '../atomic/atoms/ThemedText';
-import { LoadingIndicator, ErrorMessage } from '../atomic/atoms';
-import { EmptyState } from '../atomic/atoms';
-import { sentryService } from '../services/sentryService';
+import { Container } from '../atomic/molecules/layout/ResponsiveLayout';
+import { auth } from '../config/firebase';
+import { useTheme } from '../contexts/ThemeContext';
 import nascarService, {
   NascarRace,
   NascarDriver,
   NascarTeam,
-  NascarPrediction
+  NascarPrediction,
 } from '../services/nascarService';
-import { auth } from '../config/firebase';
+import { sentryService } from '../services/sentryService';
 
 interface NascarScreenProps {
   navigation: StackNavigationProp<any, 'Nascar'>;
@@ -50,7 +50,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
     loading: true,
     refreshing: false,
     error: null,
-    selectedTab: 'races'
+    selectedTab: 'races',
   });
 
   // Track screen view
@@ -60,7 +60,11 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
   }, []);
 
   const loadNascarData = useCallback(async (isRefresh = false) => {
-    const transaction = sentryService.startTransaction('nascar-load-data', 'user_interaction', 'Load NASCAR data');
+    const transaction = sentryService.startTransaction(
+      'nascar-load-data',
+      'user_interaction',
+      'Load NASCAR data'
+    );
     const startTime = Date.now();
 
     try {
@@ -68,22 +72,22 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
         setState(prev => ({ ...prev, loading: true, error: null }));
       }
 
-      sentryService.trackRacingOperation('load_nascar_data', 'nascar', { 
-        isRefresh, 
-        userId: auth.currentUser?.uid || 'anonymous' 
+      sentryService.trackRacingOperation('load_nascar_data', 'nascar', {
+        isRefresh,
+        userId: auth.currentUser?.uid || 'anonymous',
       });
 
       // Load data in parallel
       const [races, drivers, teams] = await Promise.all([
         nascarService.getUpcomingRaces(),
         nascarService.getDriverStandings(),
-        nascarService.getTeamStandings()
+        nascarService.getTeamStandings(),
       ]);
 
       // Load predictions for upcoming races
       const predictions: { [key: string]: NascarPrediction } = {};
       const userId = auth.currentUser?.uid || '';
-      
+
       for (const race of races) {
         try {
           const prediction = await nascarService.getRacePrediction(race.id, userId);
@@ -95,7 +99,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
           sentryService.captureError(predictionError as Error, {
             feature: 'nascar',
             action: 'load_prediction',
-            additionalData: { raceId: race.id, userId }
+            additionalData: { raceId: race.id, userId },
           });
         }
       }
@@ -108,7 +112,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
         predictions,
         loading: false,
         refreshing: false,
-        error: null
+        error: null,
       }));
 
       const duration = Date.now() - startTime;
@@ -117,30 +121,29 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
         driverCount: drivers.length,
         teamCount: teams.length,
         predictionCount: Object.keys(predictions).length,
-        duration
+        duration,
       });
 
       transaction?.finish();
-
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Failed to load NASCAR data';
-      
+
       setState(prev => ({
         ...prev,
         loading: false,
         refreshing: false,
-        error: errorMessage
+        error: errorMessage,
       }));
 
       sentryService.captureError(error as Error, {
         feature: 'nascar',
         action: 'load_data',
-        additionalData: { 
-          isRefresh, 
+        additionalData: {
+          isRefresh,
           duration,
-          userId: auth.currentUser?.uid || 'anonymous'
-        }
+          userId: auth.currentUser?.uid || 'anonymous',
+        },
       });
 
       transaction?.setStatus('internal_error');
@@ -155,42 +158,54 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
     loadNascarData(true);
   }, [loadNascarData]);
 
-  const onTabPress = useCallback((tab: 'races' | 'standings' | 'predictions') => {
-    sentryService.trackFeatureUsage('nascar', 'tab_switch', auth.currentUser?.uid, { 
-      fromTab: state.selectedTab, 
-      toTab: tab 
-    });
-    setState(prev => ({ ...prev, selectedTab: tab }));
-  }, [state.selectedTab]);
+  const onTabPress = useCallback(
+    (tab: 'races' | 'standings' | 'predictions') => {
+      sentryService.trackFeatureUsage('nascar', 'tab_switch', auth.currentUser?.uid, {
+        fromTab: state.selectedTab,
+        toTab: tab,
+      });
+      setState(prev => ({ ...prev, selectedTab: tab }));
+    },
+    [state.selectedTab]
+  );
 
-  const onRacePress = useCallback((race: NascarRace) => {
-    sentryService.trackFeatureUsage('nascar', 'race_selected', auth.currentUser?.uid, { 
-      raceId: race.id,
-      raceName: race.name,
-      track: race.track
-    });
-    
-    navigation.navigate('NascarRaceDetail', { race, prediction: state.predictions[race.id] });
-  }, [navigation, state.predictions]);
+  const onRacePress = useCallback(
+    (race: NascarRace) => {
+      sentryService.trackFeatureUsage('nascar', 'race_selected', auth.currentUser?.uid, {
+        raceId: race.id,
+        raceName: race.name,
+        track: race.track,
+      });
 
-  const onDriverPress = useCallback((driver: NascarDriver) => {
-    sentryService.trackFeatureUsage('nascar', 'driver_selected', auth.currentUser?.uid, { 
-      driverId: driver.id,
-      driverName: driver.name,
-      team: driver.team
-    });
-    
-    navigation.navigate('NascarDriverDetail', { driver });
-  }, [navigation]);
+      navigation.navigate('NascarRaceDetail', { race, prediction: state.predictions[race.id] });
+    },
+    [navigation, state.predictions]
+  );
 
-  const onPredictionPress = useCallback((race: NascarRace, prediction: NascarPrediction) => {
-    sentryService.trackFeatureUsage('nascar', 'prediction_viewed', auth.currentUser?.uid, { 
-      raceId: race.id,
-      predictionConfidence: prediction.winnerPrediction.confidence
-    });
-    
-    navigation.navigate('NascarPredictionDetail', { race, prediction });
-  }, [navigation]);
+  const onDriverPress = useCallback(
+    (driver: NascarDriver) => {
+      sentryService.trackFeatureUsage('nascar', 'driver_selected', auth.currentUser?.uid, {
+        driverId: driver.id,
+        driverName: driver.name,
+        team: driver.team,
+      });
+
+      navigation.navigate('NascarDriverDetail', { driver });
+    },
+    [navigation]
+  );
+
+  const onPredictionPress = useCallback(
+    (race: NascarRace, prediction: NascarPrediction) => {
+      sentryService.trackFeatureUsage('nascar', 'prediction_viewed', auth.currentUser?.uid, {
+        raceId: race.id,
+        predictionConfidence: prediction.winnerPrediction.confidence,
+      });
+
+      navigation.navigate('NascarPredictionDetail', { race, prediction });
+    },
+    [navigation]
+  );
 
   useEffect(() => {
     loadNascarData();
@@ -207,28 +222,31 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
   if (state.error) {
     return (
       <Container style={styles.container}>
-        <ErrorMessage 
-          message={state.error}
-          onRetry={() => loadNascarData()}
-        />
+        <ErrorMessage message={state.error} onRetry={() => loadNascarData()} />
       </Container>
     );
   }
 
-  const renderTabButton = (tab: 'races' | 'standings' | 'predictions', title: string, icon: string) => (
+  const renderTabButton = (
+    tab: 'races' | 'standings' | 'predictions',
+    title: string,
+    icon: string
+  ) => (
     <TouchableOpacity
       style={[styles.tabButton, state.selectedTab === tab && styles.activeTabButton]}
       onPress={() => onTabPress(tab)}
-      accessible={true}
+      accessible
       accessibilityLabel={`Switch to ${title} tab`}
       accessibilityRole="button"
     >
-      <Ionicons 
-        name={icon as any} 
-        size={20} 
-        color={state.selectedTab === tab ? theme.colors.primary : theme.colors.text} 
+      <Ionicons
+        name={icon as any}
+        size={20}
+        color={state.selectedTab === tab ? theme.colors.primary : theme.colors.text}
       />
-      <ThemedText style={[styles.tabButtonText, state.selectedTab === tab && styles.activeTabButtonText]}>
+      <ThemedText
+        style={[styles.tabButtonText, state.selectedTab === tab && styles.activeTabButtonText]}
+      >
         {title}
       </ThemedText>
     </TouchableOpacity>
@@ -238,7 +256,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
     <TouchableOpacity
       style={[styles.raceCard, { backgroundColor: theme.colors.card }]}
       onPress={() => onRacePress(item)}
-      accessible={true}
+      accessible
       accessibilityLabel={`${item.name} at ${item.track} on ${item.date}`}
       accessibilityRole="button"
     >
@@ -265,7 +283,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
     <TouchableOpacity
       style={[styles.driverCard, { backgroundColor: theme.colors.card }]}
       onPress={() => onDriverPress(item)}
-      accessible={true}
+      accessible
       accessibilityLabel={`${item.name}, position ${item.position}, ${item.wins} wins`}
       accessibilityRole="button"
     >
@@ -294,7 +312,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
       <TouchableOpacity
         style={[styles.predictionCard, { backgroundColor: theme.colors.card }]}
         onPress={() => onPredictionPress(item, prediction)}
-        accessible={true}
+        accessible
         accessibilityLabel={`Prediction for ${item.name}: ${prediction.winnerPrediction.driver} to win`}
         accessibilityRole="button"
       >
@@ -329,11 +347,9 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
           <FlatList
             data={state.races}
             renderItem={renderRaceItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />}
             ListEmptyComponent={
               <EmptyState
                 icon="car-sport"
@@ -348,11 +364,9 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
           <FlatList
             data={state.drivers}
             renderItem={renderDriverItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />}
             ListEmptyComponent={
               <EmptyState
                 icon="podium"
@@ -368,11 +382,9 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
           <FlatList
             data={racesWithPredictions}
             renderItem={renderPredictionItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />}
             ListEmptyComponent={
               <EmptyState
                 icon="analytics"
@@ -394,7 +406,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
         <ThemedText style={styles.headerTitle}>NASCAR</ThemedText>
         <TouchableOpacity
           onPress={onRefresh}
-          accessible={true}
+          accessible
           accessibilityLabel="Refresh NASCAR data"
           accessibilityRole="button"
         >
@@ -410,9 +422,7 @@ const NascarScreen: React.FC<NascarScreenProps> = ({ navigation }) => {
       </View>
 
       {/* Tab Content */}
-      <View style={styles.content}>
-        {renderTabContent()}
-      </View>
+      <View style={styles.content}>{renderTabContent()}</View>
     </Container>
   );
 };

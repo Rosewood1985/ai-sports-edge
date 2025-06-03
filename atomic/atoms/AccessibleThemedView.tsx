@@ -1,6 +1,7 @@
+import { useTheme } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+
 import accessibilityService, {
   AccessibilityPreferences,
 } from '../../services/accessibilityService';

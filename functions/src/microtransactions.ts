@@ -22,30 +22,30 @@ interface ProductMap {
 }
 
 const PRODUCTS: ProductMap = {
-  'advanced-player-metrics': {
-    name: 'Advanced Player Metrics',
+  "advanced-player-metrics": {
+    name: "Advanced Player Metrics",
     amount: 299, // $2.99
-    description: 'Access to advanced player metrics and statistics',
+    description: "Access to advanced player metrics and statistics",
   },
-  'player-comparison-tool': {
-    name: 'Player Comparison Tool',
+  "player-comparison-tool": {
+    name: "Player Comparison Tool",
     amount: 199, // $1.99
-    description: 'Compare players side by side with detailed analytics',
+    description: "Compare players side by side with detailed analytics",
   },
-  'historical-trends-package': {
-    name: 'Historical Trends Package',
+  "historical-trends-package": {
+    name: "Historical Trends Package",
     amount: 249, // $2.49
-    description: 'Access historical trends and patterns',
+    description: "Access historical trends and patterns",
   },
-  'player-stats-premium-bundle': {
-    name: 'Premium Stats Bundle',
+  "player-stats-premium-bundle": {
+    name: "Premium Stats Bundle",
     amount: 499, // $4.99
-    description: 'Complete package of all premium statistics features',
+    description: "Complete package of all premium statistics features",
   },
-  'odds-access': {
-    name: 'Odds Access',
+  "odds-access": {
+    name: "Odds Access",
     amount: 99, // $0.99
-    description: 'Access to betting odds for a specific game',
+    description: "Access to betting odds for a specific game",
   },
 };
 
@@ -59,8 +59,8 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
   // Ensure user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'User must be authenticated to make purchases'
+      "unauthenticated",
+      "User must be authenticated to make purchases"
     );
   }
   
@@ -69,15 +69,15 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
   // Validate user ID matches authenticated user
   if (userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'User ID does not match authenticated user'
+      "permission-denied",
+      "User ID does not match authenticated user"
     );
   }
   
   // Validate product exists
   if (!productId || !PRODUCTS[productId]) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
+      "invalid-argument",
       `Invalid product ID: ${productId}`
     );
   }
@@ -88,8 +88,8 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
   // Validate payment method
   if (!paymentMethodId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Payment method ID is required'
+      "invalid-argument",
+      "Payment method ID is required"
     );
   }
   
@@ -97,8 +97,8 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
     // Check if this is a duplicate request using idempotency key
     if (idempotencyKey) {
       const existingPurchases = await db
-        .collection('purchases')
-        .where('idempotencyKey', '==', idempotencyKey)
+        .collection("purchases")
+        .where("idempotencyKey", "==", idempotencyKey)
         .limit(1)
         .get();
       
@@ -107,21 +107,21 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
         
         // Return the existing purchase
         return {
-          status: 'succeeded',
+          status: "succeeded",
           transactionId: existingPurchase.transactionId,
-          message: 'Purchase already processed',
+          message: "Purchase already processed",
         };
       }
     }
     
     // Get customer ID from Firestore
-    const userDoc = await db.collection('users').doc(userId).get();
+    const userDoc = await db.collection("users").doc(userId).get();
     const userData = userDoc.data();
     
     if (!userData || !userData.stripeCustomerId) {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'User does not have a Stripe customer ID'
+        "failed-precondition",
+        "User does not have a Stripe customer ID"
       );
     }
     
@@ -130,7 +130,7 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
     // Create a payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: product.amount,
-      currency: 'usd',
+      currency: "usd",
       customer: customerId,
       payment_method: paymentMethodId,
       off_session: true,
@@ -145,13 +145,13 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
     });
     
     // Record the purchase in Firestore
-    const purchaseRef = db.collection('purchases').doc();
+    const purchaseRef = db.collection("purchases").doc();
     await purchaseRef.set({
       userId,
       productId,
       productName: product.name,
       amount: product.amount,
-      currency: 'usd',
+      currency: "usd",
       status: paymentIntent.status,
       transactionId: paymentIntent.id,
       paymentMethodId,
@@ -160,43 +160,43 @@ export const createOneTimePayment = functions.https.onCall(async (data, context)
     });
     
     // Add the purchase to user's purchases
-    await db.collection('users').doc(userId).collection('purchases').add({
+    await db.collection("users").doc(userId).collection("purchases").add({
       productId,
       productName: product.name,
       amount: product.amount,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       transactionId: paymentIntent.id,
-      status: 'active',
+      status: "active",
     });
     
     // Return success response
     return {
-      status: 'succeeded',
+      status: "succeeded",
       transactionId: paymentIntent.id,
     };
   } catch (error: any) {
-    console.error('Error processing payment:', error);
+    console.error("Error processing payment:", error);
     
     // Log the error for debugging
-    await db.collection('error_logs').add({
+    await db.collection("error_logs").add({
       userId,
       productId,
-      error: error.message || 'Unknown error',
+      error: error.message || "Unknown error",
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      type: 'payment_processing',
+      type: "payment_processing",
     });
     
     // Return appropriate error
-    if (error.type === 'StripeCardError') {
+    if (error.type === "StripeCardError") {
       throw new functions.https.HttpsError(
-        'aborted',
-        error.message || 'Your card was declined'
+        "aborted",
+        error.message || "Your card was declined"
       );
     }
     
     throw new functions.https.HttpsError(
-      'internal',
-      'An error occurred while processing your payment'
+      "internal",
+      "An error occurred while processing your payment"
     );
   }
 });
@@ -208,8 +208,8 @@ export const verifyPurchase = functions.https.onCall(async (data, context) => {
   // Ensure user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'User must be authenticated to verify purchases'
+      "unauthenticated",
+      "User must be authenticated to verify purchases"
     );
   }
   
@@ -218,19 +218,19 @@ export const verifyPurchase = functions.https.onCall(async (data, context) => {
   // Validate user ID matches authenticated user
   if (userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'User ID does not match authenticated user'
+      "permission-denied",
+      "User ID does not match authenticated user"
     );
   }
   
   try {
     // Query user's purchases
     const purchasesSnapshot = await db
-      .collection('users')
+      .collection("users")
       .doc(userId)
-      .collection('purchases')
-      .where('productId', '==', productId)
-      .where('status', '==', 'active')
+      .collection("purchases")
+      .where("productId", "==", productId)
+      .where("status", "==", "active")
       .limit(1)
       .get();
     
@@ -240,11 +240,11 @@ export const verifyPurchase = functions.https.onCall(async (data, context) => {
       purchaseId: !purchasesSnapshot.empty ? purchasesSnapshot.docs[0].id : null,
     };
   } catch (error: any) {
-    console.error('Error verifying purchase:', error);
+    console.error("Error verifying purchase:", error);
     
     throw new functions.https.HttpsError(
-      'internal',
-      error.message || 'An error occurred while verifying your purchase'
+      "internal",
+      error.message || "An error occurred while verifying your purchase"
     );
   }
 });
@@ -256,8 +256,8 @@ export const getUserPurchases = functions.https.onCall(async (data, context) => 
   // Ensure user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'User must be authenticated to get purchases'
+      "unauthenticated",
+      "User must be authenticated to get purchases"
     );
   }
   
@@ -266,18 +266,18 @@ export const getUserPurchases = functions.https.onCall(async (data, context) => 
   // Validate user ID matches authenticated user
   if (userId !== context.auth.uid) {
     throw new functions.https.HttpsError(
-      'permission-denied',
-      'User ID does not match authenticated user'
+      "permission-denied",
+      "User ID does not match authenticated user"
     );
   }
   
   try {
     // Query user's purchases
     const purchasesSnapshot = await db
-      .collection('users')
+      .collection("users")
       .doc(userId)
-      .collection('purchases')
-      .orderBy('timestamp', 'desc')
+      .collection("purchases")
+      .orderBy("timestamp", "desc")
       .get();
     
     // Format purchases
@@ -295,11 +295,11 @@ export const getUserPurchases = functions.https.onCall(async (data, context) => 
     
     return { purchases };
   } catch (error: any) {
-    console.error('Error getting purchases:', error);
+    console.error("Error getting purchases:", error);
     
     throw new functions.https.HttpsError(
-      'internal',
-      error.message || 'An error occurred while getting your purchases'
+      "internal",
+      error.message || "An error occurred while getting your purchases"
     );
   }
 });

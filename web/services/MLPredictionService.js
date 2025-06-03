@@ -9,14 +9,15 @@ import axios from 'axios';
 // API configuration
 const API_CONFIG = {
   // Ensure HTTPS is used in production
-  BASE_URL: process.env.REACT_APP_ML_API_URL || 
-    (process.env.NODE_ENV === 'production' 
-      ? 'https://api.ai-sports-edge.com/api/ml-sports-edge' 
+  BASE_URL:
+    process.env.REACT_APP_ML_API_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://api.ai-sports-edge.com/api/ml-sports-edge'
       : 'http://localhost:3000/api/ml-sports-edge'),
   TIMEOUT: 10000, // 10 seconds
   CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
   MAX_CACHE_ITEMS: 100, // Maximum number of items to store in cache
-  IS_PRODUCTION: process.env.NODE_ENV === 'production'
+  IS_PRODUCTION: process.env.NODE_ENV === 'production',
 };
 
 // Fallback data for when API calls fail
@@ -31,8 +32,8 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'home', line: -3.5, confidence: 0.75 },
         moneyline: { pick: 'home', odds: { home: -180, away: 160 }, confidence: 0.72 },
-        total: { pick: 'over', line: 49.5, confidence: 0.68 }
-      }
+        total: { pick: 'over', line: 49.5, confidence: 0.68 },
+      },
     },
     {
       id: 'trending2',
@@ -43,9 +44,9 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'away', line: 2.5, confidence: 0.65 },
         moneyline: { pick: 'away', odds: { home: 120, away: -140 }, confidence: 0.68 },
-        total: { pick: 'under', line: 220.5, confidence: 0.62 }
-      }
-    }
+        total: { pick: 'under', line: 220.5, confidence: 0.62 },
+      },
+    },
   ],
   nba: [
     {
@@ -57,8 +58,8 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'away', line: 2.5, confidence: 0.65 },
         moneyline: { pick: 'away', odds: { home: 120, away: -140 }, confidence: 0.68 },
-        total: { pick: 'under', line: 220.5, confidence: 0.62 }
-      }
+        total: { pick: 'under', line: 220.5, confidence: 0.62 },
+      },
     },
     {
       id: 'nba2',
@@ -69,9 +70,9 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'home', line: -5.5, confidence: 0.72 },
         moneyline: { pick: 'home', odds: { home: -220, away: 190 }, confidence: 0.75 },
-        total: { pick: 'over', line: 235.5, confidence: 0.68 }
-      }
-    }
+        total: { pick: 'over', line: 235.5, confidence: 0.68 },
+      },
+    },
   ],
   mlb: [
     {
@@ -83,9 +84,9 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'home', line: -1.5, confidence: 0.62 },
         moneyline: { pick: 'home', odds: { home: -150, away: 130 }, confidence: 0.65 },
-        total: { pick: 'under', line: 8.5, confidence: 0.58 }
-      }
-    }
+        total: { pick: 'under', line: 8.5, confidence: 0.58 },
+      },
+    },
   ],
   nhl: [
     {
@@ -97,9 +98,9 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'home', line: -1.5, confidence: 0.64 },
         moneyline: { pick: 'home', odds: { home: -160, away: 140 }, confidence: 0.67 },
-        total: { pick: 'over', line: 5.5, confidence: 0.61 }
-      }
-    }
+        total: { pick: 'over', line: 5.5, confidence: 0.61 },
+      },
+    },
   ],
   ncaa: [
     {
@@ -111,9 +112,9 @@ const FALLBACK_DATA = {
       predictions: {
         spread: { pick: 'away', line: 3.5, confidence: 0.63 },
         moneyline: { pick: 'away', odds: { home: -180, away: 160 }, confidence: 0.66 },
-        total: { pick: 'over', line: 155.5, confidence: 0.59 }
-      }
-    }
+        total: { pick: 'over', line: 155.5, confidence: 0.59 },
+      },
+    },
   ],
   formula1: [
     {
@@ -126,17 +127,32 @@ const FALLBACK_DATA = {
       predictions: {
         winner: {
           drivers: [
-            { name: 'Max Verstappen', odds: -120, confidence: 0.78, analysis: 'Strong performance in practice sessions' },
-            { name: 'Lewis Hamilton', odds: 250, confidence: 0.65, analysis: 'Previous success at this track' },
-            { name: 'Charles Leclerc', odds: 350, confidence: 0.58, analysis: 'Home advantage and improving car' }
-          ]
+            {
+              name: 'Max Verstappen',
+              odds: -120,
+              confidence: 0.78,
+              analysis: 'Strong performance in practice sessions',
+            },
+            {
+              name: 'Lewis Hamilton',
+              odds: 250,
+              confidence: 0.65,
+              analysis: 'Previous success at this track',
+            },
+            {
+              name: 'Charles Leclerc',
+              odds: 350,
+              confidence: 0.58,
+              analysis: 'Home advantage and improving car',
+            },
+          ],
         },
         podium: {
           confidence: 0.72,
-          drivers: ['Max Verstappen', 'Lewis Hamilton', 'Charles Leclerc']
-        }
-      }
-    }
+          drivers: ['Max Verstappen', 'Lewis Hamilton', 'Charles Leclerc'],
+        },
+      },
+    },
   ],
   ufc: [
     {
@@ -149,19 +165,32 @@ const FALLBACK_DATA = {
       fighter1: { name: 'Jon Jones', record: '26-1-0' },
       fighter2: { name: 'Francis Ngannou', record: '17-3-0' },
       predictions: {
-        winner: { pick: 'Jon Jones', odds: -130, confidence: 0.68, analysis: 'Superior technical skills' },
-        method: { pick: 'Decision', confidence: 0.62, analysis: 'Jones likely to use distance management' },
-        round: { pick: 'Goes to decision', confidence: 0.65, analysis: 'Both fighters have strong chins' }
-      }
-    }
-  ]
+        winner: {
+          pick: 'Jon Jones',
+          odds: -130,
+          confidence: 0.68,
+          analysis: 'Superior technical skills',
+        },
+        method: {
+          pick: 'Decision',
+          confidence: 0.62,
+          analysis: 'Jones likely to use distance management',
+        },
+        round: {
+          pick: 'Goes to decision',
+          confidence: 0.65,
+          analysis: 'Both fighters have strong chins',
+        },
+      },
+    },
+  ],
 };
 
 // In-memory cache with size limit
 const cache = {
   predictions: {},
   timestamp: {},
-  keys: [] // To track order for cache eviction
+  keys: [], // To track order for cache eviction
 };
 
 /**
@@ -169,9 +198,9 @@ const cache = {
  * @param {string} input - Input to sanitize
  * @returns {string} - Sanitized input
  */
-const sanitizeInput = (input) => {
+const sanitizeInput = input => {
   if (typeof input !== 'string') return input;
-  
+
   // Remove potentially dangerous characters
   return input.replace(/[<>'"&]/g, '');
 };
@@ -181,9 +210,9 @@ const sanitizeInput = (input) => {
  * @param {string} token - JWT token to validate
  * @returns {boolean} - Whether token is valid format
  */
-const isValidTokenFormat = (token) => {
+const isValidTokenFormat = token => {
   if (!token) return false;
-  
+
   // Basic JWT format validation (header.payload.signature)
   const tokenRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
   return tokenRegex.test(token);
@@ -200,14 +229,14 @@ const addToCache = (key, data) => {
   if (existingIndex !== -1) {
     cache.keys.splice(existingIndex, 1);
   }
-  
+
   // Add key to the end of the keys array (most recently used)
   cache.keys.push(key);
-  
+
   // Add data to cache
   cache.predictions[key] = data;
   cache.timestamp[key] = Date.now();
-  
+
   // If cache exceeds size limit, remove oldest items
   if (cache.keys.length > API_CONFIG.MAX_CACHE_ITEMS) {
     const oldestKey = cache.keys.shift(); // Remove oldest key
@@ -221,15 +250,15 @@ const addToCache = (key, data) => {
  * @param {string} key - Cache key
  * @returns {boolean} - True if cache is valid
  */
-const isCacheValid = (key) => {
+const isCacheValid = key => {
   if (!cache.timestamp[key]) {
     return false;
   }
-  
+
   const now = Date.now();
   const cacheTime = cache.timestamp[key];
-  
-  return (now - cacheTime) < API_CONFIG.CACHE_DURATION;
+
+  return now - cacheTime < API_CONFIG.CACHE_DURATION;
 };
 
 /**
@@ -239,15 +268,15 @@ const isCacheValid = (key) => {
  */
 const createApiClient = (token = null) => {
   const headers = {};
-  
+
   if (token && isValidTokenFormat(token)) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   return axios.create({
     baseURL: API_CONFIG.BASE_URL,
     timeout: API_CONFIG.TIMEOUT,
-    headers
+    headers,
   });
 };
 
@@ -269,7 +298,7 @@ const safeLog = (level, message, data = null) => {
     }
     return;
   }
-  
+
   // In development, log more details
   if (level === 'error') {
     console.error(`[MLPredictionService] ${message}`, data || '');
@@ -289,60 +318,68 @@ const safeLog = (level, message, data = null) => {
  * @param {string} options.token - JWT token for authenticated requests
  * @returns {Promise<Array>} - Game predictions
  */
-export const getGamePredictions = async ({ sport = 'NBA', date = null, limit = null, token = null } = {}) => {
+export const getGamePredictions = async ({
+  sport = 'NBA',
+  date = null,
+  limit = null,
+  token = null,
+} = {}) => {
   // Sanitize inputs
   const sanitizedSport = sanitizeInput(sport);
   const sanitizedDate = date ? sanitizeInput(date) : null;
-  
+
   // Create cache key
   const cacheKey = `game_predictions_${sanitizedSport.toLowerCase()}_${sanitizedDate || 'today'}`;
-  
+
   // Check cache
   if (isCacheValid(cacheKey)) {
     safeLog('log', `Using cached data for ${cacheKey}`);
     return cache.predictions[cacheKey];
   }
-  
+
   try {
     // Validate token format
     if (token && !isValidTokenFormat(token)) {
       safeLog('warn', 'Invalid token format provided');
       token = null;
     }
-    
+
     // Create API client
     const apiClient = createApiClient(token);
-    
+
     // Build query parameters
     const params = { sport: sanitizedSport };
     if (sanitizedDate) params.date = sanitizedDate;
     if (limit && Number.isInteger(limit) && limit > 0) params.limit = limit;
-    
+
     // Log API request (only in development)
     safeLog('log', `Fetching predictions for ${sanitizedSport}`);
-    
+
     // Make API request
     const response = await apiClient.get('/predictions/games', { params });
-    
+
     // Log success (only in development)
     safeLog('log', `Successfully fetched ${response.data.data?.length || 0} predictions`);
-    
+
     // Update cache
     addToCache(cacheKey, response.data.data);
-    
+
     return response.data.data;
   } catch (error) {
     // Log error (redacted in production)
-    safeLog('error', `Error fetching game predictions for ${sanitizedSport}`, 
-      API_CONFIG.IS_PRODUCTION ? null : error);
-    
+    safeLog(
+      'error',
+      `Error fetching game predictions for ${sanitizedSport}`,
+      API_CONFIG.IS_PRODUCTION ? null : error
+    );
+
     // Use fallback data
     safeLog('log', `Using fallback data for ${sanitizedSport.toLowerCase()}`);
     const fallbackKey = sanitizedSport.toLowerCase();
-    
+
     // Update cache with fallback data
     addToCache(cacheKey, FALLBACK_DATA[fallbackKey] || []);
-    
+
     return FALLBACK_DATA[fallbackKey] || [];
   }
 };
@@ -356,47 +393,50 @@ export const getGamePredictions = async ({ sport = 'NBA', date = null, limit = n
 export const getGamePredictionById = async (gameId, token = null) => {
   // Sanitize input
   const sanitizedGameId = sanitizeInput(gameId);
-  
+
   // Create cache key
   const cacheKey = `game_prediction_${sanitizedGameId}`;
-  
+
   // Check cache
   if (isCacheValid(cacheKey)) {
     safeLog('log', `Using cached data for ${cacheKey}`);
     return cache.predictions[cacheKey];
   }
-  
+
   try {
     // Validate token format
     if (token && !isValidTokenFormat(token)) {
       safeLog('warn', 'Invalid token format provided');
       token = null;
     }
-    
+
     // Create API client
     const apiClient = createApiClient(token);
-    
+
     // Log API request (only in development)
     safeLog('log', `Fetching prediction for game ${sanitizedGameId}`);
-    
+
     // Make API request
     const response = await apiClient.get(`/predictions/games/${sanitizedGameId}`);
-    
+
     // Log success (only in development)
     safeLog('log', `Successfully fetched prediction for game ${sanitizedGameId}`);
-    
+
     // Update cache
     addToCache(cacheKey, response.data.data);
-    
+
     return response.data.data;
   } catch (error) {
     // Log error (redacted in production)
-    safeLog('error', `Error fetching prediction for game ${sanitizedGameId}`, 
-      API_CONFIG.IS_PRODUCTION ? null : error);
-    
+    safeLog(
+      'error',
+      `Error fetching prediction for game ${sanitizedGameId}`,
+      API_CONFIG.IS_PRODUCTION ? null : error
+    );
+
     // Find fallback data for this game ID
     safeLog('log', `Using fallback data for game ${sanitizedGameId}`);
-    
+
     // Search through all fallback data for this game ID
     for (const sportKey in FALLBACK_DATA) {
       const game = FALLBACK_DATA[sportKey].find(g => g.id === sanitizedGameId);
@@ -406,7 +446,7 @@ export const getGamePredictionById = async (gameId, token = null) => {
         return game;
       }
     }
-    
+
     // Return null if no fallback data found
     return null;
   }
@@ -421,44 +461,47 @@ export const getGamePredictionById = async (gameId, token = null) => {
 export const getPlayerPrediction = async (playerId, token = null) => {
   // Sanitize input
   const sanitizedPlayerId = sanitizeInput(playerId);
-  
+
   // Create cache key
   const cacheKey = `player_prediction_${sanitizedPlayerId}`;
-  
+
   // Check cache
   if (isCacheValid(cacheKey)) {
     safeLog('log', `Using cached data for ${cacheKey}`);
     return cache.predictions[cacheKey];
   }
-  
+
   try {
     // Validate token format
     if (token && !isValidTokenFormat(token)) {
       safeLog('warn', 'Invalid token format provided');
       token = null;
     }
-    
+
     // Create API client
     const apiClient = createApiClient(token);
-    
+
     // Log API request (only in development)
     safeLog('log', `Fetching prediction for player ${sanitizedPlayerId}`);
-    
+
     // Make API request
     const response = await apiClient.get(`/predictions/players/${sanitizedPlayerId}`);
-    
+
     // Log success (only in development)
     safeLog('log', `Successfully fetched prediction for player ${sanitizedPlayerId}`);
-    
+
     // Update cache
     addToCache(cacheKey, response.data.data);
-    
+
     return response.data.data;
   } catch (error) {
     // Log error (redacted in production)
-    safeLog('error', `Error fetching prediction for player ${sanitizedPlayerId}`, 
-      API_CONFIG.IS_PRODUCTION ? null : error);
-    
+    safeLog(
+      'error',
+      `Error fetching prediction for player ${sanitizedPlayerId}`,
+      API_CONFIG.IS_PRODUCTION ? null : error
+    );
+
     // Return fallback player data
     const fallbackPlayer = {
       id: sanitizedPlayerId,
@@ -466,18 +509,18 @@ export const getPlayerPrediction = async (playerId, token = null) => {
       team: 'Team Name',
       game: {
         date: new Date(Date.now() + 86400000).toISOString(),
-        opponent: 'Opponent Team'
+        opponent: 'Opponent Team',
       },
       predictions: {
         points: { prediction: 22.5, range: [18, 27], confidence: 0.72 },
         rebounds: { prediction: 8.5, range: [6, 11], confidence: 0.68 },
-        assists: { prediction: 5.5, range: [3, 8], confidence: 0.65 }
-      }
+        assists: { prediction: 5.5, range: [3, 8], confidence: 0.65 },
+      },
     };
-    
+
     // Update cache with fallback data
     addToCache(cacheKey, fallbackPlayer);
-    
+
     return fallbackPlayer;
   }
 };
@@ -491,55 +534,58 @@ export const getPlayerPrediction = async (playerId, token = null) => {
 export const getPredictionsBySport = async (sportType, token = null) => {
   // Sanitize input
   const sanitizedSportType = sanitizeInput(sportType);
-  
+
   // Create cache key
   const cacheKey = `sport_predictions_${sanitizedSportType.toLowerCase()}`;
-  
+
   // Check cache
   if (isCacheValid(cacheKey)) {
     safeLog('log', `Using cached data for ${cacheKey}`);
     return cache.predictions[cacheKey];
   }
-  
+
   try {
     // Validate token format
     if (token && !isValidTokenFormat(token)) {
       safeLog('warn', 'Invalid token format provided');
       token = null;
     }
-    
+
     // Create API client
     const apiClient = createApiClient(token);
-    
+
     // Log API request (only in development)
     safeLog('log', `Fetching predictions for sport ${sanitizedSportType}`);
-    
+
     // Make API request
     const response = await apiClient.get(`/predictions/sports/${sanitizedSportType}`);
-    
+
     // Log success (only in development)
     safeLog('log', `Successfully fetched predictions for sport ${sanitizedSportType}`);
-    
+
     // Update cache
     addToCache(cacheKey, response.data.data);
-    
+
     return response.data.data;
   } catch (error) {
     // Log error (redacted in production)
-    safeLog('error', `Error fetching predictions for sport ${sanitizedSportType}`, 
-      API_CONFIG.IS_PRODUCTION ? null : error);
-    
+    safeLog(
+      'error',
+      `Error fetching predictions for sport ${sanitizedSportType}`,
+      API_CONFIG.IS_PRODUCTION ? null : error
+    );
+
     // Map sportType to fallback data key
     let fallbackKey = sanitizedSportType.toLowerCase();
     if (sanitizedSportType === 'NCAA_MENS') fallbackKey = 'ncaa';
     if (sanitizedSportType === 'FORMULA1') fallbackKey = 'formula1';
-    
+
     // Use fallback data
     safeLog('log', `Using fallback data for ${fallbackKey}`);
-    
+
     // Update cache with fallback data
     addToCache(cacheKey, FALLBACK_DATA[fallbackKey] || []);
-    
+
     return FALLBACK_DATA[fallbackKey] || [];
   }
 };
@@ -552,47 +598,50 @@ export const getPredictionsBySport = async (sportType, token = null) => {
 export const getTrendingPredictions = async (token = null) => {
   // Create cache key
   const cacheKey = 'trending_predictions';
-  
+
   // Check cache
   if (isCacheValid(cacheKey)) {
     safeLog('log', `Using cached data for ${cacheKey}`);
     return cache.predictions[cacheKey];
   }
-  
+
   try {
     // Validate token format
     if (token && !isValidTokenFormat(token)) {
       safeLog('warn', 'Invalid token format provided');
       token = null;
     }
-    
+
     // Create API client
     const apiClient = createApiClient(token);
-    
+
     // Log API request (only in development)
     safeLog('log', 'Fetching trending predictions');
-    
+
     // Make API request
     const response = await apiClient.get('/predictions/trending');
-    
+
     // Log success (only in development)
     safeLog('log', `Successfully fetched trending predictions`);
-    
+
     // Update cache
     addToCache(cacheKey, response.data.data);
-    
+
     return response.data.data;
   } catch (error) {
     // Log error (redacted in production)
-    safeLog('error', 'Error fetching trending predictions', 
-      API_CONFIG.IS_PRODUCTION ? null : error);
-    
+    safeLog(
+      'error',
+      'Error fetching trending predictions',
+      API_CONFIG.IS_PRODUCTION ? null : error
+    );
+
     // Use fallback data
     safeLog('log', 'Using fallback trending data');
-    
+
     // Update cache with fallback data
     addToCache(cacheKey, FALLBACK_DATA.trending || []);
-    
+
     return FALLBACK_DATA.trending || [];
   }
 };
@@ -613,35 +662,40 @@ export const submitPredictionFeedback = async (feedback, token) => {
     safeLog('error', 'Authentication required to submit feedback');
     throw new Error('Authentication required to submit feedback');
   }
-  
+
   // Sanitize feedback data
   const sanitizedFeedback = {
     predictionId: sanitizeInput(feedback.predictionId),
     predictionType: sanitizeInput(feedback.predictionType),
-    rating: typeof feedback.rating === 'number' ? 
-      Math.min(Math.max(Math.round(feedback.rating), 1), 5) : 3,
-    comments: feedback.comments ? sanitizeInput(feedback.comments) : ''
+    rating:
+      typeof feedback.rating === 'number'
+        ? Math.min(Math.max(Math.round(feedback.rating), 1), 5)
+        : 3,
+    comments: feedback.comments ? sanitizeInput(feedback.comments) : '',
   };
-  
+
   try {
     // Create API client
     const apiClient = createApiClient(token);
-    
+
     // Log API request (only in development)
     safeLog('log', `Submitting feedback for prediction ${sanitizedFeedback.predictionId}`);
-    
+
     // Make API request
     const response = await apiClient.post('/predictions/feedback', sanitizedFeedback);
-    
+
     // Log success (only in development)
     safeLog('log', 'Successfully submitted feedback');
-    
+
     return response.data;
   } catch (error) {
     // Log error (redacted in production)
-    safeLog('error', 'Error submitting prediction feedback', 
-      API_CONFIG.IS_PRODUCTION ? null : error);
-    
+    safeLog(
+      'error',
+      'Error submitting prediction feedback',
+      API_CONFIG.IS_PRODUCTION ? null : error
+    );
+
     // For feedback, we'll still throw an error since it's not critical
     throw new Error('Failed to submit feedback. Please try again later.');
   }
@@ -656,13 +710,13 @@ export const clearPredictionCache = (key = null) => {
     const sanitizedKey = sanitizeInput(key);
     delete cache.predictions[sanitizedKey];
     delete cache.timestamp[sanitizedKey];
-    
+
     // Remove from keys array
     const keyIndex = cache.keys.indexOf(sanitizedKey);
     if (keyIndex !== -1) {
       cache.keys.splice(keyIndex, 1);
     }
-    
+
     safeLog('log', `Cleared cache for ${sanitizedKey}`);
   } else {
     cache.predictions = {};
@@ -680,5 +734,5 @@ export default {
   getPredictionsBySport,
   getTrendingPredictions,
   submitPredictionFeedback,
-  clearPredictionCache
+  clearPredictionCache,
 };

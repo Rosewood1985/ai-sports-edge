@@ -1,13 +1,14 @@
 /**
  * Comprehensive Security Tests for OCR Service
- * 
+ *
  * Tests all security vulnerabilities and fixes implemented in the secure OCR service
  */
 
-const { secureEnhancedOCRService } = require('../services/secureEnhancedOCRService');
 const { secureCommandService, CommandSecurityError } = require('../services/secureCommandService');
+const { secureEnhancedOCRService } = require('../services/secureEnhancedOCRService');
 const { secureFileUploadService, SecurityError } = require('../services/secureFileUploadService');
 const { securityMonitoringService } = require('../services/securityMonitoringService');
+
 const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
@@ -25,23 +26,23 @@ describe('Secure OCR Service Security Tests', () => {
   beforeEach(() => {
     mockUploadId = crypto.randomUUID();
     testImagePath = '/tmp/secure_uploads/test_image.jpg';
-    
+
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Setup default mock implementations
     secureFileUploadService.validatePathForOCR.mockReturnValue(testImagePath);
     secureFileUploadService.getSecureFileInfo.mockResolvedValue({
       hash: 'test-hash',
-      size: 1024
+      size: 1024,
     });
-    
+
     secureCommandService.executeSecureCommand.mockResolvedValue({
       success: true,
       stdout: 'Mock OCR text output',
       stderr: '',
       exitCode: 0,
-      executionTime: 1000
+      executionTime: 1000,
     });
   });
 
@@ -49,7 +50,7 @@ describe('Secure OCR Service Security Tests', () => {
     test('should prevent command injection in OCR arguments', async () => {
       // Simulate command injection attempt through malicious file path
       const maliciousPath = '/tmp/test.jpg; rm -rf /';
-      
+
       secureFileUploadService.validatePathForOCR.mockImplementation(() => {
         throw new SecurityError('File path contains dangerous characters', 'DANGEROUS_PATH_CHARS');
       });
@@ -61,7 +62,7 @@ describe('Secure OCR Service Security Tests', () => {
       expect(securityMonitoringService.logIncident).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'malicious_file',
-          severity: 'critical'
+          severity: 'critical',
         })
       );
     });
@@ -78,7 +79,7 @@ describe('Secure OCR Service Security Tests', () => {
       expect(securityMonitoringService.logIncident).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'command_injection',
-          severity: 'high'
+          severity: 'high',
         })
       );
     });
@@ -95,7 +96,7 @@ describe('Secure OCR Service Security Tests', () => {
       expect(securityMonitoringService.logIncident).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'command_injection',
-          severity: 'high'
+          severity: 'high',
         })
       );
     });
@@ -104,7 +105,7 @@ describe('Secure OCR Service Security Tests', () => {
   describe('Path Traversal Prevention', () => {
     test('should prevent path traversal attacks', async () => {
       const traversalPath = '/tmp/secure_uploads/../../../etc/passwd';
-      
+
       secureFileUploadService.validatePathForOCR.mockImplementation(() => {
         throw new SecurityError('Invalid file path for OCR processing', 'INVALID_OCR_PATH');
       });
@@ -116,13 +117,13 @@ describe('Secure OCR Service Security Tests', () => {
       expect(securityMonitoringService.logIncident).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'path_traversal',
-          severity: 'high'
+          severity: 'high',
         })
       );
     });
 
     test('should validate file paths are within allowed directories', async () => {
-      secureFileUploadService.validatePathForOCR.mockImplementation((path) => {
+      secureFileUploadService.validatePathForOCR.mockImplementation(path => {
         if (!path.startsWith('/tmp/secure_uploads')) {
           throw new SecurityError('Path not in allowed directories', 'PATH_NOT_ALLOWED');
         }
@@ -144,7 +145,7 @@ describe('Secure OCR Service Security Tests', () => {
     test('should sanitize OCR text output', () => {
       const maliciousText = '<script>alert("xss")</script>Test text';
       const sanitized = secureEnhancedOCRService.sanitizeTextForParsing(maliciousText);
-      
+
       expect(sanitized).not.toContain('<script>');
       expect(sanitized).not.toContain('alert');
       expect(sanitized).toContain('Test text');
@@ -153,7 +154,7 @@ describe('Secure OCR Service Security Tests', () => {
     test('should sanitize data for storage', () => {
       const maliciousData = '<script>alert("xss")</script>\x00\x08Control chars\x7F';
       const sanitized = secureEnhancedOCRService.sanitizeForStorage(maliciousData);
-      
+
       expect(sanitized).not.toContain('<script>');
       expect(sanitized).not.toContain('\x00');
       expect(sanitized).not.toContain('\x08');
@@ -163,7 +164,7 @@ describe('Secure OCR Service Security Tests', () => {
     test('should limit storage data length', () => {
       const longData = 'x'.repeat(60000);
       const sanitized = secureEnhancedOCRService.sanitizeForStorage(longData);
-      
+
       expect(sanitized.length).toBeLessThanOrEqual(50000);
     });
 
@@ -181,8 +182,8 @@ describe('Secure OCR Service Security Tests', () => {
       const { PrismaClient } = require('@prisma/client');
       const mockPrisma = {
         oCRUpload: {
-          findUnique: jest.fn().mockResolvedValue(null)
-        }
+          findUnique: jest.fn().mockResolvedValue(null),
+        },
       };
       PrismaClient.mockImplementation(() => mockPrisma);
 
@@ -194,7 +195,7 @@ describe('Secure OCR Service Security Tests', () => {
     test('should validate file integrity', async () => {
       secureFileUploadService.getSecureFileInfo.mockResolvedValue({
         hash: 'expected-hash',
-        size: 1024
+        size: 1024,
       });
 
       // Test should pass with matching file info
@@ -207,14 +208,14 @@ describe('Secure OCR Service Security Tests', () => {
   describe('Processing Security Controls', () => {
     test('should enforce processing timeout', async () => {
       const shortTimeout = 100; // 100ms timeout
-      
+
       secureCommandService.executeSecureCommand.mockImplementation(() => {
         return new Promise(resolve => setTimeout(resolve, 200)); // Takes 200ms
       });
 
       await expect(
         secureEnhancedOCRService.processOCRWithSecurityValidation(mockUploadId, {
-          maxProcessingTime: shortTimeout
+          maxProcessingTime: shortTimeout,
         })
       ).rejects.toThrow();
     });
@@ -226,12 +227,13 @@ describe('Secure OCR Service Security Tests', () => {
 
     test('should track active processes', async () => {
       // Start a processing job
-      const processingPromise = secureEnhancedOCRService.processOCRWithSecurityValidation(mockUploadId);
-      
+      const processingPromise =
+        secureEnhancedOCRService.processOCRWithSecurityValidation(mockUploadId);
+
       // Check that it's tracked
       const queueStatus = secureEnhancedOCRService.getProcessingQueueStatus();
       expect(queueStatus.length).toBeGreaterThan(0);
-      
+
       // Wait for completion
       try {
         await processingPromise;
@@ -261,23 +263,23 @@ describe('Secure OCR Service Security Tests', () => {
         {
           error: new CommandSecurityError('Test', 'COMMAND_NOT_ALLOWED'),
           expectedType: 'command_injection',
-          expectedSeverity: 'high'
+          expectedSeverity: 'high',
         },
         {
           error: new SecurityError('Test', 'PATH_TRAVERSAL'),
           expectedType: 'path_traversal',
-          expectedSeverity: 'high'
+          expectedSeverity: 'high',
         },
         {
           error: new SecurityError('Test', 'MALICIOUS_FILE'),
           expectedType: 'malicious_file',
-          expectedSeverity: 'critical'
-        }
+          expectedSeverity: 'critical',
+        },
       ];
 
       for (const testCase of testCases) {
         securityMonitoringService.logIncident.mockClear();
-        
+
         secureFileUploadService.validatePathForOCR.mockImplementation(() => {
           throw testCase.error;
         });
@@ -291,7 +293,7 @@ describe('Secure OCR Service Security Tests', () => {
         expect(securityMonitoringService.logIncident).toHaveBeenCalledWith(
           expect.objectContaining({
             type: testCase.expectedType,
-            severity: testCase.expectedSeverity
+            severity: testCase.expectedSeverity,
           })
         );
       }
@@ -301,12 +303,12 @@ describe('Secure OCR Service Security Tests', () => {
   describe('Secure Cleanup', () => {
     test('should clean up temporary files', async () => {
       const tempPath = '/tmp/secure_uploads/temp_processed.jpg';
-      
+
       secureFileUploadService.secureFileCleanup.mockResolvedValue(true);
-      
+
       await secureEnhancedOCRService.secureCleanup(testImagePath, {
         processedPath: tempPath,
-        originalPath: testImagePath
+        originalPath: testImagePath,
       });
 
       expect(secureFileUploadService.secureFileCleanup).toHaveBeenCalledWith(testImagePath);
@@ -314,9 +316,7 @@ describe('Secure OCR Service Security Tests', () => {
     });
 
     test('should handle cleanup errors gracefully', async () => {
-      secureFileUploadService.secureFileCleanup.mockRejectedValue(
-        new Error('Cleanup failed')
-      );
+      secureFileUploadService.secureFileCleanup.mockRejectedValue(new Error('Cleanup failed'));
 
       // Should not throw error
       await expect(
@@ -331,15 +331,15 @@ describe('Secure OCR Service Security Tests', () => {
         { stdout: '', stderr: '', expected: 0 },
         { stdout: 'Short text', stderr: '', expected: expect.any(Number) },
         { stdout: 'Long text '.repeat(20), stderr: '', expected: expect.any(Number) },
-        { stdout: 'Text', stderr: 'Warning: some issue', expected: expect.any(Number) }
+        { stdout: 'Text', stderr: 'Warning: some issue', expected: expect.any(Number) },
       ];
 
       testCases.forEach(testCase => {
         const confidence = secureEnhancedOCRService.calculateConfidence(
-          testCase.stdout, 
+          testCase.stdout,
           testCase.stderr
         );
-        
+
         if (typeof testCase.expected === 'number') {
           expect(confidence).toBe(testCase.expected);
         } else {
@@ -352,7 +352,7 @@ describe('Secure OCR Service Security Tests', () => {
     test('should parse text blocks correctly', () => {
       const text = 'Line 1\nLine 2\n\nLine 4';
       const blocks = secureEnhancedOCRService.parseTextBlocks(text);
-      
+
       expect(blocks).toHaveLength(3); // Empty line should be filtered out
       expect(blocks[0].text).toBe('Line 1');
       expect(blocks[1].text).toBe('Line 2');
@@ -373,7 +373,7 @@ describe('Secure Command Service Security Tests', () => {
       // Mock successful execution
       const mockSpawn = jest.fn();
       jest.doMock('child_process', () => ({ spawn: mockSpawn }));
-      
+
       // This test would need more mocking to fully work
       // But demonstrates the security validation approach
     });
@@ -384,9 +384,9 @@ describe('Secure Command Service Security Tests', () => {
       const dangerousArgs = [
         'normal.jpg',
         'stdout',
-        '; rm -rf /',  // Command injection attempt
+        '; rm -rf /', // Command injection attempt
         '-l',
-        'eng'
+        'eng',
       ];
 
       await expect(
@@ -396,7 +396,7 @@ describe('Secure Command Service Security Tests', () => {
 
     test('should validate file path arguments', async () => {
       const invalidPath = '../../../etc/passwd';
-      
+
       await expect(
         secureCommandService.executeSecureCommand('tesseract', [invalidPath, 'stdout'])
       ).rejects.toThrow(CommandSecurityError);
@@ -414,12 +414,12 @@ describe('Security Monitoring Service Tests', () => {
       severity: 'high',
       type: 'command_injection',
       source: 'test',
-      message: 'Test incident'
+      message: 'Test incident',
     };
 
     const incidentId = await securityMonitoringService.logIncident(incident);
     expect(incidentId).toBeTruthy();
-    
+
     const recentIncidents = securityMonitoringService.getRecentIncidents(1);
     expect(recentIncidents).toHaveLength(1);
     expect(recentIncidents[0].message).toBe('Test incident');
@@ -431,7 +431,7 @@ describe('Security Monitoring Service Tests', () => {
       type: 'suspicious_activity',
       source: 'test',
       message: 'Repeated incident',
-      ipAddress: '192.168.1.100'
+      ipAddress: '192.168.1.100',
     };
 
     // Log multiple incidents from same IP
@@ -445,17 +445,17 @@ describe('Security Monitoring Service Tests', () => {
 
   test('should track rate limits', () => {
     const identifier = 'test-user-123';
-    
+
     // Should allow requests within limit
     for (let i = 0; i < 5; i++) {
       expect(securityMonitoringService.checkRateLimit(identifier, 10, 60000)).toBe(true);
     }
-    
+
     // Should block when limit exceeded
     for (let i = 0; i < 10; i++) {
       securityMonitoringService.checkRateLimit(identifier, 10, 60000);
     }
-    
+
     expect(securityMonitoringService.checkRateLimit(identifier, 10, 60000)).toBe(false);
   });
 });

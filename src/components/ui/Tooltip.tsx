@@ -93,7 +93,7 @@ export function Tooltip({
           role="tooltip"
         >
           {content}
-          <div className={`absolute w-0 h-0 border-4 ${arrowClasses}`}></div>
+          <div className={`absolute w-0 h-0 border-4 ${arrowClasses}`} />
         </div>
       )}
     </div>

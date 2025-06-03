@@ -1,32 +1,26 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
+
 import { useLanguage } from '../../contexts/LanguageContext';
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
-import { ThemedText } from '../atomic/atoms/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 
-type WelcomeScreenNavigationProp = StackNavigationProp<
-  OnboardingStackParamList,
-  'Welcome'
->;
+type WelcomeScreenNavigationProp = StackNavigationProp<OnboardingStackParamList, 'Welcome'>;
 
 const WelcomeScreen = () => {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
   const { colors } = useTheme();
   const { t } = useLanguage();
-  
+
   const handleGetStarted = () => {
     // Navigate to the GDPR consent screen, which is the first step in the verification flow
     navigation.navigate('GDPRConsent');
   };
-  
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
@@ -34,53 +28,41 @@ const WelcomeScreen = () => {
           <Ionicons name="basketball" size={80} color={colors.primary} />
           <ThemedText style={styles.appName}>AI Sports Edge</ThemedText>
         </View>
-        
-        <ThemedText style={styles.title}>
-          {t('onboarding.welcome_title')}
-        </ThemedText>
-        
-        <ThemedText style={styles.description}>
-          {t('onboarding.welcome_description')}
-        </ThemedText>
-        
+
+        <ThemedText style={styles.title}>{t('onboarding.welcome_title')}</ThemedText>
+
+        <ThemedText style={styles.description}>{t('onboarding.welcome_description')}</ThemedText>
+
         <View style={styles.featuresContainer}>
           <View style={styles.featureItem}>
             <Ionicons name="analytics-outline" size={24} color={colors.primary} />
-            <ThemedText style={styles.featureText}>
-              {t('onboarding.feature_analytics')}
-            </ThemedText>
+            <ThemedText style={styles.featureText}>{t('onboarding.feature_analytics')}</ThemedText>
           </View>
-          
+
           <View style={styles.featureItem}>
             <Ionicons name="trending-up-outline" size={24} color={colors.primary} />
             <ThemedText style={styles.featureText}>
               {t('onboarding.feature_predictions')}
             </ThemedText>
           </View>
-          
+
           <View style={styles.featureItem}>
             <Ionicons name="notifications-outline" size={24} color={colors.primary} />
-            <ThemedText style={styles.featureText}>
-              {t('onboarding.feature_alerts')}
-            </ThemedText>
+            <ThemedText style={styles.featureText}>{t('onboarding.feature_alerts')}</ThemedText>
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={[styles.getStartedButton, { backgroundColor: colors.primary }]}
           onPress={handleGetStarted}
-          accessible={true}
+          accessible
           accessibilityLabel={t('onboarding.get_started')}
           accessibilityRole="button"
         >
-          <Text style={styles.getStartedButtonText}>
-            {t('onboarding.get_started')}
-          </Text>
+          <Text style={styles.getStartedButtonText}>{t('onboarding.get_started')}</Text>
         </TouchableOpacity>
-        
-        <ThemedText style={styles.disclaimer}>
-          {t('onboarding.disclaimer')}
-        </ThemedText>
+
+        <ThemedText style={styles.disclaimer}>{t('onboarding.disclaimer')}</ThemedText>
       </View>
     </ThemedView>
   );

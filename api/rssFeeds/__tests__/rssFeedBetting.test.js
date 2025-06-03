@@ -1,7 +1,8 @@
 import { jest } from '@jest/globals';
-import { formatNewsItems } from '../fetchRssFeeds';
-import { getUserPreferences, filterNewsItems } from '../../../utils/userPreferencesService';
+
 import { generateFanDuelAffiliateLink } from '../../../utils/affiliateLinkGenerator';
+import { getUserPreferences, filterNewsItems } from '../../../utils/userPreferencesService';
+import { formatNewsItems } from '../fetchRssFeeds';
 
 // Mock dependencies
 jest.mock('../../../utils/userPreferencesService');
@@ -16,7 +17,7 @@ describe('RSS Feed Betting Integration', () => {
       pubDate: '2025-03-18T12:00:00Z',
       categories: ['NBA'],
       contentSnippet: 'Preview of the upcoming Lakers vs Warriors game.',
-      image: 'https://example.com/lakers-warriors.jpg'
+      image: 'https://example.com/lakers-warriors.jpg',
     },
     {
       title: 'Betting Odds: Chiefs favored by 7 points against Raiders',
@@ -25,7 +26,7 @@ describe('RSS Feed Betting Integration', () => {
       categories: ['NFL', 'BETTING'],
       contentSnippet: 'The latest betting odds for Chiefs vs Raiders game.',
       image: 'https://example.com/chiefs-raiders.jpg',
-      odds: '+250'
+      odds: '+250',
     },
     {
       title: 'Expert Picks: UFC 300 Main Card Predictions',
@@ -33,8 +34,8 @@ describe('RSS Feed Betting Integration', () => {
       pubDate: '2025-03-18T10:00:00Z',
       categories: ['UFC', 'PICKS'],
       contentSnippet: 'Expert predictions for the upcoming UFC 300 main card fights.',
-      image: 'https://example.com/ufc-300.jpg'
-    }
+      image: 'https://example.com/ufc-300.jpg',
+    },
   ];
 
   // Mock user preferences
@@ -45,42 +46,42 @@ describe('RSS Feed Betting Integration', () => {
       refreshIntervalMinutes: 15,
       keywordFilters: {
         include: [],
-        exclude: []
-      }
+        exclude: [],
+      },
     },
     favorites: {
       teams: ['Lakers', 'Chiefs'],
       players: [],
-      leagues: []
+      leagues: [],
     },
     betting: {
       showOdds: true,
       oddsFormat: 'american',
       defaultStake: 10,
-      affiliateId: 'test-affiliate'
+      affiliateId: 'test-affiliate',
     },
     ui: {
       newsTicker: {
         enabled: true,
         scrollSpeed: 'medium',
-        pauseOnHover: true
-      }
-    }
+        pauseOnHover: true,
+      },
+    },
   };
 
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Setup default mock implementations
     getUserPreferences.mockReturnValue(mockPreferences);
-    
+
     // Mock filterNewsItems to return the same items that are passed to it
     // This simulates the filtering without actually implementing the logic
-    filterNewsItems.mockImplementation((items) => {
+    filterNewsItems.mockImplementation(items => {
       return items;
     });
-    
+
     // Mock the affiliate link generation
     generateFanDuelAffiliateLink.mockImplementation((params, affiliateId) => {
       // Use the provided affiliateId or get it from the mock preferences
@@ -92,7 +93,7 @@ describe('RSS Feed Betting Integration', () => {
   describe('formatNewsItems', () => {
     it('should format RSS feed items correctly', () => {
       const formattedItems = formatNewsItems(sampleItems);
-      
+
       expect(formattedItems).toHaveLength(3);
       expect(formattedItems[0].teams).toBe('Lakers vs Warriors: Preview and Prediction');
       expect(formattedItems[0].sport).toBe('NBA');
@@ -100,38 +101,41 @@ describe('RSS Feed Betting Integration', () => {
 
     it('should identify betting-related items', () => {
       // Create a custom implementation for this test
-      filterNewsItems.mockImplementation((items) => {
+      filterNewsItems.mockImplementation(items => {
         return items.map(item => {
           // Add isBettingRelated property based on various criteria
           const itemText = [
             item.teams || '',
             item.title || '',
             item.description || '',
-            item.categories?.join(' ') || ''
-          ].join(' ').toLowerCase();
-          
+            item.categories?.join(' ') || '',
+          ]
+            .join(' ')
+            .toLowerCase();
+
           const isBettingRelated =
-            (item.categories && item.categories.some(cat =>
-              cat === 'BETTING' || cat === 'PICKS' || cat === 'ODDS'
-            )) ||
+            (item.categories &&
+              item.categories.some(
+                cat => cat === 'BETTING' || cat === 'PICKS' || cat === 'ODDS'
+              )) ||
             item.odds ||
             itemText.includes('odds') ||
             itemText.includes('betting') ||
             itemText.includes('picks') ||
             itemText.includes('expert');
-          
+
           return { ...item, isBettingRelated };
         });
       });
-      
+
       const formattedItems = formatNewsItems(sampleItems);
-      
+
       // First item is about Lakers vs Warriors (not betting related)
       expect(formattedItems[0].isBettingRelated).toBeFalsy();
-      
+
       // Second item is about betting odds (betting related)
       expect(formattedItems[1].isBettingRelated).toBeTruthy();
-      
+
       // Third item is about expert picks (betting related)
       expect(formattedItems[2].isBettingRelated).toBeTruthy();
     });
@@ -142,12 +146,12 @@ describe('RSS Feed Betting Integration', () => {
         ...mockPreferences,
         rssFeeds: {
           ...mockPreferences.rssFeeds,
-          maxItems: 2 // Only return top 2 items
-        }
+          maxItems: 2, // Only return top 2 items
+        },
       });
-      
+
       const formattedItems = formatNewsItems(sampleItems);
-      
+
       // Should prioritize Lakers and Chiefs (user's favorite teams)
       expect(formattedItems).toHaveLength(2);
       expect(formattedItems[0].teams).toContain('Lakers');
@@ -160,12 +164,12 @@ describe('RSS Feed Betting Integration', () => {
         ...mockPreferences,
         rssFeeds: {
           ...mockPreferences.rssFeeds,
-          maxItems: 1
-        }
+          maxItems: 1,
+        },
       });
-      
+
       const formattedItems = formatNewsItems(sampleItems);
-      
+
       expect(formattedItems).toHaveLength(1);
     });
   });
@@ -177,16 +181,19 @@ describe('RSS Feed Betting Integration', () => {
         id: 'game-123',
         sport: 'NFL',
         teams: 'Chiefs vs Raiders',
-        hasBettingOpportunity: true
+        hasBettingOpportunity: true,
       };
-      
+
       // Generate link
-      const link = generateFanDuelAffiliateLink({
-        sport: bettingItem.sport,
-        teams: bettingItem.teams,
-        eventId: bettingItem.id
-      }, mockPreferences.betting.affiliateId);
-      
+      const link = generateFanDuelAffiliateLink(
+        {
+          sport: bettingItem.sport,
+          teams: bettingItem.teams,
+          eventId: bettingItem.id,
+        },
+        mockPreferences.betting.affiliateId
+      );
+
       expect(link).toBe('https://fanduel.com/affiliate/NFL/Chiefs vs Raiders?aid=test-affiliate');
     });
   });
@@ -196,32 +203,32 @@ describe('RSS Feed Betting Integration', () => {
       const testCases = [
         {
           title: 'Latest odds for UFC 300',
-          expected: true
+          expected: true,
         },
         {
           title: 'NBA Standings Update',
-          expected: false
+          expected: false,
         },
         {
           title: 'Betting guide for March Madness',
-          expected: true
+          expected: true,
         },
         {
           title: 'Player injury report',
-          expected: false
+          expected: false,
         },
         {
           title: 'Moneyline shifts for weekend games',
-          expected: true
-        }
+          expected: true,
+        },
       ];
-      
+
       testCases.forEach(testCase => {
-        const isBettingRelated = 
+        const isBettingRelated =
           testCase.title.toLowerCase().includes('odds') ||
           testCase.title.toLowerCase().includes('betting') ||
           testCase.title.toLowerCase().includes('moneyline');
-        
+
         expect(isBettingRelated).toBe(testCase.expected);
       });
     });

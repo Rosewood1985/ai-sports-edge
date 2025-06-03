@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+  Animated,
+} from 'react-native';
+
 import { useInsightStream } from '../../../../hooks/useEnhancedInsights';
 import { EnhancedInsight, InsightType, InsightSeverity } from '../../../../types/enhancedInsights';
-import LoadingIndicator from '../../../LoadingIndicator';
 import ErrorMessage from '../../../ErrorMessage';
+import LoadingIndicator from '../../../LoadingIndicator';
 
 interface RealTimeInsightsWidgetProps {
   filters: {
@@ -13,31 +22,22 @@ interface RealTimeInsightsWidgetProps {
   };
 }
 
-export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
-  filters
-}) => {
+export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({ filters }) => {
   const [isStreamActive, setIsStreamActive] = useState(true);
   const [selectedInsight, setSelectedInsight] = useState<EnhancedInsight | null>(null);
   const [displayMode, setDisplayMode] = useState<'list' | 'feed' | 'graph'>('feed');
   const [maxInsights, setMaxInsights] = useState(50);
-  
+
   const animatedValue = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const {
-    insights,
-    isStreaming,
-    connectionStatus,
-    error,
-    startStream,
-    stopStream,
-    clearInsights
-  } = useInsightStream({
-    types: filters.types,
-    severity: filters.severity,
-    minConfidence: filters.confidence,
-    maxSize: maxInsights
-  });
+  const { insights, isStreaming, connectionStatus, error, startStream, stopStream, clearInsights } =
+    useInsightStream({
+      types: filters.types,
+      severity: filters.severity,
+      minConfidence: filters.confidence,
+      maxSize: maxInsights,
+    });
 
   useEffect(() => {
     if (isStreamActive) {
@@ -45,7 +45,7 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
     } else {
       stopStream();
     }
-    
+
     return () => stopStream();
   }, [isStreamActive, filters]);
 
@@ -62,9 +62,9 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
           toValue: 0,
           duration: 300,
           useNativeDriver: true,
-        })
+        }),
       ]).start();
-      
+
       // Auto-scroll to latest insight in feed mode
       if (displayMode === 'feed' && scrollViewRef.current) {
         setTimeout(() => {
@@ -84,29 +84,40 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
       prediction: '🔮',
       trend: '📈',
       correlation: '🔗',
-      recommendation: '💡'
+      recommendation: '💡',
     };
     return icons[type] || '📋';
   };
 
   const getSeverityColor = (severity: InsightSeverity): string => {
     switch (severity) {
-      case 'critical': return '#E74C3C';
-      case 'high': return '#E67E22';
-      case 'medium': return '#F39C12';
-      case 'low': return '#27AE60';
-      case 'info': return '#3498DB';
-      default: return '#95A5A6';
+      case 'critical':
+        return '#E74C3C';
+      case 'high':
+        return '#E67E22';
+      case 'medium':
+        return '#F39C12';
+      case 'low':
+        return '#27AE60';
+      case 'info':
+        return '#3498DB';
+      default:
+        return '#95A5A6';
     }
   };
 
   const getConnectionStatusColor = (): string => {
     switch (connectionStatus) {
-      case 'connected': return '#2ECC71';
-      case 'connecting': return '#F39C12';
-      case 'disconnected': return '#E74C3C';
-      case 'error': return '#8E44AD';
-      default: return '#95A5A6';
+      case 'connected':
+        return '#2ECC71';
+      case 'connecting':
+        return '#F39C12';
+      case 'disconnected':
+        return '#E74C3C';
+      case 'error':
+        return '#8E44AD';
+      default:
+        return '#95A5A6';
     }
   };
 
@@ -126,44 +137,39 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
 
   const renderInsightFeedItem = (insight: EnhancedInsight, index: number) => {
     const isNew = index === insights.length - 1;
-    
+
     return (
       <Animated.View
         key={insight.id}
         style={[
           styles.feedItem,
           isNew && {
-            transform: [{
-              scale: animatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 1.05]
-              })
-            }],
+            transform: [
+              {
+                scale: animatedValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 1.05],
+                }),
+              },
+            ],
             opacity: animatedValue.interpolate({
               inputRange: [0, 1],
-              outputRange: [1, 0.8]
-            })
-          }
+              outputRange: [1, 0.8],
+            }),
+          },
         ]}
       >
         <View style={styles.feedItemHeader}>
           <View style={styles.feedItemMeta}>
-            <Text style={styles.feedItemIcon}>
-              {getInsightIcon(insight.type)}
-            </Text>
-            <View style={[
-              styles.severityDot,
-              { backgroundColor: getSeverityColor(insight.severity) }
-            ]} />
-            <Text style={styles.feedItemTime}>
-              {getTimeSinceInsight(insight.timestamp)}
-            </Text>
+            <Text style={styles.feedItemIcon}>{getInsightIcon(insight.type)}</Text>
+            <View
+              style={[styles.severityDot, { backgroundColor: getSeverityColor(insight.severity) }]}
+            />
+            <Text style={styles.feedItemTime}>{getTimeSinceInsight(insight.timestamp)}</Text>
           </View>
-          <Text style={styles.feedItemConfidence}>
-            {(insight.confidence * 100).toFixed(0)}%
-          </Text>
+          <Text style={styles.feedItemConfidence}>{(insight.confidence * 100).toFixed(0)}%</Text>
         </View>
-        
+
         <TouchableOpacity
           onPress={() => setSelectedInsight(insight)}
           style={styles.feedItemContent}
@@ -172,7 +178,7 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
           <Text style={styles.feedItemDescription} numberOfLines={2}>
             {insight.description}
           </Text>
-          
+
           {insight.nlpAnalysis && (
             <View style={styles.nlpTags}>
               {insight.nlpAnalysis.keyPhrases.slice(0, 3).map((phrase, idx) => (
@@ -189,44 +195,32 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
 
   const renderInsightListItem = ({ item: insight }: { item: EnhancedInsight }) => (
     <TouchableOpacity
-      style={[
-        styles.listItem,
-        selectedInsight?.id === insight.id && styles.selectedListItem
-      ]}
+      style={[styles.listItem, selectedInsight?.id === insight.id && styles.selectedListItem]}
       onPress={() => setSelectedInsight(insight)}
     >
       <View style={styles.listItemHeader}>
         <View style={styles.listItemMeta}>
-          <Text style={styles.listItemIcon}>
-            {getInsightIcon(insight.type)}
-          </Text>
+          <Text style={styles.listItemIcon}>{getInsightIcon(insight.type)}</Text>
           <Text style={styles.listItemType}>{insight.type}</Text>
-          <View style={[
-            styles.severityBadge,
-            { backgroundColor: getSeverityColor(insight.severity) }
-          ]}>
+          <View
+            style={[styles.severityBadge, { backgroundColor: getSeverityColor(insight.severity) }]}
+          >
             <Text style={styles.severityText}>{insight.severity}</Text>
           </View>
         </View>
-        <Text style={styles.listItemTime}>
-          {getTimeSinceInsight(insight.timestamp)}
-        </Text>
+        <Text style={styles.listItemTime}>{getTimeSinceInsight(insight.timestamp)}</Text>
       </View>
-      
+
       <Text style={styles.listItemTitle}>{insight.title}</Text>
       <Text style={styles.listItemDescription} numberOfLines={1}>
         {insight.description}
       </Text>
-      
+
       <View style={styles.listItemFooter}>
         <Text style={styles.listItemConfidence}>
           Confidence: {(insight.confidence * 100).toFixed(1)}%
         </Text>
-        {insight.source && (
-          <Text style={styles.listItemSource}>
-            Source: {insight.source}
-          </Text>
-        )}
+        {insight.source && <Text style={styles.listItemSource}>Source: {insight.source}</Text>}
       </View>
     </TouchableOpacity>
   );
@@ -235,9 +229,7 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
     if (!selectedInsight) {
       return (
         <View style={styles.noSelectionContainer}>
-          <Text style={styles.noSelectionText}>
-            Select an insight to view details
-          </Text>
+          <Text style={styles.noSelectionText}>Select an insight to view details</Text>
           <Text style={styles.streamStatus}>
             {isStreaming ? 'Streaming live insights...' : 'Stream paused'}
           </Text>
@@ -249,13 +241,13 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
       <ScrollView style={styles.detailsContainer}>
         <View style={styles.detailsHeader}>
           <Text style={styles.detailsTitle}>{selectedInsight.title}</Text>
-          <View style={[
-            styles.detailsSeverityBadge,
-            { backgroundColor: getSeverityColor(selectedInsight.severity) }
-          ]}>
-            <Text style={styles.detailsSeverityText}>
-              {selectedInsight.severity.toUpperCase()}
-            </Text>
+          <View
+            style={[
+              styles.detailsSeverityBadge,
+              { backgroundColor: getSeverityColor(selectedInsight.severity) },
+            ]}
+          >
+            <Text style={styles.detailsSeverityText}>{selectedInsight.severity.toUpperCase()}</Text>
           </View>
         </View>
 
@@ -300,10 +292,11 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
                   Sentiment: {selectedInsight.nlpAnalysis.sentiment.overall}
                 </Text>
                 <Text style={styles.sentimentScore}>
-                  ({(selectedInsight.nlpAnalysis.sentiment.confidence * 100).toFixed(1)}% confidence)
+                  ({(selectedInsight.nlpAnalysis.sentiment.confidence * 100).toFixed(1)}%
+                  confidence)
                 </Text>
               </View>
-              
+
               {selectedInsight.nlpAnalysis.keyPhrases.length > 0 && (
                 <View style={styles.keyPhrasesContainer}>
                   <Text style={styles.keyPhrasesLabel}>Key Phrases:</Text>
@@ -316,7 +309,7 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
                   </View>
                 </View>
               )}
-              
+
               {selectedInsight.nlpAnalysis.entities.length > 0 && (
                 <View style={styles.entitiesContainer}>
                   <Text style={styles.entitiesLabel}>Entities:</Text>
@@ -381,31 +374,25 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Real-Time Insights</Text>
-          <View style={[
-            styles.connectionIndicator,
-            { backgroundColor: getConnectionStatusColor() }
-          ]}>
+          <View
+            style={[styles.connectionIndicator, { backgroundColor: getConnectionStatusColor() }]}
+          >
             <Text style={styles.connectionText}>{connectionStatus}</Text>
           </View>
         </View>
-        
+
         <View style={styles.headerControls}>
           <TouchableOpacity
             style={[
               styles.streamToggle,
-              { backgroundColor: isStreamActive ? '#E74C3C' : '#2ECC71' }
+              { backgroundColor: isStreamActive ? '#E74C3C' : '#2ECC71' },
             ]}
             onPress={() => setIsStreamActive(!isStreamActive)}
           >
-            <Text style={styles.streamToggleText}>
-              {isStreamActive ? 'Pause' : 'Start'} Stream
-            </Text>
+            <Text style={styles.streamToggleText}>{isStreamActive ? 'Pause' : 'Start'} Stream</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={clearInsights}
-          >
+
+          <TouchableOpacity style={styles.clearButton} onPress={clearInsights}>
             <Text style={styles.clearButtonText}>Clear</Text>
           </TouchableOpacity>
         </View>
@@ -416,24 +403,18 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
         {['feed', 'list', 'graph'].map(mode => (
           <TouchableOpacity
             key={mode}
-            style={[
-              styles.modeButton,
-              displayMode === mode && styles.activeModeButton
-            ]}
+            style={[styles.modeButton, displayMode === mode && styles.activeModeButton]}
             onPress={() => setDisplayMode(mode as any)}
           >
-            <Text style={[
-              styles.modeButtonText,
-              displayMode === mode && styles.activeModeButtonText
-            ]}>
+            <Text
+              style={[styles.modeButtonText, displayMode === mode && styles.activeModeButtonText]}
+            >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
             </Text>
           </TouchableOpacity>
         ))}
-        
-        <Text style={styles.insightCount}>
-          {insights.length} insights
-        </Text>
+
+        <Text style={styles.insightCount}>{insights.length} insights</Text>
       </View>
 
       <View style={styles.contentContainer}>
@@ -455,30 +436,26 @@ export const RealTimeInsightsWidget: React.FC<RealTimeInsightsWidgetProps> = ({
               )}
             </ScrollView>
           )}
-          
+
           {displayMode === 'list' && (
             <FlatList
               data={insights}
               renderItem={renderInsightListItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={item => item.id}
               style={styles.listContainer}
               showsVerticalScrollIndicator={false}
             />
           )}
-          
+
           {displayMode === 'graph' && (
             <View style={styles.graphContainer}>
-              <Text style={styles.graphPlaceholder}>
-                📊 Graph visualization coming soon...
-              </Text>
+              <Text style={styles.graphPlaceholder}>📊 Graph visualization coming soon...</Text>
             </View>
           )}
         </View>
 
         {/* Insight Details */}
-        <View style={styles.detailsPane}>
-          {renderInsightDetails()}
-        </View>
+        <View style={styles.detailsPane}>{renderInsightDetails()}</View>
       </View>
     </View>
   );

@@ -6,7 +6,7 @@ export const initializeFirestoreCache = () => {
     cacheSizeBytes: firestore.CACHE_SIZE_UNLIMITED,
     persistence: true,
   });
-  
+
   console.log('Firestore persistence enabled with unlimited cache size');
 };
 
@@ -24,49 +24,43 @@ export const clearFirestoreCache = async () => {
 export const getDocumentFromCache = async (collection, docId) => {
   try {
     // Try to get from cache first
-    const docSnap = await firestore()
-      .collection(collection)
-      .doc(docId)
-      .get({ source: 'cache' });
-    
+    const docSnap = await firestore().collection(collection).doc(docId).get({ source: 'cache' });
+
     if (docSnap.exists) {
       console.log(`Document ${docId} retrieved from cache`);
       return { data: docSnap.data(), fromCache: true };
     }
-    
+
     // If not in cache, get from server
     const serverDocSnap = await firestore()
       .collection(collection)
       .doc(docId)
       .get({ source: 'server' });
-    
+
     if (serverDocSnap.exists) {
       console.log(`Document ${docId} retrieved from server`);
       return { data: serverDocSnap.data(), fromCache: false };
     }
-    
+
     return { data: null, fromCache: false };
   } catch (error) {
     console.error(`Error getting document ${docId}:`, error);
-    
+
     // Last resort: try default get() which will use whatever is available
     try {
-      const fallbackDocSnap = await firestore()
-        .collection(collection)
-        .doc(docId)
-        .get();
-      
+      const fallbackDocSnap = await firestore().collection(collection).doc(docId).get();
+
       if (fallbackDocSnap.exists) {
         console.log(`Document ${docId} retrieved using fallback`);
-        return { 
-          data: fallbackDocSnap.data(), 
-          fromCache: fallbackDocSnap.metadata.fromCache 
+        return {
+          data: fallbackDocSnap.data(),
+          fromCache: fallbackDocSnap.metadata.fromCache,
         };
       }
     } catch (fallbackError) {
       console.error(`Fallback error for document ${docId}:`, fallbackError);
     }
-    
+
     return { data: null, fromCache: false };
   }
 };

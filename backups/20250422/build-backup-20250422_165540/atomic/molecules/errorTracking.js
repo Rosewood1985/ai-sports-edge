@@ -7,9 +7,10 @@
 
 import * as Sentry from '@sentry/browser';
 import { CaptureContext } from '@sentry/types';
+
+import { isDevelopment } from '../atoms/envConfig';
 import { safeErrorCapture, formatError, parseError } from '../atoms/errorUtils';
 import { sentryConfig } from '../atoms/serviceConfig';
-import { isDevelopment } from '../atoms/envConfig';
 
 // Get the current user (placeholder function)
 const getCurrentUser = () => {

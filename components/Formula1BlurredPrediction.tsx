@@ -1,11 +1,7 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 
 interface Formula1BlurredPredictionProps {
@@ -13,17 +9,17 @@ interface Formula1BlurredPredictionProps {
    * Title of the prediction
    */
   title: string;
-  
+
   /**
    * Description of the prediction
    */
   description: string;
-  
+
   /**
    * Function to call when the user wants to unlock the prediction
    */
   onUnlock: () => void;
-  
+
   /**
    * Price of the prediction
    */
@@ -39,23 +35,23 @@ const Formula1BlurredPrediction = ({
   title,
   description,
   onUnlock,
-  price
+  price,
 }: Formula1BlurredPredictionProps): JSX.Element => {
   const { colors, isDark } = useTheme();
-  
+
   return (
     <View style={[styles.container, { backgroundColor: colors.card }]}>
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-      
+
       <View style={styles.blurredContent}>
-        <View style={[
-          styles.blurredOverlay,
-          { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)' }
-        ]}>
+        <View
+          style={[
+            styles.blurredOverlay,
+            { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)' },
+          ]}
+        >
           <Ionicons name="lock-closed" size={24} color={colors.primary} />
-          <Text style={[styles.blurredText, { color: colors.text }]}>
-            {description}
-          </Text>
+          <Text style={[styles.blurredText, { color: colors.text }]}>{description}</Text>
           <TouchableOpacity
             style={[styles.unlockButton, { backgroundColor: colors.primary }]}
             onPress={onUnlock}
@@ -63,7 +59,7 @@ const Formula1BlurredPrediction = ({
             <Text style={styles.unlockButtonText}>Unlock for {price}</Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Fake blurred content */}
         <View style={styles.fakeContent}>
           <View style={styles.podiumContainer}>
@@ -76,15 +72,20 @@ const Formula1BlurredPrediction = ({
               <View style={[styles.position, { backgroundColor: isDark ? '#333' : '#eee' }]} />
             </View>
           </View>
-          
+
           <View style={styles.fastestLapContainer}>
             <Text style={[styles.sectionTitle, { color: colors.primary, opacity: 0.3 }]}>
               Fastest Lap Prediction
             </Text>
             <View style={[styles.blurredLine, { backgroundColor: isDark ? '#333' : '#eee' }]} />
           </View>
-          
-          <View style={[styles.blurredLine, { backgroundColor: isDark ? '#333' : '#eee', width: '60%', alignSelf: 'flex-end' }]} />
+
+          <View
+            style={[
+              styles.blurredLine,
+              { backgroundColor: isDark ? '#333' : '#eee', width: '60%', alignSelf: 'flex-end' },
+            ]}
+          />
         </View>
       </View>
     </View>

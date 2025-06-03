@@ -1,6 +1,6 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const stripe = require('stripe')(functions.config().stripe.secret_key);
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(functions.config().stripe.secret_key);
 
 // Initialize Firestore
 const db = admin.firestore();
@@ -13,8 +13,8 @@ exports.createGiftSubscription = functions.https.onCall(async (data, context) =>
   // Check if user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'You must be logged in to create a gift subscription.'
+      "unauthenticated",
+      "You must be logged in to create a gift subscription."
     );
   }
 
@@ -24,28 +24,28 @@ exports.createGiftSubscription = functions.https.onCall(async (data, context) =>
   // Validate input
   if (!paymentMethodId) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Payment method ID is required.'
+      "invalid-argument",
+      "Payment method ID is required."
     );
   }
 
   if (!amount || amount < 2500) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Gift amount must be at least $25.'
+      "invalid-argument",
+      "Gift amount must be at least $25."
     );
   }
 
   if (!code) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Gift code is required.'
+      "invalid-argument",
+      "Gift code is required."
     );
   }
 
   try {
     // Get the user's Stripe customer ID or create one
-    const userSnapshot = await db.collection('users').doc(userId).get();
+    const userSnapshot = await db.collection("users").doc(userId).get();
     const userData = userSnapshot.data();
     
     let stripeCustomerId = userData.stripeCustomerId;
@@ -62,7 +62,7 @@ exports.createGiftSubscription = functions.https.onCall(async (data, context) =>
       stripeCustomerId = customer.id;
       
       // Update the user with the Stripe customer ID
-      await db.collection('users').doc(userId).update({
+      await db.collection("users").doc(userId).update({
         stripeCustomerId
       });
     }
@@ -82,14 +82,14 @@ exports.createGiftSubscription = functions.https.onCall(async (data, context) =>
     // Create a payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency: 'usd',
+      currency: "usd",
       customer: stripeCustomerId,
       payment_method: paymentMethodId,
       off_session: false,
       confirm: true,
       description: `Gift Subscription - $${(amount / 100).toFixed(2)}`,
       metadata: {
-        type: 'gift_subscription',
+        type: "gift_subscription",
         firebaseUserId: userId
       }
     });
@@ -99,13 +99,13 @@ exports.createGiftSubscription = functions.https.onCall(async (data, context) =>
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
     
     // Create the gift subscription in Firestore
-    const giftSubscriptionRef = db.collection('giftSubscriptions').doc(code);
+    const giftSubscriptionRef = db.collection("giftSubscriptions").doc(code);
     
     const giftSubscription = {
       code,
       amount,
-      currency: 'usd',
-      status: 'active',
+      currency: "usd",
+      status: "active",
       purchasedBy: userId,
       purchasedAt: admin.firestore.FieldValue.serverTimestamp(),
       expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
@@ -131,11 +131,11 @@ exports.createGiftSubscription = functions.https.onCall(async (data, context) =>
       expiresAt: expiresAt
     };
   } catch (error) {
-    console.error('Error creating gift subscription:', error);
+    console.error("Error creating gift subscription:", error);
     
     throw new functions.https.HttpsError(
-      'internal',
-      error.message || 'An error occurred while creating the gift subscription.'
+      "internal",
+      error.message || "An error occurred while creating the gift subscription."
     );
   }
 });
@@ -148,8 +148,8 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
   // Check if user is authenticated
   if (!context.auth) {
     throw new functions.https.HttpsError(
-      'unauthenticated',
-      'You must be logged in to redeem a gift subscription.'
+      "unauthenticated",
+      "You must be logged in to redeem a gift subscription."
     );
   }
 
@@ -159,51 +159,51 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
   // Validate input
   if (!code) {
     throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Gift code is required.'
+      "invalid-argument",
+      "Gift code is required."
     );
   }
 
   try {
     // Get the gift subscription
-    const giftRef = db.collection('giftSubscriptions').doc(code);
+    const giftRef = db.collection("giftSubscriptions").doc(code);
     const giftSnapshot = await giftRef.get();
     
     if (!giftSnapshot.exists) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'Gift subscription not found.'
+        "not-found",
+        "Gift subscription not found."
       );
     }
     
     const giftData = giftSnapshot.data();
     
     // Check if the gift subscription is already redeemed
-    if (giftData.status === 'redeemed') {
+    if (giftData.status === "redeemed") {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'Gift subscription has already been redeemed.'
+        "failed-precondition",
+        "Gift subscription has already been redeemed."
       );
     }
     
     // Check if the gift subscription is expired
-    if (giftData.status === 'expired') {
+    if (giftData.status === "expired") {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'Gift subscription has expired.'
+        "failed-precondition",
+        "Gift subscription has expired."
       );
     }
     
     // Check if the gift subscription is for a specific recipient
     if (giftData.recipientEmail) {
       // Get the user's email
-      const userSnapshot = await db.collection('users').doc(userId).get();
+      const userSnapshot = await db.collection("users").doc(userId).get();
       const userData = userSnapshot.data();
       
       if (userData.email !== giftData.recipientEmail) {
         throw new functions.https.HttpsError(
-          'permission-denied',
-          'This gift subscription is for a different email address.'
+          "permission-denied",
+          "This gift subscription is for a different email address."
         );
       }
     }
@@ -218,20 +218,20 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
     endDate.setDate(endDate.getDate() + durationDays);
     
     // Create subscription in Firestore
-    const subscriptionRef = db.collection('users').doc(userId)
-      .collection('subscriptions').doc();
+    const subscriptionRef = db.collection("users").doc(userId)
+      .collection("subscriptions").doc();
     
     const subscription = {
-      status: 'active',
-      planId: 'gift',
+      status: "active",
+      planId: "gift",
       plan: {
-        id: 'gift',
-        name: 'Gift Subscription',
+        id: "gift",
+        name: "Gift Subscription",
         description: `Gift subscription worth $${(giftData.amount / 100).toFixed(2)}`,
         amount: giftData.amount,
         currency: giftData.currency,
-        interval: 'one-time',
-        productType: 'subscription'
+        interval: "one-time",
+        productType: "subscription"
       },
       currentPeriodStart: admin.firestore.FieldValue.serverTimestamp(),
       currentPeriodEnd: admin.firestore.Timestamp.fromDate(endDate),
@@ -244,22 +244,22 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
     await subscriptionRef.set(subscription);
     
     // Update user's subscription status
-    await db.collection('users').doc(userId).update({
-      subscriptionStatus: 'active',
+    await db.collection("users").doc(userId).update({
+      subscriptionStatus: "active",
       subscriptionId: subscriptionRef.id,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
     
     // Update gift subscription status
     await giftRef.update({
-      status: 'redeemed',
+      status: "redeemed",
       redeemedBy: userId,
       redeemedAt: admin.firestore.FieldValue.serverTimestamp()
     });
     
     // Track the event
-    await db.collection('analytics').add({
-      event: 'gift_subscription_redeemed',
+    await db.collection("analytics").add({
+      event: "gift_subscription_redeemed",
       userId,
       giftCode: code,
       amount: giftData.amount,
@@ -274,15 +274,15 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
       expiresAt: endDate.getTime(),
       currentPeriodStart: now.getTime(),
       currentPeriodEnd: endDate.getTime(),
-      planId: 'gift',
+      planId: "gift",
       plan: subscription.plan
     };
   } catch (error) {
-    console.error('Error redeeming gift subscription:', error);
+    console.error("Error redeeming gift subscription:", error);
     
     throw new functions.https.HttpsError(
-      'internal',
-      error.message || 'An error occurred while redeeming the gift subscription.'
+      "internal",
+      error.message || "An error occurred while redeeming the gift subscription."
     );
   }
 });
@@ -291,20 +291,20 @@ exports.redeemGiftSubscription = functions.https.onCall(async (data, context) =>
  * Check for expired gift subscriptions and update their status
  * This function runs on a schedule (once a day)
  */
-exports.checkExpiredGiftSubscriptions = functions.pubsub.schedule('0 0 * * *')
-  .timeZone('America/New_York')
+exports.checkExpiredGiftSubscriptions = functions.pubsub.schedule("0 0 * * *")
+  .timeZone("America/New_York")
   .onRun(async (context) => {
     try {
       const now = admin.firestore.Timestamp.now();
       
       // Query for active gift subscriptions that have expired
-      const snapshot = await db.collection('giftSubscriptions')
-        .where('status', '==', 'active')
-        .where('expiresAt', '<', now)
+      const snapshot = await db.collection("giftSubscriptions")
+        .where("status", "==", "active")
+        .where("expiresAt", "<", now)
         .get();
       
       if (snapshot.empty) {
-        console.log('No expired gift subscriptions found.');
+        console.log("No expired gift subscriptions found.");
         return null;
       }
       
@@ -313,7 +313,7 @@ exports.checkExpiredGiftSubscriptions = functions.pubsub.schedule('0 0 * * *')
       
       snapshot.forEach(doc => {
         batch.update(doc.ref, {
-          status: 'expired',
+          status: "expired",
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
       });
@@ -323,7 +323,7 @@ exports.checkExpiredGiftSubscriptions = functions.pubsub.schedule('0 0 * * *')
       console.log(`Updated ${snapshot.size} expired gift subscriptions.`);
       return null;
     } catch (error) {
-      console.error('Error checking expired gift subscriptions:', error);
+      console.error("Error checking expired gift subscriptions:", error);
       return null;
     }
   });

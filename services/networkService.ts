@@ -1,5 +1,6 @@
-import { Platform } from 'react-native';
 import NetInfo, { NetInfoState, NetInfoSubscription } from '@react-native-community/netinfo';
+import { Platform } from 'react-native';
+
 import { analyticsService } from './analyticsService';
 
 /**
@@ -8,7 +9,7 @@ import { analyticsService } from './analyticsService';
 export enum ConnectionStatus {
   CONNECTED = 'connected',
   DISCONNECTED = 'disconnected',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
@@ -19,7 +20,7 @@ export enum ConnectionType {
   CELLULAR = 'cellular',
   ETHERNET = 'ethernet',
   UNKNOWN = 'unknown',
-  NONE = 'none'
+  NONE = 'none',
 }
 
 /**
@@ -55,20 +56,20 @@ class NetworkService {
   private readonly MAX_RECONNECTION_ATTEMPTS = 5;
   private reconnectionTimer: any = null;
   private isReconnecting: boolean = false;
-  
+
   /**
    * Initialize the network service
    */
   initialize(): void {
     // Subscribe to network info changes
     this.netInfoSubscription = NetInfo.addEventListener(this.handleNetInfoChange);
-    
+
     // Get initial network state
     this.checkNetworkStatus();
-    
+
     console.log('Network service initialized');
   }
-  
+
   /**
    * Clean up the network service
    */
@@ -78,13 +79,13 @@ class NetworkService {
       this.netInfoSubscription();
       this.netInfoSubscription = null;
     }
-    
+
     // Clear reconnection timer
     this.clearReconnectionTimer();
-    
+
     console.log('Network service cleaned up');
   }
-  
+
   /**
    * Check current network status
    * @returns Promise with connection info
@@ -93,16 +94,16 @@ class NetworkService {
     try {
       const netInfo = await NetInfo.fetch();
       const connectionInfo = this.createConnectionInfo(netInfo);
-      
+
       // Update current status
       this.currentStatus = connectionInfo.status;
       this.currentConnectionInfo = connectionInfo;
-      
+
       return connectionInfo;
     } catch (error) {
       console.error('Error checking network status:', error);
       analyticsService.trackError(error as Error, { method: 'checkNetworkStatus' });
-      
+
       // Return unknown status
       const unknownConnectionInfo: ConnectionInfo = {
         status: ConnectionStatus.UNKNOWN,
@@ -110,16 +111,16 @@ class NetworkService {
         isConnected: false,
         isInternetReachable: null,
         details: {},
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
-      
+
       this.currentStatus = ConnectionStatus.UNKNOWN;
       this.currentConnectionInfo = unknownConnectionInfo;
-      
+
       return unknownConnectionInfo;
     }
   }
-  
+
   /**
    * Get current connection info
    * @returns Current connection info or null if not available
@@ -127,7 +128,7 @@ class NetworkService {
   getCurrentConnectionInfo(): ConnectionInfo | null {
     return this.currentConnectionInfo;
   }
-  
+
   /**
    * Check if device is currently connected
    * @returns True if connected, false otherwise
@@ -135,7 +136,7 @@ class NetworkService {
   isConnected(): boolean {
     return this.currentStatus === ConnectionStatus.CONNECTED;
   }
-  
+
   /**
    * Add network status change listener
    * @param listener Function to call when network status changes
@@ -143,18 +144,18 @@ class NetworkService {
    */
   addListener(listener: NetworkStatusListener): () => void {
     this.listeners.push(listener);
-    
+
     // If we already have connection info, notify the listener immediately
     if (this.currentConnectionInfo) {
       listener(this.currentConnectionInfo);
     }
-    
+
     // Return function to remove the listener
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener);
     };
   }
-  
+
   /**
    * Handle NetInfo state change
    * @param state New NetInfo state
@@ -162,33 +163,37 @@ class NetworkService {
   private handleNetInfoChange = (state: NetInfoState): void => {
     const connectionInfo = this.createConnectionInfo(state);
     const previousStatus = this.currentStatus;
-    
+
     // Update current status
     this.currentStatus = connectionInfo.status;
     this.currentConnectionInfo = connectionInfo;
-    
+
     // Track status change in analytics
     if (previousStatus !== connectionInfo.status) {
       analyticsService.trackEvent('network_status_change', {
         previousStatus,
         currentStatus: connectionInfo.status,
-        connectionType: connectionInfo.type
+        connectionType: connectionInfo.type,
       });
-      
+
       // Handle reconnection if needed
-      if (previousStatus === ConnectionStatus.DISCONNECTED && 
-          connectionInfo.status === ConnectionStatus.CONNECTED) {
+      if (
+        previousStatus === ConnectionStatus.DISCONNECTED &&
+        connectionInfo.status === ConnectionStatus.CONNECTED
+      ) {
         this.handleReconnection();
-      } else if (previousStatus === ConnectionStatus.CONNECTED && 
-                connectionInfo.status === ConnectionStatus.DISCONNECTED) {
+      } else if (
+        previousStatus === ConnectionStatus.CONNECTED &&
+        connectionInfo.status === ConnectionStatus.DISCONNECTED
+      ) {
         this.handleDisconnection();
       }
     }
-    
+
     // Notify listeners
     this.notifyListeners(connectionInfo);
   };
-  
+
   /**
    * Create connection info from NetInfo state
    * @param state NetInfo state
@@ -204,7 +209,7 @@ class NetworkService {
     } else {
       status = ConnectionStatus.UNKNOWN;
     }
-    
+
     // Determine connection type
     let type: ConnectionType;
     switch (state.type) {
@@ -223,7 +228,7 @@ class NetworkService {
       default:
         type = ConnectionType.UNKNOWN;
     }
-    
+
     // Create connection info
     return {
       status,
@@ -233,12 +238,12 @@ class NetworkService {
       details: {
         isConnectionExpensive: state.details?.isConnectionExpensive,
         cellularGeneration: state.details?.cellularGeneration,
-        strength: state.details?.strength
+        strength: state.details?.strength,
       },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
-  
+
   /**
    * Notify all listeners of network status change
    * @param connectionInfo Current connection info
@@ -252,30 +257,30 @@ class NetworkService {
       }
     });
   }
-  
+
   /**
    * Handle reconnection to network
    */
   private handleReconnection(): void {
     console.log('Network reconnected');
-    
+
     // Reset reconnection attempts
     this.reconnectionAttempts = 0;
     this.isReconnecting = false;
-    
+
     // Clear reconnection timer
     this.clearReconnectionTimer();
-    
+
     // Trigger sync of offline data
     this.triggerOfflineSync();
   }
-  
+
   /**
    * Handle disconnection from network
    */
   private handleDisconnection(): void {
     console.log('Network disconnected');
-    
+
     // Start reconnection attempts if not already reconnecting
     if (!this.isReconnecting) {
       this.isReconnecting = true;
@@ -283,23 +288,23 @@ class NetworkService {
       this.scheduleReconnectionCheck();
     }
   }
-  
+
   /**
    * Schedule reconnection check
    */
   private scheduleReconnectionCheck(): void {
     // Clear any existing timer
     this.clearReconnectionTimer();
-    
+
     // Calculate delay based on attempts (exponential backoff)
     const delay = Math.min(1000 * Math.pow(2, this.reconnectionAttempts), 30000);
-    
+
     // Schedule reconnection check
     this.reconnectionTimer = setTimeout(() => {
       this.attemptReconnection();
     }, delay);
   }
-  
+
   /**
    * Attempt to reconnect to network
    */
@@ -309,12 +314,14 @@ class NetworkService {
       this.isReconnecting = false;
       return;
     }
-    
-    console.log(`Attempting to reconnect (attempt ${this.reconnectionAttempts + 1}/${this.MAX_RECONNECTION_ATTEMPTS})`);
-    
+
+    console.log(
+      `Attempting to reconnect (attempt ${this.reconnectionAttempts + 1}/${this.MAX_RECONNECTION_ATTEMPTS})`
+    );
+
     // Increment attempts
     this.reconnectionAttempts++;
-    
+
     // Check network status
     this.checkNetworkStatus()
       .then(connectionInfo => {
@@ -331,7 +338,7 @@ class NetworkService {
         this.scheduleReconnectionCheck();
       });
   }
-  
+
   /**
    * Clear reconnection timer
    */
@@ -341,18 +348,18 @@ class NetworkService {
       this.reconnectionTimer = null;
     }
   }
-  
+
   /**
    * Trigger sync of offline data
    */
   private triggerOfflineSync(): void {
     // This will be implemented as part of the offline actions queue
     console.log('Triggering offline data sync');
-    
+
     // For now, just track the event
     analyticsService.trackEvent('offline_sync_triggered', {
       reconnectionAttempts: this.reconnectionAttempts,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 }

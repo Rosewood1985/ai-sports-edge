@@ -1,6 +1,6 @@
 /**
  * DDoS Protection Module
- * 
+ *
  * This module provides DDoS protection for the AI Sports Edge application.
  * It uses rate limiting, IP filtering, and other techniques to prevent denial of service attacks.
  */
@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
 const helmet = require('helmet');
 const ipFilter = require('express-ipfilter').IpFilter;
+
 const { createLogger } = require('./loggingService');
 
 // Create a logger for security events
@@ -52,7 +53,7 @@ const configureDdosProtection = (options = {}) => {
     };
 
     middleware.push(ipFilter(whitelist.length > 0 ? whitelist : blacklist, ipFilterOptions));
-    
+
     // Custom IP filter error handler
     middleware.push((err, req, res, next) => {
       if (err.name === 'IpDeniedError') {
@@ -62,13 +63,13 @@ const configureDdosProtection = (options = {}) => {
           method: req.method,
           userAgent: req.headers['user-agent'],
         });
-        
+
         return res.status(403).json({
           error: 'Access Denied',
           message: 'Your IP address is not allowed to access this resource',
         });
       }
-      
+
       next(err);
     });
   }
@@ -86,14 +87,14 @@ const configureDdosProtection = (options = {}) => {
         method: req.method,
         userAgent: req.headers['user-agent'],
       });
-      
+
       res.status(429).json({
         error: 'Too Many Requests',
         message: 'You have exceeded the rate limit. Please try again later.',
       });
     },
   });
-  
+
   middleware.push(limiter);
 
   // Speed limiting middleware
@@ -111,7 +112,7 @@ const configureDdosProtection = (options = {}) => {
       });
     },
   });
-  
+
   middleware.push(speedLimiter);
 
   // Helmet middleware for security headers
@@ -120,25 +121,26 @@ const configureDdosProtection = (options = {}) => {
   // Detect and log suspicious requests
   middleware.push((req, res, next) => {
     // Check for suspicious query parameters
-    const suspiciousParams = Object.keys(req.query).some(param => 
-      param.includes('script') || 
-      param.includes('exec') || 
-      param.includes('sql') ||
-      param.includes('eval')
+    const suspiciousParams = Object.keys(req.query).some(
+      param =>
+        param.includes('script') ||
+        param.includes('exec') ||
+        param.includes('sql') ||
+        param.includes('eval')
     );
-    
+
     // Check for suspicious headers
-    const suspiciousHeaders = Object.keys(req.headers).some(header => 
-      header.includes('x-forwarded-host') || 
-      header.includes('x-host')
+    const suspiciousHeaders = Object.keys(req.headers).some(
+      header => header.includes('x-forwarded-host') || header.includes('x-host')
     );
-    
+
     // Check for suspicious paths
-    const suspiciousPath = req.path.includes('..') || 
-      req.path.includes('admin') || 
+    const suspiciousPath =
+      req.path.includes('..') ||
+      req.path.includes('admin') ||
       req.path.includes('wp-') ||
       req.path.includes('phpMyAdmin');
-    
+
     if (suspiciousParams || suspiciousHeaders || suspiciousPath) {
       securityLogger.warn('Suspicious Request Detected', {
         ip: req.ip,
@@ -152,7 +154,7 @@ const configureDdosProtection = (options = {}) => {
         suspiciousPath,
       });
     }
-    
+
     next();
   });
 
@@ -166,11 +168,11 @@ const configureDdosProtection = (options = {}) => {
  */
 const applyDdosProtection = (app, options = {}) => {
   const middleware = configureDdosProtection(options);
-  
+
   middleware.forEach(mw => {
     app.use(mw);
   });
-  
+
   securityLogger.info('DDoS protection configured', {
     rateWindow: options.rateWindow || '15 minutes',
     rateMax: options.rateMax || 100,

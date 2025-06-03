@@ -1,29 +1,27 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
 import BettingAnalytics from '../components/BettingAnalytics';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
 
 /**
  * Screen that displays betting analytics for the user
  */
 const BettingAnalyticsScreen: React.FC = () => {
   const navigation = useNavigation();
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Betting Analytics</ThemedText>
       </View>
-      
+
       <ThemedView style={styles.content}>
         <BettingAnalytics />
       </ThemedView>

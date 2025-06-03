@@ -5,6 +5,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { cacheService } from './cacheService';
 
 export interface CacheStrategy {
@@ -76,7 +77,7 @@ export class RealTimeDataCacheService {
       persistToDisk: false,
       compressionEnabled: false,
     },
-    
+
     // L2: Compressed memory for recent game data
     l2_recent: {
       name: 'Recent Data L2',
@@ -86,7 +87,7 @@ export class RealTimeDataCacheService {
       persistToDisk: false,
       compressionEnabled: true,
     },
-    
+
     // L3: Persistent storage for historical data
     l3_historical: {
       name: 'Historical Data L3',
@@ -96,7 +97,7 @@ export class RealTimeDataCacheService {
       persistToDisk: true,
       compressionEnabled: true,
     },
-    
+
     // L4: Analytics cache for aggregated data
     l4_analytics: {
       name: 'Analytics Data L4',
@@ -144,7 +145,7 @@ export class RealTimeDataCacheService {
         // Update access metrics
         entry.lastAccessed = Date.now();
         entry.accessCount++;
-        
+
         // Promote to higher cache level if frequently accessed
         if (entry.accessCount > 10 && levelName !== levels[0]) {
           await this.promoteEntry(key, entry, levels[0]);
@@ -183,7 +184,7 @@ export class RealTimeDataCacheService {
 
     const levels = this.getCacheLevelsForDataType(dataType);
     const primaryLevel = this.cacheLevels.get(levels[0]);
-    
+
     if (!primaryLevel) return;
 
     const serializedData = await this.serializeData(data, primaryLevel.strategy);
@@ -194,15 +195,16 @@ export class RealTimeDataCacheService {
       accessCount: 0,
       priority,
       size: this.calculateSize(serializedData),
-      compressed: primaryLevel.strategy.compressionEnabled && 
-                 this.calculateSize(data) > this.COMPRESSION_THRESHOLD,
+      compressed:
+        primaryLevel.strategy.compressionEnabled &&
+        this.calculateSize(data) > this.COMPRESSION_THRESHOLD,
       source,
       version,
     };
 
     // Ensure capacity before insertion
     await this.ensureCapacity(primaryLevel, entry.size);
-    
+
     // Insert into primary level
     primaryLevel.storage.set(key, entry);
     primaryLevel.currentSize += entry.size;
@@ -243,15 +245,13 @@ export class RealTimeDataCacheService {
    * Batch set operation for multiple entries
    */
   async setBatch<T>(
-    entries: Array<{
+    entries: {
       key: string;
       data: T;
       options?: Parameters<typeof this.set>[2];
-    }>
+    }[]
   ): Promise<void> {
-    const promises = entries.map(({ key, data, options }) =>
-      this.set(key, data, options)
-    );
+    const promises = entries.map(({ key, data, options }) => this.set(key, data, options));
 
     await Promise.all(promises);
   }
@@ -267,10 +267,8 @@ export class RealTimeDataCacheService {
       const keysToDelete: string[] = [];
 
       for (const [key] of level.storage) {
-        const matches = isRegex 
-          ? pattern.test(key)
-          : key.includes(pattern as string);
-        
+        const matches = isRegex ? pattern.test(key) : key.includes(pattern as string);
+
         if (matches) {
           keysToDelete.push(key);
         }
@@ -301,16 +299,16 @@ export class RealTimeDataCacheService {
    * Preload data with priority
    */
   async preload<T>(
-    entries: Array<{
+    entries: {
       key: string;
       loader: () => Promise<T>;
       dataType?: 'live' | 'recent' | 'historical' | 'analytics';
       priority?: number;
-    }>
+    }[]
   ): Promise<void> {
     // Sort by priority (higher first)
     const sortedEntries = entries.sort((a, b) => (b.priority || 5) - (a.priority || 5));
-    
+
     const promises = sortedEntries.map(async ({ key, loader, dataType, priority }) => {
       try {
         // Check if already cached
@@ -320,7 +318,7 @@ export class RealTimeDataCacheService {
         // Load and cache
         const data = await loader();
         await this.set(key, data, { dataType, priority });
-        
+
         console.log(`Preloaded ${key} with priority ${priority || 5}`);
       } catch (error) {
         console.error(`Failed to preload ${key}:`, error);
@@ -334,20 +332,24 @@ export class RealTimeDataCacheService {
    * Get comprehensive cache metrics
    */
   getMetrics(): CacheMetrics & {
-    levelDetails: Record<string, {
-      size: number;
-      count: number;
-      hitRate: number;
-      avgDataAge: number;
-    }>;
+    levelDetails: Record<
+      string,
+      {
+        size: number;
+        count: number;
+        hitRate: number;
+        avgDataAge: number;
+      }
+    >;
   } {
     const levelDetails: Record<string, any> = {};
 
     for (const [name, level] of this.cacheLevels) {
       const entries = Array.from(level.storage.values());
-      const avgAge = entries.length > 0
-        ? entries.reduce((sum, entry) => sum + (Date.now() - entry.timestamp), 0) / entries.length
-        : 0;
+      const avgAge =
+        entries.length > 0
+          ? entries.reduce((sum, entry) => sum + (Date.now() - entry.timestamp), 0) / entries.length
+          : 0;
 
       levelDetails[name] = {
         size: level.currentSize,
@@ -368,12 +370,12 @@ export class RealTimeDataCacheService {
    */
   async warmCache(patterns: string[]): Promise<void> {
     console.log('Starting cache warming...');
-    
+
     for (const pattern of patterns) {
       try {
         // Load from persistent storage first
         await this.loadPatternFromDisk(pattern);
-        
+
         // You could also trigger API calls here to refresh data
         console.log(`Warmed cache for pattern: ${pattern}`);
       } catch (error) {
@@ -406,12 +408,10 @@ export class RealTimeDataCacheService {
    * Clear all caches
    */
   async clearAll(): Promise<void> {
-    const promises = Array.from(this.cacheLevels.keys()).map(level => 
-      this.clearLevel(level)
-    );
-    
+    const promises = Array.from(this.cacheLevels.keys()).map(level => this.clearLevel(level));
+
     await Promise.all(promises);
-    
+
     // Reset metrics
     this.metrics = {
       totalHits: 0,
@@ -459,7 +459,7 @@ export class RealTimeDataCacheService {
 
   private isValidEntry(entry: RealTimeDataEntry<any>, strategy: CacheStrategy): boolean {
     const now = Date.now();
-    return (now - entry.timestamp) < strategy.ttl;
+    return now - entry.timestamp < strategy.ttl;
   }
 
   private async ensureCapacity(level: CacheLevel, requiredSize: number): Promise<void> {
@@ -575,12 +575,12 @@ export class RealTimeDataCacheService {
   private recordHit(levelName: string, latency: number): void {
     this.metrics.totalHits++;
     this.metrics.levelHits[levelName]++;
-    
+
     this.latencyTracker.push(latency);
     if (this.latencyTracker.length > 1000) {
       this.latencyTracker = this.latencyTracker.slice(-500);
     }
-    
+
     this.updateMetrics();
   }
 
@@ -599,13 +599,16 @@ export class RealTimeDataCacheService {
   private updateMetrics(): void {
     const total = this.metrics.totalHits + this.metrics.totalMisses;
     this.metrics.hitRate = total > 0 ? this.metrics.totalHits / total : 0;
-    this.metrics.averageLatency = this.latencyTracker.length > 0
-      ? this.latencyTracker.reduce((sum, lat) => sum + lat, 0) / this.latencyTracker.length
-      : 0;
+    this.metrics.averageLatency =
+      this.latencyTracker.length > 0
+        ? this.latencyTracker.reduce((sum, lat) => sum + lat, 0) / this.latencyTracker.length
+        : 0;
 
     // Calculate memory usage
-    this.metrics.memoryUsage = Array.from(this.cacheLevels.values())
-      .reduce((total, level) => total + level.currentSize, 0);
+    this.metrics.memoryUsage = Array.from(this.cacheLevels.values()).reduce(
+      (total, level) => total + level.currentSize,
+      0
+    );
   }
 
   private async persistToDisk(
@@ -639,8 +642,8 @@ export class RealTimeDataCacheService {
       const batchSize = 10;
       for (let i = 0; i < cacheKeys.length; i += batchSize) {
         const batch = cacheKeys.slice(i, i + batchSize);
-        
-        const promises = batch.map(async (storageKey) => {
+
+        const promises = batch.map(async storageKey => {
           try {
             const data = await AsyncStorage.getItem(storageKey);
             if (!data) return;
@@ -669,8 +672,8 @@ export class RealTimeDataCacheService {
   private async loadPatternFromDisk(pattern: string): Promise<void> {
     try {
       const keys = await AsyncStorage.getAllKeys();
-      const matchingKeys = keys.filter(key => 
-        key.startsWith(this.STORAGE_PREFIX) && key.includes(pattern)
+      const matchingKeys = keys.filter(
+        key => key.startsWith(this.STORAGE_PREFIX) && key.includes(pattern)
       );
 
       for (const storageKey of matchingKeys) {

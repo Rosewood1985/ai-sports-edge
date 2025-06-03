@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,14 +8,13 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { auth } from '../config/firebase';
-import { generateSubscriptionReport } from '../services/subscriptionAnalyticsService';
+
 import { NeonContainer, NeonText } from '../atomic/atoms';
 import { Header } from '../atomic/organisms';
+import { auth } from '../config/firebase';
+import { generateSubscriptionReport } from '../services/subscriptionAnalyticsService';
 
 // Mock data for initial development
 const MOCK_DATA = {
@@ -25,7 +26,7 @@ const MOCK_DATA = {
   subscriptionsByPlan: [
     { name: 'Basic Monthly', count: 0, percentage: 0 },
     { name: 'Premium Monthly', count: 1, percentage: 100 },
-    { name: 'Premium Annual', count: 0, percentage: 0 }
+    { name: 'Premium Annual', count: 0, percentage: 0 },
   ],
   revenueByMonth: [
     { month: 'Jan', revenue: 0 },
@@ -33,13 +34,13 @@ const MOCK_DATA = {
     { month: 'Mar', revenue: 9.99 },
     { month: 'Apr', revenue: 9.99 },
     { month: 'May', revenue: 9.99 },
-    { month: 'Jun', revenue: 0 }
+    { month: 'Jun', revenue: 0 },
   ],
   subscriptionsByStatus: [
     { status: 'Active', count: 1, percentage: 100 },
     { status: 'Canceled', count: 0, percentage: 0 },
-    { status: 'Past Due', count: 0, percentage: 0 }
-  ]
+    { status: 'Past Due', count: 0, percentage: 0 },
+  ],
 };
 
 /**
@@ -49,37 +50,37 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [analyticsData, setAnalyticsData] = useState<any>(null);
-  
+
   const navigation = useNavigation();
-  
+
   useEffect(() => {
     loadAnalyticsData();
   }, [timeRange]);
-  
+
   const loadAnalyticsData = async () => {
     try {
       setLoading(true);
-      
+
       const userId = auth.currentUser?.uid;
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      
+
       // Fetch real data from the backend
       const data = await generateSubscriptionReport(userId, timeRange);
-      
+
       // Set the analytics data
       setAnalyticsData(data);
     } catch (error) {
       console.error('Error loading analytics data:', error);
-      
+
       // In case of error, use mock data to prevent UI from breaking
       setAnalyticsData(MOCK_DATA);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const renderTimeRangeSelector = () => (
     <View style={styles.timeRangeContainer}>
       <TouchableOpacity
@@ -90,7 +91,7 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
           7 Days
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.timeRangeButton, timeRange === '30d' && styles.timeRangeButtonActive]}
         onPress={() => setTimeRange('30d')}
@@ -99,7 +100,7 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
           30 Days
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.timeRangeButton, timeRange === '90d' && styles.timeRangeButtonActive]}
         onPress={() => setTimeRange('90d')}
@@ -108,7 +109,7 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
           90 Days
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={[styles.timeRangeButton, timeRange === 'all' && styles.timeRangeButtonActive]}
         onPress={() => setTimeRange('all')}
@@ -119,7 +120,7 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
       </TouchableOpacity>
     </View>
   );
-  
+
   const renderMetricCard = (title: string, value: string | number, icon: string, color: string) => (
     <View style={styles.metricCard}>
       <View style={[styles.metricIconContainer, { backgroundColor: color }]}>
@@ -129,7 +130,7 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
       <Text style={styles.metricTitle}>{title}</Text>
     </View>
   );
-  
+
   const renderBarChart = (data: any[], xKey: string, yKey: string, title: string) => (
     <View style={styles.chartContainer}>
       <Text style={styles.chartTitle}>{title}</Text>
@@ -140,19 +141,21 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
               <Text style={styles.barLabel}>{item[xKey]}</Text>
             </View>
             <View style={styles.barWrapper}>
-              <View 
+              <View
                 style={[
-                  styles.bar, 
-                  { 
+                  styles.bar,
+                  {
                     width: `${Math.min(100, (item[yKey] / Math.max(...data.map(d => d[yKey]))) * 100)}%`,
-                    backgroundColor: '#3498db'
-                  }
-                ]} 
+                    backgroundColor: '#3498db',
+                  },
+                ]}
               />
             </View>
             <Text style={styles.barValue}>
-              {typeof item[yKey] === 'number' ? 
-                yKey === 'revenue' ? `$${item[yKey].toFixed(2)}` : item[yKey] 
+              {typeof item[yKey] === 'number'
+                ? yKey === 'revenue'
+                  ? `$${item[yKey].toFixed(2)}`
+                  : item[yKey]
                 : item[yKey]}
             </Text>
           </View>
@@ -160,35 +163,36 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
       </View>
     </View>
   );
-  
-  const renderPieChart = (data: any[], nameKey: string, valueKey: string, percentageKey: string, title: string) => (
+
+  const renderPieChart = (
+    data: any[],
+    nameKey: string,
+    valueKey: string,
+    percentageKey: string,
+    title: string
+  ) => (
     <View style={styles.chartContainer}>
       <Text style={styles.chartTitle}>{title}</Text>
       <View style={styles.pieChartContainer}>
         <View style={styles.pieChartLegend}>
           {data.map((item, index) => (
             <View key={index} style={styles.legendItem}>
-              <View 
-                style={[
-                  styles.legendColor, 
-                  { backgroundColor: getColorForIndex(index) }
-                ]} 
-              />
+              <View style={[styles.legendColor, { backgroundColor: getColorForIndex(index) }]} />
               <Text style={styles.legendLabel}>{item[nameKey]}</Text>
               <Text style={styles.legendValue}>{item[valueKey]}</Text>
               <Text style={styles.legendPercentage}>({item[percentageKey]}%)</Text>
             </View>
           ))}
         </View>
-        
+
         {/* Simple pie chart visualization */}
         <View style={styles.pieChartWrapper}>
           {data.map((item, index) => (
-            <View 
+            <View
               key={index}
               style={[
                 styles.pieChartSegment,
-                { 
+                {
                   backgroundColor: getColorForIndex(index),
                   width: 40,
                   height: 40,
@@ -196,8 +200,8 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
                   position: 'absolute',
                   top: index * 10,
                   left: index * 10,
-                  opacity: item[percentageKey] > 0 ? 1 : 0.3
-                }
+                  opacity: item[percentageKey] > 0 ? 1 : 0.3,
+                },
               ]}
             />
           ))}
@@ -205,12 +209,12 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
       </View>
     </View>
   );
-  
+
   const getColorForIndex = (index: number): string => {
     const colors = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c'];
     return colors[index % colors.length];
   };
-  
+
   if (loading) {
     return (
       <NeonContainer>
@@ -221,22 +225,18 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
       </NeonContainer>
     );
   }
-  
+
   return (
     <NeonContainer>
-      <Header
-        title="Subscription Analytics"
-        onRefresh={loadAnalyticsData}
-        isLoading={loading}
-      />
-      
+      <Header title="Subscription Analytics" onRefresh={loadAnalyticsData} isLoading={loading} />
+
       <ScrollView style={styles.container}>
-        <NeonText type="heading" glow={true} style={styles.title}>
+        <NeonText type="heading" glow style={styles.title}>
           Subscription Analytics
         </NeonText>
-        
+
         {renderTimeRangeSelector()}
-        
+
         <View style={styles.metricsContainer}>
           {renderMetricCard(
             'Active Subscriptions',
@@ -244,21 +244,21 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
             'people',
             '#3498db'
           )}
-          
+
           {renderMetricCard(
             'Total Revenue',
             `$${analyticsData.totalRevenue.toFixed(2)}`,
             'cash',
             '#2ecc71'
           )}
-          
+
           {renderMetricCard(
             'Churn Rate',
             `${analyticsData.churnRate}%`,
             'trending-down',
             '#e74c3c'
           )}
-          
+
           {renderMetricCard(
             'Conversion Rate',
             `${analyticsData.conversionRate}%`,
@@ -266,14 +266,9 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
             '#f39c12'
           )}
         </View>
-        
-        {renderBarChart(
-          analyticsData.revenueByMonth,
-          'month',
-          'revenue',
-          'Revenue by Month'
-        )}
-        
+
+        {renderBarChart(analyticsData.revenueByMonth, 'month', 'revenue', 'Revenue by Month')}
+
         {renderPieChart(
           analyticsData.subscriptionsByPlan,
           'name',
@@ -281,7 +276,7 @@ const SubscriptionAnalyticsScreen: React.FC = () => {
           'percentage',
           'Subscriptions by Plan'
         )}
-        
+
         {renderPieChart(
           analyticsData.subscriptionsByStatus,
           'status',

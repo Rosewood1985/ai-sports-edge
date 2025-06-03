@@ -1,12 +1,8 @@
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity 
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
 import { useThemeColor } from '../hooks/useThemeColor';
 import { BadgeType } from '../types/rewards';
 
@@ -26,72 +22,72 @@ const ReferralBadge: React.FC<ReferralBadgeProps> = ({
   type,
   size = 'medium',
   onPress,
-  showLabel = false
+  showLabel = false,
 }) => {
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
-  
+
   const getBadgeConfig = () => {
     switch (type) {
       case 'rookie':
         return {
           icon: 'star-outline',
           colors: ['#3498db', '#2980b9'] as const,
-          label: 'Rookie Referrer'
+          label: 'Rookie Referrer',
         };
       case 'elite':
         return {
           icon: 'star-half',
           colors: ['#f39c12', '#d35400'] as const,
-          label: 'Elite Referrer'
+          label: 'Elite Referrer',
         };
       case 'hall-of-fame':
         return {
           icon: 'star',
           colors: ['#f1c40f', '#e67e22'] as const,
-          label: 'Hall of Fame'
+          label: 'Hall of Fame',
         };
       default:
         return {
           icon: 'star-outline',
           colors: ['#3498db', '#2980b9'] as const,
-          label: 'Rookie Referrer'
+          label: 'Rookie Referrer',
         };
     }
   };
-  
+
   const getSizeConfig = () => {
     switch (size) {
       case 'small':
         return {
           containerSize: 40,
           iconSize: 20,
-          fontSize: 10
+          fontSize: 10,
         };
       case 'large':
         return {
           containerSize: 80,
           iconSize: 40,
-          fontSize: 14
+          fontSize: 14,
         };
       default:
         return {
           containerSize: 60,
           iconSize: 30,
-          fontSize: 12
+          fontSize: 12,
         };
     }
   };
-  
+
   const badgeConfig = getBadgeConfig();
   const sizeConfig = getSizeConfig();
-  
+
   const BadgeContent = () => (
     <LinearGradient
       colors={badgeConfig.colors}
       style={[
         styles.badgeContainer,
-        { width: sizeConfig.containerSize, height: sizeConfig.containerSize }
+        { width: sizeConfig.containerSize, height: sizeConfig.containerSize },
       ]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -99,7 +95,7 @@ const ReferralBadge: React.FC<ReferralBadgeProps> = ({
       <Ionicons name={badgeConfig.icon as any} size={sizeConfig.iconSize} color="#fff" />
     </LinearGradient>
   );
-  
+
   return (
     <View style={styles.container}>
       {onPress ? (
@@ -109,12 +105,9 @@ const ReferralBadge: React.FC<ReferralBadgeProps> = ({
       ) : (
         <BadgeContent />
       )}
-      
+
       {showLabel && (
-        <Text style={[
-          styles.label, 
-          { color: textColor, fontSize: sizeConfig.fontSize }
-        ]}>
+        <Text style={[styles.label, { color: textColor, fontSize: sizeConfig.fontSize }]}>
           {badgeConfig.label}
         </Text>
       )}

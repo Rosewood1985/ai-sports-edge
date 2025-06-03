@@ -83,40 +83,44 @@ class NbaOddsService {
   async getBestOdds() {
     try {
       const games = await this.getMoneylineOdds();
-      
+
       return games.map(game => {
         // Find best odds for home team
-        const homeOdds = game.bookmakers.map(bookmaker => {
-          const market = bookmaker.markets.find(m => m.key === 'h2h');
-          if (!market) return null;
-          
-          const outcome = market.outcomes.find(o => o.name === game.homeTeam);
-          if (!outcome) return null;
-          
-          return {
-            bookmaker: bookmaker.name,
-            price: outcome.price,
-          };
-        }).filter(Boolean);
-        
+        const homeOdds = game.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === game.homeTeam);
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
         // Find best odds for away team
-        const awayOdds = game.bookmakers.map(bookmaker => {
-          const market = bookmaker.markets.find(m => m.key === 'h2h');
-          if (!market) return null;
-          
-          const outcome = market.outcomes.find(o => o.name === game.awayTeam);
-          if (!outcome) return null;
-          
-          return {
-            bookmaker: bookmaker.name,
-            price: outcome.price,
-          };
-        }).filter(Boolean);
-        
+        const awayOdds = game.bookmakers
+          .map(bookmaker => {
+            const market = bookmaker.markets.find(m => m.key === 'h2h');
+            if (!market) return null;
+
+            const outcome = market.outcomes.find(o => o.name === game.awayTeam);
+            if (!outcome) return null;
+
+            return {
+              bookmaker: bookmaker.name,
+              price: outcome.price,
+            };
+          })
+          .filter(Boolean);
+
         // Sort by best price
         const bestHomeOdds = homeOdds.sort((a, b) => b.price - a.price)[0] || null;
         const bestAwayOdds = awayOdds.sort((a, b) => b.price - a.price)[0] || null;
-        
+
         return {
           id: game.id,
           sport: game.sport,

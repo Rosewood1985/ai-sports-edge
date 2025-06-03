@@ -4,13 +4,14 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useWebSocket } from '../api/swrApiService';
-import { EnhancedWidget } from '../../../src/components/dashboard/widgets/EnhancedWidget';
-import { MetricCard } from '../../../src/components/dashboard/metrics/MetricCard';
-import { HorizontalBarChart } from '../../../src/components/dashboard/charts/HorizontalBarChart';
+
 import { LineChart } from '../../../atomic/molecules/charts/LineChart';
+import { HorizontalBarChart } from '../../../src/components/dashboard/charts/HorizontalBarChart';
+import { MetricCard } from '../../../src/components/dashboard/metrics/MetricCard';
+import { EnhancedWidget } from '../../../src/components/dashboard/widgets/EnhancedWidget';
 import { LoadingIndicator } from '../../atoms/LoadingIndicator';
 import { Toast } from '../../atoms/Toast';
+import { useWebSocket } from '../api/swrApiService';
 
 // Types
 interface SystemHealthData {
@@ -19,7 +20,7 @@ interface SystemHealthData {
     responseTime: number;
     errorRate: number;
     requestsPerMinute: number;
-    endpointPerformance: Array<{ endpoint: string; responseTime: number }>;
+    endpointPerformance: { endpoint: string; responseTime: number }[];
     healthScore: number;
   };
   databasePerformance: {
@@ -31,36 +32,36 @@ interface SystemHealthData {
   };
   infrastructureCosts: {
     totalCost: number;
-    costByService: Array<{ service: string; cost: number }>;
+    costByService: { service: string; cost: number }[];
     costTrend: 'up' | 'down' | 'stable';
   };
   backgroundProcesses: {
     activeProcesses: number;
     failedProcesses: number;
-    processStatus: Array<{
+    processStatus: {
       id: string;
       name: string;
       status: 'running' | 'completed' | 'failed' | 'pending';
       lastRun: string;
       duration: number;
       nextRun?: string;
-    }>;
+    }[];
   };
-  systemActions: Array<{
+  systemActions: {
     id: string;
     timestamp: string;
     action: string;
     status: 'success' | 'warning' | 'error';
     details: string;
     automated: boolean;
-  }>;
-  alerts: Array<{
+  }[];
+  alerts: {
     id: string;
     severity: 'critical' | 'warning' | 'info';
     message: string;
     timestamp: string;
     resolved: boolean;
-  }>;
+  }[];
 }
 
 interface ConnectionState {
@@ -72,26 +73,28 @@ interface ConnectionState {
 // Process status badge component
 const ProcessStatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const statusConfig = {
-    running: { 
+    running: {
       className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-      icon: '🔄'
+      icon: '🔄',
     },
-    completed: { 
+    completed: {
       className: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-      icon: '✅'
+      icon: '✅',
     },
-    failed: { 
+    failed: {
       className: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
-      icon: '❌'
+      icon: '❌',
     },
-    pending: { 
+    pending: {
       className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-      icon: '⏳'
+      icon: '⏳',
     },
   }[status] || { className: 'bg-gray-100 text-gray-800', icon: '❓' };
 
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}>
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}
+    >
       <span className="mr-1">{statusConfig.icon}</span>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
@@ -118,16 +121,16 @@ const AlertItem: React.FC<{ alert: SystemHealthData['alerts'][0] }> = ({ alert }
             </p>
           </div>
         </div>
-        {alert.resolved && (
-          <span className="text-green-500 text-sm">✓ Resolved</span>
-        )}
+        {alert.resolved && <span className="text-green-500 text-sm">✓ Resolved</span>}
       </div>
     </div>
   );
 };
 
 // Connection status indicator
-const ConnectionStatusIndicator: React.FC<{ connectionState: ConnectionState }> = ({ connectionState }) => {
+const ConnectionStatusIndicator: React.FC<{ connectionState: ConnectionState }> = ({
+  connectionState,
+}) => {
   const statusConfig = {
     connected: { color: 'green', icon: '🟢', text: 'Connected' },
     connecting: { color: 'yellow', icon: '🟡', text: 'Connecting...' },
@@ -162,7 +165,9 @@ export const SystemHealthMonitoringWidget: React.FC = () => {
 
   // WebSocket configuration
   const wsConfig = {
-    url: process.env.NEXT_PUBLIC_WS_HEALTH_URL || 'wss://us-central1-ai-sports-edge.cloudfunctions.net/systemHealth',
+    url:
+      process.env.NEXT_PUBLIC_WS_HEALTH_URL ||
+      'wss://us-central1-ai-sports-edge.cloudfunctions.net/systemHealth',
     reconnectInterval: 5000,
     maxReconnectAttempts: 10,
   };
@@ -175,40 +180,52 @@ export const SystemHealthMonitoringWidget: React.FC = () => {
     if (webSocket.lastMessage) {
       try {
         const message = webSocket.lastMessage;
-        
+
         switch (message.type) {
           case 'HEALTH_UPDATE':
             setHealthData(message.payload);
             setLoading(false);
             setError(null);
             break;
-            
+
           case 'ALERT':
             setToastMessage(`System Alert: ${message.payload.message}`);
             // Update alerts in health data
-            setHealthData(prev => prev ? {
-              ...prev,
-              alerts: [message.payload, ...prev.alerts.slice(0, 9)] // Keep last 10 alerts
-            } : null);
+            setHealthData(prev =>
+              prev
+                ? {
+                    ...prev,
+                    alerts: [message.payload, ...prev.alerts.slice(0, 9)], // Keep last 10 alerts
+                  }
+                : null
+            );
             break;
-            
+
           case 'PROCESS_STATUS':
-            setHealthData(prev => prev ? {
-              ...prev,
-              backgroundProcesses: {
-                ...prev.backgroundProcesses,
-                processStatus: message.payload.processes
-              }
-            } : null);
+            setHealthData(prev =>
+              prev
+                ? {
+                    ...prev,
+                    backgroundProcesses: {
+                      ...prev.backgroundProcesses,
+                      processStatus: message.payload.processes,
+                    },
+                  }
+                : null
+            );
             break;
-            
+
           case 'COST_UPDATE':
-            setHealthData(prev => prev ? {
-              ...prev,
-              infrastructureCosts: message.payload
-            } : null);
+            setHealthData(prev =>
+              prev
+                ? {
+                    ...prev,
+                    infrastructureCosts: message.payload,
+                  }
+                : null
+            );
             break;
-            
+
           default:
             console.log('Unknown message type:', message.type);
         }
@@ -303,15 +320,15 @@ export const SystemHealthMonitoringWidget: React.FC = () => {
 
   if (error && !healthData) {
     return (
-      <EnhancedWidget 
-        title="🔧 System Health Monitoring" 
+      <EnhancedWidget
+        title="🔧 System Health Monitoring"
         size="large"
         error={error}
         onRefresh={handleRefresh}
       >
         <div className="text-center py-8">
           <p className="text-red-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={handleRefresh}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
@@ -335,7 +352,8 @@ export const SystemHealthMonitoringWidget: React.FC = () => {
           <div className="flex justify-between items-center">
             <ConnectionStatusIndicator connectionState={connectionState} />
             <span className="text-xs text-gray-500">
-              Last updated: {healthData?.timestamp ? formatTimestamp(healthData.timestamp) : 'Never'}
+              Last updated:{' '}
+              {healthData?.timestamp ? formatTimestamp(healthData.timestamp) : 'Never'}
             </span>
           </div>
         }
@@ -349,7 +367,9 @@ export const SystemHealthMonitoringWidget: React.FC = () => {
                 {healthData.alerts
                   .filter(alert => !alert.resolved)
                   .slice(0, 3)
-                  .map(alert => <AlertItem key={alert.id} alert={alert} />)}
+                  .map(alert => (
+                    <AlertItem key={alert.id} alert={alert} />
+                  ))}
               </div>
             </div>
           )}
@@ -453,7 +473,7 @@ export const SystemHealthMonitoringWidget: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {healthData?.backgroundProcesses.processStatus.map((process) => (
+                  {healthData?.backgroundProcesses.processStatus.map(process => (
                     <tr key={process.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {process.name}

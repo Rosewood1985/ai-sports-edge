@@ -3,9 +3,10 @@
 // Deep Focus Architecture with Real Data Integration Points
 // =============================================================================
 
-import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
-import { firestore as db } from '../../config/firebase';
 import * as Sentry from '@sentry/react-native';
+import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
+
+import { firestore as db } from '../../config/firebase';
 import { getWeatherApiKey } from '../../utils/apiKeys';
 
 export class NFLDataSyncService {
@@ -64,7 +65,7 @@ export class NFLDataSyncService {
       });
 
       const teamsResponse = await this.fetchFromNFLAPI('/teams');
-      
+
       if (!this.validateTeamsResponse(teamsResponse)) {
         throw new Error('Invalid teams API response structure');
       }
@@ -93,35 +94,41 @@ export class NFLDataSyncService {
             abbreviation: team.division?.abbreviation,
           },
           // Stadium information - critical for outdoor weather analysis
-          venue: team.venue ? {
-            id: team.venue.id,
-            name: team.venue.name,
-            capacity: team.venue.capacity,
-            isDome: team.venue.indoor,
-            surface: team.venue.grass || 'Artificial',
-            location: {
-              latitude: team.venue.location?.latitude,
-              longitude: team.venue.location?.longitude,
-              city: team.venue.location?.city,
-              state: team.venue.location?.state,
-            },
-          } : null,
+          venue: team.venue
+            ? {
+                id: team.venue.id,
+                name: team.venue.name,
+                capacity: team.venue.capacity,
+                isDome: team.venue.indoor,
+                surface: team.venue.grass || 'Artificial',
+                location: {
+                  latitude: team.venue.location?.latitude,
+                  longitude: team.venue.location?.longitude,
+                  city: team.venue.location?.city,
+                  state: team.venue.location?.state,
+                },
+              }
+            : null,
           // Team performance data
-          record: team.record ? {
-            wins: team.record.wins,
-            losses: team.record.losses,
-            ties: team.record.ties,
-            percentage: team.record.percentage,
-            pointsFor: team.record.pointsFor,
-            pointsAgainst: team.record.pointsAgainst,
-            pointDifferential: team.record.pointsFor - team.record.pointsAgainst,
-          } : null,
+          record: team.record
+            ? {
+                wins: team.record.wins,
+                losses: team.record.losses,
+                ties: team.record.ties,
+                percentage: team.record.percentage,
+                pointsFor: team.record.pointsFor,
+                pointsAgainst: team.record.pointsAgainst,
+                pointDifferential: team.record.pointsFor - team.record.pointsAgainst,
+              }
+            : null,
           // Coaching staff
-          coach: team.coach ? {
-            id: team.coach.id,
-            name: team.coach.displayName,
-            experience: team.coach.experience,
-          } : null,
+          coach: team.coach
+            ? {
+                id: team.coach.id,
+                name: team.coach.displayName,
+                experience: team.coach.experience,
+              }
+            : null,
           // Salary cap information
           salaryCapInfo: {
             totalCapSpace: team.salaryCapSpace || 0,
@@ -140,7 +147,7 @@ export class NFLDataSyncService {
         };
 
         await setDoc(doc(teamsCollection, team.id.toString()), teamData, { merge: true });
-        
+
         Sentry.addBreadcrumb({
           message: `Synced team: ${team.displayName}`,
           category: 'nfl.sync.teams.detail',
@@ -170,7 +177,7 @@ export class NFLDataSyncService {
       // Get current active teams - we'll sync team rosters
       const teamsResponse = await this.fetchFromNFLAPI('/teams');
       const teams = teamsResponse.items || [];
-      
+
       const playersCollection = collection(db, 'nfl_players');
       let totalPlayersSynced = 0;
 
@@ -178,7 +185,7 @@ export class NFLDataSyncService {
         try {
           // Get team roster
           const rosterResponse = await this.fetchFromNFLAPI(`/teams/${team.id}/roster`);
-          
+
           if (!this.validateRosterResponse(rosterResponse)) {
             Sentry.addBreadcrumb({
               message: `Invalid roster response for team ${team.displayName}`,
@@ -195,7 +202,7 @@ export class NFLDataSyncService {
 
             // Get detailed player info
             const playerDetailResponse = await this.fetchFromNFLAPI(`/athletes/${athlete.id}`);
-            
+
             if (!playerDetailResponse) continue;
 
             const playerData = {
@@ -225,12 +232,14 @@ export class NFLDataSyncService {
               jerseyNumber: athlete.jersey,
               experience: playerDetailResponse.experience?.years,
               college: playerDetailResponse.college?.name,
-              draft: playerDetailResponse.draft ? {
-                year: playerDetailResponse.draft.year,
-                round: playerDetailResponse.draft.round,
-                pick: playerDetailResponse.draft.pick,
-                team: playerDetailResponse.draft.team?.displayName,
-              } : null,
+              draft: playerDetailResponse.draft
+                ? {
+                    year: playerDetailResponse.draft.year,
+                    round: playerDetailResponse.draft.round,
+                    pick: playerDetailResponse.draft.pick,
+                    team: playerDetailResponse.draft.team?.displayName,
+                  }
+                : null,
               // Contract and salary info
               contract: {
                 salaryCapHit: athlete.salaryCapHit || 0,
@@ -264,7 +273,9 @@ export class NFLDataSyncService {
               syncStatus: 'completed',
             };
 
-            await setDoc(doc(playersCollection, playerDetailResponse.id.toString()), playerData, { merge: true });
+            await setDoc(doc(playersCollection, playerDetailResponse.id.toString()), playerData, {
+              merge: true,
+            });
             totalPlayersSynced++;
 
             if (totalPlayersSynced % 50 === 0) {
@@ -308,10 +319,10 @@ export class NFLDataSyncService {
       // Get current week and season
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear();
-      
+
       // Get schedule for current season
       const scheduleResponse = await this.fetchFromNFLAPI(`/seasons/${currentYear}/types/2/weeks`);
-      
+
       if (!this.validateScheduleResponse(scheduleResponse)) {
         throw new Error('Invalid schedule API response structure');
       }
@@ -320,14 +331,15 @@ export class NFLDataSyncService {
       let totalGamesSynced = 0;
 
       // Get current and upcoming weeks
-      for (const week of scheduleResponse.items.slice(-3)) { // Last 3 weeks
+      for (const week of scheduleResponse.items.slice(-3)) {
+        // Last 3 weeks
         try {
           const weekGamesResponse = await this.fetchFromNFLAPI(
             `/seasons/${currentYear}/types/2/weeks/${week.number}/events`
           );
 
           const games = weekGamesResponse.items || [];
-          
+
           for (const game of games) {
             const gameData = {
               id: game.id,
@@ -339,8 +351,10 @@ export class NFLDataSyncService {
                 home: {
                   team: {
                     id: game.competitors.find((c: any) => c.homeAway === 'home')?.team.id,
-                    name: game.competitors.find((c: any) => c.homeAway === 'home')?.team.displayName,
-                    abbreviation: game.competitors.find((c: any) => c.homeAway === 'home')?.team.abbreviation,
+                    name: game.competitors.find((c: any) => c.homeAway === 'home')?.team
+                      .displayName,
+                    abbreviation: game.competitors.find((c: any) => c.homeAway === 'home')?.team
+                      .abbreviation,
                   },
                   score: game.competitors.find((c: any) => c.homeAway === 'home')?.score,
                   record: game.competitors.find((c: any) => c.homeAway === 'home')?.record,
@@ -349,8 +363,10 @@ export class NFLDataSyncService {
                 away: {
                   team: {
                     id: game.competitors.find((c: any) => c.homeAway === 'away')?.team.id,
-                    name: game.competitors.find((c: any) => c.homeAway === 'away')?.team.displayName,
-                    abbreviation: game.competitors.find((c: any) => c.homeAway === 'away')?.team.abbreviation,
+                    name: game.competitors.find((c: any) => c.homeAway === 'away')?.team
+                      .displayName,
+                    abbreviation: game.competitors.find((c: any) => c.homeAway === 'away')?.team
+                      .abbreviation,
                   },
                   score: game.competitors.find((c: any) => c.homeAway === 'away')?.score,
                   record: game.competitors.find((c: any) => c.homeAway === 'away')?.record,
@@ -358,19 +374,21 @@ export class NFLDataSyncService {
                 },
               },
               // Venue information - critical for weather analysis
-              venue: game.venue ? {
-                id: game.venue.id,
-                name: game.venue.fullName,
-                indoor: game.venue.indoor,
-                capacity: game.venue.capacity,
-                surface: game.venue.grass || 'Artificial',
-                location: {
-                  latitude: game.venue.address?.latitude,
-                  longitude: game.venue.address?.longitude,
-                  city: game.venue.address?.city,
-                  state: game.venue.address?.state,
-                },
-              } : null,
+              venue: game.venue
+                ? {
+                    id: game.venue.id,
+                    name: game.venue.fullName,
+                    indoor: game.venue.indoor,
+                    capacity: game.venue.capacity,
+                    surface: game.venue.grass || 'Artificial',
+                    location: {
+                      latitude: game.venue.address?.latitude,
+                      longitude: game.venue.address?.longitude,
+                      city: game.venue.address?.city,
+                      state: game.venue.address?.state,
+                    },
+                  }
+                : null,
               // Game status and timing
               status: {
                 type: game.status.type.name,
@@ -410,7 +428,7 @@ export class NFLDataSyncService {
 
             await setDoc(doc(gamesCollection, game.id.toString()), gameData, { merge: true });
             totalGamesSynced++;
-            
+
             if (totalGamesSynced % 10 === 0) {
               Sentry.addBreadcrumb({
                 message: `Synced ${totalGamesSynced} games so far`,
@@ -449,7 +467,7 @@ export class NFLDataSyncService {
       });
 
       const currentYear = new Date().getFullYear();
-      
+
       // Get NFL standings
       const standingsResponse = await this.fetchFromNFLAPI(
         `/seasons/${currentYear}/types/2/groups`
@@ -519,11 +537,15 @@ export class NFLDataSyncService {
       let weatherDataSynced = 0;
 
       const games = weekGamesResponse.items || [];
-      
+
       for (const game of games) {
         // Only sync weather for outdoor venues
-        if (game.venue && !game.venue.indoor && 
-            game.venue.address?.latitude && game.venue.address?.longitude) {
+        if (
+          game.venue &&
+          !game.venue.indoor &&
+          game.venue.address?.latitude &&
+          game.venue.address?.longitude
+        ) {
           try {
             const weatherData = await this.fetchWeatherData(
               game.venue.address.latitude,
@@ -556,7 +578,9 @@ export class NFLDataSyncService {
                 dataSource: 'openweather_api',
               };
 
-              await setDoc(doc(weatherCollection, game.id.toString()), gameWeatherData, { merge: true });
+              await setDoc(doc(weatherCollection, game.id.toString()), gameWeatherData, {
+                merge: true,
+              });
               weatherDataSynced++;
             }
           } catch (weatherError) {
@@ -591,7 +615,7 @@ export class NFLDataSyncService {
 
       const teamsResponse = await this.fetchFromNFLAPI('/teams');
       const teams = teamsResponse.items || [];
-      
+
       const injuriesCollection = collection(db, 'nfl_injuries');
       let totalInjuriesSynced = 0;
 
@@ -630,12 +654,8 @@ export class NFLDataSyncService {
                 syncStatus: 'completed',
               };
 
-              await setDoc(
-                doc(injuriesCollection, injuryData.id),
-                injuryData,
-                { merge: true }
-              );
-              
+              await setDoc(doc(injuriesCollection, injuryData.id), injuryData, { merge: true });
+
               totalInjuriesSynced++;
             }
           }
@@ -666,93 +686,92 @@ export class NFLDataSyncService {
       await this.enforceRateLimit();
 
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       Sentry.addBreadcrumb({
         message: `Making NFL API request: ${url}`,
         category: 'nfl.api.request',
         level: 'debug',
-        data: { endpoint, retryCount }
+        data: { endpoint, retryCount },
       });
 
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'AI-Sports-Edge/1.0',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         // Note: timeout is handled by AbortController in production environments
       });
 
       if (!response.ok) {
         const errorMessage = `NFL API error: ${response.status} ${response.statusText}`;
-        
+
         // Handle rate limiting
         if (response.status === 429) {
           const retryAfter = response.headers.get('Retry-After');
           const delay = retryAfter ? parseInt(retryAfter) * 1000 : 60000; // Default to 1 minute
-          
+
           Sentry.addBreadcrumb({
             message: `Rate limited, waiting ${delay}ms before retry`,
             category: 'nfl.api.rate_limit',
             level: 'warning',
           });
-          
+
           await this.sleep(delay);
-          
+
           if (retryCount < this.maxRetries) {
             return this.fetchFromNFLAPI(endpoint, retryCount + 1);
           }
         }
-        
+
         // Handle server errors with retry
         if (response.status >= 500 && retryCount < this.maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-          
+
           Sentry.addBreadcrumb({
             message: `Server error ${response.status}, retrying in ${delay}ms`,
             category: 'nfl.api.server_error',
             level: 'warning',
           });
-          
+
           await this.sleep(delay);
           return this.fetchFromNFLAPI(endpoint, retryCount + 1);
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
-      
+
       Sentry.addBreadcrumb({
         message: `NFL API request successful: ${url}`,
         category: 'nfl.api.success',
         level: 'debug',
-        data: { 
-          endpoint, 
+        data: {
+          endpoint,
           dataSize: JSON.stringify(data).length,
-          retryCount 
-        }
+          retryCount,
+        },
       });
 
       this.requestCount++;
       return data;
-      
     } catch (error) {
       Sentry.captureException(error);
-      
+
       // Retry on network errors
       if (retryCount < this.maxRetries && (error as any).name === 'TypeError') {
         const delay = Math.pow(2, retryCount) * 1000;
-        
+
         Sentry.addBreadcrumb({
           message: `Network error, retrying in ${delay}ms`,
           category: 'nfl.api.network_error',
           level: 'warning',
         });
-        
+
         await this.sleep(delay);
         return this.fetchFromNFLAPI(endpoint, retryCount + 1);
       }
-      
+
       throw new Error(`NFL API request failed: ${(error as Error).message}`);
     }
   }
@@ -760,12 +779,12 @@ export class NFLDataSyncService {
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
       const delay = this.rateLimitDelay - timeSinceLastRequest;
       await this.sleep(delay);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -787,7 +806,7 @@ export class NFLDataSyncService {
       await this.enforceRateLimit(); // Apply rate limiting to weather requests too
 
       const url = `${this.weatherBaseUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.weatherApiKey}&units=imperial`;
-      
+
       Sentry.addBreadcrumb({
         message: `Fetching weather data for coordinates: ${lat}, ${lon}`,
         category: 'nfl.weather.request',
@@ -801,15 +820,15 @@ export class NFLDataSyncService {
       }
 
       const weatherData = await response.json();
-      
+
       Sentry.addBreadcrumb({
         message: `Weather API request successful for coordinates: ${lat}, ${lon}`,
         category: 'nfl.weather.success',
         level: 'debug',
-        data: { 
+        data: {
           temperature: weatherData.main?.temp,
-          conditions: weatherData.weather?.[0]?.description 
-        }
+          conditions: weatherData.weather?.[0]?.description,
+        },
       });
 
       return weatherData;
@@ -856,18 +875,20 @@ export class NFLDataSyncService {
     const date = new Date(gameDate);
     const hour = date.getHours();
     const dayOfWeek = date.getDay();
-    
+
     // Sunday/Monday/Thursday night games
-    return (dayOfWeek === 0 && hour >= 20) || // Sunday Night
-           (dayOfWeek === 1 && hour >= 20) || // Monday Night
-           (dayOfWeek === 4 && hour >= 20);   // Thursday Night
+    return (
+      (dayOfWeek === 0 && hour >= 20) || // Sunday Night
+      (dayOfWeek === 1 && hour >= 20) || // Monday Night
+      (dayOfWeek === 4 && hour >= 20)
+    ); // Thursday Night
   }
 
   private calculateCrowdFactor(game: any): string {
     // FLAG: Implement more sophisticated crowd analysis
     const homeTeam = game.competitors.find((c: any) => c.homeAway === 'home');
     if (!homeTeam) return 'Minimal';
-    
+
     // Consider playoff implications, rivalry games, etc.
     return 'Significant';
   }
@@ -901,22 +922,24 @@ export class NFLDataSyncService {
   private async getPlayerCurrentStats(playerId: string): Promise<any> {
     try {
       const currentYear = new Date().getFullYear();
-      const statsResponse = await this.fetchFromNFLAPI(`/athletes/${playerId}/statistics/${currentYear}`);
-      
+      const statsResponse = await this.fetchFromNFLAPI(
+        `/athletes/${playerId}/statistics/${currentYear}`
+      );
+
       if (!statsResponse.splits || statsResponse.splits.length === 0) {
         return null;
       }
 
       // Process NFL stats by category
       const stats: any = {};
-      
+
       for (const split of statsResponse.splits) {
         const categories = split.categories || [];
-        
+
         for (const category of categories) {
           const categoryName = category.name?.toLowerCase() || 'general';
           stats[categoryName] = {};
-          
+
           for (const stat of category.stats) {
             stats[categoryName][stat.name] = {
               value: stat.value,
@@ -1014,12 +1037,13 @@ export class NFLDataSyncService {
 
   private async getWeatherForGame(game: any): Promise<any> {
     // FLAG: Replace with real weather API integration for game time
-    if (game.venue && !game.venue.indoor && 
-        game.venue.address?.latitude && game.venue.address?.longitude) {
-      return await this.fetchWeatherData(
-        game.venue.address.latitude,
-        game.venue.address.longitude
-      );
+    if (
+      game.venue &&
+      !game.venue.indoor &&
+      game.venue.address?.latitude &&
+      game.venue.address?.longitude
+    ) {
+      return await this.fetchWeatherData(game.venue.address.latitude, game.venue.address.longitude);
     }
     return null;
   }
@@ -1077,38 +1101,46 @@ export class NFLDataSyncService {
     return 'Normal';
   }
 
-  private suggestOffensiveAdjustments(temp: number, windSpeed: number, precipitation: number): string[] {
+  private suggestOffensiveAdjustments(
+    temp: number,
+    windSpeed: number,
+    precipitation: number
+  ): string[] {
     const adjustments = [];
-    
+
     if (windSpeed > 15 || precipitation > 0.1) {
       adjustments.push('Favor shorter passing game');
       adjustments.push('Increase rushing attempts');
     }
-    
+
     if (temp < 32) {
       adjustments.push('Focus on ball security');
       adjustments.push('Use gloves for receivers');
     }
-    
+
     if (windSpeed > 20) {
       adjustments.push('Avoid long field goal attempts');
     }
-    
+
     return adjustments.length > 0 ? adjustments : ['No weather-related adjustments needed'];
   }
 
-  private suggestDefensiveAdjustments(temp: number, windSpeed: number, precipitation: number): string[] {
+  private suggestDefensiveAdjustments(
+    temp: number,
+    windSpeed: number,
+    precipitation: number
+  ): string[] {
     const adjustments = [];
-    
+
     if (windSpeed > 15 || precipitation > 0.1) {
       adjustments.push('Focus on stopping the run');
       adjustments.push('Press coverage to disrupt timing');
     }
-    
+
     if (temp < 32) {
       adjustments.push('Force fumbles aggressively');
     }
-    
+
     return adjustments.length > 0 ? adjustments : ['No weather-related adjustments needed'];
   }
 
@@ -1125,16 +1157,17 @@ export class NFLDataSyncService {
   private calculateFantasyImpact(injury: any): string {
     const position = injury.athlete?.position?.abbreviation?.toLowerCase() || '';
     const status = injury.status?.toLowerCase() || '';
-    
+
     if (['qb', 'rb', 'wr', 'te'].includes(position) && status.includes('out')) return 'High';
-    if (['qb', 'rb', 'wr', 'te'].includes(position) && status.includes('questionable')) return 'Medium';
+    if (['qb', 'rb', 'wr', 'te'].includes(position) && status.includes('questionable'))
+      return 'Medium';
     return 'Low';
   }
 
   private calculateTeamImpact(injury: any): string {
     const position = injury.athlete?.position?.abbreviation?.toLowerCase() || '';
     const status = injury.status?.toLowerCase() || '';
-    
+
     if (position === 'qb' && status.includes('out')) return 'Critical';
     if (['qb', 'lt', 'c', 'de', 'lb'].includes(position) && status.includes('out')) return 'High';
     if (status.includes('out')) return 'Medium';
@@ -1165,12 +1198,11 @@ export class NFLDataSyncService {
   private validateGameData(game: any): boolean {
     const requiredFields = ['id', 'date', 'competitors', 'status'];
     const hasRequiredFields = requiredFields.every(field => game[field] !== undefined);
-    
+
     // Additional validation for competitor data
-    const hasValidCompetitors = game.competitors && 
-                               Array.isArray(game.competitors) &&
-                               game.competitors.length === 2;
-    
+    const hasValidCompetitors =
+      game.competitors && Array.isArray(game.competitors) && game.competitors.length === 2;
+
     return hasRequiredFields && hasValidCompetitors;
   }
 
@@ -1189,11 +1221,15 @@ export class NFLDataSyncService {
   async updateSyncStatus(status: any): Promise<void> {
     try {
       const statusDoc = doc(db, 'sync_status', 'nfl_data_sync');
-      
-      await setDoc(statusDoc, {
-        ...status,
-        lastUpdated: new Date(),
-      }, { merge: true });
+
+      await setDoc(
+        statusDoc,
+        {
+          ...status,
+          lastUpdated: new Date(),
+        },
+        { merge: true }
+      );
     } catch (error) {
       Sentry.captureException(error);
       throw error;

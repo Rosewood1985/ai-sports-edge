@@ -3,12 +3,13 @@
  * Complex header component with title and refresh functionality
  * Location: /atomic/organisms/layout/Header.tsx
  */
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
+
 import { useUITheme } from '../../../components/UIThemeProvider';
-import { useI18n } from '../i18n/I18nContext';
-import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '../../atoms';
+import { useI18n } from '../i18n/I18nContext';
 
 export interface HeaderProps {
   title: string;
@@ -26,11 +27,11 @@ export const Header = ({
   title,
   onRefresh,
   isLoading,
-  accessibilityHint
+  accessibilityHint,
 }: HeaderProps): JSX.Element => {
   const { theme } = useUITheme();
   const { t } = useI18n();
-  
+
   const styles = StyleSheet.create({
     header: {
       marginBottom: theme.spacing.sm,
@@ -62,31 +63,19 @@ export const Header = ({
       fontSize: theme.typography.fontSize.button,
       fontWeight: theme.typography.fontWeight.semiBold as '600',
       fontFamily: theme.typography.fontFamily.body,
-    }
+    },
   });
-  
+
   return (
-    <ThemedView
-      background="surface"
-      style={styles.header}
-      accessible={true}
-      accessibilityRole="header"
-    >
-      <ThemedText
-        type="h2"
-        style={styles.title}
-        accessibilityRole="header"
-      >
+    <ThemedView background="surface" style={styles.header} accessible accessibilityRole="header">
+      <ThemedText type="h2" style={styles.title} accessibilityRole="header">
         {title}
       </ThemedText>
       <TouchableOpacity
-        style={[
-          styles.refreshButton,
-          isLoading && styles.refreshButtonDisabled
-        ]}
+        style={[styles.refreshButton, isLoading && styles.refreshButtonDisabled]}
         onPress={onRefresh}
         disabled={isLoading}
-        accessible={true}
+        accessible
         accessibilityRole="button"
         accessibilityLabel={t('oddsComparison.refresh')}
         accessibilityHint={accessibilityHint || t('oddsComparison.accessibility.refreshButtonHint')}
@@ -96,15 +85,13 @@ export const Header = ({
           <ActivityIndicator size="small" color={theme.colors.onPrimary} />
         ) : (
           <>
-            <Ionicons 
-              name="refresh" 
-              size={16} 
+            <Ionicons
+              name="refresh"
+              size={16}
               color={theme.colors.onPrimary}
-              style={styles.refreshIcon} 
+              style={styles.refreshIcon}
             />
-            <ThemedText style={styles.refreshButtonText}>
-              {t('oddsComparison.refresh')}
-            </ThemedText>
+            <ThemedText style={styles.refreshButtonText}>{t('oddsComparison.refresh')}</ThemedText>
           </>
         )}
       </TouchableOpacity>

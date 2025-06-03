@@ -13,10 +13,11 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
-  Platform
+  Platform,
 } from 'react-native';
-import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
+
 import BetNowButton from './BetNowButton';
+import { useBettingAffiliate } from '../contexts/BettingAffiliateContext';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { bettingAffiliateService } from '../services/bettingAffiliateService';
 import { fanduelCookieService } from '../services/fanduelCookieService';
@@ -38,28 +39,29 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
   teamId,
   userId,
   gameId,
-  message = "Ready to place your bet? Get started now!",
-  autoShow = false
+  message = 'Ready to place your bet? Get started now!',
+  autoShow = false,
 }) => {
   const [visible, setVisible] = useState(autoShow);
   const fadeAnim = new Animated.Value(autoShow ? 1 : 0);
   const slideAnim = new Animated.Value(autoShow ? 0 : 50);
   const { trackButtonImpression } = useBettingAffiliate();
-  
+
   // Get theme colors
   const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A1A' }, 'background');
   const textColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text');
   const accentColor = useThemeColor({ light: '#FF0055', dark: '#FF3300' }, 'tint');
-  
+
   // Handle visibility changes
   useEffect(() => {
     if (show || autoShow) {
       setVisible(true);
       trackButtonImpression('popup', teamId, userId, gameId);
-      
+
       // Initialize cookies for FanDuel if this is a new popup
       if (userId && gameId && teamId) {
-        fanduelCookieService.initializeCookies(userId, gameId, teamId)
+        fanduelCookieService
+          .initializeCookies(userId, gameId, teamId)
           .then(() => {
             // Track popup shown with cookies
             fanduelCookieService.trackInteraction('popup_shown', {
@@ -67,20 +69,24 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
               gameId,
               autoShow,
             });
-            
+
             // Track microtransaction opportunity
-            microtransactionService.trackInteraction('impression', {
-              type: 'bet_now_popup',
-              gameId,
-              teamId,
-              cookieEnabled: true,
-            }, { id: userId });
+            microtransactionService.trackInteraction(
+              'impression',
+              {
+                type: 'bet_now_popup',
+                gameId,
+                teamId,
+                cookieEnabled: true,
+              },
+              { id: userId }
+            );
           })
           .catch(error => {
             console.error('Error initializing FanDuel cookies:', error);
           });
       }
-      
+
       // Animate in - faster for autoShow
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -92,7 +98,7 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
           toValue: 0,
           duration: autoShow ? 150 : 300,
           useNativeDriver: true,
-        })
+        }),
       ]).start();
     } else {
       // Animate out
@@ -106,33 +112,36 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
           toValue: 50,
           duration: 200,
           useNativeDriver: true,
-        })
+        }),
       ]).start(() => {
         setVisible(false);
       });
     }
   }, [show, autoShow, fadeAnim, slideAnim, teamId, userId, gameId, trackButtonImpression]);
-  
+
   // Track if user has interacted with the popup
   const hasInteracted = useRef(false);
-  
+
   // Auto-close timer for autoShow mode
   useEffect(() => {
     let timer: number | undefined;
     if (autoShow && visible) {
       // Auto-close after 5 minutes if not interacted with
-      timer = setTimeout(() => {
-        if (!hasInteracted.current) {
-          handleClose();
-        }
-      }, 5 * 60 * 1000) as unknown as number;
-      
+      timer = setTimeout(
+        () => {
+          if (!hasInteracted.current) {
+            handleClose();
+          }
+        },
+        5 * 60 * 1000
+      ) as unknown as number;
+
       // Check if this is after a purchase using cross-platform sync
       if (gameId) {
         try {
           const { crossPlatformSyncService } = require('../services/crossPlatformSyncService');
           const isPurchased = crossPlatformSyncService.hasPurchasedOdds(gameId);
-          
+
           if (isPurchased) {
             // Track conversion opportunity
             bettingAffiliateService.trackConversion('popup_shown_after_purchase', 0, userId);
@@ -142,16 +151,16 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
         }
       }
     }
-    
+
     return () => {
       if (timer) clearTimeout(timer);
     };
   }, [autoShow, visible, gameId, userId]);
-  
+
   // Handle close
   const handleClose = () => {
     hasInteracted.current = true;
-    
+
     // Track popup close
     if (userId && gameId) {
       // Track interaction in FanDuel cookie service
@@ -160,39 +169,38 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
         gameId,
         autoShow,
       });
-      
+
       // Track microtransaction interaction
-      microtransactionService.trackInteraction('dismiss', {
-        type: 'bet_now_popup',
-        gameId,
-        teamId,
-        cookieEnabled: true,
-      }, { id: userId });
+      microtransactionService.trackInteraction(
+        'dismiss',
+        {
+          type: 'bet_now_popup',
+          gameId,
+          teamId,
+          cookieEnabled: true,
+        },
+        { id: userId }
+      );
     }
-    
+
     if (onClose) onClose();
   };
-  
+
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="none"
-      onRequestClose={handleClose}
-    >
+    <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
       <View style={styles.overlay}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.popup,
-            { 
+            {
               backgroundColor,
               opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }]
-            }
+              transform: [{ translateY: slideAnim }],
+            },
           ]}
         >
           <View style={[styles.accentBar, { backgroundColor: accentColor }]} />
-          
+
           <TouchableOpacity
             style={styles.closeButton}
             onPress={handleClose}
@@ -200,11 +208,11 @@ const BetNowPopup: React.FC<BetNowPopupProps> = ({
           >
             <Text style={[styles.closeButtonText, { color: textColor }]}>×</Text>
           </TouchableOpacity>
-          
+
           <View style={styles.content}>
             <Text style={[styles.title, { color: textColor }]}>Boost Your Winnings!</Text>
             <Text style={[styles.message, { color: textColor }]}>{message}</Text>
-            
+
             <View style={styles.buttonContainer}>
               <BetNowButton
                 size="large"

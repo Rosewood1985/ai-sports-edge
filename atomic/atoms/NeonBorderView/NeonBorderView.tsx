@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import {
   View,
@@ -8,11 +9,11 @@ import {
   InteractionManager,
   Platform,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+
 import AccessibleThemedView from '../AccessibleThemedView';
 import CircuitGridPattern from './CircuitGridPattern';
-import useRotationAnimation from './RotationAnimation';
 import { createStyles } from './NeonBorderView.styles';
+import useRotationAnimation from './RotationAnimation';
 import { getDeviceType, getOptimizedGlowIntensity } from '../../../utils/deviceOptimization';
 
 /**

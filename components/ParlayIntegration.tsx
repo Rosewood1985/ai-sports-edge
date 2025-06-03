@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 
 // Parlay selection interface
@@ -39,7 +40,7 @@ const ParlayIntegration: React.FC<ParlayIntegrationProps> = ({
   bookmaker,
   odds,
   selection,
-  onAddToParlay
+  onAddToParlay,
 }) => {
   const [isInParlay, setIsInParlay] = useState<boolean>(false);
   const [parlayCount, setParlayCount] = useState<number>(0);
@@ -52,12 +53,13 @@ const ParlayIntegration: React.FC<ParlayIntegrationProps> = ({
         const parlayString = await AsyncStorage.getItem('parlay_selections');
         if (parlayString) {
           const parlaySelections: ParlaySelection[] = JSON.parse(parlayString);
-          
+
           // Check if this selection is already in the parlay
           const selectionExists = parlaySelections.some(
-            item => item.gameId === gameId && item.bookmaker === bookmaker && item.selection === selection
+            item =>
+              item.gameId === gameId && item.bookmaker === bookmaker && item.selection === selection
           );
-          
+
           setIsInParlay(selectionExists);
           setParlayCount(parlaySelections.length);
         } else {
@@ -68,7 +70,7 @@ const ParlayIntegration: React.FC<ParlayIntegrationProps> = ({
         console.error('Error checking parlay:', error);
       }
     };
-    
+
     checkParlay();
   }, [gameId, bookmaker, selection]);
 
@@ -85,42 +87,43 @@ const ParlayIntegration: React.FC<ParlayIntegrationProps> = ({
         bookmaker,
         odds,
         selection,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
-      
+
       // Get existing parlay selections
       const parlayString = await AsyncStorage.getItem('parlay_selections');
       let parlaySelections: ParlaySelection[] = [];
-      
+
       if (parlayString) {
         parlaySelections = JSON.parse(parlayString);
-        
+
         // Check if this selection is already in the parlay
         const selectionExists = parlaySelections.some(
-          item => item.gameId === gameId && item.bookmaker === bookmaker && item.selection === selection
+          item =>
+            item.gameId === gameId && item.bookmaker === bookmaker && item.selection === selection
         );
-        
+
         if (selectionExists) {
           Alert.alert('Already in Parlay', 'This selection is already in your parlay.');
           return;
         }
       }
-      
+
       // Add new selection to parlay
       parlaySelections.push(parlaySelection);
-      
+
       // Save updated parlay
       await AsyncStorage.setItem('parlay_selections', JSON.stringify(parlaySelections));
-      
+
       // Update state
       setIsInParlay(true);
       setParlayCount(parlaySelections.length);
-      
+
       // Call onAddToParlay callback if provided
       if (onAddToParlay) {
         onAddToParlay();
       }
-      
+
       // Show success message
       Alert.alert('Added to Parlay', 'This selection has been added to your parlay.');
     } catch (error) {
@@ -134,22 +137,27 @@ const ParlayIntegration: React.FC<ParlayIntegrationProps> = ({
     try {
       // Get existing parlay selections
       const parlayString = await AsyncStorage.getItem('parlay_selections');
-      
+
       if (parlayString) {
         let parlaySelections: ParlaySelection[] = JSON.parse(parlayString);
-        
+
         // Remove this selection from the parlay
         parlaySelections = parlaySelections.filter(
-          item => !(item.gameId === gameId && item.bookmaker === bookmaker && item.selection === selection)
+          item =>
+            !(
+              item.gameId === gameId &&
+              item.bookmaker === bookmaker &&
+              item.selection === selection
+            )
         );
-        
+
         // Save updated parlay
         await AsyncStorage.setItem('parlay_selections', JSON.stringify(parlaySelections));
-        
+
         // Update state
         setIsInParlay(false);
         setParlayCount(parlaySelections.length);
-        
+
         // Show success message
         Alert.alert('Removed from Parlay', 'This selection has been removed from your parlay.');
       }
@@ -164,7 +172,7 @@ const ParlayIntegration: React.FC<ParlayIntegrationProps> = ({
       style={[
         styles.container,
         isInParlay ? styles.inParlayContainer : styles.notInParlayContainer,
-        { borderColor: colors.primary }
+        { borderColor: colors.primary },
       ]}
       onPress={isInParlay ? removeFromParlay : addToParlay}
     >

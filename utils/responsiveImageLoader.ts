@@ -64,22 +64,19 @@ export const getSizeCategory = (): 'small' | 'medium' | 'large' | 'tablet' => {
  * @param extension Image extension (default: 'png')
  * @returns Full image path with appropriate resolution suffix
  */
-export const getResponsiveImageSource = (
-  basePath: string,
-  extension: string = 'png'
-): string => {
+export const getResponsiveImageSource = (basePath: string, extension: string = 'png'): string => {
   const resolutionSuffix = getResolutionSuffix();
   const sizeCategory = getSizeCategory();
-  
+
   // First try to load size-specific image with resolution suffix
   const sizeSpecificPath = `${basePath}_${sizeCategory}${resolutionSuffix}.${extension}`;
-  
+
   // Fallback to just resolution-specific image
   const resolutionSpecificPath = `${basePath}${resolutionSuffix}.${extension}`;
-  
+
   // Final fallback to base image
   const baseFallbackPath = `${basePath}.${extension}`;
-  
+
   // Try to require each path in order of preference
   try {
     return sizeSpecificPath;
@@ -108,7 +105,7 @@ export const getResponsiveDimensions = (
 ): { width: number; height: number } => {
   const widthRatio = SCREEN_WIDTH / baseWidth;
   const heightRatio = SCREEN_HEIGHT / baseHeight;
-  
+
   return {
     width: targetWidth * widthRatio,
     height: targetHeight * heightRatio,
@@ -137,7 +134,7 @@ export const isHighEndDevice = (): boolean => {
       return true;
     }
   }
-  
+
   return false;
 };
 

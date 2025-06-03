@@ -3,8 +3,9 @@
  * Provides context for betting affiliate functionality throughout the app
  */
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+
 import { bettingAffiliateService, ButtonSettings } from '../services/bettingAffiliateService';
 
 // Define context types
@@ -16,7 +17,12 @@ export interface BettingAffiliateContextType {
   primaryTeam: string;
   showBetButton: (contentType: string, teamId?: string) => boolean;
   trackButtonClick: (location: string, teamId?: string, userId?: string, gameId?: string) => void;
-  trackButtonImpression: (location: string, teamId?: string, userId?: string, gameId?: string) => void;
+  trackButtonImpression: (
+    location: string,
+    teamId?: string,
+    userId?: string,
+    gameId?: string
+  ) => void;
   trackConversion: (conversionType: string, conversionValue?: number, userId?: string) => void;
   updateAffiliateCode: (code: string) => Promise<void>;
   updateButtonSettings: (settings: Partial<ButtonSettings>) => Promise<void>;
@@ -35,7 +41,7 @@ const BettingAffiliateContext = createContext<BettingAffiliateContextType>({
     size: 'medium',
     animation: 'pulse',
     position: 'inline',
-    style: 'default'
+    style: 'default',
   },
   favoriteTeams: [],
   primaryTeam: '',
@@ -59,7 +65,7 @@ const STORAGE_KEYS = {
 };
 
 // Provider component
-export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const BettingAffiliateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // State
   const [affiliateCode, setAffiliateCode] = useState<string>('');
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
@@ -67,7 +73,7 @@ export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = (
     size: 'medium',
     animation: 'pulse',
     position: 'inline',
-    style: 'default'
+    style: 'default',
   });
   const [favoriteTeams, setFavoriteTeams] = useState<string[]>([]);
   const [primaryTeam, setPrimaryTeamState] = useState<string>('');
@@ -79,21 +85,21 @@ export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = (
         // Load affiliate code
         const code = await bettingAffiliateService.loadAffiliateCode();
         setAffiliateCode(code);
-        
+
         // Load enabled state
         const enabled = await bettingAffiliateService.isEnabled();
         setIsEnabled(enabled);
-        
+
         // Load button settings
         const settings = await bettingAffiliateService.loadButtonSettings();
         setButtonSettings(settings);
-        
+
         // Load favorite teams
         const teamsJson = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITE_TEAMS);
         if (teamsJson) {
           setFavoriteTeams(JSON.parse(teamsJson));
         }
-        
+
         // Load primary team
         const primary = await AsyncStorage.getItem(STORAGE_KEYS.PRIMARY_TEAM);
         if (primary) {
@@ -103,30 +109,44 @@ export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = (
         console.error('Error loading betting affiliate settings:', error);
       }
     };
-    
+
     loadSettings();
   }, []);
 
   // Determine if bet button should be shown
   const showBetButton = (contentType: string, teamId?: string): boolean => {
     if (!isEnabled) return false;
-    
+
     // Use service to determine if button should be shown
     return bettingAffiliateService.shouldShowBetButton(contentType, teamId, favoriteTeams);
   };
 
   // Track button impressions
-  const trackButtonImpression = (location: string, teamId?: string, userId?: string, gameId?: string): void => {
+  const trackButtonImpression = (
+    location: string,
+    teamId?: string,
+    userId?: string,
+    gameId?: string
+  ): void => {
     bettingAffiliateService.trackButtonImpression(location, teamId, userId, gameId);
   };
 
   // Track button clicks
-  const trackButtonClick = (location: string, teamId?: string, userId?: string, gameId?: string): void => {
+  const trackButtonClick = (
+    location: string,
+    teamId?: string,
+    userId?: string,
+    gameId?: string
+  ): void => {
     bettingAffiliateService.trackButtonClick(location, affiliateCode, teamId, userId, gameId);
   };
-  
+
   // Track conversions
-  const trackConversion = (conversionType: string, conversionValue?: number, userId?: string): void => {
+  const trackConversion = (
+    conversionType: string,
+    conversionValue?: number,
+    userId?: string
+  ): void => {
     bettingAffiliateService.trackConversion(conversionType, conversionValue, userId);
   };
 
@@ -168,7 +188,7 @@ export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = (
         const newFavoriteTeams = [...favoriteTeams, teamId];
         await AsyncStorage.setItem(STORAGE_KEYS.FAVORITE_TEAMS, JSON.stringify(newFavoriteTeams));
         setFavoriteTeams(newFavoriteTeams);
-        
+
         // If no primary team is set, set this as primary
         if (!primaryTeam) {
           await AsyncStorage.setItem(STORAGE_KEYS.PRIMARY_TEAM, teamId);
@@ -187,7 +207,7 @@ export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = (
         const newFavoriteTeams = favoriteTeams.filter(id => id !== teamId);
         await AsyncStorage.setItem(STORAGE_KEYS.FAVORITE_TEAMS, JSON.stringify(newFavoriteTeams));
         setFavoriteTeams(newFavoriteTeams);
-        
+
         // If primary team is removed, clear primary team
         if (primaryTeam === teamId) {
           await AsyncStorage.removeItem(STORAGE_KEYS.PRIMARY_TEAM);
@@ -206,7 +226,7 @@ export const BettingAffiliateProvider: React.FC<{children: React.ReactNode}> = (
       if (!favoriteTeams.includes(teamId)) {
         await addFavoriteTeam(teamId);
       }
-      
+
       await AsyncStorage.setItem(STORAGE_KEYS.PRIMARY_TEAM, teamId);
       setPrimaryTeamState(teamId);
     } catch (error) {

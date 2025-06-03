@@ -1,9 +1,10 @@
-import React from 'react';
-import { StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-import AccessibleTouchableOpacity from './AccessibleTouchableOpacity';
+import React from 'react';
+import { StyleSheet, ViewStyle, StyleProp } from 'react-native';
+
 import AccessibleThemedView from './AccessibleThemedView';
+import AccessibleTouchableOpacity from './AccessibleTouchableOpacity';
 import { useI18n } from '../organisms/i18n/I18nContext';
 
 /**

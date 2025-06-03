@@ -13,7 +13,7 @@ export const useTranslation = () => {
     },
     i18n: {
       changeLanguage: (lng: string) => Promise.resolve(),
-      language: 'en'
-    }
+      language: 'en',
+    },
   };
 };

@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,23 +9,21 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Platform
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import {  ThemedText  } from '../atomic/atoms/ThemedText';
-import {  ThemedView  } from '../atomic/atoms/ThemedView';
+
+import { ThemedText } from '../atomic/atoms/ThemedText';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { useTheme } from '../contexts/ThemeContext';
 import { fraudDetectionService } from '../services/fraudDetectionService';
 import {
   FraudAlert,
   AlertSeverity,
   AlertStatus,
   FraudPatternType,
-  AccountAction
+  AccountAction,
 } from '../types/fraudDetection';
-import { useTheme } from '../contexts/ThemeContext';
 
 // Define the navigation param list
 type RootStackParamList = {
@@ -35,14 +36,11 @@ type FraudAlertDetailsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'FraudAlertDetails'
 >;
-type FraudAlertDetailsScreenRouteProp = RouteProp<
-  RootStackParamList,
-  'FraudAlertDetails'
->;
+type FraudAlertDetailsScreenRouteProp = RouteProp<RootStackParamList, 'FraudAlertDetails'>;
 
 /**
  * FraudAlertDetailsScreen component
- * 
+ *
  * This screen displays detailed information about a fraud alert and allows admins to take actions.
  */
 const FraudAlertDetailsScreen: React.FC = () => {
@@ -60,13 +58,13 @@ const FraudAlertDetailsScreen: React.FC = () => {
   const cardBorderColor = isDark ? '#333333' : '#E0E0E0';
   const textColor = colors.text;
   const primaryColor = colors.primary;
-  
+
   // Severity colors
   const severityColors = {
     [AlertSeverity.LOW]: '#4CAF50',
     [AlertSeverity.MEDIUM]: '#FFC107',
     [AlertSeverity.HIGH]: '#FF9800',
-    [AlertSeverity.CRITICAL]: '#F44336'
+    [AlertSeverity.CRITICAL]: '#F44336',
   };
 
   // Load alert data
@@ -75,13 +73,13 @@ const FraudAlertDetailsScreen: React.FC = () => {
       try {
         setLoading(true);
         const alertData = await fraudDetectionService.getAlertById(route.params.alertId);
-        
+
         if (!alertData) {
           Alert.alert('Error', 'Alert not found');
           navigation.goBack();
           return;
         }
-        
+
         setAlert(alertData);
       } catch (error) {
         console.error('Error loading alert data:', error);
@@ -90,7 +88,7 @@ const FraudAlertDetailsScreen: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadAlertData();
   }, [route.params.alertId]);
 
@@ -103,10 +101,10 @@ const FraudAlertDetailsScreen: React.FC = () => {
   // Update alert status
   const updateAlertStatus = async (status: AlertStatus) => {
     if (!alert) return;
-    
+
     try {
       setActionLoading(true);
-      
+
       await fraudDetectionService.updateAlertStatus(
         alert.id,
         status,
@@ -114,13 +112,13 @@ const FraudAlertDetailsScreen: React.FC = () => {
         'Admin User', // TODO: Replace with actual admin name
         notesText
       );
-      
+
       // Reload alert data
       const updatedAlert = await fraudDetectionService.getAlertById(alert.id);
       if (updatedAlert) {
         setAlert(updatedAlert);
       }
-      
+
       Alert.alert('Success', `Alert status updated to ${status.replace(/_/g, ' ')}`);
     } catch (error) {
       console.error('Error updating alert status:', error);
@@ -133,10 +131,10 @@ const FraudAlertDetailsScreen: React.FC = () => {
   // Take action on user account
   const takeAction = async (action: AccountAction) => {
     if (!alert) return;
-    
+
     try {
       setActionLoading(true);
-      
+
       await fraudDetectionService.takeAction(
         alert.id,
         action,
@@ -144,13 +142,13 @@ const FraudAlertDetailsScreen: React.FC = () => {
         'Admin User', // TODO: Replace with actual admin name
         notesText
       );
-      
+
       // Reload alert data
       const updatedAlert = await fraudDetectionService.getAlertById(alert.id);
       if (updatedAlert) {
         setAlert(updatedAlert);
       }
-      
+
       Alert.alert('Success', `Action ${action.replace(/_/g, ' ')} taken on user account`);
     } catch (error) {
       console.error('Error taking action:', error);
@@ -197,23 +195,13 @@ const FraudAlertDetailsScreen: React.FC = () => {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <View
-              style={[
-                styles.severityBadge,
-                { backgroundColor: severityColors[alert.severity] }
-              ]}
+              style={[styles.severityBadge, { backgroundColor: severityColors[alert.severity] }]}
             >
-              <ThemedText style={styles.severityText}>
-                {alert.severity.toUpperCase()}
-              </ThemedText>
+              <ThemedText style={styles.severityText}>{alert.severity.toUpperCase()}</ThemedText>
             </View>
-            <ThemedText style={styles.title}>
-              {alert.patternType.replace(/_/g, ' ')}
-            </ThemedText>
+            <ThemedText style={styles.title}>{alert.patternType.replace(/_/g, ' ')}</ThemedText>
           </View>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={textColor} />
           </TouchableOpacity>
         </View>
@@ -224,8 +212,8 @@ const FraudAlertDetailsScreen: React.FC = () => {
             styles.card,
             {
               backgroundColor: cardBackgroundColor,
-              borderColor: cardBorderColor
-            }
+              borderColor: cardBorderColor,
+            },
           ]}
         >
           <View style={styles.detailRow}>
@@ -239,33 +227,27 @@ const FraudAlertDetailsScreen: React.FC = () => {
                       alert.status === AlertStatus.NEW
                         ? '#2196F3'
                         : alert.status === AlertStatus.INVESTIGATING
-                        ? '#FFC107'
-                        : alert.status === AlertStatus.RESOLVED
-                        ? '#4CAF50'
-                        : alert.status === AlertStatus.CONFIRMED
-                        ? '#9C27B0'
-                        : '#757575'
-                  }
+                          ? '#FFC107'
+                          : alert.status === AlertStatus.RESOLVED
+                            ? '#4CAF50'
+                            : alert.status === AlertStatus.CONFIRMED
+                              ? '#9C27B0'
+                              : '#757575',
+                  },
                 ]}
               />
-              <ThemedText style={styles.statusText}>
-                {alert.status.replace(/_/g, ' ')}
-              </ThemedText>
+              <ThemedText style={styles.statusText}>{alert.status.replace(/_/g, ' ')}</ThemedText>
             </View>
           </View>
 
           <View style={styles.detailRow}>
             <ThemedText style={styles.detailLabel}>User:</ThemedText>
-            <ThemedText style={styles.detailValue}>
-              {alert.username || alert.userId}
-            </ThemedText>
+            <ThemedText style={styles.detailValue}>{alert.username || alert.userId}</ThemedText>
           </View>
 
           <View style={styles.detailRow}>
             <ThemedText style={styles.detailLabel}>Detected:</ThemedText>
-            <ThemedText style={styles.detailValue}>
-              {formatTimestamp(alert.timestamp)}
-            </ThemedText>
+            <ThemedText style={styles.detailValue}>{formatTimestamp(alert.timestamp)}</ThemedText>
           </View>
 
           <View style={styles.detailRow}>
@@ -280,9 +262,7 @@ const FraudAlertDetailsScreen: React.FC = () => {
 
               <View style={styles.detailRow}>
                 <ThemedText style={styles.detailLabel}>Resolved By:</ThemedText>
-                <ThemedText style={styles.detailValue}>
-                  {alert.resolution.adminName}
-                </ThemedText>
+                <ThemedText style={styles.detailValue}>{alert.resolution.adminName}</ThemedText>
               </View>
 
               <View style={styles.detailRow}>
@@ -311,9 +291,7 @@ const FraudAlertDetailsScreen: React.FC = () => {
               {alert.resolution.notes && (
                 <View style={styles.detailRow}>
                   <ThemedText style={styles.detailLabel}>Notes:</ThemedText>
-                  <ThemedText style={styles.detailValue}>
-                    {alert.resolution.notes}
-                  </ThemedText>
+                  <ThemedText style={styles.detailValue}>{alert.resolution.notes}</ThemedText>
                 </View>
               )}
             </>
@@ -334,9 +312,7 @@ const FraudAlertDetailsScreen: React.FC = () => {
                       {formatTimestamp(action.timestamp)}
                     </ThemedText>
                   </View>
-                  <ThemedText style={styles.actionAdmin}>
-                    By: {action.adminName}
-                  </ThemedText>
+                  <ThemedText style={styles.actionAdmin}>By: {action.adminName}</ThemedText>
                   {action.notes && (
                     <ThemedText style={styles.actionNotes}>{action.notes}</ThemedText>
                   )}
@@ -353,8 +329,8 @@ const FraudAlertDetailsScreen: React.FC = () => {
               styles.card,
               {
                 backgroundColor: cardBackgroundColor,
-                borderColor: cardBorderColor
-              }
+                borderColor: cardBorderColor,
+              },
             ]}
           >
             <ThemedText style={styles.sectionTitle}>Take Action</ThemedText>

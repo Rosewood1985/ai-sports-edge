@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, ComponentType } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+
 import { useTheme } from '../contexts/ThemeContext';
 
 /**
@@ -16,12 +17,12 @@ export function createLazyComponent<T extends ComponentType<any>>(
 
   return (props: React.ComponentProps<T>) => {
     const { colors } = useTheme();
-    
+
     return (
-      <Suspense 
+      <Suspense
         fallback={
-          <LoadingFallback 
-            size={loadingProps?.size || 'large'} 
+          <LoadingFallback
+            size={loadingProps?.size || 'large'}
             color={loadingProps?.color || colors.primary}
             text={loadingProps?.text}
           />
@@ -44,7 +45,7 @@ interface LoadingFallbackProps {
 
 const LoadingFallback: React.FC<LoadingFallbackProps> = ({ size, color, text }) => {
   const { colors } = useTheme();
-  
+
   return (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size={size} color={color} />

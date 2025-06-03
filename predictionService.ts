@@ -13,11 +13,8 @@ export const predictionService = {
    */
   getGamePrediction: async (gameId: string): Promise<GamePrediction | null> => {
     try {
-      const doc = await firebaseService.firestore
-        .collection('predictions')
-        .doc(gameId)
-        .get();
-      
+      const doc = await firebaseService.firestore.collection('predictions').doc(gameId).get();
+
       if (!doc.exists) return null;
       return doc.data() as GamePrediction;
     } catch (error) {
@@ -32,30 +29,26 @@ export const predictionService = {
    * @param date The date to filter by (optional)
    * @returns Promise with an array of game predictions
    */
-  getGamePredictions: async (
-    sportId?: string, 
-    date?: Date
-  ): Promise<GamePrediction[]> => {
+  getGamePredictions: async (sportId?: string, date?: Date): Promise<GamePrediction[]> => {
     try {
       let query = firebaseService.firestore.collection('predictions');
-      
+
       if (sportId) {
         query = query.where('sportId', '==', sportId);
       }
-      
+
       if (date) {
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
-        
+
         const endOfDay = new Date(date);
         endOfDay.setHours(23, 59, 59, 999);
-        
-        query = query.where('gameDate', '>=', startOfDay)
-                     .where('gameDate', '<=', endOfDay);
+
+        query = query.where('gameDate', '>=', startOfDay).where('gameDate', '<=', endOfDay);
       }
-      
+
       const querySnapshot = await query.get();
-      
+
       return querySnapshot.docs.map(doc => doc.data() as GamePrediction);
     } catch (error) {
       console.error('Error fetching game predictions:', error);
@@ -75,7 +68,7 @@ export const predictionService = {
         .where('gameId', '==', gameId)
         .orderBy('timestamp')
         .get();
-      
+
       return querySnapshot.docs.map(doc => doc.data() as LineMovement);
     } catch (error) {
       console.error('Error fetching line movements:', error);
@@ -90,11 +83,8 @@ export const predictionService = {
    */
   getBettingAction: async (gameId: string): Promise<BettingAction | null> => {
     try {
-      const doc = await firebaseService.firestore
-        .collection('bettingAction')
-        .doc(gameId)
-        .get();
-      
+      const doc = await firebaseService.firestore.collection('bettingAction').doc(gameId).get();
+
       if (!doc.exists) return null;
       return doc.data() as BettingAction;
     } catch (error) {
@@ -111,27 +101,25 @@ export const predictionService = {
    * @returns Recommended bet size as fraction of bankroll
    */
   calculateKellyStake: (
-    probability: number, 
-    odds: number, 
+    probability: number,
+    odds: number,
     bankrollPercentage: number = 0.05
   ): number => {
     // Convert American odds to decimal odds
-    const decimalOdds = odds >= 0 
-      ? (odds / 100) + 1 
-      : (100 / Math.abs(odds)) + 1;
-    
+    const decimalOdds = odds >= 0 ? odds / 100 + 1 : 100 / Math.abs(odds) + 1;
+
     // Calculate edge
-    const edge = (probability * decimalOdds) - 1;
-    
+    const edge = probability * decimalOdds - 1;
+
     // Kelly formula: f* = (bp - q) / b
     // where b = decimal odds - 1, p = probability of winning, q = probability of losing
     const b = decimalOdds - 1;
     const p = probability;
     const q = 1 - p;
-    
-    let kellyFraction = edge > 0 ? (b * p - q) / b : 0;
-    
+
+    const kellyFraction = edge > 0 ? (b * p - q) / b : 0;
+
     // Cap at specified bankroll percentage
     return Math.min(kellyFraction, bankrollPercentage);
-  }
+  },
 };

@@ -1,10 +1,14 @@
 /**
  * Web-specific subscription service
- * 
+ *
  * This file provides subscription-related functionality for the web app,
  * importing the subscription plans from the main firebaseSubscriptionService.ts
  */
-import { SUBSCRIPTION_PLANS, ONE_TIME_PURCHASES, MICROTRANSACTIONS } from '../../services/firebaseSubscriptionService';
+import {
+  SUBSCRIPTION_PLANS,
+  ONE_TIME_PURCHASES,
+  MICROTRANSACTIONS,
+} from '../../services/firebaseSubscriptionService';
 
 // Export subscription plans for use in web components
 export { SUBSCRIPTION_PLANS, ONE_TIME_PURCHASES, MICROTRANSACTIONS };
@@ -24,7 +28,7 @@ export const formatPrice = (price, interval) => {
  * @param {string} planId - The plan ID to find
  * @returns {Object|null} - The subscription plan or null if not found
  */
-export const getPlanById = (planId) => {
+export const getPlanById = planId => {
   return SUBSCRIPTION_PLANS.find(plan => plan.id === planId) || null;
 };
 
@@ -60,5 +64,5 @@ export default {
   getPlanById,
   getMonthlyPlans,
   getYearlyPlans,
-  getGroupPlan
+  getGroupPlan,
 };

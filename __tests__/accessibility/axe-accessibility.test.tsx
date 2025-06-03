@@ -5,10 +5,11 @@
  * It tests components against WCAG accessibility guidelines.
  */
 
-import React from 'react';
-import { Text } from 'react-native';
 import { render } from '@testing-library/react-native';
 import { axe } from 'jest-axe';
+import React from 'react';
+import { Text } from 'react-native';
+
 import AccessibleTouchableOpacity from '../../atomic/atoms/AccessibleTouchableOpacity';
 import {
   expectNoAccessibilityViolations,

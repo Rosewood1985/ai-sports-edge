@@ -3,10 +3,11 @@
 // Unified Daily Updates for NFL & College Football with Optimization
 // =============================================================================
 
-import { NFLDataSyncService } from './nfl/nflDataSyncService';
-import { CollegeFootballDataSyncService } from './collegefootball/collegefootballDataSyncService';
-import { initSentry } from './sentryConfig';
 import * as admin from 'firebase-admin';
+
+import { CollegeFootballDataSyncService } from './collegefootball/collegefootballDataSyncService';
+import { NFLDataSyncService } from './nfl/nflDataSyncService';
+import { initSentry } from './sentryConfig';
 
 // Initialize Sentry for monitoring
 const Sentry = initSentry();
@@ -67,61 +68,61 @@ export class DailyFootballSyncService {
 
   // Advanced Caching Strategy Configuration
   private readonly CACHE_STRATEGIES: Record<string, CacheStrategy> = {
-    'live_scores': {
+    live_scores: {
       strategy: 'network-first',
       expiration: 30000, // 30 seconds during games
       priority: 'high',
       refreshOnExpiry: true,
     },
-    'injury_reports': {
+    injury_reports: {
       strategy: 'network-first',
       expiration: 300000, // 5 minutes
       priority: 'high',
       refreshOnExpiry: true,
     },
-    'weather_data': {
+    weather_data: {
       strategy: 'cache-first',
       expiration: 900000, // 15 minutes
       priority: 'medium',
       refreshOnExpiry: false,
     },
-    'team_stats': {
+    team_stats: {
       strategy: 'cache-first',
       expiration: 3600000, // 1 hour
       priority: 'medium',
       refreshOnExpiry: false,
     },
-    'player_stats': {
+    player_stats: {
       strategy: 'cache-first',
       expiration: 7200000, // 2 hours
       priority: 'medium',
       refreshOnExpiry: false,
     },
-    'recruiting_data': {
+    recruiting_data: {
       strategy: 'cache-first',
       expiration: 86400000, // 24 hours
       priority: 'low',
       refreshOnExpiry: false,
     },
-    'historical_data': {
+    historical_data: {
       strategy: 'cache-only',
       expiration: 604800000, // 7 days
       priority: 'low',
       refreshOnExpiry: false,
     },
-    'line_movements': {
+    line_movements: {
       strategy: 'network-first',
       expiration: 60000, // 1 minute
       priority: 'high',
       refreshOnExpiry: true,
     },
-    'transfer_portal': {
+    transfer_portal: {
       strategy: 'network-first',
       expiration: 1800000, // 30 minutes
       priority: 'medium',
       refreshOnExpiry: true,
     },
-    'coaching_changes': {
+    coaching_changes: {
       strategy: 'network-first',
       expiration: 3600000, // 1 hour
       priority: 'medium',
@@ -129,13 +130,15 @@ export class DailyFootballSyncService {
     },
   };
 
-  constructor(options: FootballSyncOptions = {
-    enableNFL: true,
-    enableCFB: true,
-    enableRealTimeUpdates: true,
-    enableAdvancedCaching: true,
-    syncPriority: 'cost-optimized',
-  }) {
+  constructor(
+    options: FootballSyncOptions = {
+      enableNFL: true,
+      enableCFB: true,
+      enableRealTimeUpdates: true,
+      enableAdvancedCaching: true,
+      syncPriority: 'cost-optimized',
+    }
+  ) {
     this.options = options;
     this.db = admin.firestore();
     this.nflService = new NFLDataSyncService();
@@ -152,7 +155,12 @@ export class DailyFootballSyncService {
       nflSync: { status: 'failed', duration: 0, recordsProcessed: 0, errors: [] },
       cfbSync: { status: 'failed', duration: 0, recordsProcessed: 0, errors: [] },
       cacheStats: { hitRate: 0, missRate: 0, apiCallsSaved: 0, costSavings: 0 },
-      performanceMetrics: { totalDuration: 0, averageResponseTime: 0, memoryUsage: 0, errorRate: 0 },
+      performanceMetrics: {
+        totalDuration: 0,
+        averageResponseTime: 0,
+        memoryUsage: 0,
+        errorRate: 0,
+      },
     };
 
     try {
@@ -215,10 +223,7 @@ export class DailyFootballSyncService {
 
       // Phase 1: High-priority real-time data
       if (this.isGameDay('nfl')) {
-        await this.syncWithOptimization(
-          () => this.nflService.syncLiveScores(),
-          'live_scores'
-        );
+        await this.syncWithOptimization(() => this.nflService.syncLiveScores(), 'live_scores');
         recordsProcessed += 16; // 32 teams, approximate games
       }
 
@@ -236,10 +241,7 @@ export class DailyFootballSyncService {
       // Phase 3: Weather data for outdoor games
       if (this.options.enableRealTimeUpdates) {
         try {
-          await this.syncWithOptimization(
-            () => this.nflService.syncWeatherData(),
-            'weather_data'
-          );
+          await this.syncWithOptimization(() => this.nflService.syncWeatherData(), 'weather_data');
           recordsProcessed += 20; // Approximately 20 outdoor stadiums
         } catch (error) {
           errors.push(`Weather sync failed: ${error.message}`);
@@ -247,24 +249,15 @@ export class DailyFootballSyncService {
       }
 
       // Phase 4: Standard data updates
-      await this.syncWithOptimization(
-        () => this.nflService.syncGames(),
-        'team_stats'
-      );
+      await this.syncWithOptimization(() => this.nflService.syncGames(), 'team_stats');
       recordsProcessed += 272; // 17 weeks * 16 games
 
-      await this.syncWithOptimization(
-        () => this.nflService.syncStandings(),
-        'team_stats'
-      );
+      await this.syncWithOptimization(() => this.nflService.syncStandings(), 'team_stats');
       recordsProcessed += 32;
 
       // Phase 5: Player statistics (less frequent)
       if (this.shouldSyncPlayerStats()) {
-        await this.syncWithOptimization(
-          () => this.nflService.syncPlayers(),
-          'player_stats'
-        );
+        await this.syncWithOptimization(() => this.nflService.syncPlayers(), 'player_stats');
         recordsProcessed += 1600; // Approximate active players
       }
 
@@ -280,7 +273,7 @@ export class DailyFootballSyncService {
     } catch (error) {
       const duration = Date.now() - startTime;
       errors.push(error.message);
-      
+
       Sentry.captureException(error);
       return {
         status: 'failed',
@@ -330,10 +323,7 @@ export class DailyFootballSyncService {
       // Phase 3: Rankings updates (important during season)
       if (this.isCollegeFootballSeason()) {
         try {
-          await this.syncWithOptimization(
-            () => this.cfbService.syncRankings(),
-            'team_stats'
-          );
+          await this.syncWithOptimization(() => this.cfbService.syncRankings(), 'team_stats');
           recordsProcessed += 130; // FBS teams
         } catch (error) {
           errors.push(`Rankings sync failed: ${error.message}`);
@@ -354,10 +344,7 @@ export class DailyFootballSyncService {
       }
 
       // Phase 5: Game data and conference updates
-      await this.syncWithOptimization(
-        () => this.cfbService.syncConferenceData(),
-        'team_stats'
-      );
+      await this.syncWithOptimization(() => this.cfbService.syncConferenceData(), 'team_stats');
       recordsProcessed += 10; // Major conferences
 
       await this.syncWithOptimization(
@@ -397,19 +384,16 @@ export class DailyFootballSyncService {
     cacheKey: string
   ): Promise<T> {
     const strategy = this.CACHE_STRATEGIES[cacheKey];
-    
+
     if (!strategy || !this.options.enableAdvancedCaching) {
       return await syncFunction();
     }
 
-    const cacheDoc = await this.db
-      .collection('football_cache')
-      .doc(cacheKey)
-      .get();
+    const cacheDoc = await this.db.collection('football_cache').doc(cacheKey).get();
 
     const now = Date.now();
     const cachedData = cacheDoc.exists ? cacheDoc.data() : null;
-    const isExpired = !cachedData || (now - cachedData.timestamp) > strategy.expiration;
+    const isExpired = !cachedData || now - cachedData.timestamp > strategy.expiration;
 
     switch (strategy.strategy) {
       case 'cache-first':
@@ -439,15 +423,12 @@ export class DailyFootballSyncService {
 
     // Cache the result
     if (freshData) {
-      await this.db
-        .collection('football_cache')
-        .doc(cacheKey)
-        .set({
-          data: freshData,
-          timestamp: now,
-          strategy: strategy.strategy,
-          expiration: strategy.expiration,
-        });
+      await this.db.collection('football_cache').doc(cacheKey).set({
+        data: freshData,
+        timestamp: now,
+        strategy: strategy.strategy,
+        expiration: strategy.expiration,
+      });
     }
 
     return freshData;
@@ -487,9 +468,7 @@ export class DailyFootballSyncService {
     const day = now.getDate();
 
     // Early signing period (December) and regular signing period (February)
-    return (month === 12 && day >= 15) || 
-           (month === 2) || 
-           (month >= 6 && month <= 8); // Summer evaluation period
+    return (month === 12 && day >= 15) || month === 2 || (month >= 6 && month <= 8); // Summer evaluation period
   }
 
   /**
@@ -506,7 +485,7 @@ export class DailyFootballSyncService {
    */
   private async generatePerformanceMetrics(): Promise<DailySyncReport['performanceMetrics']> {
     const totalDuration = Date.now() - this.syncStartTime;
-    
+
     // Get memory usage
     const memoryUsage = process.memoryUsage().heapUsed / 1024 / 1024; // MB
 
@@ -526,7 +505,7 @@ export class DailyFootballSyncService {
         if (data.errors && data.errors.length > 0) errorCount++;
         return sum + (data.duration || 0);
       }, 0);
-      
+
       averageResponseTime = totalResponseTime / recentSyncs.size;
     }
 
@@ -577,10 +556,7 @@ export class DailyFootballSyncService {
         .set(report);
 
       // Also update the latest report
-      await this.db
-        .collection('football_sync_reports')
-        .doc('latest')
-        .set(report);
+      await this.db.collection('football_sync_reports').doc('latest').set(report);
     } catch (error) {
       Sentry.captureException(error);
     }
@@ -600,7 +576,11 @@ export class DailyFootballSyncService {
         status: 'failed',
         duration: 0,
         recordsProcessed: 0,
-        errors: [result.status === 'rejected' ? result.reason?.message || 'Unknown error' : 'Service disabled'],
+        errors: [
+          result.status === 'rejected'
+            ? result.reason?.message || 'Unknown error'
+            : 'Service disabled',
+        ],
       };
     }
   }
@@ -610,12 +590,9 @@ export class DailyFootballSyncService {
    */
   async getLatestSyncReport(): Promise<DailySyncReport | null> {
     try {
-      const reportDoc = await this.db
-        .collection('football_sync_reports')
-        .doc('latest')
-        .get();
+      const reportDoc = await this.db.collection('football_sync_reports').doc('latest').get();
 
-      return reportDoc.exists ? reportDoc.data() as DailySyncReport : null;
+      return reportDoc.exists ? (reportDoc.data() as DailySyncReport) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -676,12 +653,13 @@ export class DailyFootballSyncService {
       }
 
       // Check sync performance
-      if (latestReport.performanceMetrics.totalDuration > 300000) { // 5 minutes
+      if (latestReport.performanceMetrics.totalDuration > 300000) {
+        // 5 minutes
         recommendations.push('Consider optimizing sync operations for faster execution');
       }
 
-      const status = issues.length === 0 ? 'healthy' : 
-                    issues.length <= 2 ? 'degraded' : 'unhealthy';
+      const status =
+        issues.length === 0 ? 'healthy' : issues.length <= 2 ? 'degraded' : 'unhealthy';
 
       return {
         status,

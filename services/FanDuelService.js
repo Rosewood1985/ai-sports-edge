@@ -34,7 +34,7 @@ class FanDuelService {
    */
   generateAffiliateLink(options = {}) {
     const { sport, betType, campaignId } = options;
-    
+
     // Build tracking parameters
     const trackingParams = {
       ...this.config.trackingParams,
@@ -42,12 +42,12 @@ class FanDuelService {
       ...(sport && { utm_content: sport }),
       ...(betType && { utm_term: betType }),
     };
-    
+
     // Convert tracking parameters to URL query string
     const queryParams = Object.entries(trackingParams)
       .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&');
-    
+
     // Build the affiliate link
     return `${this.config.baseUrl}?${queryParams}&pid=${this.config.affiliateId}`;
   }
@@ -64,50 +64,50 @@ class FanDuelService {
    */
   generateDeepLink(options = {}) {
     const { sport, eventId, betType, team, campaignId } = options;
-    
+
     // Map our sport keys to FanDuel sport paths
     const sportPathMap = {
-      'nba': 'basketball/nba',
-      'wnba': 'basketball/wnba',
-      'ncaab': 'basketball/college-basketball',
-      'ncaaw': 'basketball/college-basketball',
-      'f1': 'motor-racing/formula-1',
+      nba: 'basketball/nba',
+      wnba: 'basketball/wnba',
+      ncaab: 'basketball/college-basketball',
+      ncaaw: 'basketball/college-basketball',
+      f1: 'motor-racing/formula-1',
     };
-    
+
     // Map our bet types to FanDuel bet type paths
     const betTypePathMap = {
-      'moneyline': 'moneyline',
-      'spread': 'spread',
-      'total': 'total',
+      moneyline: 'moneyline',
+      spread: 'spread',
+      total: 'total',
       'player-prop': 'player-props',
       'race-winner': 'race-winner',
     };
-    
+
     // Build the path for the deep link
     let path = sportPathMap[sport.toLowerCase()] || sport.toLowerCase();
-    
+
     if (eventId) {
       path += `/${eventId}`;
     }
-    
+
     if (betType && betTypePathMap[betType.toLowerCase()]) {
       path += `/${betTypePathMap[betType.toLowerCase()]}`;
     }
-    
+
     // Build tracking parameters
     const trackingParams = {
       ...this.config.trackingParams,
       ...(campaignId && { utm_campaign: campaignId }),
       ...(sport && { utm_content: sport }),
       ...(betType && { utm_term: betType }),
-      ...(team && { team: team }),
+      ...(team && { team }),
     };
-    
+
     // Convert tracking parameters to URL query string
     const queryParams = Object.entries(trackingParams)
       .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&');
-    
+
     // Build the deep link
     return `${this.config.deepLinkBaseUrl}/${path}?${queryParams}&pid=${this.config.affiliateId}`;
   }
@@ -122,18 +122,18 @@ class FanDuelService {
    */
   generateMobileAppDeepLink(options = {}) {
     const { sport, eventId, betType } = options;
-    
+
     // Build the path for the deep link
     let path = sport.toLowerCase();
-    
+
     if (eventId) {
       path += `/${eventId}`;
     }
-    
+
     if (betType) {
       path += `/${betType.toLowerCase()}`;
     }
-    
+
     // Build the mobile app deep link
     return `${this.config.mobileAppScheme}${path}`;
   }
@@ -164,27 +164,27 @@ class FanDuelService {
     try {
       // Make an API call to FanDuel's conversion tracking API
       console.log('Tracking conversion:', data);
-      
+
       // Implement real API call to FanDuel's tracking endpoint
       const response = await fetch('https://affiliates.fanduel.com/api/track', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKeys.getFanDuelApiKey()}`
+          Authorization: `Bearer ${apiKeys.getFanDuelApiKey()}`,
         },
         body: JSON.stringify({
           userId: data.userId,
           eventType: data.eventType,
           source: data.source || 'ai_sports_edge',
           value: data.value || 0,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`FanDuel API error: ${response.status}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Error tracking conversion:', error);

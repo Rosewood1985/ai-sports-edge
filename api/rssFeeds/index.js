@@ -1,4 +1,5 @@
 const express = require('express');
+
 const { fetchAndProcessFeeds, trackNewsItemClick } = require('./fetchRssFeeds');
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const DEFAULT_FEEDS = [
   'https://www.cbssports.com/rss/headlines',
   'https://bleacherreport.com/articles/feed',
   'https://sports.yahoo.com/rss/',
-  'https://theathletic.com/news/feed'
+  'https://theathletic.com/news/feed',
 ];
 
 // Sport-specific feeds
@@ -16,32 +17,29 @@ const SPORT_FEEDS = {
   football: [
     'https://www.espn.com/espn/rss/nfl/news',
     'https://www.cbssports.com/rss/headlines/nfl',
-    'https://sports.yahoo.com/nfl/rss/'
+    'https://sports.yahoo.com/nfl/rss/',
   ],
   basketball: [
     'https://www.espn.com/espn/rss/nba/news',
     'https://www.cbssports.com/rss/headlines/nba',
-    'https://sports.yahoo.com/nba/rss/'
+    'https://sports.yahoo.com/nba/rss/',
   ],
   baseball: [
     'https://www.espn.com/espn/rss/mlb/news',
     'https://www.cbssports.com/rss/headlines/mlb',
-    'https://sports.yahoo.com/mlb/rss/'
+    'https://sports.yahoo.com/mlb/rss/',
   ],
   hockey: [
     'https://www.espn.com/espn/rss/nhl/news',
     'https://www.cbssports.com/rss/headlines/nhl',
-    'https://sports.yahoo.com/nhl/rss/'
+    'https://sports.yahoo.com/nhl/rss/',
   ],
   mma: [
     'https://www.espn.com/espn/rss/mma/news',
     'https://www.cbssports.com/rss/headlines/mma',
-    'https://sports.yahoo.com/mma/rss/'
+    'https://sports.yahoo.com/mma/rss/',
   ],
-  formula1: [
-    'https://www.espn.com/espn/rss/f1/news',
-    'https://sports.yahoo.com/formula-1/rss/'
-  ]
+  formula1: ['https://www.espn.com/espn/rss/f1/news', 'https://sports.yahoo.com/formula-1/rss/'],
 };
 
 // GET endpoint for RSS feeds
@@ -60,7 +58,7 @@ router.post('/', async (req, res) => {
   try {
     const { userPreferences } = req.body;
     let feedUrls = [...DEFAULT_FEEDS];
-    
+
     // Add sport-specific feeds based on user preferences
     if (userPreferences && userPreferences.sports && userPreferences.sports.length > 0) {
       userPreferences.sports.forEach(sport => {
@@ -69,10 +67,10 @@ router.post('/', async (req, res) => {
         }
       });
     }
-    
+
     // Remove duplicates
     feedUrls = [...new Set(feedUrls)];
-    
+
     const feeds = await fetchAndProcessFeeds(feedUrls, userPreferences);
     res.json({ items: feeds });
   } catch (error) {
@@ -85,11 +83,11 @@ router.post('/', async (req, res) => {
 router.post('/track-click', async (req, res) => {
   try {
     const { item, userId } = req.body;
-    
+
     if (!item) {
       return res.status(400).json({ error: 'Item is required' });
     }
-    
+
     await trackNewsItemClick(item, userId);
     res.json({ success: true });
   } catch (error) {

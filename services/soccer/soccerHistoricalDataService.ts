@@ -1,6 +1,7 @@
-import * as admin from 'firebase-admin';
 import * as Sentry from '@sentry/node';
 import axios from 'axios';
+import * as admin from 'firebase-admin';
+
 import { SoccerMatch, SoccerTeam, SoccerPlayer } from './soccerInterfaces';
 
 interface HistoricalMatch {
@@ -115,7 +116,7 @@ interface PlayerTransfer {
 interface SeasonStandings {
   season: string;
   competition: string;
-  standings: Array<{
+  standings: {
     position: number;
     teamId: string;
     teamName: string;
@@ -138,7 +139,7 @@ interface SeasonStandings {
       draws: number;
       losses: number;
     };
-  }>;
+  }[];
   lastUpdated: string;
   dataSource: 'football-data.org' | 'espn' | 'manual';
 }
@@ -146,7 +147,7 @@ interface SeasonStandings {
 interface PlayerCareerStats {
   playerId: string;
   playerName: string;
-  seasonStats: Array<{
+  seasonStats: {
     season: string;
     teamId: string;
     teamName: string;
@@ -162,7 +163,7 @@ interface PlayerCareerStats {
     position: string;
     dataSource: string;
     lastUpdated: string;
-  }>;
+  }[];
   careerTotals: {
     totalAppearances: number;
     totalGoals: number;
@@ -182,7 +183,7 @@ interface PlayerCareerStats {
 interface CompetitionHistory {
   competitionId: string;
   competitionName: string;
-  seasons: Array<{
+  seasons: {
     season: string;
     winner: string;
     runnerUp: string;
@@ -194,7 +195,7 @@ interface CompetitionHistory {
     finalTable?: SeasonStandings;
     dataSource: string;
     verified: boolean;
-  }>;
+  }[];
 }
 
 interface DataSourceConfiguration {
@@ -342,7 +343,7 @@ export class SoccerHistoricalDataService {
             'X-Auth-Token': this.dataSourceConfig.footballDataOrg.apiKey,
           },
           params: {
-            season: season,
+            season,
             status: 'FINISHED',
           },
           timeout: 15000,
@@ -450,7 +451,7 @@ export class SoccerHistoricalDataService {
       const historicalMatch: HistoricalMatch = {
         matchId: matchData.id.toString(),
         season: matchData.season.startDate.substring(0, 4),
-        competition: competition,
+        competition,
         date: matchData.utcDate,
         homeTeam: {
           teamId: matchData.homeTeam.id.toString(),
@@ -626,7 +627,7 @@ export class SoccerHistoricalDataService {
             'X-Auth-Token': this.dataSourceConfig.footballDataOrg.apiKey,
           },
           params: {
-            season: season,
+            season,
           },
           timeout: 15000,
         }
@@ -640,8 +641,8 @@ export class SoccerHistoricalDataService {
       const standingsData = response.data.standings[0];
 
       const standings: SeasonStandings = {
-        season: season,
-        competition: competition,
+        season,
+        competition,
         standings: standingsData.table.map((team: any) => ({
           position: team.position,
           teamId: team.team.id.toString(),
@@ -799,7 +800,7 @@ export class SoccerHistoricalDataService {
             const runnerUp = standingsData.standings.find(team => team.position === 2);
 
             competitionSeasons.push({
-              season: season,
+              season,
               winner: winner?.teamName || 'Unknown',
               runnerUp: runnerUp?.teamName || 'Unknown',
               dataSource: standingsData.dataSource,
@@ -837,7 +838,7 @@ export class SoccerHistoricalDataService {
     season: string,
     teamId?: string
   ): Promise<HistoricalMatch[]> {
-    let query = this.db
+    const query = this.db
       .collection('soccer_historical_matches')
       .where('competition', '==', competition)
       .where('season', '==', season);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
 import { colors } from '../styles/theme';
 
 /**
@@ -16,9 +17,9 @@ const NotificationPermission = () => {
       // Wait for OneSignal to initialize
       window.OneSignal.push(() => {
         // Get current permission state
-        window.OneSignal.getNotificationPermission((permission) => {
+        window.OneSignal.getNotificationPermission(permission => {
           setPermissionState(permission);
-          
+
           // Show banner if permission is not granted and user hasn't dismissed it
           if (permission !== 'granted' && !localStorage.getItem('notificationBannerDismissed')) {
             setShowBanner(true);

@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Animated, Easing, TouchableOpacity, Modal, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '../hooks/useThemeColor';
@@ -21,42 +22,42 @@ interface NetworkStatusIndicatorProps {
 const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
   showDetails = false,
   position = 'top',
-  style
+  style,
 }) => {
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(-50));
-  
+
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = '#0a7ea4';
-  
+
   // Initialize network service on mount
   useEffect(() => {
     networkService.initialize();
-    
+
     // Get initial connection info
     const initialConnectionInfo = networkService.getCurrentConnectionInfo();
     if (initialConnectionInfo) {
       setConnectionInfo(initialConnectionInfo);
       updateVisibility(initialConnectionInfo.status);
     }
-    
+
     // Subscribe to network status changes
-    const unsubscribe = networkService.addListener((info) => {
+    const unsubscribe = networkService.addListener(info => {
       setConnectionInfo(info);
       updateVisibility(info.status);
     });
-    
+
     // Clean up on unmount
     return () => {
       unsubscribe();
     };
   }, []);
-  
+
   /**
    * Update visibility based on connection status
    * @param status Connection status
@@ -75,7 +76,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
           duration: 300,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
-        })
+        }),
       ]).start();
     } else if (status === ConnectionStatus.CONNECTED && isVisible) {
       Animated.parallel([
@@ -89,19 +90,19 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
           duration: 300,
           easing: Easing.in(Easing.cubic),
           useNativeDriver: true,
-        })
+        }),
       ]).start(() => {
         setIsVisible(false);
       });
     }
   };
-  
+
   /**
    * Get status icon based on connection status
    */
   const getStatusIcon = () => {
     if (!connectionInfo) return 'help-circle';
-    
+
     switch (connectionInfo.status) {
       case ConnectionStatus.CONNECTED:
         return 'wifi';
@@ -111,13 +112,13 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
         return 'help-circle';
     }
   };
-  
+
   /**
    * Get status color based on connection status
    */
   const getStatusColor = () => {
     if (!connectionInfo) return '#999';
-    
+
     switch (connectionInfo.status) {
       case ConnectionStatus.CONNECTED:
         return '#4CAF50';
@@ -127,13 +128,13 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
         return '#999';
     }
   };
-  
+
   /**
    * Get status text based on connection status
    */
   const getStatusText = () => {
     if (!connectionInfo) return 'Unknown';
-    
+
     switch (connectionInfo.status) {
       case ConnectionStatus.CONNECTED:
         return 'Connected';
@@ -143,7 +144,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
         return 'Unknown';
     }
   };
-  
+
   /**
    * Handle press on the indicator
    */
@@ -152,17 +153,17 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
       setIsModalVisible(true);
     }
   };
-  
+
   /**
    * Render connection details modal
    */
   const renderDetailsModal = () => {
     if (!connectionInfo) return null;
-    
+
     return (
       <Modal
         visible={isModalVisible}
-        transparent={true}
+        transparent
         animationType="fade"
         onRequestClose={() => setIsModalVisible(false)}
       >
@@ -174,12 +175,12 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                 <Ionicons name="close" size={24} color={textColor} />
               </TouchableOpacity>
             </View>
-            
+
             <View style={styles.statusIconContainer}>
               <Ionicons name={getStatusIcon() as any} size={48} color={getStatusColor()} />
               <ThemedText style={styles.statusText}>{getStatusText()}</ThemedText>
             </View>
-            
+
             <View style={styles.detailsContainer}>
               <View style={styles.detailRow}>
                 <ThemedText style={styles.detailLabel}>Connection Type:</ThemedText>
@@ -187,7 +188,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                   {connectionInfo.type.charAt(0).toUpperCase() + connectionInfo.type.slice(1)}
                 </ThemedText>
               </View>
-              
+
               {connectionInfo.type === 'cellular' && connectionInfo.details.cellularGeneration && (
                 <View style={styles.detailRow}>
                   <ThemedText style={styles.detailLabel}>Network:</ThemedText>
@@ -196,7 +197,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                   </ThemedText>
                 </View>
               )}
-              
+
               <View style={styles.detailRow}>
                 <ThemedText style={styles.detailLabel}>Internet Reachable:</ThemedText>
                 <ThemedText style={styles.detailValue}>
@@ -207,7 +208,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                       : 'No'}
                 </ThemedText>
               </View>
-              
+
               {connectionInfo.details.isConnectionExpensive !== undefined && (
                 <View style={styles.detailRow}>
                   <ThemedText style={styles.detailLabel}>Metered Connection:</ThemedText>
@@ -216,7 +217,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                   </ThemedText>
                 </View>
               )}
-              
+
               {connectionInfo.details.strength !== undefined && (
                 <View style={styles.detailRow}>
                   <ThemedText style={styles.detailLabel}>Signal Strength:</ThemedText>
@@ -225,7 +226,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                   </ThemedText>
                 </View>
               )}
-              
+
               <View style={styles.detailRow}>
                 <ThemedText style={styles.detailLabel}>Last Updated:</ThemedText>
                 <ThemedText style={styles.detailValue}>
@@ -233,7 +234,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
                 </ThemedText>
               </View>
             </View>
-            
+
             <TouchableOpacity
               style={styles.refreshButton}
               onPress={() => {
@@ -242,11 +243,13 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
             >
               <ThemedText style={styles.refreshButtonText}>Refresh Status</ThemedText>
             </TouchableOpacity>
-            
+
             {connectionInfo.status === ConnectionStatus.DISCONNECTED && (
               <View style={styles.offlineTips}>
                 <ThemedText style={styles.offlineTipsTitle}>While Offline:</ThemedText>
-                <ThemedText style={styles.offlineTip}>• You can still view cached content</ThemedText>
+                <ThemedText style={styles.offlineTip}>
+                  • You can still view cached content
+                </ThemedText>
                 <ThemedText style={styles.offlineTip}>• New actions will be queued</ThemedText>
                 <ThemedText style={styles.offlineTip}>• Data will sync when back online</ThemedText>
               </View>
@@ -256,12 +259,12 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
       </Modal>
     );
   };
-  
+
   // Don't render anything if connected and not showing details
   if (!isVisible && !showDetails) {
     return null;
   }
-  
+
   return (
     <>
       <Animated.View
@@ -273,7 +276,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
             transform: [{ translateY: slideAnim }],
             backgroundColor: getStatusColor(),
           },
-          style
+          style,
         ]}
       >
         <TouchableOpacity
@@ -288,7 +291,7 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
           )}
         </TouchableOpacity>
       </Animated.View>
-      
+
       {showDetails && renderDetailsModal()}
     </>
   );

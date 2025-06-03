@@ -3,8 +3,9 @@
 // Deep Focus Architecture with Advanced Fighter Analysis
 // =============================================================================
 
-import { firebaseService } from '../firebaseService';
 import * as Sentry from '@sentry/node';
+
+import { firebaseService } from '../firebaseService';
 
 export class UFCAnalyticsService {
   async analyzeFighterPerformance(fighterId: string): Promise<FighterAnalysis> {

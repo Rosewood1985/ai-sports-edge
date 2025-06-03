@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { ThemedView, ThemedText } from '../../components/ThemedComponents';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+
+import { ThemedView, ThemedText } from '../../components/ThemedComponents';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 
 type ProfileSetupScreenNavigationProp = StackNavigationProp<
@@ -17,14 +25,14 @@ const ProfileSetupScreen = () => {
   const navigation = useNavigation<ProfileSetupScreenNavigationProp>();
   const { colors } = useTheme();
   const { t } = useLanguage();
-  
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   const [errors, setErrors] = useState<{
     firstName?: string;
     lastName?: string;
@@ -33,7 +41,7 @@ const ProfileSetupScreen = () => {
     password?: string;
     confirmPassword?: string;
   }>({});
-  
+
   const validateForm = () => {
     const newErrors: {
       firstName?: string;
@@ -43,41 +51,41 @@ const ProfileSetupScreen = () => {
       password?: string;
       confirmPassword?: string;
     } = {};
-    
+
     if (!firstName.trim()) {
       newErrors.firstName = t('validation.required');
     }
-    
+
     if (!lastName.trim()) {
       newErrors.lastName = t('validation.required');
     }
-    
+
     if (!email.trim()) {
       newErrors.email = t('validation.required');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = t('validation.invalid_email');
     }
-    
+
     if (!username.trim()) {
       newErrors.username = t('validation.required');
     } else if (username.length < 3) {
       newErrors.username = t('validation.username_too_short');
     }
-    
+
     if (!password) {
       newErrors.password = t('validation.required');
     } else if (password.length < 8) {
       newErrors.password = t('validation.password_too_short');
     }
-    
+
     if (password !== confirmPassword) {
       newErrors.confirmPassword = t('validation.passwords_dont_match');
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   const handleContinue = () => {
     if (validateForm()) {
       // Save profile data to context or API
@@ -85,7 +93,7 @@ const ProfileSetupScreen = () => {
       navigation.navigate('Preferences');
     }
   };
-  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -97,21 +105,19 @@ const ProfileSetupScreen = () => {
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.backButton}
-              accessible={true}
+              accessible
               accessibilityLabel={t('navigation.back')}
               accessibilityRole="button"
             >
               <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
-            <ThemedText style={styles.title}>
-              {t('onboarding.profile_setup_title')}
-            </ThemedText>
+            <ThemedText style={styles.title}>{t('onboarding.profile_setup_title')}</ThemedText>
           </View>
-          
+
           <ThemedText style={styles.description}>
             {t('onboarding.profile_setup_description')}
           </ThemedText>
-          
+
           <View style={styles.form}>
             <View style={styles.inputRow}>
               <View style={styles.inputContainer}>
@@ -122,14 +128,14 @@ const ProfileSetupScreen = () => {
                   onChangeText={setFirstName}
                   placeholder={t('profile.first_name_placeholder')}
                   placeholderTextColor={colors.text + '80'}
-                  accessible={true}
+                  accessible
                   accessibilityLabel={t('profile.first_name')}
                 />
                 {errors.firstName && (
                   <ThemedText style={styles.errorText}>{errors.firstName}</ThemedText>
                 )}
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <ThemedText style={styles.label}>{t('profile.last_name')}</ThemedText>
                 <TextInput
@@ -138,7 +144,7 @@ const ProfileSetupScreen = () => {
                   onChangeText={setLastName}
                   placeholder={t('profile.last_name_placeholder')}
                   placeholderTextColor={colors.text + '80'}
-                  accessible={true}
+                  accessible
                   accessibilityLabel={t('profile.last_name')}
                 />
                 {errors.lastName && (
@@ -146,7 +152,7 @@ const ProfileSetupScreen = () => {
                 )}
               </View>
             </View>
-            
+
             <View style={styles.inputContainer}>
               <ThemedText style={styles.label}>{t('profile.email')}</ThemedText>
               <TextInput
@@ -157,14 +163,12 @@ const ProfileSetupScreen = () => {
                 placeholderTextColor={colors.text + '80'}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                accessible={true}
+                accessible
                 accessibilityLabel={t('profile.email')}
               />
-              {errors.email && (
-                <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
-              )}
+              {errors.email && <ThemedText style={styles.errorText}>{errors.email}</ThemedText>}
             </View>
-            
+
             <View style={styles.inputContainer}>
               <ThemedText style={styles.label}>{t('profile.username')}</ThemedText>
               <TextInput
@@ -174,14 +178,14 @@ const ProfileSetupScreen = () => {
                 placeholder={t('profile.username_placeholder')}
                 placeholderTextColor={colors.text + '80'}
                 autoCapitalize="none"
-                accessible={true}
+                accessible
                 accessibilityLabel={t('profile.username')}
               />
               {errors.username && (
                 <ThemedText style={styles.errorText}>{errors.username}</ThemedText>
               )}
             </View>
-            
+
             <View style={styles.inputContainer}>
               <ThemedText style={styles.label}>{t('profile.password')}</ThemedText>
               <TextInput
@@ -191,14 +195,14 @@ const ProfileSetupScreen = () => {
                 placeholder={t('profile.password_placeholder')}
                 placeholderTextColor={colors.text + '80'}
                 secureTextEntry
-                accessible={true}
+                accessible
                 accessibilityLabel={t('profile.password')}
               />
               {errors.password && (
                 <ThemedText style={styles.errorText}>{errors.password}</ThemedText>
               )}
             </View>
-            
+
             <View style={styles.inputContainer}>
               <ThemedText style={styles.label}>{t('profile.confirm_password')}</ThemedText>
               <TextInput
@@ -208,7 +212,7 @@ const ProfileSetupScreen = () => {
                 placeholder={t('profile.confirm_password_placeholder')}
                 placeholderTextColor={colors.text + '80'}
                 secureTextEntry
-                accessible={true}
+                accessible
                 accessibilityLabel={t('profile.confirm_password')}
               />
               {errors.confirmPassword && (
@@ -216,22 +220,18 @@ const ProfileSetupScreen = () => {
               )}
             </View>
           </View>
-          
+
           <TouchableOpacity
             style={[styles.continueButton, { backgroundColor: colors.primary }]}
             onPress={handleContinue}
-            accessible={true}
+            accessible
             accessibilityLabel={t('navigation.continue')}
             accessibilityRole="button"
           >
-            <ThemedText style={styles.continueButtonText}>
-              {t('navigation.continue')}
-            </ThemedText>
+            <ThemedText style={styles.continueButtonText}>{t('navigation.continue')}</ThemedText>
           </TouchableOpacity>
-          
-          <ThemedText style={styles.privacyText}>
-            {t('onboarding.privacy_notice')}
-          </ThemedText>
+
+          <ThemedText style={styles.privacyText}>{t('onboarding.privacy_notice')}</ThemedText>
         </ScrollView>
       </ThemedView>
     </KeyboardAvoidingView>

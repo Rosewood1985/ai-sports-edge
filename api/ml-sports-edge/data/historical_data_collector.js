@@ -7,6 +7,7 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+
 const { fetchESPNData, fetchOddsData } = require('./fetch-enhanced');
 
 // Data directories
@@ -32,7 +33,7 @@ if (!fs.existsSync(PROCESSED_DATA_DIR)) {
 function saveHistoricalData(sport, league, season, data) {
   const filename = `${sport.toLowerCase()}_${league.toLowerCase()}_${season}_historical.json`;
   const filePath = path.join(HISTORICAL_DATA_DIR, filename);
-  
+
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
   console.log(`Saved historical data to ${filePath}`);
 }
@@ -47,7 +48,7 @@ function saveHistoricalData(sport, league, season, data) {
 function saveProcessedData(sport, league, season, data) {
   const filename = `${sport.toLowerCase()}_${league.toLowerCase()}_${season}_processed.json`;
   const filePath = path.join(PROCESSED_DATA_DIR, filename);
-  
+
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
   console.log(`Saved processed historical data to ${filePath}`);
 }
@@ -62,19 +63,22 @@ function saveProcessedData(sport, league, season, data) {
 async function fetchESPNHistoricalData(sport, league, season) {
   try {
     console.log(`Fetching ESPN historical data for ${sport}/${league} (${season})...`);
-    
+
     // Construct the ESPN API URL for historical data
     const url = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard?dates=${season}`;
-    
+
     const response = await axios.get(url);
     const data = response.data;
-    
+
     // Save raw historical data
     saveHistoricalData(sport, league, season, data);
-    
+
     return data;
   } catch (error) {
-    console.error(`Error fetching ESPN historical data for ${sport}/${league} (${season}):`, error.message);
+    console.error(
+      `Error fetching ESPN historical data for ${sport}/${league} (${season}):`,
+      error.message
+    );
     return null;
   }
 }
@@ -89,10 +93,10 @@ async function fetchESPNHistoricalData(sport, league, season) {
  */
 function processHistoricalData(sport, league, season, data) {
   console.log(`Processing historical data for ${sport}/${league} (${season})...`);
-  
+
   // Extract events from raw data
   const events = data.events || [];
-  
+
   // Process each event
   const processedEvents = events.map(event => {
     const gameId = event.id;
@@ -100,7 +104,7 @@ function processHistoricalData(sport, league, season, data) {
     const competitors = event.competitions[0]?.competitors || [];
     const homeTeam = competitors.find(team => team.homeAway === 'home')?.team || {};
     const awayTeam = competitors.find(team => team.homeAway === 'away')?.team || {};
-    
+
     // Create processed event
     return {
       id: gameId,
@@ -113,39 +117,39 @@ function processHistoricalData(sport, league, season, data) {
         id: homeTeam.id,
         name: homeTeam.displayName || 'TBD',
         abbreviation: homeTeam.abbreviation,
-        score: parseInt(competitors.find(team => team.homeAway === 'home')?.score) || null
+        score: parseInt(competitors.find(team => team.homeAway === 'home')?.score) || null,
       },
       awayTeam: {
         id: awayTeam.id,
         name: awayTeam.displayName || 'TBD',
         abbreviation: awayTeam.abbreviation,
-        score: parseInt(competitors.find(team => team.homeAway === 'away')?.score) || null
+        score: parseInt(competitors.find(team => team.homeAway === 'away')?.score) || null,
       },
       status: {
         state: event.status?.type?.state || 'pre',
-        detail: event.status?.type?.description || ''
+        detail: event.status?.type?.description || '',
       },
       venue: {
         name: event.competitions[0]?.venue?.fullName || '',
         city: event.competitions[0]?.venue?.address?.city || '',
         state: event.competitions[0]?.venue?.address?.state || '',
-        country: event.competitions[0]?.venue?.address?.country || ''
-      }
+        country: event.competitions[0]?.venue?.address?.country || '',
+      },
     };
   });
-  
+
   // Create processed data object
   const processedData = {
     sport,
     league,
     season,
     timestamp: new Date().toISOString(),
-    events: processedEvents
+    events: processedEvents,
   };
-  
+
   // Save processed data
   saveProcessedData(sport, league, season, processedData);
-  
+
   return processedData;
 }
 
@@ -159,32 +163,32 @@ function processHistoricalData(sport, league, season, data) {
  */
 async function fetchHistoricalDataForSeasons(sport, league, startYear, endYear) {
   console.log(`Fetching historical data for ${sport}/${league} from ${startYear} to ${endYear}...`);
-  
+
   const allData = {
     sport,
     league,
     startYear,
     endYear,
-    seasons: {}
+    seasons: {},
   };
-  
+
   // Fetch data for each season
   for (let year = startYear; year <= endYear; year++) {
     try {
       // Fetch raw historical data
       const rawData = await fetchESPNHistoricalData(sport, league, year.toString());
-      
+
       if (rawData) {
         // Process historical data
         const processedData = processHistoricalData(sport, league, year.toString(), rawData);
-        
+
         // Add to all data
         allData.seasons[year] = {
           rawData,
-          processedData
+          processedData,
         };
       }
-      
+
       // Add a delay to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (error) {
@@ -192,7 +196,7 @@ async function fetchHistoricalDataForSeasons(sport, league, startYear, endYear) 
       // Continue with next season
     }
   }
-  
+
   return allData;
 }
 
@@ -253,7 +257,12 @@ async function fetchNCAAMensHistoricalData(startYear, endYear) {
  * @returns {Promise<Object>} - NCAA Women's Basketball historical data
  */
 async function fetchNCAAWomensHistoricalData(startYear, endYear) {
-  return fetchHistoricalDataForSeasons('basketball', 'womens-college-basketball', startYear, endYear);
+  return fetchHistoricalDataForSeasons(
+    'basketball',
+    'womens-college-basketball',
+    startYear,
+    endYear
+  );
 }
 
 /**
@@ -261,33 +270,33 @@ async function fetchNCAAWomensHistoricalData(startYear, endYear) {
  */
 async function fetchAllHistoricalData() {
   console.log('Starting historical data collection process...');
-  
+
   // Current year
   const currentYear = new Date().getFullYear();
-  
+
   // Fetch historical data for each sport (last 5 years)
   const startYear = currentYear - 5;
   const endYear = currentYear - 1; // Exclude current year
-  
+
   try {
     // Fetch NBA historical data
     await fetchNBAHistoricalData(startYear, endYear);
-    
+
     // Fetch NFL historical data
     await fetchNFLHistoricalData(startYear, endYear);
-    
+
     // Fetch MLB historical data
     await fetchMLBHistoricalData(startYear, endYear);
-    
+
     // Fetch NHL historical data
     await fetchNHLHistoricalData(startYear, endYear);
-    
+
     // Fetch NCAA Men's Basketball historical data
     await fetchNCAAMensHistoricalData(startYear, endYear);
-    
+
     // Fetch NCAA Women's Basketball historical data
     await fetchNCAAWomensHistoricalData(startYear, endYear);
-    
+
     console.log('Historical data collection process completed');
   } catch (error) {
     console.error('Error in historical data collection process:', error);
@@ -316,5 +325,5 @@ module.exports = {
   fetchNHLHistoricalData,
   fetchNCAAMensHistoricalData,
   fetchNCAAWomensHistoricalData,
-  fetchAllHistoricalData
+  fetchAllHistoricalData,
 };

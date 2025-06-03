@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
-import { BetType, BetResult } from '../services/bettingAnalyticsService';
+
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
+import { BetType, BetResult } from '../services/bettingAnalyticsService';
 
 interface BettingAnalyticsChartProps {
   data: {
@@ -30,7 +31,7 @@ interface BettingAnalyticsChartProps {
  */
 const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, chartType }) => {
   const screenWidth = Dimensions.get('window').width - 32; // Adjust for padding
-  
+
   const chartConfig = {
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#ffffff',
@@ -43,7 +44,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
       fontSize: 10,
     },
   };
-  
+
   /**
    * Render profit chart
    */
@@ -54,19 +55,15 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
       labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
       datasets: [
         {
-          data: [
-            data.netProfit * 0.2,
-            data.netProfit * 0.5,
-            data.netProfit * 0.7,
-            data.netProfit,
-          ],
-          color: (opacity = 1) => data.netProfit >= 0 ? `rgba(76, 175, 80, ${opacity})` : `rgba(244, 67, 54, ${opacity})`,
+          data: [data.netProfit * 0.2, data.netProfit * 0.5, data.netProfit * 0.7, data.netProfit],
+          color: (opacity = 1) =>
+            data.netProfit >= 0 ? `rgba(76, 175, 80, ${opacity})` : `rgba(244, 67, 54, ${opacity})`,
           strokeWidth: 2,
         },
       ],
       legend: ['Profit Over Time'],
     };
-    
+
     return (
       <View style={styles.chartContainer}>
         <ThemedText style={styles.chartTitle}>Profit Trend</ThemedText>
@@ -81,13 +78,13 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
       </View>
     );
   };
-  
+
   /**
    * Render bet types chart
    */
   const renderBetTypesChart = () => {
     const betTypes = Object.entries(data.betTypeBreakdown);
-    
+
     if (betTypes.length === 0) {
       return (
         <View style={styles.emptyChartContainer}>
@@ -95,7 +92,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
         </View>
       );
     }
-    
+
     const betTypeData = {
       labels: betTypes.map(([type]) => type.substring(0, 4)),
       datasets: [
@@ -104,7 +101,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
         },
       ],
     };
-    
+
     return (
       <View style={styles.chartContainer}>
         <ThemedText style={styles.chartTitle}>Bet Types Distribution</ThemedText>
@@ -121,7 +118,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
       </View>
     );
   };
-  
+
   /**
    * Render win rate chart
    */
@@ -131,14 +128,14 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
     const lossCount = data.recentForm.filter(result => result === BetResult.LOSS).length;
     const pushCount = data.recentForm.filter(result => result === BetResult.PUSH).length;
     const voidCount = data.recentForm.filter(result => result === BetResult.VOID).length;
-    
+
     const total = data.totalBets || 1; // Avoid division by zero
-    
+
     const winRate = (winCount / total) * 100;
     const lossRate = (lossCount / total) * 100;
     const pushRate = (pushCount / total) * 100;
     const voidRate = (voidCount / total) * 100;
-    
+
     const pieData = [
       {
         name: 'Wins',
@@ -169,7 +166,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
         legendFontSize: 12,
       },
     ].filter(item => item.population > 0);
-    
+
     if (pieData.length === 0) {
       return (
         <View style={styles.emptyChartContainer}>
@@ -177,7 +174,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
         </View>
       );
     }
-    
+
     return (
       <View style={styles.chartContainer}>
         <ThemedText style={styles.chartTitle}>Results Distribution</ThemedText>
@@ -195,7 +192,7 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
       </View>
     );
   };
-  
+
   /**
    * Render the appropriate chart based on chartType
    */
@@ -211,12 +208,8 @@ const BettingAnalyticsChart: React.FC<BettingAnalyticsChartProps> = ({ data, cha
         return null;
     }
   };
-  
-  return (
-    <ThemedView style={styles.container}>
-      {renderChart()}
-    </ThemedView>
-  );
+
+  return <ThemedView style={styles.container}>{renderChart()}</ThemedView>;
 };
 
 const styles = StyleSheet.create({

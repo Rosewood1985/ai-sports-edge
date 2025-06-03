@@ -2,9 +2,9 @@
 
 /**
  * Test Script for Tax API Endpoints
- * 
+ *
  * This script tests the tax API endpoints by making HTTP requests to the server.
- * 
+ *
  * Usage:
  *   node test-tax-api.js
  */
@@ -17,43 +17,43 @@ const config = {
   host: 'localhost',
   port: 3000,
   basePath: '/api/tax',
-  useHttps: false
+  useHttps: false,
 };
 
 // Helper function to make HTTP requests
 function makeRequest(options, data = null) {
   return new Promise((resolve, reject) => {
     const client = config.useHttps ? https : http;
-    
-    const req = client.request(options, (res) => {
+
+    const req = client.request(options, res => {
       let responseData = '';
-      
-      res.on('data', (chunk) => {
+
+      res.on('data', chunk => {
         responseData += chunk;
       });
-      
+
       res.on('end', () => {
         try {
           const parsedData = JSON.parse(responseData);
           resolve({
             statusCode: res.statusCode,
             headers: res.headers,
-            data: parsedData
+            data: parsedData,
           });
         } catch (error) {
           reject(new Error(`Failed to parse response: ${error.message}`));
         }
       });
     });
-    
-    req.on('error', (error) => {
+
+    req.on('error', error => {
       reject(error);
     });
-    
+
     if (data) {
       req.write(JSON.stringify(data));
     }
-    
+
     req.end();
   });
 }
@@ -61,17 +61,17 @@ function makeRequest(options, data = null) {
 // Test tax calculation endpoint
 async function testTaxCalculation() {
   console.log('Testing tax calculation endpoint...');
-  
+
   const options = {
     host: config.host,
     port: config.port,
     path: `${config.basePath}/calculate`,
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   };
-  
+
   const data = {
     currency: 'usd',
     customerId: 'cus_test_123456',
@@ -81,31 +81,31 @@ async function testTaxCalculation() {
         city: 'San Francisco',
         state: 'CA',
         postal_code: '94111',
-        country: 'US'
+        country: 'US',
       },
-      address_source: 'shipping'
+      address_source: 'shipping',
     },
     lineItems: [
       {
         id: 'item_1',
         amount: 100, // $100.00
-        taxCode: 'txcd_10103001' // Digital goods
+        taxCode: 'txcd_10103001', // Digital goods
       },
       {
         id: 'item_2',
         amount: 50, // $50.00
-        taxCode: 'txcd_10103001' // Digital goods
-      }
-    ]
+        taxCode: 'txcd_10103001', // Digital goods
+      },
+    ],
   };
-  
+
   try {
     const response = await makeRequest(options, data);
-    
+
     console.log(`Status code: ${response.statusCode}`);
     console.log('Response data:');
     console.log(JSON.stringify(response.data, null, 2));
-    
+
     return response;
   } catch (error) {
     console.error('Error testing tax calculation endpoint:', error.message);
@@ -116,21 +116,21 @@ async function testTaxCalculation() {
 // Test tax rates endpoint
 async function testTaxRates() {
   console.log('\nTesting tax rates endpoint...');
-  
+
   const options = {
     host: config.host,
     port: config.port,
     path: `${config.basePath}/rates?countryCode=US&stateCode=CA&postalCode=94111&city=San%20Francisco`,
-    method: 'GET'
+    method: 'GET',
   };
-  
+
   try {
     const response = await makeRequest(options);
-    
+
     console.log(`Status code: ${response.statusCode}`);
     console.log('Response data:');
     console.log(JSON.stringify(response.data, null, 2));
-    
+
     return response;
   } catch (error) {
     console.error('Error testing tax rates endpoint:', error.message);

@@ -5,9 +5,10 @@
  * Combines theme atoms into a usable context system.
  */
 
+import { DefaultTheme, DarkTheme } from '@react-navigation/native';
 import React, { createContext, useContext } from 'react';
 import { useColorScheme } from 'react-native';
-import { DefaultTheme, DarkTheme } from '@react-navigation/native';
+
 import Colors from '../atoms/themeColors';
 import ThemeTokens from '../atoms/themeTokens';
 

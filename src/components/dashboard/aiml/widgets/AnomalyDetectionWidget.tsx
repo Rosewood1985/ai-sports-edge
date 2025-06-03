@@ -5,8 +5,9 @@
  */
 
 import React from 'react';
-import { Anomaly } from '../../../../types/aiml';
+
 import { useAnomalies } from '../../../../hooks/useAIML';
+import { Anomaly } from '../../../../types/aiml';
 
 interface AnomalyDetectionWidgetProps {
   anomalies: Anomaly[];
@@ -73,16 +74,14 @@ export function AnomalyDetectionWidget({ anomalies, className = '' }: AnomalyDet
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Anomaly Detection
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Anomaly Detection</h3>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               Real-time system anomaly monitoring
             </p>
           </div>
           <div className="flex items-center space-x-2">
             {criticalAnomalies.length > 0 && (
-              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
             )}
             <div className="text-2xl">🚨</div>
           </div>
@@ -127,24 +126,22 @@ export function AnomalyDetectionWidget({ anomalies, className = '' }: AnomalyDet
           {activeAnomalies.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-6xl mb-4">✅</div>
-              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                All Clear
-              </h4>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">All Clear</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 No active anomalies detected
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {activeAnomalies.slice(0, 5).map((anomaly) => (
+              {activeAnomalies.slice(0, 5).map(anomaly => (
                 <div
                   key={anomaly.id}
                   className={`p-4 border rounded-lg ${
                     anomaly.severity === 'critical'
                       ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
                       : anomaly.severity === 'high'
-                      ? 'border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20'
-                      : 'border-gray-200 dark:border-gray-700'
+                        ? 'border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20'
+                        : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -164,7 +161,8 @@ export function AnomalyDetectionWidget({ anomalies, className = '' }: AnomalyDet
                           </span>
                         </div>
                         <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                          Value: {anomaly.value.toFixed(2)} (Expected: {anomaly.expectedValue.toFixed(2)})
+                          Value: {anomaly.value.toFixed(2)} (Expected:{' '}
+                          {anomaly.expectedValue.toFixed(2)})
                         </div>
                         <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                           Deviation: {anomaly.deviation.toFixed(2)}x above normal
@@ -185,9 +183,7 @@ export function AnomalyDetectionWidget({ anomalies, className = '' }: AnomalyDet
                   {/* Context Information */}
                   {Object.keys(anomaly.context).length > 0 && (
                     <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Context:
-                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Context:</div>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {Object.entries(anomaly.context).map(([key, value]) => (
                           <span

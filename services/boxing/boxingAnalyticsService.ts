@@ -4,6 +4,7 @@
 // =============================================================================
 
 import * as admin from 'firebase-admin';
+
 import { BoxingFighter, BoxingFight } from './boxingDataSyncService';
 import { initSentry } from '../sentryConfig';
 
@@ -14,7 +15,7 @@ export interface FighterAnalytics {
   fighterId: string;
   fighterName: string;
   lastUpdated: Date;
-  
+
   // Performance Metrics
   performance: {
     winPercentage: number;
@@ -161,12 +162,12 @@ export interface FightAnalytics {
     publicBetting: 'fighter1' | 'fighter2' | 'even'; // Where public is betting
     lineMovement: string; // Description of how odds have moved
     valueOpportunities: string[]; // Potential value bets
-    recommendedBets: Array<{
+    recommendedBets: {
       type: string;
       selection: string;
       confidence: number;
       reasoning: string;
-    }>;
+    }[];
   };
 }
 
@@ -189,11 +190,11 @@ export interface WeightClassAnalytics {
     linealChampion?: string; // Fighter ID of lineal champion
     titleHolders: Record<string, string>; // Organization -> Fighter ID
     mandatoryChallengers: Record<string, string>; // Organization -> Fighter ID
-    unificationOpportunities: Array<{
+    unificationOpportunities: {
       fight: string;
       titles: string[];
       probability: number;
-    }>;
+    }[];
   };
 
   // Rankings Analysis
@@ -258,7 +259,7 @@ export class BoxingAnalyticsService {
       }
 
       const fightHistory = await this.getFighterHistory(fighterId);
-      
+
       const analytics: FighterAnalytics = {
         fighterId,
         fighterName: fighter.name,
@@ -273,10 +274,7 @@ export class BoxingAnalyticsService {
       };
 
       // Store analytics
-      await this.db
-        .collection('boxing_fighter_analytics')
-        .doc(fighterId)
-        .set(analytics);
+      await this.db.collection('boxing_fighter_analytics').doc(fighterId).set(analytics);
 
       console.log(`Generated analytics for fighter ${fighter.name}`);
       return analytics;
@@ -324,10 +322,7 @@ export class BoxingAnalyticsService {
       };
 
       // Store analytics
-      await this.db
-        .collection('boxing_fight_analytics')
-        .doc(fightId)
-        .set(analytics);
+      await this.db.collection('boxing_fight_analytics').doc(fightId).set(analytics);
 
       console.log(`Generated analytics for fight ${fightId}`);
       return analytics;
@@ -377,19 +372,20 @@ export class BoxingAnalyticsService {
    * Calculate performance metrics for a fighter
    */
   private async calculatePerformanceMetrics(
-    fighter: BoxingFighter, 
+    fighter: BoxingFighter,
     fightHistory: BoxingFight[]
   ): Promise<FighterAnalytics['performance']> {
     const totalFights = fighter.record.wins + fighter.record.losses + fighter.record.draws;
     const totalKOs = fighter.record.knockouts + fighter.record.technicalKnockouts;
-    
+
     // Calculate average fight duration from completed fights
     const completedFights = fightHistory.filter(f => f.status === 'completed' && f.result);
-    const avgDuration = completedFights.length > 0 
-      ? completedFights.reduce((sum, fight) => {
-          return sum + (fight.result?.round || fight.scheduledRounds);
-        }, 0) / completedFights.length
-      : 12;
+    const avgDuration =
+      completedFights.length > 0
+        ? completedFights.reduce((sum, fight) => {
+            return sum + (fight.result?.round || fight.scheduledRounds);
+          }, 0) / completedFights.length
+        : 12;
 
     // Calculate activity level (fights per year)
     const careerYears = (Date.now() - fighter.turnedPro.getTime()) / (1000 * 60 * 60 * 24 * 365);
@@ -399,7 +395,8 @@ export class BoxingAnalyticsService {
       winPercentage: totalFights > 0 ? (fighter.record.wins / totalFights) * 100 : 0,
       koPercentage: totalFights > 0 ? (totalKOs / totalFights) * 100 : 0,
       averageFightDuration: avgDuration,
-      decisionPercentage: totalFights > 0 ? ((fighter.record.wins - totalKOs) / totalFights) * 100 : 0,
+      decisionPercentage:
+        totalFights > 0 ? ((fighter.record.wins - totalKOs) / totalFights) * 100 : 0,
       activityLevel,
       peakAge: this.calculatePeakAge(fighter, fightHistory),
       declineRate: this.calculateDeclineRate(fightHistory),
@@ -410,7 +407,7 @@ export class BoxingAnalyticsService {
    * Calculate technical ratings for a fighter
    */
   private async calculateTechnicalRatings(
-    fighter: BoxingFighter, 
+    fighter: BoxingFighter,
     fightHistory: BoxingFight[]
   ): Promise<FighterAnalytics['technical']> {
     const totalFights = fighter.record.wins + fighter.record.losses + fighter.record.draws;
@@ -431,7 +428,7 @@ export class BoxingAnalyticsService {
    * Analyze opposition quality
    */
   private async analyzeOppositionQuality(
-    fighterId: string, 
+    fighterId: string,
     fightHistory: BoxingFight[]
   ): Promise<FighterAnalytics['opposition']> {
     // This would involve complex analysis of opponent ratings
@@ -450,13 +447,15 @@ export class BoxingAnalyticsService {
    * Analyze fighting style
    */
   private async analyzeFightingStyle(
-    fighter: BoxingFighter, 
+    fighter: BoxingFighter,
     fightHistory: BoxingFight[]
   ): Promise<FighterAnalytics['style']> {
     // Style analysis would be based on fight data and video analysis
     // For now, returning estimated values
-    const koPercentage = fighter.record.knockouts / (fighter.record.wins + fighter.record.losses + fighter.record.draws);
-    
+    const koPercentage =
+      fighter.record.knockouts /
+      (fighter.record.wins + fighter.record.losses + fighter.record.draws);
+
     let fightingStyle: FighterAnalytics['style']['fightingStyle'] = 'boxer-puncher';
     if (koPercentage > 0.7) fightingStyle = 'puncher';
     else if (koPercentage < 0.3) fightingStyle = 'boxer';
@@ -475,7 +474,7 @@ export class BoxingAnalyticsService {
    * Analyze physical advantages in fights
    */
   private async analyzePhysicalAdvantages(
-    fighter: BoxingFighter, 
+    fighter: BoxingFighter,
     fightHistory: BoxingFight[]
   ): Promise<FighterAnalytics['physical']> {
     // This would require analyzing each fight's physical matchups
@@ -493,7 +492,7 @@ export class BoxingAnalyticsService {
    * Determine career phase
    */
   private async determineCareerPhase(
-    fighter: BoxingFighter, 
+    fighter: BoxingFighter,
     fightHistory: BoxingFight[]
   ): Promise<FighterAnalytics['careerPhase']> {
     const age = fighter.physicalStats.age;
@@ -519,23 +518,25 @@ export class BoxingAnalyticsService {
   /**
    * Analyze fight patterns
    */
-  private async analyzeFightPatterns(fightHistory: BoxingFight[]): Promise<FighterAnalytics['patterns']> {
+  private async analyzeFightPatterns(
+    fightHistory: BoxingFight[]
+  ): Promise<FighterAnalytics['patterns']> {
     // Generate round patterns (performance by round)
     const roundPatterns = new Array(12).fill(0).map(() => Math.random() * 10);
-    
+
     return {
       roundPatterns,
       methodPatterns: {
-        'KO': 3,
-        'TKO': 5,
-        'UD': 8,
-        'MD': 2,
-        'SD': 1,
+        KO: 3,
+        TKO: 5,
+        UD: 8,
+        MD: 2,
+        SD: 1,
       },
       venuePatterns: {
         'Las Vegas': 5,
         'New York': 3,
-        'International': 2,
+        International: 2,
       },
       monthlyPatterns: new Array(12).fill(0).map(() => Math.random() * 10),
       restPatterns: {
@@ -560,13 +561,15 @@ export class BoxingAnalyticsService {
 
   private calculateDefensiveRating(fighter: BoxingFighter, fightHistory: BoxingFight[]): number {
     // Based on knockdowns taken, damage absorbed
-    const lossRate = fighter.record.losses / (fighter.record.wins + fighter.record.losses + fighter.record.draws);
-    return Math.max(1, 10 - (lossRate * 15));
+    const lossRate =
+      fighter.record.losses / (fighter.record.wins + fighter.record.losses + fighter.record.draws);
+    return Math.max(1, 10 - lossRate * 15);
   }
 
   private calculateOffensiveRating(fighter: BoxingFighter, fightHistory: BoxingFight[]): number {
-    const koRate = (fighter.record.knockouts + fighter.record.technicalKnockouts) / 
-                  (fighter.record.wins + fighter.record.losses + fighter.record.draws);
+    const koRate =
+      (fighter.record.knockouts + fighter.record.technicalKnockouts) /
+      (fighter.record.wins + fighter.record.losses + fighter.record.draws);
     return Math.min(10, koRate * 15 + 5);
   }
 
@@ -578,18 +581,20 @@ export class BoxingAnalyticsService {
   private calculateChinRating(fighter: BoxingFighter, fightHistory: BoxingFight[]): number {
     // Based on knockdowns taken, ability to recover
     const koLossRate = fighter.record.losses > 0 ? 0.3 : 0; // Assume 30% of losses by KO
-    return Math.max(1, 10 - (koLossRate * 20));
+    return Math.max(1, 10 - koLossRate * 20);
   }
 
   // Placeholder methods for fight analytics
 
   private async analyzePreFightFactors(
-    fighter1: BoxingFighter, 
-    fighter2: BoxingFighter, 
+    fighter1: BoxingFighter,
+    fighter2: BoxingFighter,
     fight: BoxingFight
   ): Promise<FightAnalytics['preFight']> {
-    const reachDiff = parseFloat(fighter1.physicalStats.reach) - parseFloat(fighter2.physicalStats.reach);
-    const heightDiff = parseFloat(fighter1.physicalStats.height) - parseFloat(fighter2.physicalStats.height);
+    const reachDiff =
+      parseFloat(fighter1.physicalStats.reach) - parseFloat(fighter2.physicalStats.reach);
+    const heightDiff =
+      parseFloat(fighter1.physicalStats.height) - parseFloat(fighter2.physicalStats.height);
     const ageDiff = fighter1.physicalStats.age - fighter2.physicalStats.age;
 
     return {
@@ -606,14 +611,21 @@ export class BoxingAnalyticsService {
         momentumShift: Math.random() * 10 - 5,
       },
       oddsAnalysis: {
-        impliedProbability1: Math.abs(fight.betting.fighter1Odds) / (Math.abs(fight.betting.fighter1Odds) + Math.abs(fight.betting.fighter2Odds)),
-        impliedProbability2: Math.abs(fight.betting.fighter2Odds) / (Math.abs(fight.betting.fighter1Odds) + Math.abs(fight.betting.fighter2Odds)),
+        impliedProbability1:
+          Math.abs(fight.betting.fighter1Odds) /
+          (Math.abs(fight.betting.fighter1Odds) + Math.abs(fight.betting.fighter2Odds)),
+        impliedProbability2:
+          Math.abs(fight.betting.fighter2Odds) /
+          (Math.abs(fight.betting.fighter1Odds) + Math.abs(fight.betting.fighter2Odds)),
         valueAssessment: 'fair_odds',
       },
     };
   }
 
-  private async analyzeHeadToHead(fighter1Id: string, fighter2Id: string): Promise<FightAnalytics['headToHead']> {
+  private async analyzeHeadToHead(
+    fighter1Id: string,
+    fighter2Id: string
+  ): Promise<FightAnalytics['headToHead']> {
     // Query previous meetings
     return {
       previousMeetings: 0,
@@ -624,7 +636,10 @@ export class BoxingAnalyticsService {
     };
   }
 
-  private async analyzeMutualOpponents(fighter1Id: string, fighter2Id: string): Promise<FightAnalytics['mutualOpponents']> {
+  private async analyzeMutualOpponents(
+    fighter1Id: string,
+    fighter2Id: string
+  ): Promise<FightAnalytics['mutualOpponents']> {
     return {
       commonOpponents: [],
       fighter1Performance: [],
@@ -640,7 +655,7 @@ export class BoxingAnalyticsService {
   ): Promise<FightAnalytics['predictionFactors']> {
     return {
       ageFactorWeight: 0.15,
-      experienceWeight: 0.20,
+      experienceWeight: 0.2,
       formWeight: 0.25,
       physicalWeight: 0.15,
       styleWeight: 0.15,
@@ -683,7 +698,7 @@ export class BoxingAnalyticsService {
   private async getFighter(fighterId: string): Promise<BoxingFighter | null> {
     try {
       const doc = await this.db.collection('boxing_fighters').doc(fighterId).get();
-      return doc.exists ? doc.data() as BoxingFighter : null;
+      return doc.exists ? (doc.data() as BoxingFighter) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -693,7 +708,7 @@ export class BoxingAnalyticsService {
   private async getFight(fightId: string): Promise<BoxingFight | null> {
     try {
       const doc = await this.db.collection('boxing_fights').doc(fightId).get();
-      return doc.exists ? doc.data() as BoxingFight : null;
+      return doc.exists ? (doc.data() as BoxingFight) : null;
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -706,7 +721,7 @@ export class BoxingAnalyticsService {
         .collection('boxing_fights')
         .where('fighter1', '==', fighterId)
         .get();
-      
+
       const snapshot2 = await this.db
         .collection('boxing_fights')
         .where('fighter2', '==', fighterId)
@@ -714,7 +729,7 @@ export class BoxingAnalyticsService {
 
       const fights1 = snapshot.docs.map(doc => doc.data() as BoxingFight);
       const fights2 = snapshot2.docs.map(doc => doc.data() as BoxingFight);
-      
+
       return [...fights1, ...fights2].sort((a, b) => b.date.getTime() - a.date.getTime());
     } catch (error) {
       Sentry.captureException(error);
@@ -728,7 +743,7 @@ export class BoxingAnalyticsService {
         .collection('boxing_fighters')
         .where('weightClass', '==', weightClass)
         .get();
-      
+
       return snapshot.docs.map(doc => doc.data() as BoxingFighter);
     } catch (error) {
       Sentry.captureException(error);
@@ -743,7 +758,7 @@ export class BoxingAnalyticsService {
         .where('weightClass', '==', weightClass)
         .where('date', '>=', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
         .get();
-      
+
       return snapshot.docs.map(doc => doc.data() as BoxingFight);
     } catch (error) {
       Sentry.captureException(error);
@@ -753,37 +768,48 @@ export class BoxingAnalyticsService {
 
   // Weight class analysis methods (placeholders)
 
-  private async analyzeDivisionHealth(fighters: BoxingFighter[], recentFights: BoxingFight[]): Promise<WeightClassAnalytics['divisionHealth']> {
+  private async analyzeDivisionHealth(
+    fighters: BoxingFighter[],
+    recentFights: BoxingFight[]
+  ): Promise<WeightClassAnalytics['divisionHealth']> {
     return {
       competitiveBalance: Math.random() * 10,
       talentDepth: Math.min(fighters.length / 20, 10),
       popularityRating: Math.random() * 10,
       financialHealth: Math.random() * 10,
-      futureProspects: fighters.filter(f => f.physicalStats.age < 25).map(f => f.id).slice(0, 5),
+      futureProspects: fighters
+        .filter(f => f.physicalStats.age < 25)
+        .map(f => f.id)
+        .slice(0, 5),
     };
   }
 
-  private async analyzeChampionshipPicture(weightClass: string, fighters: BoxingFighter[]): Promise<WeightClassAnalytics['championships']> {
-    const champions = fighters.filter(f => 
-      f.rankings.wba === 1 || f.rankings.wbc === 1 || 
-      f.rankings.ibf === 1 || f.rankings.wbo === 1
+  private async analyzeChampionshipPicture(
+    weightClass: string,
+    fighters: BoxingFighter[]
+  ): Promise<WeightClassAnalytics['championships']> {
+    const champions = fighters.filter(
+      f =>
+        f.rankings.wba === 1 || f.rankings.wbc === 1 || f.rankings.ibf === 1 || f.rankings.wbo === 1
     );
 
     return {
       undisputedChampion: champions.length === 1 ? champions[0].id : undefined,
       linealChampion: champions[0]?.id,
       titleHolders: {
-        'WBA': champions.find(f => f.rankings.wba === 1)?.id || '',
-        'WBC': champions.find(f => f.rankings.wbc === 1)?.id || '',
-        'IBF': champions.find(f => f.rankings.ibf === 1)?.id || '',
-        'WBO': champions.find(f => f.rankings.wbo === 1)?.id || '',
+        WBA: champions.find(f => f.rankings.wba === 1)?.id || '',
+        WBC: champions.find(f => f.rankings.wbc === 1)?.id || '',
+        IBF: champions.find(f => f.rankings.ibf === 1)?.id || '',
+        WBO: champions.find(f => f.rankings.wbo === 1)?.id || '',
       },
       mandatoryChallengers: {},
       unificationOpportunities: [],
     };
   }
 
-  private async analyzeRankings(fighters: BoxingFighter[]): Promise<WeightClassAnalytics['rankings']> {
+  private async analyzeRankings(
+    fighters: BoxingFighter[]
+  ): Promise<WeightClassAnalytics['rankings']> {
     const topFighters = fighters
       .filter(f => f.rankings.ring && f.rankings.ring <= 10)
       .sort((a, b) => (a.rankings.ring || 100) - (b.rankings.ring || 100))
@@ -801,11 +827,13 @@ export class BoxingAnalyticsService {
     };
   }
 
-  private async analyzeFightQuality(recentFights: BoxingFight[]): Promise<WeightClassAnalytics['fightQuality']> {
+  private async analyzeFightQuality(
+    recentFights: BoxingFight[]
+  ): Promise<WeightClassAnalytics['fightQuality']> {
     const completedFights = recentFights.filter(f => f.status === 'completed');
-    const koRate = completedFights.filter(f => 
-      f.result?.method === 'KO' || f.result?.method === 'TKO'
-    ).length / Math.max(completedFights.length, 1);
+    const koRate =
+      completedFights.filter(f => f.result?.method === 'KO' || f.result?.method === 'TKO').length /
+      Math.max(completedFights.length, 1);
 
     return {
       averageFightRating: Math.random() * 3 + 7, // 7-10 scale

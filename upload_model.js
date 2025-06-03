@@ -1,6 +1,6 @@
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 // Path to the model file
 const modelFilePath = path.join(__dirname, 'ml', 'models', 'model.pkl');

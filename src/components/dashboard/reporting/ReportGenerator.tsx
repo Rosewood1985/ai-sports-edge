@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { ReportTemplate, ReportGenerationOptions, ReportResult } from '../../../types/reporting';
+
 import { AdminDashboardService } from '../../../services/adminDashboardService';
-import { EnhancedWidget } from '../widgets/EnhancedWidget';
+import { ReportTemplate, ReportGenerationOptions, ReportResult } from '../../../types/reporting';
+import { Badge } from '../../ui/Badge';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
-import { Badge } from '../../ui/Badge';
 import { LoadingSpinner } from '../../ui/LoadingSpinner';
+import { EnhancedWidget } from '../widgets/EnhancedWidget';
 
 export interface ReportGeneratorProps {
   template: ReportTemplate;
@@ -39,7 +40,7 @@ export function ReportGenerator({
 
     setIsGenerating(true);
     setError(null);
-    
+
     try {
       // Mock report generation for now
       const mockResult: ReportResult = {
@@ -49,10 +50,10 @@ export function ReportGenerator({
         generatedAt: new Date().toISOString(),
         status: 'success',
       };
-      
+
       // Simulate generation time
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       setResult(mockResult);
       onGenerated?.(mockResult);
     } catch (err) {
@@ -110,15 +111,13 @@ export function ReportGenerator({
                 </Badge>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Report ID
                 </label>
-                <p className="text-sm text-gray-900 dark:text-white font-mono">
-                  {result.id}
-                </p>
+                <p className="text-sm text-gray-900 dark:text-white font-mono">{result.id}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -162,9 +161,7 @@ export function ReportGenerator({
                 {template.name}
               </h3>
               {template.description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {template.description}
-                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{template.description}</p>
               )}
             </div>
             {template.type && (
@@ -195,9 +192,10 @@ export function ReportGenerator({
                 Filters
               </label>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {Array.isArray(template.filters) 
-                  ? template.filters.length 
-                  : Object.keys(template.filters || {}).length} filter(s) applied
+                {Array.isArray(template.filters)
+                  ? template.filters.length
+                  : Object.keys(template.filters || {}).length}{' '}
+                filter(s) applied
               </p>
             </div>
           </div>
@@ -208,42 +206,51 @@ export function ReportGenerator({
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Generation Options
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="startDate"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Start Date
               </label>
               <input
                 type="date"
                 id="startDate"
                 value={options.startDate}
-                onChange={(e) => setOptions(prev => ({ ...prev, startDate: e.target.value }))}
+                onChange={e => setOptions(prev => ({ ...prev, startDate: e.target.value }))}
                 className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="endDate"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 End Date
               </label>
               <input
                 type="date"
                 id="endDate"
                 value={options.endDate}
-                onChange={(e) => setOptions(prev => ({ ...prev, endDate: e.target.value }))}
+                onChange={e => setOptions(prev => ({ ...prev, endDate: e.target.value }))}
                 className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="format" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="format"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Output Format
               </label>
               <select
                 id="format"
                 value={options.format}
-                onChange={(e) => setOptions(prev => ({ ...prev, format: e.target.value as any }))}
+                onChange={e => setOptions(prev => ({ ...prev, format: e.target.value as any }))}
                 className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="pdf">PDF Document</option>
@@ -251,16 +258,19 @@ export function ReportGenerator({
                 <option value="csv">CSV File</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="includeCharts"
                 checked={options.includeCharts}
-                onChange={(e) => setOptions(prev => ({ ...prev, includeCharts: e.target.checked }))}
+                onChange={e => setOptions(prev => ({ ...prev, includeCharts: e.target.checked }))}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:border-gray-600"
               />
-              <label htmlFor="includeCharts" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="includeCharts"
+                className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+              >
                 Include Charts and Visualizations
               </label>
             </div>
@@ -272,9 +282,9 @@ export function ReportGenerator({
           <Button onClick={onCancel} variant="secondary" disabled={isGenerating}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleGenerate} 
-            variant="primary" 
+          <Button
+            onClick={handleGenerate}
+            variant="primary"
             isLoading={isGenerating}
             disabled={!template.id}
           >

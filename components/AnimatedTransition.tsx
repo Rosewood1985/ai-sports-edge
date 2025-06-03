@@ -8,37 +8,37 @@ interface AnimatedTransitionProps {
    * Children to be animated
    */
   children: React.ReactNode;
-  
+
   /**
    * Type of animation
    */
   type?: AnimationType;
-  
+
   /**
    * Duration of the animation in milliseconds
    */
   duration?: number;
-  
+
   /**
    * Delay before starting the animation in milliseconds
    */
   delay?: number;
-  
+
   /**
    * Whether the animation should be active
    */
   active?: boolean;
-  
+
   /**
    * Additional styles for the container
    */
   style?: StyleProp<ViewStyle>;
-  
+
   /**
    * Index for staggered animations
    */
   index?: number;
-  
+
   /**
    * Stagger delay between items in milliseconds
    */
@@ -63,16 +63,16 @@ const AnimatedTransition: React.FC<AnimatedTransitionProps> = ({
   const translateYAnim = useRef(new Animated.Value(50)).current;
   const translateXAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
-  
+
   // Calculate total delay including stagger
-  const totalDelay = delay + (index * staggerDelay);
-  
+  const totalDelay = delay + index * staggerDelay;
+
   // Run animation when component mounts or when active state changes
   useEffect(() => {
     if (active) {
       // Create animation based on type
       const animations = [];
-      
+
       // Fade animation (used in all types)
       animations.push(
         Animated.timing(opacityAnim, {
@@ -83,7 +83,7 @@ const AnimatedTransition: React.FC<AnimatedTransitionProps> = ({
           easing: Easing.out(Easing.cubic),
         })
       );
-      
+
       // Add specific animation based on type
       switch (type) {
         case 'slide':
@@ -136,13 +136,13 @@ const AnimatedTransition: React.FC<AnimatedTransitionProps> = ({
           // Fade only, no additional animation needed
           break;
       }
-      
+
       // Run all animations in parallel
       Animated.parallel(animations).start();
     } else {
       // Reset animations if not active
       opacityAnim.setValue(0);
-      
+
       if (type === 'slide') {
         translateXAnim.setValue(50);
       } else if (type === 'slideUp') {
@@ -154,7 +154,7 @@ const AnimatedTransition: React.FC<AnimatedTransitionProps> = ({
       }
     }
   }, [active, type, duration, totalDelay]);
-  
+
   // Create transform array based on animation type
   const getTransform = () => {
     switch (type) {
@@ -169,7 +169,7 @@ const AnimatedTransition: React.FC<AnimatedTransitionProps> = ({
         return [];
     }
   };
-  
+
   return (
     <Animated.View
       style={[

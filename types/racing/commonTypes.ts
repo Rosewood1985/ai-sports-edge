@@ -21,7 +21,7 @@ export interface BasePrediction {
   eventName: string;
   generatedAt: string;
   validUntil: string;
-  
+
   // Model information
   model: {
     version: string;
@@ -29,7 +29,7 @@ export interface BasePrediction {
     trainingDate: string;
     confidence: number;
   };
-  
+
   // Data quality indicators
   dataQuality: {
     overall: DataQuality;
@@ -37,14 +37,14 @@ export interface BasePrediction {
     issues: string[];
     completeness: number; // 0-1
   };
-  
+
   // Prediction metadata
   metadata: {
     predictionType: string;
     targetAudience: 'free' | 'premium' | 'internal';
     riskLevel: 'low' | 'medium' | 'high';
     expectedAccuracy: number;
-    
+
     // Source tracking
     dataSources: string[];
     featureCount: number;
@@ -58,16 +58,19 @@ export interface MLFeatureExtractor<T> {
    * Extract ML features from raw racing data
    */
   extractFeatures(rawData: T): Promise<MLFeatureVector>;
-  
+
   /**
    * Validate feature completeness and quality
    */
   validateFeatures(features: MLFeatureVector): FeatureValidationResult;
-  
+
   /**
    * Transform features for specific ML algorithms
    */
-  transformForModel(features: MLFeatureVector, modelType: string): Promise<TransformedFeatureVector>;
+  transformForModel(
+    features: MLFeatureVector,
+    modelType: string
+  ): Promise<TransformedFeatureVector>;
 }
 
 // Generic ML feature vector
@@ -76,14 +79,14 @@ export interface MLFeatureVector {
   sport: RacingSport;
   eventId: string;
   participantId: string;
-  
+
   // Feature categories
   features: {
     [category: string]: {
       [featureName: string]: number | boolean | string;
     };
   };
-  
+
   // Feature metadata
   metadata: {
     version: string;
@@ -91,14 +94,14 @@ export interface MLFeatureVector {
     dataQuality: number;
     completeness: number;
     featureCount: number;
-    
+
     // Feature engineering info
     normalizationApplied: boolean;
     scalingMethod?: string;
     missingValueStrategy: string;
     outlierHandling: string;
   };
-  
+
   // Target variables (for training)
   targets?: {
     [targetName: string]: number | boolean;
@@ -110,17 +113,17 @@ export interface TransformedFeatureVector {
   originalId: string;
   modelType: string;
   transformedAt: string;
-  
+
   // Transformed features as arrays for ML algorithms
   numericFeatures: number[];
   categoricalFeatures: number[]; // One-hot encoded
   embeddingFeatures?: number[][]; // For deep learning models
-  
+
   // Feature names and indices
   featureNames: string[];
   categoricalIndices: number[];
   numericIndices: number[];
-  
+
   // Transformation metadata
   transformations: {
     normalization: {
@@ -143,7 +146,7 @@ export interface FeatureValidationResult {
   isValid: boolean;
   quality: DataQuality;
   score: number; // 0-1
-  
+
   // Detailed validation results
   validation: {
     completeness: {
@@ -151,34 +154,34 @@ export interface FeatureValidationResult {
       missingFeatures: string[];
       missingPercentage: number;
     };
-    
+
     accuracy: {
       score: number;
       outliers: string[];
       anomalies: string[];
       suspiciousValues: string[];
     };
-    
+
     consistency: {
       score: number;
       inconsistencies: string[];
       logicalErrors: string[];
     };
-    
+
     timeliness: {
       score: number;
       staleFeatures: string[];
       lastUpdated: { [feature: string]: string };
     };
   };
-  
+
   // Recommendations
   recommendations: {
     critical: string[];
     warning: string[];
     info: string[];
   };
-  
+
   // Feature importance for this validation
   featureImportance?: {
     [featureName: string]: number;
@@ -191,10 +194,10 @@ export interface TransformationPipeline {
   name: string;
   sport: RacingSport;
   version: string;
-  
+
   // Pipeline steps
   steps: TransformationStep[];
-  
+
   // Pipeline configuration
   config: {
     inputFormat: string;
@@ -202,13 +205,13 @@ export interface TransformationPipeline {
     batchSize: number;
     parallelProcessing: boolean;
     errorHandling: 'strict' | 'lenient' | 'skip';
-    
+
     // Data validation
     validateInput: boolean;
     validateOutput: boolean;
     qualityThreshold: number;
   };
-  
+
   // Performance metrics
   performance: {
     averageProcessingTime: number;
@@ -225,18 +228,18 @@ export interface TransformationStep {
   name: string;
   type: 'normalize' | 'encode' | 'scale' | 'extract' | 'validate' | 'aggregate' | 'filter';
   order: number;
-  
+
   // Step configuration
   config: {
     parameters: { [key: string]: any };
     requiredInputs: string[];
     outputs: string[];
-    
+
     // Error handling for this step
     onError: 'fail' | 'skip' | 'default';
     defaultValues?: { [key: string]: any };
   };
-  
+
   // Step performance
   performance: {
     averageExecutionTime: number;
@@ -244,7 +247,7 @@ export interface TransformationStep {
     successCount: number;
     lastRun: string;
   };
-  
+
   // Dependencies
   dependencies: string[]; // Other step IDs this depends on
   conditions?: string[]; // Conditions for step execution
@@ -256,12 +259,15 @@ export interface PerformanceNormalizer {
    * Normalize performance metrics across different racing formats
    */
   normalizePerformance(sport: RacingSport, rawMetrics: any): NormalizedPerformance;
-  
+
   /**
    * Calculate relative performance within peer group
    */
-  calculateRelativePerformance(performance: NormalizedPerformance, peerGroup: NormalizedPerformance[]): RelativePerformance;
-  
+  calculateRelativePerformance(
+    performance: NormalizedPerformance,
+    peerGroup: NormalizedPerformance[]
+  ): RelativePerformance;
+
   /**
    * Generate performance trend analysis
    */
@@ -273,25 +279,25 @@ export interface NormalizedPerformance {
   participantId: string;
   sport: RacingSport;
   normalizedAt: string;
-  
+
   // Core performance metrics (0-1 scale)
   core: {
     winRate: number;
     successRate: number; // Top 3 or equivalent
     consistency: number;
     improvement: number;
-    
+
     // Relative metrics
     vsField: number; // Performance vs average field
     vsPeers: number; // Performance vs similar participants
     vsElite: number; // Performance vs top performers
   };
-  
+
   // Sport-specific normalized metrics
   sportSpecific: {
     [metricName: string]: number;
   };
-  
+
   // Context factors
   context: {
     competitionLevel: number; // Quality of opposition
@@ -299,7 +305,7 @@ export interface NormalizedPerformance {
     experienceLevel: number; // Participant experience
     equipmentRating: number; // Quality of equipment/team
   };
-  
+
   // Confidence and reliability
   reliability: {
     sampleSize: number;
@@ -314,13 +320,13 @@ export interface RelativePerformance {
   participantId: string;
   peerGroupId: string;
   calculatedAt: string;
-  
+
   // Rankings within peer group
   rankings: {
     overall: number; // 1-N ranking
     percentile: number; // 0-100 percentile
     zScore: number; // Standard deviations from mean
-    
+
     // Category rankings
     byMetric: {
       [metricName: string]: {
@@ -330,20 +336,20 @@ export interface RelativePerformance {
       };
     };
   };
-  
+
   // Performance gaps
   gaps: {
     toAverage: number; // Gap to peer group average
     toLeader: number; // Gap to peer group leader
     toNext: number; // Gap to next better performer
-    
+
     // Improvement potential
     improvementPotential: number;
     achievableGoals: {
       [metricName: string]: number;
     };
   };
-  
+
   // Peer group context
   peerGroup: {
     size: number;
@@ -362,14 +368,14 @@ export interface PerformanceTrend {
     endDate: string;
     dataPoints: number;
   };
-  
+
   // Trend indicators
   trends: {
     overall: 'improving' | 'declining' | 'stable' | 'volatile';
     direction: number; // -1 to 1 (declining to improving)
     momentum: number; // Rate of change
     acceleration: number; // Change in rate of change
-    
+
     // Metric-specific trends
     byMetric: {
       [metricName: string]: {
@@ -380,7 +386,7 @@ export interface PerformanceTrend {
       };
     };
   };
-  
+
   // Cycle analysis
   cycles: {
     seasonality: {
@@ -389,20 +395,20 @@ export interface PerformanceTrend {
       amplitude: number;
       phase: number;
     };
-    
+
     peaks: {
       date: string;
       value: number;
       duration: number;
     }[];
-    
+
     troughs: {
       date: string;
       value: number;
       duration: number;
     }[];
   };
-  
+
   // Forecasting
   forecast: {
     nextPeriod: number; // Predicted performance next period
@@ -410,7 +416,7 @@ export interface PerformanceTrend {
     range: [number, number]; // Prediction interval
     factors: string[]; // Key factors influencing forecast
   };
-  
+
   // Change points
   changePoints: {
     date: string;
@@ -427,17 +433,17 @@ export interface SchemaValidator<T> {
    * Validate data against schema
    */
   validate(data: T): ValidationResult;
-  
+
   /**
    * Get schema definition
    */
   getSchema(): object;
-  
+
   /**
    * Check if data matches expected format
    */
   isValidFormat(data: any): boolean;
-  
+
   /**
    * Repair data to match schema where possible
    */
@@ -449,7 +455,7 @@ export interface ValidationResult {
   isValid: boolean;
   errors: ValidationError[];
   warnings: ValidationWarning[];
-  
+
   // Validation metrics
   metrics: {
     validFields: number;
@@ -458,7 +464,7 @@ export interface ValidationResult {
     totalFields: number;
     validationScore: number; // 0-1
   };
-  
+
   // Suggested repairs
   repairs: {
     required: string[];
@@ -475,14 +481,14 @@ export interface ValidationError {
   actualType: string;
   message: string;
   severity: 'critical' | 'error' | 'warning';
-  
+
   // Error context
   context: {
     path: string;
     rule: string;
     constraint: any;
   };
-  
+
   // Suggested fix
   suggestedFix?: {
     action: string;
@@ -497,7 +503,7 @@ export interface ValidationWarning {
   value: any;
   message: string;
   severity: 'info' | 'warning';
-  
+
   // Warning context
   context: {
     path: string;
@@ -512,14 +518,14 @@ export interface DataQualityAssessment {
   dataSource: string;
   sport: RacingSport;
   assessedAt: string;
-  
+
   // Overall quality metrics
   overall: {
     score: number; // 0-100
     grade: DataQuality;
     confidence: number;
   };
-  
+
   // Dimension-specific quality
   dimensions: {
     completeness: {
@@ -527,42 +533,42 @@ export interface DataQualityAssessment {
       missingDataPercentage: number;
       criticalFieldsMissing: string[];
     };
-    
+
     accuracy: {
       score: number;
       errorRate: number;
       inconsistencies: number;
       outliers: number;
     };
-    
+
     consistency: {
       score: number;
       contradictions: number;
       formatInconsistencies: number;
       logicalErrors: number;
     };
-    
+
     timeliness: {
       score: number;
       averageAge: number; // Hours
       staleRecords: number;
       updateFrequency: string;
     };
-    
+
     validity: {
       score: number;
       formatErrors: number;
       constraintViolations: number;
       typeErrors: number;
     };
-    
+
     uniqueness: {
       score: number;
       duplicateRecords: number;
       duplicateRate: number;
     };
   };
-  
+
   // Improvement recommendations
   recommendations: {
     immediate: {
@@ -571,7 +577,7 @@ export interface DataQualityAssessment {
       effort: 'high' | 'medium' | 'low';
       priority: number;
     }[];
-    
+
     planned: {
       action: string;
       timeline: string;
@@ -579,7 +585,7 @@ export interface DataQualityAssessment {
       effort: 'high' | 'medium' | 'low';
     }[];
   };
-  
+
   // Trend analysis
   trend: {
     improving: boolean;

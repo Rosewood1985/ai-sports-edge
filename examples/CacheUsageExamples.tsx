@@ -6,6 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, ScrollView, StyleSheet } from 'react-native';
+
 import UnifiedCacheService from '../src/services/unifiedCacheService';
 
 // Example interfaces for typed caching
@@ -46,7 +47,7 @@ interface AnalyticsData {
 const CacheUsageExamples: React.FC = () => {
   const [cacheStats, setCacheStats] = useState<any>(null);
   const [logs, setLogs] = useState<string[]>([]);
-  
+
   const cache = UnifiedCacheService.getInstance();
 
   const addLog = (message: string) => {
@@ -86,11 +87,12 @@ const CacheUsageExamples: React.FC = () => {
       });
 
       if (cached) {
-        addLog(`Retrieved game: ${cached.homeTeam} ${cached.score.home} - ${cached.score.away} ${cached.awayTeam}`);
+        addLog(
+          `Retrieved game: ${cached.homeTeam} ${cached.score.home} - ${cached.score.away} ${cached.awayTeam}`
+        );
       } else {
         addLog('Failed to retrieve cached game data');
       }
-
     } catch (error) {
       addLog(`Live data example error: ${error}`);
     }
@@ -143,7 +145,6 @@ const CacheUsageExamples: React.FC = () => {
       }
 
       addLog(`Batch retrieval: Found ${foundCount}/${playerIds.length} players`);
-
     } catch (error) {
       addLog(`Historical data example error: ${error}`);
     }
@@ -196,10 +197,11 @@ const CacheUsageExamples: React.FC = () => {
       for (const entry of analyticsEntries) {
         const data = await cache.get<AnalyticsData>(entry.key, entry.options);
         if (data) {
-          addLog(`Analytics: ${data.metric} = ${data.value} (${data.trend}, confidence: ${Math.round(data.confidence * 100)}%)`);
+          addLog(
+            `Analytics: ${data.metric} = ${data.value} (${data.trend}, confidence: ${Math.round(data.confidence * 100)}%)`
+          );
         }
       }
-
     } catch (error) {
       addLog(`Analytics example error: ${error}`);
     }
@@ -248,7 +250,6 @@ const CacheUsageExamples: React.FC = () => {
       } else {
         addLog('Odds data was incorrectly invalidated');
       }
-
     } catch (error) {
       addLog(`Invalidation example error: ${error}`);
     }
@@ -272,8 +273,9 @@ const CacheUsageExamples: React.FC = () => {
 
       // Check health after warming
       const health = await cache.healthCheck();
-      addLog(`Cache health: ${health.overall} (hit rate: ${Math.round(health.metrics.hitRate * 100)}%)`);
-
+      addLog(
+        `Cache health: ${health.overall} (hit rate: ${Math.round(health.metrics.hitRate * 100)}%)`
+      );
     } catch (error) {
       addLog(`Cache warming example error: ${error}`);
     }
@@ -316,7 +318,6 @@ const CacheUsageExamples: React.FC = () => {
       addLog(`Cache hit rate: ${Math.round(stats.hitRate * 100)}%`);
       addLog(`Average latency: ${Math.round(stats.averageLatency)}ms`);
       addLog(`Memory usage: ${Math.round(stats.detailedMetrics.realTime.memoryUsage / 1024)}KB`);
-
     } catch (error) {
       addLog(`Performance example error: ${error}`);
     }
@@ -342,7 +343,7 @@ const CacheUsageExamples: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Advanced Caching System Examples</Text>
-      
+
       {/* Cache Statistics */}
       <View style={styles.statsContainer}>
         <Text style={styles.sectionTitle}>Cache Statistics</Text>
@@ -352,7 +353,10 @@ const CacheUsageExamples: React.FC = () => {
             <Text>Hit Rate: {Math.round((cacheStats.hitRate || 0) * 100)}%</Text>
             <Text>Average Latency: {Math.round(cacheStats.averageLatency || 0)}ms</Text>
             <Text>Total Requests: {cacheStats.totalRequests || 0}</Text>
-            <Text>Memory Usage: {Math.round((cacheStats.detailedMetrics?.realTime?.memoryUsage || 0) / 1024)}KB</Text>
+            <Text>
+              Memory Usage:{' '}
+              {Math.round((cacheStats.detailedMetrics?.realTime?.memoryUsage || 0) / 1024)}KB
+            </Text>
           </View>
         )}
       </View>
@@ -360,48 +364,28 @@ const CacheUsageExamples: React.FC = () => {
       {/* Example Buttons */}
       <View style={styles.buttonsContainer}>
         <Text style={styles.sectionTitle}>Cache Examples</Text>
-        
-        <Button
-          title="1. Live Game Data"
-          onPress={handleLiveDataExample}
-          color="#FF6B35"
-        />
-        
+
+        <Button title="1. Live Game Data" onPress={handleLiveDataExample} color="#FF6B35" />
+
         <Button
           title="2. Historical Player Stats"
           onPress={handleHistoricalDataExample}
           color="#4ECDC4"
         />
-        
+
         <Button
           title="3. Analytics with Preloading"
           onPress={handleAnalyticsExample}
           color="#45B7D1"
         />
-        
-        <Button
-          title="4. Cache Invalidation"
-          onPress={handleInvalidationExample}
-          color="#F39C12"
-        />
-        
-        <Button
-          title="5. Cache Warming"
-          onPress={handleCacheWarmingExample}
-          color="#8E44AD"
-        />
-        
-        <Button
-          title="6. Performance Testing"
-          onPress={handlePerformanceExample}
-          color="#27AE60"
-        />
-        
-        <Button
-          title="Refresh Stats"
-          onPress={refreshStats}
-          color="#34495E"
-        />
+
+        <Button title="4. Cache Invalidation" onPress={handleInvalidationExample} color="#F39C12" />
+
+        <Button title="5. Cache Warming" onPress={handleCacheWarmingExample} color="#8E44AD" />
+
+        <Button title="6. Performance Testing" onPress={handlePerformanceExample} color="#27AE60" />
+
+        <Button title="Refresh Stats" onPress={refreshStats} color="#34495E" />
       </View>
 
       {/* Activity Log */}

@@ -1,12 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  StyleSheet,
-  Animated,
-} from 'react-native';
-import accessibilityService from '../../services/accessibilityService';
+import { TouchableOpacity, TouchableOpacityProps, StyleSheet, Animated } from 'react-native';
+
 import { useFocusState } from './focusStateUtils';
+import accessibilityService from '../../services/accessibilityService';
 
 /**
  * AccessibleTouchableOpacity component that extends TouchableOpacity with accessibility features.
@@ -199,15 +195,18 @@ const AccessibleTouchableOpacity: React.FC<AccessibleTouchableOpacityProps> = ({
   // Get accessibility props
   // Convert accessibilityState to Record<string, boolean> for compatibility with accessibilityService
   const convertedAccessibilityState = accessibilityState
-    ? Object.entries(accessibilityState).reduce((acc, [key, value]) => {
-        // Convert 'mixed' to true for checked property
-        if (key === 'checked' && value === 'mixed') {
-          acc[key] = true;
-        } else {
-          acc[key] = !!value; // Convert any value to boolean
-        }
-        return acc;
-      }, {} as Record<string, boolean>)
+    ? Object.entries(accessibilityState).reduce(
+        (acc, [key, value]) => {
+          // Convert 'mixed' to true for checked property
+          if (key === 'checked' && value === 'mixed') {
+            acc[key] = true;
+          } else {
+            acc[key] = !!value; // Convert any value to boolean
+          }
+          return acc;
+        },
+        {} as Record<string, boolean>
+      )
     : undefined;
 
   const accessibilityProps = accessibilityLabel
@@ -237,8 +236,8 @@ const AccessibleTouchableOpacity: React.FC<AccessibleTouchableOpacityProps> = ({
           }
         : undefined
       : isFocused
-      ? [styles.focused, focusedStyle]
-      : undefined,
+        ? [styles.focused, focusedStyle]
+        : undefined,
   ];
 
   return (
@@ -249,7 +248,7 @@ const AccessibleTouchableOpacity: React.FC<AccessibleTouchableOpacityProps> = ({
       {...props}
       onPressIn={wrappedPressIn}
       onPressOut={wrappedPressOut}
-      accessible={true}
+      accessible
       accessibilityState={{
         ...accessibilityState,
         disabled: props.disabled,

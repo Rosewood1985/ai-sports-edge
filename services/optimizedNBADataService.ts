@@ -3,13 +3,14 @@
 // High-Performance NBA Data Management with Firebase Optimization
 // =============================================================================
 
-import { where, orderBy, limit, Timestamp } from 'firebase/firestore';
 import * as Sentry from '@sentry/react-native';
-import { 
-  firebaseOptimizationService, 
-  optimizedQuery, 
+import { where, orderBy, limit, Timestamp } from 'firebase/firestore';
+
+import {
+  firebaseOptimizationService,
+  optimizedQuery,
   optimizedBatchWrite,
-  invalidateCacheForCollection 
+  invalidateCacheForCollection,
 } from './firebaseOptimizationService';
 import { firebasePerformanceService } from '../config/firebasePerformanceConfig';
 
@@ -132,7 +133,6 @@ export class OptimizedNBADataService {
         category: 'nba.data.init',
         level: 'info',
       });
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Failed to initialize NBA Data Service: ${error}`);
@@ -148,7 +148,7 @@ export class OptimizedNBADataService {
    */
   async getTodaysGames(): Promise<NBAGame[]> {
     const startTime = Date.now();
-    
+
     try {
       const today = new Date();
       const startOfDay = new Date(today.setHours(0, 0, 0, 0));
@@ -166,16 +166,12 @@ export class OptimizedNBADataService {
         });
 
       // Record performance
-      firebasePerformanceService.recordQueryPerformance(
-        'nba_games_today', 
-        Date.now() - startTime
-      );
+      firebasePerformanceService.recordQueryPerformance('nba_games_today', Date.now() - startTime);
 
       return games;
-
     } catch (error) {
       Sentry.captureException(error);
-      console.error('Error fetching today\'s games:', error);
+      console.error("Error fetching today's games:", error);
       return this.getFallbackTodaysGames();
     }
   }
@@ -185,7 +181,7 @@ export class OptimizedNBADataService {
    */
   async getLiveGames(): Promise<NBAGame[]> {
     const startTime = Date.now();
-    
+
     try {
       const games = await optimizedQuery(`${this.collectionPrefix}_games`)
         .where('status', '==', 'live')
@@ -196,13 +192,9 @@ export class OptimizedNBADataService {
           enableMetrics: true,
         });
 
-      firebasePerformanceService.recordQueryPerformance(
-        'nba_games_live', 
-        Date.now() - startTime
-      );
+      firebasePerformanceService.recordQueryPerformance('nba_games_live', Date.now() - startTime);
 
       return games;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -213,13 +205,13 @@ export class OptimizedNBADataService {
    * Get games for a specific date range with pagination
    */
   async getGamesByDateRange(
-    startDate: Date, 
-    endDate: Date, 
+    startDate: Date,
+    endDate: Date,
     pageSize: number = 25,
     lastGameId?: string
   ): Promise<{ games: NBAGame[]; hasMore: boolean; lastGameId?: string }> {
     const startTime = Date.now();
-    
+
     try {
       const result = await optimizedQuery(`${this.collectionPrefix}_games`)
         .where('gameDate', '>=', startDate)
@@ -232,7 +224,7 @@ export class OptimizedNBADataService {
         });
 
       firebasePerformanceService.recordQueryPerformance(
-        'nba_games_date_range', 
+        'nba_games_date_range',
         Date.now() - startTime
       );
 
@@ -241,7 +233,6 @@ export class OptimizedNBADataService {
         hasMore: result.hasMore,
         lastGameId: result.lastDoc?.id,
       };
-
     } catch (error) {
       Sentry.captureException(error);
       return { games: [], hasMore: false };
@@ -257,7 +248,7 @@ export class OptimizedNBADataService {
    */
   async getPlayerStats(playerId: string, season: string = '2024'): Promise<NBAPlayerStats | null> {
     const startTime = Date.now();
-    
+
     try {
       const stats = await optimizedQuery(`${this.collectionPrefix}_player_stats`)
         .where('playerId', '==', playerId)
@@ -269,13 +260,9 @@ export class OptimizedNBADataService {
           enableMetrics: true,
         });
 
-      firebasePerformanceService.recordQueryPerformance(
-        'nba_player_stats', 
-        Date.now() - startTime
-      );
+      firebasePerformanceService.recordQueryPerformance('nba_player_stats', Date.now() - startTime);
 
       return stats.length > 0 ? stats[0] : null;
-
     } catch (error) {
       Sentry.captureException(error);
       return null;
@@ -287,7 +274,7 @@ export class OptimizedNBADataService {
    */
   async getTeamRoster(teamId: string): Promise<NBAPlayer[]> {
     const startTime = Date.now();
-    
+
     try {
       const players = await optimizedQuery(`${this.collectionPrefix}_players`)
         .where('teamId', '==', teamId)
@@ -299,13 +286,9 @@ export class OptimizedNBADataService {
           enableMetrics: true,
         });
 
-      firebasePerformanceService.recordQueryPerformance(
-        'nba_team_roster', 
-        Date.now() - startTime
-      );
+      firebasePerformanceService.recordQueryPerformance('nba_team_roster', Date.now() - startTime);
 
       return players;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -316,11 +299,11 @@ export class OptimizedNBADataService {
    * Get top performers by stat category
    */
   async getTopPerformers(
-    statCategory: 'points' | 'rebounds' | 'assists', 
+    statCategory: 'points' | 'rebounds' | 'assists',
     limit: number = 10
   ): Promise<NBAPlayer[]> {
     const startTime = Date.now();
-    
+
     try {
       // Use different collection for aggregated top performers
       const performers = await optimizedQuery(`${this.collectionPrefix}_top_performers`)
@@ -334,12 +317,11 @@ export class OptimizedNBADataService {
         });
 
       firebasePerformanceService.recordQueryPerformance(
-        'nba_top_performers', 
+        'nba_top_performers',
         Date.now() - startTime
       );
 
       return performers;
-
     } catch (error) {
       Sentry.captureException(error);
       return this.getFallbackTopPerformers(statCategory, limit);
@@ -355,7 +337,7 @@ export class OptimizedNBADataService {
    */
   async getGamePredictions(gameId: string): Promise<NBAPrediction[]> {
     const startTime = Date.now();
-    
+
     try {
       const predictions = await optimizedQuery(`${this.collectionPrefix}_predictions`)
         .where('gameId', '==', gameId)
@@ -367,12 +349,11 @@ export class OptimizedNBADataService {
         });
 
       firebasePerformanceService.recordQueryPerformance(
-        'nba_game_predictions', 
+        'nba_game_predictions',
         Date.now() - startTime
       );
 
       return predictions;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -384,7 +365,7 @@ export class OptimizedNBADataService {
    */
   async getTodaysPredictions(): Promise<NBAPrediction[]> {
     const startTime = Date.now();
-    
+
     try {
       const today = new Date();
       const startOfDay = new Date(today.setHours(0, 0, 0, 0));
@@ -401,12 +382,11 @@ export class OptimizedNBADataService {
         });
 
       firebasePerformanceService.recordQueryPerformance(
-        'nba_todays_predictions', 
+        'nba_todays_predictions',
         Date.now() - startTime
       );
 
       return predictions;
-
     } catch (error) {
       Sentry.captureException(error);
       return [];
@@ -424,7 +404,7 @@ export class OptimizedNBADataService {
     try {
       await optimizedBatchWrite(
         gameUpdates,
-        async (batch) => {
+        async batch => {
           // Simulate batch write operation
           console.log(`Processing batch of ${batch.length} game updates`);
           return Promise.resolve();
@@ -445,7 +425,6 @@ export class OptimizedNBADataService {
         category: 'nba.data.bulk_update',
         level: 'info',
       });
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Bulk game score update failed: ${error}`);
@@ -459,7 +438,7 @@ export class OptimizedNBADataService {
     try {
       await optimizedBatchWrite(
         statsUpdates,
-        async (batch) => {
+        async batch => {
           console.log(`Processing batch of ${batch.length} player stats updates`);
           return Promise.resolve();
         },
@@ -474,7 +453,6 @@ export class OptimizedNBADataService {
       // Invalidate stats caches
       invalidateCacheForCollection(`${this.collectionPrefix}_player_stats`);
       invalidateCacheForCollection(`${this.collectionPrefix}_top_performers`);
-
     } catch (error) {
       Sentry.captureException(error);
       throw new Error(`Bulk player stats update failed: ${error}`);
@@ -515,12 +493,11 @@ export class OptimizedNBADataService {
     try {
       // Invalidate live data caches
       invalidateCacheForCollection(`${this.collectionPrefix}_games`);
-      
+
       // Fetch fresh live games
       await this.getLiveGames();
-      
-      console.log('Live NBA data refreshed');
 
+      console.log('Live NBA data refreshed');
     } catch (error) {
       Sentry.captureException(error);
       console.error('Error refreshing live data:', error);
@@ -534,7 +511,9 @@ export class OptimizedNBADataService {
   /**
    * Get query performance statistics
    */
-  getPerformanceStats(): { [collection: string]: { avg: number; max: number; min: number; count: number } } {
+  getPerformanceStats(): {
+    [collection: string]: { avg: number; max: number; min: number; count: number };
+  } {
     return firebasePerformanceService.getPerformanceStats();
   }
 

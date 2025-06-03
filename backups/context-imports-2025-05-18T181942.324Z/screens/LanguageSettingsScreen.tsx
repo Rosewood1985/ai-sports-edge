@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -5,19 +7,12 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { useLanguage } from '../contexts/LanguageContext';
 
-
-
-
-
-import { ThemedView } from '../atomic/atoms/ThemedView'
 import { ThemedText } from '../atomic/atoms/ThemedText';
-import { useTheme } from '@react-navigation/native';
+import { ThemedView } from '../atomic/atoms/ThemedView';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LanguageOption {
   code: string;
@@ -39,24 +34,20 @@ const LanguageSettingsScreen = () => {
     if (languageCode === language) {
       return; // No change needed
     }
-    
+
     try {
       setLoading(languageCode);
       await setLanguage(languageCode);
-      
+
       // Show success message
-      Alert.alert(
-        t('language.language_changed'),
-        t('language.restart_required'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('language.language_changed'), t('language.restart_required'), [
+        { text: t('common.ok') },
+      ]);
     } catch (error) {
       console.error('Error changing language:', error);
-      Alert.alert(
-        t('common.error'),
-        'Failed to change language. Please try again.',
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('common.error'), 'Failed to change language. Please try again.', [
+        { text: t('common.ok') },
+      ]);
     } finally {
       setLoading(null);
     }
@@ -65,31 +56,26 @@ const LanguageSettingsScreen = () => {
   // Render language option
   const renderLanguageOption = ({ item }: { item: LanguageOption }) => {
     const isSelected = item.code === language;
-    
+
     return (
       <TouchableOpacity
-        style={[
-          styles.languageOption,
-          { borderBottomColor: colors.border }
-        ]}
+        style={[styles.languageOption, { borderBottomColor: colors.border }]}
         onPress={() => handleLanguageChange(item.code)}
         disabled={loading !== null}
       >
         <View style={styles.languageInfo}>
-          <ThemedText style={styles.languageName}>
-            {item.name}
-          </ThemedText>
+          <ThemedText style={styles.languageName}>{item.name}</ThemedText>
           <ThemedText style={styles.nativeLanguageName}>
             {getLanguageNativeName(item.code)}
           </ThemedText>
         </View>
-        
+
         {isSelected ? (
           <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
         ) : (
           <Ionicons name="ellipse-outline" size={24} color={colors.text} />
         )}
-        
+
         {loading === item.code && (
           <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />
         )}
@@ -100,38 +86,38 @@ const LanguageSettingsScreen = () => {
   // Get native language name
   const getLanguageNativeName = (code: string): string => {
     switch (code) {
-      case 'en': return 'English';
-      case 'es': return 'Español';
-      default: return '';
+      case 'en':
+        return 'English';
+      case 'es':
+        return 'Español';
+      default:
+        return '';
     }
   };
 
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        
-        <ThemedText style={styles.headerTitle}>
-          {t('language.select_language')}
-        </ThemedText>
-        
+
+        <ThemedText style={styles.headerTitle}>{t('language.select_language')}</ThemedText>
+
         <View style={styles.headerRight} />
       </View>
-      
+
       <View style={styles.content}>
         <ThemedText style={styles.description}>
-          {t('language.current_language', { language: availableLanguages[language as keyof typeof availableLanguages]?.name })}
+          {t('language.current_language', {
+            language: availableLanguages[language as keyof typeof availableLanguages]?.name,
+          })}
         </ThemedText>
-        
+
         <FlatList
           data={languageOptions}
           renderItem={renderLanguageOption}
-          keyExtractor={(item) => item.code}
+          keyExtractor={item => item.code}
           style={styles.languageList}
           contentContainerStyle={styles.listContent}
         />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import geolocationService from '../../services/geolocationService';
 import '../styles/user-preferences.css';
 
@@ -19,13 +20,19 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
     maxItems: 10,
     useLocation: true,
     localTeams: [],
-    useESPN: true
+    useESPN: true,
   };
 
   // Merge default preferences with user preferences
   const [userPrefs, setUserPrefs] = useState({ ...defaultPreferences, ...preferences });
   const [availableSports, setAvailableSports] = useState([
-    'football', 'basketball', 'baseball', 'hockey', 'soccer', 'mma', 'formula1'
+    'football',
+    'basketball',
+    'baseball',
+    'hockey',
+    'soccer',
+    'mma',
+    'formula1',
   ]);
   const [newTeam, setNewTeam] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,20 +45,22 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
         try {
           setIsLoading(true);
           setLocationStatus('Detecting your location...');
-          
+
           const location = await geolocationService.getUserLocation();
-          
+
           if (location) {
             const teams = await geolocationService.getLocalTeams(location);
-            
+
             setUserPrefs(prev => ({
               ...prev,
-              localTeams: teams
+              localTeams: teams,
             }));
-            
+
             setLocationStatus(`Location detected: ${location.city}, ${location.state}`);
           } else {
-            setLocationStatus('Unable to detect your location. You can still add your favorite teams manually.');
+            setLocationStatus(
+              'Unable to detect your location. You can still add your favorite teams manually.'
+            );
           }
         } catch (error) {
           console.error('Error loading location data:', error);
@@ -61,7 +70,7 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
         }
       }
     };
-    
+
     loadLocationData();
   }, [userPrefs.useLocation]);
 
@@ -69,11 +78,11 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
    * Handle sport selection change
    * @param {string} sport - Sport name
    */
-  const handleSportChange = (sport) => {
+  const handleSportChange = sport => {
     const updatedSports = userPrefs.sports.includes(sport)
       ? userPrefs.sports.filter(s => s !== sport)
       : [...userPrefs.sports, sport];
-    
+
     setUserPrefs({ ...userPrefs, sports: updatedSports });
   };
 
@@ -90,7 +99,7 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
   const handleLocationChange = () => {
     setUserPrefs({ ...userPrefs, useLocation: !userPrefs.useLocation });
   };
-  
+
   /**
    * Handle ESPN data usage toggle change
    */
@@ -102,7 +111,7 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
    * Handle max items change
    * @param {Event} e - Input change event
    */
-  const handleMaxItemsChange = (e) => {
+  const handleMaxItemsChange = e => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value) && value > 0) {
       setUserPrefs({ ...userPrefs, maxItems: value });
@@ -116,7 +125,7 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
     if (newTeam.trim() && !userPrefs.favoriteTeams.includes(newTeam.trim())) {
       setUserPrefs({
         ...userPrefs,
-        favoriteTeams: [...userPrefs.favoriteTeams, newTeam.trim()]
+        favoriteTeams: [...userPrefs.favoriteTeams, newTeam.trim()],
       });
       setNewTeam('');
     }
@@ -126,10 +135,10 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
    * Remove a favorite team
    * @param {string} team - Team to remove
    */
-  const removeFavoriteTeam = (team) => {
+  const removeFavoriteTeam = team => {
     setUserPrefs({
       ...userPrefs,
-      favoriteTeams: userPrefs.favoriteTeams.filter(t => t !== team)
+      favoriteTeams: userPrefs.favoriteTeams.filter(t => t !== team),
     });
   };
 
@@ -149,9 +158,11 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
     <div className="user-preferences-container">
       <div className="user-preferences-header">
         <h2>News Feed Preferences</h2>
-        <button className="close-button" onClick={onClose}>&times;</button>
+        <button className="close-button" onClick={onClose}>
+          &times;
+        </button>
       </div>
-      
+
       <div className="user-preferences-content">
         <div className="preferences-section">
           <h3>Sports Categories</h3>
@@ -168,7 +179,7 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
             ))}
           </div>
         </div>
-        
+
         <div className="preferences-section">
           <h3>Content Filtering</h3>
           <label className="betting-option">
@@ -179,7 +190,7 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
             />
             Show only betting-related content
           </label>
-          
+
           <div className="max-items">
             <label>
               Maximum number of news items:
@@ -193,19 +204,19 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
             </label>
           </div>
         </div>
-        
+
         <div className="preferences-section">
           <h3>Favorite Teams</h3>
           <div className="add-team">
             <input
               type="text"
               value={newTeam}
-              onChange={(e) => setNewTeam(e.target.value)}
+              onChange={e => setNewTeam(e.target.value)}
               placeholder="Enter team name"
             />
             <button onClick={addFavoriteTeam}>Add</button>
           </div>
-          
+
           {userPrefs.favoriteTeams.length > 0 ? (
             <ul className="favorite-teams-list">
               {userPrefs.favoriteTeams.map(team => (
@@ -219,10 +230,10 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
             <p className="no-teams">No favorite teams added yet.</p>
           )}
         </div>
-        
+
         <div className="preferences-section">
           <h3>Location Settings</h3>
-          
+
           <label className="location-option">
             <input
               type="checkbox"
@@ -231,15 +242,11 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
             />
             Use my location to personalize content
           </label>
-          
+
           {userPrefs.useLocation && (
             <div className="location-status">
-              {isLoading ? (
-                <div className="loading-spinner"></div>
-              ) : (
-                <p>{locationStatus}</p>
-              )}
-              
+              {isLoading ? <div className="loading-spinner" /> : <p>{locationStatus}</p>}
+
               {userPrefs.localTeams.length > 0 && (
                 <div className="local-teams">
                   <p>We've identified these local teams:</p>
@@ -252,41 +259,41 @@ const UserPreferences = ({ preferences = {}, onSave, onClose }) => {
               )}
             </div>
           )}
-          
+
           <div className="privacy-notice">
             <p>
-              <strong>Privacy Notice:</strong> Your location data is used only to personalize
-              your news feed with local team content. We do not store your precise location
-              or share it with third parties. You can opt out at any time by unchecking the
-              box above.
+              <strong>Privacy Notice:</strong> Your location data is used only to personalize your
+              news feed with local team content. We do not store your precise location or share it
+              with third parties. You can opt out at any time by unchecking the box above.
             </p>
           </div>
         </div>
-        
+
         <div className="preferences-section">
           <h3>ESPN Integration</h3>
-          
+
           <label className="espn-option">
-            <input
-              type="checkbox"
-              checked={userPrefs.useESPN}
-              onChange={handleESPNChange}
-            />
+            <input type="checkbox" checked={userPrefs.useESPN} onChange={handleESPNChange} />
             Show ESPN calculated odds in news ticker
           </label>
-          
+
           <div className="espn-info">
             <p>
-              When enabled, the news ticker will display calculated odds based on ESPN data for your selected sports.
-              This provides additional betting insights powered by ESPN's statistics.
+              When enabled, the news ticker will display calculated odds based on ESPN data for your
+              selected sports. This provides additional betting insights powered by ESPN's
+              statistics.
             </p>
           </div>
         </div>
       </div>
-      
+
       <div className="user-preferences-footer">
-        <button className="save-button" onClick={savePreferences}>Save Preferences</button>
-        <button className="cancel-button" onClick={onClose}>Cancel</button>
+        <button className="save-button" onClick={savePreferences}>
+          Save Preferences
+        </button>
+        <button className="cancel-button" onClick={onClose}>
+          Cancel
+        </button>
       </div>
     </div>
   );

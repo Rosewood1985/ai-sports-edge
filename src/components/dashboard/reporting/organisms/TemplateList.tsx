@@ -5,7 +5,7 @@
  * functionality to create, edit, and delete templates.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import {
   Box,
   Typography,
@@ -19,13 +19,14 @@ import {
   DialogTitle,
   DialogActions,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { ReportTemplate, ReportType } from '../../../../types/reporting';
-import TemplateCard from '../molecules/TemplateCard';
-import TemplateActions from '../molecules/TemplateActions';
-import ReportTemplateForm from '../ReportTemplateForm';
-import JobProgressIndicator from '../JobProgressIndicator';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import { useReportGeneration } from '../../../../hooks/useJobQueue';
+import { ReportTemplate, ReportType } from '../../../../types/reporting';
+import JobProgressIndicator from '../JobProgressIndicator';
+import ReportTemplateForm from '../ReportTemplateForm';
+import TemplateActions from '../molecules/TemplateActions';
+import TemplateCard from '../molecules/TemplateCard';
 
 // Mock API for now - will be replaced with real API calls
 const mockApi = {

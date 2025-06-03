@@ -1,34 +1,35 @@
 /**
  * Real-Time Integration Service
- * 
+ *
  * Unified interface for all real-time sports data integration
  * Coordinates NBA stats, UFC data, odds tracking, and live updates
  */
 
-import { EventEmitter } from 'events';
-import { realTimeDataService, REALTIME_EVENTS } from './realTimeDataService';
-import { nbaRealTimeStatsService } from './nba/nbaRealTimeStatsService';
-import { ufcRealTimeDataService } from './ufc/ufcRealTimeDataService';
-import { liveOddsTrackingService } from './liveOddsTrackingService';
-import { oddsCacheService } from './oddsCacheService';
 import * as Sentry from '@sentry/react-native';
+import { EventEmitter } from 'events';
+
+import { liveOddsTrackingService } from './liveOddsTrackingService';
+import { nbaRealTimeStatsService } from './nba/nbaRealTimeStatsService';
+import { oddsCacheService } from './oddsCacheService';
+import { realTimeDataService, REALTIME_EVENTS } from './realTimeDataService';
+import { ufcRealTimeDataService } from './ufc/ufcRealTimeDataService';
 
 // Integration events
 export const INTEGRATION_EVENTS = {
   // Service status
   SERVICE_INITIALIZED: 'service_initialized',
   SERVICE_ERROR: 'service_error',
-  
+
   // Data updates
   LIVE_SCORE_UPDATE: 'live_score_update',
   ODDS_MOVEMENT: 'odds_movement',
   PLAYER_STAT_UPDATE: 'player_stat_update',
   FIGHT_UPDATE: 'fight_update',
-  
+
   // Alerts
   SIGNIFICANT_MOVEMENT_ALERT: 'significant_movement_alert',
   INJURY_ALERT: 'injury_alert',
-  
+
   // Connection status
   CONNECTION_STATUS_CHANGE: 'connection_status_change',
 };
@@ -104,13 +105,12 @@ export class RealTimeIntegrationService extends EventEmitter {
 
       this.isInitialized = true;
       console.log('[REALTIME INTEGRATION] Real-time integration service initialized');
-      
+
       this.emit(INTEGRATION_EVENTS.SERVICE_INITIALIZED, {
         timestamp: new Date().toISOString(),
         successfulServices: results.filter(r => r.status === 'fulfilled').length,
         failedServices: failures.length,
       });
-
     } catch (error) {
       console.error('[REALTIME INTEGRATION] Failed to initialize integration service:', error);
       Sentry.captureException(error);
@@ -122,11 +122,14 @@ export class RealTimeIntegrationService extends EventEmitter {
   /**
    * Initialize individual service with error handling
    */
-  private async initializeService(serviceName: string, initFunction: () => Promise<void>): Promise<void> {
+  private async initializeService(
+    serviceName: string,
+    initFunction: () => Promise<void>
+  ): Promise<void> {
     try {
       console.log(`[REALTIME INTEGRATION] Initializing ${serviceName}...`);
       await initFunction();
-      
+
       this.serviceStatuses.set(serviceName, {
         name: serviceName,
         isInitialized: true,
@@ -135,12 +138,11 @@ export class RealTimeIntegrationService extends EventEmitter {
         errorCount: 0,
         subscriptions: 0,
       });
-      
+
       console.log(`[REALTIME INTEGRATION] ${serviceName} initialized successfully`);
-      
     } catch (error) {
       console.error(`[REALTIME INTEGRATION] Failed to initialize ${serviceName}:`, error);
-      
+
       this.serviceStatuses.set(serviceName, {
         name: serviceName,
         isInitialized: false,
@@ -149,7 +151,7 @@ export class RealTimeIntegrationService extends EventEmitter {
         errorCount: 1,
         subscriptions: 0,
       });
-      
+
       // Don't rethrow - allow other services to continue initializing
     }
   }
@@ -159,43 +161,43 @@ export class RealTimeIntegrationService extends EventEmitter {
    */
   private setupEventForwarding(): void {
     // Forward real-time data events
-    realTimeDataService.on(REALTIME_EVENTS.SCORE_UPDATE, (data) => {
+    realTimeDataService.on(REALTIME_EVENTS.SCORE_UPDATE, data => {
       this.emit(INTEGRATION_EVENTS.LIVE_SCORE_UPDATE, data);
       this.updateServiceStatus('realTimeData');
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.ODDS_CHANGE, (data) => {
+    realTimeDataService.on(REALTIME_EVENTS.ODDS_CHANGE, data => {
       this.emit(INTEGRATION_EVENTS.ODDS_MOVEMENT, data);
       this.updateServiceStatus('realTimeData');
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.PLAYER_STAT_UPDATE, (data) => {
+    realTimeDataService.on(REALTIME_EVENTS.PLAYER_STAT_UPDATE, data => {
       this.emit(INTEGRATION_EVENTS.PLAYER_STAT_UPDATE, data);
       this.updateServiceStatus('realTimeData');
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.INJURY_REPORT, (data) => {
+    realTimeDataService.on(REALTIME_EVENTS.INJURY_REPORT, data => {
       this.emit(INTEGRATION_EVENTS.INJURY_ALERT, data);
       this.updateServiceStatus('realTimeData');
     });
 
     // Forward odds tracking events
-    liveOddsTrackingService.on('significant_movement', (data) => {
+    liveOddsTrackingService.on('significant_movement', data => {
       this.emit(INTEGRATION_EVENTS.SIGNIFICANT_MOVEMENT_ALERT, data);
       this.updateServiceStatus('liveOddsTracking');
     });
 
-    liveOddsTrackingService.on('odds_alert', (data) => {
+    liveOddsTrackingService.on('odds_alert', data => {
       this.emit(INTEGRATION_EVENTS.SIGNIFICANT_MOVEMENT_ALERT, data);
       this.updateServiceStatus('liveOddsTracking');
     });
 
     // Handle connection status changes
-    realTimeDataService.on(REALTIME_EVENTS.CONNECTION_ESTABLISHED, (data) => {
+    realTimeDataService.on(REALTIME_EVENTS.CONNECTION_ESTABLISHED, data => {
       this.updateConnectionStatus('realTimeData', true);
     });
 
-    realTimeDataService.on(REALTIME_EVENTS.CONNECTION_LOST, (data) => {
+    realTimeDataService.on(REALTIME_EVENTS.CONNECTION_LOST, data => {
       this.updateConnectionStatus('realTimeData', false);
     });
   }
@@ -219,7 +221,7 @@ export class RealTimeIntegrationService extends EventEmitter {
     if (status) {
       status.isConnected = isConnected;
       this.serviceStatuses.set(serviceName, status);
-      
+
       this.emit(INTEGRATION_EVENTS.CONNECTION_STATUS_CHANGE, {
         serviceName,
         isConnected,
@@ -231,9 +233,17 @@ export class RealTimeIntegrationService extends EventEmitter {
   /**
    * Start comprehensive game tracking
    */
-  async startGameTracking(gameId: string, sport: string, homeTeam: string, awayTeam: string, gameDate: string): Promise<void> {
+  async startGameTracking(
+    gameId: string,
+    sport: string,
+    homeTeam: string,
+    awayTeam: string,
+    gameDate: string
+  ): Promise<void> {
     try {
-      console.log(`[REALTIME INTEGRATION] Starting comprehensive tracking for ${sport} game: ${homeTeam} vs ${awayTeam}`);
+      console.log(
+        `[REALTIME INTEGRATION] Starting comprehensive tracking for ${sport} game: ${homeTeam} vs ${awayTeam}`
+      );
 
       // Start live score tracking
       await realTimeDataService.subscribeToLiveScores(gameId, sport);
@@ -257,14 +267,13 @@ export class RealTimeIntegrationService extends EventEmitter {
       }
 
       console.log(`[REALTIME INTEGRATION] Comprehensive tracking started for game ${gameId}`);
-
     } catch (error) {
       console.error(`[REALTIME INTEGRATION] Failed to start game tracking for ${gameId}:`, error);
       Sentry.captureException(error);
-      this.emit(INTEGRATION_EVENTS.SERVICE_ERROR, { 
-        error: error.message, 
-        gameId, 
-        operation: 'start_tracking' 
+      this.emit(INTEGRATION_EVENTS.SERVICE_ERROR, {
+        error: error.message,
+        gameId,
+        operation: 'start_tracking',
       });
     }
   }
@@ -296,7 +305,6 @@ export class RealTimeIntegrationService extends EventEmitter {
       }
 
       console.log(`[REALTIME INTEGRATION] Tracking stopped for game ${gameId}`);
-
     } catch (error) {
       console.error(`[REALTIME INTEGRATION] Failed to stop game tracking for ${gameId}:`, error);
       Sentry.captureException(error);
@@ -365,7 +373,7 @@ export class RealTimeIntegrationService extends EventEmitter {
           const lastUpdateTime = new Date(status.lastUpdate).getTime();
           const now = Date.now();
           const timeSinceUpdate = now - lastUpdateTime;
-          
+
           // Consider service unhealthy if no updates for 5 minutes
           if (timeSinceUpdate > 5 * 60 * 1000) {
             status.isConnected = false;
@@ -378,7 +386,6 @@ export class RealTimeIntegrationService extends EventEmitter {
           }
         }
       });
-
     } catch (error) {
       console.error('[REALTIME INTEGRATION] Health check error:', error);
     }
@@ -393,13 +400,15 @@ export class RealTimeIntegrationService extends EventEmitter {
     const ufcStatus = ufcRealTimeDataService.getStatus();
     const oddsStatus = liveOddsTrackingService.getStatus();
 
-    const totalSubscriptions = realTimeStatus.activeSubscriptions.length +
-                              nbaStatus.subscribedGames.length +
-                              ufcStatus.subscribedFights.length +
-                              oddsStatus.trackedGamesCount;
+    const totalSubscriptions =
+      realTimeStatus.activeSubscriptions.length +
+      nbaStatus.subscribedGames.length +
+      ufcStatus.subscribedFights.length +
+      oddsStatus.trackedGamesCount;
 
-    const healthyServices = Array.from(this.serviceStatuses.values())
-      .filter(status => status.isInitialized && status.isConnected).length;
+    const healthyServices = Array.from(this.serviceStatuses.values()).filter(
+      status => status.isInitialized && status.isConnected
+    ).length;
     const totalServices = this.serviceStatuses.size;
 
     let connectionStatus: 'healthy' | 'degraded' | 'disconnected' = 'healthy';
@@ -425,13 +434,13 @@ export class RealTimeIntegrationService extends EventEmitter {
    */
   private getLastDataUpdate(): string {
     let mostRecent = new Date(0).toISOString();
-    
+
     this.serviceStatuses.forEach(status => {
       if (status.lastUpdate && status.lastUpdate > mostRecent) {
         mostRecent = status.lastUpdate;
       }
     });
-    
+
     return mostRecent;
   }
 
@@ -448,7 +457,7 @@ export class RealTimeIntegrationService extends EventEmitter {
   getRecentAlerts(limit: number = 20): any[] {
     const oddsAlerts = liveOddsTrackingService.getRecentAlerts(limit);
     // Could add other alert sources here
-    
+
     return oddsAlerts
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, limit);
@@ -481,7 +490,6 @@ export class RealTimeIntegrationService extends EventEmitter {
       this.isInitialized = false;
 
       console.log('[REALTIME INTEGRATION] All real-time services shut down');
-
     } catch (error) {
       console.error('[REALTIME INTEGRATION] Error during shutdown:', error);
     }

@@ -3,10 +3,10 @@
  * This uses the MaxMind GeoIP2 database for IP geolocation
  */
 
+const geoip2 = require('@maxmind/geoip2-node');
 const fs = require('fs');
 const path = require('path');
 const requestIp = require('request-ip');
-const geoip2 = require('@maxmind/geoip2-node');
 
 /**
  * GeoIP service for getting location data based on IP address
@@ -37,11 +37,11 @@ class NodeGeoIPService {
 
       // Read the database file
       const dbBuffer = fs.readFileSync(this.dbPath);
-      
+
       // Create the reader
       this.reader = geoip2.Reader.openBuffer(dbBuffer);
       this.initialized = true;
-      
+
       console.log('GeoIP service initialized successfully');
       return true;
     } catch (error) {
@@ -74,7 +74,7 @@ class NodeGeoIPService {
 
       // Look up the IP address
       const response = this.reader.city(ipAddress);
-      
+
       // Extract the location data
       const locationData = {
         city: response.city?.names?.en || 'Unknown',
@@ -84,10 +84,10 @@ class NodeGeoIPService {
         longitude: response.location?.longitude || 0,
         timezone: response.location?.timeZone || 'Unknown',
         postalCode: response.postal?.code || 'Unknown',
-        ipAddress: ipAddress,
-        accuracy: response.location?.accuracyRadius || 0
+        ipAddress,
+        accuracy: response.location?.accuracyRadius || 0,
       };
-      
+
       return locationData;
     } catch (error) {
       console.error('Error getting location from IP:', error);
@@ -117,12 +117,12 @@ class NodeGeoIPService {
   async getLocationFromRequest(req) {
     try {
       const clientIp = this.getClientIP(req);
-      
+
       if (!clientIp) {
         console.error('Could not determine client IP address');
         return null;
       }
-      
+
       return this.getLocationFromIP(clientIp);
     } catch (error) {
       console.error('Error getting location from request:', error);

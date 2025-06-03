@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { useAuth } from '../../hooks/useAuth';
 import { IconButton } from '../ui/IconButton';
 
@@ -12,11 +13,11 @@ interface HeaderProps {
 /**
  * Header component for admin layout
  */
-export function Header({ 
-  showMenuButton = false, 
-  onMenuClick, 
-  showBackButton = false, 
-  onBack 
+export function Header({
+  showMenuButton = false,
+  onMenuClick,
+  showBackButton = false,
+  onBack,
 }: HeaderProps) {
   const { user } = useAuth();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -47,7 +48,12 @@ export function Header({
                 aria-label="Open main menu"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </button>
             )}
@@ -58,12 +64,20 @@ export function Header({
                 aria-label="Go back"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
             )}
             <div className="flex-shrink-0 flex items-center">
-              <a href="/admin/dashboard" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              <a
+                href="/admin/dashboard"
+                className="text-xl font-bold text-blue-600 dark:text-blue-400"
+              >
                 AI Sports Edge
               </a>
             </div>

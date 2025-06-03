@@ -1,16 +1,11 @@
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView 
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+
+import ReferralBadge from './ReferralBadge';
 import { useThemeColor } from '../hooks/useThemeColor';
 import NeonCard from './ui/NeonCard';
 import NeonText from './ui/NeonText';
-import ReferralBadge from './ReferralBadge';
 import { ReferralMilestone } from '../types/rewards';
 
 interface ReferralRewardsProps {
@@ -27,11 +22,11 @@ interface ReferralRewardsProps {
 const ReferralRewards: React.FC<ReferralRewardsProps> = ({
   milestones,
   currentReferrals,
-  onClaimReward
+  onClaimReward,
 }) => {
   const primaryColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
-  
+
   // Get icon for reward type
   const getRewardIcon = (milestone: ReferralMilestone): string => {
     switch (milestone.reward.type) {
@@ -47,7 +42,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({
         return 'gift';
     }
   };
-  
+
   // Get badge type for milestone
   const getBadgeType = (milestone: ReferralMilestone) => {
     if (milestone.count >= 20) {
@@ -58,108 +53,106 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({
       return 'rookie';
     }
   };
-  
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <NeonText type="heading" glow={true} style={styles.title}>
+      <NeonText type="heading" glow style={styles.title}>
         Referral Rewards
       </NeonText>
-      
+
       <Text style={[styles.description, { color: textColor }]}>
         Invite friends to join AI Sports Edge and earn these amazing rewards!
       </Text>
-      
+
       <View style={styles.rewardsContainer}>
         {milestones.map((milestone, index) => (
           <NeonCard key={index} style={styles.rewardCard}>
             <View style={styles.rewardHeader}>
-              <View style={[
-                styles.countBadge,
-                { backgroundColor: milestone.isUnlocked ? primaryColor : '#444' }
-              ]}>
-                <Text style={styles.countText}>
-                  {milestone.count}
-                </Text>
+              <View
+                style={[
+                  styles.countBadge,
+                  { backgroundColor: milestone.isUnlocked ? primaryColor : '#444' },
+                ]}
+              >
+                <Text style={styles.countText}>{milestone.count}</Text>
               </View>
-              
+
               <Text style={[styles.rewardTitle, { color: textColor }]}>
                 {milestone.count} Referrals
               </Text>
-              
+
               {milestone.isUnlocked && (
                 <Ionicons name="checkmark-circle" size={20} color={primaryColor} />
               )}
             </View>
-            
+
             <View style={styles.rewardContent}>
               <View style={styles.rewardIconContainer}>
                 {milestone.reward.type === 'elite_status' ? (
                   <ReferralBadge type={getBadgeType(milestone)} size="medium" />
                 ) : (
-                  <View style={[
-                    styles.iconCircle,
-                    { backgroundColor: milestone.isUnlocked ? primaryColor : '#444' }
-                  ]}>
-                    <Ionicons
-                      name={getRewardIcon(milestone) as any}
-                      size={24}
-                      color="#fff"
-                    />
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { backgroundColor: milestone.isUnlocked ? primaryColor : '#444' },
+                    ]}
+                  >
+                    <Ionicons name={getRewardIcon(milestone) as any} size={24} color="#fff" />
                   </View>
                 )}
               </View>
-              
+
               <View style={styles.rewardDetails}>
                 <Text style={[styles.rewardDescription, { color: textColor }]}>
                   {milestone.reward.description}
                 </Text>
-                
-                {milestone.reward.type === 'subscription_extension' && milestone.reward.duration && (
-                  <Text style={[styles.rewardSubtext, { color: textColor }]}>
-                    {milestone.reward.duration} days free
-                  </Text>
-                )}
-                
+
+                {milestone.reward.type === 'subscription_extension' &&
+                  milestone.reward.duration && (
+                    <Text style={[styles.rewardSubtext, { color: textColor }]}>
+                      {milestone.reward.duration} days free
+                    </Text>
+                  )}
+
                 {milestone.reward.type === 'premium_trial' && milestone.reward.duration && (
                   <Text style={[styles.rewardSubtext, { color: textColor }]}>
                     {Math.floor(milestone.reward.duration / 30)} months premium
                   </Text>
                 )}
-                
+
                 {milestone.reward.type === 'cash_or_upgrade' && (
                   <Text style={[styles.rewardSubtext, { color: textColor }]}>
-                    ${milestone.reward.amount || 0} or {milestone.reward.upgradeDuration || 0} days Pro
+                    ${milestone.reward.amount || 0} or {milestone.reward.upgradeDuration || 0} days
+                    Pro
                   </Text>
                 )}
               </View>
             </View>
-            
+
             {milestone.isUnlocked && onClaimReward && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.claimButton, { backgroundColor: primaryColor }]}
                 onPress={() => onClaimReward(milestone)}
               >
-                <Text style={styles.claimButtonText}>
-                  Claim Reward
-                </Text>
+                <Text style={styles.claimButtonText}>Claim Reward</Text>
               </TouchableOpacity>
             )}
-            
+
             {!milestone.isUnlocked && (
               <View style={styles.progressContainer}>
                 <Text style={[styles.progressText, { color: textColor }]}>
                   {currentReferrals}/{milestone.count} referrals
                 </Text>
-                
+
                 <View style={styles.progressBarContainer}>
-                  <View 
+                  <View
                     style={[
-                      styles.progressBar, 
-                      { 
+                      styles.progressBar,
+                      {
                         width: `${Math.min((currentReferrals / milestone.count) * 100, 100)}%`,
-                        backgroundColor: primaryColor 
-                      }
-                    ]} 
+                        backgroundColor: primaryColor,
+                      },
+                    ]}
                   />
                 </View>
               </View>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import React, { useState, useEffect, useRef } from 'react';
+
 import UserPreferences from './UserPreferences';
 import geolocationService from '../../services/geolocationService';
 import '../styles/news-ticker.css';
@@ -19,27 +20,29 @@ const NewsTicker = () => {
   const [preferences, setPreferences] = useState(() => {
     // Load preferences from localStorage if available
     const savedPreferences = localStorage.getItem('newsTickerPreferences');
-    return savedPreferences ? JSON.parse(savedPreferences) : {
-      sports: [],
-      bettingContentOnly: false,
-      favoriteTeams: [],
-      maxItems: 10,
-      useLocation: true,
-      localTeams: [],
-      useESPN: true
-    };
+    return savedPreferences
+      ? JSON.parse(savedPreferences)
+      : {
+          sports: [],
+          bettingContentOnly: false,
+          favoriteTeams: [],
+          maxItems: 10,
+          useLocation: true,
+          localTeams: [],
+          useESPN: true,
+        };
   });
-  
+
   const tickerRef = useRef(null);
   const scrollInterval = useRef(null);
-  
+
   // Fetch news items on mount and when preferences change
   useEffect(() => {
     fetchNewsItems();
-    
+
     // Start auto-scrolling
     startScrolling();
-    
+
     return () => {
       // Clean up scroll interval on unmount
       if (scrollInterval.current) {
@@ -47,30 +50,33 @@ const NewsTicker = () => {
       }
     };
   }, [preferences]);
-  
+
   // Load location data and odds suggestions when preferences change
   useEffect(() => {
     const loadLocationData = async () => {
       if (preferences.useLocation) {
         try {
           const location = await geolocationService.getUserLocation();
-          
+
           if (location) {
             // Get local teams
             const teams = await geolocationService.getLocalTeams(location);
-            
+
             // Update preferences with local teams
             setPreferences(prev => ({
               ...prev,
-              localTeams: teams
+              localTeams: teams,
             }));
-            
+
             // Save updated preferences to localStorage
-            localStorage.setItem('newsTickerPreferences', JSON.stringify({
-              ...preferences,
-              localTeams: teams
-            }));
-            
+            localStorage.setItem(
+              'newsTickerPreferences',
+              JSON.stringify({
+                ...preferences,
+                localTeams: teams,
+              })
+            );
+
             // Get localized odds suggestions
             const suggestions = await geolocationService.getLocalizedOddsSuggestions(location);
             setOddsSuggestions(suggestions);
@@ -80,10 +86,10 @@ const NewsTicker = () => {
         }
       }
     };
-    
+
     loadLocationData();
   }, [preferences.useLocation]);
-  
+
   // Load ESPN data when preferences change
   useEffect(() => {
     const loadESPNData = async () => {
@@ -92,15 +98,15 @@ const NewsTicker = () => {
           // Determine which sport to fetch based on preferences
           let sport = 'basketball';
           let league = 'nba';
-          
+
           if (preferences.sports && preferences.sports.length > 0) {
             const sportMapping = {
-              'NBA': { sport: 'basketball', league: 'nba' },
-              'NFL': { sport: 'football', league: 'nfl' },
-              'MLB': { sport: 'baseball', league: 'mlb' },
-              'NHL': { sport: 'hockey', league: 'nhl' }
+              NBA: { sport: 'basketball', league: 'nba' },
+              NFL: { sport: 'football', league: 'nfl' },
+              MLB: { sport: 'baseball', league: 'mlb' },
+              NHL: { sport: 'hockey', league: 'nhl' },
             };
-            
+
             // Use the first preferred sport
             const preferredSport = preferences.sports[0];
             if (sportMapping[preferredSport]) {
@@ -108,7 +114,7 @@ const NewsTicker = () => {
               league = sportMapping[preferredSport].league;
             }
           }
-          
+
           // Calculate odds based on ESPN data
           const calculatedOdds = await espnApiWrapper.calculateOdds(sport, league);
           setEspnOdds(calculatedOdds);
@@ -117,24 +123,24 @@ const NewsTicker = () => {
         }
       }
     };
-    
+
     loadESPNData();
   }, [preferences.useESPN, preferences.sports]);
-  
+
   /**
    * Fetch news items from the API
    */
   const fetchNewsItems = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await axios.post('/api/rss-feeds', { preferences });
-      
+
       if (response.status !== 200) {
         throw new Error(`Status code ${response.status}`);
       }
-      
+
       setNewsItems(response.data.items || []);
     } catch (error) {
       console.error('Error fetching news items:', error);
@@ -143,7 +149,7 @@ const NewsTicker = () => {
       setIsLoading(false);
     }
   };
-  
+
   /**
    * Start auto-scrolling the ticker
    */
@@ -151,11 +157,11 @@ const NewsTicker = () => {
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
     }
-    
+
     scrollInterval.current = setInterval(() => {
       if (tickerRef.current) {
         tickerRef.current.scrollLeft += 1;
-        
+
         // Reset scroll position when reaching the end
         if (
           tickerRef.current.scrollLeft >=
@@ -166,7 +172,7 @@ const NewsTicker = () => {
       }
     }, 20);
   };
-  
+
   /**
    * Pause auto-scrolling
    */
@@ -176,7 +182,7 @@ const NewsTicker = () => {
       scrollInterval.current = null;
     }
   };
-  
+
   /**
    * Resume auto-scrolling
    */
@@ -185,7 +191,7 @@ const NewsTicker = () => {
       startScrolling();
     }
   };
-  
+
   /**
    * Handle click on a news item
    * @param {Object} item - News item
@@ -199,39 +205,39 @@ const NewsTicker = () => {
         title: item.title,
         source: item.source,
         categories: item.categories,
-        isBettingContent: item.isBettingContent
+        isBettingContent: item.isBettingContent,
       });
     } catch (error) {
       console.error('Error tracking click:', error);
     }
   };
-  
+
   /**
    * Toggle preferences modal
    */
   const togglePreferences = () => {
     setShowPreferences(!showPreferences);
   };
-  
+
   /**
    * Save user preferences
    * @param {Object} newPreferences - New preferences
    */
-  const savePreferences = (newPreferences) => {
+  const savePreferences = newPreferences => {
     setPreferences(newPreferences);
     localStorage.setItem('newsTickerPreferences', JSON.stringify(newPreferences));
     setShowPreferences(false);
   };
-  
+
   /**
    * Determine if an item is betting content
    * @param {Object} item - News item
    * @returns {boolean} True if item is betting content
    */
-  const isBettingContent = (item) => {
+  const isBettingContent = item => {
     return item.isBettingContent || false;
   };
-  
+
   // Render loading state
   if (isLoading) {
     return (
@@ -243,13 +249,13 @@ const NewsTicker = () => {
           </button>
         </div>
         <div className="news-ticker-loading">
-          <div className="spinner"></div>
+          <div className="spinner" />
           <p>Loading news...</p>
         </div>
       </div>
     );
   }
-  
+
   // Render error state
   if (error) {
     return (
@@ -264,7 +270,7 @@ const NewsTicker = () => {
       </div>
     );
   }
-  
+
   // Render empty state
   if (newsItems.length === 0) {
     return (
@@ -275,7 +281,9 @@ const NewsTicker = () => {
             ⚙️
           </button>
         </div>
-        <div className="news-ticker-empty">No news items found. Try adjusting your preferences.</div>
+        <div className="news-ticker-empty">
+          No news items found. Try adjusting your preferences.
+        </div>
         {showPreferences && (
           <UserPreferences
             preferences={preferences}
@@ -286,7 +294,7 @@ const NewsTicker = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="news-ticker-container">
       <div className="news-ticker-header">
@@ -295,7 +303,7 @@ const NewsTicker = () => {
           ⚙️
         </button>
       </div>
-      
+
       <div
         className="news-ticker"
         ref={tickerRef}
@@ -310,7 +318,7 @@ const NewsTicker = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={`news-ticker-item ${isBettingContent(item) ? 'betting-content' : ''}`}
-              onClick={(e) => handleNewsItemClick(item, e)}
+              onClick={e => handleNewsItemClick(item, e)}
             >
               <span className="news-source">{item.source}</span>
               <span className="news-title">{item.title}</span>
@@ -318,7 +326,7 @@ const NewsTicker = () => {
           ))}
         </div>
       </div>
-      
+
       {/* Localized odds suggestions */}
       {oddsSuggestions.length > 0 && (
         <div className="odds-suggestions">
@@ -336,7 +344,7 @@ const NewsTicker = () => {
           </div>
         </div>
       )}
-      
+
       {/* ESPN calculated odds */}
       {espnOdds.length > 0 && (
         <div className="espn-odds">
@@ -355,14 +363,15 @@ const NewsTicker = () => {
                   </div>
                   <div className="espn-odds-values">
                     <span className="espn-odds-moneyline">
-                      ML: {odds.odds.homeMoneyline > 0 ? '+' : ''}{odds.odds.homeMoneyline} / {odds.odds.awayMoneyline > 0 ? '+' : ''}{odds.odds.awayMoneyline}
+                      ML: {odds.odds.homeMoneyline > 0 ? '+' : ''}
+                      {odds.odds.homeMoneyline} / {odds.odds.awayMoneyline > 0 ? '+' : ''}
+                      {odds.odds.awayMoneyline}
                     </span>
                     <span className="espn-odds-spread">
-                      Spread: {odds.odds.spread > 0 ? '+' : ''}{odds.odds.spread}
+                      Spread: {odds.odds.spread > 0 ? '+' : ''}
+                      {odds.odds.spread}
                     </span>
-                    <span className="espn-odds-overunder">
-                      O/U: {odds.odds.overUnder}
-                    </span>
+                    <span className="espn-odds-overunder">O/U: {odds.odds.overUnder}</span>
                   </div>
                   <a
                     href={odds.espnGameLink}
@@ -378,7 +387,7 @@ const NewsTicker = () => {
           </div>
         </div>
       )}
-      
+
       {showPreferences && (
         <UserPreferences
           preferences={preferences}

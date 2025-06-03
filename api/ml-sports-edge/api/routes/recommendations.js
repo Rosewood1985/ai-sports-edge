@@ -4,9 +4,10 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
-const { authenticate } = require('../middleware/auth');
 const RecommendationController = require('../controllers/recommendation.controller');
+const { authenticate } = require('../middleware/auth');
 
 /**
  * @route GET /api/recommendations/user/:userId

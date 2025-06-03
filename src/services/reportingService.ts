@@ -266,7 +266,7 @@ export class ReportingService {
     successRate: number;
     averageGenerationTime: number;
     lastRun?: string;
-    mostCommonErrors: Array<{ error: string; count: number }>;
+    mostCommonErrors: { error: string; count: number }[];
   }> {
     try {
       return await this.request(`/api/reports/templates/${templateId}/stats`);
