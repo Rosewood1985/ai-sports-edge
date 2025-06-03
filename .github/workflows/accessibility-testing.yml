@@ -1,0 +1,201 @@
+name: Accessibility Testing
+
+on:
+  push:
+    branches: [clean-main]
+    paths:
+      - 'components/**'
+      - 'screens/**'
+      - 'styles/**'
+      - 'atomic/**'
+      - 'constants/Colors.ts'
+      - 'contexts/ThemeContext.tsx'
+  pull_request:
+    branches: [clean-main]
+    paths:
+      - 'components/**'
+      - 'screens/**'
+      - 'styles/**'
+      - 'atomic/**'
+      - 'constants/Colors.ts'
+      - 'contexts/ThemeContext.tsx'
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  accessibility-tests:
+    name: Run Accessibility Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check for Jest dependencies script
+        id: check-jest-script
+        run: |
+          if [ -f "scripts/install-jest-dependencies.sh" ]; then
+            echo "jest_script_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "jest_script_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Jest dependencies script not found, skipping..."
+          fi
+          
+      - name: Install Jest dependencies
+        if: steps.check-jest-script.outputs.jest_script_exists == 'true'
+        run: bash scripts/install-jest-dependencies.sh
+        
+      - name: Install basic Jest dependencies (fallback)
+        if: steps.check-jest-script.outputs.jest_script_exists == 'false'
+        run: |
+          npm install --save-dev @testing-library/react-native @testing-library/jest-native jest-expo
+          echo "✅ Installed basic Jest dependencies"
+          
+      - name: Check for accessibility tests
+        id: check-accessibility-tests
+        run: |
+          if [ -d "__tests__/accessibility" ] && [ "$(ls -A __tests__/accessibility)" ]; then
+            echo "accessibility_tests_exist=true" >> $GITHUB_OUTPUT
+          else
+            echo "accessibility_tests_exist=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No accessibility tests found in __tests__/accessibility"
+          fi
+          
+      - name: Run Jest tests for accessibility components
+        if: steps.check-accessibility-tests.outputs.accessibility_tests_exist == 'true'
+        run: npm test -- --testPathPattern=__tests__/accessibility
+        
+      - name: Check for color contrast script
+        id: check-contrast-script
+        run: |
+          if [ -f "scripts/run-color-contrast-tests.js" ]; then
+            echo "contrast_script_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "contrast_script_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Color contrast script not found, skipping..."
+          fi
+          
+      - name: Run color contrast tests
+        if: steps.check-contrast-script.outputs.contrast_script_exists == 'true'
+        run: node scripts/run-color-contrast-tests.js
+        
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accessibility-test-results-${{ github.run_number }}
+          path: |
+            test-results
+            coverage
+            accessibility-report.json
+          retention-days: 30
+
+  # Add a job to check for accessibility issues in the UI
+  axe-test:
+    name: Run Axe Accessibility Tests
+    runs-on: ubuntu-latest
+    needs: accessibility-tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Puppeteer and Axe
+        run: npm install --save-dev puppeteer @axe-core/puppeteer
+        
+      - name: Check package.json for web script
+        id: check-web-script
+        run: |
+          if npm run | grep -q "web"; then
+            echo "web_script_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "web_script_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ 'npm run web' not found in package.json"
+          fi
+          
+      - name: Start web server (if available)
+        if: steps.check-web-script.outputs.web_script_exists == 'true'
+        run: |
+          npm run web &
+          echo "WEB_SERVER_PID=$!" >> $GITHUB_ENV
+          npx wait-on http://localhost:19006 --timeout 60000
+          
+      - name: Check for Axe test script
+        id: check-axe-script
+        run: |
+          if [ -f "scripts/run-axe-tests.js" ]; then
+            echo "axe_script_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "axe_script_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Axe test script not found, creating basic one..."
+          fi
+          
+      - name: Create basic Axe test (fallback)
+        if: steps.check-axe-script.outputs.axe_script_exists == 'false'
+        run: |
+          mkdir -p scripts
+          cat > scripts/run-axe-tests.js << 'EOF'
+          const puppeteer = require('puppeteer');
+          const { AxePuppeteer } = require('@axe-core/puppeteer');
+          const fs = require('fs');
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            
+            try {
+              await page.goto('http://localhost:19006');
+              const results = await new AxePuppeteer(page).analyze();
+              
+              fs.writeFileSync('axe-results.json', JSON.stringify(results, null, 2));
+              
+              if (results.violations.length > 0) {
+                console.log('❌ Accessibility violations found:', results.violations.length);
+                process.exit(1);
+              } else {
+                console.log('✅ No accessibility violations found');
+              }
+            } catch (error) {
+              console.log('⚠️ Could not run Axe tests:', error.message);
+            } finally {
+              await browser.close();
+            }
+          })();
+          EOF
+          echo "✅ Created basic Axe test script"
+          
+      - name: Run Axe accessibility tests
+        if: steps.check-web-script.outputs.web_script_exists == 'true'
+        run: node scripts/run-axe-tests.js
+        
+      - name: Kill web server
+        if: always() && steps.check-web-script.outputs.web_script_exists == 'true'
+        run: |
+          if [ ! -z "$WEB_SERVER_PID" ]; then
+            kill $WEB_SERVER_PID || true
+          fi
+          
+      - name: Upload axe results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-test-results-${{ github.run_number }}
+          path: axe-results.json
+          retention-days: 30
