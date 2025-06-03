@@ -24,18 +24,18 @@ jobs:
 
       - name: 🔒 Ensure .env Files Are Not Included
         run: |
-          echo "Checking for .env files in build directory..."
-          if [ -f "build/.env" ]; then
-            echo "Warning: .env file found in build directory. Removing..."
-            rm build/.env
+          echo "Checking for .env files in public directory..."
+          if [ -f "public/.env" ]; then
+            echo "Warning: .env file found in public directory. Removing..."
+            rm public/.env
           fi
-          if ls build/.env* 1> /dev/null 2>&1; then
-            echo "Warning: .env.* files found in build directory. Removing..."
-            rm build/.env*
+          if ls public/.env* 1> /dev/null 2>&1; then
+            echo "Warning: .env.* files found in public directory. Removing..."
+            rm public/.env*
           fi
           echo "Environment files check complete."
 
-      - name: � Upload Build Folder via SFTP
+      - name: 📁 Upload Public Folder via SFTP
         env:
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
         run: |
@@ -45,7 +45,7 @@ jobs:
           
           sshpass -p "$SFTP_PASS" sftp -o StrictHostKeyChecking=no deploy@aisportsedge.app <<EOF
           cd /home/q15133yvmhnq/public_html/aisportsedge.app
-          put -r build/*
+          put -r public/*
           bye
           EOF
 
