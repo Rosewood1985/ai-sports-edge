@@ -73,7 +73,11 @@
       "Bash(gh run list:*)",
       "Bash(npm audit:*)",
       "Bash(npm show:*)",
-      "Bash(npm update:*)"
+      "Bash(npm update:*)",
+      "Bash(npx expo install:*)",
+      "Bash(./scripts/quick-deploy.sh:*)",
+      "Bash(gh auth:*)",
+      "Bash(/workspaces/ai-sports-edge-restore/scripts/direct-deploy.sh:*)"
     ],
     "deny": []
   },
