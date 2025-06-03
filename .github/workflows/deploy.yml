@@ -3,13 +3,13 @@ name: AI Sports Edge Deployment
 on:
   push:
     branches:
-      - main
-      - feature/atomic-architecture*
+      - clean-main
     paths:
       - 'dist/**'
+      - 'build/**'
+      - 'public/**'
       - '.htaccess'
-      - 'scripts/secure-sftp-deploy.sh'
-      - 'scripts/verify-deployment-health.sh'
+      - 'scripts/**'
       - '.github/workflows/deploy.yml'
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Validate dist structure
         run: |
@@ -91,7 +91,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.7.0

@@ -1,9 +1,13 @@
-name: 🚀 Deploy to GoDaddy on Push to Main
+name: 🚀 Deploy to GoDaddy
 
 on:
   push:
     branches:
-      - main
+      - clean-main
+    paths:
+      - 'public/**'
+      - 'dist/**'
+      - 'build/**'
 
 jobs:
   deploy:

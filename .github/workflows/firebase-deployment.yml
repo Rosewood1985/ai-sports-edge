@@ -3,20 +3,22 @@ name: Firebase Deployment
 on:
   push:
     branches:
-      - main
+      - clean-main
+    paths:
+      - 'src/**'
+      - 'functions/**'
+      - 'firebase.json'
+      - 'firestore.rules'
+      - 'package.json'
   pull_request:
     branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - production
+      - clean-main
+    paths:
+      - 'src/**'
+      - 'functions/**'
+      - 'firebase.json'
+      - 'firestore.rules'
+      - 'package.json'
 
 jobs:
   test:
@@ -33,7 +35,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run linting
         run: npm run lint
@@ -61,7 +63,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Create .env file
         run: |
@@ -164,7 +166,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Create .env file
         run: |

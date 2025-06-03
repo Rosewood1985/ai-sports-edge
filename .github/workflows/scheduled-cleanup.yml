@@ -4,8 +4,11 @@ on:
   schedule:
     # Run every Sunday at 1:00 AM UTC
     - cron: '0 1 * * 0'
-  # Allow manual triggering
-  workflow_dispatch:
+  push:
+    branches:
+      - clean-main
+    paths:
+      - '.github/workflows/scheduled-cleanup.yml'
 
 jobs:
   cleanup:
