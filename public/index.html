@@ -1,1839 +1,2008 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#00F0FF">
-  <meta name="description" content="AI Sports Edge - AI-Powered Sports Analytics and Decision Intelligence">
-  
-  <!-- Security Headers -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(self), interest-cohort=()">
-  
-  <!-- Hreflang Tags -->
-  <link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/">
-  <link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/">
-  <link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/">
-  <link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/">
-  <link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/">
-  <link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/">
-  
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://aisportsedge.app/en/">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://aisportsedge.app/">
-  <meta property="og:title" content="AI Sports Edge - AI-Powered Sports Analytics">
-  <meta property="og:description" content="Get accurate sports analytics powered by AI. Improve your sports decisions with advanced data insights and real-time intelligence.">
-  <meta property="og:image" content="https://aisportsedge.app/og-image.jpg">
-  
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://aisportsedge.app/">
-  <meta property="twitter:title" content="AI Sports Edge - AI-Powered Sports Analytics">
-  <meta property="twitter:description" content="Get accurate sports analytics powered by AI. Improve your sports decisions with advanced data insights and real-time intelligence.">
-  <meta property="twitter:image" content="https://aisportsedge.app/og-image.jpg">
-  
-  <title>AI Sports Edge - AI-Powered Sports Analytics</title>
-  
-  <!-- Favicon -->
-  <link rel="icon" href="/ai_logo_new.svg">
-  <link rel="apple-touch-icon" href="/ai_logo_new.svg">
-  
-  <!-- Enhanced Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Bootstrap CSS for enhanced styling -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <!-- Font Awesome for enhanced icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- AOS Animation Library -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <!-- Original Styles -->
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="neon-ui.css">
-  
-  <!-- Enhanced Design Variables -->
-  <style>
-    :root {
-      /* NEON BLUE THEME - Consistent with Mobile App */
-      --primary-color: #00F0FF;
-      --primary-dark: #00D4E6;
-      --primary-light: #66F2FF;
-      --primary-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      --accent-color: #40E0D0;
-      --accent-dark: #35C7B8;
-      --accent-light: #6DE6D4;
-      --accent-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
-      --success-color: #39FF14;
-      --warning-color: #FFF000;
-      --danger-color: #FF1010;
-      --white: #ffffff;
-      --off-white: #121212;
-      --gray-100: #1E1E1E;
-      --gray-200: #2D2D2D;
-      --gray-300: #404040;
-      --gray-400: #595959;
-      --gray-500: #737373;
-      --gray-600: #808080;
-      --gray-700: #B0B0B0;
-      --gray-800: #FFFFFF;
-      --gray-900: #FFFFFF;
-      --dark-blue: #000000;
-      
-      /* Enhanced typography */
-      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      --font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      
-      /* Enhanced shadows */
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      --shadow-glow: 0 0 15px rgba(0, 102, 255, 0.5);
-      
-      /* Enhanced transitions */
-      --transition-fast: 0.15s;
-      --transition-normal: 0.3s;
-      --transition-slow: 0.5s;
-      --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Enhanced Header */
-    .header {
-      background-color: rgba(18, 18, 18, 0.98) !important;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--gray-200);
-      transition: all var(--transition-normal);
-    }
-    
-    .logo {
-      transition: transform var(--transition-normal);
-    }
-    
-    .logo:hover {
-      transform: scale(1.05);
-    }
-    
-    .logo img {
-      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-      border-radius: 8px;
-      box-shadow: var(--shadow-md);
-    }
-    
-    .logo:hover img {
-      box-shadow: var(--shadow-lg);
-      transform: rotate(5deg);
-    }
-    
-    .nav-item a {
-      position: relative;
-      transition: all var(--transition-normal) var(--transition-timing);
-    }
-    
-    .nav-item a::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background-color: var(--primary-color);
-      transition: width var(--transition-normal) var(--transition-timing);
-      border-radius: 2px;
-    }
-    
-    .nav-item a:hover::after,
-    .nav-item a.active::after {
-      width: 100%;
-    }
-    
-    .download-button {
-      background: var(--primary-gradient) !important;
-      color: var(--white) !important;
-      box-shadow: var(--shadow-md);
-      position: relative;
-      overflow: hidden;
-      transition: all var(--transition-normal) var(--transition-timing);
-    }
-    
-    .download-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.7s;
-    }
-    
-    .download-button:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .download-button:hover::before {
-      left: 100%;
-    }
-    
-    /* Enhanced Hero Section */
-    .hero {
-      background: var(--primary-gradient) !important;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
-      opacity: 0.5;
-      z-index: 0;
-    }
-    
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 100%;
-      height: 10px;
-      background: linear-gradient(90deg, var(--accent-color), var(--primary-light), var(--accent-color));
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.7);
-    }
-    
-    .hero-content {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .hero h1 {
-      font-family: var(--font-heading);
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      background: linear-gradient(to right, var(--white), var(--accent-light));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .hero-subtitle {
-      opacity: 0.95;
-      font-weight: 500;
-      line-height: 1.75;
-    }
-    
-    .primary-button {
-      background: var(--white) !important;
-      color: var(--primary-color) !important;
-      font-weight: 600;
-      box-shadow: var(--shadow-md), 0 0 15px rgba(255, 255, 255, 0.5);
-      position: relative;
-      overflow: hidden;
-      transition: all var(--transition-normal) var(--transition-timing);
-    }
-    
-    .primary-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.7s;
-    }
-    
-    .primary-button:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-lg), 0 0 20px rgba(255, 255, 255, 0.7);
-      color: var(--primary-dark) !important;
-    }
-    
-    .primary-button:hover::before {
-      left: 100%;
-    }
-    
-    .secondary-button {
-      background-color: transparent !important;
-      border: 2px solid var(--white) !important;
-      color: var(--white) !important;
-      font-weight: 600;
-      transition: all var(--transition-normal) var(--transition-timing);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-    }
-    
-    .secondary-button:hover {
-      background-color: rgba(255, 255, 255, 0.15) !important;
-      transform: translateY(-3px);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-      color: var(--white) !important;
-    }
-    
-    /* Enhanced Feature Cards */
-    .feature-card {
-      position: relative;
-      overflow: hidden;
-      transition: all var(--transition-normal) var(--transition-timing);
-      border: 1px solid var(--gray-200);
-    }
-    
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform var(--transition-normal) var(--transition-timing);
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--gray-300);
-    }
-    
-    .feature-card:hover::before {
-      transform: scaleX(1);
-    }
-    
-    .feature-icon {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
-      box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
-      transition: all var(--transition-normal) var(--transition-timing);
-      position: relative;
-    }
-    
-    .feature-icon::after {
-      content: '';
-      position: absolute;
-      top: -4px;
-      left: -4px;
-      right: -4px;
-      bottom: -4px;
-      border-radius: 50%;
-      border: 2px solid rgba(0, 102, 255, 0.2);
-      opacity: 0;
-      transform: scale(1.2);
-      transition: all var(--transition-normal) var(--transition-timing);
-    }
-    
-    .feature-card:hover .feature-icon {
-      transform: scale(1.1);
-      box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
-    }
-    
-    .feature-card:hover .feature-icon::after {
-      opacity: 1;
-      transform: scale(1);
-    }
-    
-    /* Floating Animation */
-    @keyframes float {
-      0% {
-        transform: translateY(0px);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#00F0FF" />
+    <meta
+      name="description"
+      content="AI Sports Edge - AI-Powered Sports Analytics and Decision Intelligence"
+    />
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="camera=(), microphone=(), geolocation=(self), interest-cohort=()"
+    />
+
+    <!-- Hreflang Tags -->
+    <link rel="alternate" hreflang="en" href="https://aisportsedge.app/en/" />
+    <link rel="alternate" hreflang="es" href="https://aisportsedge.app/es/" />
+    <link rel="alternate" hreflang="es-US" href="https://aisportsedge.app/es-US/" />
+    <link rel="alternate" hreflang="es-MX" href="https://aisportsedge.app/es-MX/" />
+    <link rel="alternate" hreflang="es-ES" href="https://aisportsedge.app/es-ES/" />
+    <link rel="alternate" hreflang="x-default" href="https://aisportsedge.app/en/" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://aisportsedge.app/en/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aisportsedge.app/" />
+    <meta property="og:title" content="AI Sports Edge - AI-Powered Sports Analytics" />
+    <meta
+      property="og:description"
+      content="Get accurate sports analytics powered by AI. Improve your sports decisions with advanced data insights and real-time intelligence."
+    />
+    <meta property="og:image" content="https://aisportsedge.app/og-image.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://aisportsedge.app/" />
+    <meta property="twitter:title" content="AI Sports Edge - AI-Powered Sports Analytics" />
+    <meta
+      property="twitter:description"
+      content="Get accurate sports analytics powered by AI. Improve your sports decisions with advanced data insights and real-time intelligence."
+    />
+    <meta property="twitter:image" content="https://aisportsedge.app/og-image.jpg" />
+
+    <title>AI Sports Edge - AI-Powered Sports Analytics</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/ai_logo_new.svg" />
+    <link rel="apple-touch-icon" href="/ai_logo_new.svg" />
+
+    <!-- Enhanced Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS for enhanced styling -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <!-- Font Awesome for enhanced icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <!-- Enhanced Design Variables -->
+    <style>
+      :root {
+        /* NEON BLUE THEME - Consistent with Mobile App */
+        --primary-color: #00f0ff;
+        --primary-dark: #00d4e6;
+        --primary-light: #66f2ff;
+        --primary-gradient: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--primary-dark) 100%
+        );
+        --accent-color: #40e0d0;
+        --accent-dark: #35c7b8;
+        --accent-light: #6de6d4;
+        --accent-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+        --success-color: #39ff14;
+        --warning-color: #fff000;
+        --danger-color: #ff1010;
+        --white: #ffffff;
+        --off-white: #121212;
+        --gray-100: #1e1e1e;
+        --gray-200: #2d2d2d;
+        --gray-300: #404040;
+        --gray-400: #595959;
+        --gray-500: #737373;
+        --gray-600: #808080;
+        --gray-700: #b0b0b0;
+        --gray-800: #ffffff;
+        --gray-900: #ffffff;
+        --dark-blue: #000000;
+
+        /* Enhanced typography */
+        --font-primary:
+          'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+        --font-heading:
+          'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+
+        /* Enhanced shadows */
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --shadow-glow: 0 0 15px rgba(0, 102, 255, 0.5);
+
+        /* Enhanced transitions */
+        --transition-fast: 0.15s;
+        --transition-normal: 0.3s;
+        --transition-slow: 0.5s;
+        --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
       }
-      50% {
-        transform: translateY(-10px);
-      }
-      100% {
-        transform: translateY(0px);
-      }
-    }
-    
-    .hero-image img {
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    /* Enhanced Hero Elements */
-    .hero-stats {
-      display: flex;
-      gap: 2rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-    
-    .stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--accent-light);
-      font-family: var(--font-heading);
-    }
-    
-    .stat-label {
-      font-size: 0.875rem;
-      color: rgba(255, 255, 255, 0.8);
-      text-align: center;
-    }
-    
-    /* Device Mockup */
-    .device-mockup {
-      position: relative;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-    
-    .device-screen {
-      width: 100%;
-      height: 600px;
-      border-radius: 24px;
-      box-shadow: var(--shadow-xl);
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
-    }
-    
-    .device-frame {
-      position: absolute;
-      top: -12px;
-      left: -12px;
-      right: -12px;
-      bottom: -12px;
-      border: 12px solid var(--gray-900);
-      border-radius: 36px;
-      box-shadow: var(--shadow-lg);
-      z-index: 0;
-    }
-    
-    .device-reflection {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-      border-radius: 24px;
-      z-index: 2;
-    }
-    
-    .floating-elements {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-    }
-    
-    .floating-element {
-      position: absolute;
-      background-color: var(--white);
-      border-radius: 12px;
-      box-shadow: var(--shadow-lg);
-      padding: 1rem;
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    .stats-card {
-      top: 10%;
-      right: -30%;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      animation-delay: 0.5s;
-    }
-    
-    .prediction-card {
-      bottom: 15%;
-      left: -30%;
-      animation-delay: 1s;
-      text-align: center;
-    }
-    
-    .card-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--primary-gradient);
-      color: var(--white);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-    }
-    
-    .card-content {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .card-title {
-      font-size: 0.75rem;
-      color: var(--gray-600);
-      margin-bottom: 0.25rem;
-    }
-    
-    .card-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-    
-    .card-teams {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--gray-800);
-      margin-bottom: 0.25rem;
-    }
-    
-    .card-prediction {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--success-color);
-    }
-    
-    /* Enhanced News Feed */
-    .hero-news {
-      margin-top: 3rem;
-    }
-    
-    .news-feed-enhanced {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 2rem;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .news-feed-title {
-      color: var(--white);
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .news-items {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    
-    .news-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      transition: all var(--transition-normal);
-    }
-    
-    .news-item:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateX(8px);
-    }
-    
-    .news-date {
-      background: var(--accent-color);
-      color: var(--gray-900);
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      min-width: 60px;
-      text-align: center;
-    }
-    
-    .news-headline {
-      color: var(--white);
-      flex: 1;
-      margin: 0;
-      font-weight: 500;
-    }
-    
-    .news-badge {
-      background: var(--primary-color);
-      color: var(--white);
-      padding: 0.25rem 0.5rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    
-    .news-more {
-      color: var(--accent-light);
-      text-decoration: none;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all var(--transition-normal);
-    }
-    
-    .news-more:hover {
-      color: var(--white);
-      transform: translateX(4px);
-    }
-    
-    /* Mobile Menu Styles */
-    .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--gray-700);
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0.5rem;
-      transition: color var(--transition-normal);
-    }
-    
-    .mobile-menu-toggle:hover {
-      color: var(--primary-color);
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .mobile-menu-toggle {
-        display: block;
-      }
-      
-      .nav-list {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--white);
-        box-shadow: var(--shadow-lg);
-        flex-direction: column;
-        padding: 1rem 0;
-        transform: translateY(-10px);
-        opacity: 0;
-        visibility: hidden;
+
+      /* Enhanced Header */
+      .header {
+        background-color: rgba(18, 18, 18, 0.98) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--gray-200);
         transition: all var(--transition-normal);
       }
-      
-      .nav-list.active {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
+
+      .logo {
+        transition: transform var(--transition-normal);
       }
-      
-      .nav-item {
-        margin: 0;
-        padding: 0.5rem 1rem;
+
+      .logo:hover {
+        transform: scale(1.05);
       }
-      
+
+      .logo img {
+        transition:
+          transform var(--transition-normal),
+          box-shadow var(--transition-normal);
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+      }
+
+      .logo:hover img {
+        box-shadow: var(--shadow-lg);
+        transform: rotate(5deg);
+      }
+
       .nav-item a {
-        display: block;
-        padding: 0.5rem;
+        position: relative;
+        transition: all var(--transition-normal) var(--transition-timing);
       }
-      
-      .header-content {
+
+      .nav-item a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary-color);
+        transition: width var(--transition-normal) var(--transition-timing);
+        border-radius: 2px;
+      }
+
+      .nav-item a:hover::after,
+      .nav-item a.active::after {
+        width: 100%;
+      }
+
+      .download-button {
+        background: var(--primary-gradient) !important;
+        color: var(--white) !important;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+        transition: all var(--transition-normal) var(--transition-timing);
+      }
+
+      .download-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.7s;
+      }
+
+      .download-button:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .download-button:hover::before {
+        left: 100%;
+      }
+
+      /* Enhanced Hero Section */
+      .hero {
+        background: var(--primary-gradient) !important;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.5;
+        z-index: 0;
+      }
+
+      .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 10px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-color),
+          var(--primary-light),
+          var(--accent-color)
+        );
+        box-shadow: 0 0 20px rgba(0, 229, 255, 0.7);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero h1 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(to right, var(--white), var(--accent-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero-subtitle {
+        opacity: 0.95;
+        font-weight: 500;
+        line-height: 1.75;
+      }
+
+      .primary-button {
+        background: var(--white) !important;
+        color: var(--primary-color) !important;
+        font-weight: 600;
+        box-shadow:
+          var(--shadow-md),
+          0 0 15px rgba(255, 255, 255, 0.5);
+        position: relative;
+        overflow: hidden;
+        transition: all var(--transition-normal) var(--transition-timing);
+      }
+
+      .primary-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.7s;
+      }
+
+      .primary-button:hover {
+        transform: translateY(-3px);
+        box-shadow:
+          var(--shadow-lg),
+          0 0 20px rgba(255, 255, 255, 0.7);
+        color: var(--primary-dark) !important;
+      }
+
+      .primary-button:hover::before {
+        left: 100%;
+      }
+
+      .secondary-button {
+        background-color: transparent !important;
+        border: 2px solid var(--white) !important;
+        color: var(--white) !important;
+        font-weight: 600;
+        transition: all var(--transition-normal) var(--transition-timing);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      }
+
+      .secondary-button:hover {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        color: var(--white) !important;
+      }
+
+      /* Enhanced Feature Cards */
+      .feature-card {
+        position: relative;
+        overflow: hidden;
+        transition: all var(--transition-normal) var(--transition-timing);
+        border: 1px solid var(--gray-200);
+      }
+
+      .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform var(--transition-normal) var(--transition-timing);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--gray-300);
+      }
+
+      .feature-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .feature-icon {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+        box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+        transition: all var(--transition-normal) var(--transition-timing);
         position: relative;
       }
-      .hero-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 2rem;
+
+      .feature-icon::after {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 102, 255, 0.2);
+        opacity: 0;
+        transform: scale(1.2);
+        transition: all var(--transition-normal) var(--transition-timing);
       }
-      
+
+      .feature-card:hover .feature-icon {
+        transform: scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
+      }
+
+      .feature-card:hover .feature-icon::after {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* Floating Animation */
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .hero-image img {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      /* Enhanced Hero Elements */
       .hero-stats {
-        justify-content: center;
-      }
-      
-      .device-mockup {
-        max-width: 250px;
-      }
-      
-      .stats-card, .prediction-card {
-        display: none;
-      }
-      
-      .news-items {
-        gap: 0.75rem;
-      }
-      
-      .news-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-    }
-    
-    /* Enhanced Section Styles */
-    .section-header {
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-    
-    .section-header h2 {
-      font-family: var(--font-heading);
-      font-size: 2.5rem;
-      color: var(--gray-900);
-      margin-bottom: 1rem;
-    }
-    
-    .section-header p {
-      font-size: 1.25rem;
-      color: var(--gray-600);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    /* Statistics Bar */
-    .statistics-bar {
-      background: var(--white);
-      padding: 3rem 0;
-      border-bottom: 1px solid var(--gray-200);
-    }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-      text-align: center;
-    }
-    
-    .stat-item {
-      padding: 2rem 1rem;
-    }
-    
-    .stat-number {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--primary-color);
-      font-family: var(--font-heading);
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    
-    .stat-label {
-      font-size: 1rem;
-      color: var(--gray-600);
-      font-weight: 500;
-    }
-    
-    /* Core Features Section */
-    .core-features {
-      background: var(--gray-100);
-      padding: 5rem 0;
-    }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    
-    /* Sports Coverage Section */
-    .sports-coverage {
-      background: var(--white);
-      padding: 5rem 0;
-    }
-    
-    .sports-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    
-    .sport-card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--gray-200);
-      transition: all var(--transition-normal);
-    }
-    
-    .sport-card:hover {
-      transform: translateY(-8px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--primary-color);
-    }
-    
-    .sport-icon {
-      width: 64px;
-      height: 64px;
-      background: var(--primary-gradient);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-      color: var(--white);
-      font-size: 1.5rem;
-      transition: transform var(--transition-normal);
-    }
-    
-    .sport-card:hover .sport-icon {
-      transform: scale(1.1);
-    }
-    
-    .sport-card h4 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--gray-900);
-      margin-bottom: 0.75rem;
-    }
-    
-    .sport-card p {
-      color: var(--gray-600);
-      font-size: 0.875rem;
-      line-height: 1.5;
-    }
-    
-    /* Enhanced About Section */
-    .about-section {
-      background: var(--gray-100);
-      padding: 5rem 0;
-    }
-    
-    .about-content {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    
-    .about-story {
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-    
-    .about-story h3 {
-      font-size: 2rem;
-      color: var(--gray-900);
-      margin-bottom: 1.5rem;
-      font-family: var(--font-heading);
-    }
-    
-    .about-story p {
-      font-size: 1.125rem;
-      color: var(--gray-700);
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .about-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-      margin-bottom: 4rem;
-    }
-    
-    .about-card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow-md);
-      transition: transform var(--transition-normal);
-    }
-    
-    .about-card:hover {
-      transform: translateY(-4px);
-    }
-    
-    .about-icon {
-      width: 64px;
-      height: 64px;
-      background: var(--accent-gradient);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-      color: var(--white);
-      font-size: 1.5rem;
-    }
-    
-    .about-card h4 {
-      font-size: 1.25rem;
-      color: var(--gray-900);
-      margin-bottom: 1rem;
-      font-weight: 700;
-    }
-    
-    .about-card p {
-      color: var(--gray-600);
-      line-height: 1.6;
-    }
-    
-    .about-commitment {
-      text-align: center;
-    }
-    
-    .about-commitment h3 {
-      font-size: 1.75rem;
-      color: var(--gray-900);
-      margin-bottom: 1.5rem;
-      font-family: var(--font-heading);
-    }
-    
-    .about-commitment p {
-      font-size: 1.125rem;
-      color: var(--gray-700);
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    /* Enhanced Footer */
-    .footer {
-      background: var(--gray-900);
-      color: var(--gray-300);
-      padding: 4rem 0 2rem;
-    }
-    
-    .footer-content {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-      gap: 3rem;
-      margin-bottom: 3rem;
-    }
-    
-    .footer-brand {
-      max-width: 300px;
-    }
-    
-    .footer-title {
-      color: var(--white);
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      font-family: var(--font-heading);
-    }
-    
-    .footer-description {
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-    
-    .footer-social {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    .social-link {
-      width: 40px;
-      height: 40px;
-      background: var(--gray-800);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gray-300);
-      transition: all var(--transition-normal);
-    }
-    
-    .social-link:hover {
-      background: var(--primary-color);
-      color: var(--white);
-      transform: translateY(-2px);
-    }
-    
-    .footer-heading {
-      color: var(--white);
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-    }
-    
-    .footer-links {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .footer-links li {
-      margin-bottom: 0.75rem;
-    }
-    
-    .footer-links a {
-      color: var(--gray-300);
-      text-decoration: none;
-      transition: color var(--transition-normal);
-    }
-    
-    .footer-links a:hover {
-      color: var(--primary-color);
-    }
-    
-    .footer-bottom {
-      border-top: 1px solid var(--gray-800);
-      padding-top: 2rem;
-    }
-    
-    .footer-bottom-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .footer-badges {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    .footer-badge {
-      background: var(--gray-800);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.875rem;
-      color: var(--gray-300);
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 1024px) {
-      .sports-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .about-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .footer-content {
-        grid-template-columns: 1fr 1fr;
+        display: flex;
         gap: 2rem;
-      }
-      
-      .footer-brand {
-        grid-column: 1 / -1;
-        max-width: none;
-        margin-bottom: 2rem;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-      }
-      
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .sports-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .footer-content {
-        grid-template-columns: 1fr;
-      }
-      
-      .footer-bottom-content {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
-      
-      .footer-badges {
-        justify-content: center;
+        margin-top: 2rem;
         flex-wrap: wrap;
       }
-    }
-  </style>
-  
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "AI Sports Edge",
-      "applicationCategory": "SportsApplication",
-      "operatingSystem": "iOS, Android",
-      "offers": {
-        "@type": "Offer",
-        "price": "19.99",
-        "priceCurrency": "USD"
-      },
-      "description": "AI-powered sports analytics and decision intelligence"
-    }
-  </script>
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" integrity="sha384-Mh8z9e3yCJ0aNEYt4GwJ1FqUQdUDNAUOnBw6C/+7Xzqm0qRatuRYYZ+QQQ/hKY3" crossorigin="anonymous"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
-<!-- Fix for handleAnalyticsButtonClick function -->
-<script>
-  // Initialize cross-platform services for the static HTML page
-  window.crossPlatformSyncService = {
-    hasPurchasedAnalytics: function(gameId) {
-      try {
-        const purchases = JSON.parse(localStorage.getItem('purchasedAnalytics') || '[]');
-        console.log('[CrossPlatformSync] Checking if game is purchased:', gameId, purchases.includes(gameId));
-        return purchases.includes(gameId);
-      } catch (error) {
-        console.error('[CrossPlatformSync] Error checking purchased analytics:', error);
-        return false;
+      .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
-    },
-    recordAnalyticsPurchase: function(gameId) {
-      try {
-        const purchases = JSON.parse(localStorage.getItem('purchasedAnalytics') || '[]');
-        if (!purchases.includes(gameId)) {
-          purchases.push(gameId);
-          localStorage.setItem('purchasedAnalytics', JSON.stringify(purchases));
-          console.log('[CrossPlatformSync] Recorded purchase for game:', gameId);
-          
-          // Dispatch event to notify other components
-          window.dispatchEvent(new CustomEvent('purchasedAnalyticsUpdated', {
-            detail: { purchasedAnalytics: purchases.map(id => ({ gameId: id })) }
-          }));
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-light);
+        font-family: var(--font-heading);
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+      }
+
+      /* Device Mockup */
+      .device-mockup {
+        position: relative;
+        max-width: 300px;
+        margin: 0 auto;
+      }
+
+      .device-screen {
+        width: 100%;
+        height: 600px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .device-frame {
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        right: -12px;
+        bottom: -12px;
+        border: 12px solid var(--gray-900);
+        border-radius: 36px;
+        box-shadow: var(--shadow-lg);
+        z-index: 0;
+      }
+
+      .device-reflection {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        border-radius: 24px;
+        z-index: 2;
+      }
+
+      .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+      }
+
+      .floating-element {
+        position: absolute;
+        background-color: var(--white);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        padding: 1rem;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .stats-card {
+        top: 10%;
+        right: -30%;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation-delay: 0.5s;
+      }
+
+      .prediction-card {
+        bottom: 15%;
+        left: -30%;
+        animation-delay: 1s;
+        text-align: center;
+      }
+
+      .card-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-gradient);
+        color: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+      }
+
+      .card-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-title {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        margin-bottom: 0.25rem;
+      }
+
+      .card-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .card-teams {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+      }
+
+      .card-prediction {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--success-color);
+      }
+
+      /* Enhanced News Feed */
+      .hero-news {
+        margin-top: 3rem;
+      }
+
+      .news-feed-enhanced {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .news-feed-title {
+        color: var(--white);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .news-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .news-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        transition: all var(--transition-normal);
+      }
+
+      .news-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(8px);
+      }
+
+      .news-date {
+        background: var(--accent-color);
+        color: var(--gray-900);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      .news-headline {
+        color: var(--white);
+        flex: 1;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      .news-badge {
+        background: var(--primary-color);
+        color: var(--white);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .news-more {
+        color: var(--accent-light);
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all var(--transition-normal);
+      }
+
+      .news-more:hover {
+        color: var(--white);
+        transform: translateX(4px);
+      }
+
+      /* Mobile Menu Styles */
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--gray-700);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color var(--transition-normal);
+      }
+
+      .mobile-menu-toggle:hover {
+        color: var(--primary-color);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .mobile-menu-toggle {
+          display: block;
         }
-      } catch (error) {
-        console.error('[CrossPlatformSync] Error recording purchase:', error);
-      }
-    }
-  };
 
-  // Analytics service for tracking events
-  window.analyticsService = {
-    trackEvent: function(eventName, data) {
-      console.log(`[Analytics] ${eventName}:`, data);
-      // In a real implementation, this would send data to an analytics service
-    },
-    trackUserAction: function(action, data) {
-      console.log(`[Analytics] User Action - ${action}:`, data);
-      // In a real implementation, this would send data to an analytics service
-    }
-  };
+        .nav-list {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: var(--white);
+          box-shadow: var(--shadow-lg);
+          flex-direction: column;
+          padding: 1rem 0;
+          transform: translateY(-10px);
+          opacity: 0;
+          visibility: hidden;
+          transition: all var(--transition-normal);
+        }
 
-  // Sports decision tracking service for analytics
-  window.sportsAnalyticsService = {
-    trackButtonClick: function(location, affiliateId, gameId, userId, eventId) {
-      console.log(`[Affiliate] Button click:`, { location, affiliateId, gameId, userId, eventId });
-      // In a real implementation, this would send data to an affiliate tracking service
-    },
-    trackConversion: function(type, value, userId) {
-      console.log(`[Affiliate] Conversion:`, { type, value, userId });
-      // In a real implementation, this would send data to an affiliate tracking service
-    }
-  };
+        .nav-list.active {
+          transform: translateY(0);
+          opacity: 1;
+          visibility: visible;
+        }
 
-  // Handle analytics button clicks
-  window.handleAnalyticsButtonClick = function(button, gameId, homeTeam, awayTeam) {
-    console.log('[AnalyticsButton] Button clicked for game:', { gameId, homeTeam, awayTeam });
-    
-    // Check if already purchased
-    const isPurchased = window.crossPlatformSyncService.hasPurchasedAnalytics(gameId);
-    
-    if (isPurchased) {
-      console.log('[AnalyticsButton] Game already purchased, redirecting to FanDuel');
-      // Open FanDuel in a new tab
-      const affiliateUrl = `https://sportsbook.fanduel.com/?aff_id=PLACEHOLDER_AFFILIATE_ID&subId=user123-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=analyticsbutton&utm_content=web`;
-      window.open(affiliateUrl, '_blank');
-      
-      // Track affiliate click
-      if (window.sportsAnalyticsService) {
-        window.sportsAnalyticsService.trackButtonClick('analytics_button', 'PLACEHOLDER_AFFILIATE_ID', gameId, 'user123', gameId);
+        .nav-item {
+          margin: 0;
+          padding: 0.5rem 1rem;
+        }
+
+        .nav-item a {
+          display: block;
+          padding: 0.5rem;
+        }
+
+        .header-content {
+          position: relative;
+        }
+        .hero-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 2rem;
+        }
+
+        .hero-stats {
+          justify-content: center;
+        }
+
+        .device-mockup {
+          max-width: 250px;
+        }
+
+        .stats-card,
+        .prediction-card {
+          display: none;
+        }
+
+        .news-items {
+          gap: 0.75rem;
+        }
+
+        .news-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
       }
-    } else {
-      console.log('[AnalyticsButton] Game not purchased, simulating payment');
-      
-      // Track analytics event
-      if (window.analyticsService) {
-        window.analyticsService.trackEvent('analytics_purchase_initiated', {
-          gameId: gameId,
-          userId: 'user123',
-          timestamp: Date.now(),
-        });
+
+      /* Enhanced Section Styles */
+      .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
       }
-      
-      // Change button text to show loading
-      const originalText = button.textContent.trim();
-      button.innerHTML = '<div class="analytics-button__spinner"></div>';
-      button.disabled = true;
-      
-      // Simulate payment processing
-      setTimeout(function() {
-        // Record purchase
-        window.crossPlatformSyncService.recordAnalyticsPurchase(gameId);
-        
-        // Update button
-        button.innerHTML = 'ANALYZE NOW';
-        button.disabled = false;
-        button.classList.add('analyze-now-button');
-        
-        // Track successful purchase
-        if (window.analyticsService) {
-          window.analyticsService.trackEvent('analytics_purchase_completed', {
-            gameId: gameId,
-            userId: 'user123',
-            price: 199, // $1.99
-            timestamp: Date.now(),
+
+      .section-header h2 {
+        font-family: var(--font-heading);
+        font-size: 2.5rem;
+        color: var(--gray-900);
+        margin-bottom: 1rem;
+      }
+
+      .section-header p {
+        font-size: 1.25rem;
+        color: var(--gray-600);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Statistics Bar */
+      .statistics-bar {
+        background: var(--white);
+        padding: 3rem 0;
+        border-bottom: 1px solid var(--gray-200);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        text-align: center;
+      }
+
+      .stat-item {
+        padding: 2rem 1rem;
+      }
+
+      .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        font-family: var(--font-heading);
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        font-size: 1rem;
+        color: var(--gray-600);
+        font-weight: 500;
+      }
+
+      /* Core Features Section */
+      .core-features {
+        background: var(--gray-100);
+        padding: 5rem 0;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      /* Sports Coverage Section */
+      .sports-coverage {
+        background: var(--white);
+        padding: 5rem 0;
+      }
+
+      .sports-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      .sport-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+        transition: all var(--transition-normal);
+      }
+
+      .sport-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
+      }
+
+      .sport-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--white);
+        font-size: 1.5rem;
+        transition: transform var(--transition-normal);
+      }
+
+      .sport-card:hover .sport-icon {
+        transform: scale(1.1);
+      }
+
+      .sport-card h4 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.75rem;
+      }
+
+      .sport-card p {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+
+      /* Enhanced About Section */
+      .about-section {
+        background: var(--gray-100);
+        padding: 5rem 0;
+      }
+
+      .about-content {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .about-story {
+        text-align: center;
+        margin-bottom: 4rem;
+      }
+
+      .about-story h3 {
+        font-size: 2rem;
+        color: var(--gray-900);
+        margin-bottom: 1.5rem;
+        font-family: var(--font-heading);
+      }
+
+      .about-story p {
+        font-size: 1.125rem;
+        color: var(--gray-700);
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .about-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-bottom: 4rem;
+      }
+
+      .about-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        transition: transform var(--transition-normal);
+      }
+
+      .about-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .about-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--accent-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--white);
+        font-size: 1.5rem;
+      }
+
+      .about-card h4 {
+        font-size: 1.25rem;
+        color: var(--gray-900);
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      .about-card p {
+        color: var(--gray-600);
+        line-height: 1.6;
+      }
+
+      .about-commitment {
+        text-align: center;
+      }
+
+      .about-commitment h3 {
+        font-size: 1.75rem;
+        color: var(--gray-900);
+        margin-bottom: 1.5rem;
+        font-family: var(--font-heading);
+      }
+
+      .about-commitment p {
+        font-size: 1.125rem;
+        color: var(--gray-700);
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Enhanced Footer */
+      .footer {
+        background: var(--gray-900);
+        color: var(--gray-300);
+        padding: 4rem 0 2rem;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+      }
+
+      .footer-brand {
+        max-width: 300px;
+      }
+
+      .footer-title {
+        color: var(--white);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        font-family: var(--font-heading);
+      }
+
+      .footer-description {
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-social {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .social-link {
+        width: 40px;
+        height: 40px;
+        background: var(--gray-800);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-300);
+        transition: all var(--transition-normal);
+      }
+
+      .social-link:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        transform: translateY(-2px);
+      }
+
+      .footer-heading {
+        color: var(--white);
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .footer-links li {
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-links a {
+        color: var(--gray-300);
+        text-decoration: none;
+        transition: color var(--transition-normal);
+      }
+
+      .footer-links a:hover {
+        color: var(--primary-color);
+      }
+
+      .footer-bottom {
+        border-top: 1px solid var(--gray-800);
+        padding-top: 2rem;
+      }
+
+      .footer-bottom-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .footer-badges {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .footer-badge {
+        background: var(--gray-800);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        color: var(--gray-300);
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 1024px) {
+        .sports-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .about-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-content {
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+        }
+
+        .footer-brand {
+          grid-column: 1 / -1;
+          max-width: none;
+          margin-bottom: 2rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sports-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-content {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-bottom-content {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+
+        .footer-badges {
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "AI Sports Edge",
+        "applicationCategory": "SportsApplication",
+        "operatingSystem": "iOS, Android",
+        "offers": {
+          "@type": "Offer",
+          "price": "19.99",
+          "priceCurrency": "USD"
+        },
+        "description": "AI-powered sports analytics and decision intelligence"
+      }
+    </script>
+
+    <!-- Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+      integrity="sha384-Mh8z9e3yCJ0aNEYt4GwJ1FqUQdUDNAUOnBw6C/+7Xzqm0qRatuRYYZ+QQQ/hKY3"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <!-- Fix for handleAnalyticsButtonClick function -->
+    <script>
+      // Initialize cross-platform services for the static HTML page
+      window.crossPlatformSyncService = {
+        hasPurchasedAnalytics: function (gameId) {
+          try {
+            const purchases = JSON.parse(localStorage.getItem('purchasedAnalytics') || '[]');
+            console.log(
+              '[CrossPlatformSync] Checking if game is purchased:',
+              gameId,
+              purchases.includes(gameId)
+            );
+            return purchases.includes(gameId);
+          } catch (error) {
+            console.error('[CrossPlatformSync] Error checking purchased analytics:', error);
+            return false;
+          }
+        },
+        recordAnalyticsPurchase: function (gameId) {
+          try {
+            const purchases = JSON.parse(localStorage.getItem('purchasedAnalytics') || '[]');
+            if (!purchases.includes(gameId)) {
+              purchases.push(gameId);
+              localStorage.setItem('purchasedAnalytics', JSON.stringify(purchases));
+              console.log('[CrossPlatformSync] Recorded purchase for game:', gameId);
+
+              // Dispatch event to notify other components
+              window.dispatchEvent(
+                new CustomEvent('purchasedAnalyticsUpdated', {
+                  detail: { purchasedAnalytics: purchases.map(id => ({ gameId: id })) },
+                })
+              );
+            }
+          } catch (error) {
+            console.error('[CrossPlatformSync] Error recording purchase:', error);
+          }
+        },
+      };
+
+      // Analytics service for tracking events
+      window.analyticsService = {
+        trackEvent: function (eventName, data) {
+          console.log(`[Analytics] ${eventName}:`, data);
+          // In a real implementation, this would send data to an analytics service
+        },
+        trackUserAction: function (action, data) {
+          console.log(`[Analytics] User Action - ${action}:`, data);
+          // In a real implementation, this would send data to an analytics service
+        },
+      };
+
+      // Sports decision tracking service for analytics
+      window.sportsAnalyticsService = {
+        trackButtonClick: function (location, affiliateId, gameId, userId, eventId) {
+          console.log(`[Affiliate] Button click:`, {
+            location,
+            affiliateId,
+            gameId,
+            userId,
+            eventId,
           });
+          // In a real implementation, this would send data to an affiliate tracking service
+        },
+        trackConversion: function (type, value, userId) {
+          console.log(`[Affiliate] Conversion:`, { type, value, userId });
+          // In a real implementation, this would send data to an affiliate tracking service
+        },
+      };
+
+      // Handle analytics button clicks
+      window.handleAnalyticsButtonClick = function (button, gameId, homeTeam, awayTeam) {
+        console.log('[AnalyticsButton] Button clicked for game:', { gameId, homeTeam, awayTeam });
+
+        // Check if already purchased
+        const isPurchased = window.crossPlatformSyncService.hasPurchasedAnalytics(gameId);
+
+        if (isPurchased) {
+          console.log('[AnalyticsButton] Game already purchased, redirecting to FanDuel');
+          // Open FanDuel in a new tab
+          const affiliateUrl = `https://sportsbook.fanduel.com/?aff_id=PLACEHOLDER_AFFILIATE_ID&subId=user123-${gameId}&utm_source=aisportsedge&utm_medium=affiliate&utm_campaign=analyticsbutton&utm_content=web`;
+          window.open(affiliateUrl, '_blank');
+
+          // Track affiliate click
+          if (window.sportsAnalyticsService) {
+            window.sportsAnalyticsService.trackButtonClick(
+              'analytics_button',
+              'PLACEHOLDER_AFFILIATE_ID',
+              gameId,
+              'user123',
+              gameId
+            );
+          }
+        } else {
+          console.log('[AnalyticsButton] Game not purchased, simulating payment');
+
+          // Track analytics event
+          if (window.analyticsService) {
+            window.analyticsService.trackEvent('analytics_purchase_initiated', {
+              gameId: gameId,
+              userId: 'user123',
+              timestamp: Date.now(),
+            });
+          }
+
+          // Change button text to show loading
+          const originalText = button.textContent.trim();
+          button.innerHTML = '<div class="analytics-button__spinner"></div>';
+          button.disabled = true;
+
+          // Simulate payment processing
+          setTimeout(function () {
+            // Record purchase
+            window.crossPlatformSyncService.recordAnalyticsPurchase(gameId);
+
+            // Update button
+            button.innerHTML = 'ANALYZE NOW';
+            button.disabled = false;
+            button.classList.add('analyze-now-button');
+
+            // Track successful purchase
+            if (window.analyticsService) {
+              window.analyticsService.trackEvent('analytics_purchase_completed', {
+                gameId: gameId,
+                userId: 'user123',
+                price: 199, // $1.99
+                timestamp: Date.now(),
+              });
+            }
+
+            // Show popup
+            alert(
+              `Your analytics are ready! Access insights now for the best experience.\n\nGame: ${homeTeam} vs ${awayTeam}`
+            );
+          }, 1500);
         }
-        
-        // Show popup
-        alert(`Your analytics are ready! Access insights now for the best experience.\n\nGame: ${homeTeam} vs ${awayTeam}`);
-      }, 1500);
-    }
-  };
-</script>
+      };
+    </script>
 
     <script src="/register-service-worker.js"></script>
-</head>
-<body>
-  <div id="app-content" style="display: block;">
-    <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <a href="/" class="logo">
-            <img src="/ai_logo_new.svg" alt="AI Sports Edge Logo" style="width: 40px; height: 40px;">
-            <span>AI Sports Edge</span>
-          </a>
-          <nav class="nav">
-            <ul class="nav-list">
-              <li class="nav-item"><a href="/" class="active">Home</a></li>
-              <li class="nav-item"><a href="#features">Features</a></li>
-              <li class="nav-item"><a href="pricing.html">Pricing</a></li>
-              <li class="nav-item"><a href="about.html">About</a></li>
-              <li class="nav-item"><a href="contact.html">Contact</a></li>
-              <li class="nav-item"><a href="login.html">Login</a></li>
-              <li class="nav-item"><a href="#download" class="download-button">
-                <i class="fas fa-download"></i> Download
-              </a></li>
-            </ul>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
-              <i class="fas fa-bars"></i>
-            </button>
-          </nav>
+  </head>
+  <body>
+    <div id="app-content" style="display: block">
+      <header class="header">
+        <div class="container">
+          <div class="header-content">
+            <a href="/" class="logo">
+              <img
+                src="/ai_logo_new.svg"
+                alt="AI Sports Edge Logo"
+                style="width: 40px; height: 40px"
+              />
+              <span>AI Sports Edge</span>
+            </a>
+            <nav class="nav">
+              <ul class="nav-list">
+                <li class="nav-item"><a href="/" class="active">Home</a></li>
+                <li class="nav-item"><a href="#features">Features</a></li>
+                <li class="nav-item"><a href="pricing.html">Pricing</a></li>
+                <li class="nav-item"><a href="about.html">About</a></li>
+                <li class="nav-item"><a href="contact.html">Contact</a></li>
+                <li class="nav-item"><a href="login.html">Login</a></li>
+                <li class="nav-item">
+                  <a href="#download" class="download-button">
+                    <i class="fas fa-download"></i> Download
+                  </a>
+                </li>
+              </ul>
+              <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                <i class="fas fa-bars"></i>
+              </button>
+            </nav>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <!-- Simplified Hero Section -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero-content">
-          <div class="hero-text" data-aos="fade-right">
-            <h1>AI-Powered Sports Analytics Platform</h1>
-            <p class="hero-subtitle">
-              Get accurate analytics, predictions, and insights for smarter sports decisions with advanced AI technology.
+      <!-- Simplified Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-text" data-aos="fade-right">
+              <h1>AI-Powered Sports Analytics Platform</h1>
+              <p class="hero-subtitle">
+                Get accurate analytics, predictions, and insights for smarter sports decisions with
+                advanced AI technology.
+              </p>
+              <div class="hero-cta">
+                <a href="#download" class="button primary-button">
+                  <i class="fas fa-download"></i> Download App
+                </a>
+              </div>
+            </div>
+
+            <!-- Clean Device Mockup -->
+            <div class="hero-image" data-aos="fade-left" data-aos-delay="300">
+              <div class="device-mockup">
+                <div class="device-frame"></div>
+                <div class="device-screen">
+                  <img
+                    src="/ai_logo_new.svg"
+                    alt="AI Sports Edge App"
+                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 24px"
+                  />
+                </div>
+                <div class="device-reflection"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statistics Bar Section -->
+      <section class="statistics-bar" data-aos="fade-up">
+        <div class="container">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">95%</div>
+              <div class="stat-label">Prediction Accuracy</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">50K+</div>
+              <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">25+</div>
+              <div class="stat-label">Sports Covered</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">24/7</div>
+              <div class="stat-label">Live Updates</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Features Section -->
+      <section id="features" class="core-features">
+        <div class="container">
+          <div class="section-header" data-aos="fade-up">
+            <h2>Why Choose AI Sports Edge?</h2>
+            <p>
+              Discover the powerful features that make our sports analytics and decision
+              intelligence the most accurate in the industry."
             </p>
-            <div class="hero-cta">
-              <a href="#download" class="button primary-button">
-                <i class="fas fa-download"></i> Download App
-              </a>
-            </div>
           </div>
-          
-          <!-- Clean Device Mockup -->
-          <div class="hero-image" data-aos="fade-left" data-aos-delay="300">
-            <div class="device-mockup">
-              <div class="device-frame"></div>
-              <div class="device-screen">
-                <img src="/ai_logo_new.svg" alt="AI Sports Edge App" style="width: 100%; height: 100%; object-fit: cover; border-radius: 24px;">
+          <div class="features-grid">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+              <div class="feature-icon">
+                <i class="fas fa-brain"></i>
               </div>
-              <div class="device-reflection"></div>
+              <h3>AI Predictions</h3>
+              <p>
+                Advanced machine learning algorithms analyze vast amounts of data to provide
+                accurate sports analytics and insights.
+              </p>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Statistics Bar Section -->
-    <section class="statistics-bar" data-aos="fade-up">
-      <div class="container">
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-number">95%</div>
-            <div class="stat-label">Prediction Accuracy</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">50K+</div>
-            <div class="stat-label">Active Users</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">25+</div>
-            <div class="stat-label">Sports Covered</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">24/7</div>
-            <div class="stat-label">Live Updates</div>
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Core Features Section -->
-    <section id="features" class="core-features">
-      <div class="container">
-        <div class="section-header" data-aos="fade-up">
-          <h2>Why Choose AI Sports Edge?</h2>
-          <p>Discover the powerful features that make our sports analytics and decision intelligence the most accurate in the industry."
-        </div>
-        <div class="features-grid">
-          <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-            <div class="feature-icon">
-              <i class="fas fa-brain"></i>
-            </div>
-            <h3>AI Predictions</h3>
-            <p>Advanced machine learning algorithms analyze vast amounts of data to provide accurate sports analytics and insights.</p>
-          </div>
-          
-          <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-            <div class="feature-icon">
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <h3>Real-Time Analytics</h3>
-            <p>Get up-to-the-minute stats, data, and analysis to make informed sports decisions.</p>
-          </div>
-          
-          <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
-            <div class="feature-icon">
-              <i class="fas fa-globe"></i>
-            </div>
-            <h3>Multi-Sport Coverage</h3>
-            <p>From NFL to Formula 1, we cover all major sports with specialized prediction models for each.</p>
-          </div>
-          
-          <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
-            <div class="feature-icon">
-              <i class="fas fa-users"></i>
-            </div>
-            <h3>Community Insights</h3>
-            <p>Connect with other sports enthusiasts, share insights, and learn from the community's collective knowledge.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Sports Coverage Section -->
-    <section class="sports-coverage">
-      <div class="container">
-        <div class="section-header" data-aos="fade-up">
-          <h2>Comprehensive Sports Coverage</h2>
-          <p>Specialized AI models for every major sport, delivering precise predictions across all leagues and events.</p>
-        </div>
-        <div class="sports-grid">
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="100">
-            <div class="sport-icon">
-              <i class="fas fa-football-ball"></i>
-            </div>
-            <h4>NFL</h4>
-            <p>Point spreads, over/unders, player props</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="150">
-            <div class="sport-icon">
-              <i class="fas fa-basketball-ball"></i>
-            </div>
-            <h4>NBA</h4>
-            <p>Game winners, point totals, player performance</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="200">
-            <div class="sport-icon">
-              <i class="fas fa-baseball-ball"></i>
-            </div>
-            <h4>MLB</h4>
-            <p>Moneylines, run totals, pitcher analysis</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="250">
-            <div class="sport-icon">
-              <i class="fas fa-hockey-puck"></i>
-            </div>
-            <h4>NHL</h4>
-            <p>Puck lines, goal totals, power play predictions</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="300">
-            <div class="sport-icon">
-              <i class="fas fa-futbol"></i>
-            </div>
-            <h4>Soccer</h4>
-            <p>Match results, goal totals, corner kicks</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="350">
-            <div class="sport-icon">
-              <i class="fas fa-flag-checkered"></i>
-            </div>
-            <h4>Formula 1</h4>
-            <p>Race winners, podium finishes, qualifying results</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="400">
-            <div class="sport-icon">
-              <i class="fas fa-fist-raised"></i>
-            </div>
-            <h4>UFC/MMA</h4>
-            <p>Fight outcomes, method of victory, round predictions</p>
-          </div>
-          <div class="sport-card" data-aos="zoom-in" data-aos-delay="450">
-            <div class="sport-icon">
-              <i class="fas fa-horse"></i>
-            </div>
-            <h4>Horse Racing</h4>
-            <p>Race winners, exactas, trifectas</p>
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <section id="pricing" class="pricing-section">
-      <div class="container">
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
-        <p class="section-subtitle">Choose the plan that fits your sports analytics needs and budget.</p>
-        
-        <div class="pricing-grid">
-          <div class="pricing-card popular">
-            <div class="popular-badge">Most Popular</div>
-            <div class="pricing-header">
-              <h3>Insight</h3>
-              <p class="pricing-price">$19.99<span>/month</span></p>
-            </div>
-            <div class="pricing-features">
-              <ul>
-                <li>AI-powered sports predictions</li>
-                <li>Basic analytics dashboard</li>
-                <li>Daily picks for major sports</li>
-                <li>Community access</li>
-                <li>Real-time odds tracking</li>
-                <li>Basic portfolio management</li>
-              </ul>
-            </div>
-            <div class="pricing-cta">
-              <a href="#download" class="button primary-button">Choose Plan</a>
-            </div>
-          </div>
-          
-          <div class="pricing-card">
-            <div class="pricing-header">
-              <h3>Analyst</h3>
-              <p class="pricing-price">$74.99<span>/month</span></p>
-            </div>
-            <div class="pricing-features">
-              <ul>
-                <li>Advanced AI predictions</li>
-                <li>Comprehensive analytics suite</li>
-                <li>All major sports coverage</li>
-                <li>Player prop predictions</li>
-                <li>Advanced portfolio tools</li>
-                <li>Historical trend analysis</li>
-                <li>Priority customer support</li>
-              </ul>
-            </div>
-            <div class="pricing-cta">
-              <a href="#download" class="button primary-button">Choose Plan</a>
-            </div>
-          </div>
-          
-          <div class="pricing-card">
-            <div class="pricing-header">
-              <h3>Edge Collective</h3>
-              <p class="pricing-price">$189.99<span>/month</span></p>
-            </div>
-            <div class="pricing-features">
-              <ul>
-                <li>Premium AI predictions</li>
-                <li>All sports + niche markets</li>
-                <li>VIP community access</li>
-                <li>Custom analytics strategies</li>
-                <li>Advanced portfolio management</li>
-                <li>Personalized insights</li>
-                <li>Direct expert consultation</li>
-                <li>White-glove support</li>
-              </ul>
-            </div>
-            <div class="pricing-cta">
-              <a href="#download" class="button primary-button">Choose Plan</a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="annual-discount">
-          <h3>Save 20% with Annual Plans</h3>
-          <p>Get two months free when you subscribe to an annual plan.</p>
-          <a href="#download" class="button primary-button">View Annual Plans</a>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Enhanced About Section -->
-    <section id="about" class="about-section">
-      <div class="container">
-        <div class="section-header" data-aos="fade-up">
-          <h2>About AI Sports Edge</h2>
-          <p>Revolutionizing sports analytics with artificial intelligence and data science.</p>
-        </div>
-        
-        <div class="about-content">
-          <div class="about-story" data-aos="fade-up" data-aos-delay="100">
-            <h3>Our Mission</h3>
-            <p>At AI Sports Edge, we believe that sports decisions should be powered by intelligence and data. Our mission is to democratize access to professional-grade sports analytics and AI-driven insights, giving every sports enthusiast the tools to make smarter, more informed decisions.</p>
-            <p>We've built the most advanced sports analytics platform by combining machine learning, statistical modeling, and real-time data analysis to deliver unprecedented accuracy in sports insights.</p>
-          </div>
-          
-          <div class="about-grid">
-            <div class="about-card" data-aos="fade-up" data-aos-delay="200">
-              <div class="about-icon">
-                <i class="fas fa-users"></i>
-              </div>
-              <h4>Expert Team</h4>
-              <p>Our team consists of data scientists, former professional athletes, and sports analytics experts who understand both the technical and strategic aspects of sports prediction.</p>
-            </div>
-            
-            <div class="about-card" data-aos="fade-up" data-aos-delay="300">
-              <div class="about-icon">
-                <i class="fas fa-shield-alt"></i>
-              </div>
-              <h4>Trusted Platform</h4>
-              <p>With enterprise-grade security and transparent methodologies, we've built a platform that over 50,000 users trust with their sports decisions every day.</p>
-            </div>
-            
-            <div class="about-card" data-aos="fade-up" data-aos-delay="400">
-              <div class="about-icon">
+
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+              <div class="feature-icon">
                 <i class="fas fa-chart-line"></i>
               </div>
-              <h4>Proven Results</h4>
-              <p>Our AI models have achieved a 95% prediction accuracy rate across all major sports, consistently outperforming traditional analysis methods and expert predictions.</p>
+              <h3>Real-Time Analytics</h3>
+              <p>
+                Get up-to-the-minute stats, data, and analysis to make informed sports decisions.
+              </p>
             </div>
-          </div>
-          
-          <div class="about-commitment" data-aos="fade-up" data-aos-delay="500">
-            <h3>Why Trust AI Sports Edge?</h3>
-            <p>We're committed to responsible sports analytics and transparency. Every prediction comes with detailed analysis and confidence intervals, so you understand exactly how our AI reached its conclusions. Our algorithms are continuously improved based on real-world results, ensuring you always have access to the most accurate predictions available.</p>
-            <p>Join thousands of successful users who have transformed their approach to sports analytics with AI Sports Edge. Experience the future of intelligent sports decision-making today.</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <section id="live-analytics" class="app-section">
-      <div class="container">
-        <h2 class="section-title">Live Analytics & Predictions</h2>
-        <p class="section-subtitle">Get AI-powered insights for upcoming games. Access premium analytics to see our detailed predictions and analysis.</p>
-        
-        <div class="games-grid">
-          <!-- Game Card 1 -->
-          <div class="game-card">
-            <div class="game-header">
-              <span class="game-sport">NFL</span>
-              <span class="game-time">Tomorrow, 3:30 PM</span>
-            </div>
-            
-            <div class="game-teams">
-              <div class="team home">
-                <span class="team-name">Kansas City Chiefs</span>
-                <span class="team-score">24</span>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+              <div class="feature-icon">
+                <i class="fas fa-globe"></i>
               </div>
-              <div class="vs">VS</div>
-              <div class="team away">
-                <span class="team-name">San Francisco 49ers</span>
-                <span class="team-score">17</span>
-              </div>
+              <h3>Multi-Sport Coverage</h3>
+              <p>
+                From NFL to Formula 1, we cover all major sports with specialized prediction models
+                for each.
+              </p>
             </div>
-            
-            <div class="game-data">
-              <div class="data-item">
-                <span class="data-label">Spread:</span>
-                <span class="data-value">Chiefs -3.5</span>
-              </div>
-              <div class="data-item">
-                <span class="data-label">Total:</span>
-                <span class="data-value">O/U 49.5</span>
-              </div>
-            </div>
-            
-            <div class="game-actions">
-              <button class="analytics-button analytics-button--medium" onclick="handleAnalyticsButtonClick(this, 'game1', 'Kansas City Chiefs', 'San Francisco 49ers')">
-                Get Analytics
-              </button>
-            </div>
-          </div>
-          
-          <!-- Game Card 2 -->
-          <div class="game-card">
-            <div class="game-header">
-              <span class="game-sport">NBA</span>
-              <span class="game-time">2 days from now, 7:00 PM</span>
-            </div>
-            
-            <div class="game-teams">
-              <div class="team home">
-                <span class="team-name">Los Angeles Lakers</span>
-                <span class="team-score">112</span>
-              </div>
-              <div class="vs">VS</div>
-              <div class="team away">
-                <span class="team-name">Boston Celtics</span>
-                <span class="team-score">108</span>
-              </div>
-            </div>
-            
-            <div class="game-data">
-              <div class="data-item">
-                <span class="data-label">Spread:</span>
-                <span class="data-value">Lakers -2.5</span>
-              </div>
-              <div class="data-item">
-                <span class="data-label">Total:</span>
-                <span class="data-value">O/U 220.5</span>
-              </div>
-            </div>
-            
-            <div class="game-actions">
-              <button class="analytics-button analytics-button--medium" onclick="handleAnalyticsButtonClick(this, 'game2', 'Los Angeles Lakers', 'Boston Celtics')">
-                Get Analytics
-              </button>
-            </div>
-          </div>
-          
-          <!-- Game Card 3 -->
-          <div class="game-card">
-            <div class="game-header">
-              <span class="game-sport">MLB</span>
-              <span class="game-time">3 days from now, 1:05 PM</span>
-            </div>
-            
-            <div class="game-teams">
-              <div class="team home">
-                <span class="team-name">New York Yankees</span>
-                <span class="team-score">5</span>
-              </div>
-              <div class="vs">VS</div>
-              <div class="team away">
-                <span class="team-name">Boston Red Sox</span>
-                <span class="team-score">3</span>
-              </div>
-            </div>
-            
-            <div class="game-data">
-              <div class="data-item">
-                <span class="data-label">Spread:</span>
-                <span class="data-value">Yankees -1.5</span>
-              </div>
-              <div class="data-item">
-                <span class="data-label">Total:</span>
-                <span class="data-value">O/U 8.5</span>
-              </div>
-            </div>
-            
-            <div class="game-actions">
-              <button class="analytics-button analytics-button--medium" onclick="handleAnalyticsButtonClick(this, 'game3', 'New York Yankees', 'Boston Red Sox')">
-                Get Analytics
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="analytics-cta">
-          <h2>Want More Predictions?</h2>
-          <p>Download our mobile app for comprehensive coverage and advanced features.</p>
-          <a href="#download" class="button primary-button">Download App</a>
-        </div>
-      </div>
-    </section>
-    
-    <section id="download" class="download-section">
-      <div class="container">
-        <h2 class="section-title">Download AI Sports Edge</h2>
-        <p class="section-subtitle">Get started with AI-powered sports analytics today.</p>
-        
-        <div class="download-options">
-          <div class="qr-code">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=exp://exp.host/@aisportsedge/ai-sports-edge" alt="Expo Go QR Code">
-            <p>Scan with your phone camera or Expo Go app</p>
-          </div>
-          
-          <div class="download-steps">
-            <div class="step">
-              <div class="step-number">1</div>
-              <p>Download <a href="https://expo.dev/client" target="_blank">Expo Go</a> from the App Store or Google Play</p>
-            </div>
-            <div class="step">
-              <div class="step-number">2</div>
-              <p>Open Expo Go and scan the QR code</p>
-            </div>
-            <div class="step">
-              <div class="step-number">3</div>
-              <p>Enjoy AI Sports Edge with all features enabled</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="download-button-container">
-          <a href="exp://exp.host/@aisportsedge/ai-sports-edge" class="button primary-button">Open in Expo Go</a>
-        </div>
-      </div>
-    </section>
 
-    <!-- Enhanced Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-section footer-brand">
-            <h3 class="footer-title">
-              <img src="/ai_logo_new.svg" alt="AI Sports Edge" style="width: 32px; height: 32px; margin-right: 8px;">
-              AI Sports Edge
-            </h3>
-            <p class="footer-description">
-              Your ultimate sports analytics companion powered by AI. Get predictions, analytics, and insights for smarter sports decisions.
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+              <div class="feature-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <h3>Community Insights</h3>
+              <p>
+                Connect with other sports enthusiasts, share insights, and learn from the
+                community's collective knowledge.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sports Coverage Section -->
+      <section class="sports-coverage">
+        <div class="container">
+          <div class="section-header" data-aos="fade-up">
+            <h2>Comprehensive Sports Coverage</h2>
+            <p>
+              Specialized AI models for every major sport, delivering precise predictions across all
+              leagues and events.
             </p>
-            <div class="footer-social">
-              <a href="#" class="social-link" aria-label="Follow us on Twitter">
-                <i class="fab fa-twitter"></i>
-              </a>
-              <a href="#" class="social-link" aria-label="Follow us on Facebook">
-                <i class="fab fa-facebook"></i>
-              </a>
-              <a href="#" class="social-link" aria-label="Follow us on Instagram">
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a href="#" class="social-link" aria-label="Connect on LinkedIn">
-                <i class="fab fa-linkedin"></i>
-              </a>
+          </div>
+          <div class="sports-grid">
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="100">
+              <div class="sport-icon">
+                <i class="fas fa-football-ball"></i>
+              </div>
+              <h4>NFL</h4>
+              <p>Point spreads, over/unders, player props</p>
             </div>
-          </div>
-          
-          <div class="footer-section">
-            <h4 class="footer-heading">Platform</h4>
-            <ul class="footer-links">
-              <li><a href="#features">Features</a></li>
-              <li><a href="#pricing">Pricing</a></li>
-              <li><a href="#live-analytics">Live Analytics</a></li>
-              <li><a href="#download">Download App</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4 class="footer-heading">Sports</h4>
-            <ul class="footer-links">
-              <li><a href="#">NFL</a></li>
-              <li><a href="#">NBA</a></li>
-              <li><a href="#">MLB</a></li>
-              <li><a href="#">NHL</a></li>
-              <li><a href="#">Soccer</a></li>
-              <li><a href="#">Formula 1</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4 class="footer-heading">Company</h4>
-            <ul class="footer-links">
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Blog</a></li>
-              <li><a href="#">Help Center</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4 class="footer-heading">Legal</h4>
-            <ul class="footer-links">
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">Cookie Policy</a></li>
-              <li><a href="#">Responsible Analytics</a></li>
-              <li><a href="#">Data Protection</a></li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="footer-bottom">
-          <div class="footer-bottom-content">
-            <p>&copy; 2025 AI Sports Edge. All rights reserved.</p>
-            <div class="footer-badges">
-              <span class="footer-badge">🔒 SSL Secured</span>
-              <span class="footer-badge">📱 iOS & Android</span>
-              <span class="footer-badge">🏆 95% Accuracy</span>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="150">
+              <div class="sport-icon">
+                <i class="fas fa-basketball-ball"></i>
+              </div>
+              <h4>NBA</h4>
+              <p>Game winners, point totals, player performance</p>
+            </div>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="200">
+              <div class="sport-icon">
+                <i class="fas fa-baseball-ball"></i>
+              </div>
+              <h4>MLB</h4>
+              <p>Moneylines, run totals, pitcher analysis</p>
+            </div>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="250">
+              <div class="sport-icon">
+                <i class="fas fa-hockey-puck"></i>
+              </div>
+              <h4>NHL</h4>
+              <p>Puck lines, goal totals, power play predictions</p>
+            </div>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="300">
+              <div class="sport-icon">
+                <i class="fas fa-futbol"></i>
+              </div>
+              <h4>Soccer</h4>
+              <p>Match results, goal totals, corner kicks</p>
+            </div>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="350">
+              <div class="sport-icon">
+                <i class="fas fa-flag-checkered"></i>
+              </div>
+              <h4>Formula 1</h4>
+              <p>Race winners, podium finishes, qualifying results</p>
+            </div>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="400">
+              <div class="sport-icon">
+                <i class="fas fa-fist-raised"></i>
+              </div>
+              <h4>UFC/MMA</h4>
+              <p>Fight outcomes, method of victory, round predictions</p>
+            </div>
+            <div class="sport-card" data-aos="zoom-in" data-aos-delay="450">
+              <div class="sport-icon">
+                <i class="fas fa-horse"></i>
+              </div>
+              <h4>Horse Racing</h4>
+              <p>Race winners, exactas, trifectas</p>
             </div>
           </div>
         </div>
-      </div>
-    </footer>
-  </div>
+      </section>
 
-  <!-- Loading spinner while checking auth -->
-  <div id="loading-spinner" style="display: none; justify-content: center; align-items: center; height: 100vh; background-color: #121212;">
-    <div style="width: 50px; height: 50px; border: 3px solid rgba(0, 136, 255, 0.3); border-radius: 50%; border-top-color: #0088ff; animation: spin 1s ease-in-out infinite;"></div>
-  </div>
+      <section id="pricing" class="pricing-section">
+        <div class="container">
+          <h2 class="section-title">Simple, Transparent Pricing</h2>
+          <p class="section-subtitle">
+            Choose the plan that fits your sports analytics needs and budget.
+          </p>
 
-<script>
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw",
-  authDomain: "ai-sports-edge.firebaseapp.com",
-  projectId: "ai-sports-edge",
-  storageBucket: "ai-sports-edge.appspot.com",
-  messagingSenderId: "63216708515",
-  appId: "1:63216708515:web:209e6baf130386edb00816"
-};
+          <div class="pricing-grid">
+            <div class="pricing-card popular">
+              <div class="popular-badge">Most Popular</div>
+              <div class="pricing-header">
+                <h3>Insight</h3>
+                <p class="pricing-price">$19.99<span>/month</span></p>
+              </div>
+              <div class="pricing-features">
+                <ul>
+                  <li>AI-powered sports predictions</li>
+                  <li>Basic analytics dashboard</li>
+                  <li>Daily picks for major sports</li>
+                  <li>Community access</li>
+                  <li>Real-time odds tracking</li>
+                  <li>Basic portfolio management</li>
+                </ul>
+              </div>
+              <div class="pricing-cta">
+                <a href="#download" class="button primary-button">Choose Plan</a>
+              </div>
+            </div>
 
-// Add logging
-console.log("Firebase config:", JSON.stringify(firebaseConfig));
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3>Analyst</h3>
+                <p class="pricing-price">$74.99<span>/month</span></p>
+              </div>
+              <div class="pricing-features">
+                <ul>
+                  <li>Advanced AI predictions</li>
+                  <li>Comprehensive analytics suite</li>
+                  <li>All major sports coverage</li>
+                  <li>Player prop predictions</li>
+                  <li>Advanced portfolio tools</li>
+                  <li>Historical trend analysis</li>
+                  <li>Priority customer support</li>
+                </ul>
+              </div>
+              <div class="pricing-cta">
+                <a href="#download" class="button primary-button">Choose Plan</a>
+              </div>
+            </div>
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3>Edge Collective</h3>
+                <p class="pricing-price">$189.99<span>/month</span></p>
+              </div>
+              <div class="pricing-features">
+                <ul>
+                  <li>Premium AI predictions</li>
+                  <li>All sports + niche markets</li>
+                  <li>VIP community access</li>
+                  <li>Custom analytics strategies</li>
+                  <li>Advanced portfolio management</li>
+                  <li>Personalized insights</li>
+                  <li>Direct expert consultation</li>
+                  <li>White-glove support</li>
+                </ul>
+              </div>
+              <div class="pricing-cta">
+                <a href="#download" class="button primary-button">Choose Plan</a>
+              </div>
+            </div>
+          </div>
 
-// Check authentication state
-firebase.auth().onAuthStateChanged((user) => {
-  // Hide loading spinner
-  document.getElementById('loading-spinner').style.display = 'none';
-  
-  if (user) {
-    // User is signed in, show additional features
-    console.log('User is signed in:', user.email);
-    // Add any authenticated user features here
-  } else {
-    // User is not signed in, show public content
-    console.log('User is not signed in, showing public content');
-    // Content is already visible, no redirect needed
-  }
-});
+          <div class="annual-discount">
+            <h3>Save 20% with Annual Plans</h3>
+            <p>Get two months free when you subscribe to an annual plan.</p>
+            <a href="#download" class="button primary-button">View Annual Plans</a>
+          </div>
+        </div>
+      </section>
 
-// DNS Propagation Check
-document.addEventListener('DOMContentLoaded', function() {
-  // Check if we're on the custom domain
-  const isCustomDomain = window.location.hostname === 'aisportsedge.app';
-  
-  if (!isCustomDomain) {
-    // Create DNS status banner
-    const dnsBanner = document.createElement('div');
-    dnsBanner.className = 'dns-banner';
-    dnsBanner.innerHTML = '<p>⚠️ You are viewing this site on a temporary URL. DNS propagation for aisportsedge.app is in progress.</p>';
-    
-    // Add banner to the top of the body
-    document.body.insertBefore(dnsBanner, document.body.firstChild);
-    
-    // Add banner styles
-    const bannerStyles = document.createElement('style');
-    bannerStyles.textContent = `
+      <!-- Enhanced About Section -->
+      <section id="about" class="about-section">
+        <div class="container">
+          <div class="section-header" data-aos="fade-up">
+            <h2>About AI Sports Edge</h2>
+            <p>Revolutionizing sports analytics with artificial intelligence and data science.</p>
+          </div>
+
+          <div class="about-content">
+            <div class="about-story" data-aos="fade-up" data-aos-delay="100">
+              <h3>Our Mission</h3>
+              <p>
+                At AI Sports Edge, we believe that sports decisions should be powered by
+                intelligence and data. Our mission is to democratize access to professional-grade
+                sports analytics and AI-driven insights, giving every sports enthusiast the tools to
+                make smarter, more informed decisions.
+              </p>
+              <p>
+                We've built the most advanced sports analytics platform by combining machine
+                learning, statistical modeling, and real-time data analysis to deliver unprecedented
+                accuracy in sports insights.
+              </p>
+            </div>
+
+            <div class="about-grid">
+              <div class="about-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="about-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <h4>Expert Team</h4>
+                <p>
+                  Our team consists of data scientists, former professional athletes, and sports
+                  analytics experts who understand both the technical and strategic aspects of
+                  sports prediction.
+                </p>
+              </div>
+
+              <div class="about-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="about-icon">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4>Trusted Platform</h4>
+                <p>
+                  With enterprise-grade security and transparent methodologies, we've built a
+                  platform that over 50,000 users trust with their sports decisions every day.
+                </p>
+              </div>
+
+              <div class="about-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="about-icon">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <h4>Proven Results</h4>
+                <p>
+                  Our AI models have achieved a 95% prediction accuracy rate across all major
+                  sports, consistently outperforming traditional analysis methods and expert
+                  predictions.
+                </p>
+              </div>
+            </div>
+
+            <div class="about-commitment" data-aos="fade-up" data-aos-delay="500">
+              <h3>Why Trust AI Sports Edge?</h3>
+              <p>
+                We're committed to responsible sports analytics and transparency. Every prediction
+                comes with detailed analysis and confidence intervals, so you understand exactly how
+                our AI reached its conclusions. Our algorithms are continuously improved based on
+                real-world results, ensuring you always have access to the most accurate predictions
+                available.
+              </p>
+              <p>
+                Join thousands of successful users who have transformed their approach to sports
+                analytics with AI Sports Edge. Experience the future of intelligent sports
+                decision-making today.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="live-analytics" class="app-section">
+        <div class="container">
+          <h2 class="section-title">Live Analytics & Predictions</h2>
+          <p class="section-subtitle">
+            Get AI-powered insights for upcoming games. Access premium analytics to see our detailed
+            predictions and analysis.
+          </p>
+
+          <div class="games-grid">
+            <!-- Game Card 1 -->
+            <div class="game-card">
+              <div class="game-header">
+                <span class="game-sport">NFL</span>
+                <span class="game-time">Tomorrow, 3:30 PM</span>
+              </div>
+
+              <div class="game-teams">
+                <div class="team home">
+                  <span class="team-name">Kansas City Chiefs</span>
+                  <span class="team-score">24</span>
+                </div>
+                <div class="vs">VS</div>
+                <div class="team away">
+                  <span class="team-name">San Francisco 49ers</span>
+                  <span class="team-score">17</span>
+                </div>
+              </div>
+
+              <div class="game-data">
+                <div class="data-item">
+                  <span class="data-label">Spread:</span>
+                  <span class="data-value">Chiefs -3.5</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Total:</span>
+                  <span class="data-value">O/U 49.5</span>
+                </div>
+              </div>
+
+              <div class="game-actions">
+                <button
+                  class="analytics-button analytics-button--medium"
+                  onclick="handleAnalyticsButtonClick(this, 'game1', 'Kansas City Chiefs', 'San Francisco 49ers')"
+                >
+                  Get Analytics
+                </button>
+              </div>
+            </div>
+
+            <!-- Game Card 2 -->
+            <div class="game-card">
+              <div class="game-header">
+                <span class="game-sport">NBA</span>
+                <span class="game-time">2 days from now, 7:00 PM</span>
+              </div>
+
+              <div class="game-teams">
+                <div class="team home">
+                  <span class="team-name">Los Angeles Lakers</span>
+                  <span class="team-score">112</span>
+                </div>
+                <div class="vs">VS</div>
+                <div class="team away">
+                  <span class="team-name">Boston Celtics</span>
+                  <span class="team-score">108</span>
+                </div>
+              </div>
+
+              <div class="game-data">
+                <div class="data-item">
+                  <span class="data-label">Spread:</span>
+                  <span class="data-value">Lakers -2.5</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Total:</span>
+                  <span class="data-value">O/U 220.5</span>
+                </div>
+              </div>
+
+              <div class="game-actions">
+                <button
+                  class="analytics-button analytics-button--medium"
+                  onclick="handleAnalyticsButtonClick(this, 'game2', 'Los Angeles Lakers', 'Boston Celtics')"
+                >
+                  Get Analytics
+                </button>
+              </div>
+            </div>
+
+            <!-- Game Card 3 -->
+            <div class="game-card">
+              <div class="game-header">
+                <span class="game-sport">MLB</span>
+                <span class="game-time">3 days from now, 1:05 PM</span>
+              </div>
+
+              <div class="game-teams">
+                <div class="team home">
+                  <span class="team-name">New York Yankees</span>
+                  <span class="team-score">5</span>
+                </div>
+                <div class="vs">VS</div>
+                <div class="team away">
+                  <span class="team-name">Boston Red Sox</span>
+                  <span class="team-score">3</span>
+                </div>
+              </div>
+
+              <div class="game-data">
+                <div class="data-item">
+                  <span class="data-label">Spread:</span>
+                  <span class="data-value">Yankees -1.5</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Total:</span>
+                  <span class="data-value">O/U 8.5</span>
+                </div>
+              </div>
+
+              <div class="game-actions">
+                <button
+                  class="analytics-button analytics-button--medium"
+                  onclick="handleAnalyticsButtonClick(this, 'game3', 'New York Yankees', 'Boston Red Sox')"
+                >
+                  Get Analytics
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="analytics-cta">
+            <h2>Want More Predictions?</h2>
+            <p>Download our mobile app for comprehensive coverage and advanced features.</p>
+            <a href="#download" class="button primary-button">Download App</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" class="download-section">
+        <div class="container">
+          <h2 class="section-title">Download AI Sports Edge</h2>
+          <p class="section-subtitle">Get started with AI-powered sports analytics today.</p>
+
+          <div class="download-options">
+            <div class="qr-code">
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=exp://exp.host/@aisportsedge/ai-sports-edge"
+                alt="Expo Go QR Code"
+              />
+              <p>Scan with your phone camera or Expo Go app</p>
+            </div>
+
+            <div class="download-steps">
+              <div class="step">
+                <div class="step-number">1</div>
+                <p>
+                  Download <a href="https://expo.dev/client" target="_blank">Expo Go</a> from the
+                  App Store or Google Play
+                </p>
+              </div>
+              <div class="step">
+                <div class="step-number">2</div>
+                <p>Open Expo Go and scan the QR code</p>
+              </div>
+              <div class="step">
+                <div class="step-number">3</div>
+                <p>Enjoy AI Sports Edge with all features enabled</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="download-button-container">
+            <a href="exp://exp.host/@aisportsedge/ai-sports-edge" class="button primary-button"
+              >Open in Expo Go</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Enhanced Footer -->
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-section footer-brand">
+              <h3 class="footer-title">
+                <img
+                  src="/ai_logo_new.svg"
+                  alt="AI Sports Edge"
+                  style="width: 32px; height: 32px; margin-right: 8px"
+                />
+                AI Sports Edge
+              </h3>
+              <p class="footer-description">
+                Your ultimate sports analytics companion powered by AI. Get predictions, analytics,
+                and insights for smarter sports decisions.
+              </p>
+              <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Follow us on Twitter">
+                  <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Follow us on Facebook">
+                  <i class="fab fa-facebook"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Follow us on Instagram">
+                  <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Connect on LinkedIn">
+                  <i class="fab fa-linkedin"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="footer-section">
+              <h4 class="footer-heading">Platform</h4>
+              <ul class="footer-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#live-analytics">Live Analytics</a></li>
+                <li><a href="#download">Download App</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section">
+              <h4 class="footer-heading">Sports</h4>
+              <ul class="footer-links">
+                <li><a href="#">NFL</a></li>
+                <li><a href="#">NBA</a></li>
+                <li><a href="#">MLB</a></li>
+                <li><a href="#">NHL</a></li>
+                <li><a href="#">Soccer</a></li>
+                <li><a href="#">Formula 1</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section">
+              <h4 class="footer-heading">Company</h4>
+              <ul class="footer-links">
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Help Center</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section">
+              <h4 class="footer-heading">Legal</h4>
+              <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Cookie Policy</a></li>
+                <li><a href="#">Responsible Analytics</a></li>
+                <li><a href="#">Data Protection</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="footer-bottom">
+            <div class="footer-bottom-content">
+              <p>&copy; 2025 AI Sports Edge. All rights reserved.</p>
+              <div class="footer-badges">
+                <span class="footer-badge">🔒 SSL Secured</span>
+                <span class="footer-badge">📱 iOS & Android</span>
+                <span class="footer-badge">🏆 95% Accuracy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Loading spinner while checking auth -->
+    <div
+      id="loading-spinner"
+      style="
+        display: none;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #121212;
+      "
+    >
+      <div
+        style="
+          width: 50px;
+          height: 50px;
+          border: 3px solid rgba(0, 136, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #0088ff;
+          animation: spin 1s ease-in-out infinite;
+        "
+      ></div>
+    </div>
+
+    <script>
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: 'AIzaSyDxLufbPyNYpax2MmE5ff27MHA-js9INBw',
+        authDomain: 'ai-sports-edge.firebaseapp.com',
+        projectId: 'ai-sports-edge',
+        storageBucket: 'ai-sports-edge.appspot.com',
+        messagingSenderId: '63216708515',
+        appId: '1:63216708515:web:209e6baf130386edb00816',
+      };
+
+      // Add logging
+      console.log('Firebase config:', JSON.stringify(firebaseConfig));
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      // Check authentication state
+      firebase.auth().onAuthStateChanged(user => {
+        // Hide loading spinner
+        document.getElementById('loading-spinner').style.display = 'none';
+
+        if (user) {
+          // User is signed in, show additional features
+          console.log('User is signed in:', user.email);
+          // Add any authenticated user features here
+        } else {
+          // User is not signed in, show public content
+          console.log('User is not signed in, showing public content');
+          // Content is already visible, no redirect needed
+        }
+      });
+
+      // DNS Propagation Check
+      document.addEventListener('DOMContentLoaded', function () {
+        // Check if we're on the custom domain
+        const isCustomDomain = window.location.hostname === 'aisportsedge.app';
+
+        if (!isCustomDomain) {
+          // Create DNS status banner
+          const dnsBanner = document.createElement('div');
+          dnsBanner.className = 'dns-banner';
+          dnsBanner.innerHTML =
+            '<p>⚠️ You are viewing this site on a temporary URL. DNS propagation for aisportsedge.app is in progress.</p>';
+
+          // Add banner to the top of the body
+          document.body.insertBefore(dnsBanner, document.body.firstChild);
+
+          // Add banner styles
+          const bannerStyles = document.createElement('style');
+          bannerStyles.textContent = `
       .dns-banner {
         background-color: #fff3cd;
         color: #856404;
@@ -1844,229 +2013,234 @@ document.addEventListener('DOMContentLoaded', function() {
         z-index: 1000;
       }
     `;
-    document.head.appendChild(bannerStyles);
-  }
-});
-
-// Mobile menu functionality
-document.addEventListener('DOMContentLoaded', function() {
-  // Add mobile menu toggle
-  const header = document.querySelector('.header');
-  const nav = document.querySelector('.nav');
-  
-  // Create mobile menu button
-  const mobileMenuBtn = document.createElement('button');
-  mobileMenuBtn.className = 'mobile-menu-btn';
-  mobileMenuBtn.innerHTML = '<span></span><span></span><span></span>';
-  mobileMenuBtn.setAttribute('aria-label', 'Toggle menu');
-  
-  // Add mobile menu button to header
-  header.querySelector('.header-content').insertBefore(mobileMenuBtn, nav);
-  
-  // Toggle mobile menu
-  mobileMenuBtn.addEventListener('click', function() {
-    nav.classList.toggle('active');
-    mobileMenuBtn.classList.toggle('active');
-  });
-  
-  // Add smooth scrolling to anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      
-      // Close mobile menu if open
-      nav.classList.remove('active');
-      mobileMenuBtn.classList.remove('active');
-      
-      // Scroll to target
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
+          document.head.appendChild(bannerStyles);
+        }
       });
-    });
-  });
-  
-  // Add active class to nav items based on scroll position
-  const sections = document.querySelectorAll('section[id]');
-  window.addEventListener('scroll', function() {
-    const scrollY = window.pageYOffset;
-    
-    sections.forEach(section => {
-      const sectionHeight = section.offsetHeight;
-      const sectionTop = section.offsetTop - 100;
-      const sectionId = section.getAttribute('id');
-      
-      if(scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-        document.querySelector('.nav-item a[href="#' + sectionId + '"]')?.classList.add('active');
-      } else {
-        document.querySelector('.nav-item a[href="#' + sectionId + '"]')?.classList.remove('active');
-      }
-    });
-  });
-  
-  // Add loading animation for QR code
-  const qrCode = document.querySelector('.qr-code');
-  const qrCodeImg = qrCode?.querySelector('img');
-  
-  if (qrCodeImg) {
-    qrCodeImg.addEventListener('click', function() {
-      qrCode.classList.add('loading');
-      setTimeout(() => {
-        qrCode.classList.remove('loading');
-      }, 2000);
-    });
-  }
-  
-  // Setup pricing carousel
-  setupPricingCarousel();
-});
 
-// Pricing carousel functionality
-function setupPricingCarousel() {
-  const pricingSection = document.getElementById('pricing');
-  if (!pricingSection) return;
-  
-  const pricingGrid = pricingSection.querySelector('.pricing-grid');
-  if (!pricingGrid) return;
-  
-  // Get all pricing cards
-  const pricingCards = pricingGrid.querySelectorAll('.pricing-card');
-  if (pricingCards.length < 2) return;
-  
-  // Create carousel container
-  const carouselContainer = document.createElement('div');
-  carouselContainer.className = 'carousel-container';
-  
-  // Create carousel track
-  const carouselTrack = document.createElement('div');
-  carouselTrack.className = 'carousel-track';
-  
-  // Create navigation buttons
-  const prevButton = document.createElement('button');
-  prevButton.className = 'carousel-button prev';
-  prevButton.innerHTML = '&lt;';
-  prevButton.setAttribute('aria-label', 'Previous plan');
-  
-  const nextButton = document.createElement('button');
-  nextButton.className = 'carousel-button next';
-  nextButton.innerHTML = '&gt;';
-  nextButton.setAttribute('aria-label', 'Next plan');
-  
-  // Add elements to DOM
-  carouselContainer.appendChild(prevButton);
-  carouselContainer.appendChild(carouselTrack);
-  carouselContainer.appendChild(nextButton);
-  
-  // Replace pricing grid with carousel
-  const carouselWrapper = document.createElement('div');
-  carouselWrapper.className = 'pricing-carousel';
-  carouselWrapper.appendChild(carouselContainer);
-  
-  pricingGrid.parentNode.insertBefore(carouselWrapper, pricingGrid);
-  
-  // Move pricing cards to carousel track
-  pricingCards.forEach(card => {
-    carouselTrack.appendChild(card);
-  });
-  
-  // Remove original pricing grid
-  pricingGrid.remove();
-  
-  // Set initial state
-  let currentIndex = 0;
-  const totalCards = pricingCards.length;
-  
-  // Function to update carousel display
-  function updateCarousel() {
-    pricingCards.forEach((card, index) => {
-      // Remove all classes
-      card.classList.remove('active', 'prev', 'next');
-      
-      if (index === currentIndex) {
-        card.classList.add('active');
-      } else if (index === (currentIndex - 1 + totalCards) % totalCards) {
-        card.classList.add('prev');
-      } else if (index === (currentIndex + 1) % totalCards) {
-        card.classList.add('next');
-      }
-    });
-  }
-  
-  // Initialize carousel
-  updateCarousel();
-  
-  // Add event listeners for navigation
-  prevButton.addEventListener('click', () => {
-    currentIndex = (currentIndex - 1 + totalCards) % totalCards;
-    updateCarousel();
-  });
-  
-  nextButton.addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % totalCards;
-    updateCarousel();
-  });
-  
-  // Auto-rotate every 5 seconds
-  setInterval(() => {
-    currentIndex = (currentIndex + 1) % totalCards;
-    updateCarousel();
-  }, 5000);
-}
-</script>
+      // Mobile menu functionality
+      document.addEventListener('DOMContentLoaded', function () {
+        // Add mobile menu toggle
+        const header = document.querySelector('.header');
+        const nav = document.querySelector('.nav');
 
-<!-- Enhanced Scripts -->
-<!-- Bootstrap JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- AOS Animation Library -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        // Create mobile menu button
+        const mobileMenuBtn = document.createElement('button');
+        mobileMenuBtn.className = 'mobile-menu-btn';
+        mobileMenuBtn.innerHTML = '<span></span><span></span><span></span>';
+        mobileMenuBtn.setAttribute('aria-label', 'Toggle menu');
 
-<script>
-  // Initialize AOS animations
-  AOS.init({
-    duration: 800,
-    easing: 'ease-out-cubic',
-    once: true,
-    offset: 50,
-  });
-  
-  // Enhanced mobile menu toggle
-  document.addEventListener('DOMContentLoaded', function() {
-    const mobileToggle = document.querySelector('.mobile-menu-toggle');
-    const navList = document.querySelector('.nav-list');
-    
-    if (mobileToggle && navList) {
-      mobileToggle.addEventListener('click', function() {
-        navList.classList.toggle('active');
-        this.classList.toggle('active');
-      });
-    }
-    
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
+        // Add mobile menu button to header
+        header.querySelector('.header-content').insertBefore(mobileMenuBtn, nav);
+
+        // Toggle mobile menu
+        mobileMenuBtn.addEventListener('click', function () {
+          nav.classList.toggle('active');
+          mobileMenuBtn.classList.toggle('active');
+        });
+
+        // Add smooth scrolling to anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // Close mobile menu if open
+            nav.classList.remove('active');
+            mobileMenuBtn.classList.remove('active');
+
+            // Scroll to target
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+              behavior: 'smooth',
+            });
+          });
+        });
+
+        // Add active class to nav items based on scroll position
+        const sections = document.querySelectorAll('section[id]');
+        window.addEventListener('scroll', function () {
+          const scrollY = window.pageYOffset;
+
+          sections.forEach(section => {
+            const sectionHeight = section.offsetHeight;
+            const sectionTop = section.offsetTop - 100;
+            const sectionId = section.getAttribute('id');
+
+            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+              document
+                .querySelector('.nav-item a[href="#' + sectionId + '"]')
+                ?.classList.add('active');
+            } else {
+              document
+                .querySelector('.nav-item a[href="#' + sectionId + '"]')
+                ?.classList.remove('active');
+            }
+          });
+        });
+
+        // Add loading animation for QR code
+        const qrCode = document.querySelector('.qr-code');
+        const qrCodeImg = qrCode?.querySelector('img');
+
+        if (qrCodeImg) {
+          qrCodeImg.addEventListener('click', function () {
+            qrCode.classList.add('loading');
+            setTimeout(() => {
+              qrCode.classList.remove('loading');
+            }, 2000);
           });
         }
-      });
-    });
-    
-    // Header background on scroll
-    window.addEventListener('scroll', function() {
-      const header = document.querySelector('.header');
-      if (header) {
-        if (window.scrollY > 50) {
-          header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        } else {
-          header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-        }
-      }
-    });
-  });
-</script>
 
-</body>
+        // Setup pricing carousel
+        setupPricingCarousel();
+      });
+
+      // Pricing carousel functionality
+      function setupPricingCarousel() {
+        const pricingSection = document.getElementById('pricing');
+        if (!pricingSection) return;
+
+        const pricingGrid = pricingSection.querySelector('.pricing-grid');
+        if (!pricingGrid) return;
+
+        // Get all pricing cards
+        const pricingCards = pricingGrid.querySelectorAll('.pricing-card');
+        if (pricingCards.length < 2) return;
+
+        // Create carousel container
+        const carouselContainer = document.createElement('div');
+        carouselContainer.className = 'carousel-container';
+
+        // Create carousel track
+        const carouselTrack = document.createElement('div');
+        carouselTrack.className = 'carousel-track';
+
+        // Create navigation buttons
+        const prevButton = document.createElement('button');
+        prevButton.className = 'carousel-button prev';
+        prevButton.innerHTML = '&lt;';
+        prevButton.setAttribute('aria-label', 'Previous plan');
+
+        const nextButton = document.createElement('button');
+        nextButton.className = 'carousel-button next';
+        nextButton.innerHTML = '&gt;';
+        nextButton.setAttribute('aria-label', 'Next plan');
+
+        // Add elements to DOM
+        carouselContainer.appendChild(prevButton);
+        carouselContainer.appendChild(carouselTrack);
+        carouselContainer.appendChild(nextButton);
+
+        // Replace pricing grid with carousel
+        const carouselWrapper = document.createElement('div');
+        carouselWrapper.className = 'pricing-carousel';
+        carouselWrapper.appendChild(carouselContainer);
+
+        pricingGrid.parentNode.insertBefore(carouselWrapper, pricingGrid);
+
+        // Move pricing cards to carousel track
+        pricingCards.forEach(card => {
+          carouselTrack.appendChild(card);
+        });
+
+        // Remove original pricing grid
+        pricingGrid.remove();
+
+        // Set initial state
+        let currentIndex = 0;
+        const totalCards = pricingCards.length;
+
+        // Function to update carousel display
+        function updateCarousel() {
+          pricingCards.forEach((card, index) => {
+            // Remove all classes
+            card.classList.remove('active', 'prev', 'next');
+
+            if (index === currentIndex) {
+              card.classList.add('active');
+            } else if (index === (currentIndex - 1 + totalCards) % totalCards) {
+              card.classList.add('prev');
+            } else if (index === (currentIndex + 1) % totalCards) {
+              card.classList.add('next');
+            }
+          });
+        }
+
+        // Initialize carousel
+        updateCarousel();
+
+        // Add event listeners for navigation
+        prevButton.addEventListener('click', () => {
+          currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+          updateCarousel();
+        });
+
+        nextButton.addEventListener('click', () => {
+          currentIndex = (currentIndex + 1) % totalCards;
+          updateCarousel();
+        });
+
+        // Auto-rotate every 5 seconds
+        setInterval(() => {
+          currentIndex = (currentIndex + 1) % totalCards;
+          updateCarousel();
+        }, 5000);
+      }
+    </script>
+
+    <!-- Enhanced Scripts -->
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+      // Initialize AOS animations
+      AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 50,
+      });
+
+      // Enhanced mobile menu toggle
+      document.addEventListener('DOMContentLoaded', function () {
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        const navList = document.querySelector('.nav-list');
+
+        if (mobileToggle && navList) {
+          mobileToggle.addEventListener('click', function () {
+            navList.classList.toggle('active');
+            this.classList.toggle('active');
+          });
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }
+          });
+        });
+
+        // Header background on scroll
+        window.addEventListener('scroll', function () {
+          const header = document.querySelector('.header');
+          if (header) {
+            if (window.scrollY > 50) {
+              header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            } else {
+              header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            }
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
+
+<!-- deploying correct content -->
