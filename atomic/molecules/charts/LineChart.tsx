@@ -30,19 +30,17 @@ export const LineChart = memo<LineChartProps>(
     showPoints = true,
     showLabels = true,
   }: LineChartProps) => {
-    // Handle empty data
-    if (!data || data.length === 0) {
-      return (
-        <div className={`line-chart ${className}`} style={{ height: `${height}px` }}>
-          <div className="flex items-center justify-center h-full text-gray-500">
-            No data available
-          </div>
-        </div>
-      );
-    }
-
-    // Memoize expensive calculations
+    // Memoize expensive calculations (must be before any conditional returns)
     const { sortedData, paddedMin, paddedMax, paddedRange } = useMemo(() => {
+      // Handle empty data case in the memo
+      if (!data || data.length === 0) {
+        return {
+          sortedData: [],
+          paddedMin: 0,
+          paddedMax: 1,
+          paddedRange: 1,
+        };
+      }
       // Sort data by date
       const sorted = [...data].sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -143,6 +141,17 @@ export const LineChart = memo<LineChartProps>(
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       };
     }, []);
+
+    // Handle empty data after all hooks are called
+    if (!data || data.length === 0) {
+      return (
+        <div className={`line-chart ${className}`} style={{ height: `${height}px` }}>
+          <div className="flex items-center justify-center h-full text-gray-500">
+            No data available
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`line-chart ${className}`} style={{ height: `${height}px` }}>

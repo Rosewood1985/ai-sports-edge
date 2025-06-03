@@ -1,9 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import { Game } from '../../types/odds';
-import aiPredictionService from '../../services/aiPredictionService';
-
-// Extract functions from the service
-const { loadModel, recordPredictionFeedback, generateAIPrediction } = aiPredictionService;
+import { loadModel, recordPredictionFeedback, generateAIPrediction } from '../../services/aiPredictionService';
 
 // Mock TensorFlow.js
 jest.mock('@tensorflow/tfjs', () => ({

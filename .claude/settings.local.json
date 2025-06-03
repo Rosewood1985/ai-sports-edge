@@ -69,7 +69,8 @@
       "Bash(npx expo export:*)",
       "Bash(scp:*)",
       "Bash(git pull:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(gh run list:*)"
     ],
     "deny": []
   },

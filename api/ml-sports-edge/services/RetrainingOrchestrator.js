@@ -457,6 +457,7 @@ class RetrainingOrchestrator {
       for (const game of dataset) {
         try {
           const prediction = await ModelService.predictGame(game);
+          prediction.gameData = game; // Store game data with prediction
           predictions.push(prediction);
         } catch (error) {
           logger.error(`Error predicting game ${game._id}:`, error);
@@ -465,12 +466,15 @@ class RetrainingOrchestrator {
 
       // Calculate metrics
       const spreadCorrect = predictions.filter(
-        p =>
-          p.predictions.spread.pick ===
-          (game.result.homeScore > game.result.awayScore ? 'home' : 'away')
+        p => {
+          const game = p.gameData;
+          return p.predictions.spread.pick ===
+            (game.result.homeScore > game.result.awayScore ? 'home' : 'away');
+        }
       ).length;
 
       const overUnderCorrect = predictions.filter(p => {
+        const game = p.gameData;
         const totalScore = game.result.homeScore + game.result.awayScore;
         return (
           (p.predictions.overUnder.pick === 'over' && totalScore > game.odds.closing.overUnder) ||
@@ -479,9 +483,11 @@ class RetrainingOrchestrator {
       }).length;
 
       const moneylineCorrect = predictions.filter(
-        p =>
-          p.predictions.moneyline.pick ===
-          (game.result.homeScore > game.result.awayScore ? 'home' : 'away')
+        p => {
+          const game = p.gameData;
+          return p.predictions.moneyline.pick ===
+            (game.result.homeScore > game.result.awayScore ? 'home' : 'away');
+        }
       ).length;
 
       // Calculate accuracy

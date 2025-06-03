@@ -1,10 +1,7 @@
 // Odds Conversion Utilities
 // Form Validation Utilities
 import { SPORTSBOOK_CONFIG } from '../config/sportsbook';
-import { BetLeg, BetSlip } from '../types/betting';
-
-// Analytics Calculation Utilities
-import { PerformanceMetrics } from '../types/betting';
+import { BetLeg, BetSlip, PerformanceMetrics } from '../types/betting';
 
 // OCR Text Processing Utilities
 

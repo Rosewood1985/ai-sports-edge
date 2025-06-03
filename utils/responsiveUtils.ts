@@ -7,10 +7,8 @@ import {
   TextStyle,
   ViewStyle,
   StyleSheet,
+  PixelRatio,
 } from 'react-native';
-
-// Import PixelRatio for font scaling
-import { PixelRatio } from 'react-native';
 
 // Device types with more granular categorization
 export enum DeviceType {
