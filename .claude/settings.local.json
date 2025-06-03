@@ -70,7 +70,10 @@
       "Bash(scp:*)",
       "Bash(git pull:*)",
       "Bash(git ls-tree:*)",
-      "Bash(gh run list:*)"
+      "Bash(gh run list:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm show:*)",
+      "Bash(npm update:*)"
     ],
     "deny": []
   },
