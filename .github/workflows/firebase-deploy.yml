@@ -5,8 +5,9 @@ on:
     branches: [clean-main]
     paths:
       - 'public/**'
-      - 'functions/**'
       - 'firebase.json'
+      - '.firebaserc'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -17,21 +18,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-        
-      - name: Prepare public directory
+      - name: Verify files exist
         run: |
-          mkdir -p public
-          if [ ! -f "public/index.html" ]; then
-            cp public/index.html public/index.html.bak 2>/dev/null || true
-            echo "✅ Public directory ready"
+          echo "🔍 Checking required files..."
+          ls -la public/
+          [ -f "public/index.html" ] && echo "✅ index.html found" || echo "❌ index.html missing"
+          [ -f "public/styles.css" ] && echo "✅ styles.css found" || echo "❌ styles.css missing"
+          [ -f "firebase.json" ] && echo "✅ firebase.json found" || echo "❌ firebase.json missing"
+          
+      - name: Verify neon theme in CSS
+        run: |
+          echo "🎨 Checking for neon theme..."
+          if grep -q "#00F0FF" public/styles.css; then
+            echo "✅ Neon theme (#00F0FF) found in styles.css"
+          else
+            echo "❌ Neon theme not found in styles.css"
+            echo "Current CSS colors:"
+            grep -A 3 ":root" public/styles.css | head -5
           fi
           
       - name: Deploy to Firebase
