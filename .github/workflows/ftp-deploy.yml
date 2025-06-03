@@ -2,7 +2,7 @@ name: Simple FTP Deploy
 
 on:
   push:
-    branches: [ main, master, restore-clean ]
+    branches: [ main, master, clean-main ]
 
 jobs:
   deploy:
